@@ -1,13 +1,75 @@
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Termux Website</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <h1>नमस्ते! यह मेरी Termux वेबसाइट है 🚀</h1>
-    <p>मैं अपने मोबाइल से वेबसाइट बना रहा हूँ।</p>
-</body>
-</html>	
+// script.js - Advanced JavaScript Features
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("Website loaded successfully!");
+
+    // 1. Fade-in effect for the entire page
+    let opacity = 0;
+    const fadeInInterval = setInterval(() => {
+        if (opacity >= 1) {
+            clearInterval(fadeInInterval);
+        }
+        document.body.style.opacity = opacity;
+        opacity += 0.05;
+    }, 50);
+
+    // 2. Dynamic Text Rotation
+    // सुनिश्चित करें कि आपकी index.html में एक element है जिसका id "dynamic-text" है,
+    // जैसे: <h2 id="dynamic-text"></h2>
+    const dynamicTextElement = document.getElementById('dynamic-text');
+    const phrases = [
+        "Welcome to KillerWeb!",
+        "High-level JavaScript in action!",
+        "Experience the power of modern JS!"
+    ];
+    let currentPhraseIndex = 0;
+    if (dynamicTextElement) {
+        dynamicTextElement.textContent = phrases[currentPhraseIndex];
+        setInterval(() => {
+            currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
+            dynamicTextElement.textContent = phrases[currentPhraseIndex];
+        }, 3000);
+    }
+
+    // 3. Dark Mode Toggle
+    const darkModeBtn = document.createElement('button');
+    darkModeBtn.textContent = "Toggle Dark Mode";
+    darkModeBtn.style.margin = "10px";
+    darkModeBtn.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+    });
+    document.body.appendChild(darkModeBtn);
+
+    // 4. Countdown Timer (10 seconds)
+    const countdownElement = document.createElement('div');
+    countdownElement.id = 'countdown';
+    countdownElement.style.fontSize = "20px";
+    countdownElement.style.margin = "10px";
+    document.body.appendChild(countdownElement);
+    let countdownTime = 10;
+    countdownElement.textContent = `Countdown: ${countdownTime} sec`;
+    const countdownInterval = setInterval(() => {
+        countdownTime--;
+        countdownElement.textContent = countdownTime > 0 ? `Countdown: ${countdownTime} sec` : "Time's Up!";
+        if (countdownTime <= 0) clearInterval(countdownInterval);
+    }, 1000);
+
+    // 5. Random Quote Generator Button
+    const quotes = [
+        "Believe in yourself!",
+        "The best is yet to come.",
+        "Never give up!",
+        "Stay positive and work hard!"
+    ];
+    const quoteBtn = document.createElement('button');
+    quoteBtn.textContent = "Show Random Quote";
+    quoteBtn.style.margin = "10px";
+    quoteBtn.addEventListener('click', () => {
+        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+        alert(randomQuote);
+    });
+    document.body.appendChild(quoteBtn);
+
+    // 6. Interactive Button with Animation
+    const interactiveBtn = document.createElement('button');
+    interactiveBtn.textContent = "Click Me for Action!";
