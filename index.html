@@ -1,75 +1,58 @@
-// script.js - Advanced JavaScript Features
-
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("Website loaded successfully!");
-
-    // 1. Fade-in effect for the entire page
-    let opacity = 0;
-    const fadeInInterval = setInterval(() => {
-        if (opacity >= 1) {
-            clearInterval(fadeInInterval);
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>मेरी Termux वेबसाइट 🚀</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+            transition: background-color 0.3s;
         }
-        document.body.style.opacity = opacity;
-        opacity += 0.05;
-    }, 50);
+        h1 {
+            color: #333;
+        }
+        #dynamic-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: blue;
+        }
+        button {
+            padding: 10px;
+            margin: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .dark-mode {
+            background-color: #222;
+            color: white;
+        }
+    </style>
+</head>
+<body>
 
-    // 2. Dynamic Text Rotation
-    // सुनिश्चित करें कि आपकी index.html में एक element है जिसका id "dynamic-text" है,
-    // जैसे: <h2 id="dynamic-text"></h2>
-    const dynamicTextElement = document.getElementById('dynamic-text');
-    const phrases = [
-        "Welcome to KillerWeb!",
-        "High-level JavaScript in action!",
-        "Experience the power of modern JS!"
-    ];
-    let currentPhraseIndex = 0;
-    if (dynamicTextElement) {
-        dynamicTextElement.textContent = phrases[currentPhraseIndex];
-        setInterval(() => {
-            currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
-            dynamicTextElement.textContent = phrases[currentPhraseIndex];
-        }, 3000);
-    }
+    <h1>اَلسَّلاَمْ عَلَيْــــــــــــــــــــكُمْا وَ رَحْمَةُ اللَّهِ وَبَرَكَاتُهُ! यह मेरी Termux वेबसाइट है 🚀</h1>
+    
+    <!-- Dynamic Text Rotation -->
+    <h2 id="dynamic-text"></h2>
 
-    // 3. Dark Mode Toggle
-    const darkModeBtn = document.createElement('button');
-    darkModeBtn.textContent = "Toggle Dark Mode";
-    darkModeBtn.style.margin = "10px";
-    darkModeBtn.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-    });
-    document.body.appendChild(darkModeBtn);
+    <!-- Dark Mode Toggle Button -->
+    <button id="darkModeToggle">🌙 Dark Mode</button>
 
-    // 4. Countdown Timer (10 seconds)
-    const countdownElement = document.createElement('div');
-    countdownElement.id = 'countdown';
-    countdownElement.style.fontSize = "20px";
-    countdownElement.style.margin = "10px";
-    document.body.appendChild(countdownElement);
-    let countdownTime = 10;
-    countdownElement.textContent = `Countdown: ${countdownTime} sec`;
-    const countdownInterval = setInterval(() => {
-        countdownTime--;
-        countdownElement.textContent = countdownTime > 0 ? `Countdown: ${countdownTime} sec` : "Time's Up!";
-        if (countdownTime <= 0) clearInterval(countdownInterval);
-    }, 1000);
+    <!-- Countdown Timer -->
+    <div id="countdown"></div>
 
-    // 5. Random Quote Generator Button
-    const quotes = [
-        "Believe in yourself!",
-        "The best is yet to come.",
-        "Never give up!",
-        "Stay positive and work hard!"
-    ];
-    const quoteBtn = document.createElement('button');
-    quoteBtn.textContent = "Show Random Quote";
-    quoteBtn.style.margin = "10px";
-    quoteBtn.addEventListener('click', () => {
-        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-        alert(randomQuote);
-    });
-    document.body.appendChild(quoteBtn);
+    <!-- Random Quote Button -->
+    <button id="quoteBtn">शानदार कोट्स दिखाएं</button>
 
-    // 6. Interactive Button with Animation
-    const interactiveBtn = document.createElement('button');
-    interactiveBtn.textContent = "Click Me for Action!";
+    <!-- Interactive Box -->
+    <button id="interactiveBtn">Click for Animation!</button>
+
+    <script src="script.js"></script>  <!-- यह लाइन script.js को लोड करेगी -->
+</body>
+</html>
