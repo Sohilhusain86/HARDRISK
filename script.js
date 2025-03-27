@@ -1,209 +1,143 @@
+// Advanced JavaScript Script for HARDRISK Website
+// This script provides dynamic UI features, animations, asynchronous behavior, and keyboard shortcuts.
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log("Website loaded successfully!");
 
-    // 🌟 1. Dynamic Fade-in Effect
-    let opacity = 0;
-    const fadeInInterval = setInterval(() => {
-        if (opacity >= 1) clearInterval(fadeInInterval);
-        document.body.style.opacity = opacity;
-        opacity += 0.05;
-    }, 50);
+    // =====================================================
+    // 1. Fade-In Effect for the Entire Page
+    // =====================================================
+    (function fadeInPage() {
+        let opacity = 0;
+        const fadeInterval = setInterval(() => {
+            if (opacity >= 1) {
+                clearInterval(fadeInterval);
+            }
+            document.body.style.opacity = opacity;
+            opacity += 0.05;
+        }, 50);
+    })();
 
-    // 🌟 2. Dynamic Text Rotation
-    const dynamicTextElement = document.getElementById('dynamic-text');
-    const phrases = [
-        "🚀 मेरी वेबसाइट पर आपका स्वागत है!",
-        "🌟 High-level JavaScript in action!",
-        "🎭 Experience the power of modern JS!"
-    ];
-    let currentPhraseIndex = 0;
-    setInterval(() => {
-        currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
-        dynamicTextElement.textContent = phrases[currentPhraseIndex];
-    }, 3000);
-
-    // 🌟 3. Dark Mode Toggle
-    const darkModeBtn = document.getElementById('darkModeBtn');
-    darkModeBtn.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-    });
-
-    // 🌟 4. Countdown Timer (10 seconds)
-    const countdownElement = document.getElementById('countdown');
-    let countdownTime = 10;
-    const countdownInterval = setInterval(() => {
-        countdownElement.textContent = countdownTime > 0 ? `⏳ Countdown: ${countdownTime} sec` : "🚀 Time's Up!";
-        countdownTime--;
-        if (countdownTime < 0) clearInterval(countdownInterval);
-    }, 1000);
-
-    // 🌟 5. Random Quote Generator
-    const quotes = [
-        "💡 Believe in yourself!",
-        "🚀 The best is yet to come.",
-        "🔥 Never give up!",
-        "🌟 Stay positive and work hard!"
-    ];
-    const quoteBtn = document.getElementById('quoteBtn');
-    quoteBtn.addEventListener('click', () => {
-        alert(quotes[Math.floor(Math.random() * quotes.length)]);
-    });
-
-    // 🌟 6. Interactive Button Animation
-    const animateBtn = document.getElementById('animateBtn');
-    animateBtn.addEventListener('click', () => {
-        animateBtn.style.transform = "scale(1.2)";
-        setTimeout(() => {
-            animateBtn.style.transform = "scale(1)";
-        }, 300);
-    });
-
-    // 🌟 7. Visitor Greeting Based on Time
-    const greetingElement = document.getElementById('greeting');
-    const hours = new Date().getHours();
-    if (hours < 12) {
-        greetingElement.innerHTML = "🌅 अस्सलामु अलैकुम! सुबह की मुबारकबाद! ☀️";
-    } else if (hours < 18) {
-        greetingElement.innerHTML = "🌞 अस्सलामु अलैकुम! दोपहर मुबारक! 🔥";
-    } else {
-        greetingElement.innerHTML = "🌙 अस्सलामु अलैकुम! रात मुबारक! ✨";
-    }
-
-    // 🌟 8. Scroll Animation Effect
-    window.addEventListener('scroll', () => {
-        document.body.style.backgroundColor = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
-    });
-
-    // 🌟 9. Keyboard Shortcut Feature (Press 'D' for Dark Mode)
-    document.addEventListener('keydown', (event) => {
-        if (event.key.toLowerCase() === 'd') {
-            document.body.classList.toggle('dark-mode');
-        }
-    });
-
-});
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("Website loaded successfully!");
-
-    // 1. Tab key behavior toggle using Ctrl + Shift + M
-    let tabMovesFocus = true; 
-    document.addEventListener('keydown', (event) => {
-        if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'm') {
-            tabMovesFocus = !tabMovesFocus;
-            console.log(`Tab key moves focus: ${tabMovesFocus}`);
-        }
-
-        // 2. Move to the next interactive element using Esc + Tab
-        if (event.key === "Tab" && event.altKey) {
-            event.preventDefault();
-            const focusableElements = document.querySelectorAll('button, a, input, textarea, select, [tabindex]:not([tabindex="-1"])');
-            const currentIndex = Array.from(focusableElements).indexOf(document.activeElement);
-            const nextIndex = (currentIndex + 1) % focusableElements.length;
-            focusableElements[nextIndex].focus();
-        }
-    });
-});
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("Website loaded successfully!");
-
-    // 1. Dynamic Fade-in Effect
-    let opacity = 0;
-    const fadeInInterval = setInterval(() => {
-        if (opacity >= 1) {
-            clearInterval(fadeInInterval);
-        }
-        document.body.style.opacity = opacity;
-        opacity += 0.05;
-    }, 50);
-
+    // =====================================================
     // 2. Dynamic Text Rotation
-    const dynamicTextElement = document.getElementById('dynamic-text');
+    // =====================================================
+    // Ensure that your index.html has an element with id "dynamic-text"
+    const dynamicTextEl = document.getElementById('dynamic-text');
     const phrases = [
-        "High-level JavaScript in action!",
-        "Experience the power of modern JS!"
+        "🚀 Welcome to HARDRISK!",
+        "🌟 High-level JavaScript in action!",
+        "🎭 Experience interactive magic!",
+        "💡 Creativity meets code!"
     ];
-    let currentPhraseIndex = 0;
-    if (dynamicTextElement) {
-        dynamicTextElement.textContent = phrases[currentPhraseIndex];
+    let phraseIndex = 0;
+    if (dynamicTextEl) {
+        dynamicTextEl.textContent = phrases[phraseIndex];
         setInterval(() => {
-            currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
-            dynamicTextElement.textContent = phrases[currentPhraseIndex];
+            phraseIndex = (phraseIndex + 1) % phrases.length;
+            dynamicTextEl.textContent = phrases[phraseIndex];
         }, 3000);
     }
 
-    // 3. Dark Mode Toggle
+    // =====================================================
+    // 3. Dark Mode Toggle with Persistent Storage
+    // =====================================================
+    // Ensure that index.html contains a button with id "darkModeBtn"
     const darkModeBtn = document.getElementById('darkModeBtn');
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        // Save the state in localStorage so that it persists across sessions
+        if (document.body.classList.contains('dark-mode')) {
+            localStorage.setItem('darkMode', 'enabled');
+        } else {
+            localStorage.setItem('darkMode', 'disabled');
+        }
+    }
     if (darkModeBtn) {
-        darkModeBtn.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-        });
+        darkModeBtn.addEventListener('click', toggleDarkMode);
+    }
+    // Apply dark mode based on previous setting
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
     }
 
+    // =====================================================
     // 4. Countdown Timer (10 seconds)
-    const countdownElement = document.getElementById('countdown');
-    let countdownTime = 10;
-    if (countdownElement) {
-        countdownElement.textContent = `Countdown: ${countdownTime} sec`;
+    // =====================================================
+    // Ensure index.html has an element with id "countdown"
+    const countdownEl = document.getElementById('countdown');
+    let timeLeft = 10;
+    if (countdownEl) {
+        countdownEl.textContent = `⏳ Countdown: ${timeLeft} sec`;
         const countdownInterval = setInterval(() => {
-            countdownTime--;
-            if (countdownTime > 0) {
-                countdownElement.textContent = `Countdown: ${countdownTime} sec`;
+            timeLeft--;
+            if (timeLeft > 0) {
+                countdownEl.textContent = `⏳ Countdown: ${timeLeft} sec`;
             } else {
-                countdownElement.textContent = "Time's Up!";
+                countdownEl.textContent = "🚀 Time's Up!";
                 clearInterval(countdownInterval);
             }
         }, 1000);
     }
 
-    // 5. Random Quote Generator
+    // =====================================================
+    // 5. Random Quote Generator with Asynchronous Simulation
+    // =====================================================
+    // Ensure index.html has a button with id "quoteBtn"
     const quotes = [
-        "Believe in yourself!",
-        "The best is yet to come.",
-        "Never give up!",
-        "Stay positive and work hard!"
+        "💡 Believe in yourself!",
+        "🚀 The best is yet to come.",
+        "🔥 Never give up!",
+        "🌟 Stay positive and work hard!",
+        "🎯 Success is a journey, not a destination!"
     ];
     const quoteBtn = document.getElementById('quoteBtn');
     if (quoteBtn) {
         quoteBtn.addEventListener('click', () => {
-            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-            alert(randomQuote);
+            // Simulate an asynchronous operation using a promise
+            new Promise((resolve) => {
+                setTimeout(() => {
+                    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                    resolve(randomQuote);
+                }, 200);
+            }).then((quote) => {
+                alert(`Quote: "${quote}"`);
+            }).catch((err) => {
+                console.error("Error fetching quote:", err);
+            });
         });
     }
 
+    // =====================================================
     // 6. Interactive Button Animation
+    // =====================================================
+    // Ensure index.html has a button with id "animateBtn"
     const animateBtn = document.getElementById('animateBtn');
     if (animateBtn) {
         animateBtn.addEventListener('click', () => {
+            animateBtn.style.transition = "transform 0.3s ease";
             animateBtn.style.transform = "scale(1.2)";
             setTimeout(() => {
                 animateBtn.style.transform = "scale(1)";
-                alert("Action performed!");
+                alert("🎉 Button clicked! Animation complete.");
             }, 300);
         });
     }
 
+    // =====================================================
     // 7. Visitor Greeting Based on Time
-    const greetingElement = document.getElementById('greeting');
-    if (greetingElement) {
-        const hours = new Date().getHours();
-        if (hours < 12) {
-            greetingElement.innerHTML = "Good Morning! अस्सलामु अलैकुम!";
-        } else if (hours < 18) {
-            greetingElement.innerHTML = "Good Afternoon! अस्सलामु अलैकुम!";
+    // =====================================================
+    // Ensure index.html has an element with id "greeting"
+    const greetingEl = document.getElementById('greeting');
+    if (greetingEl) {
+        const currentHour = new Date().getHours();
+        if (currentHour < 12) {
+            greetingEl.innerHTML = "🌅 Good Morning! अस्सलामु अलैकुम!";
+        } else if (currentHour < 18) {
+            greetingEl.innerHTML = "🌞 Good Afternoon! अस्सलामु अलैकुम!";
         } else {
-            greetingElement.innerHTML = "Good Evening! अस्सलामु अलैकुम!";
+            greetingEl.innerHTML = "🌙 Good Evening! अस्सलामु अलैकुम!";
         }
     }
 
-    // 8. Scroll Animation Effect - Random Background Color on Scroll
-    window.addEventListener('scroll', () => {4
-        document.body.style.backgroundColor = `rgb(${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)})`;
-    });
-
-    // 9. Keyboard Shortcut Feature (Press 'd' for Dark Mode Toggle)
-    document.addEventListener('keydown', (event) => {
-        if (event.key.toLowerCase() === 'd') {
-            document.body.classList.toggle('dark-mode');
-        }
-    });
-});
+    // =====================================================
+    // 8
