@@ -5,10 +5,28 @@ document.getElementById("darkModeBtn").addEventListener("click", function() {
 
 // 2. Random Quote Generator
 const quotes = [
-    "Stay strong, stay positive!",
-    "The best way to predict the future is to create it.",
-    "Believe in yourself and all that you are!",
-    "Success is not final, failure is not fatal."
+    "اَلسَّلاَمْ عَلَيْــــــــــــــــــــكُمْا وَ رَحْمَةُ اللَّهِ وَبَرَكَاتُهُ",
+    "اللہ پر بھروسہ:
+"اور جو اللہ پر بھروسہ کرے تو وہ اسے کافی ہے۔"
+(سورۃ الطلاق: 3).",
+    "اللہ کی رحمت:
+"بیشک اللہ کی رحمت نیکی والوں کے قریب ہے۔"
+(سورۃ الاعراف: 56)",
+    "صبر کی فضیلت:
+"بیشک اللہ صبر والوں کے ساتھ ہے۔"
+(سورۃ البقرہ: 153)."
+    "دلوں کا سکون:
+"سن لو! اللہ ہی کے ذکر سے دلوں کو چین ملتا ہے۔"
+(سورۃ الرعد: 28)."
+    "اللہ کی مدد:
+"اور مدد نہیں مگر اللہ کی طرف سے۔"
+(سورۃ الانفال: 10)."
+    "دنیا کی حقیقت:
+"اور دنیا کی زندگی تو نہیں مگر کھیل کود اور بیشک پچھلا گھر (آخرت) ہی اصل زندگی ہے۔"
+(سورۃ العنکبوت: 64)."
+    "استغفار کی برکت:
+"اور اپنے رب سے بخشش مانگو پھر اس کی طرف رجوع کرو، بیشک میرا رب مہربان محبت والا ہے۔"
+(سورۃ ہود: 90)."
 ];
 document.getElementById("quoteBtn").addEventListener("click", function() {
     alert(quotes[Math.floor(Math.random() * quotes.length)]);
@@ -29,7 +47,7 @@ function startCountdown() {
         }
     }, 1000);
 }
-startCountdown();
+startCountdown(5);const 
 
 // 4. Animation Trigger
 document.getElementById("animateBtn").addEventListener("click", function() {
