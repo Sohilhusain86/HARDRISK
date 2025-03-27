@@ -82,12 +82,65 @@
 
         <!-- Interactive Button Animation -->
         <button id="animateBtn">Click for Animation!</button>
-
-        <!-- Scroll Effect -->
-        <p>Scroll down to see the random background effect.</p>
         
         <!-- Animated Box -->
         <div class="animated-box"></div>
+        // =============================================
+// 10. Matrix Rain Effect (Advanced Background Animation)
+// =============================================
+function startMatrixRain() {
+    // Create a full-screen canvas element and append it as the background
+    const canvas = document.createElement('canvas');
+    canvas.id = "matrixRain";
+    canvas.style.position = "fixed";
+    canvas.style.top = "0";
+    canvas.style.left = "0";
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    canvas.style.zIndex = "-1"; // behind all other content
+    document.body.appendChild(canvas);
+
+    const ctx = canvas.getContext('2d');
+    // Set canvas dimensions equal to window size
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Characters to display
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%";
+    const lettersArray = letters.split("");
+    const fontSize = 16;
+    const columns = Math.floor(canvas.width / fontSize);
+
+    // Initialize drops array: one drop per column
+    const drops = Array(columns).fill(0);
+
+    function draw() {
+        // Fill the canvas with a translucent black background to create trail effect
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Set text color and font
+        ctx.fillStyle = "#0F0"; // bright green
+        ctx.font = fontSize + "px monospace";
+
+        // Draw a random letter at each drop's position
+        for (let i = 0; i < columns; i++) {
+            const text = lettersArray[Math.floor(Math.random() * lettersArray.length)];
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+            // Reset drop to top randomly after reaching bottom
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+            drops[i]++;
+        }
+    }
+
+    setInterval(draw, 33);
+}
+
+// Start the Matrix Rain Effect
+startMatrixRain();
 
         <!-- Form for Additional Interactions -->
         <form id="contactForm">
