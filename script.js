@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Advanced Countdown Timer
   function updateCountdown() {
     // लक्ष्य तिथि सेट करें (उदाहरण: 21 अप्रैल 2025, ईद की तारीख)
-    const targetDate = new Date("2025-04-21T00:00:00").getTime();
+    const targetDate = new Date("2025-04-2T00:00:00").getTime();
     const now = Date.now();
     const distance = targetDate - now;
 
