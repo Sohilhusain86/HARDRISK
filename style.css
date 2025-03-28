@@ -1,70 +1,147 @@
-/* बॉडी के लिए थोड़ी ट्रांसपेरेंसी और बैकग्राउंड इफेक्ट */
+/* Global Resets */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Global Font & Body Styles */
 body {
   font-family: 'Noto Nastaliq Urdu', serif;
   line-height: 1.8;
-  background: #000 url('https://www.toptal.com/designers/subtlepatterns/uploads/arabesque.png') repeat;
-  background-size: 400px 400px; /* अगर ज़रूरत हो तो बदलें */
+  background-color: #f8f9fa;
+  color: #333;
   margin: 0;
   padding: 20px;
   text-align: center;
-  color: #fff; /* डार्क बैकग्राउंड पर सफ़ेद टेक्स्ट */
   overflow-x: hidden;
 }
 
-/* मेन-कंटेनर को थोड़ी और ट्रांसपेरेंसी */
+/* Particles.js Background */
+#particles-js {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  z-index: -1;
+}
+
+/* Header & Navigation */
+header {
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+  margin-bottom: 30px;
+  animation: slideDown 1s ease-out;
+}
+header h1 {
+  font-size: 36px;
+  color: #FFD700;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  margin: 0;
+}
+nav {
+  margin-top: 15px;
+}
+nav a {
+  font-size: 20px;
+  color: #fff;
+  text-decoration: none;
+  margin: 0 15px;
+  transition: color 0.3s;
+}
+nav a:hover {
+  color: #FFD700;
+}
+@keyframes slideDown {
+  from { transform: translateY(-30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Main Container */
 .container {
   max-width: 900px;
-  margin: 30px auto;
+  margin: 20px auto;
   padding: 30px;
-  background: rgba(255, 255, 255, 0.1); /* हल्की पारदर्शिता */
+  background: rgba(0, 0, 0, 0.55);
   border: 10px solid gold;
   border-radius: 15px;
-  box-shadow: 0 0 25px rgba(255,215,0,0.4);
+  box-shadow: 0 0 25px rgba(255,215,0,0.7);
   text-align: justify;
   animation: fadeIn 1.5s ease-in-out;
 }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
+/* Headings & Text */
+h1, h2 {
+  color: #008000;
+}
 h1 {
   font-size: 36px;
-  margin-bottom: 15px;
-  color: #FFD700; 
-  text-shadow: 0 0 10px rgba(255,255,255,0.5);
+  margin-bottom: 10px;
+  text-shadow: 0 0 15px rgba(255,255,255,0.8);
 }
-
-/* सेक्शन टाइटल */
 h2 {
-  font-size: 28px;
+  font-size: 30px;
   color: #FFD700;
   margin: 20px 0 10px;
-  text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+}
+p {
+  font-size: 18px;
+  line-height: 1.8;
+  margin: 15px 0;
+  text-align: justify;
+}
+.highlight {
+  color: #d9534f;
+  font-weight: bold;
 }
 
-/* आर्टिकल ब्लॉक */
-article {
-  background: rgba(255, 255, 255, 0.1);
-  margin: 20px 0;
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(255,255,255,0.2);
+/* Lists */
+ul, ol {
+  margin: 10px 0 0 20px;
+  text-align: left;
+}
+ul li, ol li {
+  margin-bottom: 10px;
 }
 
-/* बटन */
+/* Buttons */
 .btn {
   display: inline-block;
-  padding: 12px 28px;
-  margin: 15px 10px;
+  padding: 14px 30px;
+  font-size: 20px;
+  font-weight: bold;
   background: #FFD700;
   color: #333;
   text-decoration: none;
-  font-size: 20px;
-  font-weight: bold;
-  border-radius: 8px;
+  border-radius: 6px;
   transition: transform 0.3s, background 0.3s;
+  margin: 10px;
   box-shadow: 0px 4px 10px rgba(255,215,0,0.6);
 }
 .btn:hover {
   background: #FFC107;
   transform: scale(1.05);
+}
+
+/* Social Media Icons */
+.social-icons a {
+  display: inline-block;
+  margin: 5px;
+  font-size: 28px;
+  color: white;
+  transition: transform 0.3s, color 0.3s;
+}
+.social-icons a:hover {
+  color: #FFD700;
+  transform: scale(1.2);
 }
 
 /* Footer */
@@ -76,20 +153,10 @@ footer {
   margin-top: 30px;
   font-size: 16px;
 }
-.social-icons a {
-  margin: 0 10px;
-  font-size: 28px;
-  color: #fff;
-  transition: transform 0.3s, color 0.3s;
-}
-.social-icons a:hover {
-  color: #FFD700;
-  transform: scale(1.2);
-}
 
-/* Responsive */
+/* Responsive Design */
 @media (max-width: 768px) {
-  h1 {
+  header h1 {
     font-size: 28px;
   }
   .btn {
@@ -97,9 +164,9 @@ footer {
     padding: 10px 20px;
   }
   h2 {
-    font-size: 22px;
+    font-size: 24px;
   }
-  p, article p {
+  p {
     font-size: 16px;
   }
 }
