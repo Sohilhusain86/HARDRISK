@@ -3,123 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>عید الفطر - معلومات</title>
+    <meta name="description" content="عید الفطر کے بارے میں تفصیلی مضمون اور اسلامی معلومات۔">
+    <meta property="og:title" content="عید الفطر - اسلامی معلومات">
+    <meta property="og:description" content="عید الفطر کی اہمیت، فضائل اور احکام کے بارے میں تفصیلات۔">
+    <meta property="og:image" content="eid-banner.jpg">
+    <meta property="og:url" content="https://yourwebsite.com/eid">
+    <title>عید الفطر - اسلامی معلومات</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap');
-
+        /* General Styles */
         body {
             font-family: 'Noto Nastaliq Urdu', serif;
-            text-align: center;
             direction: rtl;
-            background: linear-gradient(to right, #ffecd2, #fcb69f);
+            text-align: center;
+            background: linear-gradient(to right, #002147, #006D77);
+            color: white;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            overflow-x: hidden;
         }
 
-        .welcome-box {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            display: inline-block;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 2s ease-in-out;
+        /* Preloader */
+        #preloader {
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            background: black url('loader.gif') no-repeat center center;
+            background-size: 100px;
+            z-index: 100;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 700px;
+            margin: 80px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
         }
 
         h1 {
-            color: green;
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.8);
+        }
+
+        .countdown {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .buttons {
             margin-top: 20px;
         }
 
-        .lang-btn {
+        .btn {
             display: inline-block;
-            padding: 10px 20px;
-            font-size: 18px;
-            color: white;
-            background: #28a745;
+            padding: 14px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            background: #FFD700;
+            color: #333;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 6px;
             transition: 0.3s;
             margin: 10px;
+            box-shadow: 0px 4px 10px rgba(255, 215, 0, 0.6);
         }
 
-        .lang-btn:hover {
-            background: #218838;
+        .btn:hover {
+            background: #FFC107;
+            transform: scale(1.1);
         }
 
-        .about-me, .input-section {
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        /* Social Icons */
+        .social-icons {
             margin-top: 20px;
-            text-align: center;
-            animation: slideIn 1.5s ease-in-out;
         }
 
-        textarea {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        button {
-            background: green;
+        .social-icons a {
+            display: inline-block;
+            margin: 5px;
+            font-size: 24px;
             color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 18px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-top: 10px;
             transition: 0.3s;
         }
 
-        button:hover {
-            background: darkgreen;
+        .social-icons a:hover {
+            color: #FFD700;
+            transform: scale(1.2);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        /* Scroll Animation */
+        .animate {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
         }
 
-        @keyframes slideIn {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .animate.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 28px;
+            }
+            .btn {
+                font-size: 18px;
+                padding: 10px 20px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="welcome-box">
-        <h1>✨ ( ईद-उल-फ़ित्र के बारे में जानकारी  عید الفطر کے بارے میں معلومات ✨</h1>
-        <p>(आप अपनी पसंदीदा भाषा में जानकारी प्राप्त कर सकते हैं। )آپ اپنی پسندیدہ زبان میں معلومات حاصل کر سکتے ہیں:</p>
+<!-- Preloader -->
+<div id="preloader"></div>
+
+<!-- Main Content -->
+<div class="container">
+    <h1 class="animate">✨ عید الفطر مبارک ✨</h1>
+    <p class="animate">الٹی گنتی: <span id="countdown" class="countdown"></span></p>
+    
+    <div class="buttons animate">
+        <a href="eid-urdu.html" class="btn">📖 اردو میں پڑھیں</a>
+        <a href="eid-hindi.html" class="btn">📖 हिंदी में पढ़ें</a>
     </div>
 
-    <div class="buttons">
-        <a href="urdu.html" class="lang-btn">📖 اردو میں پڑھیں</a>
-        <a href="hindi.html" class="lang-btn">📖 हिंदी में पढ़ें</a>
+    <!-- Social Media Icons -->
+    <div class="social-icons animate">
+        <p>ہمیں سوشل میڈیا پر فالو کریں:</p>
+        <a href="#"><i class="fab fa-facebook"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
     </div>
+</div>
 
-    <div class="about-me">
-        <h2>🔹 (मेरे बारे में) میرے بارے میں</h2>
-        <p>السلام علیکم، میں سہیل حسین ہوں، اور یہ میری ویب سائٹ ہے جس میں اسلامی مضامین اور معلومات شامل ہیں۔ میرا مقصد لوگوں کو مستند دینی معلومات فراہم کرنا ہے(अस्सलामु अलैकुम, मैं सोहेल हुसैन हूं, और यह मेरी वेबसाइट है जिसमें इस्लामी लेख और जानकारी हैं। मेरा लक्ष्य लोगों को प्रामाणिक धार्मिक जानकारी उपलब्ध कराना है। )۔</p>
-    </div>
+<script>
+    // Preloader
+    window.onload = function() {
+        document.getElementById("preloader").style.display = "none";
+    };
 
-    <div class="input-section">
-        <h2>💬 (अपनी राय दें) اپنی رائے دیں</h2>
-        <textarea placeholder="یہاں اپنی رائے لکھیں..." rows="5"></textarea>
-        <br>
-        <button>جمع کرائیں</button>
-    </div>
+    // Countdown Timer
+    function updateCountdown() {
+        const eidDate = new Date('2025-04-21T00:00:00').getTime();
+        const now = new Date().getTime();
+        const diff = eidDate - now;
 
+        if (diff > 0) {
+            let days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            let hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            document.getElementById("countdown").innerHTML = `${days} دن ${hours} گھنٹے ${minutes} منٹ ${seconds} سیکنڈ`;
+        } else {
+            document.getElementById("countdown").innerHTML = "عید مبارک! 🎉";
+        }
+    }
+
+    setInterval(updateCountdown, 1000);
+
+    // Scroll Animations
+    const elements = document.querySelectorAll(".animate");
+    window.addEventListener("scroll", function() {
+        elements.forEach(el => {
+            if (el.getBoundingClientRect().top < window.innerHeight - 100) {
+                el.classList.add("show");
+            }
+        });
+    });
+
+</script>
 </body>
 </html>
