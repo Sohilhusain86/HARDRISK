@@ -3,12 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>عید الفطر</title>
+    <title>عید الفطر - معلومات</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap');
+
+        body {
+            font-family: 'Noto Nastaliq Urdu', serif;
+            text-align: center;
+            direction: rtl;
+            background: linear-gradient(to right, #ffecd2, #fcb69f);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .welcome-box {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        h1 {
+            color: green;
+        }
+
+        .buttons {
+            margin-top: 20px;
+        }
+
+        .lang-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            background: #28a745;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: 0.3s;
+            margin: 10px;
+        }
+
+        .lang-btn:hover {
+            background: #218838;
+        }
+
+        .about-me, .input-section {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            text-align: center;
+            animation: slideIn 1.5s ease-in-out;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background: green;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: darkgreen;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
 </head>
 <body>
-    <h1>عید الفطر کے بارے میں معلومات</h1>
-    <a href="eid-urdu.html">اردو میں پڑھیں</a> |
-    <a href="eid-hindi.html">हिंदी में पढ़ें</a>
+
+    <div class="welcome-box">
+        <h1>✨ عید الفطر کے بارے میں معلومات ✨</h1>
+        <p>آپ اپنی پسندیدہ زبان میں معلومات حاصل کر سکتے ہیں:</p>
+    </div>
+
+    <div class="buttons">
+        <a href="urdu.html" class="lang-btn">📖 اردو میں پڑھیں</a>
+        <a href="hindi.html" class="lang-btn">📖 हिंदी में पढ़ें</a>
+    </div>
+
+    <div class="about-me">
+        <h2>🔹 میرے بارے میں</h2>
+        <p>السلام علیکم، میں [آپ کا نام] ہوں، اور یہ میری ویب سائٹ ہے جس میں اسلامی مضامین اور معلومات شامل ہیں۔ میرا مقصد لوگوں کو مستند دینی معلومات فراہم کرنا ہے۔</p>
+    </div>
+
+    <div class="input-section">
+        <h2>💬 اپنی رائے دیں</h2>
+        <textarea placeholder="یہاں اپنی رائے لکھیں..." rows="5"></textarea>
+        <br>
+        <button>جمع کرائیں</button>
+    </div>
+
 </body>
 </html>
