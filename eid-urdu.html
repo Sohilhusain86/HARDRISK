@@ -1,162 +1,251 @@
 <!DOCTYPE html>
 <html lang="ur">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="عید الفطر کی فضیلت، احکام، اور مکمل اسلامی رہنمائی">
-    <meta property="og:title" content="عید الفطر - مکمل اسلامی معلومات">
-    <meta property="og:description" content="عید الفطر کی شرعی حیثیت، احکام، مسنون اعمال، اور اسلامی ہدایات">
-    <meta property="og:image" content="eid-urdu-banner.jpg">
-    <meta property="og:url" content="https://yourwebsite.com/eid-urdu">
-    <title>عید الفطر - اسلامی معلومات</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <style>
-        /* General Styles */
-        body {
-            font-family: 'Noto Nastaliq Urdu', serif;
-            direction: rtl;
-            text-align: center;
-            background: url('eid-background.jpg') no-repeat center center/cover;
-            color: white;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
-
-        header {
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            box-shadow: 0px 4px 8px rgba(255, 215, 0, 0.6);
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 30px auto;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-        }
-
-        h1 {
-            font-size: 36px;
-            text-shadow: 0px 0px 15px rgba(255, 255, 255, 0.8);
-        }
-
-        .content {
-            text-align: justify;
-            font-size: 20px;
-            line-height: 1.8;
-            padding: 10px;
-        }
-
-        .countdown {
-            font-size: 22px;
-            font-weight: bold;
-            margin: 20px 0;
-            padding: 12px;
-            border-radius: 8px;
-            background: rgba(255, 215, 0, 0.3);
-            color: black;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 14px 30px;
-            font-size: 20px;
-            font-weight: bold;
-            background: #FFD700;
-            color: #333;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: 0.3s;
-            margin: 10px;
-            box-shadow: 0px 4px 10px rgba(255, 215, 0, 0.6);
-        }
-
-        .btn:hover {
-            background: #FFC107;
-            transform: scale(1.1);
-        }
-
-        .social-icons a {
-            font-size: 24px;
-            color: white;
-            transition: 0.3s;
-        }
-
-        .social-icons a:hover {
-            color: #FFD700;
-            transform: scale(1.2);
-        }
-
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="عید الفطر کی شرعی معلومات، فضیلتیں اور احکام – حنفی مسلک کی روشنی میں">
+  <meta property="og:title" content="عید الفطر - مکمل اسلامی معلومات">
+  <meta property="og:description" content="عید الفطر کے شرعی احکام، فضیلتیں اور مسنون اعمال کی تفصیلی رہنمائی">
+  <meta property="og:image" content="eid-urdu-banner.jpg">
+  <meta property="og:url" content="https://yourwebsite.com/urdu.html">
+  <title>عید الفطر - اسلامی معلومات (حنفی مسلک)</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- گوگل اردو فونٹ -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">
+  <!-- FontAwesome for Icons -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    /* عمومی اسٹائلز */
+    body {
+      font-family: 'Noto Nastaliq Urdu', serif;
+      direction: rtl;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background: url('https://www.toptal.com/designers/subtlepatterns/uploads/arabesque.png') repeat;
+      background-color: #f8f3e5;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    
+    /* بیک گراؤنڈ اینیمیشن (Particles.js) */
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: -1;
+    }
+    
+    /* ہیڈر */
+    header {
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+      margin-bottom: 30px;
+    }
+    header h1 {
+      font-size: 36px;
+      margin: 0;
+      color: #FFD700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      animation: slideDown 1s ease-out;
+    }
+    nav {
+      margin-top: 15px;
+    }
+    nav a {
+      font-size: 20px;
+      color: #fff;
+      text-decoration: none;
+      margin: 0 15px;
+      transition: color 0.3s;
+    }
+    nav a:hover {
+      color: #FFD700;
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    /* مین کنٹینر */
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 30px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 10px solid gold;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+      text-align: justify;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    /* سیکشن ہیڈنگز */
+    h2 {
+      font-size: 30px;
+      color: #FFD700;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+    }
+    
+    /* مضامین */
+    article {
+      background: rgba(255, 255, 255, 0.1);
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+    article h3 {
+      font-size: 26px;
+      color: #FFD700;
+      margin-bottom: 10px;
+    }
+    article p, article li {
+      font-size: 20px;
+      line-height: 1.8;
+    }
+    article ul, article ol {
+      margin: 10px 0 0 20px;
+    }
+    
+    /* بٹن اسٹائل */
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      margin: 15px 10px;
+      background: #FFD700;
+      color: #333;
+      text-decoration: none;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 8px;
+      transition: transform 0.3s, background 0.3s;
+    }
+    .btn:hover {
+      background: #FFC107;
+      transform: scale(1.05);
+    }
+    
+    /* فوٹر */
+    footer {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      text-align: center;
+      color: #fff;
+      margin-top: 30px;
+      font-size: 16px;
+    }
+    .social-icons a {
+      margin: 0 10px;
+      font-size: 28px;
+      color: #fff;
+      transition: transform 0.3s, color 0.3s;
+    }
+    .social-icons a:hover {
+      color: #FFD700;
+      transform: scale(1.2);
+    }
+  </style>
 </head>
 <body>
 
-<header>🌙 عید الفطر - اسلامی معلومات</header>
+  <!-- Particles.js بیک گراؤنڈ اینیمیشن -->
+  <div id="particles-js"></div>
 
-<div class="container">
-    <h1>✨ عید الفطر کی فضیلت ✨</h1>
-    
-    <p class="countdown">عید تک باقی وقت: <span id="countdown"></span></p>
-    
-    <div class="content">
-        <h2>📖 عید الفطر کا قرآنی ذکر</h2>
-        <p>اللہ تعالیٰ نے قرآن کریم میں ارشاد فرمایا:</p>
-        <blockquote>شَهْرُ رَمَضَانَ الَّذِي أُنزِلَ فِيهِ الْقُرْآنُ (البقرة: 185)</blockquote>
-        <p>یہ وہ مہینہ ہے جس میں قرآن نازل کیا گیا، اور رمضان کے روزوں کے بعد عید الفطر خوشی اور شکر کا دن ہے۔</p>
-        
-        <h2>📜 عید الفطر کی احادیث</h2>
-        <p>رسول اللہ ﷺ نے فرمایا:</p>
-        <blockquote>صُوْمُوْا لِرُؤْيَتِهِ وَأَفْطِرُوا لِرُؤْيَتِهِ (بخاری)</blockquote>
-        <p>چاند دیکھ کر روزہ رکھو اور چاند دیکھ کر افطار کرو (یعنی عید مناؤ)۔</p>
+  <!-- ہیڈر -->
+  <header>
+    <h1>🌙 عید الفطر - مکمل اسلامی معلومات</h1>
+    <nav>
+      <a href="index.html"><i class="fas fa-home"></i> ہوم پیج</a>
+      <a href="eid-hindi.html"><i class="fas fa-book"></i> हिंदी में पढ़ें</a>
+    </nav>
+  </header>
 
-        <h2>🕌 عید کے مسنون اعمال</h2>
-        <ul>
-            <li>عید کی نماز کے لیے جانا</li>
-            <li>غسل کرنا، خوشبو لگانا، اور اچھے کپڑے پہننا</li>
-            <li>عید کے دن صدقہ فطر ادا کرنا</li>
-            <li>راستہ بدل کر واپس آنا</li>
-            <li>عید کے موقع پر تکبیرات پڑھنا</li>
-        </ul>
+  <!-- مین کنٹینر -->
+  <div class="container">
+    <article>
+      <h3>1. عید الفطر کی نماز</h3>
+      <p>
+        عید کی نماز سورج کے بلند ہونے کے بعد اور زوال سے پہلے ادا کی جاتی ہے۔ حدیث مبارکہ میں بیان ہوا:
+        <strong>"صَلَاةُ الْعِيدَيْنِ بَعْدَ طُلُوعِ الشَّمْسِ وَقَبْلَ الزَّوَالِ"</strong> (بخاری، مسلم)۔
+      </p>
+    </article>
 
-        <h2>💰 صدقہ فطر کی مقدار</h2>
-        <p>صدقہ فطر ہر مسلمان پر واجب ہے جو صاحب استطاعت ہو۔ حضرت ابن عباسؓ سے مروی ہے:</p>
-        <blockquote>فَرَضَ رَسُوْلُ اللّٰهِ زَكَاةَ الْفِطْرِ طُهْرَةً لِلصَّائِمِ (ابو داؤد)</blockquote>
-        <p>صدقہ فطر روزے دار کی طہارت کے لیے واجب کیا گیا ہے۔</p>
+    <article>
+      <h3>2. صدقہ فطر</h3>
+      <p>
+        عید کی نماز سے پہلے صدقہ فطر دینا ہر صاحب استطاعت مسلمان پر واجب ہے تاکہ غریب و محتاج بھی عید کی خوشیوں میں شریک ہو سکیں۔ حدیث میں فرمایا:
+        <strong>"فَرَضَ رَسُولُ اللَّهِ صَدَقَةَ الْفِطْرِ"</strong> (ابو داؤد)۔
+      </p>
+    </article>
 
-        <h2>🎉 عید کی خوشیاں</h2>
-        <p>عید صرف خوشی کا دن نہیں بلکہ اللہ کی نعمتوں کا شکر ادا کرنے کا موقع بھی ہے۔ ہمیں اس موقع پر غریبوں کا خیال رکھنا چاہیے اور ہر ایک کے ساتھ محبت اور اخوت کا مظاہرہ کرنا چاہیے۔</p>
-    </div>
-    
-    <div class="buttons">
-        <a href="index.html" class="btn">🏠 ہوم پیج</a>
-        <a href="eid-hindi.html" class="btn">📖 हिंदी में पढ़ें</a>
-    </div>
+    <article>
+      <h3>3. عید کے مستحب اعمال</h3>
+      <ul>
+        <li>غسل کرنا اور صاف ستھرے کپڑے پہننا</li>
+        <li>خوشبو لگانا اور مہمان نوازی</li>
+        <li>عیدگاہ پیدل جانا اور تکبیرات پڑھنا</li>
+        <li>اسلامی بھائی چارے اور محبت کا اظہار</li>
+      </ul>
+    </article>
 
+    <article>
+      <h3>4. عید کی نماز کا طریقہ (حنفی مسلک)</h3>
+      <ol>
+        <li>پہلی رکعت میں ثنا پڑھنے کے بعد تین زائد تکبیریں کہی جاتی ہیں، پھر چوتھی تکبیر پر رکوع کیا جاتا ہے۔</li>
+        <li>دوسری رکعت میں قرأت کے بعد تین زائد تکبیریں اور چوتھی تکبیر پر رکوع کیا جاتا ہے۔</li>
+      </ol>
+    </article>
+
+    <article>
+      <h3>5. خواتین اور عید</h3>
+      <p>
+        حنفی فقہ کے مطابق، خواتین کے لیے عید کی نماز مستحب ہے۔ اگرچہ گھر بیٹھ کر بھی عید کا پیغام سننا جائز ہے اور روحانی فوائد حاصل کیے جا سکتے ہیں۔
+      </p>
+    </article>
+
+    <article>
+      <h3>6. عید کی خوشیوں اور ممنوعات</h3>
+      <p>
+        عید صرف خوشی کا دن نہیں بلکہ اللہ کی نعمتوں کا شکر ادا کرنے اور اجتماعی بھائی چارے کو فروغ دینے کا موقع ہے۔ غیر شرعی سرگرمیوں جیسے موسیقی، فضول خرچی اور بے پردگی سے پرہیز ضروری ہے۔ بہترین مبارکباد کے الفاظ: <strong>تقبل اللہ منا ومنکم</strong>۔
+      </p>
+    </article>
+  </div>
+
+  <!-- فوٹر -->
+  <footer>
+    <p>&copy; 2025 اسلامی ویب سائٹ | تمام حقوق محفوظ ہیں</p>
     <div class="social-icons">
-        <p>ہمیں سوشل میڈیا پر فالو کریں:</p>
-        <a href="#"><i class="fab fa-facebook"></i></a>
-        <a href="#"><i class="fab fa-twitter"></i></a>
-        <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#"><i class="fab fa-facebook"></i></a>
+      <a href="#"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
     </div>
-</div>
+  </footer>
 
-<script>
-    function updateCountdown() {
-        const eidDate = new Date('2025-04-21T00:00:00').getTime();
-        const now = new Date().getTime();
-        const diff = eidDate - now;
-        document.getElementById("countdown").innerHTML = Math.floor(diff / (1000 * 60 * 60 * 24)) + " دن";
-    }
-    setInterval(updateCountdown, 1000);
-</script>
-
+  <!-- Particles.js اینیمیشن -->
+  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+  <script>
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 50 },
+        shape: { type: "circle" },
+        size: { value: 3 },
+        move: { speed: 2 }
+      },
+      interactivity: {
+        events: { onhover: { enable: true, mode: "repulse" } }
+      }
+    });
+  </script>
 </body>
 </html>
