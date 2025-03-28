@@ -14,22 +14,18 @@
     opacity: 0;
     animation: fadeInOut 5s ease-in-out forwards;
 }
-<script src="https://cdn.jsdelivr.net/npm/particles.js"
-  particlesJS("particles-js", {
-    particles: {
-      number: { value: 50 },
-      size: { value: 3 }
-    },
-    interactivity: {
-      events: { onhover: { enable: true, mode: "repulse" } }
-    }
-  });
-</script>
-<div id="particles-js"></div>
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; visibility: hidden; }
+}
+
+/* Particles.js Background */
 #particles-js {
     position: fixed;
     width: 100%;
     height: 100%;
-    background: #000; /* Black Background */
+    background: black; /* Black Background */
     z-index: -1;
 }
