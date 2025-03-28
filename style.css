@@ -1,119 +1,172 @@
-/* =============== Global Styles =============== */
+/* Global Resets */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Noto Naskh Arabic', serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+/* Global Font & Body Styles */
 body {
-    background-color: #f8f9fa;
-    color: #333;
-    line-height: 1.8;
+  font-family: 'Noto Nastaliq Urdu', serif;
+  line-height: 1.8;
+  background-color: #f8f9fa;
+  color: #333;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+  overflow-x: hidden;
 }
 
-/* =============== Header Design =============== */
-.header {
-    background: linear-gradient(120deg, #006400, #228B22);
-    color: white;
-    text-align: center;
-    padding: 20px 10px;
-    font-size: 28px;
-    font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+/* Particles.js Background */
+#particles-js {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  z-index: -1;
 }
 
-/* =============== Main Content =============== */
+/* Header & Navigation */
+header {
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+  margin-bottom: 30px;
+  animation: slideDown 1s ease-out;
+}
+header h1 {
+  font-size: 36px;
+  color: #FFD700;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  margin: 0;
+}
+nav {
+  margin-top: 15px;
+}
+nav a {
+  font-size: 20px;
+  color: #fff;
+  text-decoration: none;
+  margin: 0 15px;
+  transition: color 0.3s;
+}
+nav a:hover {
+  color: #FFD700;
+}
+@keyframes slideDown {
+  from { transform: translateY(-30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Main Container */
 .container {
-    max-width: 1100px;
-    margin: auto;
-    padding: 20px;
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 30px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 10px solid gold;
+  border-radius: 15px;
+  box-shadow: 0 0 25px rgba(255,215,0,0.7);
+  text-align: justify;
+  animation: fadeIn 1.5s ease-in-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-/* Section Titles */
-.section-title {
-    color: #006400;
-    font-size: 24px;
-    font-weight: bold;
-    border-bottom: 3px solid #228B22;
-    padding-bottom: 5px;
-    margin-bottom: 20px;
+/* Headings & Text */
+h1, h2 {
+  color: #008000;
+}
+h1 {
+  font-size: 36px;
+  margin-bottom: 10px;
+  text-shadow: 0 0 15px rgba(255,255,255,0.8);
+}
+h2 {
+  font-size: 30px;
+  color: #FFD700;
+  margin: 20px 0 10px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+}
+p {
+  font-size: 18px;
+  line-height: 1.8;
+  margin: 15px 0;
+  text-align: justify;
+}
+.highlight {
+  color: #d9534f;
+  font-weight: bold;
 }
 
-/* Eid Greeting */
-.eid-greeting {
-    text-align: center;
-    font-size: 26px;
-    font-weight: bold;
-    color: #DAA520;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+/* Lists */
+ul, ol {
+  margin: 10px 0 0 20px;
+  text-align: left;
+}
+ul li, ol li {
+  margin-bottom: 10px;
 }
 
-/* =============== Islamic Quote Box =============== */
-.quote-box {
-    background: #E0F7E9;
-    border-left: 5px solid #228B22;
-    padding: 15px;
-    margin: 20px 0;
-    font-style: italic;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 14px 30px;
+  font-size: 20px;
+  font-weight: bold;
+  background: #FFD700;
+  color: #333;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: transform 0.3s, background 0.3s;
+  margin: 10px;
+  box-shadow: 0px 4px 10px rgba(255,215,0,0.6);
+}
+.btn:hover {
+  background: #FFC107;
+  transform: scale(1.05);
 }
 
-/* =============== Lists =============== */
-ul {
-    list-style-type: square;
-    margin-left: 20px;
+/* Social Media Icons */
+.social-icons a {
+  display: inline-block;
+  margin: 5px;
+  font-size: 28px;
+  color: white;
+  transition: transform 0.3s, color 0.3s;
+}
+.social-icons a:hover {
+  color: #FFD700;
+  transform: scale(1.2);
 }
 
-ul li {
-    margin-bottom: 10px;
+/* Footer */
+footer {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  text-align: center;
+  color: #fff;
+  margin-top: 30px;
+  font-size: 16px;
 }
 
-/* =============== Table (Sadaqat-ul-Fitr Rates) =============== */
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-.table th, .table td {
-    border: 1px solid #006400;
-    padding: 10px;
-    text-align: center;
-}
-
-.table th {
-    background-color: #006400;
-    color: white;
-    font-weight: bold;
-}
-
-/* =============== Footer =============== */
-.footer {
-    background: linear-gradient(120deg, #006400, #228B22);
-    color: white;
-    text-align: center;
-    padding: 15px;
-    margin-top: 20px;
-    font-size: 16px;
-}
-
-/* =============== Responsive Design =============== */
+/* Responsive Design */
 @media (max-width: 768px) {
-    .header {
-        font-size: 22px;
-        padding: 15px;
-    }
-
-    .container {
-        padding: 10px;
-    }
-
-    .section-title {
-        font-size: 20px;
-    }
-
-    .eid-greeting {
-        font-size: 22px;
-    }
+  header h1 {
+    font-size: 28px;
+  }
+  .btn {
+    font-size: 18px;
+    padding: 10px 20px;
+  }
+  h2 {
+    font-size: 24px;
+  }
+  p {
+    font-size: 16px;
+  }
 }
