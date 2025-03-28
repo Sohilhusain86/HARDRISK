@@ -168,6 +168,67 @@
         events: { onhover: { enable: true, mode: "repulse" } }
       }
     });
-  </script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // 1. डार्क मोड टॉगल बटन
+  const darkModeBtn = document.getElementById("darkModeToggle");
+  if (darkModeBtn) {
+    darkModeBtn.addEventListener("click", function() {
+      document.body.classList.toggle("dark-mode");
+      console.log("डार्क मोड टॉगल हो گیا");
+    });
+  }
+
+  // 2. रैंडम कोट बटन
+  const randomQuoteBtn = document.getElementById("randomQuoteBtn");
+  const randomQuoteDisplay = document.getElementById("randomQuoteDisplay");
+  const quotes = [
+    "بے شک اللہ ہر چیز کا جاننے والا ہے۔",
+    "اللہ رحم کرنے والا ہے۔",
+    "عید مبارک! خوشیوں بھرا دن ہو۔",
+    "اللہ آپ کو برکت دے۔"
+  ];
+  if (randomQuoteBtn && randomQuoteDisplay) {
+    randomQuoteBtn.addEventListener("click", function() {
+      const randomIndex = Math.floor(Math.random() * quotes.length);
+      randomQuoteDisplay.textContent = quotes[randomIndex];
+      console.log("رینڈم کوٹ:", quotes[randomIndex]);
+    });
+  }
+
+  // 3. فॉर्म سبمٹ بٹن (اگر کوئی فارم موجود ہے)
+  const submitBtn = document.getElementById("submitBtn");
+  if (submitBtn) {
+    submitBtn.addEventListener("click", function(event) {
+      event.preventDefault(); // فام کو روکا جائے تاکہ صفحہ ری لوڈ نہ ہو
+      console.log("سبمٹ بٹن پر کلک ہوا");
+      // یہاں آپ فام سبمیشن کی اضافی پراسیسنگ کر سکتے ہیں
+    });
+  }
+
+  // 4. نیویگیشن بٹنز (صفحہ تبدیل کرنے کے لیے)
+  const homeBtn = document.getElementById("homeBtn");
+  if (homeBtn) {
+    homeBtn.addEventListener("click", function() {
+      window.location.href = "index.html";
+      console.log("ہوم پیج کی طرف جا رہے ہیں");
+    });
+  }
+  const urduBtn = document.getElementById("urduBtn");
+  if (urduBtn) {
+    urduBtn.addEventListener("click", function() {
+      window.location.href = "eid-urdu.html";
+      console.log("اردو صفحہ کی طرف جا رہے ہیں");
+    });
+  }
+  const hindiBtn = document.getElementById("hindiBtn");
+  if (hindiBtn) {
+    hindiBtn.addEventListener("click", function() {
+      window.location.href = "eid-hindi.html";
+      console.log("हिंदी पेज की तरफ जा रहे हैं");
+    });
+  }
+});
+</script>
 </body>
 </html>
