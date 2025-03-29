@@ -1,123 +1,78 @@
-<!DOCTYPE html>
+      <!DOCTYPE html>
 <html lang="ur">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="عید الفطر - خوش آمدید! یہ صفحہ مختلف زبانوں میں بنیادی معلومات فراہم کرتا ہے۔">
   <title>عید الفطر - خوش آمدید</title>
-  <!-- External CSS (آپ چاہیں تو style.css میں منتقل کر سکتے ہیں) -->
-  <link rel="stylesheet" href="style.css">
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&family=Noto+Sans+Devanagari&display=swap" rel="stylesheet">
-  <!-- FontAwesome for Icons (درست ورژن) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <style>
-    /* بنیادی اسٹائلز */
-    body {
-      font-family: 'Noto Nastaliq Urdu', serif;
-      direction: rtl;
+    /* ری سیٹ اور بنیادی سیٹنگز */
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: system-ui, sans-serif; /* لوکل فونٹس سے اضافی ریکویسٹ کم ہو */
+      direction: rtl;
+      text-align: center;
       background: linear-gradient(135deg, #002147, #006D77);
       color: #fff;
       overflow-x: hidden;
-    }
-    /* Particles.js بیک گراؤنڈ */
-    #particles-js {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      background: #000;
-      z-index: -1;
+      line-height: 1.6;
+      padding: 20px;
     }
     /* ہیڈر اسٹائل */
     header {
+      background: rgba(0, 0, 0, 0.7);
       padding: 20px;
-      text-align: center;
-      background: rgba(0, 0, 0, 0.6);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-      position: relative;
+      margin-bottom: 30px;
     }
     header h1 {
-      font-size: 36px;
+      font-size: 2em;
       color: #FFD700;
-      margin: 0;
-      animation: slideDown 1s ease-out;
+      margin-bottom: 10px;
+      animation: fadeIn 1s ease-in-out;
     }
-    nav {
-      margin-top: 15px;
-    }
+    /* نیویگیشن */
     nav a {
-      font-size: 20px;
-      color: #fff;
+      display: inline-block;
+      margin: 0 10px;
       text-decoration: none;
-      margin: 0 15px;
+      color: #fff;
+      font-size: 1.2em;
       transition: color 0.3s;
     }
     nav a:hover {
       color: #FFD700;
     }
-    /* Mobile Navigation Toggle Button */
-    .menu-toggle {
-      display: none;
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 28px;
-      cursor: pointer;
-    }
     /* مین کنٹینر */
     .container {
       max-width: 800px;
-      margin: 80px auto;
-      padding: 20px;
       background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(8px);
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-      text-align: center;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 0 auto 30px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       animation: fadeIn 1.5s ease-in-out;
     }
-    @keyframes slideDown {
-      from { transform: translateY(-30px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    .welcome-message {
-      font-size: 28px;
+    .container p {
+      font-size: 1.2em;
       margin-bottom: 20px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     }
-    /* بٹن اسٹائل */
-    .buttons {
-      margin-top: 20px;
-    }
+    /* بٹنوں کا اسٹائل */
     .buttons a {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px 28px;
-      margin: 15px 10px;
+      display: inline-block;
       background: #FFD700;
       color: #333;
+      padding: 12px 24px;
+      margin: 10px;
       text-decoration: none;
-      border-radius: 8px;
-      font-size: 20px;
+      border-radius: 5px;
+      font-size: 1em;
       font-weight: bold;
-      transition: transform 0.3s, background 0.3s;
-    }
-    .buttons a i {
-      font-size: 1.2em;
-      margin-left: 8px;
-      /* چونکہ ہم rtl استعمال کر رہے ہیں، اس لیے margin-left کا استعمال کیا گیا ہے */
+      transition: background 0.3s, transform 0.3s;
     }
     .buttons a:hover {
       background: #FFC107;
@@ -126,122 +81,66 @@
     /* فوٹر اسٹائل */
     footer {
       background: rgba(0, 0, 0, 0.8);
-      padding: 20px;
-      text-align: center;
-      color: #fff;
-      font-size: 16px;
+      padding: 15px;
+      font-size: 0.9em;
+      margin-top: 30px;
+      border-radius: 5px;
     }
-    .social-icons a {
-      margin: 0 10px;
-      font-size: 28px;
-      color: #fff;
-      transition: transform 0.3s, color 0.3s;
+    footer p {
+      margin-bottom: 10px;
     }
-    .social-icons a:hover {
-      color: #FFD700;
-      transform: scale(1.2);
+    /* اینیمیشن */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
-    /* Responsive Design */
-    @media (max-width: 768px) {
+    /* Responsive ڈیزائن */
+    @media (max-width: 600px) {
       header h1 {
-        font-size: 28px;
+        font-size: 1.5em;
       }
-      /* نیویگیشن موبائل پر عمودی دکھائیں */
       nav a {
-        font-size: 18px;
+        font-size: 1em;
         margin: 5px 0;
         display: block;
       }
-      .menu-toggle {
-        display: block;
-      }
-      nav {
-        display: none;
-        flex-direction: column;
-      }
-      nav.active {
-        display: flex;
-      }
       .container {
-        width: 90%;
-        margin: 60px auto;
         padding: 15px;
+        margin: 20px auto;
+      }
+      .container p {
+        font-size: 1em;
       }
       .buttons a {
-        font-size: 18px;
         padding: 10px 20px;
-      }
-      .welcome-message {
-        font-size: 24px;
+        font-size: 0.9em;
       }
     }
   </style>
 </head>
 <body>
-  <!-- Particles.js بیک گراؤنڈ -->
-  <div id="particles-js"></div>
-
   <!-- ہیڈر -->
   <header>
-    <button class="menu-toggle"><i class="fas fa-bars"></i></button>
     <h1>عید الفطر - خوش آمدید</h1>
     <nav>
-      <a href="eid-urdu.html"><i class="fas fa-book-open"></i> اردو میں پڑھیں</a>
-      <a href="eid-hindi.html"><i class="fas fa-book"></i> हिंदी में पढ़ें</a>
+      <a href="eid-urdu.html">اردو میں پڑھیں</a>
+      <a href="eid-hindi.html">हिंदी में पढ़ें</a>
     </nav>
   </header>
-
   <!-- مین کنٹینر -->
   <div class="container">
-    <p class="welcome-message">
+    <p>
       السلام علیکم!<br>
-      اس ویب سائٹ پر آپ کو عید الفطر کی بنیادی معلومات، احکام اور اسلامی پیغامات مختلف زبانوں میں ملیں گے۔
+      اس ویب سائٹ پر آپ کو عید الفطر کی بنیادی معلومات، احکام اور اسلامی پیغامات ملیں گے۔
     </p>
     <div class="buttons">
-      <a href="eid-urdu.html">
-        اردو صفحہ دیکھیں <i class="fas fa-arrow-right"></i>
-      </a>
-      <a href="eid-hindi.html">
-        हिंदी पृष्ठ देखें <i class="fas fa-arrow-right"></i>
-      </a>
+      <a href="eid-urdu.html">اردو صفحہ دیکھیں</a>
+      <a href="eid-hindi.html">हिंदी पृष्ठ देखें</a>
     </div>
   </div>
-
   <!-- فوٹر -->
   <footer>
     <p>&copy; 2025 اسلامی ویب سائٹ | تمام حقوق محفوظ ہیں</p>
-    <div class="social-icons">
-      <a href="#"><i class="fab fa-facebook"></i></a>
-      <a href="#"><i class="fab fa-twitter"></i></a>
-      <a href="#"><i class="fab fa-instagram"></i></a>
-    </div>
   </footer>
-
-  <!-- Particles.js اینیمیشن (صرف بڑی اسکرین کے لیے) -->
-  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
-  <script>
-    if (window.innerWidth > 768) {
-      particlesJS("particles-js", {
-        particles: {
-          number: { value: 50 },
-          shape: { type: "circle" },
-          size: { value: 3 },
-          move: { speed: 2 }
-        },
-        interactivity: {
-          events: { onhover: { enable: true, mode: "repulse" } }
-        }
-      });
-    }
-    
-    document.addEventListener("DOMContentLoaded", function() {
-      // Mobile Menu Toggle
-      const menuToggle = document.querySelector(".menu-toggle");
-      const nav = document.querySelector("nav");
-      menuToggle.addEventListener("click", function() {
-        nav.classList.toggle("active");
-      });
-    });
-  </script>
 </body>
 </html>
