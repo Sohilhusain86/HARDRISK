@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="عید الفطر - خوش آمدید! یہ صفحہ مختلف زبانوں میں بنیادی معلومات فراہم کرتا ہے۔">
   <title>عید الفطر - خوش آمدید</title>
+  <!-- External CSS (آپ چاہیں تو style.css میں منتقل کر سکتے ہیں) -->
   <link rel="stylesheet" href="style.css">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&family=Noto+Sans+Devanagari&display=swap" rel="stylesheet">
-  <!-- FontAwesome for Icons -->
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <!-- FontAwesome for Icons (درست ورژن) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <style>
     /* بنیادی اسٹائلز */
     body {
@@ -37,6 +38,7 @@
       text-align: center;
       background: rgba(0, 0, 0, 0.6);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+      position: relative;
     }
     header h1 {
       font-size: 36px;
@@ -57,9 +59,17 @@
     nav a:hover {
       color: #FFD700;
     }
-    @keyframes slideDown {
-      from { transform: translateY(-30px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+    /* Mobile Navigation Toggle Button */
+    .menu-toggle {
+      display: none;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 28px;
+      cursor: pointer;
     }
     /* مین کنٹینر */
     .container {
@@ -73,6 +83,10 @@
       text-align: center;
       animation: fadeIn 1.5s ease-in-out;
     }
+    @keyframes slideDown {
+      from { transform: translateY(-30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -83,8 +97,13 @@
       text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     }
     /* بٹن اسٹائل */
+    .buttons {
+      margin-top: 20px;
+    }
     .buttons a {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       padding: 12px 28px;
       margin: 15px 10px;
       background: #FFD700;
@@ -94,6 +113,11 @@
       font-size: 20px;
       font-weight: bold;
       transition: transform 0.3s, background 0.3s;
+    }
+    .buttons a i {
+      font-size: 1.2em;
+      margin-left: 8px;
+      /* چونکہ ہم rtl استعمال کر رہے ہیں، اس لیے margin-left کا استعمال کیا گیا ہے */
     }
     .buttons a:hover {
       background: #FFC107;
@@ -117,6 +141,40 @@
       color: #FFD700;
       transform: scale(1.2);
     }
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 28px;
+      }
+      /* نیویگیشن موبائل پر عمودی دکھائیں */
+      nav a {
+        font-size: 18px;
+        margin: 5px 0;
+        display: block;
+      }
+      .menu-toggle {
+        display: block;
+      }
+      nav {
+        display: none;
+        flex-direction: column;
+      }
+      nav.active {
+        display: flex;
+      }
+      .container {
+        width: 90%;
+        margin: 60px auto;
+        padding: 15px;
+      }
+      .buttons a {
+        font-size: 18px;
+        padding: 10px 20px;
+      }
+      .welcome-message {
+        font-size: 24px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -125,110 +183,65 @@
 
   <!-- ہیڈر -->
   <header>
-      <h1>عید الفطر - خوش آمدید</h1>
-      <nav>
-          <a href="eid-urdu.html"><i class="fas fa-book-open"></i> اردو میں پڑھیں</a>
-          <a href="eid-hindi.html"><i class="fas fa-book"></i> हिंदी में पढ़ें</a>
-      </nav>
+    <button class="menu-toggle"><i class="fas fa-bars"></i></button>
+    <h1>عید الفطر - خوش آمدید</h1>
+    <nav>
+      <a href="eid-urdu.html"><i class="fas fa-book-open"></i> اردو میں پڑھیں</a>
+      <a href="eid-hindi.html"><i class="fas fa-book"></i> हिंदी में पढ़ें</a>
+    </nav>
   </header>
 
   <!-- مین کنٹینر -->
   <div class="container">
-      <p class="welcome-message">
-          السلام علیکم!<br>
-          اس ویب سائٹ پر آپ کو عید الفطر کی بنیادی معلومات، احکام اور اسلامی پیغامات مختلف زبانوں میں ملیں گے۔
-      </p>
-      <div class="buttons">
-          <a href="eid-urdu.html"><i class="fas fa-arrow-right"></i> اردو صفحہ دیکھیں</a>
-          <a href="eid-hindi.html"><i class="fas fa-arrow-right"></i> हिंदी पृष्ठ देखें</a>
-      </div>
+    <p class="welcome-message">
+      السلام علیکم!<br>
+      اس ویب سائٹ پر آپ کو عید الفطر کی بنیادی معلومات، احکام اور اسلامی پیغامات مختلف زبانوں میں ملیں گے۔
+    </p>
+    <div class="buttons">
+      <a href="eid-urdu.html">
+        اردو صفحہ دیکھیں <i class="fas fa-arrow-right"></i>
+      </a>
+      <a href="eid-hindi.html">
+        हिंदी पृष्ठ देखें <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
   </div>
 
   <!-- فوٹر -->
   <footer>
-      <p>&copy; 2025 اسلامی ویب سائٹ | تمام حقوق محفوظ ہیں</p>
-      <div class="social-icons">
-          <a href="#"><i class="fab fa-facebook"></i></a>
-          <a href="#"><i class="fab fa-twitter"></i></a>
-          <a href="#"><i class="fab fa-instagram"></i></a>
-      </div>
+    <p>&copy; 2025 اسلامی ویب سائٹ | تمام حقوق محفوظ ہیں</p>
+    <div class="social-icons">
+      <a href="#"><i class="fab fa-facebook"></i></a>
+      <a href="#"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+    </div>
   </footer>
 
-  <!-- Particles.js اینیمیشن -->
+  <!-- Particles.js اینیمیشن (صرف بڑی اسکرین کے لیے) -->
   <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
   <script>
-    particlesJS("particles-js", {
-      particles: {
-        number: { value: 50 },
-        shape: { type: "circle" },
-        size: { value: 3 },
-        move: { speed: 2 }
-      },
-      interactivity: {
-        events: { onhover: { enable: true, mode: "repulse" } }
-      }
+    if (window.innerWidth > 768) {
+      particlesJS("particles-js", {
+        particles: {
+          number: { value: 50 },
+          shape: { type: "circle" },
+          size: { value: 3 },
+          move: { speed: 2 }
+        },
+        interactivity: {
+          events: { onhover: { enable: true, mode: "repulse" } }
+        }
+      });
+    }
+    
+    document.addEventListener("DOMContentLoaded", function() {
+      // Mobile Menu Toggle
+      const menuToggle = document.querySelector(".menu-toggle");
+      const nav = document.querySelector("nav");
+      menuToggle.addEventListener("click", function() {
+        nav.classList.toggle("active");
+      });
     });
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  // 1. डार्क मोड टॉगल बटन
-  const darkModeBtn = document.getElementById("darkModeToggle");
-  if (darkModeBtn) {
-    darkModeBtn.addEventListener("click", function() {
-      document.body.classList.toggle("dark-mode");
-      console.log("डार्क मोड टॉगल हो گیا");
-    });
-  }
-
-  // 2. रैंडम कोट बटन
-  const randomQuoteBtn = document.getElementById("randomQuoteBtn");
-  const randomQuoteDisplay = document.getElementById("randomQuoteDisplay");
-  const quotes = [
-    "بے شک اللہ ہر چیز کا جاننے والا ہے۔",
-    "اللہ رحم کرنے والا ہے۔",
-    "عید مبارک! خوشیوں بھرا دن ہو۔",
-    "اللہ آپ کو برکت دے۔"
-  ];
-  if (randomQuoteBtn && randomQuoteDisplay) {
-    randomQuoteBtn.addEventListener("click", function() {
-      const randomIndex = Math.floor(Math.random() * quotes.length);
-      randomQuoteDisplay.textContent = quotes[randomIndex];
-      console.log("رینڈم کوٹ:", quotes[randomIndex]);
-    });
-  }
-
-  // 3. فॉर्म سبمٹ بٹن (اگر کوئی فارم موجود ہے)
-  const submitBtn = document.getElementById("submitBtn");
-  if (submitBtn) {
-    submitBtn.addEventListener("click", function(event) {
-      event.preventDefault(); // فام کو روکا جائے تاکہ صفحہ ری لوڈ نہ ہو
-      console.log("سبمٹ بٹن پر کلک ہوا");
-      // یہاں آپ فام سبمیشن کی اضافی پراسیسنگ کر سکتے ہیں
-    });
-  }
-
-  // 4. نیویگیشن بٹنز (صفحہ تبدیل کرنے کے لیے)
-  const homeBtn = document.getElementById("homeBtn");
-  if (homeBtn) {
-    homeBtn.addEventListener("click", function() {
-      window.location.href = "index.html";
-      console.log("ہوم پیج کی طرف جا رہے ہیں");
-    });
-  }
-  const urduBtn = document.getElementById("urduBtn");
-  if (urduBtn) {
-    urduBtn.addEventListener("click", function() {
-      window.location.href = "eid-urdu.html";
-      console.log("اردو صفحہ کی طرف جا رہے ہیں");
-    });
-  }
-  const hindiBtn = document.getElementById("hindiBtn");
-  if (hindiBtn) {
-    hindiBtn.addEventListener("click", function() {
-      window.location.href = "eid-hindi.html";
-      console.log("हिंदी पेज की तरफ जा रहे हैं");
-    });
-  }
-});
-</script>
+  </script>
 </body>
 </html>
