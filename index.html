@@ -1,51 +1,245 @@
-<!DOCTYPE html><html lang="ur">
+<!DOCTYPE html>
+<html lang="ur">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>عید الفطر - خوش آمدید</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="عید الفطر - خوش آمدید! یہ صفحہ اسلامی معلومات، تفصیلی بیانات اور متحرک انٹرفیس فراہم کرتا ہے۔">
+  <title>عید الفطر - خوش آمدید</title>
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    /* Global Resets اور بنیادی سیٹنگز */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+      font-family: system-ui, sans-serif;
+    }
+    body {
+      direction: rtl;
+      background: linear-gradient(135deg, #002147, #006D77);
+      color: #fff;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+    /* فل-اسکرین سلام انٹرو (Splash Screen) */ 
+    #intro {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #002147;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: fadeOut 2s ease-out forwards;
+      animation-delay: 3s;
+    }
+    #intro h1 {
+      font-size: 3em;
+      color: #FFD700;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+    /* Countdown Section */ 
+    #countdown {
+      text-align: center;
+      font-size: 1.5em;
+      margin: 20px 0;
+    }
+    /* متحرک لوگو */ 
+    #logo {
+      display: block;
+      margin: 20px auto;
+      width: 150px;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
+    }
+    /* نیویگیشن بٹن */ 
+    nav {
+      text-align: center;
+      margin: 20px 0;
+    }
+    nav button {
+      background: #FFD700;
+      color: #333;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 5px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+    nav button:hover {
+      background: #FFC107;
+      transform: scale(1.05);
+    }
+    /* مین کنٹینر (تفصیلی بیان) */ 
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    .container p {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      text-align: justify;
+    }
+    /* فُٹَر */ 
+    footer {
+      background: rgba(0,0,0,0.8);
+      padding: 15px;
+      text-align: center;
+      font-size: 0.9em;
+      border-top: 1px solid #444;
+    }
+    footer .social-icons a {
+      margin: 0 10px;
+      font-size: 1.5em;
+      color: #fff;
+      transition: transform 0.3s, color 0.3s;
+    }
+    footer .social-icons a:hover {
+      color: #FFD700;
+      transform: scale(1.2);
+    }
+    /* فی امان اللہ اینیمیشن (واپسی پر دکھانے کے لیے) */ 
+    #farewell {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #002147;
+      color: #FFD700;
+      text-align: center;
+      padding: 10px 0;
+      font-size: 1.2em;
+      z-index: 9999;
+      display: none;
+      animation: slideUp 2s ease-out forwards;
+    }
+    @keyframes slideUp {
+      0% { transform: translateY(100%); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    /* Responsive Design */ 
+    @media (max-width: 600px) {
+      #intro h1 { font-size: 2em; }
+      nav button { font-size: 0.9em; padding: 8px 16px; }
+      .container p { font-size: 1em; }
+      #countdown { font-size: 1.2em; }
+      #logo { width: 120px; }
+    }
+  </style>
 </head>
 <body>
-    <!-- سلامی انٹرو -->
+    <!-- فل-اسکرین سلام انٹرو --> 
     <div id="intro">
-        <h1>السلام علیکم و رحمۃ اللہ و برکاتہ</h1>
-    </div><!-- عید مبارک آڈیو -->
-<audio autoplay>
-    <source src="eid-mubarak.mp3" type="audio/mp3">
-</audio>
-
-<!-- عید کے وقت کا کاؤنٹ ڈاؤن -->
-<div id="countdown"></div>
-
-<!-- متحرک لوگو -->
-<img id="logo" src="logo.png" alt="Logo">
-
-<!-- مین کنٹینر -->
-<div class="container">
-    <p class="welcome-message">عید الفطر کے بارے میں مکمل معلومات حاصل کریں۔</p>
-    <div class="buttons">
-        <button id="darkModeToggle">ڈارک موڈ</button>
-        <button id="randomQuoteBtn">کوٹ دیکھیے</button>
-        <button id="urduBtn">اردو میں پڑھیں</button>
-        <button id="hindiBtn">हिंदी में पढ़ें</button>
+      <h1>السلام علیکم</h1>
     </div>
-</div>
-
-<!-- فُٹَر -->
-<footer>
-    <div class="social-icons">
+    
+    <!-- عید مبارک آڈیو (صفحہ کھلتے ہی) --> 
+    <audio id="eidAudio" autoplay>
+      <source src="eid-mubarak.mp3" type="audio/mp3">
+      آپ کا براؤزر آڈیو سپورٹ نہیں کرتا۔
+    </audio>
+    
+    <!-- عید کے وقت کا کاؤنٹ ڈاؤن (2 اپریل 2025) --> 
+    <div id="countdown"></div>
+    
+    <!-- متحرک لوگو --> 
+    <img id="logo" src="https://i.ibb.co/vvC4B3bQ/347269821280055442-JPG.webp" alt="Company Logo">
+    
+    <!-- نیویگیشن بٹن --> 
+    <nav>
+      <button id="homeBtn">ہوم</button>
+      <button id="darkModeToggle">ڈارک موڈ</button>
+      <button id="randomQuoteBtn">اقتباس</button>
+      <button id="urduBtn">اردو میں پڑھیں</button>
+      <button id="hindiBtn">हिंदी में पढ़ें</button>
+      <button id="moreBtn">مزید معلومات</button>
+    </nav>
+    
+    <!-- مین کنٹینر: تفصیلی بیان --> 
+    <div class="container">
+      <p>
+        یہاں آپ کو عید الفطر کے حوالے سے تفصیلی معلومات فراہم کی جا رہی ہیں۔ اس بیان میں اسلامی احکام، عید کی اہمیت، اور سماجی، روحانی اور معاشرتی پہلوؤں پر تفصیل سے روشنی ڈالی گئی ہے۔ ہمارا مقصد یہ ہے کہ ناظرین کو جامع اور مستند معلومات فراہم کی جائیں تاکہ وہ عید کے حقیقی روح کو سمجھ سکیں۔<br><br>
+        اس ویب سائٹ پر آپ کو اردو اور ہندی دونوں زبانوں میں معلومات دستیاب ہوں گی۔ ہم نے ہر تفصیل پر غور کیا ہے تاکہ آپ کو کسی قسم کی معلومات کی کمی نہ ہو۔ ہماری کوشش ہے کہ یہ ویب سائٹ ایک کمپنی کی طرح پروفیشنل اور جدید نظر آئے، جہاں ہر صارف کو بہترین تجربہ حاصل ہو۔<br><br>
+        اس کے علاوہ، مختلف بٹنز کے ذریعے آپ ڈارک موڈ، اقتباسات، اور اضافی معلومات تک آسان رسائی حاصل کر سکتے ہیں۔ ہم امید کرتے ہیں کہ یہ پلیٹ فارم آپ کے لئے معلوماتی اور مفید ثابت ہوگا۔
+      </p>
+    </div>
+    
+    <!-- فُٹَر: سوشل آئیکنز اور کاپی رائٹ --> 
+    <footer>
+      <div class="social-icons">
         <a href="#"><i class="fab fa-facebook"></i></a>
         <a href="#"><i class="fab fa-twitter"></i></a>
         <a href="#"><i class="fab fa-instagram"></i></a>
-    </div>
-    <p>&copy; 2025 اسلامی ویب سائٹ | تمام حقوق محفوظ ہیں</p>
-</footer>
-
-<!-- فی امان اللہ اینیمیشن -->
-<div id="farewell" style="display: none;">فی امان اللہ</div>
-
-<script src="script.js"></script>
-
-</body>
-</html>
+      </div>
+      <p>&copy; 2025 اسلامی ویب سائٹ | تمام حقوق محفوظ ہیں &#10004;</p>
+    </footer>
+    
+    <!-- فی امان اللہ اینیمیشن (ویب سے واپس جاتے وقت دکھانے کے لیے) --> 
+    <div id="farewell">فی امان اللہ</div>
+    
+    <script>
+      // Countdown Timer Setup (Target: 2 April 2025)
+      const countdownEl = document.getElementById('countdown');
+      const targetDate = new Date('April 2, 2025 00:00:00').getTime();
+      
+      const countdownInterval = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+        if (distance < 0) {
+          clearInterval(countdownInterval);
+          countdownEl.innerHTML = 'عید مبارک!';
+          return;
+        }
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        countdownEl.innerHTML = `عید تک: ${days} دن : ${hours} گھنٹے : ${minutes} منٹ : ${seconds} سیکنڈ`;
+      }, 1000);
+      
+      // بٹنوں کے لیے Event Listeners
+      document.getElementById('darkModeToggle').addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+      });
+      
+      document.getElementById('randomQuoteBtn').addEventListener('click', () => {
+        alert('اللہ ہر چیز پر قادر ہے!');
+      });
+      
+      document.getElementById('homeBtn').addEventListener('click', () => {
+        location.href = 'index.html';
+      });
+      document.getElementById('urduBtn').addEventListener('click', () => {
+        location.href = 'eid-urdu.html';
+      });
+      document.getElementById('hindiBtn').addEventListener('click', () => {
+        location.href = 'eid-hindi.html';
+      });
+      document.getElementById('moreBtn').addEventListener('click', () => {
+        alert('مزید معلومات جلد ہی دستیاب ہوں گی۔');
+      });
+      
+      // فی امان اللہ اینیمیشن (صفحہ چھوڑتے وقت دکھانے کا نمونہ)\n      window.addEventListener('beforeunload', () => {\n        document.getElementById('farewell').style.display = 'block';\n      });\n    </script>\n</body>\n</html>\n``` 
+      
