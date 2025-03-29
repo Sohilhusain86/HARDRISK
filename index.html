@@ -14,7 +14,10 @@
       text-align: center;
       padding: 20px;
     }
-    h1 { color: #007BFF; margin-bottom: 20px; }
+    h1 { 
+      color: #007BFF; 
+      margin-bottom: 20px; 
+    }
     .buttons {
       margin-bottom: 20px;
     }
@@ -28,6 +31,9 @@
       color: #fff;
     }
     /* बटन के अलग-अलग रंग */
+    #homeBtn { background: #007BFF; }
+    #quotesBtn { background: #6c757d; }
+    #darkBtn { background: #343a40; }
     #urduBtn { background: #28a745; }
     #hindiBtn { background: #dc3545; }
     .countdown {
@@ -36,7 +42,8 @@
     }
     #salamPopup {
       position: fixed;
-      top: 50%; left: 50%;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%);
       background: #fff;
       color: #000;
@@ -51,6 +58,9 @@
 <body>
   <h1>MuslimCelebrations.com</h1>
   <div class="buttons">
+    <button id="homeBtn">होम</button>
+    <button id="quotesBtn">उद्धरण</button>
+    <button id="darkBtn">डार्क</button>
     <button id="urduBtn">📖 उर्दू बायान पेज</button>
     <button id="hindiBtn">📖 हिंदी बायान पेज</button>
   </div>
@@ -73,6 +83,7 @@
       countdownElement.innerHTML = `${hours} घंटे ${minutes} मिनट ${seconds} सेकंड`;
     }
     setInterval(updateCountdown, 1000);
+    updateCountdown();
     
     // सलाम पॉप-अप 3 सेकंड बाद गायब हो जाएगा
     setTimeout(() => {
@@ -80,11 +91,21 @@
     }, 3000);
     
     // बटन क्लिक इवेंट्स (पेज नेविगेशन के लिए placeholder URLs)
+    document.getElementById('homeBtn').addEventListener('click', function() {
+      window.location.href = 'home.html';  // होम पेज का URL बदलें
+    });
+    document.getElementById('quotesBtn').addEventListener('click', function() {
+      window.location.href = 'quotes.html';  // उद्धरण पेज का URL बदलें
+    });
+    document.getElementById('darkBtn').addEventListener('click', function() {
+      document.body.style.background = '#333';
+      document.body.style.color = '#fff';
+    });
     document.getElementById('urduBtn').addEventListener('click', function() {
-      window.location.href = 'urdu.html';  // अपनी उर्दू बायान पेज का URL डालें
+      window.location.href = 'urdu.html';  // उर्दू बायान पेज का URL बदलें
     });
     document.getElementById('hindiBtn').addEventListener('click', function() {
-      window.location.href = 'hindi.html';  // अपनी हिंदी बायान पेज का URL डालें
+      window.location.href = 'hindi.html';  // हिंदी बायान पेज का URL बदलें
     });
   </script>
 </body>
