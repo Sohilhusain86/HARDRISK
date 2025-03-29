@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ur">
+<html lang="ur" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="عید الفطر - خوش آمدید! یہ صفحہ اسلامی معلومات، تفصیلی بیانات اور متحرک انٹرفیس فراہم کرتا ہے۔">
-  <title>عید الفطر - خوش آمدید</title>
+  <meta name="description" content="پیشہ ورانہ ہوم پیج - جدید اور معیاری ویب ڈیزائن">
+  <title>ہوم پیج - اسلامی ویب سائٹ</title>
   <!-- FontAwesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <style>
@@ -25,90 +25,107 @@
       overflow-x: hidden;
       line-height: 1.6;
     }
-    /* فل-اسکرین سلام انٹرو (Splash Screen) */ 
-    #intro {
+    
+    /* Header with Navigation */
+    header {
+      width: 100%;
+      padding: 15px 20px;
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background: #002147;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.6);
       display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.3s ease;
+    }
+    header.scrolled {
+      background: rgba(0, 0, 0, 0.9);
+    }
+    header .logo {
+      font-size: 1.8em;
+      font-weight: bold;
+      color: #FFD700;
+    }
+    header nav {
+      display: flex;
+      gap: 15px;
+    }
+    header nav a {
+      text-decoration: none;
+      color: #fff;
+      font-size: 1em;
+      transition: color 0.3s;
+    }
+    header nav a:hover {
+      color: #FFD700;
+    }
+    
+    /* Hero Section with Salam Intro */
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      background: url('hero-bg.jpg') center/cover no-repeat; /* اپنے ہیرو بیک گراؤنڈ امیج کا راستہ یہاں دیں */
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 9999;
-      animation: fadeOut 2s ease-out forwards;
-      animation-delay: 3s;
+      text-align: center;
+      padding: 0 20px;
     }
-    #intro h1 {
-      font-size: 3em;
+    .hero h1 {
+      font-size: 3.5em;
       color: #FFD700;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    }
-    @keyframes fadeOut {
-      0% { opacity: 1; }
-      100% { opacity: 0; visibility: hidden; }
-    }
-    /* Countdown Section */ 
-    #countdown {
-      text-align: center;
-      font-size: 1.5em;
-      margin: 20px 0;
-    }
-    /* متحرک لوگو */ 
-    #logo {
-      display: block;
-      margin: 20px auto;
-      width: 150px;
-      animation: float 3s ease-in-out infinite;
-    }
-    @keyframes float {
-      0% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-      100% { transform: translateY(0); }
-    }
-    /* نیویگیشن بٹن */ 
-    nav {
-      text-align: center;
-      margin: 20px 0;
-    }
-    nav button {
-      background: #FFD700;
-      color: #333;
-      border: none;
-      padding: 10px 20px;
-      margin: 5px;
-      border-radius: 5px;
-      font-size: 1em;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.3s;
-    }
-    nav button:hover {
-      background: #FFC107;
-      transform: scale(1.05);
-    }
-    /* مین کنٹینر (تفصیلی بیان) */ 
-    .container {
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    }
-    .container p {
-      font-size: 1.2em;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
       margin-bottom: 20px;
-      text-align: justify;
+      opacity: 0;
+      animation: fadeInDown 2s ease-out forwards;
     }
-    /* فُٹَر */ 
+    .hero p {
+      font-size: 1.5em;
+      margin-bottom: 30px;
+      opacity: 0;
+      animation: fadeInUp 2s ease-out forwards;
+      animation-delay: 1s;
+    }
+    @keyframes fadeInDown {
+      0% { opacity: 0; transform: translateY(-50px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(50px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* About Section */
+    .about {
+      padding: 60px 20px;
+      text-align: center;
+      background: #001C33;
+    }
+    .about h2 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      color: #FFD700;
+    }
+    .about p {
+      font-size: 1.2em;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    /* Footer */
     footer {
-      background: rgba(0,0,0,0.8);
-      padding: 15px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
       text-align: center;
       font-size: 0.9em;
       border-top: 1px solid #444;
+    }
+    footer .social-icons {
+      margin-bottom: 10px;
     }
     footer .social-icons a {
       margin: 0 10px;
@@ -120,218 +137,113 @@
       color: #FFD700;
       transform: scale(1.2);
     }
-    /* فی امان اللہ اینیمیشن (واپسی پر دکھانے کے لیے) */ 
-    #farewell {
+    
+    /* Back to Top Button */
+    #backToTop {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: #002147;
-      color: #FFD700;
-      text-align: center;
-      padding: 10px 0;
-      font-size: 1.2em;
-      z-index: 9999;
+      bottom: 40px;
+      right: 40px;
+      background: #FFD700;
+      color: #333;
+      padding: 10px 15px;
+      border-radius: 5px;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
       display: none;
-      animation: slideUp 2s ease-out forwards;
+      transition: transform 0.3s, background 0.3s;
+      z-index: 1001;
     }
-    @keyframes slideUp {
-      0% { transform: translateY(100%); opacity: 0; }
-      100% { transform: translateY(0); opacity: 1; }
+    #backToTop:hover {
+      background: #FFC107;
+      transform: scale(1.05);
     }
-    /* Responsive Design */ 
+    
+    /* Responsive Design */
     @media (max-width: 600px) {
-      #intro h1 { font-size: 2em; }
-      nav button { font-size: 0.9em; padding: 8px 16px; }
-      .container p { font-size: 1em; }
-      #countdown { font-size: 1.2em; }
-      #logo { width: 120px; }
+      .hero h1 { font-size: 2.5em; }
+      .hero p { font-size: 1.2em; }
+      header .logo { font-size: 1.5em; }
+      header nav a { font-size: 0.9em; }
+      .about h2 { font-size: 2em; }
+      .about p { font-size: 1em; }
     }
   </style>
 </head>
 <body>
-    <!DOCTYPE html><html lang="ur">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سلام انٹرو</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: #000;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            font-family: 'Noto Nastaliq Urdu', serif;
-        }
-        .intro {
-            position: absolute;
-            text-align: center;
-            font-size: 40px;
-            opacity: 0;
-            animation: fadeIn 4s ease-in-out forwards;
-        }
-        @keyframes fadeIn {
-            0% { opacity: 0; transform: scale(0.5); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        .stars {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: url('stars.gif');
-            background-size: cover;
-            animation: twinkle 5s infinite;
-        }
-        @keyframes twinkle {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-    </style>
-</head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سلام انٹرو</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: #000;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            font-family: 'Noto Nastaliq Urdu', serif;
-        }
-        .intro {
-            position: absolute;
-            text-align: center;
-            font-size: 40px;
-            opacity: 0;
-            animation: fadeIn 4s ease-in-out forwards;
-        }
-        @keyframes fadeIn {
-            0% { opacity: 0; transform: scale(0.5); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        .stars {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: url('stars.gif');
-            background-size: cover;
-            animation: twinkle 5s infinite;
-        }
-        @keyframes twinkle {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-    </style>
-</head>
-<body>
-    <div class="stars"></div>
-    <div class="intro">
-      اَلسَّلاَمْ عَلَيْــــــــــــــــــــكُمْا وَ رَحْمَةُ اللَّهِ وَبَرَكَاتُهُ
-    </div>
-    <audio autoplay>
-        <source src="salam.mp3" type="audio/mp3">
-    </audio>
-</body>
-    </html>
-    
-    <!-- عید کے وقت کا کاؤنٹ ڈاؤن (2 اپریل 2025) --> 
-    <div id="countdown"></div>
-    
-    <!-- متحرک لوگو --> 
-    <img id="logo" src=https://i.ibb.co/vvC4B3bQ/347269821280055442-JPG.webp alt="https://i.ibb.co/vvC4B3bQ/347269821280055442-JPG.webp">
-    
-    <!-- نیویگیشن بٹن --> 
+  <!-- Header with Navigation -->
+  <header id="header">
+    <div class="logo">میرا برانڈ</div>
     <nav>
-      <button id="homeBtn">ہوم</button>
-      <button id="darkModeToggle">ڈارک موڈ</button>
-      <button id="randomQuoteBtn">اقتباس</button>
-      <button id="urduBtn">اردو میں پڑھیں</button>
-      <button id="hindiBtn">हिंदी में पढ़ें</button>
-      <button id="moreBtn">مزید معلومات</button>
+      <a href="index.html">ہوم</a>
+      <a href="about.html">ہمارے بارے میں</a>
+      <a href="services.html">سروسز</a>
+      <a href="contact.html">رابطہ کریں</a>
+      <!-- اضافی بٹن: اردو، ہندی اور اقتباس -->
+      <a href="eid-urdu.html">اردو</a>
+      <a href="eid-hindi.html">हिंदी</a>
+      <a href="#" id="quoteBtn">اقتباس</a>
     </nav>
-    
-    <!-- مین کنٹینر: تفصیلی بیان --> 
-    <div class="container">
-      <p>
-        یہاں آپ کو عید الفطر کے حوالے سے تفصیلی معلومات فراہم کی جا رہی ہیں۔ اس بیان میں اسلامی احکام، عید کی اہمیت، اور سماجی، روحانی اور معاشرتی پہلوؤں پر تفصیل سے روشنی ڈالی گئی ہے۔ ہمارا مقصد یہ ہے کہ ناظرین کو جامع اور مستند معلومات فراہم کی جائیں تاکہ وہ عید کے حقیقی روح کو سمجھ سکیں۔<br><br>
-        اس ویب سائٹ پر آپ کو اردو اور ہندی دونوں زبانوں میں معلومات دستیاب ہوں گی۔ ہم نے ہر تفصیل پر غور کیا ہے تاکہ آپ کو کسی قسم کی معلومات کی کمی نہ ہو۔ ہماری کوشش ہے کہ یہ ویب سائٹ ایک کمپنی کی طرح پروفیشنل اور جدید نظر آئے، جہاں ہر صارف کو بہترین تجربہ حاصل ہو۔<br><br>
-        اس کے علاوہ، مختلف بٹنز کے ذریعے آپ ڈارک موڈ، اقتباسات، اور اضافی معلومات تک آسان رسائی حاصل کر سکتے ہیں۔ ہم امید کرتے ہیں کہ یہ پلیٹ فارم آپ کے لئے معلوماتی اور مفید ثابت ہوگا۔
-      </p>
+  </header>
+  
+  <!-- Hero Section with Salam Intro -->
+  <section class="hero">
+    <h1>السلام علیکم و رحمۃ اللہ وبرکاتہ</h1>
+    <p>خوش آمدید! ایک نیا آغاز، خوشیوں بھرا دن اور ایمان کی تازگی آپ کے لیے!</p>
+  </section>
+  
+  <!-- About Section -->
+  <section class="about">
+    <h2>ہمارا مشن</h2>
+    <p>
+      ہماری ویب سائٹ کا مقصد آپ کو بہترین اور مستند معلومات فراہم کرنا ہے۔ ہم جدید ٹیکنالوجی اور روایتی اقدار کو ملا کر ایک ایسا پلیٹ فارم فراہم کرتے ہیں جس سے آپ کو نہ صرف معلومات بلکہ ایک بہتر تجربہ بھی حاصل ہو۔ ہماری ٹیم محنت اور لگن سے کام کرتی ہے تاکہ آپ کی رہنمائی اور مسائل کا حل ممکن ہو سکے۔
+    </p>
+  </section>
+  
+  <!-- Footer -->
+  <footer>
+    <div class="social-icons">
+      <a href="#"><i class="fab fa-facebook"></i></a>
+      <a href="#"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
     </div>
+    <p>&copy; 2025 میرے برانڈ | تمام حقوق محفوظ ہیں &#10004;</p>
+  </footer>
+  
+  <!-- Back to Top Button -->
+  <button id="backToTop">اوپر جائیں</button>
+  
+  <script>
+    // Header scroll effect: اسکرول کے دوران ہیڈر کا پس منظر تبدیل ہونا
+    window.addEventListener('scroll', () => {
+      const header = document.getElementById('header');
+      if(window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+      
+      // Back-to-top button visibility
+      const backToTop = document.getElementById('backToTop');
+      if(window.scrollY > 300) {
+        backToTop.style.display = 'block';
+      } else {
+        backToTop.style.display = 'none';
+      }
+    });
     
-    <!-- فُٹَر: سوشل آئیکنز اور کاپی رائٹ --> 
-    <footer>
-      <div class="social-icons">
-        <a href="#"><i class="fab fa-facebook"></i></a>
-        <a href="#"><i class="fab fa-twitter"></i></a>
-        <a href="#"><i class="fab fa-instagram"></i></a>
-      </div>
-      <p>&copy; 2025 اسلامی ویب سائٹ | تمام حقوق محفوظ ہیں &#10004;</p>
-    </footer>
+    // Back-to-top button click event
+    document.getElementById('backToTop').addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
     
-    <!-- فی امان اللہ اینیمیشن (ویب سے واپس جاتے وقت دکھانے کے لیے) --> 
-    <div id="farewell">فی امان اللہ</div>
+    // Quotes Button: اگر صارف "اقتباس" پر کلک کرے تو ایک پیغام ظاہر ہو
+    document.getElementById('quoteBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      alert('اللہ ہر چیز پر قادر ہے!');
+    });
     
-    <script>
-      // Countdown Timer Setup (Target: 2 April 2025)
-      const countdownEl = document.getElementById('countdown');
-      const targetDate = new Date('April 2, 2025 00:00:00').getTime();
-      
-      const countdownInterval = setInterval(() => {
-        const now = new Date().getTime();
-        const distance = targetDate - now;
-        if (distance < 0) {
-          clearInterval(countdownInterval);
-          countdownEl.innerHTML = 'عید مبارک!';
-          return;
-        }
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        countdownEl.innerHTML = `عید تک: ${days} دن : ${hours} گھنٹے : ${minutes} منٹ : ${seconds} سیکنڈ`;
-      }, 1000);
-      
-      // بٹنوں کے لیے Event Listeners
-      document.getElementById('darkModeToggle').addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-      });
-      
-      document.getElementById('randomQuoteBtn').addEventListener('click', () => {
-        alert('اللہ ہر چیز پر قادر ہے!');
-      });
-      
-      document.getElementById('homeBtn').addEventListener('click', () => {
-        location.href = 'index.html';
-      });
-      document.getElementById('urduBtn').addEventListener('click', () => {
-        location.href = 'eid-urdu.html';
-      });
-      document.getElementById('hindiBtn').addEventListener('click', () => {
-        location.href = 'eid-hindi.html';
-      });
-      document.getElementById('moreBtn').addEventListener('click', () => {
-        alert('مزید معلومات جلد ہی دستیاب ہوں گی۔');
-      });
-      
-      // فی امان اللہ اینیمیشن (صفحہ چھوڑتے وقت دکھانے کا نمونہ)\n      window.addEventListener('beforeunload', () => {\n        document.getElementById('farewell').style.display = 'block';\n      });\n    </script>\n</body>\n</html>\n``` 
-      
+    // آپ یہاں اضافی JavaScript شامل کر سکتے ہیں
+  </script>
+</body>
+</html>
