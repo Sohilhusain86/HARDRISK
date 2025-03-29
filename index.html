@@ -1,146 +1,51 @@
-      <!DOCTYPE html>
-<html lang="ur">
+<!DOCTYPE html><html lang="ur">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="عید الفطر - خوش آمدید! یہ صفحہ مختلف زبانوں میں بنیادی معلومات فراہم کرتا ہے۔">
-  <title>عید الفطر - خوش آمدید</title>
-  <style>
-    /* ری سیٹ اور بنیادی سیٹنگز */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: system-ui, sans-serif; /* لوکل فونٹس سے اضافی ریکویسٹ کم ہو */
-      direction: rtl;
-      text-align: center;
-      background: linear-gradient(135deg, #002147, #006D77);
-      color: #fff;
-      overflow-x: hidden;
-      line-height: 1.6;
-      padding: 20px;
-    }
-    /* ہیڈر اسٹائل */
-    header {
-      background: rgba(0, 0, 0, 0.7);
-      padding: 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-      margin-bottom: 30px;
-    }
-    header h1 {
-      font-size: 2em;
-      color: #FFD700;
-      margin-bottom: 10px;
-      animation: fadeIn 1s ease-in-out;
-    }
-    /* نیویگیشن */
-    nav a {
-      display: inline-block;
-      margin: 0 10px;
-      text-decoration: none;
-      color: #fff;
-      font-size: 1.2em;
-      transition: color 0.3s;
-    }
-    nav a:hover {
-      color: #FFD700;
-    }
-    /* مین کنٹینر */
-    .container {
-      max-width: 800px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      padding: 20px;
-      margin: 0 auto 30px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      animation: fadeIn 1.5s ease-in-out;
-    }
-    .container p {
-      font-size: 1.2em;
-      margin-bottom: 20px;
-    }
-    /* بٹنوں کا اسٹائل */
-    .buttons a {
-      display: inline-block;
-      background: #FFD700;
-      color: #333;
-      padding: 12px 24px;
-      margin: 10px;
-      text-decoration: none;
-      border-radius: 5px;
-      font-size: 1em;
-      font-weight: bold;
-      transition: background 0.3s, transform 0.3s;
-    }
-    .buttons a:hover {
-      background: #FFC107;
-      transform: scale(1.05);
-    }
-    /* فوٹر اسٹائل */
-    footer {
-      background: rgba(0, 0, 0, 0.8);
-      padding: 15px;
-      font-size: 0.9em;
-      margin-top: 30px;
-      border-radius: 5px;
-    }
-    footer p {
-      margin-bottom: 10px;
-    }
-    /* اینیمیشن */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    /* Responsive ڈیزائن */
-    @media (max-width: 600px) {
-      header h1 {
-        font-size: 1.5em;
-      }
-      nav a {
-        font-size: 1em;
-        margin: 5px 0;
-        display: block;
-      }
-      .container {
-        padding: 15px;
-        margin: 20px auto;
-      }
-      .container p {
-        font-size: 1em;
-      }
-      .buttons a {
-        padding: 10px 20px;
-        font-size: 0.9em;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عید الفطر - خوش آمدید</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
-  <!-- ہیڈر -->
-  <header>
-    <h1>عید الفطر - خوش آمدید</h1>
-    <nav>
-      <a href="eid-urdu.html">اردو میں پڑھیں</a>
-      <a href="eid-hindi.html">हिंदी में पढ़ें</a>
-    </nav>
-  </header>
-  <!-- مین کنٹینر -->
-  <div class="container">
-    <p>
-      السلام علیکم!<br>
-      اس ویب سائٹ پر آپ کو عید الفطر کی بنیادی معلومات، احکام اور اسلامی پیغامات ملیں گے۔
-    </p>
+    <!-- سلامی انٹرو -->
+    <div id="intro">
+        <h1>السلام علیکم و رحمۃ اللہ و برکاتہ</h1>
+    </div><!-- عید مبارک آڈیو -->
+<audio autoplay>
+    <source src="eid-mubarak.mp3" type="audio/mp3">
+</audio>
+
+<!-- عید کے وقت کا کاؤنٹ ڈاؤن -->
+<div id="countdown"></div>
+
+<!-- متحرک لوگو -->
+<img id="logo" src="logo.png" alt="Logo">
+
+<!-- مین کنٹینر -->
+<div class="container">
+    <p class="welcome-message">عید الفطر کے بارے میں مکمل معلومات حاصل کریں۔</p>
     <div class="buttons">
-      <a href="eid-urdu.html">اردو صفحہ دیکھیں</a>
-      <a href="eid-hindi.html">हिंदी पृष्ठ देखें</a>
+        <button id="darkModeToggle">ڈارک موڈ</button>
+        <button id="randomQuoteBtn">کوٹ دیکھیے</button>
+        <button id="urduBtn">اردو میں پڑھیں</button>
+        <button id="hindiBtn">हिंदी में पढ़ें</button>
     </div>
-  </div>
-  <!-- فوٹر -->
-  <footer>
+</div>
+
+<!-- فُٹَر -->
+<footer>
+    <div class="social-icons">
+        <a href="#"><i class="fab fa-facebook"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+    </div>
     <p>&copy; 2025 اسلامی ویب سائٹ | تمام حقوق محفوظ ہیں</p>
-  </footer>
+</footer>
+
+<!-- فی امان اللہ اینیمیشن -->
+<div id="farewell" style="display: none;">فی امان اللہ</div>
+
+<script src="script.js"></script>
+
 </body>
 </html>
