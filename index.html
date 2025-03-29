@@ -1,9 +1,11 @@
-<!DOCTYPE html><html lang="hi">
+<!DOCTYPE html>
+<html lang="hi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MuslimCelebrations.com</title>
   <style>
+    /* साधारण CSS रीसेट */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: Arial, sans-serif;
@@ -12,7 +14,10 @@
       text-align: center;
       padding: 20px;
     }
-    h1 { color: #007BFF; }
+    h1 { color: #007BFF; margin-bottom: 20px; }
+    .buttons {
+      margin-bottom: 20px;
+    }
     .buttons button {
       padding: 10px 20px;
       border: none;
@@ -20,8 +25,9 @@
       cursor: pointer;
       margin: 5px;
       font-size: 1em;
-      color: white;
+      color: #fff;
     }
+    /* बटन के अलग-अलग रंग */
     #urduBtn { background: #28a745; }
     #hindiBtn { background: #dc3545; }
     .countdown {
@@ -38,6 +44,7 @@
       border-radius: 8px;
       font-size: 1.5em;
       box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+      z-index: 999;
     }
   </style>
 </head>
@@ -50,6 +57,7 @@
   <div class="countdown" id="countdownTimer">काउंटडाउन लोड हो रहा है...</div>
   <div id="salamPopup">اَلسَّلاَمْ عَلَيْــــــــــــــــــــكُمْا وَ رَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</div>
   <script>
+    // ईद काउंटडाउन (2 अप्रैल 2025)
     const eidDate = new Date("April 2, 2025 00:00:00").getTime();
     const countdownElement = document.getElementById('countdownTimer');
     function updateCountdown() {
@@ -65,7 +73,19 @@
       countdownElement.innerHTML = `${hours} घंटे ${minutes} मिनट ${seconds} सेकंड`;
     }
     setInterval(updateCountdown, 1000);
-    setTimeout(() => document.getElementById('salamPopup').style.display = 'none', 3000);
+    
+    // सलाम पॉप-अप 3 सेकंड बाद गायब हो जाएगा
+    setTimeout(() => {
+      document.getElementById('salamPopup').style.display = 'none';
+    }, 3000);
+    
+    // बटन क्लिक इवेंट्स (पेज नेविगेशन के लिए placeholder URLs)
+    document.getElementById('urduBtn').addEventListener('click', function() {
+      window.location.href = 'urdu.html';  // अपनी उर्दू बायान पेज का URL डालें
+    });
+    document.getElementById('hindiBtn').addEventListener('click', function() {
+      window.location.href = 'hindi.html';  // अपनी हिंदी बायान पेज का URL डालें
+    });
   </script>
 </body>
 </html>
