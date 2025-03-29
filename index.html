@@ -3,112 +3,191 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MuslimCelebrations.com</title>
+  <title>MuslimCelebrations.com | दुनिया का सबसे बेहतरीन होम पेज</title>
   <style>
-    /* साधारण CSS रीसेट */
+    /* CSS रीसेट */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: Arial, sans-serif;
-      background: #fff;
-      color: #333;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fad0c4, #ff9a9e);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    header {
+      padding: 20px;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+    }
+    header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    nav button {
+      background: rgba(0,0,0,0.3);
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      border-radius: 5px;
+      cursor: pointer;
+      color: #fff;
+      transition: transform 0.3s, background 0.3s;
+    }
+    nav button:hover {
+      transform: translateY(-5px);
+      background: rgba(0,0,0,0.5);
+    }
+    /* हीरो सेक्शन */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 70vh;
       text-align: center;
       padding: 20px;
+      position: relative;
+      z-index: 5;
     }
-    h1 { 
-      color: #007BFF; 
-      margin-bottom: 20px; 
-    }
-    .buttons {
+    .hero h2 {
+      font-size: 2em;
       margin-bottom: 20px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
     }
-    .buttons button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      margin: 5px;
-      font-size: 1em;
-      color: #fff;
-    }
-    /* बटन के अलग-अलग रंग */
-    #homeBtn { background: #007BFF; }
-    #quotesBtn { background: #6c757d; }
-    #darkBtn { background: #343a40; }
-    #urduBtn { background: #28a745; }
-    #hindiBtn { background: #dc3545; }
     .countdown {
       font-size: 1.5em;
-      margin-top: 20px;
+      margin-bottom: 20px;
+      background: rgba(0,0,0,0.3);
+      padding: 10px 20px;
+      border-radius: 5px;
     }
-    #salamPopup {
+    .hero p {
+      font-size: 1.2em;
+      max-width: 600px;
+      line-height: 1.5;
+    }
+    /* पॉप-अप सलाम */
+    #greetingPopup {
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(0.5);
       background: #fff;
-      color: #000;
-      padding: 15px;
-      border-radius: 8px;
+      color: #333;
+      padding: 20px 30px;
+      border-radius: 10px;
       font-size: 1.5em;
-      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-      z-index: 999;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      z-index: 100;
+      opacity: 0;
+      animation: popupAppear 0.5s forwards;
+    }
+    @keyframes popupAppear {
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+    /* फुटर */
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: rgba(0,0,0,0.2);
+      position: relative;
+      z-index: 10;
+      font-size: 0.9em;
+    }
+    footer .social-icons a {
+      color: #fff;
+      margin: 0 10px;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    footer .social-icons a:hover {
+      color: #ffd700;
+    }
+    /* रिस्पॉन्सिव */
+    @media (max-width: 600px) {
+      header h1 { font-size: 2em; }
+      .hero h2 { font-size: 1.5em; }
+      nav button { font-size: 0.9em; padding: 8px 15px; }
+      .countdown { font-size: 1.2em; }
     }
   </style>
 </head>
 <body>
-  <h1>MuslimCelebrations.com</h1>
-  <div class="buttons">
-    <button id="homeBtn">होम</button>
-    <button id="quotesBtn">उद्धरण</button>
-    <button id="darkBtn">डार्क</button>
-    <button id="urduBtn">📖 उर्दू बायान पेज</button>
-    <button id="hindiBtn">📖 हिंदी बायान पेज</button>
-  </div>
-  <div class="countdown" id="countdownTimer">काउंटडाउन लोड हो रहा है...</div>
-  <div id="salamPopup">اَلسَّلاَمْ عَلَيْــــــــــــــــــــكُمْا وَ رَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</div>
+  <!-- पॉप-अप सलाम -->
+  <div id="greetingPopup">اَلسَّلاَمْ عَلَيْــــــــــــــــــــكُمْا وَ رَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</div>
+  <header>
+    <h1>MuslimCelebrations.com</h1>
+    <nav>
+      <button onclick="location.href='home.html'">होम</button>
+      <button onclick="location.href='quotes.html'">उद्धरण</button>
+      <button onclick="toggleDarkMode()">डार्क मोड</button>
+      <button onclick="location.href='urdu.html'">📖 उर्दू बायान पेज</button>
+      <button onclick="location.href='hindi.html'">📖 हिंदी बायान पेज</button>
+    </nav>
+  </header>
+  <section class="hero">
+    <h2>दुनिया का सबसे बेहतरीन होम पेज</h2>
+    <div class="countdown" id="countdownTimer">काउंटडाउन लोड हो रहा है...</div>
+    <p>जैसे ही ईद आए, अपने आप जश्न मनाएं - <strong>ईद मुबारक!</strong></p>
+  </section>
+  <footer>
+    <div class="social-icons">
+      <a href="#" target="_blank">FB</a>
+      <a href="#" target="_blank">TW</a>
+      <a href="#" target="_blank">IG</a>
+    </div>
+    <p>&copy; 2025 MuslimCelebrations.com</p>
+  </footer>
   <script>
     // ईद काउंटडाउन (2 अक्टूबर 2025)
     const eidDate = new Date("October 2, 2025 00:00:00").getTime();
     const countdownElement = document.getElementById('countdownTimer');
-    
     function updateCountdown() {
       const now = new Date().getTime();
       const distance = eidDate - now;
-      if (distance < 0) {
-        countdownElement.innerHTML = "ईद मुबारक!"; // ईद आने के बाद यह संदेश दिखेगा
+      if(distance < 0) {
+        countdownElement.innerHTML = "ईद मुबारक!";
         return;
       }
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
       const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-      countdownElement.innerHTML = `${hours} घंटे ${minutes} मिनट ${seconds} सेकंड`;
+      countdownElement.innerHTML = days + " दिन " + hours + " घंटे " + minutes + " मिनट " + seconds + " सेकंड";
     }
-    
     setInterval(updateCountdown, 1000);
     updateCountdown();
     
-    // सलाम पॉप-अप 3 सेकंड बाद गायब हो जाएगा
+    // पॉप-अप सलाम 3 सेकंड बाद गायब
     setTimeout(() => {
-      document.getElementById('salamPopup').style.display = 'none';
+      document.getElementById('greetingPopup').style.display = 'none';
     }, 3000);
     
-    // बटन क्लिक इवेंट्स (पेज नेविगेशन के लिए placeholder URLs)
-    document.getElementById('homeBtn').addEventListener('click', function() {
-      window.location.href = 'home.html';  // होम पेज का URL बदलें
-    });
-    document.getElementById('quotesBtn').addEventListener('click', function() {
-      window.location.href = 'quotes.html';  // उद्धरण पेज का URL बदलें
-    });
-    document.getElementById('darkBtn').addEventListener('click', function() {
-      document.body.style.background = '#333';
-      document.body.style.color = '#fff';
-    });
-    document.getElementById('urduBtn').addEventListener('click', function() {
-      window.location.href = 'urdu.html';  // उर्दू बायान पेज का URL बदलें
-    });
-    document.getElementById('hindiBtn').addEventListener('click', function() {
-      window.location.href = 'hindi.html';  // हिंदी बायान पेज का URL बदलें
-    });
+    // डार्क मोड टॉगल फ़ंक्शन
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      if(document.body.classList.contains('dark-mode')) {
+        document.body.style.background = '#333';
+        document.body.style.color = '#fff';
+      } else {
+        document.body.style.background = 'linear-gradient(135deg, #ff9a9e, #fad0c4, #fad0c4, #ff9a9e)';
+        document.body.style.color = '#fff';
+      }
+    }
   </script>
 </body>
 </html>
