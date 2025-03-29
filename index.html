@@ -150,16 +150,108 @@
   </style>
 </head>
 <body>
-    <!-- فل-اسکرین سلام انٹرو --> 
-    <div id="intro">
-      <h3>اَلسَّلاَمْ عَلَيْــــــــــــــــــــكُمْا وَ رَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</h3>
+    <!DOCTYPE html><html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سلام انٹرو</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #000;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Noto Nastaliq Urdu', serif;
+        }
+        .intro {
+            position: absolute;
+            text-align: center;
+            font-size: 40px;
+            opacity: 0;
+            animation: fadeIn 4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('stars.gif');
+            background-size: cover;
+            animation: twinkle 5s infinite;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+    </style>
+</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سلام انٹرو</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #000;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Noto Nastaliq Urdu', serif;
+        }
+        .intro {
+            position: absolute;
+            text-align: center;
+            font-size: 40px;
+            opacity: 0;
+            animation: fadeIn 4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('stars.gif');
+            background-size: cover;
+            animation: twinkle 5s infinite;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="intro">
+      اَلسَّلاَمْ عَلَيْــــــــــــــــــــكُمْا وَ رَحْمَةُ اللَّهِ وَبَرَكَاتُهُ
     </div>
-    
-    <!-- عید مبارک آڈیو (صفحہ کھلتے ہی) --> 
-    <audio id="eidAudio" autoplay>
-      <source src="eid-mubarak.mp3" type="audio/mp3">
-      آپ کا براؤزر آڈیو سپورٹ نہیں کرتا۔
+    <audio autoplay>
+        <source src="salam.mp3" type="audio/mp3">
     </audio>
+</body>
+    </html>
     
     <!-- عید کے وقت کا کاؤنٹ ڈاؤن (2 اپریل 2025) --> 
     <div id="countdown"></div>
