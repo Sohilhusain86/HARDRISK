@@ -67,14 +67,15 @@
   <div class="countdown" id="countdownTimer">काउंटडाउन लोड हो रहा है...</div>
   <div id="salamPopup">اَلسَّلاَمْ عَلَيْــــــــــــــــــــكُمْا وَ رَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</div>
   <script>
-    // ईद काउंटडाउन (2 अप्रैल 2025)
-    const eidDate = new Date("April 2, 2025 00:00:00").getTime();
+    // ईद काउंटडाउन (2 अक्टूबर 2025)
+    const eidDate = new Date("October 2, 2025 00:00:00").getTime();
     const countdownElement = document.getElementById('countdownTimer');
+    
     function updateCountdown() {
       const now = new Date().getTime();
       const distance = eidDate - now;
       if (distance < 0) {
-        countdownElement.innerHTML = "ईद मुबारक!";
+        countdownElement.innerHTML = "ईद मुबारक!"; // ईद आने के बाद यह संदेश दिखेगा
         return;
       }
       const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -82,6 +83,7 @@
       const seconds = Math.floor((distance % (1000 * 60)) / 1000);
       countdownElement.innerHTML = `${hours} घंटे ${minutes} मिनट ${seconds} सेकंड`;
     }
+    
     setInterval(updateCountdown, 1000);
     updateCountdown();
     
