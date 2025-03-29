@@ -1,152 +1,55 @@
-<!DOCTYPE html>
-<html lang="hi">
+<!DOCTYPE html><html lang="hi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MuslimCelebrations.com - सरल ईद वेब पेज</title>
+  <title>MuslimCelebrations.com</title>
   <style>
-    /* साधारण CSS रीसेट */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: Arial, sans-serif;
       background: #fff;
       color: #333;
-      line-height: 1.6;
+      text-align: center;
       padding: 20px;
     }
-    header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    header img {
-      width: 120px;
-      height: auto;
-    }
-    header h2 {
-      margin-top: 10px;
-      font-size: 1.2em;
-      color: #555;
-    }
-    /* मुख्य कंटेंट के लिए कंटेनर */
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    /* पॉप-अप एनीमेशन वाले बटन */
-    .buttons {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
+    h1 { color: #007BFF; }
     .buttons button {
       padding: 10px 20px;
       border: none;
-      background: #007BFF;
-      color: #fff;
       border-radius: 4px;
       cursor: pointer;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: popUp 0.5s forwards;
+      margin: 5px;
+      font-size: 1em;
+      color: white;
     }
-    .buttons button:nth-child(1) { animation-delay: 0.2s; }
-    .buttons button:nth-child(2) { animation-delay: 0.4s; }
-    .buttons button:nth-child(3) { animation-delay: 0.6s; }
-    .buttons button:nth-child(4) { animation-delay: 0.8s; }
-    .buttons button:nth-child(5) { animation-delay: 1s; }
-    @keyframes popUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    /* सामग्री की स्टाइलिंग */
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 1.8em;
-    }
-    p {
-      text-align: justify;
-      margin-bottom: 15px;
-    }
-    /* काउंटडाउन टाइमर */
+    #urduBtn { background: #28a745; }
+    #hindiBtn { background: #dc3545; }
     .countdown {
-      text-align: center;
       font-size: 1.5em;
-      margin: 20px 0;
-      padding: 10px;
-      background: #f8f8f8;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-    /* फूटर */
-    footer {
-      text-align: center;
-      font-size: 0.9em;
       margin-top: 20px;
-      color: #666;
     }
-    /* मोबाइल के लिए समायोजन */
-    @media (max-width: 600px) {
-      body { padding: 10px; }
-      .buttons button { padding: 8px 16px; }
-      h1 { font-size: 1.5em; }
-    }
-    /* पॉप-अप सलाम विंडो */
     #salamPopup {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.5);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
       background: #fff;
-      color: #333;
-      padding: 20px 40px;
+      color: #000;
+      padding: 15px;
       border-radius: 8px;
-      font-size: 1.8em;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      opacity: 0;
-      z-index: 999;
-      animation: popupAnim 0.5s forwards;
-    }
-    @keyframes popupAnim {
-      to {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-      }
+      font-size: 1.5em;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <img src="https://i.postimg.cc/pm8QHtXL" alt="कंपनी का लोगो">
-      <h1>कंपनी ईद समारोह</h1>
-      <h2>MuslimCelebrations.com</h2>
-    </header>
-    <!-- पॉप-अप एनीमेशन वाले बटन -->
-    <div class="buttons">
-      <button id="homeBtn">होम</button>
-      <button id="quotesBtn">उद्धरण</button>
-      <button id="darkBtn">डार्क</button>
-      <button id="hindiBtn">हिंदी</button>
-      <button id="urduBtn">उर्दू</button>
-    </div>
-    <!-- मुख्य सामग्री -->
-    <p>हमारी सरल, आसानी से पढ़ी जा सकने वाली वेबसाइट में आपका स्वागत है, जिसे धीमे नेटवर्क और सभी ब्राउज़रों पर सुचारू रूप से चलने के लिए डिज़ाइन किया गया है।</p>
-    <!-- ईद के लिए काउंटडाउन टाइमर (2 अप्रैल 2025) -->
-    <div class="countdown" id="countdownTimer">काउंटडाउन लोड हो रहा है...</div>
-    <p>जैसे ही हम दिल से भरे संदेशों और सरल डिज़ाइन के साथ ईद मनाते हैं, कृपया अधिक अपडेट के लिए जुड़े रहें।</p>
+  <h1>MuslimCelebrations.com</h1>
+  <div class="buttons">
+    <button id="urduBtn">📖 उर्दू बायान पेज</button>
+    <button id="hindiBtn">📖 हिंदी बायान पेज</button>
   </div>
-  <footer>
-    <p>&copy; 2025 कंपनी का नाम</p>
-  </footer>
-  <!-- सलाम पॉप-अप विंडो -->
+  <div class="countdown" id="countdownTimer">काउंटडाउन लोड हो रहा है...</div>
   <div id="salamPopup">اَلسَّلاَمْ عَلَيْــــــــــــــــــــكُمْا وَ رَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</div>
   <script>
-    // ईद काउंटडाउन टाइमर (2 अप्रैल 2025)
     const eidDate = new Date("April 2, 2025 00:00:00").getTime();
     const countdownElement = document.getElementById('countdownTimer');
     function updateCountdown() {
@@ -154,44 +57,15 @@
       const distance = eidDate - now;
       if (distance < 0) {
         countdownElement.innerHTML = "ईद मुबारक!";
-        clearInterval(countdownInterval);
         return;
       }
       const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-      countdownElement.innerHTML = hours + " घंटे " + minutes + " मिनट " + seconds + " सेकंड";
+      countdownElement.innerHTML = `${hours} घंटे ${minutes} मिनट ${seconds} सेकंड`;
     }
-    const countdownInterval = setInterval(updateCountdown, 1000);
-    updateCountdown();
-
-    // पॉप-अप सलाम विंडो को कुछ सेकंड बाद छुपाने का फंक्शन
-    window.addEventListener('load', function() {
-      const popup = document.getElementById('salamPopup');
-      // 3 सेकंड के बाद सलाम पॉप-अप को छुपा दें
-      setTimeout(() => {
-         popup.style.transition = "opacity 0.5s";
-         popup.style.opacity = "0";
-      }, 3000);
-    });
-
-    // उदाहरण बटन कार्यक्षमता (डेमो के लिए अलर्ट संदेश)
-    document.getElementById('homeBtn').addEventListener('click', function() {
-      alert("होम पर क्लिक किया गया!");
-    });
-    document.getElementById('quotesBtn').addEventListener('click', function() {
-      alert("उद्धरण पर क्लिक किया गया!");
-    });
-    document.getElementById('darkBtn').addEventListener('click', function() {
-      document.body.style.background = '#333';
-      document.body.style.color = '#fff';
-    });
-    document.getElementById('hindiBtn').addEventListener('click', function() {
-      alert("हिंदी चुनी गई!");
-    });
-    document.getElementById('urduBtn').addEventListener('click', function() {
-      alert("उर्दू चुनी गई!");
-    });
+    setInterval(updateCountdown, 1000);
+    setTimeout(() => document.getElementById('salamPopup').style.display = 'none', 3000);
   </script>
 </body>
 </html>
