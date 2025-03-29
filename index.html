@@ -1,219 +1,196 @@
 <!DOCTYPE html>
-<html lang="ur" dir="rtl">
+<html lang="hi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="پیشہ ورانہ ہوم پیج - آسان، ہلکا اور تیز ویب ڈیزائن">
-  <title>ہوم پیج - اسلامی ویب سائٹ</title>
-  <!-- FontAwesome for Icons (CDN) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <title>MuslimCelebrations.com - सरल ईद वेब पेज</title>
   <style>
-    /* Global Resets */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    html, body {
-      height: 100%;
-      font-family: system-ui, sans-serif;
-    }
+    /* साधारण CSS रीसेट */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      direction: rtl;
-      background: linear-gradient(135deg, #002147, #006D77);
-      color: #fff;
-      overflow-x: hidden;
+      font-family: Arial, sans-serif;
+      background: #fff;
+      color: #333;
       line-height: 1.6;
+      padding: 20px;
     }
-    
-    /* Header */
     header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      padding: 10px 20px;
-      background: rgba(0, 0, 0, 0.7);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 1000;
-    }
-    header .logo {
-      font-size: 1.8em;
-      font-weight: bold;
-      color: #FFD700;
-    }
-    header nav {
-      display: flex;
-      gap: 15px;
-    }
-    header nav a {
-      text-decoration: none;
-      color: #fff;
-      font-size: 1em;
-      transition: color 0.3s;
-    }
-    header nav a:hover {
-      color: #FFD700;
-    }
-    
-    /* Hero Section */
-    .hero {
-      width: 100%;
-      height: 100vh;
-      background: url('hero-bg.jpg') center/cover no-repeat; /* استعمال کے لیے ہلکا بیک گراؤنڈ استعمال کریں */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
       text-align: center;
-      padding: 0 20px;
-    }
-    .hero h1 {
-      font-size: 3em;
-      color: #FFD700;
       margin-bottom: 20px;
     }
-    .hero p {
-      font-size: 1.3em;
-      margin-bottom: 30px;
+    header img {
+      width: 120px;
+      height: auto;
     }
-    
-    /* About Section */
-    .about {
-      padding: 50px 20px;
-      text-align: center;
-      background: #001C33;
-    }
-    .about h2 {
-      font-size: 2.5em;
-      margin-bottom: 20px;
-      color: #FFD700;
-    }
-    .about p {
+    header h2 {
+      margin-top: 10px;
       font-size: 1.2em;
+      color: #555;
+    }
+    /* मुख्य कंटेंट के लिए कंटेनर */
+    .container {
       max-width: 800px;
       margin: 0 auto;
     }
-    
-    /* Footer */
+    /* पॉप-अप एनीमेशन वाले बटन */
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .buttons button {
+      padding: 10px 20px;
+      border: none;
+      background: #007BFF;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: popUp 0.5s forwards;
+    }
+    .buttons button:nth-child(1) { animation-delay: 0.2s; }
+    .buttons button:nth-child(2) { animation-delay: 0.4s; }
+    .buttons button:nth-child(3) { animation-delay: 0.6s; }
+    .buttons button:nth-child(4) { animation-delay: 0.8s; }
+    .buttons button:nth-child(5) { animation-delay: 1s; }
+    @keyframes popUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    /* सामग्री की स्टाइलिंग */
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.8em;
+    }
+    p {
+      text-align: justify;
+      margin-bottom: 15px;
+    }
+    /* काउंटडाउन टाइमर */
+    .countdown {
+      text-align: center;
+      font-size: 1.5em;
+      margin: 20px 0;
+      padding: 10px;
+      background: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    /* फूटर */
     footer {
-      background: rgba(0,0,0,0.8);
-      padding: 15px;
       text-align: center;
       font-size: 0.9em;
-      border-top: 1px solid #444;
+      margin-top: 20px;
+      color: #666;
     }
-    footer .social-icons a {
-      margin: 0 10px;
-      font-size: 1.5em;
-      color: #fff;
-      transition: transform 0.3s, color 0.3s;
-    }
-    footer .social-icons a:hover {
-      color: #FFD700;
-      transform: scale(1.2);
-    }
-    
-    /* Back-to-Top Button */
-    #backToTop {
-      position: fixed;
-      bottom: 40px;
-      right: 40px;
-      background: #FFD700;
-      color: #333;
-      padding: 10px 15px;
-      border-radius: 5px;
-      border: none;
-      font-size: 1em;
-      cursor: pointer;
-      display: none;
-      z-index: 1001;
-      transition: transform 0.3s, background 0.3s;
-    }
-    #backToTop:hover {
-      background: #FFC107;
-      transform: scale(1.05);
-    }
-    
-    /* Responsive Design */
+    /* मोबाइल के लिए समायोजन */
     @media (max-width: 600px) {
-      .hero h1 { font-size: 2.5em; }
-      .hero p { font-size: 1em; }
-      header .logo { font-size: 1.5em; }
-      header nav a { font-size: 0.9em; }
-      .about h2 { font-size: 2em; }
-      .about p { font-size: 1em; }
+      body { padding: 10px; }
+      .buttons button { padding: 8px 16px; }
+      h1 { font-size: 1.5em; }
+    }
+    /* पॉप-अप सलाम विंडो */
+    #salamPopup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.5);
+      background: #fff;
+      color: #333;
+      padding: 20px 40px;
+      border-radius: 8px;
+      font-size: 1.8em;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      opacity: 0;
+      z-index: 999;
+      animation: popupAnim 0.5s forwards;
+    }
+    @keyframes popupAnim {
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Header with Navigation -->
-  <header id="header">
-    <div class="logo">MuslimCelebrations</div>
-    <nav>
-      <a href="index.html">ہوم</a>
-      <a href="about.html">ہمارے بارے میں</a>
-      <a href="services.html">سروسز</a>
-      <a href="contact.html">رابطہ کریں</a>
-      <a href="eid-urdu.html">اردو</a>
-      <a href="eid-hindi.html">हिंदी</a>
-      <a href="#" id="quoteBtn">اقتباس</a>
-    </nav>
-  </header>
-  
-  <!-- Hero Section with Salam Intro -->
-  <section class="hero">
-    <h1>السلام علیکم و رحمۃ اللہ وبرکاتہ</h1>
-    <p>خوش آمدید! ایک نیا آغاز، خوشیوں بھرا دن اور ایمان کی تازگی آپ کے لیے!</p>
-  </section>
-  
-  <!-- About Section -->
-  <section class="about">
-    <h2>ہمارا مشن</h2>
-    <p>
-      ہماری ویب سائٹ کا مقصد آپ کو بہترین اور مستند معلومات فراہم کرنا ہے۔ ہم جدید ٹیکنالوجی اور روایتی اقدار کو ملا کر ایک ایسا پلیٹ فارم فراہم کرتے ہیں، جس سے آپ کو نہ صرف معلومات بلکہ ایک بہتر تجربہ بھی حاصل ہو۔
-    </p>
-  </section>
-  
-  <!-- Footer -->
-  <footer>
-    <div class="social-icons">
-      <a href="#"><i class="fab fa-facebook"></i></a>
-      <a href="#"><i class="fab fa-twitter"></i></a>
-      <a href="#"><i class="fab fa-instagram"></i></a>
+  <div class="container">
+    <header>
+      <img src="https://i.postimg.cc/pm8QHtXL" alt="कंपनी का लोगो">
+      <h1>कंपनी ईद समारोह</h1>
+      <h2>MuslimCelebrations.com</h2>
+    </header>
+    <!-- पॉप-अप एनीमेशन वाले बटन -->
+    <div class="buttons">
+      <button id="homeBtn">होम</button>
+      <button id="quotesBtn">उद्धरण</button>
+      <button id="darkBtn">डार्क</button>
+      <button id="hindiBtn">हिंदी</button>
+      <button id="urduBtn">उर्दू</button>
     </div>
-    <p>&copy; 2025 MuslimCelebrations | تمام حقوق محفوظ ہیں &#10004;</p>
+    <!-- मुख्य सामग्री -->
+    <p>हमारी सरल, आसानी से पढ़ी जा सकने वाली वेबसाइट में आपका स्वागत है, जिसे धीमे नेटवर्क और सभी ब्राउज़रों पर सुचारू रूप से चलने के लिए डिज़ाइन किया गया है।</p>
+    <!-- ईद के लिए काउंटडाउन टाइमर (2 अप्रैल 2025) -->
+    <div class="countdown" id="countdownTimer">काउंटडाउन लोड हो रहा है...</div>
+    <p>जैसे ही हम दिल से भरे संदेशों और सरल डिज़ाइन के साथ ईद मनाते हैं, कृपया अधिक अपडेट के लिए जुड़े रहें।</p>
+  </div>
+  <footer>
+    <p>&copy; 2025 कंपनी का नाम</p>
   </footer>
-  
-  <!-- Back-to-Top Button -->
-  <button id="backToTop">اوپر جائیں</button>
-  
+  <!-- सलाम पॉप-अप विंडो -->
+  <div id="salamPopup">اَلسَّلاَمْ عَلَيْــــــــــــــــــــكُمْا وَ رَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</div>
   <script>
-    // Header scroll effect: اسکرول کے دوران ہیڈر کا پس منظر تبدیل ہونا
-    window.addEventListener('scroll', () => {
-      const header = document.getElementById('header');
-      if (window.scrollY > 50) {
-        header.classList.add('scrolled');
-      } else {
-        header.classList.remove('scrolled');
+    // ईद काउंटडाउन टाइमर (2 अप्रैल 2025)
+    const eidDate = new Date("April 2, 2025 00:00:00").getTime();
+    const countdownElement = document.getElementById('countdownTimer');
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = eidDate - now;
+      if (distance < 0) {
+        countdownElement.innerHTML = "ईद मुबारक!";
+        clearInterval(countdownInterval);
+        return;
       }
-      
-      // Back-to-top button visibility
-      const backToTop = document.getElementById('backToTop');
-      backToTop.style.display = window.scrollY > 300 ? 'block' : 'none';
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      countdownElement.innerHTML = hours + " घंटे " + minutes + " मिनट " + seconds + " सेकंड";
+    }
+    const countdownInterval = setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // पॉप-अप सलाम विंडो को कुछ सेकंड बाद छुपाने का फंक्शन
+    window.addEventListener('load', function() {
+      const popup = document.getElementById('salamPopup');
+      // 3 सेकंड के बाद सलाम पॉप-अप को छुपा दें
+      setTimeout(() => {
+         popup.style.transition = "opacity 0.5s";
+         popup.style.opacity = "0";
+      }, 3000);
     });
-    
-    // Back-to-top button click event for smooth scroll to top
-    document.getElementById('backToTop').addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // उदाहरण बटन कार्यक्षमता (डेमो के लिए अलर्ट संदेश)
+    document.getElementById('homeBtn').addEventListener('click', function() {
+      alert("होम पर क्लिक किया गया!");
     });
-    
-    // Quotes Button: Show alert with a random quote (for demonstration)
-    document.getElementById('quoteBtn').addEventListener('click', (e) => {
-      e.preventDefault();
-      alert('اللہ ہر چیز پر قادر ہے!');
+    document.getElementById('quotesBtn').addEventListener('click', function() {
+      alert("उद्धरण पर क्लिक किया गया!");
+    });
+    document.getElementById('darkBtn').addEventListener('click', function() {
+      document.body.style.background = '#333';
+      document.body.style.color = '#fff';
+    });
+    document.getElementById('hindiBtn').addEventListener('click', function() {
+      alert("हिंदी चुनी गई!");
+    });
+    document.getElementById('urduBtn').addEventListener('click', function() {
+      alert("उर्दू चुनी गई!");
     });
   </script>
 </body>
