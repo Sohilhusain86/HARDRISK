@@ -1,388 +1,253 @@
 <!DOCTYPE html>
-<html lang="hi" dir="ltr">
+<html lang="hi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="ईद-उत्सव - इस्लामी मुद्दे और विस्तृत बयान (अहल-सुन्नत व जमात की दृष्टि से)">
-  <title>ईद-उत्सव: इस्लामी मुद्दे और विस्तृत बयान (अहल-सुन्नत व जमात)</title>
-  <!-- FontAwesome for Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <title>ईद मुबारक 2025 - विस्तृत विवरण, काउंटडाउन एवं धार्मिक शिक्षाएँ</title>
   <style>
-    /* --------------------- Global Resets और बेसिक स्टाइल्स --------------------- */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    html, body {
-      height: 100%;
-      font-family: system-ui, sans-serif;
-    }
     body {
-      background: linear-gradient(135deg, #002147, #006D77);
-      color: #fff;
-      overflow-x: hidden;
-      line-height: 1.8;
-    }
-    
-    /* --------------------- Fullscreen Salam Intro (Splash Screen) --------------------- */
-    #intro {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #002147;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      animation: fadeOut 2s ease-out forwards;
-      animation-delay: 3s;
-    }
-    #intro h1 {
-      font-size: 3.5em;
-      color: #FFD700;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    }
-    @keyframes fadeOut {
-      0% { opacity: 1; }
-      100% { opacity: 0; visibility: hidden; }
-    }
-    
-    /* --------------------- Countdown Timer Section --------------------- */
-    #countdown {
-      text-align: center;
-      font-size: 1.5em;
-      margin: 20px 0;
-    }
-    
-    /* --------------------- Animated Logo --------------------- */
-<!-- Animated Logo Section -->
-<img id="logo" src="https://i.ibb.co/Nng239Xm/347269821280055442-JPG.webp" alt="Company Logo">
-    @keyframes float {
-      0% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-      100% { transform: translateY(0); }
-    }
-    
-    /* --------------------- Navigation Buttons --------------------- */
-    nav {
-      text-align: center;
-      margin: 20px 0;
-    }
-    nav a, nav button {
-      background: #FFD700;
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f0f8;
       color: #333;
-      text-decoration: none;
-      padding: 10px 20px;
-      margin: 5px;
-      border-radius: 5px;
-      font-size: 1em;
-      font-weight: bold;
-      cursor: pointer;
-      border: none;
-      transition: background 0.3s, transform 0.3s;
-    }
-    nav a:hover, nav button:hover {
-      background: #FFC107;
-      transform: scale(1.05);
-    }
-    
-    /* --------------------- Main Container: Detailed Islamic Issues --------------------- */
-    .container {
-      max-width: 800px;
-      margin: 20px auto;
+      margin: 0;
       padding: 20px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    }
-    .container h2 {
-      text-align: center;
-      margin-bottom: 15px;
-      color: #FFD700;
-    }
-    .container p, .container ul {
-      font-size: 1.2em;
-      margin-bottom: 20px;
-      text-align: justify;
       line-height: 1.8;
     }
-    .container ul {
-      list-style-type: disc;
-      margin-right: 20px;
-    }
-    
-    /* --------------------- Extra Information: Historical, Fiqhi & Additional Issues --------------------- */
-    .extra-info {
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid #444;
-    }
-    .extra-info h3 {
-      color: #FFD700;
-      margin-bottom: 10px;
-    }
-    .extra-info p, .extra-info ul {
-      font-size: 1.1em;
-      margin-bottom: 15px;
-      text-align: justify;
-    }
-    .extra-info ul {
-      list-style-type: circle;
-      margin-right: 20px;
-    }
-    
-    /* --------------------- Footer --------------------- */
-    footer {
-      background: rgba(0,0,0,0.8);
-      padding: 15px;
-      text-align: center;
-      font-size: 0.9em;
-      border-top: 1px solid #444;
-    }
-    footer .social-icons a {
-      margin: 0 10px;
-      font-size: 1.5em;
+    header, footer {
+      background-color: #2e8b57;
       color: #fff;
-      transition: transform 0.3s, color 0.3s;
+      text-align: center;
+      padding: 20px;
+      margin-bottom: 20px;
     }
-    footer .social-icons a:hover {
-      color: #FFD700;
-      transform: scale(1.2);
+    nav ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      justify-content: center;
     }
-    
-    /* --------------------- Back-to-Top Button --------------------- */
-    #backToTop {
-      position: fixed;
-      bottom: 40px;
-      right: 40px;
-      background: #FFD700;
-      color: #333;
-      padding: 10px 15px;
+    nav ul li {
+      margin: 0 15px;
+    }
+    nav ul li a {
+      text-decoration: none;
+      color: #fff;
+      font-size: 1.1em;
+    }
+    section {
+      background-color: #fff;
+      margin-bottom: 20px;
+      padding: 20px;
       border-radius: 5px;
-      border: none;
-      font-size: 1em;
-      cursor: pointer;
-      display: none;
-      transition: transform 0.3s, background 0.3s;
-      z-index: 1001;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    #backToTop:hover {
-      background: #FFC107;
-      transform: scale(1.05);
+    h1, h2, h3 {
+      color: #2e8b57;
     }
-    
-    /* --------------------- Responsive Design --------------------- */
-    @media (max-width: 600px) {
-      #intro h1 { font-size: 2.5em; }
-      nav a, nav button { font-size: 0.9em; padding: 8px 16px; }
-      .container p { font-size: 1em; }
-      #countdown { font-size: 1.2em; }
-      #logo { width: 120px; }
+    blockquote {
+      background-color: #e6ffe6;
+      border-left: 5px solid #2e8b57;
+      padding: 10px 20px;
+      margin: 20px 0;
+      font-style: italic;
+    }
+    .countdown {
+      font-size: 1.5em;
+      text-align: center;
+      margin: 20px 0;
+      padding: 15px;
+      border: 2px solid #2e8b57;
+      border-radius: 10px;
+      background-color: #f9fff9;
+    }
+    @media(max-width: 600px) {
+      h1 { font-size: 1.8em; }
+      .countdown { font-size: 1.2em; }
     }
   </style>
 </head>
 <body>
-  <!-- Fullscreen Salam Intro -->
-  <div id="intro">
-    <h1>اَلسَّلاَمْ عَلَيْــــــــــــــــــــكُمْا وَ رَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</h1>
-  </div>
-  
-  <!-- Background Audio (Plays automatically) -->
-  <audio id="eidAudio" autoplay>
-    <source src="eid-mubarak.mp3" type="audio/mp3">
-    आपका ब्राउज़र ऑडियो सपोर्ट नहीं करता।
-  </audio>
-  
-  <!-- Countdown Timer: Counts down to March 31, 2025 -->
-  <div id="countdown"></div>
-  
-  <!-- Animated Logo -->
-  <img id="logo" src="logo.png" alt="Company Logo">
-  
-  <!-- Navigation with Additional Buttons for Urdu, Hindi, and Quotes -->
-  <header id="header">
-    <div class="logo">मेरा ब्रांड</div>
+  <header>
+    <h1>ईद मुबारक 2025</h1>
+    <p>31 मार्च 2025 तक काउंटडाउन, धार्मिक शिक्षाएँ और विस्तृत विवेचन</p>
     <nav>
-      <a href="index.html">होम</a>
-      <a href="about.html">हमारे बारे में</a>
-      <a href="services.html">सेवाएँ</a>
-      <a href="contact.html">संपर्क करें</a>
-      <a href="eid-urdu.html">اردو</a>
-      <a href="eid-hindi.html">हिंदी</a>
-      <a href="#" id="quoteBtn">اقتباس</a>
+      <ul>
+        <li><a href="eid-urdu.html">اردو</a></li>
+        <li><a href="eid-hindi.html">हिंदी</a></li>
+      </ul>
     </nav>
   </header>
-  
-  <!-- Hero Section (This can be repeated or integrated with the intro if desired) -->
-  <section class="hero">
-    <h1>اَلسَّلاَمْ عَلَيْــــــــــــــــــــكُمْا وَ رَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</h1>
-    <p>आपका स्वागत है! एक नया आरंभ, खुशियों भरा दिन और विश्वास की ताजगी आपके लिए!</p>
+
+  <!-- काउंटडाउन सेक्शन -->
+  <section class="countdown">
+    <div id="countdownTimer">लोड हो रहा है...</div>
   </section>
-  
-  <!-- About Section -->
-  <section class="about">
-    <h2>हमारा मिशन</h2>
+
+  <!-- परिचय -->
+  <section class="intro">
+    <h2>परिचय</h2>
     <p>
-      हमारी वेबसाइट का उद्देश्य आपको बेहतरीन और प्रमाणिक जानकारी प्रदान करना है। हम आधुनिक तकनीक और पारंपरिक मूल्यों का संगम कर एक ऐसा मंच प्रस्तुत करते हैं, जहाँ आपको न केवल जानकारी मिले बल्कि एक उत्तम अनुभव भी प्राप्त हो।
+      ईद मुबारक, रमजान के पवित्र महीने के समाप्ति के उपलक्ष्य में मनाया जाने वाला एक पवित्र उत्सव है। यह दिन न केवल मुसलमानों के लिए खुशी और उल्लास का संदेश लाता है, बल्कि यह अल्लाह की अनंत रहमत, बरकत और आशीर्वाद का प्रतीक भी है। इस पृष्ठ पर हम 31 मार्च 2025 तक चलने वाले काउंटडाउन के साथ-साथ कुरआन और हदीस की शिक्षाओं के आधार पर ईद के धार्मिक, सामाजिक और आध्यात्मिक पहलुओं का विस्तृत विवेचन करेंगे।
+    </p>
+    <p>
+      इस विस्तृत विवेचन में हम कुरआन के आयतों, सही हदीस (जैसे कि सही बुखारी, सही मुस्लिम, अबू दाऊद आदि) के हवाले से ईद के महत्व, उसके कार्यों और उसके प्रभावों का वर्णन करेंगे। हमारा उद्देश्य यह है कि पाठक न केवल ईद की खुशी में भाग लें बल्कि उसके साथ-साथ अपने जीवन में सकारात्मक बदलाव और सामाजिक एकता का संदेश भी अपनाएं।
     </p>
   </section>
-  
-  <!-- Main Container: Detailed Islamic Issues and Explanations -->
-  <div class="container">
-    <h2>ईद: इस्लामी मुद्दे और विस्तृत बयान (अहल-सुन्नत व जमात)</h2>
+
+  <!-- कुरआन की शिक्षाएँ -->
+  <section class="quran-teachings">
+    <h2>कुरआन की शिक्षाएँ</h2>
     <p>
-      यह वेबसाइट अहल-सुन्नत व जमात की प्रमाणिक शिक्षाओं की रोशनी में ईद के सभी मुद्दों, इबादतों, और बरकतों का विस्तृत बयान प्रस्तुत करती है। यहाँ हम कुरान और हदीस की शिक्षाओं के आधार पर ईद के विभिन्न पहलुओं को समझाते हैं ताकि प्रत्येक मुसलमान अपने धर्म को बेहतर तरीके से समझ सके।
+      कुरआन शरीफ में अल्लाह ने अपनी रहमत, कृपा और अनंत बरकतों का उल्लेख करते हुए मुसलमानों को हिदायत दी है। रमजान के बाद ईद का दिन, अल्लाह की उस कृपा का प्रतीक है जिसे उसने अपने बंदों पर नूरानी बरसात के रूप में उतारा है।
     </p>
     <p>
-      <strong>कुरानिक शिक्षाएँ:</strong><br>
-      कुरान में अल्लाह की एकता, इबादत, और शुक्रगुज़ारी के सिद्धांतों को प्रमुखता से बताया गया है। ईद के दिन ये सिद्धांत और भी अधिक उभार लेते हैं:
+      एक महत्वपूर्ण आयत में अल्लाह फरमाता है:
+    </p>
+    <blockquote>
+      \"وَلِتُكَبِّرُوا اللَّهَ عَلَىٰ مَا هَدَاكُمْ وَلَعَلَّكُمْ تَشْكُرُونَ\" <br>
+      (सूरह अल-बकरा, आयत 185)
+    </blockquote>
+    <p>
+      इस आयत का संदेश है कि हमें अपनी हिदायत और रहमत के लिए अल्लाह का शुक्र अदा करना चाहिए। रमजान के कठिन रोजों के बाद ईद का दिन हमारे लिए आशीर्वाद है, जो हमें अल्लाह की अनंत कृपा का अहसास कराता है।
+    </p>
+    <p>
+      एक अन्य आयत, जो हमें यह सिखाती है कि हमें अपनी सभी गतिविधियों के बाद अपने प्रभु की याद बनाए रखनी चाहिए, इस प्रकार है:
+    </p>
+    <blockquote>
+      \"فَإِذَا فَرَغْتَ فَانصَبْ وَإِلَىٰ رَبِّكَ فَارْغَبْ\" <br>
+      (सूरह अल-शरह, आयत 7-8)
+    </blockquote>
+    <p>
+      इसका अर्थ है कि जब आपकी पूजा और साधना पूरी हो जाए, तो अपने प्रभु की ओर लग जाएँ। यह संदेश हमें याद दिलाता है कि ईद के बाद भी हमें अल्लाह की याद और उसकी इबादत को अपनी जीवनशैली में बनाए रखना चाहिए।
+    </p>
+  </section>
+
+  <!-- हदीस की शिक्षाएँ -->
+  <section class="hadith-teachings">
+    <h2>हदीस की शिक्षाएँ</h2>
+    <p>
+      नबी मुहम्मद ﷺ ने अपनी हदीसों के माध्यम से ईद के महत्व और उसके उचित आचरण को स्पष्ट किया है। सही बुखारी में एक हदीस है जिसमें बताया गया है:
+    </p>
+    <blockquote>
+      \"जो व्यक्ति ईद के दिन अल्लाह की याद में मगन हो, उसका दिल जगमगा उठता है, जबकि बाकी के दिल सुन्न हो जाते हैं।\" <br>
+      (सही बुखारी)
+    </blockquote>
+    <p>
+      इसी प्रकार, सही मुस्लिम में एक हदीस मिलती है, जिसमें बताया गया है कि ईद के दिन सामूहिक नमाज, दुआ और एक दूसरे को मुबारकबाद देना अनिवार्य है। अबू दाऊद की एक हदीस में नबी ﷺ ने फरमाया:
+    </p>
+    <blockquote>
+      \"ईद के दिन, मुसलमानों को चाहिए कि वे एक-दूसरे को मुबारकबाद दें और एक-दूसरे के साथ खुशी बाँटें।\" <br>
+      (अबू दाऊद)
+    </blockquote>
+    <p>
+      इन हदीसों से यह स्पष्ट होता है कि नबी ﷺ ने ईद को एक सामाजिक और आध्यात्मिक उत्सव के रूप में स्थापित किया, जहाँ लोग न केवल अपनी खुशियाँ मनाते हैं बल्कि एक-दूसरे के साथ अपने भाईचारे और प्रेम का संदेश भी साझा करते हैं।
+    </p>
+  </section>
+
+  <!-- ईद के धार्मिक आचरण एवं सामाजिक नियम -->
+  <section class="eid-observances">
+    <h2>ईद के धार्मिक आचरण एवं सामाजिक नियम</h2>
+    <p>
+      ईद मुबारक के दिन के दौरान कई धार्मिक और सामाजिक कार्यों का पालन किया जाता है, जिनका उद्देश्य अल्लाह की कृपा का आभार व्यक्त करना और समाज में एकता एवं भाईचारे को बढ़ावा देना है। इनमें प्रमुख हैं:
     </p>
     <ul>
-      <li>
-        <strong>नमाज़-ए-ईद:</strong> यह एक सामूहिक इबादत है जिसमें सभी मुसलमान एक साथ इकट्ठे होकर अल्लाह की तारीफ करते हैं और उनकी रहमत के लिए दुआ करते हैं।
-      </li>
-      <li>
-        <strong>शुक्रगुज़ारी:</strong> अल्लाह की दी हुई बरकतों का एहसास कर उनके प्रति दिल से शुक्र अदा करना, जिससे आत्मिक शुद्धि और नैतिक उच्चता प्राप्त होती है।
-      </li>
-      <li>
-        <strong>इबादत का संदेश:</strong> इबादत के माध्यम से व्यक्ति अपने जीवन को अनुशासित करता है और अल्लाह की रज़ा पाने के लिए प्रयासरत रहता है।
-      </li>
+      <li><strong>ईद की नमाज:</strong> सामूहिक नमाज अदा करना, जिसे एकता और सहयोग का प्रतीक माना जाता है।</li>
+      <li><strong>सदका-ए-फितर:</strong> ईद से पहले आवश्यक दान देना ताकि गरीब और जरूरतमंद भी इस खुशी में शामिल हो सकें।</li>
+      <li><strong>नहाना एवं साफ-सफाई:</strong> नमाज से पहले पूरी शरीरिक साफ-सफाई करना और साफ-सुथरे कपड़े पहनना, जैसा कि नबी ﷺ ने बताया।</li>
+      <li><strong>गले मिलना एवं मुबारकबाद देना:</strong> भाईचारे और सामाजिक मेलजोल को बढ़ावा देने के लिए, एक-दूसरे को मुबारकबाद देना।</li>
+      <li><strong>दुआ एवं ज़िक्र:</strong> नमाज के पश्चात दुआ करना और अल्लाह की याद में लीन रहना, ताकि दिल में आध्यात्मिक ऊर्जा बनी रहे।</li>
     </ul>
     <p>
-      <strong>हदीस और सहाबा की शिक्षाएँ:</strong><br>
-      पैगंबर-ए-कुरान ﷺ की हदीस और सहाबा की सजीव शिक्षाओं से हमें पता चलता है कि ईद के दिन विशेष दुआएं, दान-पुण्य और सामाजिक एकता का आयोजन किया जाता था:
+      ये सभी कार्य न केवल धार्मिक कर्तव्यों का पालन करते हैं, बल्कि समाज में सहयोग, प्रेम और एकता का संदेश भी फैलाते हैं। कुरआन एवं हदीस की शिक्षाएँ हमें यही सिखाती हैं कि असली ईद का अर्थ केवल उत्सव मनाना नहीं, बल्कि अपने जीवन में सकारात्मक परिवर्तन लाना है।
+    </p>
+  </section>
+
+  <!-- ईद के बाद का संदेश -->
+  <section class="post-eid-reflection">
+    <h2>ईद के बाद का संदेश एवं आध्यात्मिक प्रेरणा</h2>
+    <p>
+      ईद के दिन की समाप्ति के पश्चात भी हमें अल्लाह की याद और अपनी इबादत में स्थिरता बनाए रखनी चाहिए। कुरआन में यह निर्देश है:
+    </p>
+    <blockquote>
+      \"فَإِذَا فَرَغْتَ فَانصَبْ وَإِلَىٰ رَبِّكَ فَارْغَبْ\" <br>
+      (सूरह अल-शरह, आयत 7-8)
+    </blockquote>
+    <p>
+      इसका अर्थ है कि जब आपकी पूजा समाप्त हो जाए, तो अपने प्रभु की ओर लौट जाएँ और उसकी रहमत का आभार व्यक्त करें। यह संदेश हमें याद दिलाता है कि ईद का महत्व सिर्फ एक दिन तक सीमित नहीं है, बल्कि यह हमारे सम्पूर्ण जीवन में एक नई प्रेरणा और ऊर्जा का स्रोत बन जाता है।
+    </p>
+    <p>
+      सही मुस्लिम में भी वर्णित है कि ईद के बाद भी मुसलमानों को अपने दैनिक कार्यों में अल्लाह की याद को शामिल करना चाहिए, ताकि उनकी आत्मा सदैव तरोताजा रहे और वह अपनी जिंदगी में सुधार के लिए निरंतर प्रयासरत रहें।
+    </p>
+  </section>
+
+  <!-- व्यावहारिक मार्गदर्शन एवं सामाजिक उत्तरदायित्व -->
+  <section class="practical-guidance">
+    <h2>व्यावहारिक मार्गदर्शन एवं सामाजिक उत्तरदायित्व</h2>
+    <p>
+      ईद मुबारक के अवसर पर, हमें न केवल अपनी आध्यात्मिक जिम्मेदारियों का निर्वाह करना चाहिए, बल्कि सामाजिक उत्तरदायित्वों को भी समझना और निभाना चाहिए। इस दिन का संदेश है कि हम अपने परिवार, समाज और समुदाय में भाईचारे और सहयोग की भावना को प्रबल करें:
     </p>
     <ul>
-      <li>
-        <strong>विशेष दुआएं:</strong> पैगंबर ﷺ ने दुआओं की महत्ता पर जोर दिया, जिससे व्यक्ति की आत्मिक शुद्धि और सामूहिक भलाई सुनिश्चित होती है।
-      </li>
-      <li>
-        <strong>दान और दान-पुण्य:</strong> ईद के अवसर पर दान देने से समाज में आर्थिक और सामाजिक न्याय स्थापित होता है और अल्लाह की बरकतें प्राप्त होती हैं।
-      </li>
-      <li>
-        <strong>सहाबा की शिक्षाएँ:</strong> सहाबा की जीवनशैली से हमें प्रेरणा मिलती है कि ईद के दिन आपसी भाईचारे, सहयोग और मानवता का संदेश फैलाया जाए।
-      </li>
+      <li>अपने पड़ोसियों और मित्रों के साथ मिलकर सामाजिक गतिविधियों का आयोजन करें और जरूरतमंदों की सहायता करें।</li>
+      <li>मस्जिदों और दीनिक संस्थानों में जाकर दुआएँ करें और धार्मिक शिक्षाओं का प्रचार प्रसार करें।</li>
+      <li>अपने जीवन में अल्लाह की याद को नियमित रूप से शामिल करें, चाहे वह नमाज हो, ज़िक्र हो या दुआ।</li>
+      <li>सामूहिक रूप से सदका-ए-फितर एवं अन्य दान-पुण्य के कार्यों में सहयोग करें ताकि समाज में एकता और प्रेम का संदेश फैल सके।</li>
     </ul>
     <p>
-      <strong>सामाजिक और आध्यात्मिक पहलू:</strong><br>
-      ईद का दिन न केवल धार्मिक इबादत का है बल्कि यह सामाजिक एकता और आध्यात्मिक तरोताजा होने का भी अवसर है:
+      कुरआन में एक आयत हमें यह सिखाती है:
     </p>
-    <ul>
-      <li>
-        <strong>परिवार और सामाजिक मेल-मिलाप:</strong> ईद के दिन परिवार और दोस्तों के बीच प्रेम और सहयोग का आदान-प्रदान होता है, जिससे सामाजिक बंधन मजबूत होते हैं।
-      </li>
-      <li>
-        <strong>आध्यात्मिक तरोताजा:</strong> विशेष इबादत, ज़िक्र और दुआओं के माध्यम से व्यक्ति अपनी आत्मा को शुद्ध करता है और अल्लाह के करीब होता है।
-      </li>
-      <li>
-        <strong>सामाजिक न्याय:</strong> दान-पुण्य और दान के माध्यम से समाज में आर्थिक असमानताओं को कम करने की कोशिश की जाती है।
-      </li>
-    </ul>
-    
-    <div class="extra-info">
-      <h3>ऐतिहासिक और फिकही पृष्ठभूमि:</h3>
-      <p>
-        अहल-सुन्नत व जमात की शिक्षाओं के अनुसार, ईद एक ऐसा ऐतिहासिक और धार्मिक दिन है जिसने मुसलमानों को एकजुट किया है। इसके इतिहास में कई महत्वपूर्ण घटनाएँ और फिकही बहसें शामिल हैं:
-      </p>
-      <ul>
-        <li>
-          <strong>नमाज़-ए-ईद की महत्ता:</strong> ऐतिहासिक स्रोतों के अनुसार, ईद की नमाज़ ने न केवल आध्यात्मिक उन्नति बल्कि सामाजिक एकता का भी प्रतीक बना।
-        </li>
-        <li>
-          <strong>दान-पुण्य और सामाजिक न्याय:</strong> फिकही विचारधारा के अनुसार, ईद के दिन दान-पुण्य का आयोजन सामाजिक न्याय को सुनिश्चित करने के लिए किया जाता है।
-        </li>
-        <li>
-          <strong>हदीस की शिक्षाएँ:</strong> कई हदीस में ईद के दिन की विशेष दुआओं और इबादतों का उल्लेख मिलता है, जो मुसलमानों के जीवन में सकारात्मक परिवर्तन का कारण बनती हैं।
-        </li>
-      </ul>
-      <h3>कुरान और हदीस से मुख्य संदेश:</h3>
-      <p>
-        कुरान और हदीस में ईद के दिन की महत्ता और बरकत का उल्लेख मिलता है। इन संदेशों के अनुसार:
-      </p>
-      <ul>
-        <li>
-          <strong>अल्लाह की बरकतों का अहसास:</strong> कुरान में अल्लाह की दी हुई बरकतों का धन्यवाद करने और उनका शुकर अदा करने की सलाह दी गई है।
-        </li>
-        <li>
-          <strong>दुआएँ और ज़िक्र:</strong> हदीस के अनुसार, ईद के दिन विशेष दुआएँ और ज़िक्र से आत्मा को शुद्ध किया जाता है और सामाजिक एकता को बल मिलता है।
-        </li>
-        <li>
-          <strong>नबी ﷺ की शिक्षाएँ:</strong> पैगंबर ﷺ की शिक्षाओं के अनुसार, ईद का दिन एक ऐसा अवसर है जब व्यक्ति अपनी जिंदगी में नैतिक और आध्यात्मिक सुधार ला सकता है।
-        </li>
-      </ul>
-      <p>
-        इन विस्तृत विवरणों के माध्यम से हमारा उद्देश्य यह है कि हर मुसलमान को ईद के दिन की वास्तविक महत्वता का एहसास हो और वह अपनी जिंदगी में इस दिन की आध्यात्मिक, सामाजिक और नैतिक अहमियत को समझ सके।
-      </p>
-    </div>
-  </div>
-  
-  <!-- Footer -->
+    <blockquote>
+      \"وَاذْكُرُوا نِعْمَتَ اللَّهِ عَلَيْكُمْ وَمِيثَاقَهُ الَّذِي وَعَدَكُمْ\" <br>
+      (आल-इमरान: 31)
+    </blockquote>
+    <p>
+      इसका तात्पर्य है कि हमें अल्लाह की उन अनगिनत نعमतों का आभार व्यक्त करना चाहिए जो उसने हमें दी हैं, और उन पर अमल करना चाहिए।
+    </p>
+  </section>
+
+  <!-- निष्कर्ष एवं आशीर्वाद -->
+  <section class="conclusion">
+    <h2>निष्कर्ष एवं आशीर्वाद</h2>
+    <p>
+      ईद मुबारक 2025 का यह विस्तृत विवेचन हमें याद दिलाता है कि ईद केवल एक उत्सव नहीं, बल्कि यह हमारे जीवन में सकारात्मक बदलाव, सामाजिक एकता और आध्यात्मिक उन्नति का प्रतीक है। कुरआन, हदीस एवं नबी ﷺ की शिक्षाएँ हमें सिखाती हैं कि हमें हमेशा अल्लाह का शुक्र अदा करना चाहिए, अपने सामाजिक और धार्मिक कर्तव्यों का निर्वाह करना चाहिए और अपने जीवन में निरंतर सुधार के लिए प्रयासरत रहना चाहिए।
+    </p>
+    <p>
+      हमारी दुआ है कि अल्लाह हमें अपनी अनंत रहमत, कृपा और बरकतों से नवाजे, और हमें ईद के इस पावन अवसर पर अपने परिवार, समाज तथा सम्पूर्ण मानवता के लिए अमूल्य आशीर्वाद प्रदान करे। <strong>आमीन!</strong>
+    </p>
+    <p>
+      आइए, हम सब मिलकर ईद के इस पवित्र अवसर पर अपने दिलों में अल्लाह की याद को ताज़ा करें, अपने कर्मों में सुधार लाएँ और एक समृद्ध एवं प्रेमपूर्ण समाज का निर्माण करें।
+    </p>
+  </section>
+
   <footer>
+    <p>&copy; 2025 ईद मुबारक 2025 | सभी अधिकार सुरक्षित</p>
     <div class="social-icons">
-      <a href="#"><i class="fab fa-facebook"></i></a>
-      <a href="#"><i class="fab fa-twitter"></i></a>
-      <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#" class="icon">फेसबुक</a>
+      <a href="#" class="icon">ट्विटर</a>
+      <a href="#" class="icon">इंस्टाग्राम</a>
+      <a href="#" class="icon">यूट्यूब</a>
     </div>
-    <p>&copy; 2025 मेरी ब्रांड | सभी अधिकार सुरक्षित &#10004;</p>
   </footer>
-  
-  <!-- Back-to-Top Button -->
-  <button id="backToTop">ऊपर जाएँ</button>
-  
+
   <script>
-    // --------------------- Header Scroll Effect ---------------------
-    window.addEventListener('scroll', () => {
-      const header = document.getElementById('header');
-      if(window.scrollY > 50) {
-        header.classList.add('scrolled');
-      } else {
-        header.classList.remove('scrolled');
-      }
-      
-      // --------------------- Back-to-Top Button Visibility ---------------------
-      const backToTop = document.getElementById('backToTop');
-      if(window.scrollY > 300) {
-        backToTop.style.display = 'block';
-      } else {
-        backToTop.style.display = 'none';
-      }
-    });
-    
-    // --------------------- Back-to-Top Button Click Event ---------------------
-    document.getElementById('backToTop').addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-    
-    // --------------------- Countdown Timer Setup (Target: 2 April 2025) ---------------------
-    const countdownEl = document.getElementById('countdown');
-    const targetDate = new Date(March 31, 2025 00:00:00').getTime();
-    const countdownInterval = setInterval(() => {
+    // काउंटडाउन के लिए अंतिम तारीख सेट करें: 31 मार्च 2025, 00:00:00
+    const targetDate = new Date("March 31, 2025 00:00:00").getTime();
+    function updateCountdown() {
       const now = new Date().getTime();
       const distance = targetDate - now;
       if (distance < 0) {
+        document.getElementById("countdownTimer").innerHTML = "ईद मुबारक!";
         clearInterval(countdownInterval);
-        countdownEl.innerHTML = 'ईद मुबारक!';
         return;
+      }
       const days = Math.floor(distance / (1000 * 60 * 60 * 24));
       const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-      countdownEl.innerHTML = `ईद तक: ${days} दिन : ${hours} घंटे : ${minutes} मिनट : ${seconds} सेकंड`;
-    }, 1000);
-    
-    // --------------------- Quotes Button Event ---------------------
-    document.getElementById('quoteBtn').addEventListener('click', (e) => {
-      e.preventDefault();
-      alert('الله हर चीज़ पर काबिल है!');
-    });
-    
-    // --------------------- Additional JavaScript (if needed) ---------------------
-    // You can add more JS functions here
-    
+      document.getElementById("countdownTimer").innerHTML =
+        days + " दिन " + hours + " घंटे " + minutes + " मिनट " + seconds + " सेकंड";
+    }
+    const countdownInterval = setInterval(updateCountdown, 1000);
+    updateCountdown();
   </script>
 </body>
 </html>
