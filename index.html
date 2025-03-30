@@ -2,114 +2,285 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
+  <meta name="description" content="तकनीकी समस्याओं के कारण वेबसाइट बंद – अतिरिक्त तकनीकी विवरण और इंटरेक्टिव अनुभव।">
+  <meta name="keywords" content="Website Shutdown, Technical Details, Interactive, High Export Quality, Offline, Extra Info">
+  <meta name="author" content="Export Experience">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Website Temporarily Shut Down</title>
+  <title>Website Temporarily Shut Down - Extra Info Experience</title>
   <style>
-    /* बॉडी का बेस स्टाइल और एनिमेशन सेटअप */
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #f2f2f2, #e6e6e6);
-      color: #333;
+    :root {
+      --primary-color: #2e8b57;
+      --secondary-color: #d9534f;
+      --bg-gradient-start: #f2f2f2;
+      --bg-gradient-end: #e6e6e6;
+      --text-color: #333;
+      --container-bg: #ffffff;
+      --shadow-color: rgba(0,0,0,0.2);
+      --transition-speed: 0.5s;
+    }
+
+    /* Reset styles */
+    * {
       margin: 0;
-      padding: 20px;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Body & Background */
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      color: var(--text-color);
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    /* Subtle background animation */
+    body::after {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, rgba(46,139,87,0.1), transparent 70%);
+      animation: pulse 8s infinite ease-in-out;
+      z-index: -1;
+    }
+    
+    @keyframes pulse {
+      0%   { transform: scale(0.8); opacity: 0.8; }
+      50%  { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(0.8); opacity: 0.8; }
+    }
+
+    /* Preloader styles */
+    #preloader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--container-bg);
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      overflow: hidden;
+      z-index: 9999;
     }
-    /* कंटेनर का स्टाइल और एनिमेशन */
+    .loader {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid var(--primary-color);
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Main Container */
     .container {
-      background-color: #fff;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 90%;
+      max-width: 650px;
       padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      background-color: var(--container-bg);
+      border-radius: 12px;
+      box-shadow: 0 8px 16px var(--shadow-color);
       text-align: center;
+      transform: translate(-50%, -50%) scale(0.8);
       opacity: 0;
-      transform: translateY(50px);
-      animation: fadeInUp 1s forwards;
+      animation: containerAppear 1s forwards ease-out;
+      animation-delay: 1s;
     }
-    /* हेडिंग का एनिमेटेड स्टाइल */
-    h1 {
-      font-size: 2.5em;
-      color: #d9534f;
+    @keyframes containerAppear {
+      to {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+    }
+    
+    /* Header with advanced animation */
+    .container h1 {
+      font-size: 2.8em;
+      color: var(--secondary-color);
       margin-bottom: 20px;
-      animation: bounce 1s ease-in-out 1.2s both;
+      text-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      opacity: 0;
+      animation: bounceIn 1s forwards;
+      animation-delay: 1.2s;
     }
-    p {
+    @keyframes bounceIn {
+      0% {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      60% {
+        transform: translateY(10px);
+        opacity: 1;
+      }
+      80% {
+        transform: translateY(-5px);
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
+
+    .container p {
       font-size: 1.2em;
-      margin-bottom: 20px;
+      margin: 20px 0;
       opacity: 0;
-      transform: translateY(20px);
-      animation: fadeIn 1s forwards;
+      transform: translateY(30px);
+      animation: fadeInUp 0.8s forwards;
     }
-    p:nth-of-type(1) {
-      animation-delay: 1.5s;
+    .container p:nth-of-type(1) { animation-delay: 1.4s; }
+    .container p:nth-of-type(2) { animation-delay: 1.6s; }
+    .container p:nth-of-type(3) { animation-delay: 1.8s; }
+    @keyframes fadeInUp {
+      to { opacity: 1; transform: translateY(0); }
     }
-    p:nth-of-type(2) {
-      animation-delay: 1.7s;
-    }
-    p:nth-of-type(3) {
-      animation-delay: 1.9s;
-    }
+
     .footer {
       font-size: 0.9em;
       color: #777;
       margin-top: 30px;
       opacity: 0;
-      animation: fadeIn 1s forwards;
-      animation-delay: 2.1s;
-    }
-    /* एनिमेशन की की-फ्रेम्स */
-    @keyframes fadeInUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      animation: fadeIn 0.8s forwards;
+      animation-delay: 2s;
     }
     @keyframes fadeIn {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      to { opacity: 1; }
     }
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
-      }
-      40% {
-        transform: translateY(-20px);
-      }
-      60% {
-        transform: translateY(-10px);
-      }
+
+    /* Toggle Button for Technical Details */
+    .toggle-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: var(--primary-color);
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background var(--transition-speed);
+      font-size: 1em;
     }
-    /* अतिरिक्त ट्रांजिशन इफेक्ट */
-    a {
-      text-decoration: none;
-      color: #2e8b57;
-      transition: color 0.3s;
+    .toggle-btn:hover {
+      background-color: #246b45;
     }
-    a:hover {
-      color: #1e593e;
+    
+    /* Collapsible Technical Details */
+    .tech-details {
+      margin-top: 20px;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #fafafa;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.6s ease-out;
+    }
+    .tech-details.open {
+      max-height: 400px;
+    }
+    .tech-details p {
+      font-size: 0.95em;
+      text-align: left;
+      margin: 10px 0;
+    }
+    
+    /* Tooltip for extra info */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      border-bottom: 1px dashed var(--primary-color);
+    }
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 220px;
+      background-color: var(--primary-color);
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%; /* Position above the text */
+      left: 50%;
+      margin-left: -110px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      .container { padding: 20px; }
+      .container h1 { font-size: 2em; }
+      .container p { font-size: 1em; }
     }
   </style>
 </head>
 <body>
+  <!-- Preloader -->
+  <div id="preloader">
+    <div class="loader"></div>
+  </div>
+  
+  <!-- Main Content Container -->
   <div class="container">
     <h1>Website Shut Down</h1>
     <p>
-      हमारी वेबसाइट तकनीकी परेशानियों के कारण फिलहाल बंद कर दी गई है।
+      हमारी वेबसाइट तकनीकी परेशानियों के कारण <span class="tooltip">अस्थायी रूप से बंद<span class="tooltiptext">Technical difficulties encountered. Our servers are under maintenance.</span></span> कर दी गई है।
     </p>
     <p>
-      इस अप्रत्याशित समस्या के कारण हमें वेबसाइट से स्क्रिप्ट हटानी पड़ी है।
+      इस अप्रत्याशित समस्या के कारण हमें तत्काल स्क्रिप्ट हटानी पड़ी है और हम जल्द ही समाधान करने का प्रयास करेंगे।
     </p>
     <p>
-      हम जल्द से जल्द समस्या का समाधान करके वापस आने का प्रयास करेंगे। कृपया कुछ समय बाद पुनः प्रयास करें।
+      कृपया कुछ समय पश्चात पुनः प्रयास करें। आपके धैर्य के लिए धन्यवाद।
     </p>
+    
+    <!-- Toggle Button for Technical Details -->
+    <button class="toggle-btn" onclick="toggleTechDetails()">तकनीकी विवरण देखें</button>
+    <div class="tech-details" id="techDetails">
+      <p><strong>Error Code:</strong> 503 Service Unavailable</p>
+      <p><strong>Description:</strong> सर्वर पर अत्यधिक लोड और नेटवर्क समस्याओं के कारण अस्थायी बंदी।</p>
+      <p><strong>Estimated Downtime:</strong> 2-3 घंटे (अनुमानित)</p>
+      <p><strong>Contact Support:</strong> <a href="mailto:support@example.com" style="color: var(--primary-color);">support@example.com</a></p>
+      <p>अधिक जानकारी के लिए कृपया हमारी तकनीकी टीम से संपर्क करें।</p>
+    </div>
+    
     <div class="footer">
       &copy; 2025 | Export Experience Script
     </div>
   </div>
+  
+  <script>
+    // Preloader hide on window load
+    window.addEventListener('load', function() {
+      const preloader = document.getElementById('preloader');
+      preloader.style.transition = 'opacity 0.8s ease-out';
+      preloader.style.opacity = '0';
+      setTimeout(function() {
+        preloader.style.display = 'none';
+      }, 800);
+    });
+    
+    // Toggle Technical Details
+    function toggleTechDetails() {
+      const details = document.getElementById('techDetails');
+      details.classList.toggle('open');
+    }
+  </script>
 </body>
 </html>
