@@ -2,31 +2,30 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <meta name="description" content="तकनीकी समस्याओं के कारण वेबसाइट बंद – अतिरिक्त तकनीकी विवरण और इंटरेक्टिव अनुभव।">
-  <meta name="keywords" content="Website Shutdown, Technical Details, Interactive, High Export Quality, Offline, Extra Info">
+  <meta name="description" content="तकनीकी समस्याओं के कारण वेबसाइट बंद – Warning के साथ एक्स्ट्रा इंटरेक्टिव अनुभव">
+  <meta name="keywords" content="Website Shutdown, Warning, Technical Issues, Interactive, High Export Quality, Offline">
   <meta name="author" content="Export Experience">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Website Temporarily Shut Down - Extra Info Experience</title>
+  <title>⚠️ Website Shut Down - Extra Warning Experience</title>
   <style>
     :root {
       --primary-color: #2e8b57;
       --secondary-color: #d9534f;
-      --bg-gradient-start: #f2f2f2;
+      --warning-color: #ffcc00;
+      --bg-gradient-start: #f0f0f8;
       --bg-gradient-end: #e6e6e6;
       --text-color: #333;
       --container-bg: #ffffff;
-      --shadow-color: rgba(0,0,0,0.2);
+      --shadow-color: rgba(0,0,0,0.25);
       --transition-speed: 0.5s;
     }
-
-    /* Reset styles */
+    
+    /* Reset and Base Styles */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
-    /* Body & Background */
     body {
       font-family: 'Arial', sans-serif;
       background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
@@ -35,8 +34,7 @@
       overflow: hidden;
       position: relative;
     }
-    
-    /* Subtle background animation */
+    /* Background Pulse Animation */
     body::after {
       content: "";
       position: absolute;
@@ -45,17 +43,16 @@
       width: 200%;
       height: 200%;
       background: radial-gradient(circle at center, rgba(46,139,87,0.1), transparent 70%);
-      animation: pulse 8s infinite ease-in-out;
-      z-index: -1;
+      animation: pulse 10s infinite ease-in-out;
+      z-index: -2;
+    }
+    @keyframes pulse {
+      0%   { transform: scale(0.9); opacity: 0.8; }
+      50%  { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.8; }
     }
     
-    @keyframes pulse {
-      0%   { transform: scale(0.8); opacity: 0.8; }
-      50%  { transform: scale(1.1); opacity: 1; }
-      100% { transform: scale(0.8); opacity: 0.8; }
-    }
-
-    /* Preloader styles */
+    /* Preloader */
     #preloader {
       position: fixed;
       top: 0;
@@ -80,14 +77,14 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-
+    
     /* Main Container */
     .container {
       position: absolute;
       top: 50%;
       left: 50%;
       width: 90%;
-      max-width: 650px;
+      max-width: 700px;
       padding: 40px;
       background-color: var(--container-bg);
       border-radius: 12px;
@@ -99,13 +96,36 @@
       animation-delay: 1s;
     }
     @keyframes containerAppear {
-      to {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-      }
+      to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
     }
     
-    /* Header with advanced animation */
+    /* Warning Banner */
+    .warning-banner {
+      background-color: var(--warning-color);
+      color: #000;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 20px;
+      display: inline-block;
+      opacity: 0;
+      animation: slideDown 0.8s forwards;
+      animation-delay: 0.8s;
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .warning-banner .icon {
+      animation: blink 1.2s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+    
+    /* Container Heading & Text */
     .container h1 {
       font-size: 2.8em;
       color: var(--secondary-color);
@@ -116,22 +136,11 @@
       animation-delay: 1.2s;
     }
     @keyframes bounceIn {
-      0% {
-        transform: translateY(-50px);
-        opacity: 0;
-      }
-      60% {
-        transform: translateY(10px);
-        opacity: 1;
-      }
-      80% {
-        transform: translateY(-5px);
-      }
-      100% {
-        transform: translateY(0);
-      }
+      0% { transform: translateY(-50px); opacity: 0; }
+      60% { transform: translateY(10px); opacity: 1; }
+      80% { transform: translateY(-5px); }
+      100% { transform: translateY(0); }
     }
-
     .container p {
       font-size: 1.2em;
       margin: 20px 0;
@@ -145,22 +154,9 @@
     @keyframes fadeInUp {
       to { opacity: 1; transform: translateY(0); }
     }
-
-    .footer {
-      font-size: 0.9em;
-      color: #777;
-      margin-top: 30px;
-      opacity: 0;
-      animation: fadeIn 0.8s forwards;
-      animation-delay: 2s;
-    }
-    @keyframes fadeIn {
-      to { opacity: 1; }
-    }
-
-    /* Toggle Button for Technical Details */
+    
+    /* Technical Details Toggle Button */
     .toggle-btn {
-      display: inline-block;
       margin-top: 20px;
       padding: 10px 20px;
       background-color: var(--primary-color);
@@ -175,7 +171,7 @@
       background-color: #246b45;
     }
     
-    /* Collapsible Technical Details */
+    /* Collapsible Technical Details Panel */
     .tech-details {
       margin-top: 20px;
       padding: 20px;
@@ -185,44 +181,29 @@
       max-height: 0;
       overflow: hidden;
       transition: max-height 0.6s ease-out;
+      text-align: left;
+      font-size: 0.95em;
     }
     .tech-details.open {
-      max-height: 400px;
+      max-height: 500px;
     }
     .tech-details p {
-      font-size: 0.95em;
-      text-align: left;
       margin: 10px 0;
     }
     
-    /* Tooltip for extra info */
-    .tooltip {
-      position: relative;
-      display: inline-block;
-      cursor: pointer;
-      border-bottom: 1px dashed var(--primary-color);
-    }
-    .tooltip .tooltiptext {
-      visibility: hidden;
-      width: 220px;
-      background-color: var(--primary-color);
-      color: #fff;
-      text-align: center;
-      border-radius: 6px;
-      padding: 8px;
-      position: absolute;
-      z-index: 1;
-      bottom: 125%; /* Position above the text */
-      left: 50%;
-      margin-left: -110px;
+    /* Footer Style */
+    .footer {
+      font-size: 0.9em;
+      color: #777;
+      margin-top: 30px;
       opacity: 0;
-      transition: opacity 0.3s;
+      animation: fadeIn 0.8s forwards;
+      animation-delay: 2s;
     }
-    .tooltip:hover .tooltiptext {
-      visibility: visible;
-      opacity: 1;
+    @keyframes fadeIn {
+      to { opacity: 1; }
     }
-
+    
     /* Responsive Design */
     @media (max-width: 600px) {
       .container { padding: 20px; }
@@ -239,12 +220,15 @@
   
   <!-- Main Content Container -->
   <div class="container">
+    <div class="warning-banner">
+      <span class="icon">⚠️</span> WARNING: Critical Technical Issues!
+    </div>
     <h1>Website Shut Down</h1>
     <p>
-      हमारी वेबसाइट तकनीकी परेशानियों के कारण <span class="tooltip">अस्थायी रूप से बंद<span class="tooltiptext">Technical difficulties encountered. Our servers are under maintenance.</span></span> कर दी गई है।
+      हमारी वेबसाइट तकनीकी परेशानियों के कारण <strong>अस्थायी रूप से बंद</strong> कर दी गई है।
     </p>
     <p>
-      इस अप्रत्याशित समस्या के कारण हमें तत्काल स्क्रिप्ट हटानी पड़ी है और हम जल्द ही समाधान करने का प्रयास करेंगे।
+      इस अप्रत्याशित समस्या के कारण हमें तत्काल स्क्रिप्ट हटानी पड़ी है। हम अपनी टीम के साथ मिलकर समस्या का समाधान करने का प्रयास कर रहे हैं।
     </p>
     <p>
       कृपया कुछ समय पश्चात पुनः प्रयास करें। आपके धैर्य के लिए धन्यवाद।
@@ -256,7 +240,7 @@
       <p><strong>Error Code:</strong> 503 Service Unavailable</p>
       <p><strong>Description:</strong> सर्वर पर अत्यधिक लोड और नेटवर्क समस्याओं के कारण अस्थायी बंदी।</p>
       <p><strong>Estimated Downtime:</strong> 2-3 घंटे (अनुमानित)</p>
-      <p><strong>Contact Support:</strong> <a href="mailto:support@example.com" style="color: var(--primary-color);">support@example.com</a></p>
+      <p><strong>Support:</strong> <a href="mailto:support@example.com" style="color: var(--primary-color);">support@example.com</a></p>
       <p>अधिक जानकारी के लिए कृपया हमारी तकनीकी टीम से संपर्क करें।</p>
     </div>
     
@@ -276,7 +260,7 @@
       }, 800);
     });
     
-    // Toggle Technical Details
+    // Toggle Technical Details Panel
     function toggleTechDetails() {
       const details = document.getElementById('techDetails');
       details.classList.toggle('open');
