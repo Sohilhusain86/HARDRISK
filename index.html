@@ -1,1 +1,115 @@
-
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website Temporarily Shut Down</title>
+  <style>
+    /* बॉडी का बेस स्टाइल और एनिमेशन सेटअप */
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #f2f2f2, #e6e6e6);
+      color: #333;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    /* कंटेनर का स्टाइल और एनिमेशन */
+    .container {
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      text-align: center;
+      opacity: 0;
+      transform: translateY(50px);
+      animation: fadeInUp 1s forwards;
+    }
+    /* हेडिंग का एनिमेटेड स्टाइल */
+    h1 {
+      font-size: 2.5em;
+      color: #d9534f;
+      margin-bottom: 20px;
+      animation: bounce 1s ease-in-out 1.2s both;
+    }
+    p {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 1s forwards;
+    }
+    p:nth-of-type(1) {
+      animation-delay: 1.5s;
+    }
+    p:nth-of-type(2) {
+      animation-delay: 1.7s;
+    }
+    p:nth-of-type(3) {
+      animation-delay: 1.9s;
+    }
+    .footer {
+      font-size: 0.9em;
+      color: #777;
+      margin-top: 30px;
+      opacity: 0;
+      animation: fadeIn 1s forwards;
+      animation-delay: 2.1s;
+    }
+    /* एनिमेशन की की-फ्रेम्स */
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-20px);
+      }
+      60% {
+        transform: translateY(-10px);
+      }
+    }
+    /* अतिरिक्त ट्रांजिशन इफेक्ट */
+    a {
+      text-decoration: none;
+      color: #2e8b57;
+      transition: color 0.3s;
+    }
+    a:hover {
+      color: #1e593e;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Website Shut Down</h1>
+    <p>
+      हमारी वेबसाइट तकनीकी परेशानियों के कारण फिलहाल बंद कर दी गई है।
+    </p>
+    <p>
+      इस अप्रत्याशित समस्या के कारण हमें वेबसाइट से स्क्रिप्ट हटानी पड़ी है।
+    </p>
+    <p>
+      हम जल्द से जल्द समस्या का समाधान करके वापस आने का प्रयास करेंगे। कृपया कुछ समय बाद पुनः प्रयास करें।
+    </p>
+    <div class="footer">
+      &copy; 2025 | Export Experience Script
+    </div>
+  </div>
+</body>
+</html>
