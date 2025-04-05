@@ -2,268 +2,100 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <meta name="description" content="तकनीकी समस्याओं के कारण वेबसाइट बंद – Warning के साथ एक्स्ट्रा इंटरेक्टिव अनुभव">
-  <meta name="keywords" content="Website Shutdown, Warning, Technical Issues, Interactive, High Export Quality, Offline">
-  <meta name="author" content="Export Experience">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚠️ Website Shut Down - Extra Warning Experience</title>
+  <title>इस्लामिक शब्द जनरेटर</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary-color: #2e8b57;
-      --secondary-color: #d9534f;
-      --warning-color: #ffcc00;
-      --bg-gradient-start: #f0f0f8;
-      --bg-gradient-end: #e6e6e6;
-      --text-color: #333;
-      --container-bg: #ffffff;
-      --shadow-color: rgba(0,0,0,0.25);
-      --transition-speed: 0.5s;
-    }
-    
-    /* Reset and Base Styles */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
     body {
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-      color: var(--text-color);
-      height: 100vh;
-      overflow: hidden;
-      position: relative;
-    }
-    /* Background Pulse Animation */
-    body::after {
-      content: "";
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle at center, rgba(46,139,87,0.1), transparent 70%);
-      animation: pulse 10s infinite ease-in-out;
-      z-index: -2;
-    }
-    @keyframes pulse {
-      0%   { transform: scale(0.9); opacity: 0.8; }
-      50%  { transform: scale(1.05); opacity: 1; }
-      100% { transform: scale(0.9); opacity: 0.8; }
-    }
-    
-    /* Preloader */
-    #preloader {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--container-bg);
+      font-family: 'Noto Sans Devanagari', sans-serif;
+      background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%);
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 9999;
+      height: 100vh;
+      color: #004d40;
     }
-    .loader {
-      border: 8px solid #f3f3f3;
-      border-top: 8px solid var(--primary-color);
-      border-radius: 50%;
-      width: 80px;
-      height: 80px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    /* Main Container */
     .container {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 90%;
-      max-width: 700px;
-      padding: 40px;
-      background-color: var(--container-bg);
-      border-radius: 12px;
-      box-shadow: 0 8px 16px var(--shadow-color);
       text-align: center;
-      transform: translate(-50%, -50%) scale(0.8);
-      opacity: 0;
-      animation: containerAppear 1s forwards ease-out;
-      animation-delay: 1s;
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 90%;
+      animation: fadeIn 1s ease-in-out;
     }
-    @keyframes containerAppear {
-      to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    h1 {
+      font-size: 26px;
+      margin-bottom: 20px;
+      color: #00695c;
     }
-    
-    /* Warning Banner */
-    .warning-banner {
-      background-color: var(--warning-color);
-      color: #000;
-      padding: 10px 20px;
-      border-radius: 5px;
-      font-size: 1.2em;
+    #word {
+      font-size: 30px;
       font-weight: bold;
-      margin-bottom: 20px;
-      display: inline-block;
-      opacity: 0;
-      animation: slideDown 0.8s forwards;
-      animation-delay: 0.8s;
+      margin: 30px 0;
+      color: #00897b;
+      transition: 0.3s ease;
     }
-    @keyframes slideDown {
-      from { transform: translateY(-50px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    .warning-banner .icon {
-      animation: blink 1.2s infinite;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.2; }
-    }
-    
-    /* Container Heading & Text */
-    .container h1 {
-      font-size: 2.8em;
-      color: var(--secondary-color);
-      margin-bottom: 20px;
-      text-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      opacity: 0;
-      animation: bounceIn 1s forwards;
-      animation-delay: 1.2s;
-    }
-    @keyframes bounceIn {
-      0% { transform: translateY(-50px); opacity: 0; }
-      60% { transform: translateY(10px); opacity: 1; }
-      80% { transform: translateY(-5px); }
-      100% { transform: translateY(0); }
-    }
-    .container p {
-      font-size: 1.2em;
-      margin: 20px 0;
-      opacity: 0;
-      transform: translateY(30px);
-      animation: fadeInUp 0.8s forwards;
-    }
-    .container p:nth-of-type(1) { animation-delay: 1.4s; }
-    .container p:nth-of-type(2) { animation-delay: 1.6s; }
-    .container p:nth-of-type(3) { animation-delay: 1.8s; }
-    @keyframes fadeInUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    /* Technical Details Toggle Button */
-    .toggle-btn {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: var(--primary-color);
-      color: #fff;
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
+      background-color: #00796b;
+      color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 10px;
       cursor: pointer;
-      transition: background var(--transition-speed);
-      font-size: 1em;
+      transition: background 0.3s ease;
     }
-    .toggle-btn:hover {
-      background-color: #246b45;
-    }
-    
-    /* Collapsible Technical Details Panel */
-    .tech-details {
-      margin-top: 20px;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background-color: #fafafa;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.6s ease-out;
-      text-align: left;
-      font-size: 0.95em;
-    }
-    .tech-details.open {
-      max-height: 500px;
-    }
-    .tech-details p {
-      margin: 10px 0;
-    }
-    
-    /* Footer Style */
-    .footer {
-      font-size: 0.9em;
-      color: #777;
-      margin-top: 30px;
-      opacity: 0;
-      animation: fadeIn 0.8s forwards;
-      animation-delay: 2s;
+    button:hover {
+      background-color: #004d40;
     }
     @keyframes fadeIn {
-      to { opacity: 1; }
-    }
-    
-    /* Responsive Design */
-    @media (max-width: 600px) {
-      .container { padding: 20px; }
-      .container h1 { font-size: 2em; }
-      .container p { font-size: 1em; }
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
-  <!-- Preloader -->
-  <div id="preloader">
-    <div class="loader"></div>
-  </div>
-  
-  <!-- Main Content Container -->
   <div class="container">
-    <div class="warning-banner">
-      <span class="icon">⚠️</span> WARNING: Critical Technical Issues!
-    </div>
-    <h1>Website Shut Down</h1>
-    <p>
-      हमारी वेबसाइट तकनीकी परेशानियों के कारण <strong>अस्थायी रूप से बंद</strong> कर दी गई है।
-    </p>
-    <p>
-      इस अप्रत्याशित समस्या के कारण हमें तत्काल स्क्रिप्ट हटानी पड़ी है। हम अपनी टीम के साथ मिलकर समस्या का समाधान करने का प्रयास कर रहे हैं।
-    </p>
-    <p>
-      कृपया कुछ समय पश्चात पुनः प्रयास करें। आपके धैर्य के लिए धन्यवाद।
-    </p>
-    
-    <!-- Toggle Button for Technical Details -->
-    <button class="toggle-btn" onclick="toggleTechDetails()">तकनीकी विवरण देखें</button>
-    <div class="tech-details" id="techDetails">
-      <p><strong>Error Code:</strong> 503 Service Unavailable</p>
-      <p><strong>Description:</strong> सर्वर पर अत्यधिक लोड और नेटवर्क समस्याओं के कारण अस्थायी बंदी।</p>
-      <p><strong>Estimated Downtime:</strong> 2-3 घंटे (अनुमानित)</p>
-      <p><strong>Support:</strong> <a href="mailto:support@example.com" style="color: var(--primary-color);">support@example.com</a></p>
-      <p>अधिक जानकारी के लिए कृपया हमारी तकनीकी टीम से संपर्क करें।</p>
-    </div>
-    
-    <div class="footer">
-      &copy; 2025 | Export Experience Script
-    </div>
+    <h1>इस्लामिक शब्द जनरेटर</h1>
+    <div id="word">शब्द यहाँ दिखेगा</div>
+    <button onclick="generateWord()">नया शब्द दिखाएँ</button>
   </div>
-  
+
   <script>
-    // Preloader hide on window load
-    window.addEventListener('load', function() {
-      const preloader = document.getElementById('preloader');
-      preloader.style.transition = 'opacity 0.8s ease-out';
-      preloader.style.opacity = '0';
-      setTimeout(function() {
-        preloader.style.display = 'none';
-      }, 800);
-    });
-    
-    // Toggle Technical Details Panel
-    function toggleTechDetails() {
-      const details = document.getElementById('techDetails');
-      details.classList.toggle('open');
+    const words = [
+      "सबर (सब्र)", "शुकर (शुक्र)", "तौहीद", "ईमान", "सलाम", 
+      "तक़वा", "हया", "इल्म", "दुआ", "रहमत",
+      "अख़लाक़", "बरकत", "हिकमत", "नमाज़", "रिज़्क़",
+      "सदाक़ा", "सवाब", "तौबा", "जन्नत", "अद्ल" "सब्र (धैर्य)", "शुक्र (आभार)", "तौहीद (एकेश्वरवाद)", "ईमान (विश्वास)", "सलाम (शांति)",
+  "तक़वा (अल्लाह का डर)", "हया (लज्जा)", "इल्म (ज्ञान)", "दुआ (प्रार्थना)", "रहमत (कृपा)",
+  "अख़लाक़ (चरित्र)", "बरकत (आशीर्वाद)", "हिकमत (बुद्धिमत्ता)", "नमाज़ (इबादत)",
+  "रिज़्क़ (रोज़ी)", "सदाक़ा (दान)", "सवाब (पुण्य)", "तौबा (पश्चाताप)", "जन्नत (स्वर्ग)",
+  "अद्ल (न्याय)", "इरादा (संकल्प)", "सबब (कारण)", "खुलूस (निष्कलंकता)", "इख़लास (सच्चाई)",
+  "अज़्म (दृढ़ निश्चय)", "मग़फ़िरत (क्षमा)", "नसीहत (उपदेश)", "सबक (सीख)", "सफर (यात्रा)",
+  "हिम्मत (साहस)", "इबादत (उपासना)", "नूर (प्रकाश)", "फैसलाह (निर्णय)", "तलाश (खोज)",
+  "सचाई", "संयम", "आस्था", "नेकनीयती", "इनायत (कृपा)", "खुदा की रहमत", "इंसाफ",
+  "दिल से दुआ", "रब की राह", "रज़ा (स्वीकार्यता)", "सब्र का फल", "बरकत वाली सोच",
+  "ज़िक्र (स्मरण)", "क़ुबूलियत (स्वीकृति)", "तौफीक़ (काबिलियत)", "हिदायत (मार्गदर्शन)",
+  "यकीन (पक्का विश्वास)", "नेकी", "सुकून", "फरमाबरदारी", "अमल", "रूह की तसल्ली",
+  "क़दरदानी", "रूहानी ताक़त", "तस्लीम (आत्मसमर्पण)", "बसीरत (अंतरदृष्टि)", "खुशबू-ए-इमान",
+  "तवक्कुल (पूर्ण भरोसा)", "रौशनी", "सब्र का इम्तहान", "रब की कसम", "ख़िदमत (सेवा)"
+];
+
+    function generateWord() {
+      const randomIndex = Math.floor(Math.random() * words.length);
+      const wordElement = document.getElementById("word");
+      wordElement.style.opacity = 0;
+      setTimeout(() => {
+        wordElement.innerText = words[randomIndex];
+        wordElement.style.opacity = 1;
+      }, 300);
     }
   </script>
 </body>
