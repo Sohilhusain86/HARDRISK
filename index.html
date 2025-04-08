@@ -2,101 +2,70 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>इस्लामिक शब्द जनरेटर</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>हैकिंग क्या है? पूरी जानकारी हिंदी में</title>
   <style>
-    * {
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f1f1f1;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
+      color: #333;
     }
-    body {
-      font-family: 'Noto Sans Devanagari', sans-serif;
-      background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: #004d40;
-    }
-    .container {
+    header {
+      background-color: #222;
+      color: #fff;
+      padding: 20px;
       text-align: center;
-      background: white;
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      max-width: 400px;
-      width: 90%;
-      animation: fadeIn 1s ease-in-out;
     }
-    h1 {
-      font-size: 26px;
-      margin-bottom: 20px;
-      color: #00695c;
+    section {
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      background-color: #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-top: 20px;
     }
-    #word {
-      font-size: 30px;
-      font-weight: bold;
-      margin: 30px 0;
-      color: #00897b;
-      transition: 0.3s ease;
+    h1, h2 {
+      color: #444;
     }
-    button {
-      padding: 12px 24px;
-      font-size: 18px;
-      background-color: #00796b;
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: #222;
       color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    button:hover {
-      background-color: #004d40;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>इस्लामिक शब्द जनरेटर</h1>
-    <div id="word">शब्द यहाँ दिखेगा</div>
-    <button onclick="generateWord()">नया शब्द दिखाएँ</button>
-  </div>
 
-  <script>
-    const words = [
-      "सबर (सब्र)", "शुकर (शुक्र)", "तौहीद", "ईमान", "सलाम", 
-      "तक़वा", "हया", "इल्म", "दुआ", "रहमत",
-      "अख़लाक़", "बरकत", "हिकमत", "नमाज़", "रिज़्क़",
-      "सदाक़ा", "सवाब", "तौबा", "जन्नत", "अद्ल" "सब्र (धैर्य)", "शुक्र (आभार)", "तौहीद (एकेश्वरवाद)", "ईमान (विश्वास)", "सलाम (शांति)",
-  "तक़वा (अल्लाह का डर)", "हया (लज्जा)", "इल्म (ज्ञान)", "दुआ (प्रार्थना)", "रहमत (कृपा)",
-  "अख़लाक़ (चरित्र)", "बरकत (आशीर्वाद)", "हिकमत (बुद्धिमत्ता)", "नमाज़ (इबादत)",
-  "रिज़्क़ (रोज़ी)", "सदाक़ा (दान)", "सवाब (पुण्य)", "तौबा (पश्चाताप)", "जन्नत (स्वर्ग)",
-  "अद्ल (न्याय)", "इरादा (संकल्प)", "सबब (कारण)", "खुलूस (निष्कलंकता)", "इख़लास (सच्चाई)",
-  "अज़्म (दृढ़ निश्चय)", "मग़फ़िरत (क्षमा)", "नसीहत (उपदेश)", "सबक (सीख)", "सफर (यात्रा)",
-  "हिम्मत (साहस)", "इबादत (उपासना)", "नूर (प्रकाश)", "फैसलाह (निर्णय)", "तलाश (खोज)",
-  "सचाई", "संयम", "आस्था", "नेकनीयती", "इनायत (कृपा)", "खुदा की रहमत", "इंसाफ",
-  "दिल से दुआ", "रब की राह", "रज़ा (स्वीकार्यता)", "सब्र का फल", "बरकत वाली सोच",
-  "ज़िक्र (स्मरण)", "क़ुबूलियत (स्वीकृति)", "तौफीक़ (काबिलियत)", "हिदायत (मार्गदर्शन)",
-  "यकीन (पक्का विश्वास)", "नेकी", "सुकून", "फरमाबरदारी", "अमल", "रूह की तसल्ली",
-  "क़दरदानी", "रूहानी ताक़त", "तस्लीम (आत्मसमर्पण)", "बसीरत (अंतरदृष्टि)", "खुशबू-ए-इमान",
-  "तवक्कुल (पूर्ण भरोसा)", "रौशनी", "सब्र का इम्तहान", "रब की कसम", "ख़िदमत (सेवा)"
-];
+  <header>
+    <h1>हैकिंग क्या है?</h1>
+    <p>पूरी जानकारी हिंदी में</p>
+  </header>
 
-    function generateWord() {
-      const randomIndex = Math.floor(Math.random() * words.length);
-      const wordElement = document.getElementById("word");
-      wordElement.style.opacity = 0;
-      setTimeout(() => {
-        wordElement.innerText = words[randomIndex];
-        wordElement.style.opacity = 1;
-      }, 300);
-    }
-  </script>
+  <section>
+    <h2>हैकिंग का मतलब</h2>
+    <p>हैकिंग का मतलब होता है किसी सिस्टम, कंप्यूटर या नेटवर्क में अनधिकृत रूप से प्रवेश करना। यह गलत भी हो सकता है और सही भी, यह इस बात पर निर्भर करता है कि इसका उपयोग कैसे किया जा रहा है।</p>
+
+    <h2>हैकिंग के प्रकार</h2>
+    <ul>
+      <li><strong>White Hat Hacker:</strong> यह अच्छे हैकर होते हैं जो सिस्टम की सुरक्षा जांचने के लिए हैकिंग करते हैं।</li>
+      <li><strong>Black Hat Hacker:</strong> यह गलत उद्देश्य से हैकिंग करते हैं जैसे डेटा चोरी करना, वेबसाइट क्रैश करना आदि।</li>
+      <li><strong>Grey Hat Hacker:</strong> ये दोनों का मिश्रण होते हैं। कभी सही तो कभी गलत तरीके से हैकिंग करते हैं।</li>
+    </ul>
+
+    <h2>हैकिंग कैसे सीखें?</h2>
+    <p>हैकिंग सीखने के लिए आपको कंप्यूटर नेटवर्क, प्रोग्रामिंग भाषा (जैसे Python, HTML, JS), और टूल्स जैसे Kali Linux, Termux आदि की जानकारी होनी चाहिए।</p>
+
+    <h2>क्या हैकिंग करना गैरकानूनी है?</h2>
+    <p>अगर आप किसी की अनुमति के बिना सिस्टम हैक करते हैं, तो यह अवैध है और इसके लिए आपको सज़ा हो सकती है। लेकिन अगर आप एथिकल हैकिंग (ethical hacking) करते हैं तो यह वैध होता है।</p>
+  </section>
+
+  <footer>
+    <p>© 2025 Sohil's Channel | SES BLOGS</p>
+  </footer>
+
 </body>
 </html>
