@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dark Web Kya Hai?</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
   <style>
-    /* Basic Reset */
     * {
       margin: 0;
       padding: 0;
@@ -15,41 +15,56 @@
 
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #0c0c0c;
+      background: linear-gradient(to right, #0d0d0d, #1a1a1a);
       color: #e0e0e0;
-      line-height: 1.7;
     }
 
     header {
-      background: linear-gradient(to right, #000000, #1f1f1f);
-      padding: 40px 20px;
       text-align: center;
-      border-bottom: 2px solid #333;
-      animation: fadeIn 2s ease-in-out;
+      padding: 60px 20px;
+      background: linear-gradient(135deg, #000000, #111111);
+      border-bottom: 2px solid #222;
     }
 
     header h1 {
-      color: #00ffe1;
-      font-size: 2.8rem;
-      animation: slideDown 1.5s ease-out;
+      font-size: 3rem;
+      color: #00ffcc;
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 10px #00ffcc;
+      animation: glow 2s infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #00ffcc; }
+      to { text-shadow: 0 0 20px #00ffcc, 0 0 30px #00ffcc; }
     }
 
     main {
-      padding: 40px 20px;
-      max-width: 1000px;
+      max-width: 1100px;
       margin: auto;
+      padding: 40px 20px;
     }
 
-    section {
-      margin-bottom: 50px;
-      animation: fadeUp 1.5s ease-out;
+    .section {
+      background: #161616;
+      border: 1px solid #333;
+      padding: 30px;
+      margin-bottom: 30px;
+      border-radius: 10px;
+      transition: 0.3s;
+      box-shadow: 0 0 10px #000;
+    }
+
+    .section:hover {
+      background: #202020;
+      transform: scale(1.01);
+      box-shadow: 0 0 20px #00ffc3;
     }
 
     h2 {
       color: #00ffaa;
       margin-bottom: 15px;
-      font-size: 1.8rem;
-      border-left: 4px solid #00ff99;
+      border-left: 4px solid #00ffcc;
       padding-left: 10px;
     }
 
@@ -62,106 +77,104 @@
       padding-left: 20px;
     }
 
-    footer {
-      text-align: center;
-      padding: 20px;
-      background: #111;
-      border-top: 2px solid #333;
-      color: #aaa;
-    }
-
     .highlight {
       color: #ff4081;
       font-weight: bold;
     }
 
-    /* Animations */
-    @keyframes fadeIn {
-      from {opacity: 0;}
-      to {opacity: 1;}
+    footer {
+      text-align: center;
+      padding: 30px 10px;
+      background: #111;
+      border-top: 1px solid #333;
+      color: #999;
+      font-size: 0.95rem;
     }
 
-    @keyframes slideDown {
-      from {transform: translateY(-40px); opacity: 0;}
-      to {transform: translateY(0); opacity: 1;}
+    a {
+      color: #00eaff;
+      text-decoration: none;
     }
 
-    @keyframes fadeUp {
-      from {opacity: 0; transform: translateY(30px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
-
-    /* Scroll effect */
-    section:hover {
-      background: #1a1a1a;
-      border-left: 5px solid #00ffcc;
-      padding-left: 15px;
-      transition: 0.3s ease;
+    a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Dark Web Kya Hai Aur Kaise Use Karte Hain?</h1>
+    <h1>Dark Web Kya Hai?</h1>
   </header>
 
   <main>
-    <section>
-      <h2>1. Dark Web Kya Hai?</h2>
-      <p>
-        Dark Web internet ka wo hissa hai jo search engines (Google, Bing) se chhupa hota hai aur jise access karne ke liye special tools jaise <span class="highlight">Tor Browser</span> ki zarurat hoti hai. Yeh Deep Web ka ek part hai jahan privacy aur anonymity ko bahut importance di jaati hai.
-      </p>
-    </section>
+    <div class="section">
+      <h2>1. Dark Web Ka Parichay</h2>
+      <p>Dark Web Internet ka wo hissa hai jahan tak normal browsers aur search engines nahi pahuch sakte. Iska istemal privacy aur anonymity ke liye kiya jaata hai. Yeh Deep Web ka ek chhupa hua aur private part hota hai.</p>
+    </div>
 
-    <section>
-      <h2>2. Surface Web vs Deep Web vs Dark Web</h2>
-      <ul>
-        <li><span class="highlight">Surface Web:</span> Normal websites jaise Google, YouTube, Facebook.</li>
-        <li><span class="highlight">Deep Web:</span> Password-protected ya database wali sites (jaise: bank accounts, medical records).</li>
-        <li><span class="highlight">Dark Web:</span> Anonymous websites (.onion) jo Tor browser ke zariye access hoti hain.</li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>3. Dark Web Kaise Access Karein?</h2>
+    <div class="section">
+      <h2>2. Kaise Access Karte Hain?</h2>
       <ol>
-        <li>VPN install karo aur connect ho jao.</li>
-        <li>Official Tor Browser download karo: <a href="https://www.torproject.org" target="_blank">torproject.org</a></li>
-        <li>Tor Browser open karo aur kisi trusted .onion link ko access karo.</li>
-        <li>Apna identity hamesha anonymous rakho.</li>
+        <li>Apne device mein <span class="highlight">VPN</span> install karo.</li>
+        <li><span class="highlight">Tor Browser</span> download karo (Official site: <a href="https://www.torproject.org/" target="_blank">torproject.org</a>).</li>
+        <li>Tor browser se <code>.onion</code> websites access karo.</li>
+        <li>Kabhi bhi apna personal data share na karo.</li>
       </ol>
-    </section>
+    </div>
 
-    <section>
-      <h2>4. Dark Web Par Kya Milta Hai?</h2>
+    <div class="section">
+      <h2>3. Dark Web Par Kya Milta Hai?</h2>
       <ul>
-        <li>Privacy-focused forums</li>
-        <li>Anonymous email services</li>
-        <li>Data leaks ya hacking forums (illegal)</li>
-        <li>Illegal marketplaces (WARNING: Illegal aur dangerous!)</li>
+        <li>Anonymous forums aur communities</li>
+        <li>Encrypted email services</li>
+        <li>Illegal marketplaces (Warning!)</li>
+        <li>Data leaks & hacking related info</li>
       </ul>
-    </section>
+    </div>
 
-    <section>
-      <h2>5. Dark Web Safe Hai Ya Nahi?</h2>
-      <p>
-        Dark Web sirf tab tak safe hai jab tak aap <span class="highlight">cautious</span> hain. Personal information kabhi share mat karo. Unknown links pe click na karo. Legal limit mein hi use karo.
-      </p>
-    </section>
-
-    <section>
-      <h2>6. FAQs</h2>
+    <div class="section">
+      <h2>4. Dark Web Ke Risks</h2>
       <ul>
-        <li><strong>Q:</strong> Kya dark web illegal hai?<br/><strong>A:</strong> Nahi. Dark web ka use karna illegal nahi hai, lekin illegal cheezen wahan milti hain.</li>
-        <li><strong>Q:</strong> Kya Tor browser safe hai?<br/><strong>A:</strong> Haan, agar sahi tarike se use kiya jaye.</li>
-        <li><strong>Q:</strong> Kya dark web pe paisa kama sakte hain?<br/><strong>A:</strong> Legal way se mushkil hai, lekin illegal log wahan scams ya selling karte hain (jo ki risky aur kanooni jurm hai).</li>
+        <li>Scams & phishing links</li>
+        <li>Malware aur virus attacks</li>
+        <li>Legal trouble if used illegally</li>
+        <li>Personal identity leak ka khatra</li>
       </ul>
-    </section>
+    </div>
+
+    <div class="section">
+      <h2>5. Suraksha Tips</h2>
+      <ul>
+        <li>Strong VPN ka use karo</li>
+        <li>Unknown links par click na karo</li>
+        <li>Anonymous username/email ka use karo</li>
+        <li>Legal aur educational purpose tak simit raho</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>6. Myths vs Reality</h2>
+      <ul>
+        <li><span class="highlight">Myth:</span> Har koi dark web use karta hai illegal kaam ke liye.</li>
+        <li><span class="highlight">Reality:</span> Wahan privacy tools aur free speech ke platforms bhi hain.</li>
+        <li><span class="highlight">Myth:</span> Tor use karte hi police pakad legi.</li>
+        <li><span class="highlight">Reality:</span> Tor browser legal hai; galat kaam se hi problem hoti hai.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>7. FAQs</h2>
+      <ul>
+        <li><strong>Q:</strong> Dark web ka use illegal hai?<br><strong>A:</strong> Nahi. Use karna illegal nahi hai, lekin illegal kaam karna zaroor hai.</li>
+        <li><strong>Q:</strong> Tor safe hai?<br><strong>A:</strong> Haan, jab tak aap basic safety follow karte ho.</li>
+        <li><strong>Q:</strong> Dark web pe kaunse site safe hain?<br><strong>A:</strong> DuckDuckGo onion, ProtonMail, SecureDrop, etc.</li>
+      </ul>
+    </div>
   </main>
 
   <footer>
-    <p>© 2025 | Dark Web Hindi Guide by Sohil's Channel</p>
+    <p>© 2025 | Made by Sohil's Channel | Educational Purpose Only</p>
   </footer>
 
 </body>
