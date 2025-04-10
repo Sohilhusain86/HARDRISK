@@ -1,70 +1,167 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>हैकिंग क्या है? पूरी जानकारी हिंदी में</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dark Web Kya Hai?</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f1f1f1;
+    /* Basic Reset */
+    * {
       margin: 0;
       padding: 0;
-      color: #333;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
     }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0c0c0c;
+      color: #e0e0e0;
+      line-height: 1.7;
+    }
+
     header {
-      background-color: #222;
-      color: #fff;
-      padding: 20px;
+      background: linear-gradient(to right, #000000, #1f1f1f);
+      padding: 40px 20px;
       text-align: center;
+      border-bottom: 2px solid #333;
+      animation: fadeIn 2s ease-in-out;
     }
-    section {
-      padding: 20px;
-      max-width: 800px;
+
+    header h1 {
+      color: #00ffe1;
+      font-size: 2.8rem;
+      animation: slideDown 1.5s ease-out;
+    }
+
+    main {
+      padding: 40px 20px;
+      max-width: 1000px;
       margin: auto;
-      background-color: #fff;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      margin-top: 20px;
     }
-    h1, h2 {
-      color: #444;
+
+    section {
+      margin-bottom: 50px;
+      animation: fadeUp 1.5s ease-out;
     }
+
+    h2 {
+      color: #00ffaa;
+      margin-bottom: 15px;
+      font-size: 1.8rem;
+      border-left: 4px solid #00ff99;
+      padding-left: 10px;
+    }
+
+    p, li {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+
+    ul, ol {
+      padding-left: 20px;
+    }
+
     footer {
       text-align: center;
-      padding: 10px;
-      background-color: #222;
-      color: white;
-      margin-top: 20px;
+      padding: 20px;
+      background: #111;
+      border-top: 2px solid #333;
+      color: #aaa;
+    }
+
+    .highlight {
+      color: #ff4081;
+      font-weight: bold;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+
+    @keyframes slideDown {
+      from {transform: translateY(-40px); opacity: 0;}
+      to {transform: translateY(0); opacity: 1;}
+    }
+
+    @keyframes fadeUp {
+      from {opacity: 0; transform: translateY(30px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    /* Scroll effect */
+    section:hover {
+      background: #1a1a1a;
+      border-left: 5px solid #00ffcc;
+      padding-left: 15px;
+      transition: 0.3s ease;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>हैकिंग क्या है?</h1>
-    <p>पूरी जानकारी हिंदी में</p>
+    <h1>Dark Web Kya Hai Aur Kaise Use Karte Hain?</h1>
   </header>
 
-  <section>
-    <h2>हैकिंग का मतलब</h2>
-    <p>हैकिंग का मतलब होता है किसी सिस्टम, कंप्यूटर या नेटवर्क में अनधिकृत रूप से प्रवेश करना। यह गलत भी हो सकता है और सही भी, यह इस बात पर निर्भर करता है कि इसका उपयोग कैसे किया जा रहा है।</p>
+  <main>
+    <section>
+      <h2>1. Dark Web Kya Hai?</h2>
+      <p>
+        Dark Web internet ka wo hissa hai jo search engines (Google, Bing) se chhupa hota hai aur jise access karne ke liye special tools jaise <span class="highlight">Tor Browser</span> ki zarurat hoti hai. Yeh Deep Web ka ek part hai jahan privacy aur anonymity ko bahut importance di jaati hai.
+      </p>
+    </section>
 
-    <h2>हैकिंग के प्रकार</h2>
-    <ul>
-      <li><strong>White Hat Hacker:</strong> यह अच्छे हैकर होते हैं जो सिस्टम की सुरक्षा जांचने के लिए हैकिंग करते हैं।</li>
-      <li><strong>Black Hat Hacker:</strong> यह गलत उद्देश्य से हैकिंग करते हैं जैसे डेटा चोरी करना, वेबसाइट क्रैश करना आदि।</li>
-      <li><strong>Grey Hat Hacker:</strong> ये दोनों का मिश्रण होते हैं। कभी सही तो कभी गलत तरीके से हैकिंग करते हैं।</li>
-    </ul>
+    <section>
+      <h2>2. Surface Web vs Deep Web vs Dark Web</h2>
+      <ul>
+        <li><span class="highlight">Surface Web:</span> Normal websites jaise Google, YouTube, Facebook.</li>
+        <li><span class="highlight">Deep Web:</span> Password-protected ya database wali sites (jaise: bank accounts, medical records).</li>
+        <li><span class="highlight">Dark Web:</span> Anonymous websites (.onion) jo Tor browser ke zariye access hoti hain.</li>
+      </ul>
+    </section>
 
-    <h2>हैकिंग कैसे सीखें?</h2>
-    <p>हैकिंग सीखने के लिए आपको कंप्यूटर नेटवर्क, प्रोग्रामिंग भाषा (जैसे Python, HTML, JS), और टूल्स जैसे Kali Linux, Termux आदि की जानकारी होनी चाहिए।</p>
+    <section>
+      <h2>3. Dark Web Kaise Access Karein?</h2>
+      <ol>
+        <li>VPN install karo aur connect ho jao.</li>
+        <li>Official Tor Browser download karo: <a href="https://www.torproject.org" target="_blank">torproject.org</a></li>
+        <li>Tor Browser open karo aur kisi trusted .onion link ko access karo.</li>
+        <li>Apna identity hamesha anonymous rakho.</li>
+      </ol>
+    </section>
 
-    <h2>क्या हैकिंग करना गैरकानूनी है?</h2>
-    <p>अगर आप किसी की अनुमति के बिना सिस्टम हैक करते हैं, तो यह अवैध है और इसके लिए आपको सज़ा हो सकती है। लेकिन अगर आप एथिकल हैकिंग (ethical hacking) करते हैं तो यह वैध होता है।</p>
-  </section>
+    <section>
+      <h2>4. Dark Web Par Kya Milta Hai?</h2>
+      <ul>
+        <li>Privacy-focused forums</li>
+        <li>Anonymous email services</li>
+        <li>Data leaks ya hacking forums (illegal)</li>
+        <li>Illegal marketplaces (WARNING: Illegal aur dangerous!)</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>5. Dark Web Safe Hai Ya Nahi?</h2>
+      <p>
+        Dark Web sirf tab tak safe hai jab tak aap <span class="highlight">cautious</span> hain. Personal information kabhi share mat karo. Unknown links pe click na karo. Legal limit mein hi use karo.
+      </p>
+    </section>
+
+    <section>
+      <h2>6. FAQs</h2>
+      <ul>
+        <li><strong>Q:</strong> Kya dark web illegal hai?<br/><strong>A:</strong> Nahi. Dark web ka use karna illegal nahi hai, lekin illegal cheezen wahan milti hain.</li>
+        <li><strong>Q:</strong> Kya Tor browser safe hai?<br/><strong>A:</strong> Haan, agar sahi tarike se use kiya jaye.</li>
+        <li><strong>Q:</strong> Kya dark web pe paisa kama sakte hain?<br/><strong>A:</strong> Legal way se mushkil hai, lekin illegal log wahan scams ya selling karte hain (jo ki risky aur kanooni jurm hai).</li>
+      </ul>
+    </section>
+  </main>
 
   <footer>
-    <p>© 2025 Sohil's Channel | SES BLOGS</p>
+    <p>© 2025 | Dark Web Hindi Guide by Sohil's Channel</p>
   </footer>
 
 </body>
