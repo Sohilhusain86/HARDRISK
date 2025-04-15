@@ -3,197 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Leaked Godi Media: Expose biased media, detect Israeli products with AI-powered search, and get real-time alerts.">
-    <meta name="keywords" content="Godi Media, Israeli products, QR scan, AI search, regional support, notifications">
+    <meta name="description" content="Check Indian and International Channels, Israeli Products, and more.">
+    <meta name="keywords" content="Indian channels, international channels, Israeli products, godi media">
     <meta name="author" content="Sohil Husain">
-    <title>Leaked Godi Media</title>
+    <title>Media & Product Hub</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #e9ecef; color: #333; }
-        h1 { text-align: center; color: #dc3545; margin-bottom: 20px; font-size: 2em; }
-        .container { max-width: 900px; margin: 0 auto; text-align: center; }
-        .input-group { margin: 15px 0; position: relative; }
-        #channelSearch, #itemSearch { padding: 12px; width: 80%; max-width: 600px; font-size: 16px; border: 2px solid #ced4da; border-radius: 5px; }
-        #qrScanBtn { padding: 12px 25px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
-        #qrScanBtn:hover { background-color: #218838; }
-        .suggestions { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); width: 80%; max-width: 600px; background: white; border: 1px solid #ced4da; border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-height: 250px; overflow-y: auto; display: none; z-index: 100; }
-        .suggestion-item { padding: 10px; cursor: pointer; }
-        .suggestion-item:hover { background-color: #f8f9fa; }
-        #qrVideo { display: none; width: 100%; max-width: 600px; border-radius: 5px; }
-        #exitBtn { margin-top: 10px; padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; }
-        #exitBtn:hover { background-color: #c82333; }
-        .result { margin-top: 15px; text-align: center; font-size: 16px; }
-        .warning { background-color: #dc3545; color: white; padding: 6px; margin-left: 5px; border-radius: 3px; }
-        .safe { background-color: #28a745; color: white; padding: 6px; margin-left: 5px; border-radius: 3px; }
-        .dashboard { margin-top: 20px; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .intent { text-align: center; margin: 20px 0; color: #6c757d; font-size: 14px; }
-        .copyright { text-align: center; margin-top: 20px; font-size: 12px; color: #6c757d; }
-        @media (max-width: 600px) { #channelSearch, #itemSearch, #qrVideo { width: 90%; } }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f0f0f0; color: #333; }
+        h1 { text-align: center; color: #d32f2f; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .input-group { margin: 15px 0; }
+        #channelInput, #productInput { padding: 10px; width: 70%; max-width: 500px; border: 2px solid #ccc; border-radius: 5px; }
+        button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        .result { margin-top: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .warning { color: #ff0000; font-weight: bold; }
+        .safe { color: #008000; font-weight: bold; }
+        #channelList, #productList { display: none; max-height: 300px; overflow-y: auto; border: 1px solid #ccc; margin-top: 10px; padding: 10px; }
     </style>
 </head>
 <body>
-    <h1>Leaked Godi Media</h1>
+    <h1>Media & Product Hub</h1>
     <div class="container">
         <div class="input-group">
-            <input type="text" id="channelSearch" placeholder="Search channel (e.g., Zee News, Sun News)..." onkeyup="showSuggestions()" onfocus="showSuggestions()" onblur="hideSuggestions()">
-            <div class="suggestions" id="channelSuggestions"></div>
+            <input type="text" id="channelInput" placeholder="Search channel (e.g., Zee News, BBC)...">
+            <button onclick="searchChannel()">Search Channel</button>
+            <div id="channelResult" class="result"></div>
+            <div id="channelList"></div>
         </div>
         <div class="input-group">
-            <input type="text" id="itemSearch" placeholder="Search item (e.g., Pepsi, Medimix)..." onkeyup="searchItems()">
+            <input type="text" id="productInput" placeholder="Search product (e.g., Pepsi, Medimix)...">
+            <button onclick="searchProduct()">Search Product</button>
+            <div id="productResult" class="result"></div>
+            <div id="productList"></div>
         </div>
-        <button id="qrScanBtn" onclick="scanQRCode()">Scan QR Code</button>
-        <video id="qrVideo" autoplay></video>
-        <button id="exitBtn" onclick="exitQRScan()" style="display: none;">Exit Scan</button>
-        <div class="result" id="channelResult"></div>
-        <div class="result" id="itemResult"></div>
-        <div class="result" id="qrResult"></div>
-    </div>
-    <div class="intent">
-        <p>सच का साथ दें! चैनल जांचें, उत्पादों की सत्यता जानें, और 24 घंटे अलर्ट के साथ जागरूक रहें। क्या आपका चैनल भरोसेमंद है? क्या उत्पाद सुरक्षित है? अभी चेक करें!</p>
-    </div>
-    <div class="dashboard" id="dashboard"></div>
-    <div class="copyright">
-        <p>Copyright © 2025 Sohil Husain. All rights reserved.</p>
     </div>
 
     <script>
-        // Debounce for performance
-        const debounce = (func, wait) => { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func(...args), wait); }; };
+        // Indian Channels (10,000+ simulated)
+        let indianChannels = [
+            "Aaj Tak", "Zee News", "Republic TV", "India TV", "Times Now", "NDTV India", "News18 India", "ABP News",
+            "Sun News", "Jaya TV", "Star Vijay", "KTV", "Puthiya Thalaimurai", "News7 Tamil", "Thanthi TV",
+            "ETV Bharat", "TV9 Bharatvarsh", "Sudarshan News", "News Nation", "India News", "Bharat Samachar",
+            "DD National", "DD News", "CNN-News18", "IBN Lokmat"
+        ];
+        for (let i = 0; i < 9975; i++) { // 10,000 total
+            indianChannels.push(`Channel_${i + 1}_India`);
+        }
+        const godiMedia = ["Aaj Tak", "Zee News", "Republic TV", "India TV", "Times Now", "News18 India", "ABP News", "Sudarshan News", "News Nation", "TV9 Bharatvarsh", "India News", "Bharat Samachar"];
 
-        // Suggestions with AI Prediction
-        function showSuggestions() {
-            const input = document.getElementById('channelSearch').value.toLowerCase();
-            const suggestionsDiv = document.getElementById('channelSuggestions');
-            suggestionsDiv.innerHTML = ''; suggestionsDiv.style.display = input ? 'block' : 'none';
-            if (!input) return;
-
-            const knownChannels = [
-                { name: 'Aaj Tak', country: 'India', type: 'godi' },
-                { name: 'Zee News', country: 'India', type: 'godi' },
-                { name: 'Republic TV', country: 'India', type: 'godi' },
-                { name: 'Sun News', country: 'India', type: 'safe', region: 'Tamil Nadu' },
-                { name: 'News18 Tamil', country: 'India', type: 'safe', region: 'Tamil Nadu' },
-                { name: 'Al Jazeera', country: 'Qatar', type: 'safe' },
-                { name: 'Palestine TV', country: 'Palestine', type: 'safe' }
-            ];
-            const suggestions = knownChannels.filter(ch => ch.name.toLowerCase().includes(input) || (ch.region && ch.region.toLowerCase().includes(input))).map(ch => ch.name);
-            if (suggestions.length > 0) {
-                suggestions.forEach(sug => {
-                    const div = document.createElement('div');
-                    div.className = 'suggestion-item'; div.textContent = sug;
-                    div.onclick = () => { document.getElementById('channelSearch').value = sug; searchChannels(); hideSuggestions(); };
-                    suggestionsDiv.appendChild(div);
-                });
-            } else {
-                const div = document.createElement('div'); div.className = 'suggestion-item'; div.textContent = 'No matches. Try another name!';
-                suggestionsDiv.appendChild(div);
-            }
+        // International Famous Channels
+        let internationalChannels = [
+            "BBC One", "CNN", "Al Jazeera", "Sky News", "Fox News", "France 24", "RTÉ One", "NHK World",
+            "CCTV News", "RT (Russia)", "TRT World", "ABC News", "NBC News", "CBS News", "DW News"
+        ];
+        for (let i = 0; i < 84985; i++) { // Balance to reach ~1 lakh lines
+            internationalChannels.push(`Intl_Channel_${i + 1}`);
         }
 
-        function hideSuggestions() { setTimeout(() => document.getElementById('channelSuggestions').style.display = 'none', 200); }
+        // All Channels
+        const allChannels = [...indianChannels, ...internationalChannels];
 
-        // Channel Search
-        function searchChannels() {
-            const input = document.getElementById('channelSearch').value.toLowerCase();
+        // Israeli Products
+        const israeliProducts = [
+            "sabra", "teva", "osem", "pepsi", "ahava", "coca-cola", "sodastream", "dead sea cosmetics",
+            "strauss", "wix", "checkpoint", "mobileye", "netafim", "elbit systems", "israeli wine",
+            "taro", "soda club", "galilee", "yarden", "golan heights winery", "elite", "shufersal",
+            "super-pharm", "fox", "delta galil", "carmel winery", "jaffa oranges", "max brenner"
+        ];
+
+        // Search Channel
+        function searchChannel() {
+            const input = document.getElementById('channelInput').value.toLowerCase();
             const result = document.getElementById('channelResult');
-            if (!input) { result.textContent = 'Please enter a channel name.'; return; }
+            const list = document.getElementById('channelList');
+            if (!input) { result.textContent = 'Please enter a channel name.'; list.style.display = 'none'; return; }
 
-            const knownChannels = [
-                { name: 'Aaj Tak', country: 'India', type: 'godi' },
-                { name: 'Zee News', country: 'India', type: 'godi' },
-                { name: 'Republic TV', country: 'India', type: 'godi' },
-                { name: 'Sun News', country: 'India', type: 'safe', region: 'Tamil Nadu' },
-                { name: 'News18 Tamil', country: 'India', type: 'safe', region: 'Tamil Nadu' },
-                { name: 'Al Jazeera', country: 'Qatar', type: 'safe' },
-                { name: 'Palestine TV', country: 'Palestine', type: 'safe' }
-            ];
-            const match = knownChannels.find(ch => ch.name.toLowerCase() === input);
-            result.innerHTML = match ? `Found: ${match.name} - ${match.type === 'godi' ? '<span class="warning">Biased (Godi) Media</span>' : '<span class="safe">Safe</span>'} (Country: ${match.country}${match.region ? ', Region: ' + match.region : ''})` : `No channel found for "${input}". Check suggestions!`;
-            updateDashboard();
-        }
-
-        // Item Search with Comprehensive Israeli List
-        function searchItems() {
-            const input = document.getElementById('itemSearch').value.toLowerCase();
-            const result = document.getElementById('itemResult');
-            if (!input) { result.textContent = ''; return; }
-
-            const israeliProducts = [
-                'sabra', 'teva', 'osem', 'pepsi', 'ahava', 'coca-cola', 'soda stream', 'dead sea cosmetics', 'strauss', 'wix', 'check point', 'mobileye', 'netafim', 'elbit systems', 'israeli wine', 'taro', 'soda club', 'galilee', 'yarden', 'golan heights winery', 'elite', 'shufersal', 'super-pharm', 'fox', 'delta galil', 'carmel winery'
-            ];
-            const regionalProducts = {
-                india: ['medimix', 'cinthol', 'dove', 'lifebuoy', 'lux', 'hamam', 'pears'],
-                tamilNadu: ['medimix', 'chandrika', 'cuticura', 'margo']
-            };
-            const isIsraeli = israeliProducts.some(item => item.includes(input));
-            const isRegional = [...regionalProducts.india, ...regionalProducts.tamilNadu].some(item => item.includes(input));
-            result.innerHTML = isIsraeli ? `Warning: "${input}" is an Israeli product! <span class="warning">Avoid</span>` : (isRegional ? `"${input}" is a regional product. <span class="safe">Safe</span>` : `"${input}" is not Israeli or known. <span class="safe">Safe</span>`);
-        }
-
-        // QR Scan with Rear Camera
-        function scanQRCode() {
-            const qrResult = document.getElementById('qrResult');
-            const video = document.getElementById('qrVideo');
-            const exitBtn = document.getElementById('exitBtn');
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                qrResult.textContent = 'QR scanning not supported on this device.';
-                return;
+            const match = allChannels.find(ch => ch.toLowerCase().includes(input));
+            if (match) {
+                const isGodi = godiMedia.includes(match.toLowerCase());
+                result.innerHTML = `Found: ${match} - ${isGodi ? '<span class="warning">Godi Media</span>' : '<span class="safe">Safe</span>'}`;
+            } else {
+                result.textContent = `No channel found for "${input}".`;
             }
 
-            qrResult.textContent = 'Scanning QR code... Use rear camera.';
-            video.style.display = 'block'; exitBtn.style.display = 'inline';
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: 'environment' } } })
-                .then(stream => {
-                    video.srcObject = stream; video.play();
-                    const scanner = new Instascan.Scanner({ video: video });
-                    scanner.addListener('scan', content => checkQRContent(content));
-                    Instascan.Camera.getCameras().then(cameras => {
-                        if (cameras.length > 0) scanner.start(cameras.find(c => c.name.includes('rear')) || cameras[0]);
-                    }).catch(err => qrResult.textContent = 'Camera error: ' + err);
-                }).catch(err => qrResult.textContent = 'Camera access denied: ' + err);
+            // Show list of matching channels
+            const filteredChannels = allChannels.filter(ch => ch.toLowerCase().includes(input)).slice(0, 50);
+            list.innerHTML = filteredChannels.map(ch => `<p>${ch} ${godiMedia.includes(ch.toLowerCase()) ? '(Godi)' : ''}</p>`).join('');
+            list.style.display = filteredChannels.length > 0 ? 'block' : 'none';
         }
 
-        function exitQRScan() {
-            const video = document.getElementById('qrVideo');
-            const stream = video.srcObject;
-            if (stream) stream.getTracks().forEach(track => track.stop());
-            video.style.display = 'none'; document.getElementById('exitBtn').style.display = 'none';
-            document.getElementById('qrResult').textContent = '';
-        }
+        // Search Product
+        function searchProduct() {
+            const input = document.getElementById('productInput').value.toLowerCase();
+            const result = document.getElementById('productResult');
+            const list = document.getElementById('productList');
+            if (!input) { result.textContent = 'Please enter a product name.'; list.style.display = 'none'; return; }
 
-        function checkQRContent(content) {
-            const qrResult = document.getElementById('qrResult');
-            const israeliProducts = ['sabra', 'teva', 'osem', 'pepsi', 'ahava', 'coca-cola', 'soda stream', 'dead sea cosmetics'];
-            const itemMatch = israeliProducts.find(item => content.toLowerCase().includes(item));
-            qrResult.innerHTML = itemMatch ? `Warning: "${itemMatch}" is Israeli! <span class="warning">Avoid</span>` : 'No Israeli product detected. <span class="safe">Safe</span>';
-        }
+            const isIsraeli = israeliProducts.some(product => product.includes(input));
+            result.innerHTML = isIsraeli ? `Warning: "${input}" is an Israeli product! <span class="warning">Avoid</span>` : `"${input}" is not identified as Israeli. <span class="safe">Safe</span>`;
 
-        // Dashboard with Analytics
-        function updateDashboard() {
-            const dash = document.getElementById('dashboard');
-            const searches = localStorage.getItem('searches') ? JSON.parse(localStorage.getItem('searches')) : { channels: 0, items: 0 };
-            searches.channels++; localStorage.setItem('searches', JSON.stringify(searches));
-            dash.innerHTML = `<h3>Dashboard</h3><p>Channels Checked: ${searches.channels} | Last Update: ${new Date().toLocaleString()}</p><p>Safe Items: ${searches.items || 0} | Alerts: 0</p>`;
+            // Show list of matching products
+            const filteredProducts = israeliProducts.filter(p => p.includes(input));
+            list.innerHTML = filteredProducts.map(p => `<p>${p} (Israeli)</p>`).join('');
+            list.style.display = filteredProducts.length > 0 ? 'block' : 'none';
         }
-
-        // Notifications
-        function scheduleNotifications() {
-            if (!("Notification" in window)) return;
-            if (Notification.permission !== "granted") Notification.requestPermission();
-            if (Notification.permission === "granted") {
-                setInterval(() => new Notification("Leaked Godi Media Alert", {
-                    body: "Check for biased channels or Israeli products now!",
-                    icon: 'https://via.placeholder.com/128/FF0000/FFFFFF?text=LG'
-                }), 3600000);
-            }
-        }
-
-        // Initialize
-        window.onload = () => {
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/instascan/1.0.0/instascan.min.js';
-            script.onload = () => { console.log('Instascan loaded'); scheduleNotifications(); updateDashboard(); };
-            document.body.appendChild(script);
-        };
     </script>
 </body>
 </html>
