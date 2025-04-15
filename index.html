@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Optimized Leaked Godi Media with search-based loading, QR scan, and 24-hour notifications.">
-    <meta name="keywords" content="Godi Media, Israeli items, QR scan, country time, language, notifications">
+    <meta name="description" content="Optimized Leaked Godi Media with search suggestions, QR scan, and 24-hour notifications.">
+    <meta name="keywords" content="Godi Media, Israeli items, QR scan, search suggestions, country time, language, notifications">
     <meta name="author" content="Sohil Husain">
     <title>Leaked Godi Media</title>
     <style>
@@ -23,6 +23,7 @@
         .search-container {
             text-align: center;
             margin-bottom: 20px;
+            position: relative;
         }
         #channelSearch, #itemSearch, #qrScanBtn {
             padding: 10px;
@@ -41,6 +42,29 @@
         }
         #qrScanBtn:hover {
             background-color: #45a049;
+        }
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 500px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            z-index: 10;
+        }
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .suggestion-item:hover {
+            background-color: #f0f0f0;
         }
         .channel-list {
             max-width: 800px;
@@ -108,6 +132,7 @@
         @media (max-width: 600px) {
             #channelSearch, #itemSearch, #qrScanBtn { width: 90%; }
             .channel-list { padding: 10px; }
+            .suggestions { width: 90%; }
         }
     </style>
 </head>
@@ -115,7 +140,8 @@
     <h1>Leaked Godi Media</h1>
 
     <div class="search-container">
-        <input type="text" id="channelSearch" placeholder="Search for a channel (e.g., National India News)..." onkeyup="debouncedChannelSearch()">
+        <input type="text" id="channelSearch" placeholder="Search for a channel (e.g., Aaj Tak, National India News)..." onkeyup="showSuggestions()" onfocus="showSuggestions()" onblur="hideSuggestions()">
+        <div class="suggestions" id="channelSuggestions"></div>
         <input type="text" id="itemSearch" placeholder="Search for an item (e.g., soap, Pepsi)..." onkeyup="debouncedItemSearch()">
         <button id="qrScanBtn" onclick="scanQRCode()">Scan QR Code</button>
         <p id="channelResult" style="margin-top: 10px; color: #333;"></p>
@@ -124,7 +150,7 @@
     </div>
 
     <div class="intent">
-        <p>इस वेबसाइट का उद्देश्य लोगों को जागरूक करना है कि वे किन चैनलों और वस्तुओं से जुड़े हैं। खोज, QR स्कैन, और 24 घंटे के नोटिफिकेशन से जानकारी प्राप्त करें। यह खास तौर पर मुस्लिम समुदाय के लिए उपयोगी है। यह एक कानूनी और शैक्षिक पहल है।</p>
+        <p>इस वेबसाइट का उद्देश्य आपको जागरूक करना है! खोजें, QR स्कैन करें, और 24 घंटे के नोटिफिकेशन के साथ सच जानें। क्या आपका पसंदीदा चैनल भरोसेमंद है? क्या प्रोडक्ट इसराइली है? अभी चेक करें और मुस्लिम समुदाय का समर्थन करें। यह एक कानूनी और शैक्षिक पहल है!</p>
     </div>
 
     <div class="channel-list" id="channelList"></div>
@@ -141,6 +167,105 @@
                 clearTimeout(timeout);
                 timeout = setTimeout(() => func(...args), wait);
             };
+        }
+
+        // Show suggestions for channel search
+        function showSuggestions() {
+            const input = document.getElementById('channelSearch').value.toLowerCase();
+            const suggestionsDiv = document.getElementById('channelSuggestions');
+            suggestionsDiv.innerHTML = '';
+            suggestionsDiv.style.display = input ? 'block' : 'none';
+
+            if (!input) return;
+
+            const countries = [
+                { name: 'India', timeZone: 'Asia/Kolkata', language: 'Hindi' },
+                { name: 'USA', timeZone: 'America/New_York', language: 'English' },
+                { name: 'UK', timeZone: 'Europe/London', language: 'English' },
+                { name: 'Canada', timeZone: 'America/Toronto', language: 'English/French' },
+                { name: 'Australia', timeZone: 'Australia/Sydney', language: 'English' },
+                { name: 'Germany', timeZone: 'Europe/Berlin', language: 'German' },
+                { name: 'France', timeZone: 'Europe/Paris', language: 'French' },
+                { name: 'Russia', timeZone: 'Europe/Moscow', language: 'Russian' },
+                { name: 'China', timeZone: 'Asia/Shanghai', language: 'Mandarin' },
+                { name: 'Japan', timeZone: 'Asia/Tokyo', language: 'Japanese' },
+                { name: 'Brazil', timeZone: 'America/Sao_Paulo', language: 'Portuguese' },
+                { name: 'South Africa', timeZone: 'Africa/Johannesburg', language: 'Afrikaans/English' },
+                { name: 'Pakistan', timeZone: 'Asia/Karachi', language: 'Urdu' },
+                { name: 'Bangladesh', timeZone: 'Asia/Dhaka', language: 'Bengali' },
+                { name: 'Sri Lanka', timeZone: 'Asia/Colombo', language: 'Sinhala/Tamil' },
+                { name: 'Nepal', timeZone: 'Asia/Kathmandu', language: 'Nepali' },
+                { name: 'Palestine', timeZone: 'Asia/Gaza', language: 'Arabic' },
+                { name: 'Italy', timeZone: 'Europe/Rome', language: 'Italian' },
+                { name: 'Spain', timeZone: 'Europe/Madrid', language: 'Spanish' },
+                { name: 'Mexico', timeZone: 'America/Mexico_City', language: 'Spanish' },
+                { name: 'Argentina', timeZone: 'America/Argentina/Buenos_Aires', language: 'Spanish' },
+                { name: 'Egypt', timeZone: 'Africa/Cairo', language: 'Arabic' },
+                { name: 'Nigeria', timeZone: 'Africa/Lagos', language: 'English/Hausa' },
+                { name: 'Kenya', timeZone: 'Africa/Nairobi', language: 'Swahili/English' },
+                { name: 'Saudi Arabia', timeZone: 'Asia/Riyadh', language: 'Arabic' },
+                { name: 'UAE', timeZone: 'Asia/Dubai', language: 'Arabic' },
+                { name: 'Turkey', timeZone: 'Europe/Istanbul', language: 'Turkish' },
+                { name: 'Thailand', timeZone: 'Asia/Bangkok', language: 'Thai' },
+                { name: 'Indonesia', timeZone: 'Asia/Jakarta', language: 'Indonesian' },
+                { name: 'Malaysia', timeZone: 'Asia/Kuala_Lumpur', language: 'Malay' },
+                { name: 'Vietnam', timeZone: 'Asia/Ho_Chi_Minh', language: 'Vietnamese' },
+                { name: 'Philippines', timeZone: 'Asia/Manila', language: 'Filipino/English' },
+                { name: 'South Korea', timeZone: 'Asia/Seoul', language: 'Korean' },
+                { name: 'Iran', timeZone: 'Asia/Tehran', language: 'Persian' },
+                { name: 'Iraq', timeZone: 'Asia/Baghdad', language: 'Arabic' }
+            ];
+            const godiPrefixes = ['National', 'Patriot', 'Freedom', 'Unity', 'Desh', 'Surya', 'Prakash', 'Jai', 'Bharat', 'Hindu', 'Voice', 'Glory', 'Power', 'Elite', 'Royal'];
+            const safePrefixes = ['Truth', 'Justice', 'Global', 'Peace', 'Independent', 'Open', 'Free', 'Democracy', 'Citizen', 'Human'];
+            const knownChannels = [
+                { name: 'Aaj Tak', country: 'India', type: 'godi' },
+                { name: 'Republic TV', country: 'India', type: 'godi' },
+                { name: 'Al Jazeera', country: 'Qatar', type: 'safe' },
+                { name: 'Palestine TV', country: 'Palestine', type: 'safe' }
+            ];
+
+            // Generate suggestions from known channels and random channels
+            const suggestions = [];
+            knownChannels.forEach(channel => {
+                if (channel.name.toLowerCase().includes(input)) {
+                    suggestions.push(channel.name);
+                }
+            });
+            countries.forEach(country => {
+                for (let i = 0; i < 100; i++) { // Limit suggestions
+                    const prefix = i % 4 < 3 ? godiPrefixes[Math.floor(Math.random() * godiPrefixes.length)] : safePrefixes[Math.floor(Math.random() * safePrefixes.length)];
+                    const channelName = `${prefix} ${country.name} News ${i}`.toLowerCase();
+                    if (channelName.includes(input) && suggestions.length < 10) { // Max 10 suggestions
+                        suggestions.push(`${prefix} ${country.name} News ${i}`);
+                    }
+                }
+            });
+
+            if (suggestions.length > 0) {
+                suggestions.forEach(suggestion => {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.textContent = suggestion;
+                    div.onclick = () => {
+                        document.getElementById('channelSearch').value = suggestion;
+                        searchChannels(); // Trigger search on selection
+                        hideSuggestions();
+                    };
+                    suggestionsDiv.appendChild(div);
+                });
+            } else {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.textContent = 'No suggestions found. Try something else!';
+                suggestionsDiv.appendChild(div);
+            }
+        }
+
+        // Hide suggestions when not focused
+        function hideSuggestions() {
+            setTimeout(() => {
+                document.getElementById('channelSuggestions').style.display = 'none';
+            }, 200); // Delay to allow click
         }
 
         // Channel Search function with dynamic loading based on channel name
@@ -198,6 +323,12 @@
             ];
             const godiPrefixes = ['National', 'Patriot', 'Freedom', 'Unity', 'Desh', 'Surya', 'Prakash', 'Jai', 'Bharat', 'Hindu', 'Voice', 'Glory', 'Power', 'Elite', 'Royal'];
             const safePrefixes = ['Truth', 'Justice', 'Global', 'Peace', 'Independent', 'Open', 'Free', 'Democracy', 'Citizen', 'Human'];
+            const knownChannels = [
+                { name: 'Aaj Tak', country: 'India', type: 'godi' },
+                { name: 'Republic TV', country: 'India', type: 'godi' },
+                { name: 'Al Jazeera', country: 'Qatar', type: 'safe' },
+                { name: 'Palestine TV', country: 'Palestine', type: 'safe' }
+            ];
 
             countries.forEach(country => {
                 for (let i = 0; i < 1000; i++) { // 1000 channels per country
@@ -241,8 +372,47 @@
                 }
             });
 
+            // Check known channels
+            knownChannels.forEach(channel => {
+                if (channel.name.toLowerCase().includes(input)) {
+                    const section = document.createElement('div');
+                    section.className = 'country-section';
+                    const heading = document.createElement('h2');
+                    heading.textContent = channel.country;
+                    section.appendChild(heading);
+                    const info = document.createElement('div');
+                    info.className = 'country-info';
+                    const time = new Date().toLocaleString('en-US', { timeZone: countries.find(c => c.name === channel.country)?.timeZone || 'UTC' });
+                    info.textContent = `Time: ${time} | Language: ${countries.find(c => c.name === channel.country)?.language || 'Unknown'}`;
+                    section.appendChild(info);
+
+                    const channelItem = document.createElement('div');
+                    channelItem.className = 'channel-item';
+                    channelItem.textContent = channel.name;
+                    if (channel.type === 'godi') {
+                        const warning = document.createElement('span');
+                        warning.className = 'warning';
+                        warning.textContent = 'Warning: Biased Media';
+                        channelItem.appendChild(warning);
+                        channelItem.setAttribute('data-type', 'godi');
+                        if (!found) resultMsg.textContent = `Found: ${channel.name} - This is a Biased (Godi) Media Channel.`;
+                    } else {
+                        const safeMark = document.createElement('span');
+                        safeMark.className = 'safe';
+                        safeMark.textContent = '✔ Safe';
+                        channelItem.appendChild(safeMark);
+                        channelItem.setAttribute('data-type', 'safe');
+                        if (!found) resultMsg.textContent = `Found: ${channel.name} - This is a Safe and Trustworthy Channel.`;
+                    }
+                    channelItem.classList.add('show');
+                    section.appendChild(channelItem);
+                    channelList.appendChild(section);
+                    found = true;
+                }
+            });
+
             if (!found) {
-                resultMsg.textContent = `No channel found matching "${input}". Please try a different channel name.`;
+                resultMsg.textContent = `No channel found matching "${input}". Check suggestions for help!`;
             }
         }
 
@@ -334,30 +504,30 @@
 
             function startNotifications() {
                 const notifications = [
-                    "Check out a new biased media channel expose at Leaked Godi Media!",
-                    "Discover safe news sources with us - visit now!",
-                    "Is your favorite soap Israeli? Scan and find out!",
+                    "Check out a new biased media expose at Leaked Godi Media!",
+                    "Discover safe news sources - visit now!",
+                    "Is your soap Israeli? Scan and find out!",
                     "Stay updated on media bias - visit Leaked Godi Media!",
-                    "Avoid Israeli products - use our QR scanner today!",
+                    "Avoid Israeli products - use our QR scanner!",
                     "New insights on trustworthy channels - check now!",
-                    "Expose Godi Media with our latest updates - visit!",
-                    "Scan products to support the Muslim community - try now!",
+                    "Expose Godi Media with our latest updates!",
+                    "Scan products to support the Muslim community!",
                     "Find out which channels are safe - visit us!",
                     "New alerts on biased media - don’t miss out!",
-                    "Check if your Pepsi is Israeli with our tool!",
-                    "Stay informed with Leaked Godi Media - visit now!",
-                    "Avoid supporting Israeli goods - scan with us!",
-                    "Discover the truth behind news channels - check today!",
-                    "New QR scan feature to protect your choices!",
-                    "Uncover media bias every hour - visit Leaked Godi Media!",
+                    "Is your Pepsi Israeli? Check with our tool!",
+                    "Stay informed with Leaked Godi Media - visit!",
+                    "Avoid supporting Israeli goods - scan now!",
+                    "Discover the truth behind news - check today!",
+                    "New QR feature to protect your choices!",
+                    "Uncover media bias every hour - visit us!",
                     "Is your soda safe? Scan it now!",
-                    "Get the latest on trustworthy media sources!",
-                    "Expose and avoid biased channels - visit us!",
-                    "Support awareness with our QR scanner - try today!",
+                    "Get the latest on trustworthy media!",
+                    "Expose biased channels - visit Leaked Godi Media!",
+                    "Support awareness with our QR scanner!",
                     "New updates on Godi Media - don’t wait!",
-                    "Check product origins with our tool - visit now!",
+                    "Check product origins - visit now!",
                     "Stay safe from Israeli products - scan here!",
-                    "Latest media insights await you - visit Leaked Godi Media!"
+                    "Latest media insights await you - visit!"
                 ];
 
                 function showNotification() {
