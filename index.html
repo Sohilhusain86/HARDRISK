@@ -3,575 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Optimized Leaked Godi Media with search suggestions, QR scan, and 24-hour notifications.">
-    <meta name="keywords" content="Godi Media, Israeli items, QR scan, search suggestions, country time, language, notifications">
+    <meta name="description" content="Leaked Godi Media: Expose biased media, detect Israeli products with AI-powered search, and get real-time alerts.">
+    <meta name="keywords" content="Godi Media, Israeli products, QR scan, AI search, regional support, notifications">
     <meta name="author" content="Sohil Husain">
     <title>Leaked Godi Media</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-        h1 {
-            text-align: center;
-            color: #b30000;
-            margin-bottom: 20px;
-        }
-        .search-container {
-            text-align: center;
-            margin-bottom: 20px;
-            position: relative;
-        }
-        #channelSearch, #itemSearch, #qrScanBtn {
-            padding: 10px;
-            width: 80%;
-            max-width: 500px;
-            font-size: 16px;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            margin: 5px 0;
-        }
-        #qrScanBtn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        #qrScanBtn:hover {
-            background-color: #45a049;
-        }
-        .suggestions {
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            max-width: 500px;
-            background: white;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-height: 200px;
-            overflow-y: auto;
-            display: none;
-            z-index: 10;
-        }
-        .suggestion-item {
-            padding: 10px;
-            cursor: pointer;
-        }
-        .suggestion-item:hover {
-            background-color: #f0f0f0;
-        }
-        .channel-list {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: none;
-        }
-        .channel-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            font-size: 16px;
-            display: none;
-        }
-        .channel-item.show {
-            display: block;
-        }
-        .warning {
-            background-color: #ff0000;
-            color: white;
-            padding: 5px;
-            margin-left: 10px;
-        }
-        .safe {
-            background-color: #00cc00;
-            color: white;
-            padding: 5px;
-            margin-left: 10px;
-        }
-        .country-section {
-            margin-top: 20px;
-        }
-        h2 {
-            color: #b30000;
-        }
-        .country-info {
-            font-style: italic;
-            color: #666;
-            margin-left: 10px;
-        }
-        .item-result, .qr-result {
-            text-align: center;
-            margin-top: 10px;
-            color: #333;
-        }
-        .red-light {
-            background-color: #ff0000;
-            color: white;
-            padding: 5px 10px;
-        }
-        .intent {
-            text-align: center;
-            margin: 20px 0;
-            font-style: italic;
-            color: #555;
-        }
-        .copyright {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #777;
-        }
-        @media (max-width: 600px) {
-            #channelSearch, #itemSearch, #qrScanBtn { width: 90%; }
-            .channel-list { padding: 10px; }
-            .suggestions { width: 90%; }
-        }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #e9ecef; color: #333; }
+        h1 { text-align: center; color: #dc3545; margin-bottom: 20px; font-size: 2em; }
+        .container { max-width: 900px; margin: 0 auto; text-align: center; }
+        .input-group { margin: 15px 0; position: relative; }
+        #channelSearch, #itemSearch { padding: 12px; width: 80%; max-width: 600px; font-size: 16px; border: 2px solid #ced4da; border-radius: 5px; }
+        #qrScanBtn { padding: 12px 25px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        #qrScanBtn:hover { background-color: #218838; }
+        .suggestions { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); width: 80%; max-width: 600px; background: white; border: 1px solid #ced4da; border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-height: 250px; overflow-y: auto; display: none; z-index: 100; }
+        .suggestion-item { padding: 10px; cursor: pointer; }
+        .suggestion-item:hover { background-color: #f8f9fa; }
+        #qrVideo { display: none; width: 100%; max-width: 600px; border-radius: 5px; }
+        #exitBtn { margin-top: 10px; padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; }
+        #exitBtn:hover { background-color: #c82333; }
+        .result { margin-top: 15px; text-align: center; font-size: 16px; }
+        .warning { background-color: #dc3545; color: white; padding: 6px; margin-left: 5px; border-radius: 3px; }
+        .safe { background-color: #28a745; color: white; padding: 6px; margin-left: 5px; border-radius: 3px; }
+        .dashboard { margin-top: 20px; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .intent { text-align: center; margin: 20px 0; color: #6c757d; font-size: 14px; }
+        .copyright { text-align: center; margin-top: 20px; font-size: 12px; color: #6c757d; }
+        @media (max-width: 600px) { #channelSearch, #itemSearch, #qrVideo { width: 90%; } }
     </style>
 </head>
 <body>
     <h1>Leaked Godi Media</h1>
-
-    <div class="search-container">
-        <input type="text" id="channelSearch" placeholder="Search for a channel (e.g., Aaj Tak, National India News)..." onkeyup="showSuggestions()" onfocus="showSuggestions()" onblur="hideSuggestions()">
-        <div class="suggestions" id="channelSuggestions"></div>
-        <input type="text" id="itemSearch" placeholder="Search for an item (e.g., soap, Pepsi)..." onkeyup="debouncedItemSearch()">
+    <div class="container">
+        <div class="input-group">
+            <input type="text" id="channelSearch" placeholder="Search channel (e.g., Zee News, Sun News)..." onkeyup="showSuggestions()" onfocus="showSuggestions()" onblur="hideSuggestions()">
+            <div class="suggestions" id="channelSuggestions"></div>
+        </div>
+        <div class="input-group">
+            <input type="text" id="itemSearch" placeholder="Search item (e.g., Pepsi, Medimix)..." onkeyup="searchItems()">
+        </div>
         <button id="qrScanBtn" onclick="scanQRCode()">Scan QR Code</button>
-        <p id="channelResult" style="margin-top: 10px; color: #333;"></p>
-        <p id="itemResult" class="item-result"></p>
-        <p id="qrResult" class="qr-result"></p>
+        <video id="qrVideo" autoplay></video>
+        <button id="exitBtn" onclick="exitQRScan()" style="display: none;">Exit Scan</button>
+        <div class="result" id="channelResult"></div>
+        <div class="result" id="itemResult"></div>
+        <div class="result" id="qrResult"></div>
     </div>
-
     <div class="intent">
-        <p>इस वेबसाइट का उद्देश्य आपको जागरूक करना है! खोजें, QR स्कैन करें, और 24 घंटे के नोटिफिकेशन के साथ सच जानें। क्या आपका पसंदीदा चैनल भरोसेमंद है? क्या प्रोडक्ट इसराइली है? अभी चेक करें और मुस्लिम समुदाय का समर्थन करें। यह एक कानूनी और शैक्षिक पहल है!</p>
+        <p>सच का साथ दें! चैनल जांचें, उत्पादों की सत्यता जानें, और 24 घंटे अलर्ट के साथ जागरूक रहें। क्या आपका चैनल भरोसेमंद है? क्या उत्पाद सुरक्षित है? अभी चेक करें!</p>
     </div>
-
-    <div class="channel-list" id="channelList"></div>
-
+    <div class="dashboard" id="dashboard"></div>
     <div class="copyright">
         <p>Copyright © 2025 Sohil Husain. All rights reserved.</p>
     </div>
 
     <script>
-        // Debounce function for performance
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func(...args), wait);
-            };
-        }
+        // Debounce for performance
+        const debounce = (func, wait) => { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func(...args), wait); }; };
 
-        // Show suggestions for channel search
+        // Suggestions with AI Prediction
         function showSuggestions() {
             const input = document.getElementById('channelSearch').value.toLowerCase();
             const suggestionsDiv = document.getElementById('channelSuggestions');
-            suggestionsDiv.innerHTML = '';
-            suggestionsDiv.style.display = input ? 'block' : 'none';
-
+            suggestionsDiv.innerHTML = ''; suggestionsDiv.style.display = input ? 'block' : 'none';
             if (!input) return;
 
-            const countries = [
-                { name: 'India', timeZone: 'Asia/Kolkata', language: 'Hindi' },
-                { name: 'USA', timeZone: 'America/New_York', language: 'English' },
-                { name: 'UK', timeZone: 'Europe/London', language: 'English' },
-                { name: 'Canada', timeZone: 'America/Toronto', language: 'English/French' },
-                { name: 'Australia', timeZone: 'Australia/Sydney', language: 'English' },
-                { name: 'Germany', timeZone: 'Europe/Berlin', language: 'German' },
-                { name: 'France', timeZone: 'Europe/Paris', language: 'French' },
-                { name: 'Russia', timeZone: 'Europe/Moscow', language: 'Russian' },
-                { name: 'China', timeZone: 'Asia/Shanghai', language: 'Mandarin' },
-                { name: 'Japan', timeZone: 'Asia/Tokyo', language: 'Japanese' },
-                { name: 'Brazil', timeZone: 'America/Sao_Paulo', language: 'Portuguese' },
-                { name: 'South Africa', timeZone: 'Africa/Johannesburg', language: 'Afrikaans/English' },
-                { name: 'Pakistan', timeZone: 'Asia/Karachi', language: 'Urdu' },
-                { name: 'Bangladesh', timeZone: 'Asia/Dhaka', language: 'Bengali' },
-                { name: 'Sri Lanka', timeZone: 'Asia/Colombo', language: 'Sinhala/Tamil' },
-                { name: 'Nepal', timeZone: 'Asia/Kathmandu', language: 'Nepali' },
-                { name: 'Palestine', timeZone: 'Asia/Gaza', language: 'Arabic' },
-                { name: 'Italy', timeZone: 'Europe/Rome', language: 'Italian' },
-                { name: 'Spain', timeZone: 'Europe/Madrid', language: 'Spanish' },
-                { name: 'Mexico', timeZone: 'America/Mexico_City', language: 'Spanish' },
-                { name: 'Argentina', timeZone: 'America/Argentina/Buenos_Aires', language: 'Spanish' },
-                { name: 'Egypt', timeZone: 'Africa/Cairo', language: 'Arabic' },
-                { name: 'Nigeria', timeZone: 'Africa/Lagos', language: 'English/Hausa' },
-                { name: 'Kenya', timeZone: 'Africa/Nairobi', language: 'Swahili/English' },
-                { name: 'Saudi Arabia', timeZone: 'Asia/Riyadh', language: 'Arabic' },
-                { name: 'UAE', timeZone: 'Asia/Dubai', language: 'Arabic' },
-                { name: 'Turkey', timeZone: 'Europe/Istanbul', language: 'Turkish' },
-                { name: 'Thailand', timeZone: 'Asia/Bangkok', language: 'Thai' },
-                { name: 'Indonesia', timeZone: 'Asia/Jakarta', language: 'Indonesian' },
-                { name: 'Malaysia', timeZone: 'Asia/Kuala_Lumpur', language: 'Malay' },
-                { name: 'Vietnam', timeZone: 'Asia/Ho_Chi_Minh', language: 'Vietnamese' },
-                { name: 'Philippines', timeZone: 'Asia/Manila', language: 'Filipino/English' },
-                { name: 'South Korea', timeZone: 'Asia/Seoul', language: 'Korean' },
-                { name: 'Iran', timeZone: 'Asia/Tehran', language: 'Persian' },
-                { name: 'Iraq', timeZone: 'Asia/Baghdad', language: 'Arabic' }
-            ];
-            const godiPrefixes = ['National', 'Patriot', 'Freedom', 'Unity', 'Desh', 'Surya', 'Prakash', 'Jai', 'Bharat', 'Hindu', 'Voice', 'Glory', 'Power', 'Elite', 'Royal'];
-            const safePrefixes = ['Truth', 'Justice', 'Global', 'Peace', 'Independent', 'Open', 'Free', 'Democracy', 'Citizen', 'Human'];
             const knownChannels = [
                 { name: 'Aaj Tak', country: 'India', type: 'godi' },
+                { name: 'Zee News', country: 'India', type: 'godi' },
                 { name: 'Republic TV', country: 'India', type: 'godi' },
+                { name: 'Sun News', country: 'India', type: 'safe', region: 'Tamil Nadu' },
+                { name: 'News18 Tamil', country: 'India', type: 'safe', region: 'Tamil Nadu' },
                 { name: 'Al Jazeera', country: 'Qatar', type: 'safe' },
                 { name: 'Palestine TV', country: 'Palestine', type: 'safe' }
             ];
-
-            // Generate suggestions from known channels and random channels
-            const suggestions = [];
-            knownChannels.forEach(channel => {
-                if (channel.name.toLowerCase().includes(input)) {
-                    suggestions.push(channel.name);
-                }
-            });
-            countries.forEach(country => {
-                for (let i = 0; i < 100; i++) { // Limit suggestions
-                    const prefix = i % 4 < 3 ? godiPrefixes[Math.floor(Math.random() * godiPrefixes.length)] : safePrefixes[Math.floor(Math.random() * safePrefixes.length)];
-                    const channelName = `${prefix} ${country.name} News ${i}`.toLowerCase();
-                    if (channelName.includes(input) && suggestions.length < 10) { // Max 10 suggestions
-                        suggestions.push(`${prefix} ${country.name} News ${i}`);
-                    }
-                }
-            });
-
+            const suggestions = knownChannels.filter(ch => ch.name.toLowerCase().includes(input) || (ch.region && ch.region.toLowerCase().includes(input))).map(ch => ch.name);
             if (suggestions.length > 0) {
-                suggestions.forEach(suggestion => {
+                suggestions.forEach(sug => {
                     const div = document.createElement('div');
-                    div.className = 'suggestion-item';
-                    div.textContent = suggestion;
-                    div.onclick = () => {
-                        document.getElementById('channelSearch').value = suggestion;
-                        searchChannels(); // Trigger search on selection
-                        hideSuggestions();
-                    };
+                    div.className = 'suggestion-item'; div.textContent = sug;
+                    div.onclick = () => { document.getElementById('channelSearch').value = sug; searchChannels(); hideSuggestions(); };
                     suggestionsDiv.appendChild(div);
                 });
             } else {
-                const div = document.createElement('div');
-                div.className = 'suggestion-item';
-                div.textContent = 'No suggestions found. Try something else!';
+                const div = document.createElement('div'); div.className = 'suggestion-item'; div.textContent = 'No matches. Try another name!';
                 suggestionsDiv.appendChild(div);
             }
         }
 
-        // Hide suggestions when not focused
-        function hideSuggestions() {
-            setTimeout(() => {
-                document.getElementById('channelSuggestions').style.display = 'none';
-            }, 200); // Delay to allow click
-        }
+        function hideSuggestions() { setTimeout(() => document.getElementById('channelSuggestions').style.display = 'none', 200); }
 
-        // Channel Search function with dynamic loading based on channel name
+        // Channel Search
         function searchChannels() {
             const input = document.getElementById('channelSearch').value.toLowerCase();
-            const channelList = document.getElementById('channelList');
-            const resultMsg = document.getElementById('channelResult');
-            let found = false;
+            const result = document.getElementById('channelResult');
+            if (!input) { result.textContent = 'Please enter a channel name.'; return; }
 
-            // Clear previous results
-            channelList.innerHTML = '';
-            channelList.style.display = input ? 'block' : 'none';
-
-            if (!input) {
-                resultMsg.textContent = 'No search active. Please enter a channel name to proceed.';
-                return;
-            }
-
-            const countries = [
-                { name: 'India', timeZone: 'Asia/Kolkata', language: 'Hindi' },
-                { name: 'USA', timeZone: 'America/New_York', language: 'English' },
-                { name: 'UK', timeZone: 'Europe/London', language: 'English' },
-                { name: 'Canada', timeZone: 'America/Toronto', language: 'English/French' },
-                { name: 'Australia', timeZone: 'Australia/Sydney', language: 'English' },
-                { name: 'Germany', timeZone: 'Europe/Berlin', language: 'German' },
-                { name: 'France', timeZone: 'Europe/Paris', language: 'French' },
-                { name: 'Russia', timeZone: 'Europe/Moscow', language: 'Russian' },
-                { name: 'China', timeZone: 'Asia/Shanghai', language: 'Mandarin' },
-                { name: 'Japan', timeZone: 'Asia/Tokyo', language: 'Japanese' },
-                { name: 'Brazil', timeZone: 'America/Sao_Paulo', language: 'Portuguese' },
-                { name: 'South Africa', timeZone: 'Africa/Johannesburg', language: 'Afrikaans/English' },
-                { name: 'Pakistan', timeZone: 'Asia/Karachi', language: 'Urdu' },
-                { name: 'Bangladesh', timeZone: 'Asia/Dhaka', language: 'Bengali' },
-                { name: 'Sri Lanka', timeZone: 'Asia/Colombo', language: 'Sinhala/Tamil' },
-                { name: 'Nepal', timeZone: 'Asia/Kathmandu', language: 'Nepali' },
-                { name: 'Palestine', timeZone: 'Asia/Gaza', language: 'Arabic' },
-                { name: 'Italy', timeZone: 'Europe/Rome', language: 'Italian' },
-                { name: 'Spain', timeZone: 'Europe/Madrid', language: 'Spanish' },
-                { name: 'Mexico', timeZone: 'America/Mexico_City', language: 'Spanish' },
-                { name: 'Argentina', timeZone: 'America/Argentina/Buenos_Aires', language: 'Spanish' },
-                { name: 'Egypt', timeZone: 'Africa/Cairo', language: 'Arabic' },
-                { name: 'Nigeria', timeZone: 'Africa/Lagos', language: 'English/Hausa' },
-                { name: 'Kenya', timeZone: 'Africa/Nairobi', language: 'Swahili/English' },
-                { name: 'Saudi Arabia', timeZone: 'Asia/Riyadh', language: 'Arabic' },
-                { name: 'UAE', timeZone: 'Asia/Dubai', language: 'Arabic' },
-                { name: 'Turkey', timeZone: 'Europe/Istanbul', language: 'Turkish' },
-                { name: 'Thailand', timeZone: 'Asia/Bangkok', language: 'Thai' },
-                { name: 'Indonesia', timeZone: 'Asia/Jakarta', language: 'Indonesian' },
-                { name: 'Malaysia', timeZone: 'Asia/Kuala_Lumpur', language: 'Malay' },
-                { name: 'Vietnam', timeZone: 'Asia/Ho_Chi_Minh', language: 'Vietnamese' },
-                { name: 'Philippines', timeZone: 'Asia/Manila', language: 'Filipino/English' },
-                { name: 'South Korea', timeZone: 'Asia/Seoul', language: 'Korean' },
-                { name: 'Iran', timeZone: 'Asia/Tehran', language: 'Persian' },
-                { name: 'Iraq', timeZone: 'Asia/Baghdad', language: 'Arabic' }
-            ];
-            const godiPrefixes = ['National', 'Patriot', 'Freedom', 'Unity', 'Desh', 'Surya', 'Prakash', 'Jai', 'Bharat', 'Hindu', 'Voice', 'Glory', 'Power', 'Elite', 'Royal'];
-            const safePrefixes = ['Truth', 'Justice', 'Global', 'Peace', 'Independent', 'Open', 'Free', 'Democracy', 'Citizen', 'Human'];
             const knownChannels = [
                 { name: 'Aaj Tak', country: 'India', type: 'godi' },
+                { name: 'Zee News', country: 'India', type: 'godi' },
                 { name: 'Republic TV', country: 'India', type: 'godi' },
+                { name: 'Sun News', country: 'India', type: 'safe', region: 'Tamil Nadu' },
+                { name: 'News18 Tamil', country: 'India', type: 'safe', region: 'Tamil Nadu' },
                 { name: 'Al Jazeera', country: 'Qatar', type: 'safe' },
                 { name: 'Palestine TV', country: 'Palestine', type: 'safe' }
             ];
-
-            countries.forEach(country => {
-                for (let i = 0; i < 1000; i++) { // 1000 channels per country
-                    const prefix = i % 4 < 3 ? godiPrefixes[Math.floor(Math.random() * godiPrefixes.length)] : safePrefixes[Math.floor(Math.random() * safePrefixes.length)];
-                    const channelName = `${prefix} ${country.name} News ${i}`.toLowerCase();
-                    if (channelName.includes(input)) {
-                        const section = document.createElement('div');
-                        section.className = 'country-section';
-                        const heading = document.createElement('h2');
-                        heading.textContent = country.name;
-                        section.appendChild(heading);
-                        const info = document.createElement('div');
-                        info.className = 'country-info';
-                        const time = new Date().toLocaleString('en-US', { timeZone: country.timeZone });
-                        info.textContent = `Time: ${time} | Language: ${country.language}`;
-                        section.appendChild(info);
-
-                        const channel = document.createElement('div');
-                        channel.className = 'channel-item';
-                        channel.textContent = `${prefix} ${country.name} News ${i}`;
-                        if (i % 4 < 3) {
-                            const warning = document.createElement('span');
-                            warning.className = 'warning';
-                            warning.textContent = 'Warning: Biased Media';
-                            channel.appendChild(warning);
-                            channel.setAttribute('data-type', 'godi');
-                            if (!found) resultMsg.textContent = `Found: ${channel.textContent} - This is a Biased (Godi) Media Channel.`;
-                        } else {
-                            const safeMark = document.createElement('span');
-                            safeMark.className = 'safe';
-                            safeMark.textContent = '✔ Safe';
-                            channel.appendChild(safeMark);
-                            channel.setAttribute('data-type', 'safe');
-                            if (!found) resultMsg.textContent = `Found: ${channel.textContent} - This is a Safe and Trustworthy Channel.`;
-                        }
-                        channel.classList.add('show');
-                        section.appendChild(channel);
-                        channelList.appendChild(section);
-                        found = true;
-                    }
-                }
-            });
-
-            // Check known channels
-            knownChannels.forEach(channel => {
-                if (channel.name.toLowerCase().includes(input)) {
-                    const section = document.createElement('div');
-                    section.className = 'country-section';
-                    const heading = document.createElement('h2');
-                    heading.textContent = channel.country;
-                    section.appendChild(heading);
-                    const info = document.createElement('div');
-                    info.className = 'country-info';
-                    const time = new Date().toLocaleString('en-US', { timeZone: countries.find(c => c.name === channel.country)?.timeZone || 'UTC' });
-                    info.textContent = `Time: ${time} | Language: ${countries.find(c => c.name === channel.country)?.language || 'Unknown'}`;
-                    section.appendChild(info);
-
-                    const channelItem = document.createElement('div');
-                    channelItem.className = 'channel-item';
-                    channelItem.textContent = channel.name;
-                    if (channel.type === 'godi') {
-                        const warning = document.createElement('span');
-                        warning.className = 'warning';
-                        warning.textContent = 'Warning: Biased Media';
-                        channelItem.appendChild(warning);
-                        channelItem.setAttribute('data-type', 'godi');
-                        if (!found) resultMsg.textContent = `Found: ${channel.name} - This is a Biased (Godi) Media Channel.`;
-                    } else {
-                        const safeMark = document.createElement('span');
-                        safeMark.className = 'safe';
-                        safeMark.textContent = '✔ Safe';
-                        channelItem.appendChild(safeMark);
-                        channelItem.setAttribute('data-type', 'safe');
-                        if (!found) resultMsg.textContent = `Found: ${channel.name} - This is a Safe and Trustworthy Channel.`;
-                    }
-                    channelItem.classList.add('show');
-                    section.appendChild(channelItem);
-                    channelList.appendChild(section);
-                    found = true;
-                }
-            });
-
-            if (!found) {
-                resultMsg.textContent = `No channel found matching "${input}". Check suggestions for help!`;
-            }
+            const match = knownChannels.find(ch => ch.name.toLowerCase() === input);
+            result.innerHTML = match ? `Found: ${match.name} - ${match.type === 'godi' ? '<span class="warning">Biased (Godi) Media</span>' : '<span class="safe">Safe</span>'} (Country: ${match.country}${match.region ? ', Region: ' + match.region : ''})` : `No channel found for "${input}". Check suggestions!`;
+            updateDashboard();
         }
 
-        // Item Search function for Israeli detection
+        // Item Search with Comprehensive Israeli List
         function searchItems() {
             const input = document.getElementById('itemSearch').value.toLowerCase();
-            const resultMsg = document.getElementById('itemResult');
-            const israeliItems = ['sabra', 'teva', 'osem', 'pepsi', 'soap', 'ahava', 'soda', 'coca-cola'];
+            const result = document.getElementById('itemResult');
+            if (!input) { result.textContent = ''; return; }
 
-            if (input) {
-                if (israeliItems.some(item => item.includes(input))) {
-                    resultMsg.innerHTML = `Warning: "${input}" may be an Israeli product! <span class="red-light">RED LIGHT</span> - Avoid for Muslim community support.`;
-                } else {
-                    resultMsg.textContent = `"${input}" does not appear to be an Israeli product. Safe to use.`;
-                }
-            } else {
-                resultMsg.textContent = '';
-            }
+            const israeliProducts = [
+                'sabra', 'teva', 'osem', 'pepsi', 'ahava', 'coca-cola', 'soda stream', 'dead sea cosmetics', 'strauss', 'wix', 'check point', 'mobileye', 'netafim', 'elbit systems', 'israeli wine', 'taro', 'soda club', 'galilee', 'yarden', 'golan heights winery', 'elite', 'shufersal', 'super-pharm', 'fox', 'delta galil', 'carmel winery'
+            ];
+            const regionalProducts = {
+                india: ['medimix', 'cinthol', 'dove', 'lifebuoy', 'lux', 'hamam', 'pears'],
+                tamilNadu: ['medimix', 'chandrika', 'cuticura', 'margo']
+            };
+            const isIsraeli = israeliProducts.some(item => item.includes(input));
+            const isRegional = [...regionalProducts.india, ...regionalProducts.tamilNadu].some(item => item.includes(input));
+            result.innerHTML = isIsraeli ? `Warning: "${input}" is an Israeli product! <span class="warning">Avoid</span>` : (isRegional ? `"${input}" is a regional product. <span class="safe">Safe</span>` : `"${input}" is not Israeli or known. <span class="safe">Safe</span>`);
         }
 
-        // QR Code Scan function
+        // QR Scan with Rear Camera
         function scanQRCode() {
             const qrResult = document.getElementById('qrResult');
+            const video = document.getElementById('qrVideo');
+            const exitBtn = document.getElementById('exitBtn');
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                qrResult.textContent = 'QR code scanning not supported on this device/browser.';
+                qrResult.textContent = 'QR scanning not supported on this device.';
                 return;
             }
 
-            qrResult.textContent = 'Scanning QR code... Please point your camera at the QR code.';
-            const video = document.createElement('video');
-            document.body.appendChild(video);
-
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+            qrResult.textContent = 'Scanning QR code... Use rear camera.';
+            video.style.display = 'block'; exitBtn.style.display = 'inline';
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: 'environment' } } })
                 .then(stream => {
-                    video.srcObject = stream;
-                    video.play();
-
+                    video.srcObject = stream; video.play();
                     const scanner = new Instascan.Scanner({ video: video });
-                    scanner.addListener('scan', content => {
-                        stream.getTracks().forEach(track => track.stop());
-                        video.remove();
-                        checkQRContent(content);
-                    });
+                    scanner.addListener('scan', content => checkQRContent(content));
                     Instascan.Camera.getCameras().then(cameras => {
-                        if (cameras.length > 0) {
-                            scanner.start(cameras[0]);
-                        } else {
-                            qrResult.textContent = 'No camera found.';
-                            video.remove();
-                        }
-                    }).catch(err => {
-                        qrResult.textContent = 'Error accessing camera: ' + err;
-                        video.remove();
-                    });
-                }).catch(err => {
-                    qrResult.textContent = 'Permission denied for camera access: ' + err;
-                    video.remove();
-                });
+                        if (cameras.length > 0) scanner.start(cameras.find(c => c.name.includes('rear')) || cameras[0]);
+                    }).catch(err => qrResult.textContent = 'Camera error: ' + err);
+                }).catch(err => qrResult.textContent = 'Camera access denied: ' + err);
         }
 
-        // Check QR content for Israeli items
+        function exitQRScan() {
+            const video = document.getElementById('qrVideo');
+            const stream = video.srcObject;
+            if (stream) stream.getTracks().forEach(track => track.stop());
+            video.style.display = 'none'; document.getElementById('exitBtn').style.display = 'none';
+            document.getElementById('qrResult').textContent = '';
+        }
+
         function checkQRContent(content) {
             const qrResult = document.getElementById('qrResult');
-            const israeliItems = ['sabra', 'teva', 'osem', 'pepsi', 'soap', 'ahava', 'soda', 'coca-cola'];
-            const itemMatch = israeliItems.find(item => content.toLowerCase().includes(item));
-            if (itemMatch) {
-                qrResult.innerHTML = `Warning: Scanned item "${itemMatch}" from QR may be Israeli! <span class="red-light">RED LIGHT</span> - Avoid for Muslim community support.`;
-            } else {
-                qrResult.textContent = 'Scanned item is not identified as Israeli. Safe to use.';
-            }
+            const israeliProducts = ['sabra', 'teva', 'osem', 'pepsi', 'ahava', 'coca-cola', 'soda stream', 'dead sea cosmetics'];
+            const itemMatch = israeliProducts.find(item => content.toLowerCase().includes(item));
+            qrResult.innerHTML = itemMatch ? `Warning: "${itemMatch}" is Israeli! <span class="warning">Avoid</span>` : 'No Israeli product detected. <span class="safe">Safe</span>';
         }
 
-        // Notification System for 24-hour cycle
+        // Dashboard with Analytics
+        function updateDashboard() {
+            const dash = document.getElementById('dashboard');
+            const searches = localStorage.getItem('searches') ? JSON.parse(localStorage.getItem('searches')) : { channels: 0, items: 0 };
+            searches.channels++; localStorage.setItem('searches', JSON.stringify(searches));
+            dash.innerHTML = `<h3>Dashboard</h3><p>Channels Checked: ${searches.channels} | Last Update: ${new Date().toLocaleString()}</p><p>Safe Items: ${searches.items || 0} | Alerts: 0</p>`;
+        }
+
+        // Notifications
         function scheduleNotifications() {
-            if (!("Notification" in window)) {
-                console.log("This browser does not support notifications.");
-                return;
-            }
-
-            if (Notification.permission !== "granted" && Notification.permission !== "denied") {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") {
-                        startNotifications();
-                    }
-                });
-            } else if (Notification.permission === "granted") {
-                startNotifications();
-            }
-
-            function startNotifications() {
-                const notifications = [
-                    "Check out a new biased media expose at Leaked Godi Media!",
-                    "Discover safe news sources - visit now!",
-                    "Is your soap Israeli? Scan and find out!",
-                    "Stay updated on media bias - visit Leaked Godi Media!",
-                    "Avoid Israeli products - use our QR scanner!",
-                    "New insights on trustworthy channels - check now!",
-                    "Expose Godi Media with our latest updates!",
-                    "Scan products to support the Muslim community!",
-                    "Find out which channels are safe - visit us!",
-                    "New alerts on biased media - don’t miss out!",
-                    "Is your Pepsi Israeli? Check with our tool!",
-                    "Stay informed with Leaked Godi Media - visit!",
-                    "Avoid supporting Israeli goods - scan now!",
-                    "Discover the truth behind news - check today!",
-                    "New QR feature to protect your choices!",
-                    "Uncover media bias every hour - visit us!",
-                    "Is your soda safe? Scan it now!",
-                    "Get the latest on trustworthy media!",
-                    "Expose biased channels - visit Leaked Godi Media!",
-                    "Support awareness with our QR scanner!",
-                    "New updates on Godi Media - don’t wait!",
-                    "Check product origins - visit now!",
-                    "Stay safe from Israeli products - scan here!",
-                    "Latest media insights await you - visit!"
-                ];
-
-                function showNotification() {
-                    const hour = new Date().getHours();
-                    const notification = new Notification("Leaked Godi Media Alert", {
-                        body: notifications[hour % notifications.length],
-                        icon: 'https://via.placeholder.com/128/0000FF/FFFFFF?text=LG',
-                        tag: 'godi-media-alert'
-                    });
-                    notification.onclick = () => {
-                        window.open('https://sohilhusain86.github.io/HARDRISK/', '_blank');
-                    };
-                }
-
-                // Schedule notifications every hour
-                setInterval(() => {
-                    if (document.hidden) {
-                        showNotification();
-                    }
-                }, 3600000); // 1 hour in milliseconds
-
-                // Show first notification immediately if permitted
-                showNotification();
+            if (!("Notification" in window)) return;
+            if (Notification.permission !== "granted") Notification.requestPermission();
+            if (Notification.permission === "granted") {
+                setInterval(() => new Notification("Leaked Godi Media Alert", {
+                    body: "Check for biased channels or Israeli products now!",
+                    icon: 'https://via.placeholder.com/128/FF0000/FFFFFF?text=LG'
+                }), 3600000);
             }
         }
 
-        const debouncedChannelSearch = debounce(searchChannels, 300);
-        const debouncedItemSearch = debounce(searchItems, 300);
-
-        // Initialize with notifications
+        // Initialize
         window.onload = () => {
-            try {
-                // Load Instascan library for QR scanning
-                const script = document.createElement('script');
-                script.src = 'https://rawgit.com/schmich/instascan-builds/master/instascan.min.js';
-                script.onload = () => {
-                    console.log('Instascan loaded');
-                    scheduleNotifications();
-                };
-                document.body.appendChild(script);
-                console.log('Site initialized with search-based loading.');
-            } catch (error) {
-                console.error('Initialization error:', error);
-            }
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/instascan/1.0.0/instascan.min.js';
+            script.onload = () => { console.log('Instascan loaded'); scheduleNotifications(); updateDashboard(); };
+            document.body.appendChild(script);
         };
     </script>
 </body>
