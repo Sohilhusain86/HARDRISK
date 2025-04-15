@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Optimized Leaked Godi Media with search-based loading for low-end devices.">
-    <meta name="keywords" content="Godi Media, Israeli items, country time, language, optimized">
+    <meta name="description" content="Optimized Leaked Godi Media with search-based loading, QR scan, and 24-hour notifications.">
+    <meta name="keywords" content="Godi Media, Israeli items, QR scan, country time, language, notifications">
     <meta name="author" content="Sohil Husain">
     <title>Leaked Godi Media</title>
     <style>
@@ -24,7 +24,7 @@
             text-align: center;
             margin-bottom: 20px;
         }
-        #channelSearch, #itemSearch {
+        #channelSearch, #itemSearch, #qrScanBtn {
             padding: 10px;
             width: 80%;
             max-width: 500px;
@@ -32,6 +32,15 @@
             border: 2px solid #ccc;
             border-radius: 5px;
             margin: 5px 0;
+        }
+        #qrScanBtn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #qrScanBtn:hover {
+            background-color: #45a049;
         }
         .channel-list {
             max-width: 800px;
@@ -74,7 +83,7 @@
             color: #666;
             margin-left: 10px;
         }
-        .item-result {
+        .item-result, .qr-result {
             text-align: center;
             margin-top: 10px;
             color: #333;
@@ -97,7 +106,7 @@
             color: #777;
         }
         @media (max-width: 600px) {
-            #channelSearch, #itemSearch { width: 90%; }
+            #channelSearch, #itemSearch, #qrScanBtn { width: 90%; }
             .channel-list { padding: 10px; }
         }
     </style>
@@ -106,14 +115,16 @@
     <h1>Leaked Godi Media</h1>
 
     <div class="search-container">
-        <input type="text" id="channelSearch" placeholder="Search for a media channel..." onkeyup="debouncedChannelSearch()">
+        <input type="text" id="channelSearch" placeholder="Search for a channel (e.g., National India News)..." onkeyup="debouncedChannelSearch()">
         <input type="text" id="itemSearch" placeholder="Search for an item (e.g., soap, Pepsi)..." onkeyup="debouncedItemSearch()">
+        <button id="qrScanBtn" onclick="scanQRCode()">Scan QR Code</button>
         <p id="channelResult" style="margin-top: 10px; color: #333;"></p>
         <p id="itemResult" class="item-result"></p>
+        <p id="qrResult" class="qr-result"></p>
     </div>
 
     <div class="intent">
-        <p>इस वेबसाइट का उद्देश्य लोगों को जागरूक करना है कि वे किन चैनलों और वस्तुओं से जुड़े हैं। खोज के माध्यम से चैनलों की विश्वसनीयता और वस्तुओं की उत्पत्ति (विशेषकर इसराइली) की जानकारी प्राप्त करें। यह खास तौर पर मुस्लिम समुदाय के लिए उपयोगी है। यह एक कानूनी और शैक्षिक पहल है।</p>
+        <p>इस वेबसाइट का उद्देश्य लोगों को जागरूक करना है कि वे किन चैनलों और वस्तुओं से जुड़े हैं। खोज, QR स्कैन, और 24 घंटे के नोटिफिकेशन से जानकारी प्राप्त करें। यह खास तौर पर मुस्लिम समुदाय के लिए उपयोगी है। यह एक कानूनी और शैक्षिक पहल है।</p>
     </div>
 
     <div class="channel-list" id="channelList"></div>
@@ -132,7 +143,7 @@
             };
         }
 
-        // Channel Search function with dynamic loading
+        // Channel Search function with dynamic loading based on channel name
         function searchChannels() {
             const input = document.getElementById('channelSearch').value.toLowerCase();
             const channelList = document.getElementById('channelList');
@@ -144,7 +155,7 @@
             channelList.style.display = input ? 'block' : 'none';
 
             if (!input) {
-                resultMsg.textContent = '';
+                resultMsg.textContent = 'No search active. Please enter a channel name to proceed.';
                 return;
             }
 
@@ -189,22 +200,23 @@
             const safePrefixes = ['Truth', 'Justice', 'Global', 'Peace', 'Independent', 'Open', 'Free', 'Democracy', 'Citizen', 'Human'];
 
             countries.forEach(country => {
-                if (country.name.toLowerCase().includes(input)) {
-                    const section = document.createElement('div');
-                    section.className = 'country-section';
-                    const heading = document.createElement('h2');
-                    heading.textContent = country.name;
-                    section.appendChild(heading);
-                    const info = document.createElement('div');
-                    info.className = 'country-info';
-                    const time = new Date().toLocaleString('en-US', { timeZone: country.timeZone });
-                    info.textContent = `Time: ${time} | Language: ${country.language}`;
-                    section.appendChild(info);
+                for (let i = 0; i < 1000; i++) { // 1000 channels per country
+                    const prefix = i % 4 < 3 ? godiPrefixes[Math.floor(Math.random() * godiPrefixes.length)] : safePrefixes[Math.floor(Math.random() * safePrefixes.length)];
+                    const channelName = `${prefix} ${country.name} News ${i}`.toLowerCase();
+                    if (channelName.includes(input)) {
+                        const section = document.createElement('div');
+                        section.className = 'country-section';
+                        const heading = document.createElement('h2');
+                        heading.textContent = country.name;
+                        section.appendChild(heading);
+                        const info = document.createElement('div');
+                        info.className = 'country-info';
+                        const time = new Date().toLocaleString('en-US', { timeZone: country.timeZone });
+                        info.textContent = `Time: ${time} | Language: ${country.language}`;
+                        section.appendChild(info);
 
-                    for (let i = 0; i < 100; i++) { // Limited channels per match
                         const channel = document.createElement('div');
                         channel.className = 'channel-item';
-                        const prefix = i % 4 < 3 ? godiPrefixes[Math.floor(Math.random() * godiPrefixes.length)] : safePrefixes[Math.floor(Math.random() * safePrefixes.length)];
                         channel.textContent = `${prefix} ${country.name} News ${i}`;
                         if (i % 4 < 3) {
                             const warning = document.createElement('span');
@@ -212,26 +224,25 @@
                             warning.textContent = 'Warning: Biased Media';
                             channel.appendChild(warning);
                             channel.setAttribute('data-type', 'godi');
+                            if (!found) resultMsg.textContent = `Found: ${channel.textContent} - This is a Biased (Godi) Media Channel.`;
                         } else {
                             const safeMark = document.createElement('span');
                             safeMark.className = 'safe';
                             safeMark.textContent = '✔ Safe';
                             channel.appendChild(safeMark);
                             channel.setAttribute('data-type', 'safe');
+                            if (!found) resultMsg.textContent = `Found: ${channel.textContent} - This is a Safe and Trustworthy Channel.`;
                         }
-                        section.appendChild(channel);
                         channel.classList.add('show');
-                        if (found) break; // Limit to first match for now
+                        section.appendChild(channel);
+                        channelList.appendChild(section);
+                        found = true;
                     }
-                    channelList.appendChild(section);
-                    found = true;
                 }
             });
 
-            if (!found && input) {
-                resultMsg.textContent = `No channel found matching "${input}".`;
-            } else if (found) {
-                resultMsg.textContent = `Found channels for "${input}".`;
+            if (!found) {
+                resultMsg.textContent = `No channel found matching "${input}". Please try a different channel name.`;
             }
         }
 
@@ -252,12 +263,141 @@
             }
         }
 
+        // QR Code Scan function
+        function scanQRCode() {
+            const qrResult = document.getElementById('qrResult');
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                qrResult.textContent = 'QR code scanning not supported on this device/browser.';
+                return;
+            }
+
+            qrResult.textContent = 'Scanning QR code... Please point your camera at the QR code.';
+            const video = document.createElement('video');
+            document.body.appendChild(video);
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.play();
+
+                    const scanner = new Instascan.Scanner({ video: video });
+                    scanner.addListener('scan', content => {
+                        stream.getTracks().forEach(track => track.stop());
+                        video.remove();
+                        checkQRContent(content);
+                    });
+                    Instascan.Camera.getCameras().then(cameras => {
+                        if (cameras.length > 0) {
+                            scanner.start(cameras[0]);
+                        } else {
+                            qrResult.textContent = 'No camera found.';
+                            video.remove();
+                        }
+                    }).catch(err => {
+                        qrResult.textContent = 'Error accessing camera: ' + err;
+                        video.remove();
+                    });
+                }).catch(err => {
+                    qrResult.textContent = 'Permission denied for camera access: ' + err;
+                    video.remove();
+                });
+        }
+
+        // Check QR content for Israeli items
+        function checkQRContent(content) {
+            const qrResult = document.getElementById('qrResult');
+            const israeliItems = ['sabra', 'teva', 'osem', 'pepsi', 'soap', 'ahava', 'soda', 'coca-cola'];
+            const itemMatch = israeliItems.find(item => content.toLowerCase().includes(item));
+            if (itemMatch) {
+                qrResult.innerHTML = `Warning: Scanned item "${itemMatch}" from QR may be Israeli! <span class="red-light">RED LIGHT</span> - Avoid for Muslim community support.`;
+            } else {
+                qrResult.textContent = 'Scanned item is not identified as Israeli. Safe to use.';
+            }
+        }
+
+        // Notification System for 24-hour cycle
+        function scheduleNotifications() {
+            if (!("Notification" in window)) {
+                console.log("This browser does not support notifications.");
+                return;
+            }
+
+            if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        startNotifications();
+                    }
+                });
+            } else if (Notification.permission === "granted") {
+                startNotifications();
+            }
+
+            function startNotifications() {
+                const notifications = [
+                    "Check out a new biased media channel expose at Leaked Godi Media!",
+                    "Discover safe news sources with us - visit now!",
+                    "Is your favorite soap Israeli? Scan and find out!",
+                    "Stay updated on media bias - visit Leaked Godi Media!",
+                    "Avoid Israeli products - use our QR scanner today!",
+                    "New insights on trustworthy channels - check now!",
+                    "Expose Godi Media with our latest updates - visit!",
+                    "Scan products to support the Muslim community - try now!",
+                    "Find out which channels are safe - visit us!",
+                    "New alerts on biased media - don’t miss out!",
+                    "Check if your Pepsi is Israeli with our tool!",
+                    "Stay informed with Leaked Godi Media - visit now!",
+                    "Avoid supporting Israeli goods - scan with us!",
+                    "Discover the truth behind news channels - check today!",
+                    "New QR scan feature to protect your choices!",
+                    "Uncover media bias every hour - visit Leaked Godi Media!",
+                    "Is your soda safe? Scan it now!",
+                    "Get the latest on trustworthy media sources!",
+                    "Expose and avoid biased channels - visit us!",
+                    "Support awareness with our QR scanner - try today!",
+                    "New updates on Godi Media - don’t wait!",
+                    "Check product origins with our tool - visit now!",
+                    "Stay safe from Israeli products - scan here!",
+                    "Latest media insights await you - visit Leaked Godi Media!"
+                ];
+
+                function showNotification() {
+                    const hour = new Date().getHours();
+                    const notification = new Notification("Leaked Godi Media Alert", {
+                        body: notifications[hour % notifications.length],
+                        icon: 'https://via.placeholder.com/128/0000FF/FFFFFF?text=LG',
+                        tag: 'godi-media-alert'
+                    });
+                    notification.onclick = () => {
+                        window.open('https://sohilhusain86.github.io/HARDRISK/', '_blank');
+                    };
+                }
+
+                // Schedule notifications every hour
+                setInterval(() => {
+                    if (document.hidden) {
+                        showNotification();
+                    }
+                }, 3600000); // 1 hour in milliseconds
+
+                // Show first notification immediately if permitted
+                showNotification();
+            }
+        }
+
         const debouncedChannelSearch = debounce(searchChannels, 300);
         const debouncedItemSearch = debounce(searchItems, 300);
 
-        // Initialize with no load
+        // Initialize with notifications
         window.onload = () => {
             try {
+                // Load Instascan library for QR scanning
+                const script = document.createElement('script');
+                script.src = 'https://rawgit.com/schmich/instascan-builds/master/instascan.min.js';
+                script.onload = () => {
+                    console.log('Instascan loaded');
+                    scheduleNotifications();
+                };
+                document.body.appendChild(script);
                 console.log('Site initialized with search-based loading.');
             } catch (error) {
                 console.error('Initialization error:', error);
