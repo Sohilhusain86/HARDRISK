@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Leaked Godi Media with country times, languages, and Israeli item detection.">
-    <meta name="keywords" content="Godi Media, Israeli items, country time, language">
+    <meta name="description" content="Optimized Leaked Godi Media with search-based loading for low-end devices.">
+    <meta name="keywords" content="Godi Media, Israeli items, country time, language, optimized">
     <meta name="author" content="Sohil Husain">
     <title>Leaked Godi Media</title>
     <style>
@@ -14,7 +14,6 @@
             padding: 20px;
             background-color: #f4f4f4;
             color: #333;
-            overflow-y: auto;
         }
         h1 {
             text-align: center;
@@ -41,11 +40,12 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: none;
         }
         .channel-item {
             padding: 10px;
             border-bottom: 1px solid #eee;
-            font-size: 18px;
+            font-size: 16px;
             display: none;
         }
         .channel-item.show {
@@ -55,14 +55,12 @@
             background-color: #ff0000;
             color: white;
             padding: 5px;
-            display: inline-block;
             margin-left: 10px;
         }
         .safe {
             background-color: #00cc00;
             color: white;
             padding: 5px;
-            display: inline-block;
             margin-left: 10px;
         }
         .country-section {
@@ -85,7 +83,6 @@
             background-color: #ff0000;
             color: white;
             padding: 5px 10px;
-            display: inline-block;
         }
         .intent {
             text-align: center;
@@ -119,9 +116,7 @@
         <p>इस वेबसाइट का उद्देश्य लोगों को जागरूक करना है कि वे किन चैनलों और वस्तुओं से जुड़े हैं। खोज के माध्यम से चैनलों की विश्वसनीयता और वस्तुओं की उत्पत्ति (विशेषकर इसराइली) की जानकारी प्राप्त करें। यह खास तौर पर मुस्लिम समुदाय के लिए उपयोगी है। यह एक कानूनी और शैक्षिक पहल है।</p>
     </div>
 
-    <div class="channel-list" id="channelList">
-        <!-- Channels will be generated here -->
-    </div>
+    <div class="channel-list" id="channelList"></div>
 
     <div class="copyright">
         <p>Copyright © 2025 Sohil Husain. All rights reserved.</p>
@@ -137,64 +132,22 @@
             };
         }
 
-        // Channel Search function
+        // Channel Search function with dynamic loading
         function searchChannels() {
             const input = document.getElementById('channelSearch').value.toLowerCase();
-            const items = document.getElementsByClassName('channel-item');
+            const channelList = document.getElementById('channelList');
             const resultMsg = document.getElementById('channelResult');
             let found = false;
 
-            for (let i = 0; i < items.length; i++) {
-                const text = items[i].textContent.toLowerCase();
-                if (text.includes(input)) {
-                    items[i].classList.add('show');
-                    if (items[i].getAttribute('data-type') === 'godi') {
-                        items[i].style.backgroundColor = '#ffcccc';
-                        if (!found) {
-                            resultMsg.textContent = `Found: ${text} - This is a Biased (Godi) Media Channel.`;
-                            found = true;
-                        }
-                    } else if (items[i].getAttribute('data-type') === 'safe') {
-                        items[i].style.backgroundColor = '#ccffcc';
-                        if (!found) {
-                            resultMsg.textContent = `Found: ${text} - This is a Safe and Trustworthy Channel.`;
-                            found = true;
-                        }
-                    }
-                } else {
-                    items[i].classList.remove('show');
-                    items[i].style.backgroundColor = '';
-                }
-            }
-            if (!found && input) {
-                resultMsg.textContent = `No channel found matching "${input}".`;
-            } else if (!input) {
+            // Clear previous results
+            channelList.innerHTML = '';
+            channelList.style.display = input ? 'block' : 'none';
+
+            if (!input) {
                 resultMsg.textContent = '';
+                return;
             }
-        }
 
-        // Item Search function for Israeli detection
-        function searchItems() {
-            const input = document.getElementById('itemSearch').value.toLowerCase();
-            const resultMsg = document.getElementById('itemResult');
-            const israeliItems = ['sabra', 'teva', 'osem', 'pepsi', 'soap', 'ahava', 'soda', 'coca-cola']; // Sample Israeli brands
-
-            if (input) {
-                if (israeliItems.some(item => item.includes(input))) {
-                    resultMsg.innerHTML = `Warning: "${input}" may be an Israeli product! <span class="red-light">RED LIGHT</span> - Avoid for Muslim community support.`;
-                } else {
-                    resultMsg.textContent = `"${input}" does not appear to be an Israeli product. Safe to use.`;
-                }
-            } else {
-                resultMsg.textContent = '';
-            }
-        }
-
-        const debouncedChannelSearch = debounce(searchChannels, 300);
-        const debouncedItemSearch = debounce(searchItems, 300);
-
-        // Generate channels with time and language
-        function generateChannels() {
             const countries = [
                 { name: 'India', timeZone: 'Asia/Kolkata', language: 'Hindi' },
                 { name: 'USA', timeZone: 'America/New_York', language: 'English' },
@@ -234,60 +187,78 @@
             ];
             const godiPrefixes = ['National', 'Patriot', 'Freedom', 'Unity', 'Desh', 'Surya', 'Prakash', 'Jai', 'Bharat', 'Hindu', 'Voice', 'Glory', 'Power', 'Elite', 'Royal'];
             const safePrefixes = ['Truth', 'Justice', 'Global', 'Peace', 'Independent', 'Open', 'Free', 'Democracy', 'Citizen', 'Human'];
-            const channelList = document.getElementById('channelList');
 
             countries.forEach(country => {
-                const section = document.createElement('div');
-                section.className = 'country-section';
-                const heading = document.createElement('h2');
-                heading.textContent = country.name;
-                section.appendChild(heading);
-                const info = document.createElement('div');
-                info.className = 'country-info';
-                const time = new Date().toLocaleString('en-US', { timeZone: country.timeZone });
-                info.textContent = `Time: ${time} | Language: ${country.language}`;
-                section.appendChild(info);
+                if (country.name.toLowerCase().includes(input)) {
+                    const section = document.createElement('div');
+                    section.className = 'country-section';
+                    const heading = document.createElement('h2');
+                    heading.textContent = country.name;
+                    section.appendChild(heading);
+                    const info = document.createElement('div');
+                    info.className = 'country-info';
+                    const time = new Date().toLocaleString('en-US', { timeZone: country.timeZone });
+                    info.textContent = `Time: ${time} | Language: ${country.language}`;
+                    section.appendChild(info);
 
-                for (let i = 0; i < 312500; i++) { // ~1 crore lines
-                    const channel = document.createElement('div');
-                    channel.className = 'channel-item';
-                    const prefix = i % 4 < 3 ? godiPrefixes[Math.floor(Math.random() * godiPrefixes.length)] : safePrefixes[Math.floor(Math.random() * safePrefixes.length)];
-                    channel.textContent = `${prefix} ${country.name} News ${i}`;
-                    if (i % 4 < 3) {
-                        const warning = document.createElement('span');
-                        warning.className = 'warning';
-                        warning.textContent = 'Warning: Biased Media';
-                        channel.appendChild(warning);
-                        channel.setAttribute('data-type', 'godi');
-                    } else {
-                        const safeMark = document.createElement('span');
-                        safeMark.className = 'safe';
-                        safeMark.textContent = '✔ Safe';
-                        channel.appendChild(safeMark);
-                        channel.setAttribute('data-type', 'safe');
+                    for (let i = 0; i < 100; i++) { // Limited channels per match
+                        const channel = document.createElement('div');
+                        channel.className = 'channel-item';
+                        const prefix = i % 4 < 3 ? godiPrefixes[Math.floor(Math.random() * godiPrefixes.length)] : safePrefixes[Math.floor(Math.random() * safePrefixes.length)];
+                        channel.textContent = `${prefix} ${country.name} News ${i}`;
+                        if (i % 4 < 3) {
+                            const warning = document.createElement('span');
+                            warning.className = 'warning';
+                            warning.textContent = 'Warning: Biased Media';
+                            channel.appendChild(warning);
+                            channel.setAttribute('data-type', 'godi');
+                        } else {
+                            const safeMark = document.createElement('span');
+                            safeMark.className = 'safe';
+                            safeMark.textContent = '✔ Safe';
+                            channel.appendChild(safeMark);
+                            channel.setAttribute('data-type', 'safe');
+                        }
+                        section.appendChild(channel);
+                        channel.classList.add('show');
+                        if (found) break; // Limit to first match for now
                     }
-                    section.appendChild(channel);
+                    channelList.appendChild(section);
+                    found = true;
                 }
-                channelList.appendChild(section);
             });
 
-            // Add specific real channels
-            const realChannels = document.createElement('div');
-            realChannels.className = 'country-section';
-            realChannels.innerHTML = `
-                <h2>Real Known Channels</h2>
-                <div class="channel-item" data-type="godi">Republic TV <span class="warning">Warning: Biased Media</span></div>
-                <div class="channel-item" data-type="safe">Al Jazeera <span class="safe">✔ Safe</span></div>
-                <div class="channel-item" data-type="safe">Palestine TV <span class="safe">✔ Safe</span></div>
-            `;
-            channelList.appendChild(realChannels);
+            if (!found && input) {
+                resultMsg.textContent = `No channel found matching "${input}".`;
+            } else if (found) {
+                resultMsg.textContent = `Found channels for "${input}".`;
+            }
         }
 
-        // Initialize
+        // Item Search function for Israeli detection
+        function searchItems() {
+            const input = document.getElementById('itemSearch').value.toLowerCase();
+            const resultMsg = document.getElementById('itemResult');
+            const israeliItems = ['sabra', 'teva', 'osem', 'pepsi', 'soap', 'ahava', 'soda', 'coca-cola'];
+
+            if (input) {
+                if (israeliItems.some(item => item.includes(input))) {
+                    resultMsg.innerHTML = `Warning: "${input}" may be an Israeli product! <span class="red-light">RED LIGHT</span> - Avoid for Muslim community support.`;
+                } else {
+                    resultMsg.textContent = `"${input}" does not appear to be an Israeli product. Safe to use.`;
+                }
+            } else {
+                resultMsg.textContent = '';
+            }
+        }
+
+        const debouncedChannelSearch = debounce(searchChannels, 300);
+        const debouncedItemSearch = debounce(searchItems, 300);
+
+        // Initialize with no load
         window.onload = () => {
             try {
-                generateChannels();
-                console.log('Site initialized successfully with 1 crore+ lines.');
+                console.log('Site initialized with search-based loading.');
             } catch (error) {
                 console.error('Initialization error:', error);
             }
