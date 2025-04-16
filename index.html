@@ -1,112 +1,158 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Check Indian and International Channels, Israeli Products, and more.">
-    <meta name="keywords" content="Indian channels, international channels, Israeli products, godi media">
-    <meta name="author" content="Sohil Husain">
-    <title>Media & Product Hub</title>
+    <title>संदर्भ-आधारित AI प्रश्न-उत्तर प्रणाली</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f0f0f0; color: #333; }
-        h1 { text-align: center; color: #d32f2f; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .input-group { margin: 15px 0; }
-        #channelInput, #productInput { padding: 10px; width: 70%; max-width: 500px; border: 2px solid #ccc; border-radius: 5px; }
-        button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background-color: #45a049; }
-        .result { margin-top: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        .warning { color: #ff0000; font-weight: bold; }
-        .safe { color: #008000; font-weight: bold; }
-        #channelList, #productList { display: none; max-height: 300px; overflow-y: auto; border: 1px solid #ccc; margin-top: 10px; padding: 10px; }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #loading {
+            display: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        #error {
+            color: red;
+            display: none;
+        }
+        #answers {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .answer-item {
+            margin: 10px 0;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            textarea, input[type="text"] {
+                font-size: 14px;
+            }
+            button {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Media & Product Hub</h1>
-    <div class="container">
-        <div class="input-group">
-            <input type="text" id="channelInput" placeholder="Search channel (e.g., Zee News, BBC)...">
-            <button onclick="searchChannel()">Search Channel</button>
-            <div id="channelResult" class="result"></div>
-            <div id="channelList"></div>
-        </div>
-        <div class="input-group">
-            <input type="text" id="productInput" placeholder="Search product (e.g., Pepsi, Medimix)...">
-            <button onclick="searchProduct()">Search Product</button>
-            <div id="productResult" class="result"></div>
-            <div id="productList"></div>
-        </div>
-    </div>
+    <h1>AI प्रश्न-उत्तर प्रणाली</h1>
+    <p>नीचे संदर्भ पाठ दर्ज करें और उससे संबंधित प्रश्न पूछें। यह AI आपके संदर्भ के आधार पर उत्तर देगा।</p>
+    <textarea id="context" rows="10" placeholder="यहां संदर्भ पाठ दर्ज करें (उदाहरण: कोई लेख, पैराग्राफ, या जानकारी)"></textarea>
+    <input type="text" id="question" placeholder="अपना प्रश्न दर्ज करें">
+    <button onclick="answerQuestion()">उत्तर प्राप्त करें</button>
+    <p id="loading">मॉडल लोड हो रहा है या उत्तर की प्रक्रिया चल रही है...</p>
+    <p id="error"></p>
+    <div id="answers"></div>
 
+    <!-- TensorFlow.js और Q&A मॉडल लोड करें -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/qna@latest/dist/qna.min.js"></script>
     <script>
-        // Indian Channels (10,000+ simulated)
-        let indianChannels = [
-            "Aaj Tak", "Zee News", "Republic TV", "India TV", "Times Now", "NDTV India", "News18 India", "ABP News",
-            "Sun News", "Jaya TV", "Star Vijay", "KTV", "Puthiya Thalaimurai", "News7 Tamil", "Thanthi TV",
-            "ETV Bharat", "TV9 Bharatvarsh", "Sudarshan News", "News Nation", "India News", "Bharat Samachar",
-            "DD National", "DD News", "CNN-News18", "IBN Lokmat"
-        ];
-        for (let i = 0; i < 9975; i++) { // 10,000 total
-            indianChannels.push(`Channel_${i + 1}_India`);
+        let model;
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const answersDiv = document.getElementById('answers');
+
+        // मॉडल लोड करें
+        async function loadModel() {
+            try {
+                loading.style.display = 'block';
+                error.style.display = 'none';
+                model = await qna.load();
+                loading.style.display = 'none';
+                answersDiv.innerHTML = '<p>मॉडल लोड हो गया है! अब संदर्भ और प्रश्न दर्ज करें।</p>';
+            } catch (err) {
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                error.innerText = 'मॉडल लोड करने में त्रुटि: ' + err.message;
+            }
         }
-        const godiMedia = ["Aaj Tak", "Zee News", "Republic TV", "India TV", "Times Now", "News18 India", "ABP News", "Sudarshan News", "News Nation", "TV9 Bharatvarsh", "India News", "Bharat Samachar"];
 
-        // International Famous Channels
-        let internationalChannels = [
-            "BBC One", "CNN", "Al Jazeera", "Sky News", "Fox News", "France 24", "RTÉ One", "NHK World",
-            "CCTV News", "RT (Russia)", "TRT World", "ABC News", "NBC News", "CBS News", "DW News"
-        ];
-        for (let i = 0; i < 84985; i++) { // Balance to reach ~1 lakh lines
-            internationalChannels.push(`Intl_Channel_${i + 1}`);
-        }
+        // प्रश्न का उत्तर दें
+        async function answerQuestion() {
+            const context = document.getElementById('context').value.trim();
+            const question = document.getElementById('question').value.trim();
 
-        // All Channels
-        const allChannels = [...indianChannels, ...internationalChannels];
-
-        // Israeli Products
-        const israeliProducts = [
-            "sabra", "teva", "osem", "pepsi", "ahava", "coca-cola", "sodastream", "dead sea cosmetics",
-            "strauss", "wix", "checkpoint", "mobileye", "netafim", "elbit systems", "israeli wine",
-            "taro", "soda club", "galilee", "yarden", "golan heights winery", "elite", "shufersal",
-            "super-pharm", "fox", "delta galil", "carmel winery", "jaffa oranges", "max brenner"
-        ];
-
-        // Search Channel
-        function searchChannel() {
-            const input = document.getElementById('channelInput').value.toLowerCase();
-            const result = document.getElementById('channelResult');
-            const list = document.getElementById('channelList');
-            if (!input) { result.textContent = 'Please enter a channel name.'; list.style.display = 'none'; return; }
-
-            const match = allChannels.find(ch => ch.toLowerCase().includes(input));
-            if (match) {
-                const isGodi = godiMedia.includes(match.toLowerCase());
-                result.innerHTML = `Found: ${match} - ${isGodi ? '<span class="warning">Godi Media</span>' : '<span class="safe">Safe</span>'}`;
-            } else {
-                result.textContent = `No channel found for "${input}".`;
+            // इनपुट मान्यता
+            if (!context || !question) {
+                error.style.display = 'block';
+                error.innerText = 'कृपया संदर्भ और प्रश्न दोनों प्रदान करें।';
+                answersDiv.innerHTML = '';
+                return;
             }
 
-            // Show list of matching channels
-            const filteredChannels = allChannels.filter(ch => ch.toLowerCase().includes(input)).slice(0, 50);
-            list.innerHTML = filteredChannels.map(ch => `<p>${ch} ${godiMedia.includes(ch.toLowerCase()) ? '(Godi)' : ''}</p>`).join('');
-            list.style.display = filteredChannels.length > 0 ? 'block' : 'none';
+            if (!model) {
+                error.style.display = 'block';
+                error.innerText = 'मॉडल अभी लोड नहीं हुआ है। कृपया प्रतीक्षा करें।';
+                return;
+            }
+
+            try {
+                loading.style.display = 'block';
+                error.style.display = 'none';
+                answersDiv.innerHTML = '';
+
+                // मॉडल से उत्तर प्राप्त करें
+                const answers = await model.findAnswers(question, context);
+
+                loading.style.display = 'none';
+
+                if (answers.length > 0) {
+                    answersDiv.innerHTML = '<h3>उत्तर:</h3>';
+                    answers.forEach((answer, index) => {
+                        answersDiv.innerHTML += `
+                            <div class="answer-item">
+                                <strong>उत्तर ${index + 1}:</strong> ${answer.text} <br>
+                                <small>(स्कोर: ${answer.score.toFixed(2)})</small>
+                            </div>
+                        `;
+                    });
+                } else {
+                    answersDiv.innerHTML = '<p>कोई उत्तर नहीं मिला। कृपया संदर्भ या प्रश्न को संशोधित करें।</p>';
+                }
+            } catch (err) {
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                error.innerText = 'उत्तर प्राप्त करने में त्रुटि: ' + err.message;
+            }
         }
 
-        // Search Product
-        function searchProduct() {
-            const input = document.getElementById('productInput').value.toLowerCase();
-            const result = document.getElementById('productResult');
-            const list = document.getElementById('productList');
-            if (!input) { result.textContent = 'Please enter a product name.'; list.style.display = 'none'; return; }
-
-            const isIsraeli = israeliProducts.some(product => product.includes(input));
-            result.innerHTML = isIsraeli ? `Warning: "${input}" is an Israeli product! <span class="warning">Avoid</span>` : `"${input}" is not identified as Israeli. <span class="safe">Safe</span>`;
-
-            // Show list of matching products
-            const filteredProducts = israeliProducts.filter(p => p.includes(input));
-            list.innerHTML = filteredProducts.map(p => `<p>${p} (Israeli)</p>`).join('');
-            list.style.display = filteredProducts.length > 0 ? 'block' : 'none';
-        }
+        // पेज लोड होने पर मॉडल लोड करें
+        window.onload = loadModel;
     </script>
 </body>
 </html>
