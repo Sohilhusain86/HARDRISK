@@ -3,222 +3,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gupt Gyaan: Dark Web aur Anya Rahasya</title>
+    <meta name="description" content="Internet ki chhupi se chhupi jankari, jaise deep web, dark web, cybersecurity, aur future technologies ke bare mein janiye.">
+    <meta name="keywords" content="internet, deep web, dark web, cybersecurity, Web3, quantum internet, privacy">
+    <meta name="author" content="Grok by xAI">
+    <title>Internet ki Chhupi se Chhupi Jankari</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Inline Manifest for PWA -->
+    <meta name="theme-color" content="#333">
+    <script>
+        const manifest = {
+            "name": "Internet ki Chhupi Jankari",
+            "short_name": "Internet Jankari",
+            "description": "Internet ke chhupe tathya aur rochak jankari",
+            "start_url": ".",
+            "display": "standalone",
+            "background_color": "#f4f4f4",
+            "theme_color": "#333",
+            "icons": []
+        };
+        const stringManifest = JSON.stringify(manifest);
+        const blob = new Blob([stringManifest], { type: 'application/json' });
+        const manifestURL = URL.createObjectURL(blob);
+        document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="${manifestURL}">`);
+    </script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
         }
-        header {
-            background: #333;
-            color: #fff;
-            text-align: center;
-            padding: 2rem;
+        .dark-mode {
+            background-color: #1a202c;
+            color: #e2e8f0;
         }
-        nav {
-            background: #444;
-            padding: 1rem;
+        .dark-mode .bg-white {
+            background-color: #2d3748;
         }
-        nav a {
-            color: #fff;
-            margin: 0 1rem;
-            text-decoration: none;
+        .dark-mode .bg-gray-100 {
+            background-color: #1a202c;
         }
-        nav a:hover {
-            color: #ddd;
+        .accordion-header {
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
-        .container {
-            max-width: 1200px;
-            margin: auto;
-            padding: 2rem;
+        .accordion-content {
+            display: none;
+            transition: all 0.3s ease;
         }
-        section {
-            margin-bottom: 2rem;
-            background: #fff;
-            padding: 1.5rem;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        .accordion-content.active {
+            display: block;
         }
-        h2 {
-            color: #333;
-            border-bottom: 2px solid #333;
-            padding-bottom: 0.5rem;
+        .animate-fade {
+            animation: fadeIn 1s ease-in-out;
         }
-        p {
-            margin: 1rem 0;
-        }
-        ul {
-            list-style-type: disc;
-            margin-left: 2rem;
-        }
-        footer {
-            background: #333;
-            color: #fff;
-            text-align: center;
-            padding: 1rem;
-            position: relative;
-            bottom: 0;
-            width: 100%;
-        }
-        .warning {
-            background: #ffe6e6;
-            padding: 1rem;
-            border-left: 5px solid #cc0000;
-            margin: 1rem 0;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
-<body>
-    <header>
-        <h1>Gupt Gyaan: Dark Web aur Anya Rahasya</h1>
-        <p>Internet ke kam baat kiye jane wale hisson aur technologies ke baare mein jaaniye.</p>
-    </header>
-    <nav>
-        <a href="#dark-web">Dark Web</a>
-        <a href="#tor-network">Tor Network</a>
-        <a href="#cryptocurrency">Cryptocurrency</a>
-        <a href="#cybersecurity">Cybersecurity</a>
-        <a href="#privacy-tools">Privacy Tools</a>
-        <a href="#ethical-hacking">Ethical Hacking</a>
-        <a href="#hidden-tech">Hidden Tech</a>
-    </nav>
-    <div class="container">
-        <!-- Dark Web Section -->
-        <section id="dark-web">
-            <h2>Dark Web Kya Hai?</h2>
-            <p>Dark web internet ka woh hissa hai jo regular search engines jaise Google ya Bing se access nahi kiya ja sakta. Yeh ek hidden network hai jo special software, jaise Tor Browser, ke through access hota hai. Dark web anonymity pradaan karta hai, isliye iska use legal aur illegal dono kaamon ke liye hota hai.</p>
-            <p>Dark web ke baare mein aksar galatfahmiyan hoti hain. Log sochte hain ke yeh sirf illegal activities ke liye hai, lekin yeh bhi sach hai ke dark web ka use journalists, activists, aur privacy advocates bhi karte hain apni identity chhupane ke liye, khaas kar repressive governments ke under.</p>
-            <div class="warning">
-                <p><strong>Warning:</strong> Dark web par jaana khatarnaak ho sakta hai. Illegal content, scams, aur malware ka khatra rehta hai. Hamesha caution ke saath proceed karein aur legal boundaries ka dhyaan rakhein.</p>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 dark:text-white animate-fade">
+                <i class="fas fa-globe mr-2"></i> Internet ki Chhupi se Chhupi Jankari
+            </h1>
+            <button id="theme-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700">
+                <i class="fas fa-moon text-gray-800 dark:text-white"></i>
+            </button>
+        </header>
+
+        <!-- Intro Section -->
+        <section class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-8 animate-fade">
+            <p class="text-lg text-gray-600 dark:text-gray-300">
+                Yeh page internet ke kam jane jate tathya aur rochak jankari ko cover karta hai, jo aam taur par charcha mein nahi aate.
+            </p>
+        </section>
+
+        <!-- Accordion Sections -->
+        <section class="space-y-4">
+            <!-- Section 1: Internet ka Structure -->
+            <div class="accordion bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="accordion-header p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">1. Internet ka Structure</h2>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="accordion-content p-4">
+                    <ul class="list-disc pl-6">
+                        <li><strong>Surface Web</strong>: Yeh woh internet hai jo Google, Bing ya Yahoo ke through access hota hai. Ye internet ka sirf 4-5% hai.</li>
+                        <li><strong>Deep Web</strong>: Internet ka woh hissa jo search engines se indexed nahi hota, jaise private databases, academic journals, aur government records. Ye ~90% hai.</li>
+                        <li><strong>Dark Web</strong>: Deep苗Deep web ka ek chhota, anonymized hissa, jo Tor network ya I2P ke through access hota hai. Yahan illegal activities ke sath-sath whistleblower platforms bhi hain.</li>
+                    </ul>
+                </div>
             </div>
-            <h3>Dark Web Ka Structure</h3>
-            <ul>
-                <li><strong>Surface Web:</strong> Yeh internet ka woh hissa hai jo sabke liye accessible hai, jaise news websites, social media, etc.</li>
-                <li><strong>Deep Web:</strong> Yeh internet ka woh part hai jo search engines se index nahi hota, jaise private databases, email accounts, etc.</li>
-                <li><strong>Dark Web:</strong> Deep web ka ek chhota subset jo intentionally hidden hota hai aur anonymity tools ke through access hota hai.</li>
-            </ul>
-            <h3>Dark Web Ke Uses</h3>
-            <p>Dark web ke kuch legitimate uses hain:</p>
-            <ul>
-                <li>Whistleblowers sensitive information leak karne ke liye dark web ka use karte hain.</li>
-                <li>Journalists anonymous sources ke saath communicate karte hain.</li>
-                <li>Activists censorship se bachne ke liye dark web par forums banate hain.</li>
-            </ul>
-            <p>Lekin illegal activities bhi hoti hain, jaise:</p>
-            <ul>
-                <li>Illegal marketplaces jahan drugs, weapons, aur stolen data bikta hai.</li>
-                <li>Hacking services aur malware distribution.</li>
-                <li>Counterfeit currency aur fake IDs ka trade.</li>
-            </ul>
-        </section>
 
-        <!-- Tor Network Section -->
-        <section id="tor-network">
-            <h2>Tor Network: Dark Web Ka Darwaza</h2>
-            <p>Tor (The Onion Router) ek free, open-source software hai jo users ko anonymous browsing ka option deta hai. Tor network ke through data multiple nodes (servers) se guzarta hai, har node par encryption layer remove hota hai, isliye isse "onion routing" kehte hain.</p>
-            <h3>Tor Kaise Kaam Karta Hai?</h3>
-            <p>Jab aap Tor Browser use karte hain, aapka internet traffic:</p>
-            <ol>
-                <li>Entry Node se enter hota hai.</li>
-                <li>Middle Nodes ke through randomly travel karta hai.</li>
-                <li>Exit Node se final destination tak jata hai.</li>
-            </ol>
-            <p>Har node sirf agle aur pichle node ke baare mein janta hai, isliye aapki identity track karna mushkil ho jata hai.</p>
-            <h3>Tor Ke Fayde</h3>
-            <ul>
-                <li>Anonymity: Aapki location aur identity chhup jati hai.</li>
-                <li>Censorship Bypass: Restricted countries mein blocked websites access kar sakte hain.</li>
-                <li>Privacy: ISPs aur governments se browsing hide hoti hai.</li>
-            </ul>
-            <h3>Tor Ke Nuksan</h3>
-            <ul>
-                <li>Slow Speed: Multiple nodes ke wajah se browsing slow hoti hai.</li>
-                <li>Illegal Use: Tor ka misuse illegal activities ke liye hota hai.</li>
-                <li>Exit Node Risks: Exit node par traffic unencrypted ho sakta hai, jo risky hai.</li>
-            </ul>
-            <div class="warning">
-                <p><strong>Tip:</strong> Tor use karte waqt hamesha HTTPS websites visit karein taaki data encrypted rahe.</p>
+            <!-- Section 2: Chhupi Technologies aur Protocols -->
+            <div class="accordion bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="accordion-header p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">2. Chhupi Technologies aur Protocols</h2>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="accordion-content p-4">
+                    <ul class="list-disc pl-6">
+                        <li><strong>TOR (The Onion Router)</strong>: Anonymous browsing ke liye istemal hota hai. Data ko multiple layers mein encrypt karta hai.</li>
+                        <li><strong>Blockchain-based Networks</strong>: Decentralized networks jo cryptocurrencies aur Web3 applications ko power dete hain.</li>
+                        <li><strong>ZeroNet/I2P</strong>: Peer-to-peer networks jo censorship-resistant hote hain aur traditional servers ke bagair kaam karte hain.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Section 3: Data Tracking aur Privacy -->
+            <div class="accordion bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="accordion-header p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">3. Data Tracking aur Privacy</h2>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="accordion-content p-4">
+                    <ul class="list-disc pl-6">
+                        <li><strong>Cookies aur Trackers</strong>: Har website aapke browsing behavior ko track karti hai. Third-party cookies ads ke liye data collect karte hain.</li>
+                        <li><strong>Fingerprinting</strong>: Websites aapke browser, device, aur settings ke unique patterns se aapki pehchan karti hain.</li>
+                        <li><strong>Data Brokers</strong>: Companies jaise Acxiom aur Experian aapka personal data collect aur sell karti hain.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Section 4: Cybersecurity ke Chhupe Tathya -->
+            <div class="accordion bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="accordion-header p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">4. Cybersecurity ke Chhupe Tathya</h2>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="accordion-content p-4">
+                    <ul class="list-disc pl-6">
+                        <li><strong>Zero-Day Exploits</strong>: Hackers software ke unknown vulnerabilities ka fayda uthate hain.</li>
+                        <li><strong>Botnets</strong>: Lakhs of infected devices ek network mein judkar DDoS attacks ya spam campaigns chalate hain.</li>
+                        <li><strong>Phishing ke Naye Roop</strong>: AI-generated emails aur deepfake videos se phishing attacks ab aur sophisticated ho gaye hain.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Section 5: Internet ke Social aur Cultural Aspects -->
+            <div class="accordion bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="accordion-header p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">5. Internet ke Social aur Cultural Aspects</h2>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="accordion-content p-4">
+                    <ul class="list-disc pl-6">
+                        <li><strong>Echo Chambers</strong>: Algorithms aapko wahi content dikhate hain jo aapke views se match karta hai, jisse polarization badhta hai.</li>
+                        <li><strong>Meme Culture aur Virality</strong>: Internet ke subcultures (jaise Reddit, 4chan) global trends aur memes ko shape karte hain.</li>
+                        <li><strong>Disinformation Campaigns</strong>: Governments aur organizations social media par propaganda aur fake news spread karte hain.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Section 6: Dark Web ki Haqeeqat -->
+            <div class="accordion bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="accordion-header p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">6. Dark Web ki Haqeeqat</h2>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="accordion-content p-4">
+                    <ul class="list-disc pl-6">
+                        <li>Dark web sirf illegal activities ke liye nahi hai. Yahan journalists, activists, aur privacy advocates bhi active hain.</li>
+                        <li>Markets jaise Silk Road ke successors abhi bhi exist karte hain, lekin law enforcement inhe regularly target karta hai.</li>
+                        <li>Cryptocurrency (jaise Bitcoin, Monero) dark web transactions ka backbone hai.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Section 7: Internet ka Future -->
+            <div class="accordion bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="accordion-header p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">7. Internet ka Future</h2>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="accordion-content p-4">
+                    <ul class="list-disc pl-6">
+                        <li><strong>Web3</strong>: Decentralized internet jo blockchain par based hai, jahan users apna data control kar sakte hain.</li>
+                        <li><strong>Quantum Internet</strong>: Quantum computing ke sath internet ki speed aur security badh sakti hai.</li>
+                        <li><strong>Metaverse</strong>: Virtual reality aur augmented reality ke sath internet ek immersive experience ban sakta hai.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Section 8: Interesting Facts -->
+            <div class="accordion bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="accordion-header p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">8. Kuch Interesting Facts</h2>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="accordion-content p-4">
+                    <ul class="list-disc pl-6">
+                        <li>Internet ka pehla "website" 1991 mein CERN ne banaya tha.</li>
+                        <li>Har second ~40,000 Google searches hote hain.</li>
+                        <li>Internet ka ~30% traffic adult content se related hai.</li>
+                        <li>Undersea cables internet ka backbone hain, jo 99% international data carry karte hain.</li>
+                    </ul>
+                </div>
             </div>
         </section>
 
-        <!-- Cryptocurrency Section -->
-        <section id="cryptocurrency">
-            <h2>Cryptocurrency: Digital Currency Ka Raaz</h2>
-            <p>Cryptocurrency ek decentralized digital currency hai jo blockchain technology par kaam karti hai. Dark web par cryptocurrencies jaise Bitcoin aur Monero ka use payments ke liye hota hai kyunki yeh anonymous transactions allow karti hain.</p>
-            <h3>Popular Cryptocurrencies</h3>
-            <ul>
-                <li><strong>Bitcoin (BTC):</strong> Sabse pehli aur popular crypto, lekin fully anonymous nahi.</li>
-                <li><strong>Monero (XMR):</strong> Privacy-focused crypto, dark web par zyada popular.</li>
-                <li><strong>Ethereum (ETH):</strong> Smart contracts ke liye famous, lekin dark web par kam use hoti hai.</li>
-            </ul>
-            <h3>Cryptocurrency Ka Dark Web Connection</h3>
-            <p>Dark web marketplaces jaise Silk Road (ab band) aur AlphaBay Bitcoin ka use karte the. Monero ab zyada popular hai kyunki yeh transactions ko completely hide karta hai.</p>
-            <div class="warning">
-                <p><strong>Warning:</strong> Cryptocurrency transactions irreversible hoti hain. Scams se bachne ke liye trusted wallets aur exchanges ka use karein.</p>
-            </div>
-        </section>
-
-        <!-- Cybersecurity Section -->
-        <section id="cybersecurity">
-            <h2>Cybersecurity: Apni Digital Duniya Ki Suraksha</h2>
-            <p>Cybersecurity internet aur digital devices ko threats se bachane ka science hai. Dark web ke context mein, cybersecurity ka gyaan zaroori hai taaki aap scams, malware, aur hacking se bach sakein.</p>
-            <h3>Common Cyber Threats</h3>
-            <ul>
-                <li><strong>Phishing:</strong> Fake emails ya websites jo aapka personal info churati hain.</li>
-                <li><strong>Malware:</strong> Viruses, ransomware, ya spyware jo aapke device ko harm karte hain.</li>
-                <li><strong>DDoS Attacks:</strong> Websites ko overload karke crash karna.</li>
-            </ul>
-            <h3>Cybersecurity Tips</h3>
-            <ul>
-                <li>Strong, unique passwords use karein.</li>
-                <li>Two-factor authentication (2FA) enable karein.</li>
-                <li>Antivirus software install karein.</li>
-                <li>Regularly software update karein.</li>
-            </ul>
-        </section>
-
-        <!-- Privacy Tools Section -->
-        <section id="privacy-tools">
-            <h2>Privacy Tools: Apni Pehchaan Chhupayein</h2>
-            <p>Dark web ke alawa bhi kayi tools hain jo aapki privacy protect kar sakte hain:</p>
-            <ul?!
-                <li><strong>VPNs (Virtual Private Networks):</strong> Aapki location aur browsing hide karte hain.</li>
-                <li><strong>Signal Messenger:</strong> End-to-end encrypted messaging app.</li>
-                <li><strong>ProtonMail:</strong> Secure email service jo privacy pe focus karta hai.</li>
-                <li><strong>Tails OS:</strong> Privacy-focused operating system jo USB se boot hota hai.</li>
-            </ul>
-        </section>
-
-        <!-- Ethical Hacking Section -->
-        <section id="ethical-hacking">
-            <h2>Ethical Hacking: Hack Karke Suraksha Badhayein</h2>
-            <p>Ethical hacking mein hackers companies ke systems mein vulnerabilities dhoondte hain taaki unhe fix kiya ja sake. Yeh dark web ke illegal hacking se bilkul alag hai.</p>
-            <h3>Ethical Hacking Ke Types</h3>
-            <ul>
-                <li><strong>Penetration Testing:</strong> Systems mein weaknesses dhoondna.</li>
-                <li><strong>Red Teaming:</strong> Real-world attack simulations.</li>
-                <li><strong>Bug Bounty Programs:</strong> Companies bugs dhoondne ke liye rewards deti hain.</li>
-            </ul>
-        </section>
-
-        <!-- Hidden Tech Section -->
-        <section id="hidden-tech">
-            <h2>Hidden Technologies: Duniya Ke Anjaane Tools</h2>
-            <p>Kuch technologies ke baare mein log kam jante hain:</p>
-            <ul>
-                <li><strong>Zero-Knowledge Proofs:</strong> Data share kiye bina proof dena, jaise Zcash cryptocurrency mein.</li>
-                <li><strong>Mesh Networks:</strong> Decentralized networks jo internet censorship se bachate hain.</li>
-                <li><strong>Quantum Cryptography:</strong> Future ka encryption jo unhackable hai.</li>
-            </ul>
-        </section>
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-gray-600 dark:text-gray-400">
+            <p>Adhik jankari ke liye trusted sources se research karen. Internet ek vishal duniya hai!</p>
+            <p class="mt-2">Created by <a href="https://x.ai" class="text-blue-600 dark:text-blue-400">Grok by xAI</a></p>
+        </footer>
     </div>
-    <footer>
-        <p>&copy; 2025 Gupt Gyaan. Sabhi adhikaar surakshit.</p>
-        <p>Disclaimer: Yeh information sirf educational purposes ke liye hai. Illegal activities mein involve na hona.</p>
-    </footer>
+
+    <!-- Inline JavaScript -->
+    <script>
+        // Accordion Functionality
+        const accordionHeaders = document.querySelectorAll('.accordion-header');
+        accordionHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                content.classList.toggle('active');
+                const icon = header.querySelector('i');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+            });
+        });
+
+        // Dark Mode Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const icon = themeToggle.querySelector('i');
+            icon.classList.toggle('fa-moon');
+            icon.classList.toggle('fa-sun');
+        });
+
+        // Inline Service Worker for P pala
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('install', event => {
+                    event.waitUntil(
+                        caches.open('v1').then(cache => {
+                            return cache.addAll(['.']);
+                        })
+                    );
+                });
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request).then(response => {
+                            return response || fetch(event.request);
+                        })
+                    );
+                });
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swURL = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swURL)
+                .then(reg => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker registration failed:', err));
+        }
+    </script>
 </body>
-</html>
+    </html>
