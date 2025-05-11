@@ -1,28 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Starfield - Chrome Stars Inspired</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0">
+    <meta name="description" content="A simplified interactive 3D visualization of nearby stars, inspired by 100,000 Stars Chrome Experiment.">
+    <title>100,000 Stars - Simplified</title>
+    <link href="https://fonts.googleapis.com/css?family=Lekton|Lora:400,700,400italic" rel="stylesheet" type="text/css">
     <style>
-        body { margin: 0; overflow: hidden; background: #000; }
-        canvas { display: block; }
-        #info {
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            color: #fff;
+            font-family: 'Lora', serif;
+        }
+        #layout {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            color: white;
-            font-family: Arial, sans-serif;
+            width: 100%;
+            height: 100%;
+        }
+        #visualization {
+            width: 100%;
+            height: 100%;
+        }
+        #glContainer {
+            width: 100%;
+            height: 100%;
+        }
+        #css-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        #css-world, #css-camera {
+            width: 100%;
+            height: 100%;
+        }
+        #icon-nav {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            cursor: pointer;
+        }
+        #spectral-graph {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            font-size: 12px;
+            text-align: center;
+        }
+        #spectral-graph .heat-map {
+            width: 100px;
+            height: 10px;
+            background: linear-gradient(to right, #ff0000, #ffffff, #0000ff);
+            margin-bottom: 5px;
+        }
+        #detailContainer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            display: none;
+        }
+        #detailTitle {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        #detailClose {
+            float: right;
+            cursor: pointer;
+        }
+        #star-name {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             font-size: 16px;
-            text-shadow: 1px 1px 2px black;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px 10px;
+        }
+        #minimap {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+        }
+        #zoom-levels {
+            width: 100px;
+            height: 10px;
+            background: #333;
+            position: relative;
+        }
+        #zoom-backdrop {
+            width: 100%;
+            height: 100%;
+            background: #555;
+        }
+        #zoom-cursor {
+            width: 2px;
+            height: 100%;
+            background: #fff;
+            position: absolute;
+            left: 50%;
+        }
+        #about {
+            position: absolute;
+            bottom: 20px;
+            left: 140px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        #loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <div id="info">Use mouse to rotate, scroll to zoom</div>
-    <!-- Three.js CDN -->
+    <div id="layout">
+        <div id="visualization">
+            <div id="css-container">
+                <div id="css-world">
+                    <div id="css-camera"></div>
+                </div>
+            </div>
+            <div id="glContainer"></div>
+        </div>
+
+        <div id="icon-nav">
+            <svg width="38px" height="37px" viewBox="-0.25 -0.125 38 37">
+                <path fill="#FFFFFF" d="M18.438,3c8.513,0,15.438,6.925,15.438,15.438c0,8.513-6.925,15.438-15.438,15.438 C9.925,33.875,3,26.95,3,18.438C3,9.925,9.925,3,18.438,3 M18.438,0C8.255,0,0,8.255,0,18.438s8.255,18.438,18.438,18.438 s18.438-8.255,18.438-18.438S28.62,0,18.438,0L18.438,0z"></path>
+                <path fill="#FFFFFF" d="M14.242,25.305c0.131,0,0.264-0.035,0.381-0.104l11.004-6.347c0.234-0.137,0.379-0.389,0.379-0.658 c0-0.273-0.145-0.523-0.379-0.66l-11.002-6.354c-0.234-0.137-0.525-0.135-0.76-0.002c-0.234,0.137-0.381,0.387-0.381,0.66 l-0.002,12.703c0,0.273,0.145,0.523,0.379,0.658C13.979,25.27,14.111,25.305,14.242,25.305z"></path>
+            </svg>
+        </div>
+
+        <div id="spectral-graph">
+            <div id="heat-map" class="heat-map"></div>
+            <p class="left">3,840°K (cooler)</p>
+            <p class="center">7,300°K</p>
+            <p class="right">42,000°K (hotter)</p>
+            <h5>B-V Stellar Color Index <br> Temperatures in Kelvin</h5>
+        </div>
+
+        <div id="detailContainer">
+            <div id="detailTitle">
+                <span>Sun</span>
+                <div id="detailClose">
+                    <p id="ex-out">×</p>
+                </div>
+            </div>
+            <div id="detailBody">
+                <p>
+                    The <b>Sun</b> is the star at the center of the Solar System. It is almost perfectly spherical and consists of hot plasma interwoven with magnetic fields.
+                </p>
+                <p>
+                    Excerpt from <a href="http://en.wikipedia.org/wiki/Sun">Wikipedia.</a>
+                </p>
+            </div>
+        </div>
+
+        <div id="star-name">
+            <span>Sun</span>
+        </div>
+
+        <div id="minimap">
+            <div id="zoom-levels">
+                <div id="zoom-backdrop"></div>
+                <div id="zoom-cursor"></div>
+            </div>
+            <div id="about">?</div>
+        </div>
+
+        <div id="loader">
+            <div>
+                <p id="loadtext">Focusing optics…</p>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- OrbitControls for camera interaction -->
     <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
     <script>
         // Scene setup
@@ -30,24 +194,22 @@
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+        document.getElementById('glContainer').appendChild(renderer.domElement);
 
-        // Create starfield
+        // Starfield
         const starCount = 10000;
         const geometry = new THREE.BufferGeometry();
         const positions = new Float32Array(starCount * 3);
         const colors = new Float32Array(starCount * 3);
 
         for (let i = 0; i < starCount * 3; i += 3) {
-            // Random positions in a spherical distribution
             const theta = Math.random() * 2 * Math.PI;
             const phi = Math.acos(2 * Math.random() - 1);
-            const radius = 100 * Math.cbrt(Math.random()); // Cube root for better distribution
+            const radius = 100 * Math.cbrt(Math.random());
             positions[i] = radius * Math.sin(phi) * Math.cos(theta);
             positions[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
             positions[i + 2] = radius * Math.cos(phi);
 
-            // Random colors (white-ish with slight variations)
             const color = new THREE.Color().setHSL(Math.random(), 0.2, 0.8);
             colors[i] = color.r;
             colors[i + 1] = color.g;
@@ -76,17 +238,22 @@
         controls.dampingFactor = 0.05;
         controls.rotateSpeed = 0.5;
 
-        // Handle window resize
+        // Window resize
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
+        // Loader
+        const loader = document.getElementById('loader');
+        setTimeout(() => {
+            loader.style.display = 'none';
+        }, 2000);
+
         // Animation loop
         function animate() {
             requestAnimationFrame(animate);
-            // Rotate starfield for effect
             starField.rotation.y += 0.0005;
             controls.update();
             renderer.render(scene, camera);
