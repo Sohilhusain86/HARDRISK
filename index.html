@@ -1,180 +1,97 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Hindi Webpage</title>
-    <!-- Yeh CSS style tag hai jo webpage ko sundar banata hai -->
+    <title>Starfield - Chrome Stars Inspired</title>
     <style>
-        body {
+        body { margin: 0; overflow: hidden; background: #000; }
+        canvas { display: block; }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
             font-family: Arial, sans-serif;
-            background-color: #f0f8ff;
-            margin: 0;
-            padding: 20px;
-        }
-        header {
-            background-color: #4682b4;
-            color: white;
-            text-align: center;
-            padding: 20px;
-            border-radius: 10px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .box {
-            border: 2px solid #20b2aa;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-        }
-        button {
-            background-color: #32cd32;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #228b22;
-        }
-        footer {
-            text-align: center;
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #4682b4;
-            color: white;
-            border-radius: 10px;
-        }
-        .random-list {
-            list-style-type: none;
-            padding: 0;
-        }
-        .random-list li {
-            background-color: #f5f5f5;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
+            font-size: 16px;
+            text-shadow: 1px 1px 2px black;
         }
     </style>
 </head>
 <body>
-    <!-- Header section jo webpage ka title dikhata hai -->
-    <header>
-        <h1>स्वागत है मेरे रैंडम वेबपेज पर!</h1>
-        <p>यह एक बिल्कुल रैंडम पेज है, बस मजे के लिए बनाया गया है।</p>
-    </header>
-
-    <!-- Main container jisme saara content hai -->
-    <div class="container">
-        <!-- Pehla section: Ek random introduction -->
-        <div class="box">
-            <h2>क्या है ये पेज?</h2>
-            <p>ये पेज बस एक उदाहरण है। इसमें कुछ रैंडम टेक्स्ट, इमेज, बटन, और लिस्ट्स हैं। आप इसे देख सकते हैं, क्लिक कर सकते हैं, और मजे ले सकते हैं।</p>
-        </div>
-
-        <!-- Dusra section: Ek random image -->
-        <div class="box">
-            <h2>एक रैंडम तस्वीर</h2>
-            <img src="https://via.placeholder.com/600x400" alt="Random Placeholder Image">
-            <p>ये बस एक प्लेसहोल्डर इमेज है। आप चाहें तो अपनी इमेज डाल सकते हैं।</p>
-        </div>
-
-        <!-- Teesra section: Ek random button jo kuch karta hai -->
-        <div class="box">
-            <h2>कुछ मजेदार करें!</h2>
-            <button onclick="showMessage()">यहाँ क्लिक करें</button>
-            <p id="message" style="display: none;">हाय! आपने बटन दबाया, अब क्या? 😄</p>
-        </div>
-
-        <!-- Chautha section: Ek random list -->
-        <div class="box">
-            <h2>कुछ रैंडम चीजों की लिस्ट</h2>
-            <ul class="random-list">
-                <li>सेब 🍎</li>
-                <li>किताब 📚</li>
-                <li>पहाड़ ⛰️</li>
-                <li>सूरज ☀️</li>
-                <li>चाय ☕</li>
-                <li>लैपटॉप 💻</li>
-                <li>पंछी 🐦</li>
-                <li>समुद्र 🌊</li>
-                <li>चाँद 🌙</li>
-                <li>गिटार 🎸</li>
-            </ul>
-        </div>
-
-        <!-- Panchva section: Ek random form -->
-        <div class="box">
-            <h2>एक रैंडम फॉर्म</h2>
-            <form>
-                <label for="name">आपका नाम:</label><br>
-                <input type="text" id="name" placeholder="अपना नाम डालें"><br><br>
-                <label for="email">आपका ईमेल:</label><br>
-                <input type="email" id="email" placeholder="अपना ईमेल डालें"><br><br>
-                <label for="message">आपका संदेश:</label><br>
-                <textarea id="message" placeholder="कुछ लिखें..."></textarea><br><br>
-                <button type="submit">भेजें</button>
-            </form>
-        </div>
-
-        <!-- Chhatha section: Ek random table -->
-        <div class="box">
-            <h2>एक रैंडम टेबल</h2>
-            <table border="1" style="width: 100%; text-align: center;">
-                <tr>
-                    <th>क्र.सं.</th>
-                    <th>चीज</th>
-                    <th>विवरण</th>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td>पेन</td>
-                    <td>लिखने के लिए</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>कुर्सी</td>
-                    <td>बैठने के लिए</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>घड़ी</td>
-                    <td>समय देखने के लिए</td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td>फूल</td>
-                    <td>सजावट के लिए</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-    <!-- Footer section -->
-    <footer>
-        <p>© 2025 Random Webpage | बस मजे के लिए बनाया गया 😎</p>
-    </footer>
-
-    <!-- JavaScript code jo button ke click par message dikhata hai -->
+    <div id="info">Use mouse to rotate, scroll to zoom</div>
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls for camera interaction -->
+    <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
     <script>
-        function showMessage() {
-            let message = document.getElementById("message");
-            message.style.display = "block";
-            setTimeout(() => {
-                message.style.display = "none";
-            }, 3000);
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Create starfield
+        const starCount = 10000;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(starCount * 3);
+        const colors = new Float32Array(starCount * 3);
+
+        for (let i = 0; i < starCount * 3; i += 3) {
+            // Random positions in a spherical distribution
+            const theta = Math.random() * 2 * Math.PI;
+            const phi = Math.acos(2 * Math.random() - 1);
+            const radius = 100 * Math.cbrt(Math.random()); // Cube root for better distribution
+            positions[i] = radius * Math.sin(phi) * Math.cos(theta);
+            positions[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
+            positions[i + 2] = radius * Math.cos(phi);
+
+            // Random colors (white-ish with slight variations)
+            const color = new THREE.Color().setHSL(Math.random(), 0.2, 0.8);
+            colors[i] = color.r;
+            colors[i + 1] = color.g;
+            colors[i + 2] = color.b;
         }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const material = new THREE.PointsMaterial({
+            size: 0.1,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8
+        });
+
+        const starField = new THREE.Points(geometry, material);
+        scene.add(starField);
+
+        // Camera position
+        camera.position.z = 50;
+
+        // OrbitControls for interaction
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.rotateSpeed = 0.5;
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            // Rotate starfield for effect
+            starField.rotation.y += 0.0005;
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
     </script>
 </body>
 </html>
