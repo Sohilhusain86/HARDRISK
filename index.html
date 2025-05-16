@@ -1,123 +1,338 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="HARDRISK - Experience the power of modern JavaScript. Interactive quotes, animations, countdown, dark mode, and more!">
-    <meta name="keywords" content="JavaScript, HARDRISK, Interactive Web, Dark Mode, Quotes, Countdown, Animations">
-    <meta name="author" content="Sohil Husain">
-    
-    <!-- Open Graph Meta Tags for Social Sharing -->
-    <meta property="og:title" content="HARDRISK - Explore JavaScript Power!">
-    <meta property="og:description" content="An interactive website built with modern JavaScript features like Dark Mode, Quotes, Animations & Countdown Timer!">
-    <meta property="og:image" content="https://yourwebsite.com/preview-image.jpg">
-    <meta property="og:url" content="https://sohilhusain86.github.io/HARDRISK/">
-    
-    <!-- Favicon -->
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    
-    <!-- External CSS -->
-    <link rel="stylesheet" href="style.css">
-    
-    <!-- Internal CSS for quick styling -->
+    <title>World Clock with Notifications</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Smooth transition effects */
-        body { 
-            transition: opacity 0.5s, background-color 0.5s, color 0.5s;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
+        body {
+            background: linear-gradient(to bottom, #1e3a8a, #3b82f6);
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+            color: #ffffff;
         }
-        h1, h2 { margin-bottom: 15px; }
-        .dark-mode { background-color: #121212; color: white; }
-        button { 
-            margin: 10px; 
-            padding: 10px 15px; 
-            cursor: pointer; 
-            font-size: 16px;
+        .clock-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
         }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
-            border: 2px solid gray;
-            border-radius: 10px;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-            background-color: #f9f9f9;
+        .clock-card:hover {
+            transform: scale(1.05);
         }
-        .dark-mode .container {
-            background-color: #1e1e1e;
-            border-color: white;
-        }
-        /* Animated Elements */
-        .animated-box {
-            width: 100px;
-            height: 100px;
-            background: red;
-            position: relative;
-            animation: moveBox 3s infinite alternate;
-        }
-        @keyframes moveBox {
-            0% { left: 0; }
-            100% { left: 200px; }
+        #searchInput {
+            background: rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
-
-<body>
-    <h1 id="greeting">Loading Greeting...</h1>
-    <h2 id="dynamic-text">Loading dynamic text...</h2>
-
-    <div class="container">
-        <p><strong>Welcome to HARDRISK!</strong> Explore the power of interactive JavaScript.</p>
-
-        <!-- Dark Mode Toggle -->
-        <button id="darkModeBtn">Toggle Dark Mode</button>
-
-        <!-- Random Quote Generator -->
-        <button id="quoteBtn">Show Random Quote</button>
-
-        <!-- Countdown Timer -->
-        <div id="countdown">⏳ Countdown: 10 sec</div>
-
-        <!-- Interactive Button Animation -->
-        <button id="animateBtn">Click for Animation!</button>
-
-        <!-- Scroll Effect -->
-        <p>Scroll down to see the random background effect.</p>
-        
-        <!-- Animated Box -->
-        <div class="animated-box"></div>
-
-        <!-- Form for Additional Interactions -->
-        <form id="contactForm">
-            <h3>Feedback Form</h3>
-            <label for="name">Name:</label>
-            <input type="text" id="name" required>
-            
-            <label for="message">Message:</label>
-            <textarea id="message" required></textarea>
-            
-            <button type="submit">Send Feedback</button>
-        </form>
-
-        <!-- Real-Time Clock -->
-        <div id="clock">⏰ Time: Loading...</div>
+<body class="flex flex-col items-center p-4">
+    <h1 class="text-4xl font-bold mb-6 text-center">World Clock</h1>
+    
+    <!-- Notification Permission Button -->
+    <div class="mb-6 text-center">
+        <button id="notifyBtn" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg">
+            Enable Notifications
+        </button>
+        <p id="notifyStatus" class="mt-2 text-sm"></p>
     </div>
 
-    <!-- JavaScript File -->
-    <script src="script.js"></script>
-    
-    <!-- Inline Script for Real-Time Clock -->
+    <!-- Search Bar -->
+    <div class="w-full max-w-md mb-6">
+        <input type="text" id="searchInput" placeholder="Search country..." 
+               class="w-full p-3 rounded-lg text-white placeholder-gray-300 focus:outline-none">
+    </div>
+
+    <!-- Clock Container -->
+    <div id="clockContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-6xl"></div>
+
     <script>
-        function updateClock() {
-            const now = new Date();
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const seconds = now.getSeconds().toString().padStart(2, '0');
-            document.getElementById('clock').textContent = `⏰ Time: ${hours}:${minutes}:${seconds}`;
+        // List of countries with their primary time zones
+        const countries = [
+            { name: "Afghanistan", timeZone: "Asia/Kabul" },
+            { name: "Albania", timeZone: "Europe/Tirane" },
+            { name: "Algeria", timeZone: "Africa/Algiers" },
+            { name: "Andorra", timeZone: "Europe/Andorra" },
+            { name: "Angola", timeZone: "Africa/Luanda" },
+            { name: "Argentina", timeZone: "America/Argentina/Buenos_Aires" },
+            { name: "Armenia", timeZone: "Asia/Yerevan" },
+            { name: "Australia", timeZone: "Australia/Sydney" },
+            { name: "Austria", timeZone: "Europe/Vienna" },
+            { name: "Azerbaijan", timeZone: "Asia/Baku" },
+            { name: "Bahamas", timeZone: "America/Nassau" },
+            { name: "Bahrain", timeZone: "Asia/Bahrain" },
+            { name: "Bangladesh", timeZone: "Asia/Dhaka" },
+            { name: "Barbados", timeZone: "America/Barbados" },
+            { name: "Belarus", timeZone: "Europe/Minsk" },
+            { name: "Belgium", timeZone: "Europe/Brussels" },
+            { name: "Belize", timeZone: "America/Belize" },
+            { name: "Benin", timeZone: "Africa/Porto-Novo" },
+            { name: "Bhutan", timeZone: "Asia/Thimphu" },
+            { name: "Bolivia", timeZone: "America/La_Paz" },
+            { name: "Bosnia and Herzegovina", timeZone: "Europe/Sarajevo" },
+            { name: "Botswana", timeZone: "Africa/Gaborone" },
+            { name: "Brazil", timeZone: "America/Sao_Paulo" },
+            { name: "Brunei", timeZone: "Asia/Brunei" },
+            { name: "Bulgaria", timeZone: "Europe/Sofia" },
+            { name: "Burkina Faso", timeZone: "Africa/Ouagadougou" },
+            { name: "Burundi", timeZone: "Africa/Gitega" },
+            { name: "Cambodia", timeZone: "Asia/Phnom_Penh" },
+            { name: "Cameroon", timeZone: "Africa/Douala" },
+            { name: "Canada", timeZone: "America/Toronto" },
+            { name: "Cape Verde", timeZone: "Atlantic/Cape_Verde" },
+            { name: "Central African Republic", timeZone: "Africa/Bangui" },
+            { name: "Chad", timeZone: "Africa/Ndjamena" },
+            { name: "Chile", timeZone: "America/Santiago" },
+            { name: "China", timeZone: "Asia/Shanghai" },
+            { name: "Colombia", timeZone: "America/Bogota" },
+            { name: "Comoros", timeZone: "Indian/Comoro" },
+            { name: "Congo", timeZone: "Africa/Brazzaville" },
+            { name: "Costa Rica", timeZone: "America/Costa_Rica" },
+            { name: "Croatia", timeZone: "Europe/Zagreb" },
+            { name: "Cuba", timeZone: "America/Havana" },
+            { name: "Cyprus", timeZone: "Asia/Nicosia" },
+            { name: "Czech Republic", timeZone: "Europe/Prague" },
+            { name: "Denmark", timeZone: "Europe/Copenhagen" },
+            { name: "Djibouti", timeZone: "Africa/Djibouti" },
+            { name: "Dominica", timeZone: "America/Dominica" },
+            { name: "Dominican Republic", timeZone: "America/Santo_Domingo" },
+            { name: "Ecuador", timeZone: "America/Guayaquil" },
+            { name: "Egypt", timeZone: "Africa/Cairo" },
+            { name: "El Salvador", timeZone: "America/El_Salvador" },
+            { name: "Equatorial Guinea", timeZone: "Africa/Malabo" },
+            { name: "Eritrea", timeZone: "Africa/Asmara" },
+            { name: "Estonia", timeZone: "Europe/Tallinn" },
+            { name: "Eswatini", timeZone: "Africa/Mbabane" },
+            { name: "Ethiopia", timeZone: "Africa/Addis_Ababa" },
+            { name: "Fiji", timeZone: "Pacific/Fiji" },
+            { name: "Finland", timeZone: "Europe/Helsinki" },
+            { name: "France", timeZone: "Europe/Paris" },
+            { name: "Gabon", timeZone: "Africa/Libreville" },
+            { name: "Gambia", timeZone: "Africa/Banjul" },
+            { name: "Georgia", timeZone: "Asia/Tbilisi" },
+            { name: "Germany", timeZone: "Europe/Berlin" },
+            { name: "Ghana", timeZone: "Africa/Accra" },
+            { name: "Greece", timeZone: "Europe/Athens" },
+            { name: "Grenada", timeZone: "America/Grenada" },
+            { name: "Guatemala", timeZone: "America/Guatemala" },
+            { name: "Guinea", timeZone: "Africa/Conakry" },
+            { name: "Guinea-Bissau", timeZone: "Africa/Bissau" },
+            { name: "Guyana", timeZone: "America/Guyana" },
+            { name: "Haiti", timeZone: "America/Port-au-Prince" },
+            { name: "Honduras", timeZone: "America/Tegucigalpa" },
+            { name: "Hungary", timeZone: "Europe/Budapest" },
+            { name: "Iceland", timeZone: "Atlantic/Reykjavik" },
+            { name: "India", timeZone: "Asia/Kolkata" },
+            { name: "Indonesia", timeZone: "Asia/Jakarta" },
+            { name: "Iran", timeZone: "Asia/Tehran" },
+            { name: "Iraq", timeZone: "Asia/Baghdad" },
+            { name: "Ireland", timeZone: "Europe/Dublin" },
+            { name: "Israel", timeZone: "Asia/Jerusalem" },
+            { name: "Italy", timeZone: "Europe/Rome" },
+            { name: "Jamaica", timeZone: "America/Jamaica" },
+            { name: "Japan", timeZone: "Asia/Tokyo" },
+            { name: "Jordan", timeZone: "Asia/Amman" },
+            { name: "Kazakhstan", timeZone: "Asia/Almaty" },
+            { name: "Kenya", timeZone: "Africa/Nairobi" },
+            { name: "Kiribati", timeZone: "Pacific/Tarawa" },
+            { name: "Kuwait", timeZone: "Asia/Kuwait" },
+            { name: "Kyrgyzstan", timeZone: "Asia/Bishkek" },
+            { name: "Laos", timeZone: "Asia/Vientiane" },
+            { name: "Latvia", timeZone: "Europe/Riga" },
+            { name: "Lebanon", timeZone: "Asia/Beirut" },
+            { name: "Lesotho", timeZone: "Africa/Maseru" },
+            { name: "Liberia", timeZone: "Africa/Monrovia" },
+            { name: "Libya", timeZone: "Africa/Tripoli" },
+            { name: "Liechtenstein", timeZone: "Europe/Vaduz" },
+            { name: "Lithuania", timeZone: "Europe/Vilnius" },
+            { name: "Luxembourg", timeZone: "Europe/Luxembourg" },
+            { name: "Madagascar", timeZone: "Indian/Antananarivo" },
+            { name: "Malawi", timeZone: "Africa/Blantyre" },
+            { name: "Malaysia", timeZone: "Asia/Kuala_Lumpur" },
+            { name: "Maldives", timeZone: "Indian/Maldives" },
+            { name: "Mali", timeZone: "Africa/Bamako" },
+            { name: "Malta", timeZone: "Europe/Malta" },
+            { name: "Marshall Islands", timeZone: "Pacific/Majuro" },
+            { name: "Mauritania", timeZone: "Africa/Nouakchott" },
+            { name: "Mauritius", timeZone: "Indian/Mauritius" },
+            { name: "Mexico", timeZone: "America/Mexico_City" },
+            { name: "Micronesia", timeZone: "Pacific/Chuuk" },
+            { name: "Moldova", timeZone: "Europe/Chisinau" },
+            { name: "Monaco", timeZone: "Europe/Monaco" },
+            { name: "Mongolia", timeZone: "Asia/Ulaanbaatar" },
+            { name: "Montenegro", timeZone: "Europe/Podgorica" },
+            { name: "Morocco", timeZone: "Africa/Casablanca" },
+            { name: "Mozambique", timeZone: "Africa/Maputo" },
+            { name: "Myanmar", timeZone: "Asia/Yangon" },
+            { name: "Namibia", timeZone: "Africa/Windhoek" },
+            { name: "Nauru", timeZone: "Pacific/Nauru" },
+            { name: "Nepal", timeZone: "Asia/Kathmandu" },
+            { name: "Netherlands", timeZone: "Europe/Amsterdam" },
+            { name: "New Zealand", timeZone: "Pacific/Auckland" },
+            { name: "Nicaragua", timeZone: "America/Managua" },
+            { name: "Niger", timeZone: "Africa/Niamey" },
+            { name: "Nigeria", timeZone: "Africa/Lagos" },
+            { name: "North Korea", timeZone: "Asia/Pyongyang" },
+            { name: "North Macedonia", timeZone: "Europe/Skopje" },
+            { name: "Norway", timeZone: "Europe/Oslo" },
+            { name: "Oman", timeZone: "Asia/Muscat" },
+            { name: "Pakistan", timeZone: "Asia/Karachi" },
+            { name: "Palau", timeZone: "Pacific/Palau" },
+            { name: "Panama", timeZone: "America/Panama" },
+            { name: "Papua New Guinea", timeZone: "Pacific/Port_Moresby" },
+            { name: "Paraguay", timeZone: "America/Asuncion" },
+            { name: "Peru", timeZone: "America/Lima" },
+            { name: "Philippines", timeZone: "Asia/Manila" },
+            { name: "Poland", timeZone: "Europe/Warsaw" },
+            { name: "Portugal", timeZone: "Europe/Lisbon" },
+            { name: "Qatar", timeZone: "Asia/Qatar" },
+            { name: "Romania", timeZone: "Europe/Bucharest" },
+            { name: "Russia", timeZone: "Europe/Moscow" },
+            { name: "Rwanda", timeZone: "Africa/Kigali" },
+            { name: "Saint Kitts and Nevis", timeZone: "America/St_Kitts" },
+            { name: "Saint Lucia", timeZone: "America/St_Lucia" },
+            { name: "Saint Vincent and the Grenadines", timeZone: "America/St_Vincent" },
+            { name: "Samoa", timeZone: "Pacific/Apia" },
+            { name: "San Marino", timeZone: "Europe/San_Marino" },
+            { name: "Sao Tome and Principe", timeZone: "Africa/Sao_Tome" },
+            { name: "Saudi Arabia", timeZone: "Asia/Riyadh" },
+            { name: "Senegal", timeZone: "Africa/Dakar" },
+            { name: "Serbia", timeZone: "Europe/Belgrade" },
+            { name: "Seychelles", timeZone: "Indian/Mahe" },
+            { name: "Sierra Leone", timeZone: "Africa/Freetown" },
+            { name: "Singapore", timeZone: "Asia/Singapore" },
+            { name: "Slovakia", timeZone: "Europe/Bratislava" },
+            { name: "Slovenia", timeZone: "Europe/Ljubljana" },
+            { name: "Solomon Islands", timeZone: "Pacific/Guadalcanal" },
+            { name: "Somalia", timeZone: "Africa/Mogadishu" },
+            { name: "South Africa", timeZone: "Africa/Johannesburg" },
+            { name: "South Korea", timeZone: "Asia/Seoul" },
+            { name: "South Sudan", timeZone: "Africa/Juba" },
+            { name: "Spain", timeZone: "Europe/Madrid" },
+            { name: "Sri Lanka", timeZone: "Asia/Colombo" },
+            { name: "Sudan", timeZone: "Africa/Khartoum" },
+            { name: "Suriname", timeZone: "America/Paramaribo" },
+            { name: "Sweden", timeZone: "Europe/Stockholm" },
+            { name: "Switzerland", timeZone: "Europe/Zurich" },
+            { name: "Syria", timeZone: "Asia/Damascus" },
+            { name: "Taiwan", timeZone: "Asia/Taipei" },
+            { name: "Tajikistan", timeZone: "Asia/Dushanbe" },
+            { name: "Tanzania", timeZone: "Africa/Dar_es_Salaam" },
+            { name: "Thailand", timeZone: "Asia/Bangkok" },
+            { name: "Togo", timeZone: "Africa/Lome" },
+            { name: "Tonga", timeZone: "Pacific/Tongatapu" },
+            { name: "Trinidad and Tobago", timeZone: "America/Port_of_Spain" },
+            { name: "Tunisia", timeZone: "Africa/Tunis" },
+            { name: "Turkey", timeZone: "Europe/Istanbul" },
+            { name: "Turkmenistan", timeZone: "Asia/Ashgabat" },
+            { name: "Tuvalu", timeZone: "Pacific/Funafuti" },
+            { name: "Uganda", timeZone: "Africa/Kampala" },
+            { name: "Ukraine", timeZone: "Europe/Kyiv" },
+            { name: "United Arab Emirates", timeZone: "Asia/Dubai" },
+            { name: "United Kingdom", timeZone: "Europe/London" },
+            { name: "United States", timeZone: "America/New_York" },
+            { name: "Uruguay", timeZone: "America/Montevideo" },
+            { name: "Uzbekistan", timeZone: "Asia/Tashkent" },
+            { name: "Vanuatu", timeZone: "Pacific/Efate" },
+            { name: "Venezuela", timeZone: "America/Caracas" },
+            { name: "Vietnam", timeZone: "Asia/Ho_Chi_Minh" },
+            { name: "Yemen", timeZone: "Asia/Aden" },
+            { name: "Zambia", timeZone: "Africa/Lusaka" },
+            { name: "Zimbabwe", timeZone: "Africa/Harare" }
+        ];
+
+        const clockContainer = document.getElementById('clockContainer');
+        const notifyBtn = document.getElementById('notifyBtn');
+        const notifyStatus = document.getElementById('notifyStatus');
+        const searchInput = document.getElementById('searchInput');
+        let notificationInterval;
+
+        // Request Notification Permission
+        notifyBtn.addEventListener('click', () => {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    notifyStatus.textContent = 'Notifications enabled!';
+                    notifyBtn.classList.add('hidden');
+                    startNotifications();
+                } else {
+                    notifyStatus.textContent = 'Notifications denied. Please allow in browser settings.';
+                }
+            });
+        });
+
+        // Start sending notifications every 20 minutes
+        function startNotifications() {
+            if (notificationInterval) clearInterval(notificationInterval);
+            notificationInterval = setInterval(() => {
+                countries.forEach(country => {
+                    const time = new Date().toLocaleTimeString('en-US', {
+                        timeZone: country.timeZone,
+                        hour12: true,
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        second: 'numeric'
+                    });
+                    new Notification(`${country.name} Time`, {
+                        body: `Current time in ${country.name}: ${time}`,
+                        icon: 'https://via.placeholder.com/32' // Optional icon
+                    });
+                });
+            }, 20 * 60 * 1000); // 20 minutes
         }
-        setInterval(updateClock, 1000);
+
+        // Create clock cards
+        function createClocks(searchTerm = '') {
+            clockContainer.innerHTML = '';
+            countries
+                .filter(country => country.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                .forEach(country => {
+                    const clockCard = document.createElement('div');
+                    clockCard.className = 'clock-card p-6 rounded-lg shadow-lg text-center';
+                    clockCard.innerHTML = `
+                        <h2 class="text-xl font-semibold mb-2">${country.name}</h2>
+                        <p class="text-2xl font-mono" id="time-${country.timeZone.replace(/\//g, '-')}"</p>
+                    `;
+                    clockContainer.appendChild(clockCard);
+                });
+        }
+
+        // Update times every second
+        function updateClocks() {
+            countries.forEach(country => {
+                const timeElement = document.getElementById(`time-${country.timeZone.replace(/\//g, '-')}`);
+                if (timeElement) {
+                    const time = new Date().toLocaleTimeString('en-US', {
+                        timeZone: country.timeZone,
+                        hour12: true,
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        second: 'numeric'
+                    });
+                    timeElement.textContent = time;
+                }
+            });
+        }
+
+        // Search functionality
+        searchInput.addEventListener('input', () => {
+            createClocks(searchInput.value);
+            updateClocks();
+        });
+
+        // Initialize clocks and update every second
+        createClocks();
+        updateClocks();
+        setInterval(updateClocks, 1000);
+
+        // Check initial notification permission
+        if (Notification.permission === 'granted') {
+            notifyStatus.textContent = 'Notifications already enabled!';
+            notifyBtn.classList.add('hidden');
+            startNotifications();
+        } else if (Notification.permission === 'denied') {
+            notifyStatus.textContent = 'Notifications denied. Please allow in browser settings.';
+            notifyBtn.disabled = true;
+        }
     </script>
 </body>
 </html>
