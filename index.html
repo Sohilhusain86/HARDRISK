@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>World Clock with Notifications</title>
+    <title>World Clock & Godi Media Search</title>
     <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -13,27 +13,31 @@
             font-family: 'Arial', sans-serif;
             color: #ffffff;
         }
-        .clock-card {
+        .clock-card, .media-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             transition: transform 0.3s ease;
         }
-        .clock-card:hover {
+        .clock-card:hover, .media-card:hover {
             transform: scale(1.05);
         }
-        #searchInput {
+        #searchInput, #mediaSearchInput {
             background: rgba(255, 255, 255, 0.2);
         }
-        .header-container {
+        .header-container, .media-header-container {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 1rem;
         }
+        .section-divider {
+            border-top: 2px solid rgba(255, 255, 255, 0.3);
+            margin: 2rem 0;
+        }
     </style>
 </head>
 <body class="flex flex-col items-center p-4">
-    <!-- Header with Clock Logo -->
+    <!-- Part 1: World Clock Section -->
     <div class="header-container mb-6">
         <img src="https://img.icons8.com/ios-filled/50/ffffff/clock.png" alt="Clock Icon" class="w-10 h-10">
         <h1 class="text-4xl font-bold text-center">World Clock</h1>
@@ -47,7 +51,7 @@
         <p id="notifyStatus" class="mt-2 text-sm"></p>
     </div>
 
-    <!-- Search Bar -->
+    <!-- Search Bar for World Clock -->
     <div class="w-full max-w-md mb-6">
         <input type="text" id="searchInput" placeholder="Search country..." 
                class="w-full p-3 rounded-lg text-white placeholder-gray-300 focus:outline-none">
@@ -56,8 +60,26 @@
     <!-- Clock Container -->
     <div id="clockContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-6xl"></div>
 
+    <!-- Divider between sections -->
+    <div class="section-divider w-full max-w-6xl"></div>
+
+    <!-- Part 2: Godi Media Search Engine Section -->
+    <div class="media-header-container mb-6">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/news.png" alt="News Icon" class="w-10 h-10">
+        <h1 class="text-4xl font-bold text-center">Godi Media Search Engine</h1>
+    </div>
+
+    <!-- Search Bar for Godi Media -->
+    <div class="w-full max-w-md mb-6">
+        <input type="text" id="mediaSearchInput" placeholder="Search media outlet..." 
+               class="w-full p-3 rounded-lg text-white placeholder-gray-300 focus:outline-none">
+    </div>
+
+    <!-- Media Container -->
+    <div id="mediaContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-6xl"></div>
+
     <script>
-        // List of countries with their primary time zones (same as before)
+        // Part 1: World Clock Logic
         const countries = [
             { name: "Afghanistan", timeZone: "Asia/Kabul" },
             { name: "Albania", timeZone: "Europe/Tirane" },
@@ -172,7 +194,7 @@
             { name: "Mongolia", timeZone: "Asia/Ulaanbaatar" },
             { name: "Montenegro", timeZone: "Europe/Podgorica" },
             { name: "Morocco", timeZone: "Africa/Casablanca" },
-            { name: "Mozambique", timeZone: "Africa/Maputo" },
+            { name: "No Mozambique", timeZone: "Africa/Maputo" },
             { name: "Myanmar", timeZone: "Asia/Yangon" },
             { name: "Namibia", timeZone: "Africa/Windhoek" },
             { name: "Nauru", timeZone: "Pacific/Nauru" },
@@ -297,7 +319,6 @@
                 .filter(country => country.name.toLowerCase().includes(searchTerm.toLowerCase()))
                 .forEach((country, index) => {
                     const clockCard = document.createElement('div');
-                    // Unique ID for each clock based on index to avoid conflicts
                     const clockId = `time-${index}`;
                     clockCard.className = 'clock-card p-6 rounded-lg shadow-lg text-center';
                     clockCard.innerHTML = `
@@ -305,7 +326,6 @@
                         <p class="text-2xl font-mono" id="${clockId}"></p>
                     `;
                     clockContainer.appendChild(clockCard);
-                    // Store the clock ID in the country object for updates
                     country.clockId = clockId;
                 });
         }
@@ -332,7 +352,7 @@
             });
         }
 
-        // Search functionality
+        // Search functionality for clocks
         searchInput.addEventListener('input', () => {
             createClocks(searchInput.value);
             updateClocks();
@@ -352,6 +372,124 @@
             notifyStatus.textContent = 'Notifications denied. Please allow in browser settings.';
             notifyBtn.disabled = true;
         }
+
+        // Part 2: Godi Media Search Engine Logic
+        const mediaOutlets = [
+            {
+                name: "Republic TV",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Republic_TV_logo.jpg/120px-Republic_TV_logo.jpg",
+                description: "Republic TV is a popular English-language news channel in India, known for its aggressive reporting style and prime-time debates. It has been criticized for alleged pro-government bias.",
+                bias: "Right-leaning (Alleged)",
+                website: "https://www.republicworld.com/"
+            },
+            {
+                name: "Times Now",
+                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/7/7b/Times_Now_Logo.svg/120px-Times_Now_Logo.svg.png",
+                description: "Times Now is a leading English news channel under the Times Network, often accused of sensationalism and favoring the ruling party in its coverage.",
+                bias: "Right-leaning (Alleged)",
+                website: "https://www.timesnownews.com/"
+            },
+            {
+                name: "Zee News",
+                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/5/5d/Zee_News_Logo.svg/120px-Zee_News_Logo.svg.png",
+                description: "Zee News is a Hindi news channel with a wide reach, frequently criticized for promoting nationalist narratives aligned with the government.",
+                bias: "Right-leaning (Alleged)",
+                website: "https://zeenews.india.com/"
+            },
+            {
+                name: "India TV",
+                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/8/8b/India_TV_Logo.svg/120px-India_TV_Logo.svg.png",
+                description: "India TV is a Hindi news channel known for sensationalist reporting and often accused of bias toward the ruling party.",
+                bias: "Right-leaning (Alleged)",
+                website: "https://www.indiatvnews.com/"
+            },
+            {
+                name: "News18 India",
+                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/9/9e/News18_India_Logo.svg/120px-News18_India_Logo.svg.png",
+                description: "News18 India, part of the Network18 group, is a Hindi news channel often criticized for its coverage favoring the government.",
+                bias: "Right-leaning (Alleged)",
+                website: "https://www.news18.com/"
+            },
+            {
+                name: "Aaj Tak",
+                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/5/5a/Aaj_Tak_Logo.svg/120px-Aaj_Tak_Logo.svg.png",
+                description: "Aaj Tak is one of India’s most-watched Hindi news channels, sometimes accused of sensationalism and pro-government reporting.",
+                bias: "Right-leaning (Alleged)",
+                website: "https://www.aajtak.in/"
+            },
+            {
+                name: "ABP News",
+                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/3/3e/ABP_News_Logo.svg/120px-ABP_News_Logo.svg.png",
+                description: "ABP News is a Hindi news channel that has faced criticism for shifting toward pro-government narratives in recent years.",
+                bias: "Right-leaning (Alleged)",
+                website: "https://www.abplive.com/"
+            },
+            {
+                name: "Sudarshan News",
+                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/5/5e/Sudarshan_News_Logo.svg/120px-Sudarshan_News_Logo.svg.png",
+                description: "Sudarshan News is a Hindi channel known for its nationalist stance and has been heavily criticized for promoting divisive content.",
+                bias: "Far Right (Alleged)",
+                website: "https://www.sudarshannews.in/"
+            },
+            {
+                name: "TV9 Bharatvarsh",
+                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/7/7c/TV9_Bharatvarsh_Logo.svg/120px-TV9_Bharatvarsh_Logo.svg.png",
+                description: "TV9 Bharatvarsh, part of the TV9 network, is a Hindi news channel often accused of aligning with government narratives.",
+                bias: "Right-leaning (Alleged)",
+                website: "https://www.tv9hindi.com/"
+            },
+            {
+                name: "OpIndia",
+                logo: "https://www.opindia.com/wp-content/uploads/2018/07/opindia-logo.png",
+                description: "OpIndia is a digital news platform known for its right-wing editorial stance and has been accused of spreading misinformation favoring the government.",
+                bias: "Far Right (Alleged)",
+                website: "https://www.opindia.com/"
+            },
+            {
+                name: "News Nation",
+                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/2/2e/News_Nation_Logo.svg/120px-News_Nation_Logo.svg.png",
+                description: "News Nation is a Hindi news channel often criticized for sensationalist reporting and pro-government bias.",
+                bias: "Right-leaning (Alleged)",
+                website: "https://www.newsnationtv.com/"
+            },
+            {
+                name: "India Today",
+                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/2/2a/India_Today_Logo.svg/120px-India_Today_Logo.svg.png",
+                description: "India Today, while a major news outlet, has faced criticism for occasionally aligning with government narratives in its coverage.",
+                bias: "Center-Right (Alleged)",
+                website: "https://www.indiatoday.in/"
+            }
+        ];
+
+        const mediaContainer = document.getElementById('mediaContainer');
+        const mediaSearchInput = document.getElementById('mediaSearchInput');
+
+        // Create media cards
+        function createMediaCards(searchTerm = '') {
+            mediaContainer.innerHTML = '';
+            mediaOutlets
+                .filter(outlet => outlet.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                .forEach(outlet => {
+                    const mediaCard = document.createElement('div');
+                    mediaCard.className = 'media-card p-6 rounded-lg shadow-lg text-center';
+                    mediaCard.innerHTML = `
+                        <img src="${outlet.logo}" alt="${outlet.name} Logo" class="w-16 h-16 mx-auto mb-4">
+                        <h2 class="text-xl font-semibold mb-2">${outlet.name}</h2>
+                        <p class="text-sm mb-2">${outlet.description}</p>
+                        <p class="text-sm mb-2"><strong>Bias:</strong> ${outlet.bias}</p>
+                        <a href="${outlet.website}" target="_blank" class="text-blue-300 hover:underline">Visit Website</a>
+                    `;
+                    mediaContainer.appendChild(mediaCard);
+                });
+        }
+
+        // Search functionality for media outlets
+        mediaSearchInput.addEventListener('input', () => {
+            createMediaCards(mediaSearchInput.value);
+        });
+
+        // Initialize media cards
+        createMediaCards();
     </script>
 </body>
 </html>
