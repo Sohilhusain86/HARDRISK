@@ -24,10 +24,20 @@
         #searchInput {
             background: rgba(255, 255, 255, 0.2);
         }
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
     </style>
 </head>
 <body class="flex flex-col items-center p-4">
-    <h1 class="text-4xl font-bold mb-6 text-center">World Clock</h1>
+    <!-- Header with Clock Logo -->
+    <div class="header-container mb-6">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/clock.png" alt="Clock Icon" class="w-10 h-10">
+        <h1 class="text-4xl font-bold text-center">World Clock</h1>
+    </div>
     
     <!-- Notification Permission Button -->
     <div class="mb-6 text-center">
@@ -47,7 +57,7 @@
     <div id="clockContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-6xl"></div>
 
     <script>
-        // List of countries with their primary time zones
+        // List of countries with their primary time zones (same as before)
         const countries = [
             { name: "Afghanistan", timeZone: "Asia/Kabul" },
             { name: "Albania", timeZone: "Europe/Tirane" },
@@ -274,7 +284,7 @@
                     });
                     new Notification(`${country.name} Time`, {
                         body: `Current time in ${country.name}: ${time}`,
-                        icon: 'https://via.placeholder.com/32' // Optional icon
+                        icon: 'https://img.icons8.com/ios-filled/32/ffffff/clock.png'
                     });
                 });
             }, 20 * 60 * 1000); // 20 minutes
@@ -285,30 +295,39 @@
             clockContainer.innerHTML = '';
             countries
                 .filter(country => country.name.toLowerCase().includes(searchTerm.toLowerCase()))
-                .forEach(country => {
+                .forEach((country, index) => {
                     const clockCard = document.createElement('div');
+                    // Unique ID for each clock based on index to avoid conflicts
+                    const clockId = `time-${index}`;
                     clockCard.className = 'clock-card p-6 rounded-lg shadow-lg text-center';
                     clockCard.innerHTML = `
                         <h2 class="text-xl font-semibold mb-2">${country.name}</h2>
-                        <p class="text-2xl font-mono" id="time-${country.timeZone.replace(/\//g, '-')}"</p>
+                        <p class="text-2xl font-mono" id="${clockId}"></p>
                     `;
                     clockContainer.appendChild(clockCard);
+                    // Store the clock ID in the country object for updates
+                    country.clockId = clockId;
                 });
         }
 
         // Update times every second
         function updateClocks() {
             countries.forEach(country => {
-                const timeElement = document.getElementById(`time-${country.timeZone.replace(/\//g, '-')}`);
+                const timeElement = document.getElementById(country.clockId);
                 if (timeElement) {
-                    const time = new Date().toLocaleTimeString('en-US', {
-                        timeZone: country.timeZone,
-                        hour12: true,
-                        hour: 'numeric',
-                        minute: 'numeric',
-                        second: 'numeric'
-                    });
-                    timeElement.textContent = time;
+                    try {
+                        const time = new Date().toLocaleTimeString('en-US', {
+                            timeZone: country.timeZone,
+                            hour12: true,
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            second: 'numeric'
+                        });
+                        timeElement.textContent = time;
+                    } catch (error) {
+                        console.error(`Error updating time for ${country.name}: ${error.message}`);
+                        timeElement.textContent = 'Error';
+                    }
                 }
             });
         }
