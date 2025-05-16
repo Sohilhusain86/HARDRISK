@@ -492,4 +492,105 @@
         createMediaCards();
     </script>
 </body>
+        </div>
+
+    <!-- Media Container -->
+    <div id="mediaContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-6xl"></div>
+
+    <!-- Divider between sections -->
+    <div class="section-divider w-full max-w-6xl"></div>
+ 
+        // Create media cards
+        function createMediaCards(searchTerm = '') {
+            mediaContainer.innerHTML = '';
+            mediaOutlets
+                .filter(outlet => outlet.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                .forEach(outlet => {
+                    const mediaCard = document.createElement('div');
+                    mediaCard.className = 'media-card p-6 rounded-lg shadow-lg text-center';
+                    mediaCard.innerHTML = `
+                        <img src="${outlet.logo}" alt="${outlet.name} Logo" class="w-16 h-16 mx-auto mb-4">
+                        <h2 class="text-xl font-semibold mb-2">${outlet.name}</h2>
+                        <p class="text-sm mb-2">${outlet.description}</p>
+                        <p class="text-sm mb-2"><strong>Bias:</strong> ${outlet.bias}</p>
+                        <a href="${outlet.website}" target="_blank" class="text-blue-300 hover:underline">Visit Website</a>
+                    `;
+                    mediaContainer.appendChild(mediaCard);
+                });
+        }
+
+        // Search functionality for media outlets
+        mediaSearchInput.addEventListener('input', () => {
+            createMediaCards(mediaSearchInput.value);
+        });
+
+        // Initialize media cards
+        createMediaCards();
+
+        // Part 3: Live News Headlines Logic
+        const newsHeadlines = [
+            { media: "Republic TV", title: "Government Announces New Economic Policy!", link: "https://www.republicworld.com/economy", timestamp: "2 mins ago" },
+            { media: "Republic TV", title: "PM Addresses Nation on Development Plans", link: "https://www.republicworld.com/politics", timestamp: "15 mins ago" },
+            { media: "Times Now", title: "Breaking: Major Infrastructure Project Launched!", link: "https://www.timesnownews.com/india", timestamp: "5 mins ago" },
+            { media: "Times Now", title: "India’s Global Ranking Improves in Ease of Business", link: "https://www.timesnownews.com/business", timestamp: "30 mins ago" },
+            { media: "Zee News", title: "भारत ने जीता अंतरराष्ट्रीय पुरस्कार!", link: "https://zeenews.india.com/hindi", timestamp: "10 mins ago" },
+            { media: "Zee News", title: "सरकार की नई योजना से किसानों को फायदा", link: "https://zeenews.india.com/hindi/agriculture", timestamp: "20 mins ago" },
+            { media: "India TV", title: "नया कानून पास, जनता में उत्साह!", link: "https://www.indiatvnews.com/news", timestamp: "8 mins ago" },
+            { media: "India TV", title: "देश में निवेश बढ़ा, सरकार की तारीफ", link: "https://www.indiatvnews.com/business", timestamp: "25 mins ago" },
+            { media: "News18 India", title: "प्रधानमंत्री का बड़ा ऐलान, युवाओं को नौकरी!", link: "https://www.news18.com/india", timestamp: "12 mins ago" },
+            { media: "News18 India", title: "भारत की नई रक्षा नीति की चर्चा", link: "https://www.news18.com/defence", timestamp: "18 mins ago" },
+            { media: "Aaj Tak", title: "नई शिक्षा नीति लागू, स्कूलों में बदलाव", link: "https://www.aajtak.in/education", timestamp: "3 mins ago" },
+            { media: "Aaj Tak", title: "सरकार ने दी राहत, टैक्स में छूट", link: "https://www.aajtak.in/business", timestamp: "22 mins ago" },
+            { media: "ABP News", title: "भारत ने जी20 में मचाया धमाल!", link: "https://www.abplive.com/news", timestamp: "7 mins ago" },
+            { media: "ABP News", title: "नए बिल से उद्योगों को फायदा", link: "https://www.abplive.com/business", timestamp: "28 mins ago" },
+            { media: "Sudarshan News", title: "हिंदुत्व की जीत, नया मंदिर बनेगा!", link: "https://www.sudarshannews.in/religion", timestamp: "4 mins ago" },
+            { media: "Sudarshan News", title: "देशभक्ति की मिसाल, सरकार की तारीफ", link: "https://www.sudarshannews.in/politics", timestamp: "19 mins ago" },
+            { media: "TV9 Bharatvarsh", title: "नई तकनीक से भारत आगे, सरकार का दावा", link: "https://www.tv9hindi.com/technology", timestamp: "9 mins ago" },
+            { media: "TV9 Bharatvarsh", title: "किसानों के लिए नई योजना लॉन्च", link: "https://www.tv9hindi.com/agriculture", timestamp: "16 mins ago" },
+            { media: "OpIndia", title: "Left-Wing Conspiracy Exposed!", link: "https://www.opindia.com/politics", timestamp: "6 mins ago" },
+            { media: "OpIndia", title: "Government’s Bold Move Against Opposition", link: "https://www.opindia.com/opinion", timestamp: "14 mins ago" },
+            { media: "News Nation", title: "भारत में नई रेल परियोजना शुरू", link: "https://www.newsnationtv.com/india", timestamp: "11 mins ago" },
+            { media: "News Nation", title: "सरकार की नीति से जनता खुश", link: "https://www.newsnationtv.com/politics", timestamp: "24 mins ago" },
+            { media: "India Today", title: "India Shines at Global Summit", link: "https://www.indiatoday.in/india", timestamp: "13 mins ago" },
+            { media: "India Today", title: "New Law to Boost Economy", link: "https://www.indiatoday.in/business", timestamp: "27 mins ago" }
+        ];
+
+        const newsContainer = document.getElementById('newsContainer');
+        const newsSearchInput = document.getElementById('newsSearchInput');
+
+        // Create news headline cards
+        function createNewsCards(searchTerm = '') {
+            newsContainer.innerHTML = '';
+            newsHeadlines
+                .filter(headline => headline.media.toLowerCase().includes(searchTerm.toLowerCase()))
+                .forEach(headline => {
+                    const newsCard = document.createElement('div');
+                    newsCard.className = 'news-card p-6 rounded-lg shadow-lg text-center';
+                    newsCard.innerHTML = `
+                        <h2 class="text-xl font-semibold mb-2">${headline.title}</h2>
+                        <p class="text-sm mb-2"><strong>Media:</strong> ${headline.media}</p>
+                        <p class="text-sm mb-2"><strong>Updated:</strong> ${headline.timestamp}</p>
+                        <a href="${headline.link}" target="_blank" class="text-blue-300 hover:underline">Read More</a>
+                    `;
+                    newsContainer.appendChild(newsCard);
+                });
+        }
+
+        // Search functionality for news headlines
+        newsSearchInput.addEventListener('input', () => {
+            createNewsCards(newsSearchInput.value);
+        });
+
+        // Initialize news headline cards
+        createNewsCards();
+
+        // Simulate live updates every 5 minutes
+        setInterval(() => {
+            newsHeadlines.forEach(headline => {
+                headline.timestamp = "Just now"; // Simulate update
+            });
+            createNewsCards(newsSearchInput.value); // Refresh with current search term
+        }, 5 * 60 * 1000); // 5 minutes
+    </script>
+</body>
 </html>
