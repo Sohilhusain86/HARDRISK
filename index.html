@@ -25,14 +25,16 @@
         .state-card, .district-card, .media-card, .news-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .state-card:hover, .district-card:hover, 
         .media-card:hover, .news-card:hover {
             transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
         #searchInput, #mediaSearchInput, #newsSearchInput {
             background: rgba(255, 255, 255, 0.2);
+            border: none;
         }
         .header-container {
             display: flex;
@@ -60,6 +62,10 @@
             border-radius: 50%;
             cursor: pointer;
             display: none;
+            transition: background 0.3s ease;
+        }
+        #backToTop:hover {
+            background: #2563eb;
         }
         #darkModeToggle {
             position: fixed;
@@ -70,11 +76,28 @@
             padding: 8px 16px;
             border-radius: 20px;
             cursor: pointer;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        .dark-mode #darkModeToggle {
+            background: #4a5568;
+            color: #e2e8f0;
         }
         .map-img {
             width: 100px;
             height: auto;
             margin-bottom: 1rem;
+        }
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .header-container h1 {
+                font-size: 1.5rem;
+            }
+            .map-img {
+                width: 80px;
+            }
+            .state-card, .media-card, .news-card {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
