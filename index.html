@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indian States, Media & News Search Engine</title>
-    <!-- Tailwind CSS CDN for styling -->
+    <title>Duniya ke Saare Desh ka Live Time Table</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Moment.js aur Moment Timezone -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <style>
         body {
             background: linear-gradient(to bottom, #1e3a8a, #3b82f6);
@@ -18,21 +21,19 @@
             background: linear-gradient(to bottom, #2d3748, #4a5568);
             color: #e2e8f0;
         }
-        .dark-mode .state-card, .dark-mode .district-card, 
-        .dark-mode .media-card, .dark-mode .news-card {
+        .dark-mode .time-card {
             background: rgba(255, 255, 255, 0.05);
         }
-        .state-card, .district-card, .media-card, .news-card {
+        .time-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .state-card:hover, .district-card:hover, 
-        .media-card:hover, .news-card:hover {
+        .time-card:hover {
             transform: scale(1.05);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
-        #searchInput, #mediaSearchInput, #newsSearchInput {
+        #searchInput {
             background: rgba(255, 255, 255, 0.2);
             border: none;
         }
@@ -41,16 +42,6 @@
             align-items: center;
             justify-content: center;
             gap: 1rem;
-        }
-        .section-divider {
-            border-top: 2px solid rgba(255, 255, 255, 0.3);
-            margin: 2rem 0;
-        }
-        .district-card img, .media-card img {
-            width: 40px;
-            height: 40px;
-            object-fit: cover;
-            margin: 0 auto 1rem;
         }
         #backToTop {
             position: fixed;
@@ -82,20 +73,33 @@
             background: #4a5568;
             color: #e2e8f0;
         }
-        .map-img {
-            width: 100px;
-            height: auto;
-            margin-bottom: 1rem;
+        .flag-img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            margin: 0 auto 1rem;
         }
-        /* Responsive adjustments */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .pagination button {
+            padding: 0.5rem 1rem;
+            background: #3b82f6;
+            color: #fff;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+        .pagination button:hover {
+            background: #2563eb;
+        }
         @media (max-width: 640px) {
             .header-container h1 {
                 font-size: 1.5rem;
             }
-            .map-img {
-                width: 80px;
-            }
-            .state-card, .media-card, .news-card {
+            .time-card {
                 padding: 1rem;
             }
         }
@@ -103,1243 +107,320 @@
 </head>
 <body class="flex flex-col items-center p-4">
     <!-- Dark Mode Toggle -->
-    <button id="darkModeToggle">Toggle Dark Mode</button>
+    <button id="darkModeToggle" aria-label="Dark Mode Toggle Karo">Dark Mode Toggle</button>
 
     <!-- Back to Top Button -->
-    <button id="backToTop">⬆</button>
+    <button id="backToTop" aria-label="Wapas Upar Jao">⬆</button>
 
     <!-- Header -->
     <div class="header-container mb-6">
-        <img src="https://img.icons8.com/ios-filled/50/ffffff/india.png" alt="India Icon" class="w-10 h-10">
-        <h1 class="text-4xl font-bold text-center">Indian States, Media & News Search Engine</h1>
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/globe.png" alt="Duniya ka Icon" class="w-10 h-10">
+        <h1 class="text-4xl font-bold text-center">Duniya ke Saare Desh ka Live Time Table</h1>
     </div>
 
-    <!-- Part 1: States and Districts Section -->
-    <!-- Search Bar for States -->
+    <!-- Search Bar -->
     <div class="w-full max-w-md mb-6">
-        <input type="text" id="searchInput" placeholder="Search state or district..." 
-               class="w-full p-3 rounded-lg text-white placeholder-gray-300 focus:outline-none">
+        <input type="text" id="searchInput" placeholder="Desh dhoondho..." 
+               class="w-full p-3 rounded-lg text-white placeholder-gray-300 focus:outline-none" 
+               aria-label="Desh dhoondho">
     </div>
 
-    <!-- States and Districts Container -->
-    <div id="stateContainer" class="w-full max-w-6xl mb-8"></div>
+    <!-- Time Table Container -->
+    <div id="timeContainer" class="w-full max-w-6xl mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
-    <!-- Divider between sections -->
-    <div class="section-divider w-full max-w-6xl"></div>
-
-    <!-- Part 2: Media Outlets Section -->
-    <!-- Search Bar for Media -->
-    <div class="w-full max-w-md mb-6">
-        <input type="text" id="mediaSearchInput" placeholder="Search media outlet..." 
-               class="w-full p-3 rounded-lg text-white placeholder-gray-300 focus:outline-none">
-    </div>
-
-    <!-- Media Container -->
-    <div id="mediaContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-6xl mb-8"></div>
-
-    <!-- Divider between sections -->
-    <div class="section-divider w-full max-w-6xl"></div>
-
-    <!-- Part 3: Live News Headlines Section -->
-    <!-- Search Bar for News -->
-    <div class="w-full max-w-md mb-6">
-        <input type="text" id="newsSearchInput" placeholder="Search news by media..." 
-               class="w-full p-3 rounded-lg text-white placeholder-gray-300 focus:outline-none">
-    </div>
-
-    <!-- News Container -->
-    <div id="newsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-6xl"></div>
+    <!-- Pagination -->
+    <div id="pagination" class="pagination"></div>
 
     <script>
-        // Part 1: States and Districts Logic
-        const states = [
-            {
-                name: "Andhra Pradesh",
-                description: "Known for its rich culture, Tirupati temple, and IT hub in Amaravati.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Andhra_Pradesh_in_India.svg/200px-Andhra_Pradesh_in_India.svg.png",
-                districts: [
-                    { name: "Alluri Sitharama Raju", famousFor: "Famous for its tribal culture and natural beauty.", icon: "🌿" },
-                    { name: "Anakapalli", famousFor: "Famous for its jaggery market and beaches.", icon: "🏖️" },
-                    { name: "Anantapur", famousFor: "Famous for silk sarees and the Lepakshi Temple.", icon: "🕍" },
-                    { name: "Annamayya", famousFor: "Famous for the Annamayya Sankeertanas and temples.", icon: "🛕" },
-                    { name: "Bapatla", famousFor: "Famous for its beaches and the Bapatla Agricultural College.", icon: "🏖️" },
-                    { name: "Chittoor", famousFor: "Famous for the Tirupati Balaji Temple, a major Hindu pilgrimage site.", icon: "🛕" },
-                    { name: "Dr. B.R. Ambedkar Konaseema", famousFor: "Famous for its backwaters and coconut groves.", icon: "🌴" },
-                    { name: "East Godavari", famousFor: "Famous for the Godavari River and Kakinada port.", icon: "🚢" },
-                    { name: "Eluru", famousFor: "Famous for its handwoven carpets and Kolleru Lake.", icon: "🌊" },
-                    { name: "Guntur", famousFor: "Famous for chili production and ancient Buddhist sites like Amaravathi.", icon: "🌶️" },
-                    { name: "Kakinada", famousFor: "Famous for its port and the Hope Island biodiversity.", icon: "🏝️" },
-                    { name: "Krishna", famousFor: "Famous for the Kanaka Durga Temple and Machilipatnam port.", icon: "🛕" },
-                    { name: "Kurnool", famousFor: "Famous for the Konda Reddy Fort and the Belum Caves.", icon: "🏰" },
-                    { name: "Nandyal", famousFor: "Famous for the Mahanandi Temple and agricultural produce.", icon: "🛕" },
-                    { name: "Nellore", famousFor: "Famous for its beaches and the Ranganatha Temple.", icon: "🏖️" },
-                    { name: "Palnadu", famousFor: "Famous for the historical Palnadu War and limestone deposits.", icon: "🪨" },
-                    { name: "Parvathipuram Manyam", famousFor: "Famous for its tribal culture and scenic hills.", icon: "⛰️" },
-                    { name: "Prakasam", famousFor: "Famous for its granite industry and the Markapur slate.", icon: "🪨" },
-                    { name: "Sri Balaji", famousFor: "Famous for the Venkateswara Temple in Tirupati.", icon: "🛕" },
-                    { name: "Sri Potti Sriramulu Nellore", famousFor: "Famous for its shrimp farming and beaches.", icon: "🦐" },
-                    { name: "Sri Sathya Sai", famousFor: "Famous for the Sai Baba Ashram in Puttaparthi.", icon: "🛕" },
-                    { name: "Srikakulam", famousFor: "Famous for the Srikurmam Temple and Arasavalli Sun Temple.", icon: "🛕" },
-                    { name: "Visakhapatnam", famousFor: "Famous for its beaches and the INS Kursura Submarine Museum.", icon: "🏖️" },
-                    { name: "Vizianagaram", famousFor: "Famous for the Vizianagaram Fort and textile industry.", icon: "🏰" },
-                    { name: "West Godavari", famousFor: "Famous for its aquaculture and the Dwaraka Tirumala Temple.", icon: "🛕" },
-                    { name: "YSR Kadapa", famousFor: "Famous for its black stone quarries and Gandikota Fort.", icon: "🏰" }
-                ]
-            },
-            {
-                name: "Arunachal Pradesh",
-                description: "Known for its biodiversity, tribal culture, and the Tawang Monastery.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Arunachal_Pradesh_in_India.svg/200px-Arunachal_Pradesh_in_India.svg.png",
-                districts: [
-                    { name: "Anjaw", famousFor: "Famous for its scenic beauty and the Anjaw Festival.", icon: "🌄" },
-                    { name: "Changlang", famousFor: "Famous for its tea gardens and the Namdapha National Park.", icon: "🍵" },
-                    { name: "Dibang Valley", famousFor: "Famous for the Mehao Wildlife Sanctuary.", icon: "🐾" },
-                    { name: "East Kameng", famousFor: "Famous for its Pakke Tiger Reserve.", icon: "🐯" },
-                    { name: "East Siang", famousFor: "Famous for the Daying Ering Wildlife Sanctuary.", icon: "🐾" },
-                    { name: "Itanagar Capital Complex", famousFor: "Famous for the Itanagar Fort and Ganga Lake.", icon: "🏰" },
-                    { name: "Kamle", famousFor: "Famous for its lush greenery and tribal culture.", icon: "🌿" },
-                    { name: "Kra Daadi", famousFor: "Famous for its traditional festivals and landscapes.", icon: "🎉" },
-                    { name: "Kurung Kumey", famousFor: "Famous for its dense forests and tribal heritage.", icon: "🌳" },
-                    { name: "Lepa Rada", famousFor: "Famous for its natural beauty and tribal traditions.", icon: "🌄" },
-                    { name: "Lohit", famousFor: "Famous for the Parshuram Kund pilgrimage site.", icon: "🛕" },
-                    { name: "Longding", famousFor: "Famous for its Wancho tribal culture.", icon: "🎭" },
-                    { name: "Lower Dibang Valley", famousFor: "Famous for its biodiversity and the Mehao Lake.", icon: "🐾" },
-                    { name: "Lower Siang", famousFor: "Famous for its scenic rivers and tribal culture.", icon: "🌊" },
-                    { name: "Lower Subansiri", famousFor: "Famous for the Apatani tribal culture and Ziro Valley.", icon: "🎭" },
-                    { name: "Namsai", famousFor: "Famous for the Golden Pagoda and tea estates.", icon: "🏯" },
-                    { name: "Pakke Kessang", famousFor: "Famous for the Pakke Wildlife Sanctuary.", icon: "🐾" },
-                    { name: "Papum Pare", famousFor: "Famous for the Itanagar Wildlife Sanctuary.", icon: "🐾" },
-                    { name: "Shi Yomi", famousFor: "Famous for its high-altitude landscapes and monasteries.", icon: "🏯" },
-                    { name: "Siang", famousFor: "Famous for the Siang River and tribal festivals.", icon: "🌊" },
-                    { name: "Tawang", famousFor: "Famous for the Tawang Monastery, a major Buddhist site.", icon: "🏯" },
-                    { name: "Tirap", famousFor: "Famous for its Nocturne tribal culture.", icon: "🎭" },
-                    { name: "Upper Siang", famousFor: "Famous for the Yingkiong town and Siang River rafting.", icon: "🚣" },
-                    { name: "Upper Subansiri", famousFor: "Famous for the Tagin tribal culture and Daporijo.", icon: "🎭" },
-                    { name: "West Kameng", famousFor: "Famous for the Sela Pass and Buddhist monasteries.", icon: "🏯" },
-                    { name: "West Siang", famousFor: "Famous for the Mechuka Valley and adventure tourism.", icon: "⛰️" }
-                ]
-            },
-            {
-                name: "Assam",
-                description: "Known for its tea plantations, the Brahmaputra River, and Kaziranga National Park.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Assam_in_India.svg/200px-Assam_in_India.svg.png",
-                districts: [
-                    { name: "Baksa", famousFor: "Famous for the Manas National Park.", icon: "🐾" },
-                    { name: "Barpeta", famousFor: "Famous for the Barpeta Satra monastery.", icon: "🏯" },
-                    { name: "Biswanath", famousFor: "Famous for the Biswanath Ghat and tea gardens.", icon: "🍵" },
-                    { name: "Bongaigaon", famousFor: "Famous for its oil refinery and the Kakoijana Reserve Forest.", icon: "🛢️" },
-                    { name: "Cachar", famousFor: "Famous for the Khaspur ruins and tea estates.", icon: "🍵" },
-                    { name: "Charaideo", famousFor: "Famous for the Charaideo Maidam (ancient burial mounds).", icon: "🏛️" },
-                    { name: "Chirang", famousFor: "Famous for its biodiversity and the Manas River.", icon: "🐾" },
-                    { name: "Darrang", famousFor: "Famous for the Orang National Park.", icon: "🐾" },
-                    { name: "Dhemaji", famousFor: "Famous for its scenic beauty and the Ghuguha Dol temple.", icon: "🛕" },
-                    { name: "Dhubri", famousFor: "Famous for the Chhath Puja celebrations and Panbari Mosque.", icon: "🕌" },
-                    { name: "Dibrugarh", famousFor: "Famous for its tea estates and the Dehing Patkai Wildlife Sanctuary.", icon: "🍵" },
-                    { name: "Dima Hasao", famousFor: "Famous for the Haflong Hill Station and Jatinga bird mystery.", icon: "🐦" },
-                    { name: "Goalpara", famousFor: "Famous for the Hulukanda Hill and Surya Pahar archaeological site.", icon: "🏛️" },
-                    { name: "Golaghat", famousFor: "Famous for the Kaziranga National Park and tea gardens.", icon: "🐾" },
-                    { name: "Hailakandi", famousFor: "Famous for its tea estates and the Siddheswar Temple.", icon: "🍵" },
-                    { name: "Hojai", famousFor: "Famous for its rice production and the Hojai Kali Temple.", icon: "🛕" },
-                    { name: "Jorhat", famousFor: "Famous for the Majuli Island, the largest river island.", icon: "🏝️" },
-                    { name: "Kamrup", famousFor: "Famous for the Kamakhya Temple in Guwahati.", icon: "🛕" },
-                    { name: "Kamrup Metropolitan", famousFor: "Famous for Guwahati city and the Umananda Temple.", icon: "🛕" },
-                    { name: "Karbi Anglong", famousFor: "Famous for the Karbi Youth Festival and Diphu town.", icon: "🎉" },
-                    { name: "Karimganj", famousFor: "Famous for its Indo-Bangladesh border and the Malegarh War Memorial.", icon: "🪖" },
-                    { name: "Kokrajhar", famousFor: "Famous for the Chakrashila Wildlife Sanctuary.", icon: "🐾" },
-                    { name: "Lakhimpur", famousFor: "Famous for its tea gardens and the Bordoibam Beelmukh Bird Sanctuary.", icon: "🐦" },
-                    { name: "Majuli", famousFor: "Famous for being the largest river island and its Vaishnavite Satras.", icon: "🏝️" },
-                    { name: "Morigaon", famousFor: "Famous for the Pobitora Wildlife Sanctuary.", icon: "🐾" },
-                    { name: "Nagaon", famousFor: "Famous for the Bordowa Satra, birthplace of Srimanta Sankardeva.", icon: "🏯" },
-                    { name: "Nalbari", famousFor: "Famous for its Sanskrit education centers and the Billeswar Temple.", icon: "🛕" },
-                    { name: "Sivasagar", famousFor: "Famous for the Rang Ghar and Ahom-era monuments.", icon: "🏛️" },
-                    { name: "Sonitpur", famousFor: "Famous for the Tezpur Agnigarh Hill and tea estates.", icon: "🍵" },
-                    { name: "South Salmara-Mankachar", famousFor: "Famous for its Indo-Bangladesh border trade.", icon: "🛤️" },
-                    { name: "Tinsukia", famousFor: "Famous for the Dibru-Saikhowa National Park and oil industry.", icon: "🛢️" },
-                    { name: "Udalguri", famousFor: "Famous for the Bornadi Wildlife Sanctuary.", icon: "🐾" },
-                    { name: "West Karbi Anglong", famousFor: "Famous for its tribal culture and natural landscapes.", icon: "🌿" },
-                    { name: "Bajali", famousFor: "Famous for its agricultural produce and cultural heritage.", icon: "🌾" },
-                    { name: "Tamulpur", famousFor: "Famous for its scenic beauty and rural charm.", icon: "🌄" }
-                ]
-            },
-            {
-                name: "Bihar",
-                description: "Known for its historical significance, Buddhist sites, and the Ganges River.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Bihar_in_India.svg/200px-Bihar_in_India.svg.png",
-                districts: [
-                    { name: "Araria", famousFor: "Famous for its jute production and Kali Mandir.", icon: "🛕" },
-                    { name: "Arwal", famousFor: "Famous for its agricultural produce and rural heritage.", icon: "🌾" },
-                    { name: "Aurangabad", famousFor: "Famous for the Deo Surya Mandir and historical sites.", icon: "🛕" },
-                    { name: "Banka", famousFor: "Famous for the Mandar Hill and its religious significance.", icon: "⛰️" },
-                    { name: "Begusarai", famousFor: "Famous for the Simaria Ghat and industrial growth.", icon: "🏭" },
-                    { name: "Bhagalpur", famousFor: "Famous for silk production and the Vikramshila University ruins.", icon: "🧵" },
-                    { name: "Bhojpur", famousFor: "Famous for the Ara town and historical battles.", icon: "🪖" },
-                    { name: "Buxar", famousFor: "Famous for the Buxar Fort and the Battle of Buxar site.", icon: "🏰" },
-                    { name: "Darbhanga", famousFor: "Famous for the Darbhanga Fort and Mithila paintings.", icon: "🎨" },
-                    { name: "East Champaran", famousFor: "Famous for the Gandhi Ashram in Motihari.", icon: "🏛️" },
-                    { name: "Gaya", famousFor: "Famous for the Mahabodhi Temple, a UNESCO World Heritage Site.", icon: "🛕" },
-                    { name: "Gopalganj", famousFor: "Famous for its sugarcane production and rural culture.", icon: "🌾" },
-                    { name: "Jamui", famousFor: "Famous for its hills and the Jain pilgrimage site Kundalpur.", icon: "🛕" },
-                    { name: "Jehanabad", famousFor: "Famous for the Barabar Caves, ancient rock-cut caves.", icon: "🪨" },
-                    { name: "Kaimur", famousFor: "Famous for the Mundeshwari Temple, one of the oldest Hindu temples.", icon: "🛕" },
-                    { name: "Katihar", famousFor: "Famous for its jute industry and the Katihar Railway Junction.", icon: "🚂" },
-                    { name: "Khagaria", famousFor: "Famous for its agricultural produce and the Katyayani Temple.", icon: "🛕" },
-                    { name: "Kishanganj", famousFor: "Famous for its tea gardens and the Indo-Bangladesh border.", icon: "🍵" },
-                    { name: "Lakhisarai", famousFor: "Famous for the Ashok Dham Temple and archaeological sites.", icon: "🛕" },
-                    { name: "Madhepura", famousFor: "Famous for the Singheshwar Temple and Kosi River.", icon: "🛕" },
-                    { name: "Madhubani", famousFor: "Famous for Madhubani paintings, a traditional art form.", icon: "🎨" },
-                    { name: "Munger", famousFor: "Famous for the Munger Fort and Bihar School of Yoga.", icon: "🏰" },
-                    { name: "Muzaffarpur", famousFor: "Famous for litchi production and the Baba Garibnath Temple.", icon: "🍒" },
-                    { name: "Nalanda", famousFor: "Famous for the ancient Nalanda University, a UNESCO site.", icon: "🏛️" },
-                    { name: "Nawada", famousFor: "Famous for the Kakolat Waterfall and ancient temples.", icon: "💧" },
-                    { name: "Patna", famousFor: "Famous for the Patna Sahib Gurudwara and historical sites like Golghar.", icon: "🏛️" },
-                    { name: "Purnia", famousFor: "Famous for its maize production and the Purnea Airport.", icon: "🌽" },
-                    { name: "Rohtas", famousFor: "Famous for the Rohtas Fort and the Sher Shah Suri Tomb.", icon: "🏰" },
-                    { name: "Saharsa", famousFor: "Famous for the Matsyagandha Temple and Kosi River.", icon: "🛕" },
-                    { name: "Samastipur", famousFor: "Famous for its agricultural produce and the Thaneshwar Temple.", icon: "🛕" },
-                    { name: "Saran", famousFor: "Famous for the Chhapra town and historical significance.", icon: "🏛️" },
-                    { name: "Sheikhpura", famousFor: "Famous for its stone quarries and the Girihinda Hill.", icon: "⛰️" },
-                    { name: "Sheohar", famousFor: "Famous for its rural heritage and agricultural produce.", icon: "🌾" },
-                    { name: "Sitamarhi", famousFor: "Famous for being the birthplace of Goddess Sita and the Janaki Temple.", icon: "🛕" },
-                    { name: "Siwan", famousFor: "Famous for the Darauli village and historical significance.", icon: "🏛️" },
-                    { name: "Supaul", famousFor: "Famous for the Kosi River and agricultural produce.", icon: "🌊" },
-                    { name: "Vaishali", famousFor: "Famous for the Ashokan Pillar and being the birthplace of Lord Mahavira.", icon: "🏛️" },
-                    { name: "West Champaran", famousFor: "Famous for the Valmiki Tiger Reserve and Gandhian history.", icon: "🐯" }
-                ]
-            },
-            {
-                name: "Chhattisgarh",
-                description: "Known for its tribal culture, forests, and the Chitrakoot Falls.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Chhattisgarh_in_India.svg/200px-Chhattisgarh_in_India.svg.png",
-                districts: [
-                    { name: "Balod", famousFor: "Famous for its steel industry and the Siya Devi Temple.", icon: "🏭" },
-                    { name: "Baloda Bazar", famousFor: "Famous for the Siddheshwar Temple and cement industries.", icon: "🛕" },
-                    { name: "Balrampur-Ramanujganj", famousFor: "Famous for the Tattapani Hot Springs.", icon: "♨️" },
-                    { name: "Bastar", famousFor: "Famous for its tribal culture and the Danteshwari Temple.", icon: "🛕" },
-                    { name: "Bemetara", famousFor: "Famous for its agricultural produce and the Devkar Temple.", icon: "🛕" },
-                    { name: "Bijapur", famousFor: "Famous for its tribal heritage and natural landscapes.", icon: "🌿" },
-                    { name: "Bilaspur", famousFor: "Famous for the Ratanpur Fort and the High Court of Chhattisgarh.", icon: "🏰" },
-                    { name: "Dantewada", famousFor: "Famous for the Dantewada Shakti Peeth and Bailadila iron ore mines.", icon: "🛕" },
-                    { name: "Dhamtari", famousFor: "Famous for the Gangrel Dam and rice production.", icon: "🌾" },
-                    { name: "Durg", famousFor: "Famous for the Bhilai Steel Plant and the Maitri Bagh Zoo.", icon: "🏭" },
-                    { name: "Gariaband", famousFor: "Famous for the Jatmai-Ghatarani Waterfalls.", icon: "💧" },
-                    { name: "Gaurela-Pendra-Marwahi", famousFor: "Famous for the Achanakmar Wildlife Sanctuary.", icon: "🐾" },
-                    { name: "Janjgir-Champa", famousFor: "Famous for the Vishnu Mandir and coal industries.", icon: "🛕" },
-                    { name: "Jashpur", famousFor: "Famous for the Ranidah Waterfall and tribal culture.", icon: "💧" },
-                    { name: "Kabirdham", famousFor: "Famous for the Bhoramdeo Temple, known as the Khajuraho of Chhattisgarh.", icon: "🛕" },
-                    { name: "Kanker", famousFor: "Famous for the Kanker Palace and tribal heritage.", icon: "🏰" },
-                    { name: "Khairagarh-Chhuikhadan-Gandai", famousFor: "Famous for the Khairagarh University of Music and Arts.", icon: "🎶" },
-                    { name: "Kondagaon", famousFor: "Famous for its tribal handicrafts and the Keshkal Valley.", icon: "🎨" },
-                    { name: "Korba", famousFor: "Famous for its coal mines and the Korba Super Thermal Power Plant.", icon: "🏭" },
-                    { name: "Korea", famousFor: "Famous for the Amritdhara Waterfall and coal reserves.", icon: "💧" },
-                    { name: "Mahasamund", famousFor: "Famous for the Sirpur archaeological site and rice production.", icon: "🏛️" },
-                    { name: "Manendragarh-Chirmiri-Bharatpur", famousFor: "Famous for its coal mines and the Hasdeo River.", icon: "🏭" },
-                    { name: "Mohla-Manpur-Ambagarh Chowki", famousFor: "Famous for its tribal culture and forests.", icon: "🌿" },
-                    { name: "Mungeli", famousFor: "Famous for the Mungeli Lormi Temple and agricultural produce.", icon: "🛕" },
-                    { name: "Narayanpur", famousFor: "Famous for its tribal culture and the Ramakrishna Mission Ashram.", icon: "🌿" },
-                    { name: "Raigarh", famousFor: "Famous for its coal mines and the Gomarda Wildlife Sanctuary.", icon: "🐾" },
-                    { name: "Raipur", famousFor: "Famous for being the capital of Chhattisgarh and the Mahant Ghasidas Museum.", icon: "🏛️" },
-                    { name: "Rajnandgaon", famousFor: "Famous for the Dongargarh Temple and rice mills.", icon: "🛕" },
-                    { name: "Sakti", famousFor: "Famous for its agricultural produce and the Shivnath River.", icon: "🌾" },
-                    { name: "Sarangarh-Bilaigarh", famousFor: "Famous for its rural heritage and agricultural produce.", icon: "🌾" },
-                    { name: "Sukma", famousFor: "Famous for its tribal culture and natural landscapes.", icon: "🌿" },
-                    { name: "Surajpur", famousFor: "Famous for the Tamor Pingla Wildlife Sanctuary.", icon: "🐾" },
-                    { name: "Surguja", famousFor: "Famous for the Mainpat Hill Station, known as the Shimla of Chhattisgarh.", icon: "⛰️" }
-                ]
-            },
-            {
-                name: "Goa",
-                description: "Known for its beaches, nightlife, and Portuguese heritage.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Goa_in_India.svg/200px-Goa_in_India.svg.png",
-                districts: [
-                    { name: "North Goa", famousFor: "Famous for Calangute Beach, Fort Aguada, and vibrant nightlife.", icon: "🏖️" },
-                    { name: "South Goa", famousFor: "Famous for Palolem Beach, Colva Beach, and the Basilica of Bom Jesus.", icon: "🏖️" }
-                ]
-            },
-            {
-                name: "Gujarat",
-                description: "Known for the Statue of Unity, Gir National Park, and its industrial growth.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Gujarat_in_India.svg/200px-Gujarat_in_India.svg.png",
-                districts: [
-                    { name: "Ahmedabad", famousFor: "Famous for the Sabarmati Ashram and textile industry.", icon: "🏛️" },
-                    { name: "Amreli", famousFor: "Famous for the Nagnath Temple and Gir lion sanctuary proximity.", icon: "🛕" },
-                    { name: "Anand", famousFor: "Famous for the Amul Dairy and Sardar Patel Memorial.", icon: "🥛" },
-                    { name: "Aravalli", famousFor: "Famous for its tribal culture and Shamlaji Temple.", icon: "🛕" },
-                    { name: "Banaskantha", famousFor: "Famous for the Ambaji Temple and dairy industry.", icon: "🛕" },
-                    { name: "Bharuch", famousFor: "Famous for the Narmada River and chemical industries.", icon: "🏭" },
-                    { name: "Bhavnagar", famousFor: "Famous for the Takhteshwar Temple and shipbreaking industry in Alang.", icon: "🛕" },
-                    { name: "Botad", famousFor: "Famous for its cotton production and rural heritage.", icon: "🧵" },
-                    { name: "Chhota Udaipur", famousFor: "Famous for its tribal culture and the Rathwa tribal festival.", icon: "🎉" },
-                    { name: "Dahod", famousFor: "Famous for its tribal heritage and the Dahod Railway Workshop.", icon: "🚂" },
-                    { name: "Dang", famousFor: "Famous for the Saputara Hill Station and tribal culture.", icon: "⛰️" },
-                    { name: "Devbhoomi Dwarka", famousFor: "Famous for the Dwarkadhish Temple, a major pilgrimage site.", icon: "🛕" },
-                    { name: "Gandhinagar", famousFor: "Famous for being the capital of Gujarat and the Akshardham Temple.", icon: "🏛️" },
-                    { name: "Gir Somnath", famousFor: "Famous for the Somnath Temple, a Jyotirlinga site.", icon: "🛕" },
-                    { name: "Jamnagar", famousFor: "Famous for the Reliance Refinery and the Marine National Park.", icon: "🏭" },
-                    { name: "Junagadh", famousFor: "Famous for the Girnar Hill and Gir National Park (Asiatic lions).", icon: "🐾" },
-                    { name: "Kheda", famousFor: "Famous for the Dakor Temple and agricultural produce.", icon: "🛕" },
-                    { name: "Kutch", famousFor: "Famous for the Great Rann of Kutch and the Dattatreya Temple.", icon: "🏜️" },
-                    { name: "Mahisagar", famousFor: "Famous for its tribal culture and the Kaleshwari archaeological site.", icon: "🏛️" },
-                    { name: "Mehsana", famousFor: "Famous for the Sun Temple at Modhera, a UNESCO site.", icon: "🛕" },
-                    { name: "Morbi", famousFor: "Famous for its ceramic tile industry and the Mani Mandir.", icon: "🏭" },
-                    { name: "Narmada", famousFor: "Famous for the Sardar Sarovar Dam and the Shoolpaneshwar Wildlife Sanctuary.", icon: "🐾" },
-                    { name: "Navsari", famousFor: "Famous for its Parsi heritage and the Dandi Salt March site.", icon: "🏛️" },
-                    { name: "Panchmahal", famousFor: "Famous for the Champaner-Pavagadh Archaeological Park, a UNESCO site.", icon: "🏛️" },
-                    { name: "Patan", famousFor: "Famous for the Rani ki Vav, a UNESCO World Heritage stepwell.", icon: "🏛️" },
-                    { name: "Porbandar", famousFor: "Famous for being the birthplace of Mahatma Gandhi and the Kirti Mandir.", icon: "🏛️" },
-                    { name: "Rajkot", famousFor: "Famous for its engineering industry and the Watson Museum.", icon: "🏭" },
-                    { name: "Sabarkantha", famousFor: "Famous for the Idar Hill Fort and dairy industry.", icon: "🏰" },
-                    { name: "Surat", famousFor: "Famous for its diamond and textile industries, and Dumas Beach.", icon: "💎" },
-                    { name: "Surendranagar", famousFor: "Famous for its cotton production and the Chhari Dhand Bird Sanctuary.", icon: "🐦" },
-                    { name: "Tapi", famousFor: "Famous for its tribal culture and the Ukai Dam.", icon: "🌿" },
-                    { name: "Vadodara", famousFor: "Famous for the Laxmi Vilas Palace and Sayaji Garden.", icon: "🏰" },
-                    { name: "Valsad", famousFor: "Famous for the Tithal Beach and mango orchards.", icon: "🏖️" }
-                ]
-            },
-            {
-                name: "Haryana",
-                description: "Known for its agricultural production, historical sites, and proximity to Delhi.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Haryana_in_India.svg/200px-Haryana_in_India.svg.png",
-                districts: [
-                    { name: "Ambala", famousFor: "Famous for its cloth market and the Ambala Cantonment.", icon: "🧵" },
-                    { name: "Bhiwani", famousFor: "Famous for the Star Monument and wrestling culture.", icon: "🤼" },
-                    { name: "Charkhi Dadri", famousFor: "Famous for its rural heritage and agricultural produce.", icon: "🌾" },
-                    { name: "Faridabad", famousFor: "Famous for its industrial growth and the Badkhal Lake.", icon: "🏭" },
-                    { name: "Fatehabad", famousFor: "Famous for its ancient archaeological sites and the Humayun Mosque.", icon: "🕌" },
-                    { name: "Gurugram", famousFor: "Famous for its IT hub, Cyber City, and modern infrastructure.", icon: "💻" },
-                    { name: "Hisar", famousFor: "Famous for the Hisar Fort and Chaudhary Charan Singh Haryana Agricultural University.", icon: "🏰" },
-                    { name: "Jhajjar", famousFor: "Famous for the Bhindawas Wildlife Sanctuary and salt production.", icon: "🐾" },
-                    { name: "Jind", famousFor: "Famous for its historical significance and the Dhamtan Sahib Gurudwara.", icon: "🛕" },
-                    { name: "Kaithal", famousFor: "Famous for the Kaithal Fort and the Hanuman Vatika.", icon: "🏰" },
-                    { name: "Karnal", famousFor: "Famous for the Karnal Fort and the National Dairy Research Institute.", icon: "🏰" },
-                    { name: "Kurukshetra", famousFor: "Famous for the Mahabharata battle site and the Brahma Sarovar.", icon: "🏛️" },
-                    { name: "Mahendragarh", famousFor: "Famous for the Narnaul town and historical forts.", icon: "🏰" },
-                    { name: "Nuh", famousFor: "Famous for the Shaking Minarets and the Nuh Fort.", icon: "🏰" },
-                    { name: "Palwal", famousFor: "Famous for the Dauji Maharaj Temple and cotton production.", icon: "🛕" },
-                    { name: "Panchkula", famousFor: "Famous for the Morni Hills and the Cactus Garden.", icon: "⛰️" },
-                    { name: "Panipat", famousFor: "Famous for the historical battles of Panipat and textile industry.", icon: "🪖" },
-                    { name: "Rewari", famousFor: "Famous for its brass industry and the Rewari Heritage Steam Locomotive Museum.", icon: "🚂" },
-                    { name: "Rohtak", famousFor: "Famous for the Maharshi Dayanand University and wrestling culture.", icon: "🤼" },
-                    { name: "Sirsa", famousFor: "Famous for the Dera Sacha Sauda and cotton production.", icon: "🧵" },
-                    { name: "Sonipat", famousFor: "Famous for the Khwaja Khizr Tomb and agricultural produce.", icon: "🏛️" },
-                    { name: "Yamunanagar", famousFor: "Famous for its plywood industry and the Kalesar National Park.", icon: "🐾" }
-                ]
-            },
-            {
-                name: "Himachal Pradesh",
-                description: "Known for its hill stations, Himalayan landscapes, and adventure tourism.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Himachal_Pradesh_in_India.svg/200px-Himachal_Pradesh_in_India.svg.png",
-                districts: [
-                    { name: "Bilaspur", famousFor: "Famous for the Gobind Sagar Lake and the Bhakra Dam.", icon: "🌊" },
-                    { name: "Chamba", famousFor: "Famous for the Chamba Rumal and the Laxmi Narayan Temple.", icon: "🛕" },
-                    { name: "Hamirpur", famousFor: "Famous for its educational institutes and the Sujanpur Tira Fort.", icon: "🏰" },
-                    { name: "Kangra", famousFor: "Famous for the Kangra Fort and the Masroor Rock Cut Temples.", icon: "🏰" },
-                    { name: "Kinnaur", famousFor: "Famous for the Kinnaur Kailash mountain and apple orchards.", icon: "🍎" },
-                    { name: "Kullu", famousFor: "Famous for the Kullu Dussehra festival and the Great Himalayan National Park.", icon: "🎉" },
-                    { name: "Lahaul and Spiti", famousFor: "Famous for the Key Monastery and high-altitude landscapes.", icon: "🏯" },
-                    { name: "Mandi", famousFor: "Famous for the Prashar Lake and the Rewalsar Lake.", icon: "🌊" },
-                    { name: "Shimla", famousFor: "Famous for the Mall Road, Christ Church, and being the summer capital of British India.", icon: "⛰️" },
-                    { name: "Sirmaur", famousFor: "Famous for the Renuka Lake and the Churdhar Peak.", icon: "🌊" },
-                    { name: "Solan", famousFor: "Famous for the Shoolini Mata Temple and mushroom farming.", icon: "🛕" },
-                    { name: "Una", famousFor: "Famous for the Chintpurni Temple and Dera Baba Barbhag Singh.", icon: "🛕" }
-                ]
-            },
-            {
-                name: "Jharkhand",
-                description: "Known for its mineral resources, tribal culture, and the Betla National Park.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Jharkhand_in_India.svg/200px-Jharkhand_in_India.svg.png",
-                districts: [
-                    { name: "Bokaro", famousFor: "Famous for the Bokaro Steel Plant and the Garga Dam.", icon: "🏭" },
-                    { name: "Chatra", famousFor: "Famous for the Bhadrakali Temple and the Kauleshwari Hill.", icon: "🛕" },
-                    { name: "Deoghar", famousFor: "Famous for the Baidyanath Temple, a Jyotirlinga site.", icon: "🛕" },
-                    { name: "Dhanbad", famousFor: "Famous for its coal mines and the Dhanbad Railway Station.", icon: "🏭" },
-                    { name: "Dumka", famousFor: "Famous for the Massanjore Dam and the Maluti Temples.", icon: "🛕" },
-                    { name: "East Singhbhum", famousFor: "Famous for Jamshedpur city and the Tata Steel Plant.", icon: "🏭" },
-                    { name: "Garhwa", famousFor: "Famous for the Garhwa Fort and the Sukhnath Temple.", icon: "🏰" },
-                    { name: "Giridih", famousFor: "Famous for the Parasnath Hill, a Jain pilgrimage site.", icon: "🛕" },
-                    { name: "Godda", famousFor: "Famous for the Sunder Dam and agricultural produce.", icon: "🌾" },
-                    { name: "Gumla", famousFor: "Famous for its tribal culture and the Tanginath Temple.", icon: "🛕" },
-                    { name: "Hazaribagh", famousFor: "Famous for the Hazaribagh National Park and Canary Hill.", icon: "🐾" },
-                    { name: "Jamtara", famousFor: "Famous for its coal reserves and the Parwat Vihar Park.", icon: "🏞️" },
-                    { name: "Khunti", famousFor: "Famous for the birthplace of Birsa Munda and tribal culture.", icon: "🎭" },
-                    { name: "Koderma", famousFor: "Famous for its mica mines and the Tilaiya Dam.", icon: "🪨" },
-                    { name: "Latehar", famousFor: "Famous for the Netarhat Hill Station and the Betla National Park.", icon: "⛰️" },
-                    { name: "Lohardaga", famousFor: "Famous for its bauxite mines and tribal heritage.", icon: "🪨" },
-                    { name: "Pakur", famousFor: "Famous for its black stone quarries and the Dharni Pahar.", icon: "🪨" },
-                    { name: "Palamu", famousFor: "Famous for the Palamu Tiger Reserve and the Betla Fort.", icon: "🐯" },
-                    { name: "Ramgarh", famousFor: "Famous for its coal mines and the Rajrappa Temple.", icon: "🛕" },
-                    { name: "Ranchi", famousFor: "Famous for being the capital of Jharkhand and the Ranchi Hill.", icon: "🏛️" },
-                    { name: "Sahibganj", famousFor: "Famous for the Rajmahal Hills and the Ganges River.", icon: "⛰️" },
-                    { name: "Seraikela Kharsawan", famousFor: "Famous for its steel industry and tribal culture.", icon: "🏭" },
-                    { name: "Simdega", famousFor: "Famous for its tribal culture and the Kelaghagh Dam.", icon: "🌿" },
-                    { name: "West Singhbhum", famousFor: "Famous for its iron ore mines and the Saranda Forest.", icon: "🪨" }
-                ]
-            },
-            {
-                name: "Karnataka",
-                description: "Known for its IT hub in Bengaluru, historical sites, and the Western Ghats.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Karnataka_in_India.svg/200px-Karnataka_in_India.svg.png",
-                districts: [
-                    { name: "Bagalkot", famousFor: "Famous for the Badami Caves, a UNESCO World Heritage Site.", icon: "🏛️" },
-                    { name: "Ballari", famousFor: "Famous for the Hampi ruins, a UNESCO World Heritage Site.", icon: "🏛️" },
-                    { name: "Belagavi", famousFor: "Famous for the Belgaum Fort and the Kittur Fort.", icon: "🏰" },
-                    { name: "Bengaluru Rural", famousFor: "Famous for its agricultural produce and proximity to Bengaluru.", icon: "🌾" },
-                    { name: "Bengaluru Urban", famousFor: "Famous for being the IT capital of India and the Lalbagh Botanical Garden.", icon: "💻" },
-                    { name: "Bidar", famousFor: "Famous for the Bidar Fort and the Gurudwara Nanak Jhira Sahib.", icon: "🏰" },
-                    { name: "Chamarajanagar", famousFor: "Famous for the Bandipur National Park and the Chamarajeshwara Temple.", icon: "🐾" },
-                    { name: "Chikkaballapur", famousFor: "Famous for the Nandi Hills and grape cultivation.", icon: "⛰️" },
-                    { name: "Chikkamagaluru", famousFor: "Famous for its coffee plantations and the Mullayanagiri Peak.", icon: "☕" },
-                    { name: "Chitradurga", famousFor: "Famous for the Chitradurga Fort and wind energy production.", icon: "🏰" },
-                    { name: "Dakshina Kannada", famousFor: "Famous for Mangalore city, beaches, and the Udupi Sri Krishna Matha.", icon: "🏖️" },
-                    { name: "Davanagere", famousFor: "Famous for its textile industry and the Harihar town.", icon: "🧵" },
-                    { name: "Dharwad", famousFor: "Famous for the Karnataka University and the Hubli-Dharwad twin cities.", icon: "🏛️" },
-                    { name: "Gadag", famousFor: "Famous for the Trikuteshwara Temple and wind energy production.", icon: "🛕" },
-                    { name: "Hassan", famousFor: "Famous for the Hoysala temples in Belur and Halebidu, UNESCO sites.", icon: "🛕" },
-                    { name: "Haveri", famousFor: "Famous for the Siddhesvara Temple and cardamom production.", icon: "🛕" },
-                    { name: "Kalaburagi", famousFor: "Famous for the Gulbarga Fort and the Khwaja Bande Nawaz Dargah.", icon: "🏰" },
-                    { name: "Kodagu", famousFor: "Famous for Coorg coffee plantations and the Abbey Falls.", icon: "☕" },
-                    { name: "Kolar", famousFor: "Famous for the Kolar Gold Fields and the Someshwara Temple.", icon: "🪨" },
-                    { name: "Koppal", famousFor: "Famous for the Koppal Fort and the Mahadeva Temple in Itagi.", icon: "🏰" },
-                    { name: "Mandya", famousFor: "Famous for the KRS Dam and sugarcane production.", icon: "🌾" },
-                    { name: "Mysuru", famousFor: "Famous for the Mysore Palace, Dasara festival, and sandalwood products.", icon: "🏰" },
-                    { name: "Raichur", famousFor: "Famous for the Raichur Fort and thermal power station.", icon: "🏰" },
-                    { name: "Ramanagara", famousFor: "Famous for its silk industry and the Ramadevara Betta.", icon: "🧵" },
-                    { name: "Shivamogga", famousFor: "Famous for the Jog Falls, one of the highest waterfalls in India.", icon: "💧" },
-                    { name: "Tumakuru", famousFor: "Famous for the Siddaganga Matha and coconut production.", icon: "🌴" },
-                    { name: "Udupi", famousFor: "Famous for the Udupi cuisine and the Sri Krishna Matha.", icon: "🍽️" },
-                    { name: "Uttara Kannada", famousFor: "Famous for the Karwar Beach and the Dandeli Wildlife Sanctuary.", icon: "🏖️" },
-                    { name: "Vijayanagara", famousFor: "Famous for the Hampi ruins, a UNESCO World Heritage Site.", icon: "🏛️" },
-                    { name: "Vijayapura", famousFor: "Famous for the Gol Gumbaz and the Ibrahim Rauza.", icon: "🏛️" },
-                    { name: "Yadgir", famousFor: "Famous for the Yadgir Fort and agricultural produce.", icon: "🏰" }
-                ]
-            },
-            {
-                name: "Kerala",
-                description: "Known for its backwaters, beaches, and the highest literacy rate in India.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Kerala_in_India.svg/200px-Kerala_in_India.svg.png",
-                districts: [
-                    { name: "Alappuzha", famousFor: "Famous for the Alleppey Backwaters and houseboat cruises.", icon: "🚤" },
-                    { name: "Ernakulam", famousFor: "Famous for Kochi city, the Mattancherry Palace, and the Kochi-Muziris Biennale.", icon: "🏛️" },
-                    { name: "Idukki", famousFor: "Famous for the Munnar Hill Station and tea plantations.", icon: "🍵" },
-                    { name: "Kannur", famousFor: "Famous for the St. Angelo Fort and Theyyam dance.", icon: "🏰" },
-                    { name: "Kasaragod", famousFor: "Famous for the Bekal Fort and traditional Yakshagana art.", icon: "🏰" },
-                    { name: "Kollam", famousFor: "Famous for the Ashtamudi Lake and the Thangassery Lighthouse.", icon: "🌊" },
-                    { name: "Kottayam", famousFor: "Famous for the Kumarakom Backwaters and rubber plantations.", icon: "🌿" },
-                    { name: "Kozhikode", famousFor: "Famous for the Kozhikode Beach and the Kappad Beach (where Vasco da Gama landed).", icon: "🏖️" },
-                    { name: "Malappuram", famousFor: "Famous for the Kottakkunnu Hill and the Teak Museum.", icon: "⛰️" },
-                    { name: "Palakkad", famousFor: "Famous for the Palakkad Fort and the Silent Valley National Park.", icon: "🏰" },
-                    { name: "Pathanamthitta", famousFor: "Famous for the Sabarimala Temple, a major pilgrimage site.", icon: "🛕" },
-                    { name: "Thiruvananthapuram", famousFor: "Famous for the Padmanabhaswamy Temple and Kovalam Beach.", icon: "🛕" },
-                    { name: "Thrissur", famousFor: "Famous for the Thrissur Pooram festival and the Guruvayur Temple.", icon: "🎉" },
-                    { name: "Wayanad", famousFor: "Famous for the Edakkal Caves and the Wayanad Wildlife Sanctuary.", icon: "🐾" }
-                ]
-            },
-            {
-                name: "Madhya Pradesh",
-                description: "Known as the heart of India, famous for its historical sites and wildlife.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Madhya_Pradesh_in_India.svg/200px-Madhya_Pradesh_in_India.svg.png",
-                districts: [
-                    { name: "Agar Malwa", famousFor: "Famous for the Baijnath Mahadev Temple and agricultural produce.", icon: "🛕" },
-                    { name: "Alirajpur", famousFor: "Famous for its tribal culture and the Khandwa Jain Temple.", icon: "🛕" },
-                    { name: "Anuppur", famousFor: "Famous for the Amarkantak pilgrimage site and coal mines.", icon: "🛕" },
-                    { name: "Ashoknagar", famousFor: "Famous for the Chanderi Fort and handloom industry.", icon: "🏰" },
-                    { name: "Balaghat", famousFor: "Famous for its manganese mines and the Kanha Tiger Reserve.", icon: "🐯" },
-                    { name: "Barwani", famousFor: "Famous for its tribal culture and the Bawangaja Jain statues.", icon: "🛕" },
-                    { name: "Betul", famousFor: "Famous for the Balajipuram Temple and teak forests.", icon: "🛕" },
-                    { name: "Bhind", famousFor: "Famous for the Gohad Fort and historical significance.", icon: "🏰" },
-                    { name: "Bhopal", famousFor: "Famous for being the capital of Madhya Pradesh and the Bhimbetka Rock Shelters.", icon: "🏛️" },
-                    { name: "Burhanpur", famousFor: "Famous for the Asirgarh Fort and the Jama Masjid.", icon: "🏰" },
-                    { name: "Chhatarpur", famousFor: "Famous for the Khajuraho Temples, a UNESCO World Heritage Site.", icon: "🛕" },
-                    { name: "Chhindwara", famousFor: "Famous for its coal mines and the Patalkot Valley.", icon: "🏭" },
-                    { name: "Damoh", famousFor: "Famous for the Singorgarh Fort and the Kundalpur Jain pilgrimage site.", icon: "🏰" },
-                    { name: "Datia", famousFor: "Famous for the Pitambara Peeth and the Datia Palace.", icon: "🏰" },
-                    { name: "Dewas", famousFor: "Famous for the Chamunda Mata Temple and textile industry.", icon: "🛕" },
-                    { name: "Dhar", famousFor: "Famous for the Mandu Fort and the Bagh Caves.", icon: "🏰" },
-                    { name: "Dindori", famousFor: "Famous for its tribal culture and the Baiga tribe.", icon: "🎭" },
-                    { name: "Guna", famousFor: "Famous for the Bajrangarh Fort and agricultural produce.", icon: "🏰" },
-                    { name: "Gwalior", famousFor: "Famous for the Gwalior Fort and the Tansen Tomb.", icon: "🏰" },
-                    { name: "Harda", famousFor: "Famous for its agricultural produce and the Narmada River.", icon: "🌾" },
-                    { name: "Hoshangabad", famousFor: "Famous for the Pachmarhi Hill Station and the Sethani Ghat.", icon: "⛰️" },
-                    { name: "Indore", famousFor: "Famous for the Rajwada Palace and being a commercial hub.", icon: "🏰" },
-                    { name: "Jabalpur", famousFor: "Famous for the Dhuandhar Falls and the Marble Rocks at Bhedaghat.", icon: "💧" },
-                    { name: "Jhabua", famousFor: "Famous for its tribal culture and the Bhagoriya Festival.", icon: "🎉" },
-                    { name: "Katni", famousFor: "Famous for its limestone and dolomite mines.", icon: "🪨" },
-                    { name: "Khandwa", famousFor: "Famous for the Omkareshwar Jyotirlinga and the Narmada River.", icon: "🛕" },
-                    { name: "Khargone", famousFor: "Famous for the Maheshwar Fort and handwoven sarees.", icon: "🏰" },
-                    { name: "Mandla", famousFor: "Famous for the Kanha Tiger Reserve and tribal culture.", icon: "🐯" },
-                    { name: "Mandsaur", famousFor: "Famous for the Pashupatinath Temple and opium production.", icon: "🛕" },
-                    { name: "Morena", famousFor: "Famous for the Bateshwar Temples and the Chambal River.", icon: "🛕" },
-                    { name: "Narmadapuram", famousFor: "Famous for the Tawa Dam and the Narmada River.", icon: "🌊" },
-                    { name: "Narsinghpur", famousFor: "Famous for its agricultural produce and the Narsinghpur Fort.", icon: "🏰" },
-                    { name: "Neemuch", famousFor: "Famous for its opium production and the Jeeran Teerth Jain temple.", icon: "🛕" },
-                    { name: "Niwari", famousFor: "Famous for the Orchha Fort and historical significance.", icon: "🏰" },
-                    { name: "Panna", famousFor: "Famous for the Panna Tiger Reserve and diamond mines.", icon: "🐯" },
-                    { name: "Raisen", famousFor: "Famous for the Sanchi Stupa, a UNESCO World Heritage Site.", icon: "🏛️" },
-                    { name: "Rajgarh", famousFor: "Famous for its agricultural produce and the Jalpa Mata Temple.", icon: "🛕" },
-                    { name: "Ratlam", famousFor: "Famous for its gold jewelry market and the Kedareshwar Temple.", icon: "💎" },
-                    { name: "Rewa", famousFor: "Famous for the Rewa Fort and white tigers in the Govindgarh Palace.", icon: "🐯" },
-                    { name: "Sagar", famousFor: "Famous for the Lakha Banjara Lake and the Eran archaeological site.", icon: "🏛️" },
-                    { name: "Satna", famousFor: "Famous for the Chitrakoot Dham and cement industries.", icon: "🛕" },
-                    { name: "Sehore", famousFor: "Famous for the Siddhapur Temple and agricultural produce.", icon: "🛕" },
-                    { name: "Seoni", famousFor: "Famous for the Pench Tiger Reserve, inspiration for The Jungle Book.", icon: "🐯" },
-                    { name: "Shahdol", famousFor: "Famous for its coal mines and the Virateshwar Temple.", icon: "🏭" },
-                    { name: "Shajapur", famousFor: "Famous for its agricultural produce and the Raj Rajeshwari Temple.", icon: "🛕" },
-                    { name: "Sheopur", famousFor: "Famous for the Kuno National Park and wood carving.", icon: "🐾" },
-                    { name: "Shivpuri", famousFor: "Famous for the Madhav National Park and the Chhatri monuments.", icon: "🐾" },
-                    { name: "Sidhi", famousFor: "Famous for the Sanjay-Dubri National Park and coal reserves.", icon: "🐾" },
-                    { name: "Singrauli", famousFor: "Famous for its coal mines and the Singrauli Super Thermal Power Plant.", icon: "🏭" },
-                    { name: "Tikamgarh", famousFor: "Famous for the Orchha Fort complex and historical significance.", icon: "🏰" },
-                    { name: "Ujjain", famousFor: "Famous for the Mahakaleshwar Jyotirlinga and the Kumbh Mela.", icon: "🛕" },
-                    { name: "Umaria", famousFor: "Famous for the Bandhavgarh National Park, known for its tigers.", icon: "🐯" },
-                    { name: "Vidisha", famousFor: "Famous for the Udayagiri Caves and the Vijaya Mandir.", icon: "🪨" }
-                ]
-            },
-            {
-                name: "Maharashtra",
-                description: "Known for Mumbai, Bollywood, and the financial capital of India.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Maharashtra_in_India.svg/200px-Maharashtra_in_India.svg.png",
-                districts: [
-                    { name: "Ahmednagar", famousFor: "Famous for the Shani Shingnapur Temple and historical forts.", icon: "🛕" },
-                    { name: "Akola", famousFor: "Famous for its cotton production and the Narnala Fort.", icon: "🧵" },
-                    { name: "Amravati", famousFor: "Famous for the Melghat Tiger Reserve and the Ambadevi Temple.", icon: "🐯" },
-                    { name: "Aurangabad", famousFor: "Famous for the Ajanta and Ellora Caves, UNESCO World Heritage Sites.", icon: "🏛️" },
-                    { name: "Beed", famousFor: "Famous for the Kankaleshwar Temple and agricultural produce.", icon: "🛕" },
-                    { name: "Bhandara", famousFor: "Famous for the Ambagarh Fort and rice production.", icon: "🏰" },
-                    { name: "Buldhana", famousFor: "Famous for the Lonar Crater Lake, a National Geo-heritage Monument.", icon: "🌋" },
-                    { name: "Chandrapur", famousFor: "Famous for the Tadoba Andhari Tiger Reserve and coal mines.", icon: "🐯" },
-                    { name: "Dhule", famousFor: "Famous for its textile industry and the Bhamer Fort.", icon: "🧵" },
-                    { name: "Gadchiroli", famousFor: "Famous for its tribal culture and the Markanda Temple.", icon: "🛕" },
-                    { name: "Gondia", famousFor: "Famous for the Navegaon National Park and rice production.", icon: "🐾" },
-                    { name: "Hingoli", famousFor: "Famous for the Aundha Nagnath Temple, a Jyotirlinga site.", icon: "🛕" },
-                    { name: "Jalgaon", famousFor: "Famous for its banana production and the Changdev Temple.", icon: "🍌" },
-                    { name: "Jalna", famousFor: "Famous for its cotton production and the Matsyodari Devi Temple.", icon: "🛕" },
-                    { name: "Kolhapur", famousFor: "Famous for the Mahalaxmi Temple and Kolhapuri chappals.", icon: "🛕" },
-                    { name: "Latur", famousFor: "Famous for its educational institutes and the Udgir Fort.", icon: "🏰" },
-                    { name: "Mumbai City", famousFor: "Famous for Bollywood, Gateway of India, and being the financial hub.", icon: "🎬" },
-                    { name: "Mumbai Suburban", famousFor: "Famous for the Sanjay Gandhi National Park and Film City.", icon: "🐾" },
-                    { name: "Nagpur", famousFor: "Famous for its oranges and the Deekshabhoomi Stupa.", icon: "🍊" },
-                    { name: "Nanded", famousFor: "Famous for the Hazur Sahib Gurudwara, a major Sikh pilgrimage site.", icon: "🛕" },
-                    { name: "Nandurbar", famousFor: "Famous for its tribal culture and the Toranmal Hill Station.", icon: "⛰️" },
-                    { name: "Nashik", famousFor: "Famous for the Kumbh Mela and the Trimbakeshwar Jyotirlinga.", icon: "🛕" },
-                    { name: "Osmanabad", famousFor: "Famous for the Tulja Bhavani Temple and agricultural produce.", icon: "🛕" },
-                    { name: "Palghar", famousFor: "Famous for the Tansa Wildlife Sanctuary and beaches like Kelva.", icon: "🏖️" },
-                    { name: "Parbhani", famousFor: "Famous for the Hazrat Turabul Haq Dargah and cotton production.", icon: "🕌" },
-                    { name: "Pune", famousFor: "Famous for its educational institutes, the Shaniwar Wada, and IT industry.", icon: "🏛️" },
-                    { name: "Raigad", famousFor: "Famous for the Raigad Fort, the capital of the Maratha Empire.", icon: "🏰" },
-                    { name: "Ratnagiri", famousFor: "Famous for its Alphonso mangoes and the Ganpatipule Beach.", icon: "🥭" },
-                    { name: "Sangli", famousFor: "Famous for its turmeric production and the Sangli Fort.", icon: "🏰" },
-                    { name: "Satara", famousFor: "Famous for the Kaas Plateau, a UNESCO Biodiversity Site.", icon: "🌸" },
-                    { name: "Sindhudurg", famousFor: "Famous for the Sindhudurg Fort and Malvan Beach.", icon: "🏖️" },
-                    { name: "Solapur", famousFor: "Famous for its textile industry and the Siddheshwar Temple.", icon: "🛕" },
-                    { name: "Thane", famousFor: "Famous for the Upvan Lake and proximity to Mumbai.", icon: "🌊" },
-                    { name: "Wardha", famousFor: "Famous for the Sevagram Ashram of Mahatma Gandhi.", icon: "🏛️" },
-                    { name: "Washim", famousFor: "Famous for its cotton production and the Balaji Temple.", icon: "🛕" },
-                    { name: "Yavatmal", famousFor: "Famous for its cotton production and the Tipeshwar Wildlife Sanctuary.", icon: "🐾" }
-                ]
-            },
-            {
-                name: "Manipur",
-                description: "Known for its natural beauty, Loktak Lake, and the Manipuri dance.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Manipur_in_India.svg/200px-Manipur_in_India.svg.png",
-                districts: [
-                    { name: "Bishnupur", famousFor: "Famous for the Loktak Lake and the Keibul Lamjao National Park.", icon: "🌊" },
-                    { name: "Chandel", famousFor: "Famous for its tribal culture and the Moreh border town.", icon: "🛤️" },
-                    { name: "Churachandpur", famousFor: "Famous for its tribal culture and the Khuga Dam.", icon: "🌿" },
-                    { name: "Imphal East", famousFor: "Famous for the Andro village and traditional pottery.", icon: "🏺" },
-                    { name: "Imphal West", famousFor: "Famous for the Kangla Fort and the Ima Keithel (Mother’s Market).", icon: "🏰" },
-                    { name: "Jiribam", famousFor: "Famous for its scenic beauty and the Jiri River.", icon: "🌊" },
-                    { name: "Kakching", famousFor: "Famous for the Kakching Garden and agricultural produce.", icon: "🌸" },
-                    { name: "Kamjong", famousFor: "Famous for its tribal culture and natural landscapes.", icon: "🌿" },
-                    { name: "Kangpokpi", famousFor: "Famous for its tribal culture and the Sadu Chiru Waterfall.", icon: "💧" },
-                    { name: "Noney", famousFor: "Famous for its natural beauty and the Noney Bridge.", icon: "🌄" },
-                    { name: "Pherzawl", famousFor: "Famous for its tribal culture and scenic hills.", icon: "⛰️" },
-                    { name: "Senapati", famousFor: "Famous for the Mao town and the Dzuko Valley.", icon: "🌄" },
-                    { name: "Tamenglong", famousFor: "Famous for its orange orchards and the Buning Meadow.", icon: "🍊" },
-                    { name: "Tengnoupal", famousFor: "Famous for its border trade with Myanmar and tribal culture.", icon: "🛤️" },
-                    { name: "Thoubal", famousFor: "Famous for the Thoubal River and the Ikop Lake.", icon: "🌊" },
-                    { name: "Ukhrul", famousFor: "Famous for the Shirui Lily and tribal culture.", icon: "🌸
-},
-            {
-                name: "Meghalaya",
-                description: "Known for its living root bridges, wettest places on Earth, and tribal culture.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Meghalaya_in_India.svg/200px-Meghalaya_in_India.svg.png",
-                districts: [
-                    { name: "East Garo Hills", famousFor: "Famous for the Nokrek National Park, a UNESCO Biosphere Reserve.", icon: "🐾" },
-                    { name: "East Jaintia Hills", famousFor: "Famous for the Nartiang Monoliths and limestone caves.", icon: "🪨" },
-                    { name: "East Khasi Hills", famousFor: "Famous for Shillong, the capital city, and the Living Root Bridges.", icon: "🌉" },
-                    { name: "North Garo Hills", famousFor: "Famous for its tribal culture and the Siju Caves.", icon: "🪨" },
-                    { name: "Ri Bhoi", famousFor: "Famous for the Umiam Lake and the Nongkhyllem Wildlife Sanctuary.", icon: "🌊" },
-                    { name: "South Garo Hills", famousFor: "Famous for the Balpakram National Park, known as the 'Land of Spirits'.", icon: "🐾" },
-                    { name: "South West Garo Hills", famousFor: "Famous for its tribal culture and the Garo Heritage Festival.", icon: "🎉" },
-                    { name: "South West Khasi Hills", famousFor: "Famous for the Mawsynram village, one of the wettest places on Earth.", icon: "☔" },
-                    { name: "West Garo Hills", famousFor: "Famous for the Tura town and the Arbella Peak.", icon: "⛰️" },
-                    { name: "West Jaintia Hills", famousFor: "Famous for the Thadlaskein Lake and limestone mining.", icon: "🌊" },
-                    { name: "West Khasi Hills", famousFor: "Famous for the Nongstoin town and the Langshiang Falls.", icon: "💧" }
-                ]
-            },
-            {
-                name: "Mizoram",
-                description: "Known for its lush greenery, tribal culture, and the Mizo Hnahthial festival.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Mizoram_in_India.svg/200px-Mizoram_in_India.svg.png",
-                districts: [
-                    { name: "Aizawl", famousFor: "Famous for being the capital of Mizoram and the Durtlang Hills.", icon: "🏛️" },
-                    { name: "Champhai", famousFor: "Famous for the Murlen National Park and grape cultivation.", icon: "🍇" },
-                    { name: "Hnahthial", famousFor: "Famous for the Hnahthial Festival and tribal culture.", icon: "🎉" },
-                    { name: "Khawzawl", famousFor: "Famous for its tribal culture and natural landscapes.", icon: "🌿" },
-                    { name: "Kolasib", famousFor: "Famous for the Serlui B Dam and agricultural produce.", icon: "🌾" },
-                    { name: "Lawngtlai", famousFor: "Famous for the Phawngpui Blue Mountain, the highest peak in Mizoram.", icon: "⛰️" },
-                    { name: "Lunglei", famousFor: "Famous for the Lunglei town and the Nghasih Stream.", icon: "🌊" },
-                    { name: "Mamit", famousFor: "Famous for the Dampa Tiger Reserve and tribal culture.", icon: "🐯" },
-                    { name: "Saiha", famousFor: "Famous for the Palak Wildlife Sanctuary and tribal culture.", icon: "🐾" },
-                    { name: "Saitual", famousFor: "Famous for its tribal culture and scenic beauty.", icon: "🌄" },
-                    { name: "Serchhip", famousFor: "Famous for the Vantawng Falls and agricultural produce.", icon: "💧" }
-                ]
-            },
-            {
-                name: "Nagaland",
-                description: "Known for the Hornbill Festival, tribal culture, and rugged landscapes.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Nagaland_in_India.svg/200px-Nagaland_in_India.svg.png",
-                districts: [
-                    { name: "Chumoukedima", famousFor: "Famous for its tribal culture and the Diezephe Craft Village.", icon: "🎨" },
-                    { name: "Dimapur", famousFor: "Famous for the Dimapur Jain Temple and the Kachari Ruins.", icon: "🛕" },
-                    { name: "Kiphire", famousFor: "Famous for the Fakim Wildlife Sanctuary and tribal culture.", icon: "🐾" },
-                    { name: "Kohima", famousFor: "Famous for being the capital of Nagaland and the Kohima War Cemetery.", icon: "🏛️" },
-                    { name: "Longleng", famousFor: "Famous for its tribal culture and the Phom tribe.", icon: "🎭" },
-                    { name: "Mokokchung", famousFor: "Famous for the Ungma village and the Ao tribe culture.", icon: "🎭" },
-                    { name: "Mon", famousFor: "Famous for the Konyak tribe and the Longwa village on the Indo-Myanmar border.", icon: "🛤️" },
-                    { name: "Niuland", famousFor: "Famous for its tribal culture and agricultural produce.", icon: "🌾" },
-                    { name: "Noklak", famousFor: "Famous for its tribal culture and the Khiamniungan tribe.", icon: "🎭" },
-                    { name: "Peren", famousFor: "Famous for the Benreu village and the Zeliang tribe.", icon: "🎭" },
-                    { name: "Phek", famousFor: "Famous for the Pfutsero town and the Chakhesang tribe.", icon: "🎭" },
-                    { name: "Shamator", famousFor: "Famous for its tribal culture and the Yimkhiung tribe.", icon: "🎭" },
-                    { name: "Tseminyu", famousFor: "Famous for its tribal culture and the Rengma tribe.", icon: "🎭" },
-                    { name: "Tuensang", famousFor: "Famous for the Chang tribe and the Changsangmongko village.", icon: "🎭" },
-                    { name: "Wokha", famousFor: "Famous for the Doyang River and the Lotha tribe.", icon: "🌊" },
-                    { name: "Zunheboto", famousFor: "Famous for the Sumi tribe and the Ghosu Bird Sanctuary.", icon: "🐦" }
-                ]
-            },
-            {
-                name: "Odisha",
-                description: "Known for the Jagannath Temple, Konark Sun Temple, and Chilika Lake.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Odisha_in_India.svg/200px-Odisha_in_India.svg.png",
-                districts: [
-                    { name: "Angul", famousFor: "Famous for the Satkosia Tiger Reserve and coal mines.", icon: "🐯" },
-                    { name: "Balangir", famousFor: "Famous for the Harishankar Temple and the Patnagarh Fort.", icon: "🛕" },
-                    { name: "Balasore", famousFor: "Famous for the Chandipur Beach and the Balasore Rocket Launching Station.", icon: "🏖️" },
-                    { name: "Bargarh", famousFor: "Famous for the Nrusinghanath Temple and the Dhanu Yatra festival.", icon: "🎉" },
-                    { name: "Bhadrak", famousFor: "Famous for the Akhandalamani Temple and agricultural produce.", icon: "🛕" },
-                    { name: "Boudh", famousFor: "Famous for the Boudh Buddhist Monastery and the Charisambhu Temple.", icon: "🏯" },
-                    { name: "Cuttack", famousFor: "Famous for the Barabati Fort and the Cuttack Chandi Temple.", icon: "🏰" },
-                    { name: "Deogarh", famousFor: "Famous for the Pradhanpat Waterfall and the Deogarh Palace.", icon: "💧" },
-                    { name: "Dhenkanal", famousFor: "Famous for the Kapilash Temple and the Saptasajya Hills.", icon: "🛕" },
-                    { name: "Gajapati", famousFor: "Famous for the Gandahati Waterfall and tribal culture.", icon: "💧" },
-                    { name: "Ganjam", famousFor: "Famous for the Gopalpur Beach and the Tara Tarini Temple.", icon: "🏖️" },
-                    { name: "Jagatsinghpur", famousFor: "Famous for the Sarala Temple and the Paradip Port.", icon: "🛕" },
-                    { name: "Jajpur", famousFor: "Famous for the Biraja Temple and the Dashashwamedh Ghat.", icon: "🛕" },
-                    { name: "Jharsuguda", famousFor: "Famous for its coal mines and the Jharsuguda Airport.", icon: "🏭" },
-                    { name: "Kalahandi", famousFor: "Famous for the Karlapat Wildlife Sanctuary and the Dokarichanchara Waterfall.", icon: "🐾" },
-                    { name: "Kandhamal", famousFor: "Famous for the Daringbadi Hill Station, known as the Kashmir of Odisha.", icon: "⛰️" },
-                    { name: "Kendrapara", famousFor: "Famous for the Bhitarkanika National Park and the Baladevjew Temple.", icon: "🐾" },
-                    { name: "Kendujhar", famousFor: "Famous for the Sanaghagara Waterfall and iron ore mines.", icon: "💧" },
-                    { name: "Khordha", famousFor: "Famous for Bhubaneswar, the capital city, and the Dhauli Shanti Stupa.", icon: "🏛️" },
-                    { name: "Koraput", famousFor: "Famous for the Deomali Peak and the Gupteshwar Cave Temple.", icon: "⛰️" },
-                    { name: "Malkangiri", famousFor: "Famous for the Balimela Reservoir and tribal culture.", icon: "🌊" },
-                    { name: "Mayurbhanj", famousFor: "Famous for the Simlipal National Park and the Baripada town.", icon: "🐾" },
-                    { name: "Nabarangpur", famousFor: "Famous for its tribal culture and the Papadahandi Temple.", icon: "🛕" },
-                    { name: "Nayagarh", famousFor: "Famous for the Dakshina Kali Temple and the Ranapur Fort.", icon: "🛕" },
-                    { name: "Nuapada", famousFor: "Famous for the Yogeswara Temple and the Sunabeda Wildlife Sanctuary.", icon: "🐾" },
-                    { name: "Puri", famousFor: "Famous for the Jagannath Temple and the Puri Beach.", icon: "🛕" },
-                    { name: "Rayagada", famousFor: "Famous for the Majhighariani Temple and tribal culture.", icon: "🛕" },
-                    { name: "Sambalpur", famousFor: "Famous for the Hirakud Dam and the Samaleswari Temple.", icon: "🌊" },
-                    { name: "Subarnapur", famousFor: "Famous for the Sureswari Temple and the Mahanadi River.", icon: "🛕" },
-                    { name: "Sundargarh", famousFor: "Famous for the Rourkela Steel Plant and the Khandadhar Waterfall.", icon: "🏭" }
-                ]
-            },
-            {
-                name: "Punjab",
-                description: "Known for the Golden Temple, agricultural production, and the Wagah Border ceremony.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Punjab_in_India.svg/200px-Punjab_in_India.svg.png",
-                districts: [
-                    { name: "Amritsar", famousFor: "Famous for the Golden Temple and the Jallianwala Bagh.", icon: "🛕" },
-                    { name: "Barnala", famousFor: "Famous for its agricultural produce and the Barnala Fort.", icon: "🏰" },
-                    { name: "Bathinda", famousFor: "Famous for the Qila Mubarak and the Bathinda Refinery.", icon: "🏰" },
-                    { name: "Faridkot", famousFor: "Famous for the Faridkot Fort and the Gurdwara Tilla Baba Farid.", icon: "🏰" },
-                    { name: "Fatehgarh Sahib", famousFor: "Famous for the Gurdwara Fatehgarh Sahib and the Aam Khas Bagh.", icon: "🛕" },
-                    { name: "Fazilka", famousFor: "Famous for its proximity to the Indo-Pak border and agricultural produce.", icon: "🛤️" },
-                    { name: "Ferozepur", famousFor: "Famous for the Ferozepur Cantonment and the Saragarhi Memorial.", icon: "🪖" },
-                    { name: "Gurdaspur", famousFor: "Famous for the Dera Baba Nanak and the Mukteshwar Mahadev Temple.", icon: "🛕" },
-                    { name: "Hoshiarpur", famousFor: "Famous for the Hoshiarpur Archaeological Museum and citrus cultivation.", icon: "🍊" },
-                    { name: "Jalandhar", famousFor: "Famous for its sports goods industry and the Devi Talab Mandir.", icon: "🛕" },
-                    { name: "Kapurthala", famousFor: "Famous for the Jagatjit Palace and the Kanjli Wetland.", icon: "🏰" },
-                    { name: "Ludhiana", famousFor: "Famous for its textile industry and the Guru Nanak Stadium.", icon: "🧵" },
-                    { name: "Malerkotla", famousFor: "Famous for its historical significance and the Jama Masjid.", icon: "🕌" },
-                    { name: "Mansa", famousFor: "Famous for its cotton production and agricultural produce.", icon: "🧵" },
-                    { name: "Moga", famousFor: "Famous for its agricultural produce and the Nestlé factory.", icon: "🌾" },
-                    { name: "Muktsar", famousFor: "Famous for the Gurdwara Tibbi Sahib and the Muktsar Fort.", icon: "🛕" },
-                    { name: "Pathankot", famousFor: "Famous for its proximity to Himachal Pradesh and the Ranjit Sagar Dam.", icon: "🌊" },
-                    { name: "Patiala", famousFor: "Famous for the Qila Mubarak and the Patiala Peg.", icon: "🏰" },
-                    { name: "Rupnagar", famousFor: "Famous for the Anandpur Sahib Gurdwara and the Bhakra Dam.", icon: "🛕" },
-                    { name: "S.A.S. Nagar", famousFor: "Famous for Mohali city and the PCA Stadium.", icon: "🏟️" },
-                    { name: "Sangrur", famousFor: "Famous for its agricultural produce and the Banasar Garden.", icon: "🌾" },
-                    { name: "Shahid Bhagat Singh Nagar", famousFor: "Famous for its agricultural produce and the Gurdwara Charan Kamal.", icon: "🛕" },
-                    { name: "Tarn Taran", famousFor: "Famous for the Gurdwara Darbar Sahib and the Goindwal Baoli.", icon: "🛕" }
-                ]
-            },
-            {
-                name: "Rajasthan",
-                description: "Known for its deserts, royal heritage, and the Thar Desert.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Rajasthan_in_India.svg/200px-Rajasthan_in_India.svg.png",
-                districts: [
-                    { name: "Ajmer", famousFor: "Famous for the Ajmer Sharif Dargah and the Pushkar Lake.", icon: "🕌" },
-                    { name: "Alwar", famousFor: "Famous for the Bhangarh Fort and the Sariska Tiger Reserve.", icon: "🏰" },
-                    { name: "Banswara", famousFor: "Famous for the Mahi Dam and tribal culture.", icon: "🌊" },
-                    { name: "Baran", famousFor: "Famous for the Sitabari pilgrimage site and the Parvati River.", icon: "🛕" },
-                    { name: "Barmer", famousFor: "Famous for the Barmer Fort and the Thar Desert.", icon: "🏜️" },
-                    { name: "Bharatpur", famousFor: "Famous for the Keoladeo National Park, a UNESCO World Heritage Site.", icon: "🐦" },
-                    { name: "Bhilwara", famousFor: "Famous for its textile industry and the Harni Mahadev Temple.", icon: "🧵" },
-                    { name: "Bikaner", famousFor: "Famous for the Junagarh Fort and the Karni Mata Temple.", icon: "🏰" },
-                    { name: "Bundi", famousFor: "Famous for the Taragarh Fort and the Bundi stepwells.", icon: "🏰" },
-                    { name: "Chittorgarh", famousFor: "Famous for the Chittorgarh Fort, a UNESCO World Heritage Site.", icon: "🏰" },
-                    { name: "Churu", famousFor: "Famous for its havelis and the Tal Chhapar Sanctuary.", icon: "🏛️" },
-                    { name: "Dausa", famousFor: "Famous for the Mehandipur Balaji Temple and the Abhaneri Stepwell.", icon: "🛕" },
-                    { name: "Dholpur", famousFor: "Famous for the Chambal River Safari and the Dholpur Palace.", icon: "🌊" },
-                    { name: "Dungarpur", famousFor: "Famous for the Udai Bilas Palace and tribal culture.", icon: "🏰" },
-                    { name: "Hanumangarh", famousFor: "Famous for the Bhatner Fort and the Gogamedi Fair.", icon: "🏰" },
-                    { name: "Jaipur", famousFor: "Famous for the Hawa Mahal, Amber Fort, and being the Pink City.", icon: "🏰" },
-                    { name: "Jaisalmer", famousFor: "Famous for the Jaisalmer Fort and the Sam Sand Dunes.", icon: "🏜️" },
-                    { name: "Jalore", famousFor: "Famous for the Jalore Fort and the Sundha Mata Temple.", icon: "🏰" },
-                    { name: "Jhalawar", famousFor: "Famous for the Gagron Fort, a UNESCO World Heritage Site.", icon: "🏰" },
-                    { name: "Jhunjhunu", famousFor: "Famous for the Rani Sati Temple and its havelis.", icon: "🛕" },
-                    { name: "Jodhpur", famousFor: "Famous for the Mehrangarh Fort and being the Blue City.", icon: "🏰" },
-                    { name: "Karauli", famousFor: "Famous for the Kaila Devi Temple and the Karauli City Palace.", icon: "🛕" },
-                    { name: "Kota", famousFor: "Famous for the Chambal River and the Kota Garh Palace.", icon: "🌊" },
-                    { name: "Nagaur", famousFor: "Famous for the Nagaur Fort and the Nagaur Cattle Fair.", icon: "🏰" },
-                    { name: "Pali", famousFor: "Famous for the Ranakpur Jain Temple and textile industry.", icon: "🛕" },
-                    { name: "Pratapgarh", famousFor: "Famous for its tribal culture and the Sita Mata Wildlife Sanctuary.", icon: "🐾" },
-                    { name: "Rajsamand", famousFor: "Famous for the Kumbhalgarh Fort, a UNESCO World Heritage Site.", icon: "🏰" },
-                    { name: "Sawai Madhopur", famousFor: "Famous for the Ranthambore National Park and the Ranthambore Fort.", icon: "🐯" },
-                    { name: "Sikar", famousFor: "Famous for its havelis and the Khatu Shyamji Temple.", icon: "🛕" },
-                    { name: "Sirohi", famousFor: "Famous for the Mount Abu Hill Station and the Dilwara Jain Temples.", icon: "⛰️" },
-                    { name: "Sri Ganganagar", famousFor: "Famous for its canal irrigation and the Gurdwara Budha Johar.", icon: "🌾" },
-                    { name: "Tonk", famousFor: "Famous for the Jama Masjid and the Sunehri Kothi.", icon: "🕌" },
-                    { name: "Udaipur", famousFor: "Famous for the City Palace, Lake Pichola, and being the City of Lakes.", icon: "🏰" }
-                ]
-            },
-            {
-                name: "Sikkim",
-                description: "Known for its Himalayan landscapes, monasteries, and organic farming.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Sikkim_in_India.svg/200px-Sikkim_in_India.svg.png",
-                districts: [
-                    { name: "East Sikkim", famousFor: "Famous for Gangtok, the capital city, and the Enchey Monastery.", icon: "🏛️" },
-                    { name: "North Sikkim", famousFor: "Famous for the Gurudongmar Lake and the Lachung Monastery.", icon: "🌊" },
-                    { name: "South Sikkim", famousFor: "Famous for the Namchi town and the Samdruptse Monastery.", icon: "🏯" },
-                    { name: "West Sikkim", famousFor: "Famous for the Pemayangtse Monastery and the Khecheopalri Lake.", icon: "🏯" },
-                    { name: "Gyalshing", famousFor: "Famous for its scenic beauty and the Gyalshing town.", icon: "🌄" },
-                    { name: "Soreng", famousFor: "Famous for its tribal culture and the Soreng town.", icon: "🎭" }
-                ]
-            },
-            {
-                name: "Tamil Nadu",
-                description: "Known for its Dravidian architecture, temples, and cultural heritage.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Tamil_Nadu_in_India.svg/200px-Tamil_Nadu_in_India.svg.png",
-                districts: [
-                    { name: "Ariyalur", famousFor: "Famous for the Gangaikonda Cholapuram Temple, a UNESCO site.", icon: "🛕" },
-                    { name: "Chengalpattu", famousFor: "Famous for the Vedanthangal Bird Sanctuary and the Crocodile Bank.", icon: "🐦" },
-                    { name: "Chennai", famousFor: "Famous for the Marina Beach and the Kapaleeshwarar Temple.", icon: "🏖️" },
-                    { name: "Coimbatore", famousFor: "Famous for its textile industry and the Anamalai Tiger Reserve.", icon: "🧵" },
-                    { name: "Cuddalore", famousFor: "Famous for the Silver Beach and the Pichavaram Mangrove Forest.", icon: "🏖️" },
-                    { name: "Dharmapuri", famousFor: "Famous for the Hogenakkal Falls and the Theerthamalai Temple.", icon: "💧" },
-                    { name: "Dindigul", famousFor: "Famous for the Dindigul Fort and the Sirumalai Hill Station.", icon: "🏰" },
-                    { name: "Erode", famousFor: "Famous for its turmeric market and the Bhavani River.", icon: "🌿" },
-                    { name: "Kallakurichi", famousFor: "Famous for its agricultural produce and the Kalvarayan Hills.", icon: "🌾" },
-                    { name: "Kancheepuram", famousFor: "Famous for the Kanchi Kamakshi Temple and silk sarees.", icon: "🛕" },
-                    { name: "Kanyakumari", famousFor: "Famous for the Vivekananda Rock Memorial and the southernmost tip of India.", icon: "🛕" },
-                    { name: "Karur", famousFor: "Famous for its textile industry and the Pasupathieswarar Temple.", icon: "🧵" },
-                    { name: "Krishnagiri", famousFor: "Famous for its mango cultivation and the Krishnagiri Dam.", icon: "🥭" },
-                    { name: "Madurai", famousFor: "Famous for the Meenakshi Amman Temple and the Thirumalai Nayak Palace.", icon: "🛕" },
-                    { name: "Mayiladuthurai", famousFor: "Famous for the Mayuranathaswami Temple and the Kaveri River.", icon: "🛕" },
-                    { name: "Nagapattinam", famousFor: "Famous for the Velankanni Church and the Nagore Dargah.", icon: "⛪" },
-                    { name: "Namakkal", famousFor: "Famous for the Namakkal Anjaneyar Temple and poultry farming.", icon: "🛕" },
-                    { name: "Nilgiris", famousFor: "Famous for Ooty, the Queen of Hills, and the Nilgiri Mountain Railway.", icon: "⛰️" },
-                    { name: "Perambalur", famousFor: "Famous for its fossil sites and the Perambalur Fort.", icon: "🏰" },
-                    { name: "Pudukkottai", famousFor: "Famous for the Sittanavasal Caves and the Pudukkottai Palace.", icon: "🪨" },
-                    { name: "Ramanathapuram", famousFor: "Famous for the Rameswaram Temple, a Jyotirlinga site.", icon: "🛕" },
-                    { name: "Ranipet", famousFor: "Famous for its industrial growth and the Ratnagiri Balamurugan Temple.", icon: "🏭" },
-                    { name: "Salem", famousFor: "Famous for its steel plant and the Yercaud Hill Station.", icon: "⛰️" },
-                    { name: "Sivaganga", famousFor: "Famous for the Chettinad cuisine and the Sivaganga Palace.", icon: "🏰" },
-                    { name: "Tenkasi", famousFor: "Famous for the Courtallam Waterfalls and the Kasi Viswanathar Temple.", icon: "💧" },
-                    { name: "Thanjavur", famousFor: "Famous for the Brihadeeswarar Temple, a UNESCO World Heritage Site.", icon: "🛕" },
-                    { name: "Theni", famousFor: "Famous for the Suruli Falls and cardamom plantations.", icon: "💧" },
-                    { name: "Thoothukudi", famousFor: "Famous for the Tuticorin Port and the Thiruchendur Murugan Temple.", icon: "🚢" },
-                    { name: "Tiruchirappalli", famousFor: "Famous for the Rock Fort Temple and the Srirangam Temple.", icon: "🛕" },
-                    { name: "Tirunelveli", famousFor: "Famous for the Nellaiappar Temple and the Manimuthar Dam.", icon: "🛕" },
-                    { name: "Tirupathur", famousFor: "Famous for the Yelagiri Hill Station and sandalwood forests.", icon: "⛰️" },
-                    { name: "Tiruppur", famousFor: "Famous for its knitwear industry and the Tiruppur Kumaran Memorial.", icon: "🧵" },
-                    { name: "Tiruvallur", famousFor: "Famous for the Veeraraghava Swamy Temple and the Pulicat Lake.", icon: "🛕" },
-                    { name: "Tiruvannamalai", famousFor: "Famous for the Annamalaiyar Temple and the Karthigai Deepam festival.", icon: "🛕" },
-                    { name: "Tiruvarur", famousFor: "Famous for the Thyagaraja Temple and the Kamalalayam Tank.", icon: "🛕" },
-                    { name: "Vellore", famousFor: "Famous for the Vellore Fort and the Golden Temple (Sripuram).", icon: "🏰" },
-                    { name: "Viluppuram", famousFor: "Famous for the Gingee Fort and the Auroville township nearby.", icon: "🏰" },
-                    { name: "Virudhunagar", famousFor: "Famous for its matchstick industry and the Srivilliputhur Andal Temple.", icon: "🛕" }
-                ]
-            },
-            {
-                name: "Telangana",
-                description: "Known for Hyderabad, the Charminar, and its IT industry.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Telangana_in_India.svg/200px-Telangana_in_India.svg.png",
-                districts: [
-                    { name: "Adilabad", famousFor: "Famous for the Kuntala Waterfall and the Basar Saraswati Temple.", icon: "💧" },
-                    { name: "Bhadradri Kothagudem", famousFor: "Famous for the Bhadrachalam Temple and the Kinnerasani Wildlife Sanctuary.", icon: "🛕" },
-                    { name: "Hyderabad", famousFor: "Famous for the Charminar, Golconda Fort, and the IT hub.", icon: "🏰" },
-                    { name: "Jagtial", famousFor: "Famous for its agricultural produce and the Dharmapuri Temple.", icon: "🛕" },
-                    { name: "Jangaon", famousFor: "Famous for its agricultural produce and the Jangaon Fort.", icon: "🏰" },
-                    { name: "Jayashankar Bhupalpally", famousFor: "Famous for the Eturnagaram Wildlife Sanctuary and tribal culture.", icon: "🐾" },
-                    { name: "Jogulamba Gadwal", famousFor: "Famous for its handwoven Gadwal sarees and the Jogulamba Temple.", icon: "🧵" },
-                    { name: "Kamareddy", famousFor: "Famous for its agricultural produce and the Domakonda Fort.", icon: "🏰" },
-                    { name: "Karimnagar", famousFor: "Famous for the Elgandal Fort and the Vemulawada Rajarajeshwara Temple.", icon: "🏰" },
-                    { name: "Khammam", famousFor: "Famous for the Khammam Fort and the Nelakondapalli Buddhist site.", icon: "🏰" },
-                    { name: "Kumuram Bheem Asifabad", famousFor: "Famous for the Sirpur Paper Mills and tribal culture.", icon: "🏭" },
-                    { name: "Mahabubabad", famousFor: "Famous for its agricultural produce and the Kuravi Veerabhadra Swamy Temple.", icon: "🛕" },
-                    { name: "Mahabubnagar", famousFor: "Famous for the Pillalamarri Banyan Tree and the Koilsagar Dam.", icon: "🌳" },
-                    { name: "Mancherial", famousFor: "Famous for its coal mines and the Gandhari Khilla Fort.", icon: "🏭" },
-                    { name: "Medak", famousFor: "Famous for the Medak Cathedral and the Pocharam Wildlife Sanctuary.", icon: "⛪" },
-                    { name: "Medchal-Malkajgiri", famousFor: "Famous for its proximity to Hyderabad and the Keesaragutta Temple.", icon: "🛕" },
-                    { name: "Mulugu", famousFor: "Famous for the Laknavaram Lake and tribal culture.", icon: "🌊" },
-                    { name: "Nagarkurnool", famousFor: "Famous for the Somasila Temple and the Nallamala Forest.", icon: "🛕" },
-                    { name: "Nalgonda", famousFor: "Famous for the Yadagirigutta Temple and the Nagarjuna Sagar Dam.", icon: "🛕" },
-                    { name: "Narayanpet", famousFor: "Famous for its handwoven sarees and agricultural produce.", icon: "🧵" },
-                    { name: "Nirmal", famousFor: "Famous for its toy-making industry and the Nirmal Fort.", icon: "🎨" },
-                    { name: "Nizamabad", famousFor: "Famous for the Nizamabad Fort and the Alisagar Deer Park.", icon: "🏰" },
-                    { name: "Peddapalli", famousFor: "Famous for its coal mines and the Ramagiri Fort.", icon: "🏭" },
-                    { name: "Rajanna Sircilla", famousFor: "Famous for its handwoven textiles and the Vemulawada Temple proximity.", icon: "🧵" },
-                    { name: "Ranga Reddy", famousFor: "Famous for its proximity to Hyderabad and the Mrugavani National Park.", icon: "🐾" },
-                    { name: "Sangareddy", famousFor: "Famous for the Singur Dam and the Manjeera Wildlife Sanctuary.", icon: "🌊" },
-                    { name: "Siddipet", famousFor: "Famous for its agricultural produce and the Komuravelli Mallikarjuna Temple.", icon: "🛕" },
-                    { name: "Suryapet", famousFor: "Famous for its agricultural produce and the Phanigiri Buddhist site.", icon: "🏛️" },
-                    { name: "Vikarabad", famousFor: "Famous for the Ananthagiri Hills and the Vikarabad Fort.", icon: "⛰️" },
-                    { name: "Wanaparthy", famousFor: "Famous for the Wanaparthy Palace and agricultural produce.", icon: "🏰" },
-                    { name: "Warangal", famousFor: "Famous for the Warangal Fort and the Thousand Pillar Temple.", icon: "🏰" },
-                    { name: "Yadadri Bhuvanagiri", famousFor: "Famous for the Yadagirigutta Narasimha Temple and the Kolanupaka Jain Temple.", icon: "🛕" }
-                ]
-            },
-            {
-                name: "Tripura",
-                description: "Known for its tribal culture, lush greenery, and the Ujjayanta Palace.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Tripura_in_India.svg/200px-Tripura_in_India.svg.png",
-                districts: [
-                    { name: "Dhalai", famousFor: "Famous for the Ambassa town and the Dumboor Lake.", icon: "🌊" },
-                    { name: "Gomati", famousFor: "Famous for the Tirthamukh pilgrimage site and the Chabimura rock carvings.", icon: "🪨" },
-                    { name: "Khowai", famousFor: "Famous for the Khowai River and tribal culture.", icon: "🌊" },
-                    { name: "North Tripura", famousFor: "Famous for the Jampui Hills and the Rowa Wildlife Sanctuary.", icon: "⛰️" },
-                    { name: "Sepahijala", famousFor: "Famous for the Sepahijala Wildlife Sanctuary and the Neermahal Palace.", icon: "🐾" },
-                    { name: "South Tripura", famousFor: "Famous for the Pilak archaeological site and the Trishna Wildlife Sanctuary.", icon: "🏛️" },
-                    { name: "Unakoti", famousFor: "Famous for the Unakoti rock carvings and the Kailashahar town.", icon: "🪨" },
-                    { name: "West Tripura", famousFor: "Famous for Agartala, the capital city, and the Ujjayanta Palace.", icon: "🏛️" }
-                ]
-            },
-            {
-                name: "Uttar Pradesh",
-                description: "Known for the Taj Mahal, Kumbh Mela, and its historical significance.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Uttar_Pradesh_in_India.svg/200px-Uttar_Pradesh_in_India.svg.png",
-                districts: [
-                    { name: "Agra", famousFor: "Famous for the Taj Mahal, a UNESCO World Heritage Site.", icon: "🏛️" },
-                    { name: "Aligarh", famousFor: "Famous for the Aligarh Muslim University and the lock industry.", icon: "🏛️" },
-                    { name: "Ambedkar Nagar", famousFor: "Famous for the Tanda town and its handwoven textiles.", icon: "🧵" },
-                    { name: "Amethi", famousFor: "Famous for its political significance and the Munshiganj market.", icon: "🏛️" },
-                    { name: "Amroha", famousFor: "Famous for its mango orchards and the Vasudev Temple.", icon: "🥭" },
-                    { name: "Auraiya", famousFor: "Famous for its agricultural produce and the Kanch Mahal.", icon: "🌾" },
-                    { name: "Ayodhya", famousFor: "Famous for the Ram Janmabhoomi Temple and the Hanuman Garhi.", icon: "🛕" },
-                    { name: "Azamgarh", famousFor: "Famous for its historical significance and the Azamgarh Fort.", icon: "🏰" },
-                    { name: "Baghpat", famousFor: "Famous for its agricultural produce and the Pura Mahadev Temple.", icon: "🛕" },
-                    { name: "Bahraich", famousFor: "Famous for the Katarniaghat Wildlife Sanctuary and the Dargah Sharif.", icon: "🐾" },
-                    { name: "Ballia", famousFor: "Famous for the Surha Tal Bird Sanctuary and the Dadri Mela.", icon: "🐦" },
-                    { name: "Balrampur", famousFor: "Famous for the Shravasti Buddhist site and the Devi Patan Temple.", icon: "🏛️" },
-                    { name: "Banda", famousFor: "Famous for the Bamdeveshwar Temple and the Ken River.", icon: "🛕" },
-                    { name: "Barabanki", famousFor: "Famous for the Dewa Sharif Dargah and the Parijaat Tree.", icon: "🕌" },
-                    { name: "Bareilly", famousFor: "Famous for the Ala Hazrat Dargah and the Bareilly Cantonment.", icon: "🕌" },
-                    { name: "Basti", famousFor: "Famous for its agricultural produce and the Makhauda Dham.", icon: "🛕" },
-                    { name: "Bhadohi", famousFor: "Famous for its carpet industry and the Sitamarhi Temple.", icon: "🧵" },
-                    { name: "Bijnor", famousFor: "Famous for the Vidur Kuti and the Ganj Bazaar.", icon: "🛕" },
-                    { name: "Budaun", famousFor: "Famous for the Jama Masjid and the Budaun Fort.", icon: "🕌" },
-                    { name: "Bulandshahr", famousFor: "Famous for the Anoopshahr Ganga Ghat and the Bulandshahr Fort.", icon: "🌊" },
-                    { name: "Chandauli", famousFor: "Famous for the Rajdari and Devdari Waterfalls and the Dhanapur Martyr’s Memorial.", icon: "💧" },
-                    { name: "Chitrakoot", famousFor: "Famous for the Kamadgiri Temple and the Ramghat.", icon: "🛕" },
-                    { name: "Deoria", famousFor: "Famous for the Dugdheshwar Nath Temple and the Deoria Fort.", icon: "🛕" },
-                    { name: "Etah", famousFor: "Famous for its agricultural produce and the Patna Bird Sanctuary.", icon: "🐦" },
-                    { name: "Etawah", famousFor: "Famous for the Chambal Safari and the Etawah Fort.", icon: "🌊" },
-                    { name: "Farrukhabad", famousFor: "Famous for its potato cultivation and the Kampil Jain pilgrimage site.", icon: "🥔" },
-                    { name: "Fatehpur", famousFor: "Famous for the Bhitaura Ghat and the Fatehpur Fort.", icon: "🌊" },
-                    { name: "Firozabad", famousFor: "Famous for its glass bangle industry and the Firozabad Fort.", icon: "💎" },
-                    { name: "Gautam Buddh Nagar", famousFor: "Famous for Noida city and the Surajpur Wetland.", icon: "🏙️" },
-                    { name: "Ghaziabad", famousFor: "Famous for its industrial growth and the Shipra Mall.", icon: "🏭" },
-                    { name: "Ghazipur", famousFor: "Famous for the Lord Cornwallis Tomb and the Ghazipur Opium Factory.", icon: "🏛️" },
-                    { name: "Gonda", famousFor: "Famous for the Parvati Temple and the Swaminarayan Chhapia.", icon: "🛕" },
-                    { name: "Gorakhpur", famousFor: "Famous for the Gorakhnath Temple and the Gita Press.", icon: "🛕" },
-                    { name: "Hamirpur", famousFor: "Famous for the Yamuna River and the Hamirpur Fort.", icon: "🌊" },
-                    { name: "Hapur", famousFor: "Famous for its agricultural produce and the Garhmukteshwar Ganga Ghat.", icon: "🌾" },
-                    { name: "Hardoi", famousFor: "Famous for the Sandi Bird Sanctuary and the Hardoi Fort.", icon: "🐦" },
-                    { name: "Hathras", famousFor: "Famous for its hing (asafoetida) production and the Hathras Fort.", icon: "🌿" },
-                    { name: "Jalaun", famousFor: "Famous for the Kalpi town and the Jalaun Fort.", icon: "🏰" },
-                    { name: "Jaunpur", famousFor: "Famous for the Atala Masjid and the Jaunpur Fort.", icon: "🕌" },
-                    { name: "Jhansi", famousFor: "Famous for the Jhansi Fort and the Rani Lakshmi Bai Park.", icon: "🏰" },
-                    { name: "Kannauj", famousFor: "Famous for its perfume industry and the Kannauj Fort.", icon: "🌸" },
-                    { name: "Kanpur Dehat", famousFor: "Famous for its agricultural produce and the Akbarpur Fort.", icon: "🌾" },
-                    { name: "Kanpur Nagar", famousFor: "Famous for the Kanpur Memorial Church and the JK Temple.", icon: "⛪" },
-                    { name: "Kasganj", famousFor: "Famous for its agricultural produce and the Kasganj Fort.", icon: "🌾" },
-                    { name: "Kaushambi", famousFor: "Famous for the Kaushambi Buddhist site and the Sheetla Temple.", icon: "🏛️" },
-                    { name: "Kushinagar", famousFor: "Famous for the Parinirvana Stupa and the Kushinagar Buddhist site.", icon: "🏛️" },
-                    { name: "Lakhimpur Kheri", famousFor: "Famous for the Dudhwa National Park and the Shiv Temple in Naimisharanya.", icon: "🐾" },
-                    { name: "Lalitpur", famousFor: "Famous for the Deogarh Jain Temples and the Lalitpur Fort.", icon: "🛕" },
-                    { name: "Lucknow", famousFor: "Famous for the Bara Imambara, the Chota Imambara, and the City of Nawabs.", icon: "🏛️" },
-                    { name: "Maharajganj", famousFor: "Famous for the Indo-Nepal border and the Lehra Devi Temple.", icon: "🛕" },
-                    { name: "Mahoba", famousFor: "Famous for the Sun Temple at Rahila and the Mahoba Fort.", icon: "🛕" },
-                    { name: "Mainpuri", famousFor: "Famous for its agricultural produce and the Mainpuri Fort.", icon: "🌾" },
-                    { name: "Mathura", famousFor: "Famous for the Krishna Janmabhoomi Temple and the Yamuna Ghats.", icon: "🛕" },
-                    { name: "Mau", famousFor: "Famous for its handwoven textiles and the Mau Fort.", icon: "🧵" },
-                    { name: "Meerut", famousFor: "Famous for the St. John’s Church and the Augarnath Temple.", icon: "⛪" },
-                    { name: "Mirzapur", famousFor: "Famous for the Vindhyavasini Temple and the Chunar Fort.", icon: "🛕" },
-                    { name: "Moradabad", famousFor: "Famous for its brass handicrafts and the Moradabad Fort.", icon: "🎨" },
-                    { name: "Muzaffarnagar", famousFor: "Famous for its sugar industry and the Vahelna Jain Temple.", icon: "🛕" },
-                    { name: "Pilibhit", famousFor: "Famous for the Pilibhit Tiger Reserve and the Gomat Taal.", icon: "🐯" },
-                    { name: "Pratapgarh", famousFor: "Famous for the Bela Bhawani Temple and the Pratapgarh Fort.", icon: "🛕" },
-                    { name: "Prayagraj", famousFor: "Famous for the Kumbh Mela, the Triveni Sangam, and the Allahabad Fort.", icon: "🌊" },
-                    { name: "Raebareli", famousFor: "Famous for its political significance and the Dalmau Ghat.", icon: "🏛️" },
-                    { name: "Rampur", famousFor: "Famous for its Rampuri knives and the Rampur Raza Library.", icon: "🔪" },
-                    { name: "Saharanpur", famousFor: "Famous for its wood carving industry and the Shakumbhari Devi Temple.", icon: "🎨" },
-                    { name: "Sambhal", famousFor: "Famous for the Jama Masjid and the Sambhal Horn Industry.", icon: "🕌" },
-                    { name: "Sant Kabir Nagar", famousFor: "Famous for the Kabir Chaura Math and the Bakhira Bird Sanctuary.", icon: "🐦" },
-                    { name: "Shahjahanpur", famousFor: "Famous for its agricultural produce and the Shahjahanpur Fort.", icon: "🌾" },
-                    { name: "Shamli", famousFor: "Famous for its sugar industry and the Shamli Fort.", icon: "🌾" },
-                    { name: "Shravasti", famousFor: "Famous for the Jetavana Monastery and the Sobhanath Temple.", icon: "🏛️" },
-                    { name: "Siddharthnagar", famousFor: "Famous for the Kapilvastu Buddhist site and the Banbasa Devi Temple.", icon: "🏛️" },
-                    { name: "Sitapur", famousFor: "Famous for the Naimisharanya pilgrimage site and the Sitapur Fort.", icon: "🛕" },
-                    { name: "Sonbhadra", famousFor: "Famous for the Robertsganj town and the Kaimur Wildlife Sanctuary.", icon: "🐾" },
-                    { name: "Sultanpur", famousFor: "Famous for the Victoria Park and the Koeripur Bird Sanctuary.", icon: "🐦" },
-                    { name: "Unnao", famousFor: "Famous for the Bangarmau town and the Unnao Fort.", icon: "🏰" },
-                    { name: "Varanasi", famousFor: "Famous for the Kashi Vishwanath Temple, the Ganga Ghats, and the Sarnath Stupa.", icon: "🛕" }
-                ]
-            },
-            {
-                name: "Uttarakhand",
-                description: "Known for its Himalayan pilgrimage sites, hill stations, and the Char Dham Yatra.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Uttarakhand_in_India.svg/200px-Uttarakhand_in_India.svg.png",
-                districts: [
-                    { name: "Almora", famousFor: "Famous for the Kasar Devi Temple and the Almora Bazaar.", icon: "🛕" },
-                    { name: "Bageshwar", famousFor: "Famous for the Bagnath Temple and the Pindari Glacier trek.", icon: "🛕" },
-                    { name: "Chamoli", famousFor: "Famous for the Badrinath Temple and the Valley of Flowers National Park.", icon: "🛕" },
-                    { name: "Champawat", famousFor: "Famous for the Baleshwar Temple and the Lohaghat town.", icon: "🛕" },
-                    { name: "Dehradun", famousFor: "Famous for the Robber’s Cave and the Tapkeshwar Mahadev Temple.", icon: "🛕" },
-                    { name: "Haridwar", famousFor: "Famous for the Har Ki Pauri Ghat and the Chandi Devi Temple.", icon: "🌊" },
-                    { name: "Nainital", famousFor: "Famous for the Naini Lake and the Naina Devi Temple.", icon: "🌊" },
-                    { name: "Pauri Garhwal", famousFor: "Famous for the Kandoliya Temple and the Lansdowne Hill Station.", icon: "🛕" },
-                    { name: "Pithoragarh", famousFor: "Famous for the Pithoragarh Fort and the Dharchula town.", icon: "🏰" },
-                    { name: "Rudraprayag", famousFor: "Famous for the Kedarnath Temple and the Rudranath Temple.", icon: "🛕" },
-                    { name: "Tehri Garhwal", famousFor: "Famous for the Tehri Dam and the Devprayag Sangam.", icon: "🌊" },
-                    { name: "Udham Singh Nagar", famousFor: "Famous for the Nanakmatta Gurudwara and the Pantnagar University.", icon: "🛕" },
-                    { name: "Uttarkashi", famousFor: "Famous for the Gangotri Temple and the Yamunotri Temple.", icon: "🛕" }
-                ]
-            },
-            {
-                name: "West Bengal",
-                description: "Known for Kolkata, the Sundarbans, and its cultural heritage.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/West_Bengal_in_India.svg/200px-West_Bengal_in_India.svg.png",
-                districts: [
-                    { name: "Alipurduar", famousFor: "Famous for the Buxa Tiger Reserve and the Jayanti Hills.", icon: "🐯" },
-                    { name: "Bankura", famousFor: "Famous for the Bishnupur Terracotta Temples and the Susunia Hills.", icon: "🛕" },
-                    { name: "Birbhum", famousFor: "Famous for the Shantiniketan and the Tarapith Temple.", icon: "🏛️" },
-                    { name: "Cooch Behar", famousFor: "Famous for the Cooch Behar Palace and the Madan Mohan Temple.", icon: "🏰" },
-                    { name: "Dakshin Dinajpur", famousFor: "Famous for the Balurghat town and the Bangarh archaeological site.", icon: "🏛️" },
-                    { name: "Darjeeling", famousFor: "Famous for the Darjeeling Himalayan Railway and the tea gardens.", icon: "🚂" },
-                    { name: "Hooghly", famousFor: "Famous for the Imambara and the Bandel Church.", icon: "⛪" },
-                    { name: "Howrah", famousFor: "Famous for the Howrah Bridge and the Belur Math.", icon: "🌉" },
-                    { name: "Jalpaiguri", famousFor: "Famous for the Gorumara National Park and the Jalpaiguri Rajbari.", icon: "🐾" },
-                    { name: "Jhargram", famousFor: "Famous for its tribal culture and the Jhargram Palace.", icon: "🏰" },
-                    { name: "Kalimpong", famousFor: "Famous for the Durpin Monastery and the Deolo Hill.", icon: "🏯" },
-                    { name: "Kolkata", famousFor: "Famous for the Victoria Memorial, the Howrah Bridge, and the Durga Puja festival.", icon: "🏛️" },
-                    { name: "Malda", famousFor: "Famous for the Gaur archaeological site and the Malda mangoes.", icon: "🏛️" },
-                    { name: "Murshidabad", famousFor: "Famous for the Hazarduari Palace and the Imambara.", icon: "🏰" },
-                    { name: "Nadia", famousFor: "Famous for the Mayapur ISKCON Temple and the Nabadwip town.", icon: "🛕" },
-                    { name: "North 24 Parganas", famousFor: "Famous for the Sundarbans National Park and the Basirhat town.", icon: "🐾" },
-                    { name: "Paschim Bardhaman", famousFor: "Famous for the Asansol industrial area and the Durgapur Steel Plant.", icon: "🏭" },
-                    { name: "Paschim Medinipur", famousFor: "Famous for the Garbeta town and the Kurumbera Fort.", icon: "🏰" },
-                    { name: "Purba Bardhaman", famousFor: "Famous for the Bardhaman Rajbari and the 108 Shiv Mandir complex.", icon: "🏰" },
-                    { name: "Purba Medinipur", famousFor: "Famous for the Digha Beach and the Tamluk town.", icon: "🏖️" },
-                    { name: "Purulia", famousFor: "Famous for the Ayodhya Hills and the Baranti Lake.", icon: "⛰️" },
-                    { name: "South 24 Parganas", famousFor: "Famous for the Sundarbans Delta and the Diamond Harbour.", icon: "🐾" },
-                    { name: "Uttar Dinajpur", famousFor: "Famous for the Raiganj Wildlife Sanctuary and the Kulik Bird Sanctuary.", icon: "🐦" }
-                ]
-            },
-            // Union Territories
-            {
-                name: "Andaman and Nicobar Islands",
-                description: "Known for its pristine beaches, coral reefs, and the Cellular Jail.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Andaman_and_Nicobar_Islands_in_India.svg/200px-Andaman_and_Nicobar_Islands_in_India.svg.png",
-                districts: [
-                    { name: "North and Middle Andaman", famousFor: "Famous for the Saddle Peak and the Diglipur town.", icon: "⛰️" },
-                    { name: "South Andaman", famousFor: "Famous for the Cellular Jail and the Radhanagar Beach.", icon: "🏖️" },
-                    { name: "Nicobar", famousFor: "Famous for the Indira Point and the Nicobarese tribal culture.", icon: "🏝️" }
-                ]
-            },
-            {
-                name: "Chandigarh",
-                description: "Known for its planned architecture, the Rock Garden, and being a Union Territory.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Chandigarh_in_India.svg/200px-Chandigarh_in_India.svg.png",
-                districts: [
-                    { name: "Chandigarh", famousFor: "Famous for the Rock Garden, Sukhna Lake, and the Capitol Complex.", icon: "🏛️" }
-                ]
-            },
-            {
-                name: "Dadra and Nagar Haveli and Daman and Diu",
-                description: "Known for its beaches, Portuguese heritage, and lush greenery.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Dadra_and_Nagar_Haveli_and_Daman_and_Diu_in_India.svg/200px-Dadra_and_Nagar_Haveli_and_Daman_and_Diu_in_India.svg.png",
-                districts: [
-                    { name: "Dadra and Nagar Haveli", famousFor: "Famous for the Vanganga Lake and the Silvassa town.", icon: "🌊" },
-                    { name: "Daman", famousFor: "Famous for the Devka Beach and the Basilica of Bom Jesus Church.", icon: "🏖️" },
-                    { name: "Diu", famousFor: "Famous for the Diu Fort and the Naida Caves.", icon: "🏰" }
-                ]
-            },
-            {
-                name: "Lakshadweep",
-                description: "Known for its coral atolls, lagoons, and marine biodiversity.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Lakshadweep_in_India.svg/200px-Lakshadweep_in_India.svg.png",
-                districts: [
-                    { name: "Lakshadweep", famousFor: "Famous for the Agatti Island, Bangaram Atoll, and the Minicoy Lighthouse.", icon: "🏝️" }
-                ]
-            },
-            {
-                name: "Delhi",
-                description: "Known for being the capital of India, historical monuments, and cultural diversity.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Delhi_in_India.svg/200px-Delhi_in_India.svg.png",
-                districts: [
-                    { name: "Central Delhi", famousFor: "Famous for the Connaught Place and the Jantar Mantar.", icon: "🏛️" },
-                    { name: "East Delhi", famousFor: "Famous for the Akshardham Temple and the Yamuna Sports Complex.", icon: "🛕" },
-                    { name: "New Delhi", famousFor: "Famous for the India Gate, Rashtrapati Bhavan, and the Qutub Minar.", icon: "🏛️" },
-                    { name: "North Delhi", famousFor: "Famous for the Red Fort and the Jama Masjid.", icon: "🏰" },
-                    { name: "North East Delhi", famousFor: "Famous for the Yamuna Biodiversity Park and the Shastri Park.", icon: "🌳" },
-                    { name: "North West Delhi", famousFor: "Famous for the Adventure Island and the Metro Walk Mall.", icon: "🎢" },
-                    { name: "Shahdara", famousFor: "Famous for the Yamuna Riverfront and the Dilshad Garden.", icon: "🌊" },
-                    { name: "South Delhi", famousFor: "Famous for the Lotus Temple and the Hauz Khas Complex.", icon: "🛕" },
-                    { name: "South East Delhi", famousFor: "Famous for the Tughlakabad Fort and the Badarpur Border.", icon: "🏰" },
-                    { name: "South West Delhi", famousFor: "Famous for the Dhaula Kuan and the Palam Airport.", icon: "✈️" },
-                    { name: "West Delhi", famousFor: "Famous for the Pacific Mall and the Janakpuri District Centre.", icon: "🏬" }
-                ]
-            },
-            {
-                name: "Puducherry",
-                description: "Known for its French colonial heritage, beaches, and Auroville.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Puducherry_in_India.svg/200px-Puducherry_in_India.svg.png",
-                districts: [
-                    { name: "Karaikal", famousFor: "Famous for the Karaikal Beach and the Karaikal Ammaiyar Temple.", icon: "🏖️" },
-                    { name: "Mahe", famousFor: "Famous for the Mahe Beach and the St. Theresa’s Church.", icon: "🏖️" },
-                    { name: "Puducherry", famousFor: "Famous for the Aurobindo Ashram, Auroville, and the Promenade Beach.", icon: "🏛️" },
-                    { name: "Yanam", famousFor: "Famous for the Yanam Tower and the Godavari River.", icon: "🌊" }
-                ]
-            },
-            {
-                name: "Jammu and Kashmir",
-                description: "Known for its Himalayan landscapes, the Dal Lake, and the Vaishno Devi Temple.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Jammu_and_Kashmir_in_India.svg/200px-Jammu_and_Kashmir_in_India.svg.png",
-                districts: [
-                    { name: "Anantnag", famousFor: "Famous for the Martand Sun Temple and the Amarnath Cave.", icon: "🛕" },
-                    { name: "Bandipora", famousFor: "Famous for the Wular Lake and the Gurez Valley.", icon: "🌊" },
-                    { name: "Baramulla", famousFor: "Famous for the Gulmarg Ski Resort and the Wular Lake.", icon: "⛷️" },
-                    { name: "Budgam", famousFor: "Famous for the Doodhpathri meadow and the Srinagar Airport.", icon: "🌄" },
-                    { name: "Doda", famousFor: "Famous for the Bhaderwah Valley and the Kailash Kund.", icon: "⛰️" },
-                    { name: "Ganderbal", famousFor: "Famous for the Sindh River and the Kheer Bhawani Temple.", icon: "🛕" },
-                    { name: "Jammu", famousFor: "Famous for the Vaishno Devi Temple and the Raghunath Temple.", icon: "🛕" },
-                    { name: "Kathua", famousFor: "Famous for the Billawar town and the Basohli paintings.", icon: "🎨" },
-                    { name: "Kishtwar", famousFor: "Famous for the Kishtwar National Park and the Saffron fields.", icon: "🐾" },
-                    { name: "Kulgam", famousFor: "Famous for the Aharbal Waterfall and the Kulgam town.", icon: "💧" },
-                    { name: "Kupwara", famousFor: "Famous for the Lolab Valley and the Bangus Valley.", icon: "🌄" },
-                    { name: "Poonch", famousFor: "Famous for the Poonch Fort and the Surankote Valley.", icon: "🏰" },
-                    { name: "Pulwama", famousFor: "Famous for its saffron fields and the Avantipur Temple.", icon: "🌿" },
-                    { name: "Rajouri", famousFor: "Famous for the Dehra Ki Gali and the Rajouri Fort.", icon: "🏰" },
-                    { name: "Ramban", famousFor: "Famous for the Baglihar Dam and the Sanasar Lake.", icon: "🌊" },
-                    { name: "Reasi", famousFor: "Famous for the Shiv Khori Cave and the Reasi Fort.", icon: "🛕" },
-                    { name: "Samba", famousFor: "Famous for the Samba Fort and the Indo-Pak border.", icon: "🏰" },
-                    { name: "Shopian", famousFor: "Famous for its apple orchards and the Mughal Road.", icon: "🍎" },
-                    { name: "Srinagar", famousFor: "Famous for the Dal Lake, Shalimar Bagh, and the Hazratbal Shrine.", icon: "🌊" },
-                    { name: "Udhampur", famousFor: "Famous for the Patnitop Hill Station and the Sudh Mahadev Temple.", icon: "⛰️" }
-                ]
-            },
-            {
-                name: "Ladakh",
-                description: "Known for its high-altitude desert, monasteries, and the Pangong Lake.",
-                map: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Ladakh_in_India.svg/200px-Ladakh_in_India.svg.png",
-                districts: [
-                    { name: "Kargil", famousFor: "Famous for the Kargil War Memorial and the Suru Valley.", icon: "🪖" },
-                    { name: "Leh", famousFor: "Famous for the Leh Palace, the Pangong Lake, and the Hemis Monastery.", icon: "🏯" }
-                ]
-            }
+        // Data: Duniya ke 195 desh aur unke major time zones
+        const countries = [
+            { name: "Afghanistan", flag: "https://flagcdn.com/w40/af.png", timezones: ["Asia/Kabul"] },
+            { name: "Albania", flag: "https://flagcdn.com/w40/al.png", timezones: ["Europe/Tirane"] },
+            { name: "Algeria", flag: "https://flagcdn.com/w40/dz.png", timezones: ["Africa/Algiers"] },
+            { name: "Andorra", flag: "https://flagcdn.com/w40/ad.png", timezones: ["Europe/Andorra"] },
+            { name: "Angola", flag: "https://flagcdn.com/w40/ao.png", timezones: ["Africa/Luanda"] },
+            { name: "Antigua and Barbuda", flag: "https://flagcdn.com/w40/ag.png", timezones: ["America/Antigua"] },
+            { name: "Argentina", flag: "https://flagcdn.com/w40/ar.png", timezones: ["America/Argentina/Buenos_Aires", "America/Argentina/Cordoba"] },
+            { name: "Armenia", flag: "https://flagcdn.com/w40/am.png", timezones: ["Asia/Yerevan"] },
+            { name: "Australia", flag: "https://flagcdn.com/w40/au.png", timezones: ["Australia/Sydney", "Australia/Perth", "Australia/Adelaide", "Australia/Darwin"] },
+            { name: "Austria", flag: "https://flagcdn.com/w40/at.png", timezones: ["Europe/Vienna"] },
+            { name: "Azerbaijan", flag: "https://flagcdn.com/w40/az.png", timezones: ["Asia/Baku"] },
+            { name: "Bahamas", flag: "https://flagcdn.com/w40/bs.png", timezones: ["America/Nassau"] },
+            { name: "Bahrain", flag: "https://flagcdn.com/w40/bh.png", timezones: ["Asia/Bahrain"] },
+            { name: "Bangladesh", flag: "https://flagcdn.com/w40/bd.png", timezones: ["Asia/Dhaka"] },
+            { name: "Barbados", flag: "https://flagcdn.com/w40/bb.png", timezones: ["America/Barbados"] },
+            { name: "Belarus", flag: "https://flagcdn.com/w40/by.png", timezones: ["Europe/Minsk"] },
+            { name: "Belgium", flag: "https://flagcdn.com/w40/be.png", timezones: ["Europe/Brussels"] },
+            { name: "Belize", flag: "https://flagcdn.com/w40/bz.png", timezones: ["America/Belize"] },
+            { name: "Benin", flag: "https://flagcdn.com/w40/bj.png", timezones: ["Africa/Porto-Novo"] },
+            { name: "Bhutan", flag: "https://flagcdn.com/w40/bt.png", timezones: ["Asia/Thimphu"] },
+            { name: "Bolivia", flag: "https://flagcdn.com/w40/bo.png", timezones: ["America/La_Paz"] },
+            { name: "Bosnia and Herzegovina", flag: "https://flagcdn.com/w40/ba.png", timezones: ["Europe/Sarajevo"] },
+            { name: "Botswana", flag: "https://flagcdn.com/w40/bw.png", timezones: ["Africa/Gaborone"] },
+            { name: "Brazil", flag: "https://flagcdn.com/w40/br.png", timezones: ["America/Sao_Paulo", "America/Manaus", "America/Noronha"] },
+            { name: "Brunei", flag: "https://flagcdn.com/w40/bn.png", timezones: ["Asia/Brunei"] },
+            { name: "Bulgaria", flag: "https://flagcdn.com/w40/bg.png", timezones: ["Europe/Sofia"] },
+            { name: "Burkina Faso", flag: "https://flagcdn.com/w40/bf.png", timezones: ["Africa/Ouagadougou"] },
+            { name: "Burundi", flag: "https://flagcdn.com/w40/bi.png", timezones: ["Africa/Gitega"] },
+            { name: "Cambodia", flag: "https://flagcdn.com/w40/kh.png", timezones: ["Asia/Phnom_Penh"] },
+            { name: "Cameroon", flag: "https://flagcdn.com/w40/cm.png", timezones: ["Africa/Douala"] },
+            { name: "Canada", flag: "https://flagcdn.com/w40/ca.png", timezones: ["America/Toronto", "America/Vancouver", "America/Whitehorse", "America/St_Johns"] },
+            { name: "Cape Verde", flag: "https://flagcdn.com/w40/cv.png", timezones: ["Atlantic/Cape_Verde"] },
+            { name: "Central African Republic", flag: "https://flagcdn.com/w40/cf.png", timezones: ["Africa/Bangui"] },
+            { name: "Chad", flag: "https://flagcdn.com/w40/td.png", timezones: ["Africa/Ndjamena"] },
+            { name: "Chile", flag: "https://flagcdn.com/w40/cl.png", timezones: ["America/Santiago", "Pacific/Easter"] },
+            { name: "China", flag: "https://flagcdn.com/w40/cn.png", timezones: ["Asia/Shanghai"] },
+            { name: "Colombia", flag: "https://flagcdn.com/w40/co.png", timezones: ["America/Bogota"] },
+            { name: "Comoros", flag: "https://flagcdn.com/w40/km.png", timezones: ["Indian/Comoro"] },
+            { name: "Costa Rica", flag: "https://flagcdn.com/w40/cr.png", timezones: ["America/Costa_Rica"] },
+            { name: "Croatia", flag: "https://flagcdn.com/w40/hr.png", timezones: ["Europe/Zagreb"] },
+            { name: "Cuba", flag: "https://flagcdn.com/w40/cu.png", timezones: ["America/Havana"] },
+            { name: "Cyprus", flag: "https://flagcdn.com/w40/cy.png", timezones: ["Asia/Nicosia"] },
+            { name: "Czech Republic", flag: "https://flagcdn.com/w40/cz.png", timezones: ["Europe/Prague"] },
+            { name: "Democratic Republic of the Congo", flag: "https://flagcdn.com/w40/cd.png", timezones: ["Africa/Kinshasa", "Africa/Lubumbashi"] },
+            { name: "Denmark", flag: "https://flagcdn.com/w40/dk.png", timezones: ["Europe/Copenhagen"] },
+            { name: "Djibouti", flag: "https://flagcdn.com/w40/dj.png", timezones: ["Africa/Djibouti"] },
+            { name: "Dominica", flag: "https://flagcdn.com/w40/dm.png", timezones: ["America/Dominica"] },
+            { name: "Dominican Republic", flag: "https://flagcdn.com/w40/do.png", timezones: ["America/Santo_Domingo"] },
+            { name: "Ecuador", flag: "https://flagcdn.com/w40/ec.png", timezones: ["America/Guayaquil", "Pacific/Galapagos"] },
+            { name: "Egypt", flag: "https://flagcdn.com/w40/eg.png", timezones: ["Africa/Cairo"] },
+            { name: "El Salvador", flag: "https://flagcdn.com/w40/sv.png", timezones: ["America/El_Salvador"] },
+            { name: "Equatorial Guinea", flag: "https://flagcdn.com/w40/gq.png", timezones: ["Africa/Malabo"] },
+            { name: "Eritrea", flag: "https://flagcdn.com/w40/er.png", timezones: ["Africa/Asmara"] },
+            { name: "Estonia", flag: "https://flagcdn.com/w40/ee.png", timezones: ["Europe/Tallinn"] },
+            { name: "Eswatini", flag: "https://flagcdn.com/w40/sz.png", timezones: ["Africa/Mbabane"] },
+            { name: "Ethiopia", flag: "https://flagcdn.com/w40/et.png", timezones: ["Africa/Addis_Ababa"] },
+            { name: "Fiji", flag: "https://flagcdn.com/w40/fj.png", timezones: ["Pacific/Fiji"] },
+            { name: "Finland", flag: "https://flagcdn.com/w40/fi.png", timezones: ["Europe/Helsinki"] },
+            { name: "France", flag: "https://flagcdn.com/w40/fr.png", timezones: ["Europe/Paris", "Pacific/Tahiti", "Pacific/Noumea", "America/Marquesas"] },
+            { name: "Gabon", flag: "https://flagcdn.com/w40/ga.png", timezones: ["Africa/Libreville"] },
+            { name: "Gambia", flag: "https://flagcdn.com/w40/gm.png", timezones: ["Africa/Banjul"] },
+            { name: "Georgia", flag: "https://flagcdn.com/w40/ge.png", timezones: ["Asia/Tbilisi"] },
+            { name: "Germany", flag: "https://flagcdn.com/w40/de.png", timezones: ["Europe/Berlin"] },
+            { name: "Ghana", flag: "https://flagcdn.com/w40/gh.png", timezones: ["Africa/Accra"] },
+            { name: "Greece", flag: "https://flagcdn.com/w40/gr.png", timezones: ["Europe/Athens"] },
+            { name: "Grenada", flag: "https://flagcdn.com/w40/gd.png", timezones: ["America/Grenada"] },
+            { name: "Guatemala", flag: "https://flagcdn.com/w40/gt.png", timezones: ["America/Guatemala"] },
+            { name: "Guinea", flag: "https://flagcdn.com/w40/gn.png", timezones: ["Africa/Conakry"] },
+            { name: "Guinea-Bissau", flag: "https://flagcdn.com/w40/gw.png", timezones: ["Africa/Bissau"] },
+            { name: "Guyana", flag: "https://flagcdn.com/w40/gy.png", timezones: ["America/Guyana"] },
+            { name: "Haiti", flag: "https://flagcdn.com/w40/ht.png", timezones: ["America/Port-au-Prince"] },
+            { name: "Honduras", flag: "https://flagcdn.com/w40/hn.png", timezones: ["America/Tegucigalpa"] },
+            { name: "Hungary", flag: "https://flagcdn.com/w40/hu.png", timezones: ["Europe/Budapest"] },
+            { name: "Iceland", flag: "https://flagcdn.com/w40/is.png", timezones: ["Atlantic/Reykjavik"] },
+            { name: "India", flag: "https://flagcdn.com/w40/in.png", timezones: ["Asia/Kolkata"] },
+            { name: "Indonesia", flag: "https://flagcdn.com/w40/id.png", timezones: ["Asia/Jakarta", "Asia/Makassar", "Asia/Jayapura"] },
+            { name: "Iran", flag: "https://flagcdn.com/w40/ir.png", timezones: ["Asia/Tehran"] },
+            { name: "Iraq", flag: "https://flagcdn.com/w40/iq.png", timezones: ["Asia/Baghdad"] },
+            { name: "Ireland", flag: "https://flagcdn.com/w40/ie.png", timezones: ["Europe/Dublin"] },
+            { name: "Israel", flag: "https://flagcdn.com/w40/il.png", timezones: ["Asia/Jerusalem"] },
+            { name: "Italy", flag: "https://flagcdn.com/w40/it.png", timezones: ["Europe/Rome"] },
+            { name: "Jamaica", flag: "https://flagcdn.com/w40/jm.png", timezones: ["America/Jamaica"] },
+            { name: "Japan", flag: "https://flagcdn.com/w40/jp.png", timezones: ["Asia/Tokyo"] },
+            { name: "Jordan", flag: "https://flagcdn.com/w40/jo.png", timezones: ["Asia/Amman"] },
+            { name: "Kazakhstan", flag: "https://flagcdn.com/w40/kz.png", timezones: ["Asia/Almaty", "Asia/Aqtobe"] },
+            { name: "Kenya", flag: "https://flagcdn.com/w40/ke.png", timezones: ["Africa/Nairobi"] },
+            { name: "Kiribati", flag: "https://flagcdn.com/w40/ki.png", timezones: ["Pacific/Tarawa", "Pacific/Kiritimati"] },
+            { name: "Kuwait", flag: "https://flagcdn.com/w40/kw.png", timezones: ["Asia/Kuwait"] },
+            { name: "Kyrgyzstan", flag: "https://flagcdn.com/w40/kg.png", timezones: ["Asia/Bishkek"] },
+            { name: "Laos", flag: "https://flagcdn.com/w40/la.png", timezones: ["Asia/Vientiane"] },
+            { name: "Latvia", flag: "https://flagcdn.com/w40/lv.png", timezones: ["Europe/Riga"] },
+            { name: "Lebanon", flag: "https://flagcdn.com/w40/lb.png", timezones: ["Asia/Beirut"] },
+            { name: "Lesotho", flag: "https://flagcdn.com/w40/ls.png", timezones: ["Africa/Maseru"] },
+            { name: "Liberia", flag: "https://flagcdn.com/w40/lr.png", timezones: ["Africa/Monrovia"] },
+            { name: "Libya", flag: "https://flagcdn.com/w40/ly.png", timezones: ["Africa/Tripoli"] },
+            { name: "Liechtenstein", flag: "https://flagcdn.com/w40/li.png", timezones: ["Europe/Vaduz"] },
+            { name: "Lithuania", flag: "https://flagcdn.com/w40/lt.png", timezones: ["Europe/Vilnius"] },
+            { name: "Luxembourg", flag: "https://flagcdn.com/w40/lu.png", timezones: ["Europe/Luxembourg"] },
+            { name: "Madagascar", flag: "https://flagcdn.com/w40/mg.png", timezones: ["Indian/Antananarivo"] },
+            { name: "Malawi", flag: "https://flagcdn.com/w40/mw.png", timezones: ["Africa/Blantyre"] },
+            { name: "Malaysia", flag: "https://flagcdn.com/w40/my.png", timezones: ["Asia/Kuala_Lumpur", "Asia/Kuching"] },
+            { name: "Maldives", flag: "https://flagcdn.com/w40/mv.png", timezones: ["Indian/Maldives"] },
+            { name: "Mali", flag: "https://flagcdn.com/w40/ml.png", timezones: ["Africa/Bamako"] },
+            { name: "Malta", flag: "https://flagcdn.com/w40/mt.png", timezones: ["Europe/Malta"] },
+            { name: "Marshall Islands", flag: "https://flagcdn.com/w40/mh.png", timezones: ["Pacific/Majuro"] },
+            { name: "Mauritania", flag: "https://flagcdn.com/w40/mr.png", timezones: ["Africa/Nouakchott"] },
+            { name: "Mauritius", flag: "https://flagcdn.com/w40/mu.png", timezones: ["Indian/Mauritius"] },
+            { name: "Mexico", flag: "https://flagcdn.com/w40/mx.png", timezones: ["America/Mexico_City", "America/Tijuana"] },
+            { name: "Micronesia", flag: "https://flagcdn.com/w40/fm.png", timezones: ["Pacific/Pohnpei"] },
+            { name: "Moldova", flag: "https://flagcdn.com/w40/md.png", timezones: ["Europe/Chisinau"] },
+            { name: "Monaco", flag: "https://flagcdn.com/w40/mc.png", timezones: ["Europe/Monaco"] },
+            { name: "Mongolia", flag: "https://flagcdn.com/w40/mn.png", timezones: ["Asia/Ulaanbaatar"] },
+            { name: "Montenegro", flag: "https://flagcdn.com/w40/me.png", timezones: ["Europe/Podgorica"] },
+            { name: "Morocco", flag: "https://flagcdn.com/w40/ma.png", timezones: ["Africa/Casablanca"] },
+            { name: "Mozambique", flag: "https://flagcdn.com/w40/mz.png", timezones: ["Africa/Maputo"] },
+            { name: "Myanmar", flag: "https://flagcdn.com/w40/mm.png", timezones: ["Asia/Yangon"] },
+            { name: "Namibia", flag: "https://flagcdn.com/w40/na.png", timezones: ["Africa/Windhoek"] },
+            { name: "Nauru", flag: "https://flagcdn.com/w40/nr.png", timezones: ["Pacific/Nauru"] },
+            { name: "Nepal", flag: "https://flagcdn.com/w40/np.png", timezones: ["Asia/Kathmandu"] },
+            { name: "Netherlands", flag: "https://flagcdn.com/w40/nl.png", timezones: ["Europe/Amsterdam"] },
+            { name: "New Zealand", flag: "https://flagcdn.com/w40/nz.png", timezones: ["Pacific/Auckland", "Pacific/Chatham"] },
+            { name: "Nicaragua", flag: "https://flagcdn.com/w40/ni.png", timezones: ["America/Managua"] },
+            { name: "Niger", flag: "https://flagcdn.com/w40/ne.png", timezones: ["Africa/Niamey"] },
+            { name: "Nigeria", flag: "https://flagcdn.com/w40/ng.png", timezones: ["Africa/Lagos"] },
+            { name: "North Korea", flag: "https://flagcdn.com/w40/kp.png", timezones: ["Asia/Pyongyang"] },
+            { name: "North Macedonia", flag: "https://flagcdn.com/w40/mk.png", timezones: ["Europe/Skopje"] },
+            { name: "Norway", flag: "https://flagcdn.com/w40/no.png", timezones: ["Europe/Oslo"] },
+            { name: "Oman", flag: "https://flagcdn.com/w40/om.png", timezones: ["Asia/Muscat"] },
+            { name: "Pakistan", flag: "https://flagcdn.com/w40/pk.png", timezones: ["Asia/Karachi"] },
+            { name: "Palau", flag: "https://flagcdn.com/w40/pw.png", timezones: ["Pacific/Palau"] },
+            { name: "Panama", flag: "https://flagcdn.com/w40/pa.png", timezones: ["America/Panama"] },
+            { name: "Papua New Guinea", flag: "https://flagcdn.com/w40/pg.png", timezones: ["Pacific/Port_Moresby"] },
+            { name: "Paraguay", flag: "https://flagcdn.com/w40/py.png", timezones: ["America/Asuncion"] },
+            { name: "Peru", flag: "https://flagcdn.com/w40/pe.png", timezones: ["America/Lima"] },
+            { name: "Philippines", flag: "https://flagcdn.com/w40/ph.png", timezones: ["Asia/Manila"] },
+            { name: "Poland", flag: "https://flagcdn.com/w40/pl.png", timezones: ["Europe/Warsaw"] },
+            { name: "Portugal", flag: "https://flagcdn.com/w40/pt.png", timezones: ["Europe/Lisbon", "Atlantic/Azores"] },
+            { name: "Qatar", flag: "https://flagcdn.com/w40/qa.png", timezones: ["Asia/Qatar"] },
+            { name: "Republic of the Congo", flag: "https://flagcdn.com/w40/cg.png", timezones: ["Africa/Brazzaville"] },
+            { name: "Romania", flag: "https://flagcdn.com/w40/ro.png", timezones: ["Europe/Bucharest"] },
+            { name: "Russia", flag: "https://flagcdn.com/w40/ru.png", timezones: ["Europe/Moscow", "Asia/Vladivostok", "Asia/Yekaterinburg", "Europe/Kaliningrad", "Asia/Kamchatka"] },
+            { name: "Rwanda", flag: "https://flagcdn.com/w40/rw.png", timezones: ["Africa/Kigali"] },
+            { name: "Saint Kitts and Nevis", flag: "https://flagcdn.com/w40/kn.png", timezones: ["America/St_Kitts"] },
+            { name: "Saint Lucia", flag: "https://flagcdn.com/w40/lc.png", timezones: ["America/St_Lucia"] },
+            { name: "Saint Vincent and the Grenadines", flag: "https://flagcdn.com/w40/vc.png", timezones: ["America/St_Vincent"] },
+            { name: "Samoa", flag: "https://flagcdn.com/w40/ws.png", timezones: ["Pacific/Apia"] },
+            { name: "San Marino", flag: "https://flagcdn.com/w40/sm.png", timezones: ["Europe/San_Marino"] },
+            { name: "Sao Tome and Principe", flag: "https://flagcdn.com/w40/st.png", timezones: ["Africa/Sao_Tome"] },
+            { name: "Saudi Arabia", flag: "https://flagcdn.com/w40/sa.png", timezones: ["Asia/Riyadh"] },
+            { name: "Senegal", flag: "https://flagcdn.com/w40/sn.png", timezones: ["Africa/Dakar"] },
+            { name: "Serbia", flag: "https://flagcdn.com/w40/rs.png", timezones: ["Europe/Belgrade"] },
+            { name: "Seychelles", flag: "https://flagcdn.com/w40/sc.png", timezones: ["Indian/Mahe"] },
+            { name: "Sierra Leone", flag: "https://flagcdn.com/w40/sl.png", timezones: ["Africa/Freetown"] },
+            { name: "Singapore", flag: "https://flagcdn.com/w40/sg.png", timezones: ["Asia/Singapore"] },
+            { name: "Slovakia", flag: "https://flagcdn.com/w40/sk.png", timezones: ["Europe/Bratislava"] },
+            { name: "Slovenia", flag: "https://flagcdn.com/w40/si.png", timezones: ["Europe/Ljubljana"] },
+            { name: "Solomon Islands", flag: "https://flagcdn.com/w40/sb.png", timezones: ["Pacific/Guadalcanal"] },
+            { name: "Somalia", flag: "https://flagcdn.com/w40/so.png", timezones: ["Africa/Mogadishu"] },
+            { name: "South Africa", flag: "https://flagcdn.com/w40/za.png", timezones: ["Africa/Johannesburg"] },
+            { name: "South Korea", flag: "https://flagcdn.com/w40/kr.png", timezones: ["Asia/Seoul"] },
+            { name: "South Sudan", flag: "https://flagcdn.com/w40/ss.png", timezones: ["Africa/Juba"] },
+            { name: "Spain", flag: "https://flagcdn.com/w40/es.png", timezones: ["Europe/Madrid", "Atlantic/Canary"] },
+            { name: "Sri Lanka", flag: "https://flagcdn.com/w40/lk.png", timezones: ["Asia/Colombo"] },
+            { name: "Sudan", flag: "https://flagcdn.com/w40/sd.png", timezones: ["Africa/Khartoum"] },
+            { name: "Suriname", flag: "https://flagcdn.com/w40/sr.png", timezones: ["America/Paramaribo"] },
+            { name: "Sweden", flag: "https://flagcdn.com/w40/se.png", timezones: ["Europe/Stockholm"] },
+            { name: "Switzerland", flag: "https://flagcdn.com/w40/ch.png", timezones: ["Europe/Zurich"] },
+            { name: "Syria", flag: "https://flagcdn.com/w40/sy.png", timezones: ["Asia/Damascus"] },
+            { name: "Taiwan", flag: "https://flagcdn.com/w40/tw.png", timezones: ["Asia/Taipei"] },
+            { name: "Tajikistan", flag: "https://flagcdn.com/w40/tj.png", timezones: ["Asia/Dushanbe"] },
+            { name: "Tanzania", flag: "https://flagcdn.com/w40/tz.png", timezones: ["Africa/Dar_es_Salaam"] },
+            { name: "Thailand", flag: "https://flagcdn.com/w40/th.png", timezones: ["Asia/Bangkok"] },
+            { name: "Timor-Leste", flag: "https://flagcdn.com/w40/tl.png", timezones: ["Asia/Dili"] },
+            { name: "Togo", flag: "https://flagcdn.com/w40/tg.png", timezones: ["Africa/Lome"] },
+            { name: "Tonga", flag: "https://flagcdn.com/w40/to.png", timezones: ["Pacific/Tongatapu"] },
+            { name: "Trinidad and Tobago", flag: "https://flagcdn.com/w40/tt.png", timezones: ["America/Port_of_Spain"] },
+            { name: "Tunisia", flag: "https://flagcdn.com/w40/tn.png", timezones: ["Africa/Tunis"] },
+            { name: "Turkey", flag: "https://flagcdn.com/w40/tr.png", timezones: ["Europe/Istanbul"] },
+            { name: "Turkmenistan", flag: "https://flagcdn.com/w40/tm.png", timezones: ["Asia/Ashgabat"] },
+            { name: "Tuvalu", flag: "https://flagcdn.com/w40/tv.png", timezones: ["Pacific/Funafuti"] },
+            { name: "Uganda", flag: "https://flagcdn.com/w40/ug.png", timezones: ["Africa/Kampala"] },
+            { name: "Ukraine", flag: "https://flagcdn.com/w40/ua.png", timezones: ["Europe/Kiev"] },
+            { name: "United Arab Emirates", flag: "https://flagcdn.com/w40/ae.png", timezones: ["Asia/Dubai"] },
+            { name: "United Kingdom", flag: "https://flagcdn.com/w40/gb.png", timezones: ["Europe/London"] },
+            { name: "United States", flag: "https://flagcdn.com/w40/us.png", timezones: ["America/New_York", "America/Los_Angeles", "America/Chicago", "Pacific/Honolulu", "America/Anchorage", "America/Phoenix"] },
+            { name: "Uruguay", flag: "https://flagcdn.com/w40/uy.png", timezones: ["America/Montevideo"] },
+            { name: "Uzbekistan", flag: "https://flagcdn.com/w40/uz.png", timezones: ["Asia/Tashkent"] },
+            { name: "Vanuatu", flag: "https://flagcdn.com/w40/vu.png", timezones: ["Pacific/Efate"] },
+            { name: "Venezuela", flag: "https://flagcdn.com/w40/ve.png", timezones: ["America/Caracas"] },
+            { name: "Vietnam", flag: "https://flagcdn.com/w40/vn.png", timezones: ["Asia/Ho_Chi_Minh"] },
+            { name: "Yemen", flag: "https://flagcdn.com/w40/ye.png", timezones: ["Asia/Aden"] },
+            { name: "Zambia", flag: "https://flagcdn.com/w40/zm.png", timezones: ["Africa/Lusaka"] },
+            { name: "Zimbabwe", flag: "https://flagcdn.com/w40/zw.png", timezones: ["Africa/Harare"] }
         ];
 
-        // Part 2: Media Outlets Logic
-        const mediaOutlets = [
-            { name: "The Times of India", description: "One of the largest English-language newspapers in India.", logo: "https://img.icons8.com/ios-filled/50/ffffff/news.png", url: "https://timesofindia.indiatimes.com" },
-            { name: "The Hindu", description: "A leading English-language newspaper known for its in-depth reporting.", logo: "https://img.icons8.com/ios-filled/50/ffffff/news.png", url: "https://www.thehindu.com" },
-            { name: "Hindustan Times", description: "A widely read English newspaper with a focus on national news.", logo: "https://img.icons8.com/ios-filled/50/ffffff/news.png", url: "https://www.hindustantimes.com" },
-            { name: "Dainik Bhaskar", description: "One of the largest Hindi-language newspapers in India.", logo: "https://img.icons8.com/ios-filled/50/ffffff/news.png", url: "https://www.bhaskar.com" },
-            { name: "Amar Ujala", description: "A popular Hindi newspaper with a focus on North India.", logo: "https://img.icons8.com/ios-filled/50/ffffff/news.png", url: "https://www.amarujala.com" },
-            { name: "Zee News", description: "A leading Hindi news channel with 24/7 coverage.", logo: "https://img.icons8.com/ios-filled/50/ffffff/television.png", url: "https://zeenews.india.com" },
-            { name: "NDTV", description: "A prominent English news channel known for its balanced reporting.", logo: "https://img.icons8.com/ios-filled/50/ffffff/television.png", url: "https://www.ndtv.com" },
-            { name: "India Today", description: "A popular English news magazine and TV channel.", logo: "https://img.icons8.com/ios-filled/50/ffffff/television.png", url: "https://www.indiatoday.in" },
-            { name: "ABP News", description: "A leading Hindi news channel with live updates.", logo: "https://img.icons8.com/ios-filled/50/ffffff/television.png", url: "https://www.abplive.com" },
-            { name: "Republic TV", description: "An English news channel known for its debates and breaking news.", logo: "https://img.icons8.com/ios-filled/50/ffffff/television.png", url: "https://www.republicworld.com" },
-            { name: "Aaj Tak", description: "A popular Hindi news channel with extensive coverage.", logo: "https://img.icons8.com/ios-filled/50/ffffff/television.png", url: "https://www.aajtak.in" },
-            { name: "The Indian Express", description: "An English newspaper known for its investigative journalism.", logo: "https://img.icons8.com/ios-filled/50/ffffff/news.png", url: "https://indianexpress.com" },
-            { name: "Deccan Chronicle", description: "A leading English newspaper in South India.", logo: "https://img.icons8.com/ios-filled/50/ffffff/news.png", url: "https://www.deccanchronicle.com" },
-            { name: "The Statesman", description: "An English newspaper with a focus on national and international news.", logo: "https://img.icons8.com/ios-filled/50/ffffff/news.png", url: "https://www.thestatesman.com" },
-            { name: "The Telegraph India", description: "An English newspaper with a focus on Eastern India.", logo: "https://img.icons8.com/ios-filled/50/ffffff/news.png", url: "https://www.telegraphindia.com" }
-        ];
+        // DOM elements
+        const timeContainer = document.getElementById('timeContainer');
+        const searchInput = document.getElementById('searchInput');
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const backToTop = document.getElementById('backToTop');
+        const pagination = document.getElementById('pagination');
 
-        // Part 3: Live News Headlines Logic (Mock Data for Demo)
-        const newsHeadlines = [
-            { media: "The Times of India", headline: "India Celebrates 75 Years of Constitution: PM Modi Addresses Nation", date: "May 16, 2025", url: "https://timesofindia.indiatimes.com" },
-            { media: "The Hindu", headline: "ISRO Launches New Satellite to Boost Rural Connectivity", date: "May 16, 2025", url: "https://www.thehindu.com" },
-            { media: "Hindustan Times", headline: "Delhi Air Quality Improves After Rain, AQI at 150", date: "May 16, 2025", url: "https://www.hindustantimes.com" },
-            { media: "Dainik Bhaskar", headline: "मध्य प्रदेश में भारी बारिश की चेतावनी, स्कूल बंद", date: "May 16, 2025", url: "https://www.bhaskar.com" },
-            { media: "Amar Ujala", headline: "लखनऊ में नया मेट्रो रूट शुरू, यात्रियों में उत्साह", date: "May 16, 2025", url: "https://www.amarujala.com" },
-            { media: "Zee News", headline: "RBI Announces New Digital Payment Guidelines", date: "May 16, 2025", url: "https://zeenews.india.com" },
-            { media: "NDTV", headline: "Supreme Court to Hear Plea on Electoral Bonds Today", date: "May 16, 2025", url: "https://www.ndtv.com" },
-            { media: "India Today", headline: "Mumbai Local Trains to Get AC Coaches by End of 2025", date: "May 16, 2025", url: "https://www.indiatoday.in" },
-            { media: "ABP News", headline: "Bihar: Nitish Kumar Inaugurates New Ganga Bridge", date: "May 16, 2025", url: "https://www.abplive.com" },
-            { media: "Republic TV", headline: "Tensions Rise in Manipur, Army Deployed", date: "May 16, 2025", url: "https://www.republicworld.com" },
-            { media: "Aaj Tak
-{ media: "Aaj Tak", headline: "पश्चिम बंगाल में तूफान की चेतावनी, कोलकाता में हाई अलर्ट", date: "May 16, 2025", url: "https://www.aajtak.in" },
-            { media: "The Indian Express", headline: "Kerala Tourism Sees Record Influx of Visitors in 2025", date: "May 16, 2025", url: "https://indianexpress.com" },
-            { media: "Deccan Chronicle", headline: "Hyderabad Metro Phase 3 to Be Completed by 2026", date: "May 16, 2025", url: "https://www.deccanchronicle.com" },
-            { media: "The Statesman", headline: "Assam Tea Production Hits New High This Season", date: "May 16, 2025", url: "https://www.thestatesman.com" },
-            { media: "The Telegraph India", headline: "Sikkim Becomes First State to Achieve 100% Organic Farming", date: "May 16, 2025", url: "https://www.telegraphindia.com" }
-        ];
+        // Pagination variables
+        let currentPage = 1;
+        const perPage = 30;
 
-        // Function to render states and districts
-        function renderStates() {
-            const stateList = document.getElementById("state-list");
-            states.forEach(state => {
-                const stateCard = document.createElement("div");
-                stateCard.classList.add("state-card");
-                stateCard.innerHTML = `
-                    <h3>${state.name}</h3>
-                    <p>${state.description}</p>
-                    <img src="${state.map}" alt="${state.name} Map">
-                    <h4>Districts:</h4>
-                    <ul>
-                        ${state.districts.map(district => `
-                            <li>${district.icon} ${district.name} - ${district.famousFor}</li>
-                        `).join("")}
-                    </ul>
+        // Time display karo
+        function displayTime(searchTerm = '', pageNum = 1) {
+            timeContainer.innerHTML = '';
+            const filteredCountries = countries.filter(country => 
+                color.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            const start = (pageNum - 1) * perPage;
+            const end = start + perPage;
+            const paginatedCountries = filteredCountries.slice(start, end);
+
+            paginatedCountries.forEach(country => {
+                const timeCard = document.createElement('div');
+                timeCard.className = 'time-card p-4 rounded-lg';
+                timeCard.innerHTML = `
+                    <img src="${country.flag}" alt="${country.name} ka Jhanda" class="flag-img">
+                    <h2 class="text-xl font-bold mb-2">${country.name}</h2>
+                    <div class="grid grid-cols-1 gap-2">
+                        ${country.timezones.map(timezone => `
+                            <div class="p-3 rounded-lg text-center">
+                                <p class="font-bold">${timezone.split('/').pop()}</p>
+                                <p id="time-${country.name}-${timezone}">${moment().tz(timezone).format('HH:mm:ss, MMMM Do YYYY')}</p>
+                                <p class="text-sm">Timezone: ${timezone}</p>
+                            </div>
+                        `).join('')}
+                    </div>
                 `;
-                stateList.appendChild(stateCard);
+                timeContainer.appendChild(timeCard);
             });
+
+            // Pagination buttons
+            pagination.innerHTML = `
+                <div class="flex justify-center gap-4">
+                    ${pageNum > 1 ? `<button onclick="displayTime('${searchTerm}', ${pageNum - 1})">Previous</button>` : ''}
+                    ${end < filteredCountries.length ? `<button onclick="displayTime('${searchTerm}', ${pageNum + 1})">Next</button>` : ''}
+                </div>
+            `;
+
+            updateClocks();
         }
 
-        // Function to render media outlets
-        function renderMedia() {
-            const mediaList = document.getElementById("media-list");
-            mediaOutlets.forEach(media => {
-                const mediaCard = document.createElement("div");
-                mediaCard.classList.add("media-card");
-                mediaCard.innerHTML = `
-                    <img src="${media.logo}" alt="${media.name} Logo">
-                    <h3>${media.name}</h3>
-                    <p>${media.description}</p>
-                    <a href="${media.url}" target="_blank">Visit Website</a>
-                `;
-                mediaList.appendChild(mediaCard);
-            });
-        }
-
-        // Function to render live news headlines
-        function renderNews() {
-            const newsList = document.getElementById("news-list");
-            newsHeadlines.forEach(news => {
-                const newsItem = document.createElement("div");
-                newsItem.classList.add("news-item");
-                newsItem.innerHTML = `
-                    <h3>${news.headline}</h3>
-                    <p><strong>${news.media}</strong> - ${news.date}</p>
-                    <a href="${news.url}" target="_blank">Read More</a>
-                `;
-                newsList.appendChild(newsItem);
-            });
-        }
-
-        // Search Functionality
-        document.getElementById("search-input").addEventListener("input", function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const stateCards = document.querySelectorAll(".state-card");
-            const mediaCards = document.querySelectorAll(".media-card");
-            const newsItems = document.querySelectorAll(".news-item");
-
-            // Filter States
-            stateCards.forEach(card => {
-                const stateName = card.querySelector("h3").textContent.toLowerCase();
-                const districts = card.querySelectorAll("li");
-                let districtMatch = false;
-                districts.forEach(district => {
-                    if (district.textContent.toLowerCase().includes(searchTerm)) {
-                        districtMatch = true;
+        // Har second clock update karo
+        function updateClocks() {
+            countries.forEach(country => {
+                country.timezones.forEach(timezone => {
+                    const timeElement = document.getElementById(`time-${country.name}-${timezone}`);
+                    if (timeElement) {
+                        timeElement.textContent = moment().tz(timezone).format('HH:mm:ss, MMMM Do YYYY');
                     }
                 });
-                if (stateName.includes(searchTerm) || districtMatch) {
-                    card.style.display = "block";
-                } else {
-                    card.style.display = "none";
-                }
             });
+        }
 
-            // Filter Media
-            mediaCards.forEach(card => {
-                const mediaName = card.querySelector("h3").textContent.toLowerCase();
-                if (mediaName.includes(searchTerm)) {
-                    card.style.display = "block";
-                } else {
-                    card.style.display = "none";
-                }
-            });
-
-            // Filter News
-            newsItems.forEach(item => {
-                const headline = item.querySelector("h3").textContent.toLowerCase();
-                const media = item.querySelector("p").textContent.toLowerCase();
-                if (headline.includes(searchTerm) || media.includes(searchTerm)) {
-                    item.style.display = "block";
-                } else {
-                    item.style.display = "none";
-                }
-            });
+        // Search ka event listener
+        searchInput.addEventListener('input', () => {
+            currentPage = 1;
+            displayTime(searchInput.value, currentPage);
         });
 
-        // Dark Mode Toggle
-        document.getElementById("dark-mode-toggle").addEventListener("click", function() {
-            document.body.classList.toggle("dark-mode");
-            const icon = this.querySelector("i");
-            if (document.body.classList.contains("dark-mode")) {
-                icon.classList.remove("fa-moon");
-                icon.classList.add("fa-sun");
-            } else {
-                icon.classList.remove("fa-sun");
-                icon.classList.add("fa-moon");
-            }
+        // Dark mode toggle
+        darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
         });
 
-        // Back to Top Button
-        const backToTopBtn = document.getElementById("back-to-top");
-        window.addEventListener("scroll", function() {
-            if (window.scrollY > 300) {
-                backToTopBtn.style.display = "block";
-            } else {
-                backToTopBtn.style.display = "none";
-            }
+        // Dark mode preference load karo
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+
+        // Back to top button
+        window.addEventListener('scroll', () => {
+            backToTop.style.display = window.scrollY > 300 ? 'block' : 'none';
         });
 
-        backToTopBtn.addEventListener("click", function() {
-            window.scrollTo({ top: 0, behavior: "smooth" });
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // Initialize the page
-        renderStates();
-        renderMedia();
-        renderNews();
+        // Shuru mein display aur clock update
+        displayTime();
+        setInterval(updateClocks, 1000);
     </script>
 </body>
 </html>
