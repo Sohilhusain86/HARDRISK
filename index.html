@@ -1,426 +1,403 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duniya ke Saare Desh ka Live Time Table</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Moment.js aur Moment Timezone -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <title>Global World Clock</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
         body {
-            background: linear-gradient(to bottom, #1e3a8a, #3b82f6);
-            min-height: 100vh;
-            font-family: 'Arial', sans-serif;
-            color: #ffffff;
-            transition: background 0.5s ease, color 0.5s ease;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
         }
-        .dark-mode {
-            background: linear-gradient(to bottom, #2d3748, #4a5568);
-            color: #e2e8f0;
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
         }
-        .dark-mode .time-card {
-            background: rgba(255, 255, 255, 0.05);
+        .clock-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            transition: background-color 0.3s;
         }
-        .time-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        body.dark-mode .clock-container {
+            background: #2c2c2c;
         }
-        .time-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        h1 {
+            text-align: center;
+            color: #1a73e8;
+            margin-bottom: 20px;
+            font-size: 2.5em;
         }
-        #searchInput {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
+        body.dark-mode h1 {
+            color: #4a90e2;
         }
-        .header-container {
+        .controls {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: 1rem;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        #backToTop {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #3b82f6;
-            color: #fff;
+        .continent-filter {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            cursor: pointer;
+        }
+        body.dark-mode .continent-filter {
+            background: #3c3c3c;
+            border-color: #555;
+            color: #e0e0e0;
+        }
+        .toggle-dark-mode {
             padding: 10px 20px;
-            border-radius: 50%;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        body.dark-mode .toggle-dark-mode {
+            background: #4a90e2;
+        }
+        .clock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .clock {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        body.dark-mode .clock {
+            background: #3c3c3c;
+        }
+        .clock:hover {
+            transform: scale(1.05);
+        }
+        .city {
+            font-weight: bold;
+            color: #1a73e8;
+            font-size: 1.2em;
+        }
+        body.dark-mode .city {
+            color: #4a90e2;
+        }
+        .time {
+            font-size: 1.1em;
+            color: #333;
+        }
+        body.dark-mode .time {
+            color: #e0e0e0;
+        }
+        .continent {
+            font-size: 0.9em;
+            color: #666;
+        }
+        body.dark-mode .continent {
+            color: #aaa;
+        }
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1a73e8;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
             cursor: pointer;
             display: none;
-            transition: background 0.3s ease;
+            font-size: 16px;
         }
-        #backToTop:hover {
-            background: #2563eb;
+        body.dark-mode .back-to-top {
+            background: #4a90e2;
         }
-        #darkModeToggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #fff;
-            color: #1e3a8a;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: background 0.3s ease, color 0.3s ease;
+        .back-to-top.show {
+            display: block;
         }
-        .dark-mode #darkModeToggle {
-            background: #4a5568;
-            color: #e2e8f0;
-        }
-        .flag-img {
-            width: 40px;
-            height: 40px;
-            object-fit: cover;
-            margin: 0 auto 1rem;
-        }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        .pagination button {
-            padding: 0.5rem 1rem;
-            background: #3b82f6;
-            color: #fff;
-            border-radius: 0.5rem;
-            cursor: pointer;
-        }
-        .pagination button:hover {
-            background: #2563eb;
-        }
-        @media (max-width: 640px) {
-            .header-container h1 {
-                font-size: 1.5rem;
+        @media (max-width: 600px) {
+            .clock-grid {
+                grid-template-columns: 1fr;
             }
-            .time-card {
-                padding: 1rem;
+            h1 {
+                font-size: 1.8em;
+            }
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
             }
         }
     </style>
 </head>
-<body class="flex flex-col items-center p-4">
-    <!-- Dark Mode Toggle -->
-    <button id="darkModeToggle" aria-label="Dark Mode Toggle Karo">Dark Mode Toggle</button>
-
-    <!-- Back to Top Button -->
-    <button id="backToTop" aria-label="Wapas Upar Jao">⬆</button>
-
-    <!-- Header -->
-    <div class="header-container mb-6">
-        <img src="https://img.icons8.com/ios-filled/50/ffffff/globe.png" alt="Duniya ka Icon" class="w-10 h-10">
-        <h1 class="text-4xl font-bold text-center">Duniya ke Saare Desh ka Live Time Table</h1>
+<body>
+    <div class="clock-container">
+        <h1>Global World Clock</h1>
+        <div class="controls">
+            <select class="continent-filter" onchange="filterByContinent(this.value)">
+                <option value="all">All Continents</option>
+                <option value="Africa">Africa</option>
+                <option value="Asia">Asia</option>
+                <option value="Australia">Australia</option>
+                <option value="Europe">Europe</option>
+                <option value="North America">North America</option>
+                <option value="South America">South America</option>
+                <option value="Antarctica">Antarctica</option>
+            </select>
+            <button class="toggle-dark-mode" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+        </div>
+        <div class="clock-grid" id="clocks"></div>
+        <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Back to Top</button>
     </div>
-
-    <!-- Search Bar -->
-    <div class="w-full max-w-md mb-6">
-        <input type="text" id="searchInput" placeholder="Desh dhoondho..." 
-               class="w-full p-3 rounded-lg text-white placeholder-gray-300 focus:outline-none" 
-               aria-label="Desh dhoondho">
-    </div>
-
-    <!-- Time Table Container -->
-    <div id="timeContainer" class="w-full max-w-6xl mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-
-    <!-- Pagination -->
-    <div id="pagination" class="pagination"></div>
-
     <script>
-        // Data: Duniya ke 195 desh aur unke major time zones
-        const countries = [
-            { name: "Afghanistan", flag: "https://flagcdn.com/w40/af.png", timezones: ["Asia/Kabul"] },
-            { name: "Albania", flag: "https://flagcdn.com/w40/al.png", timezones: ["Europe/Tirane"] },
-            { name: "Algeria", flag: "https://flagcdn.com/w40/dz.png", timezones: ["Africa/Algiers"] },
-            { name: "Andorra", flag: "https://flagcdn.com/w40/ad.png", timezones: ["Europe/Andorra"] },
-            { name: "Angola", flag: "https://flagcdn.com/w40/ao.png", timezones: ["Africa/Luanda"] },
-            { name: "Antigua and Barbuda", flag: "https://flagcdn.com/w40/ag.png", timezones: ["America/Antigua"] },
-            { name: "Argentina", flag: "https://flagcdn.com/w40/ar.png", timezones: ["America/Argentina/Buenos_Aires", "America/Argentina/Cordoba"] },
-            { name: "Armenia", flag: "https://flagcdn.com/w40/am.png", timezones: ["Asia/Yerevan"] },
-            { name: "Australia", flag: "https://flagcdn.com/w40/au.png", timezones: ["Australia/Sydney", "Australia/Perth", "Australia/Adelaide", "Australia/Darwin"] },
-            { name: "Austria", flag: "https://flagcdn.com/w40/at.png", timezones: ["Europe/Vienna"] },
-            { name: "Azerbaijan", flag: "https://flagcdn.com/w40/az.png", timezones: ["Asia/Baku"] },
-            { name: "Bahamas", flag: "https://flagcdn.com/w40/bs.png", timezones: ["America/Nassau"] },
-            { name: "Bahrain", flag: "https://flagcdn.com/w40/bh.png", timezones: ["Asia/Bahrain"] },
-            { name: "Bangladesh", flag: "https://flagcdn.com/w40/bd.png", timezones: ["Asia/Dhaka"] },
-            { name: "Barbados", flag: "https://flagcdn.com/w40/bb.png", timezones: ["America/Barbados"] },
-            { name: "Belarus", flag: "https://flagcdn.com/w40/by.png", timezones: ["Europe/Minsk"] },
-            { name: "Belgium", flag: "https://flagcdn.com/w40/be.png", timezones: ["Europe/Brussels"] },
-            { name: "Belize", flag: "https://flagcdn.com/w40/bz.png", timezones: ["America/Belize"] },
-            { name: "Benin", flag: "https://flagcdn.com/w40/bj.png", timezones: ["Africa/Porto-Novo"] },
-            { name: "Bhutan", flag: "https://flagcdn.com/w40/bt.png", timezones: ["Asia/Thimphu"] },
-            { name: "Bolivia", flag: "https://flagcdn.com/w40/bo.png", timezones: ["America/La_Paz"] },
-            { name: "Bosnia and Herzegovina", flag: "https://flagcdn.com/w40/ba.png", timezones: ["Europe/Sarajevo"] },
-            { name: "Botswana", flag: "https://flagcdn.com/w40/bw.png", timezones: ["Africa/Gaborone"] },
-            { name: "Brazil", flag: "https://flagcdn.com/w40/br.png", timezones: ["America/Sao_Paulo", "America/Manaus", "America/Noronha"] },
-            { name: "Brunei", flag: "https://flagcdn.com/w40/bn.png", timezones: ["Asia/Brunei"] },
-            { name: "Bulgaria", flag: "https://flagcdn.com/w40/bg.png", timezones: ["Europe/Sofia"] },
-            { name: "Burkina Faso", flag: "https://flagcdn.com/w40/bf.png", timezones: ["Africa/Ouagadougou"] },
-            { name: "Burundi", flag: "https://flagcdn.com/w40/bi.png", timezones: ["Africa/Gitega"] },
-            { name: "Cambodia", flag: "https://flagcdn.com/w40/kh.png", timezones: ["Asia/Phnom_Penh"] },
-            { name: "Cameroon", flag: "https://flagcdn.com/w40/cm.png", timezones: ["Africa/Douala"] },
-            { name: "Canada", flag: "https://flagcdn.com/w40/ca.png", timezones: ["America/Toronto", "America/Vancouver", "America/Whitehorse", "America/St_Johns"] },
-            { name: "Cape Verde", flag: "https://flagcdn.com/w40/cv.png", timezones: ["Atlantic/Cape_Verde"] },
-            { name: "Central African Republic", flag: "https://flagcdn.com/w40/cf.png", timezones: ["Africa/Bangui"] },
-            { name: "Chad", flag: "https://flagcdn.com/w40/td.png", timezones: ["Africa/Ndjamena"] },
-            { name: "Chile", flag: "https://flagcdn.com/w40/cl.png", timezones: ["America/Santiago", "Pacific/Easter"] },
-            { name: "China", flag: "https://flagcdn.com/w40/cn.png", timezones: ["Asia/Shanghai"] },
-            { name: "Colombia", flag: "https://flagcdn.com/w40/co.png", timezones: ["America/Bogota"] },
-            { name: "Comoros", flag: "https://flagcdn.com/w40/km.png", timezones: ["Indian/Comoro"] },
-            { name: "Costa Rica", flag: "https://flagcdn.com/w40/cr.png", timezones: ["America/Costa_Rica"] },
-            { name: "Croatia", flag: "https://flagcdn.com/w40/hr.png", timezones: ["Europe/Zagreb"] },
-            { name: "Cuba", flag: "https://flagcdn.com/w40/cu.png", timezones: ["America/Havana"] },
-            { name: "Cyprus", flag: "https://flagcdn.com/w40/cy.png", timezones: ["Asia/Nicosia"] },
-            { name: "Czech Republic", flag: "https://flagcdn.com/w40/cz.png", timezones: ["Europe/Prague"] },
-            { name: "Democratic Republic of the Congo", flag: "https://flagcdn.com/w40/cd.png", timezones: ["Africa/Kinshasa", "Africa/Lubumbashi"] },
-            { name: "Denmark", flag: "https://flagcdn.com/w40/dk.png", timezones: ["Europe/Copenhagen"] },
-            { name: "Djibouti", flag: "https://flagcdn.com/w40/dj.png", timezones: ["Africa/Djibouti"] },
-            { name: "Dominica", flag: "https://flagcdn.com/w40/dm.png", timezones: ["America/Dominica"] },
-            { name: "Dominican Republic", flag: "https://flagcdn.com/w40/do.png", timezones: ["America/Santo_Domingo"] },
-            { name: "Ecuador", flag: "https://flagcdn.com/w40/ec.png", timezones: ["America/Guayaquil", "Pacific/Galapagos"] },
-            { name: "Egypt", flag: "https://flagcdn.com/w40/eg.png", timezones: ["Africa/Cairo"] },
-            { name: "El Salvador", flag: "https://flagcdn.com/w40/sv.png", timezones: ["America/El_Salvador"] },
-            { name: "Equatorial Guinea", flag: "https://flagcdn.com/w40/gq.png", timezones: ["Africa/Malabo"] },
-            { name: "Eritrea", flag: "https://flagcdn.com/w40/er.png", timezones: ["Africa/Asmara"] },
-            { name: "Estonia", flag: "https://flagcdn.com/w40/ee.png", timezones: ["Europe/Tallinn"] },
-            { name: "Eswatini", flag: "https://flagcdn.com/w40/sz.png", timezones: ["Africa/Mbabane"] },
-            { name: "Ethiopia", flag: "https://flagcdn.com/w40/et.png", timezones: ["Africa/Addis_Ababa"] },
-            { name: "Fiji", flag: "https://flagcdn.com/w40/fj.png", timezones: ["Pacific/Fiji"] },
-            { name: "Finland", flag: "https://flagcdn.com/w40/fi.png", timezones: ["Europe/Helsinki"] },
-            { name: "France", flag: "https://flagcdn.com/w40/fr.png", timezones: ["Europe/Paris", "Pacific/Tahiti", "Pacific/Noumea", "America/Marquesas"] },
-            { name: "Gabon", flag: "https://flagcdn.com/w40/ga.png", timezones: ["Africa/Libreville"] },
-            { name: "Gambia", flag: "https://flagcdn.com/w40/gm.png", timezones: ["Africa/Banjul"] },
-            { name: "Georgia", flag: "https://flagcdn.com/w40/ge.png", timezones: ["Asia/Tbilisi"] },
-            { name: "Germany", flag: "https://flagcdn.com/w40/de.png", timezones: ["Europe/Berlin"] },
-            { name: "Ghana", flag: "https://flagcdn.com/w40/gh.png", timezones: ["Africa/Accra"] },
-            { name: "Greece", flag: "https://flagcdn.com/w40/gr.png", timezones: ["Europe/Athens"] },
-            { name: "Grenada", flag: "https://flagcdn.com/w40/gd.png", timezones: ["America/Grenada"] },
-            { name: "Guatemala", flag: "https://flagcdn.com/w40/gt.png", timezones: ["America/Guatemala"] },
-            { name: "Guinea", flag: "https://flagcdn.com/w40/gn.png", timezones: ["Africa/Conakry"] },
-            { name: "Guinea-Bissau", flag: "https://flagcdn.com/w40/gw.png", timezones: ["Africa/Bissau"] },
-            { name: "Guyana", flag: "https://flagcdn.com/w40/gy.png", timezones: ["America/Guyana"] },
-            { name: "Haiti", flag: "https://flagcdn.com/w40/ht.png", timezones: ["America/Port-au-Prince"] },
-            { name: "Honduras", flag: "https://flagcdn.com/w40/hn.png", timezones: ["America/Tegucigalpa"] },
-            { name: "Hungary", flag: "https://flagcdn.com/w40/hu.png", timezones: ["Europe/Budapest"] },
-            { name: "Iceland", flag: "https://flagcdn.com/w40/is.png", timezones: ["Atlantic/Reykjavik"] },
-            { name: "India", flag: "https://flagcdn.com/w40/in.png", timezones: ["Asia/Kolkata"] },
-            { name: "Indonesia", flag: "https://flagcdn.com/w40/id.png", timezones: ["Asia/Jakarta", "Asia/Makassar", "Asia/Jayapura"] },
-            { name: "Iran", flag: "https://flagcdn.com/w40/ir.png", timezones: ["Asia/Tehran"] },
-            { name: "Iraq", flag: "https://flagcdn.com/w40/iq.png", timezones: ["Asia/Baghdad"] },
-            { name: "Ireland", flag: "https://flagcdn.com/w40/ie.png", timezones: ["Europe/Dublin"] },
-            { name: "Israel", flag: "https://flagcdn.com/w40/il.png", timezones: ["Asia/Jerusalem"] },
-            { name: "Italy", flag: "https://flagcdn.com/w40/it.png", timezones: ["Europe/Rome"] },
-            { name: "Jamaica", flag: "https://flagcdn.com/w40/jm.png", timezones: ["America/Jamaica"] },
-            { name: "Japan", flag: "https://flagcdn.com/w40/jp.png", timezones: ["Asia/Tokyo"] },
-            { name: "Jordan", flag: "https://flagcdn.com/w40/jo.png", timezones: ["Asia/Amman"] },
-            { name: "Kazakhstan", flag: "https://flagcdn.com/w40/kz.png", timezones: ["Asia/Almaty", "Asia/Aqtobe"] },
-            { name: "Kenya", flag: "https://flagcdn.com/w40/ke.png", timezones: ["Africa/Nairobi"] },
-            { name: "Kiribati", flag: "https://flagcdn.com/w40/ki.png", timezones: ["Pacific/Tarawa", "Pacific/Kiritimati"] },
-            { name: "Kuwait", flag: "https://flagcdn.com/w40/kw.png", timezones: ["Asia/Kuwait"] },
-            { name: "Kyrgyzstan", flag: "https://flagcdn.com/w40/kg.png", timezones: ["Asia/Bishkek"] },
-            { name: "Laos", flag: "https://flagcdn.com/w40/la.png", timezones: ["Asia/Vientiane"] },
-            { name: "Latvia", flag: "https://flagcdn.com/w40/lv.png", timezones: ["Europe/Riga"] },
-            { name: "Lebanon", flag: "https://flagcdn.com/w40/lb.png", timezones: ["Asia/Beirut"] },
-            { name: "Lesotho", flag: "https://flagcdn.com/w40/ls.png", timezones: ["Africa/Maseru"] },
-            { name: "Liberia", flag: "https://flagcdn.com/w40/lr.png", timezones: ["Africa/Monrovia"] },
-            { name: "Libya", flag: "https://flagcdn.com/w40/ly.png", timezones: ["Africa/Tripoli"] },
-            { name: "Liechtenstein", flag: "https://flagcdn.com/w40/li.png", timezones: ["Europe/Vaduz"] },
-            { name: "Lithuania", flag: "https://flagcdn.com/w40/lt.png", timezones: ["Europe/Vilnius"] },
-            { name: "Luxembourg", flag: "https://flagcdn.com/w40/lu.png", timezones: ["Europe/Luxembourg"] },
-            { name: "Madagascar", flag: "https://flagcdn.com/w40/mg.png", timezones: ["Indian/Antananarivo"] },
-            { name: "Malawi", flag: "https://flagcdn.com/w40/mw.png", timezones: ["Africa/Blantyre"] },
-            { name: "Malaysia", flag: "https://flagcdn.com/w40/my.png", timezones: ["Asia/Kuala_Lumpur", "Asia/Kuching"] },
-            { name: "Maldives", flag: "https://flagcdn.com/w40/mv.png", timezones: ["Indian/Maldives"] },
-            { name: "Mali", flag: "https://flagcdn.com/w40/ml.png", timezones: ["Africa/Bamako"] },
-            { name: "Malta", flag: "https://flagcdn.com/w40/mt.png", timezones: ["Europe/Malta"] },
-            { name: "Marshall Islands", flag: "https://flagcdn.com/w40/mh.png", timezones: ["Pacific/Majuro"] },
-            { name: "Mauritania", flag: "https://flagcdn.com/w40/mr.png", timezones: ["Africa/Nouakchott"] },
-            { name: "Mauritius", flag: "https://flagcdn.com/w40/mu.png", timezones: ["Indian/Mauritius"] },
-            { name: "Mexico", flag: "https://flagcdn.com/w40/mx.png", timezones: ["America/Mexico_City", "America/Tijuana"] },
-            { name: "Micronesia", flag: "https://flagcdn.com/w40/fm.png", timezones: ["Pacific/Pohnpei"] },
-            { name: "Moldova", flag: "https://flagcdn.com/w40/md.png", timezones: ["Europe/Chisinau"] },
-            { name: "Monaco", flag: "https://flagcdn.com/w40/mc.png", timezones: ["Europe/Monaco"] },
-            { name: "Mongolia", flag: "https://flagcdn.com/w40/mn.png", timezones: ["Asia/Ulaanbaatar"] },
-            { name: "Montenegro", flag: "https://flagcdn.com/w40/me.png", timezones: ["Europe/Podgorica"] },
-            { name: "Morocco", flag: "https://flagcdn.com/w40/ma.png", timezones: ["Africa/Casablanca"] },
-            { name: "Mozambique", flag: "https://flagcdn.com/w40/mz.png", timezones: ["Africa/Maputo"] },
-            { name: "Myanmar", flag: "https://flagcdn.com/w40/mm.png", timezones: ["Asia/Yangon"] },
-            { name: "Namibia", flag: "https://flagcdn.com/w40/na.png", timezones: ["Africa/Windhoek"] },
-            { name: "Nauru", flag: "https://flagcdn.com/w40/nr.png", timezones: ["Pacific/Nauru"] },
-            { name: "Nepal", flag: "https://flagcdn.com/w40/np.png", timezones: ["Asia/Kathmandu"] },
-            { name: "Netherlands", flag: "https://flagcdn.com/w40/nl.png", timezones: ["Europe/Amsterdam"] },
-            { name: "New Zealand", flag: "https://flagcdn.com/w40/nz.png", timezones: ["Pacific/Auckland", "Pacific/Chatham"] },
-            { name: "Nicaragua", flag: "https://flagcdn.com/w40/ni.png", timezones: ["America/Managua"] },
-            { name: "Niger", flag: "https://flagcdn.com/w40/ne.png", timezones: ["Africa/Niamey"] },
-            { name: "Nigeria", flag: "https://flagcdn.com/w40/ng.png", timezones: ["Africa/Lagos"] },
-            { name: "North Korea", flag: "https://flagcdn.com/w40/kp.png", timezones: ["Asia/Pyongyang"] },
-            { name: "North Macedonia", flag: "https://flagcdn.com/w40/mk.png", timezones: ["Europe/Skopje"] },
-            { name: "Norway", flag: "https://flagcdn.com/w40/no.png", timezones: ["Europe/Oslo"] },
-            { name: "Oman", flag: "https://flagcdn.com/w40/om.png", timezones: ["Asia/Muscat"] },
-            { name: "Pakistan", flag: "https://flagcdn.com/w40/pk.png", timezones: ["Asia/Karachi"] },
-            { name: "Palau", flag: "https://flagcdn.com/w40/pw.png", timezones: ["Pacific/Palau"] },
-            { name: "Panama", flag: "https://flagcdn.com/w40/pa.png", timezones: ["America/Panama"] },
-            { name: "Papua New Guinea", flag: "https://flagcdn.com/w40/pg.png", timezones: ["Pacific/Port_Moresby"] },
-            { name: "Paraguay", flag: "https://flagcdn.com/w40/py.png", timezones: ["America/Asuncion"] },
-            { name: "Peru", flag: "https://flagcdn.com/w40/pe.png", timezones: ["America/Lima"] },
-            { name: "Philippines", flag: "https://flagcdn.com/w40/ph.png", timezones: ["Asia/Manila"] },
-            { name: "Poland", flag: "https://flagcdn.com/w40/pl.png", timezones: ["Europe/Warsaw"] },
-            { name: "Portugal", flag: "https://flagcdn.com/w40/pt.png", timezones: ["Europe/Lisbon", "Atlantic/Azores"] },
-            { name: "Qatar", flag: "https://flagcdn.com/w40/qa.png", timezones: ["Asia/Qatar"] },
-            { name: "Republic of the Congo", flag: "https://flagcdn.com/w40/cg.png", timezones: ["Africa/Brazzaville"] },
-            { name: "Romania", flag: "https://flagcdn.com/w40/ro.png", timezones: ["Europe/Bucharest"] },
-            { name: "Russia", flag: "https://flagcdn.com/w40/ru.png", timezones: ["Europe/Moscow", "Asia/Vladivostok", "Asia/Yekaterinburg", "Europe/Kaliningrad", "Asia/Kamchatka"] },
-            { name: "Rwanda", flag: "https://flagcdn.com/w40/rw.png", timezones: ["Africa/Kigali"] },
-            { name: "Saint Kitts and Nevis", flag: "https://flagcdn.com/w40/kn.png", timezones: ["America/St_Kitts"] },
-            { name: "Saint Lucia", flag: "https://flagcdn.com/w40/lc.png", timezones: ["America/St_Lucia"] },
-            { name: "Saint Vincent and the Grenadines", flag: "https://flagcdn.com/w40/vc.png", timezones: ["America/St_Vincent"] },
-            { name: "Samoa", flag: "https://flagcdn.com/w40/ws.png", timezones: ["Pacific/Apia"] },
-            { name: "San Marino", flag: "https://flagcdn.com/w40/sm.png", timezones: ["Europe/San_Marino"] },
-            { name: "Sao Tome and Principe", flag: "https://flagcdn.com/w40/st.png", timezones: ["Africa/Sao_Tome"] },
-            { name: "Saudi Arabia", flag: "https://flagcdn.com/w40/sa.png", timezones: ["Asia/Riyadh"] },
-            { name: "Senegal", flag: "https://flagcdn.com/w40/sn.png", timezones: ["Africa/Dakar"] },
-            { name: "Serbia", flag: "https://flagcdn.com/w40/rs.png", timezones: ["Europe/Belgrade"] },
-            { name: "Seychelles", flag: "https://flagcdn.com/w40/sc.png", timezones: ["Indian/Mahe"] },
-            { name: "Sierra Leone", flag: "https://flagcdn.com/w40/sl.png", timezones: ["Africa/Freetown"] },
-            { name: "Singapore", flag: "https://flagcdn.com/w40/sg.png", timezones: ["Asia/Singapore"] },
-            { name: "Slovakia", flag: "https://flagcdn.com/w40/sk.png", timezones: ["Europe/Bratislava"] },
-            { name: "Slovenia", flag: "https://flagcdn.com/w40/si.png", timezones: ["Europe/Ljubljana"] },
-            { name: "Solomon Islands", flag: "https://flagcdn.com/w40/sb.png", timezones: ["Pacific/Guadalcanal"] },
-            { name: "Somalia", flag: "https://flagcdn.com/w40/so.png", timezones: ["Africa/Mogadishu"] },
-            { name: "South Africa", flag: "https://flagcdn.com/w40/za.png", timezones: ["Africa/Johannesburg"] },
-            { name: "South Korea", flag: "https://flagcdn.com/w40/kr.png", timezones: ["Asia/Seoul"] },
-            { name: "South Sudan", flag: "https://flagcdn.com/w40/ss.png", timezones: ["Africa/Juba"] },
-            { name: "Spain", flag: "https://flagcdn.com/w40/es.png", timezones: ["Europe/Madrid", "Atlantic/Canary"] },
-            { name: "Sri Lanka", flag: "https://flagcdn.com/w40/lk.png", timezones: ["Asia/Colombo"] },
-            { name: "Sudan", flag: "https://flagcdn.com/w40/sd.png", timezones: ["Africa/Khartoum"] },
-            { name: "Suriname", flag: "https://flagcdn.com/w40/sr.png", timezones: ["America/Paramaribo"] },
-            { name: "Sweden", flag: "https://flagcdn.com/w40/se.png", timezones: ["Europe/Stockholm"] },
-            { name: "Switzerland", flag: "https://flagcdn.com/w40/ch.png", timezones: ["Europe/Zurich"] },
-            { name: "Syria", flag: "https://flagcdn.com/w40/sy.png", timezones: ["Asia/Damascus"] },
-            { name: "Taiwan", flag: "https://flagcdn.com/w40/tw.png", timezones: ["Asia/Taipei"] },
-            { name: "Tajikistan", flag: "https://flagcdn.com/w40/tj.png", timezones: ["Asia/Dushanbe"] },
-            { name: "Tanzania", flag: "https://flagcdn.com/w40/tz.png", timezones: ["Africa/Dar_es_Salaam"] },
-            { name: "Thailand", flag: "https://flagcdn.com/w40/th.png", timezones: ["Asia/Bangkok"] },
-            { name: "Timor-Leste", flag: "https://flagcdn.com/w40/tl.png", timezones: ["Asia/Dili"] },
-            { name: "Togo", flag: "https://flagcdn.com/w40/tg.png", timezones: ["Africa/Lome"] },
-            { name: "Tonga", flag: "https://flagcdn.com/w40/to.png", timezones: ["Pacific/Tongatapu"] },
-            { name: "Trinidad and Tobago", flag: "https://flagcdn.com/w40/tt.png", timezones: ["America/Port_of_Spain"] },
-            { name: "Tunisia", flag: "https://flagcdn.com/w40/tn.png", timezones: ["Africa/Tunis"] },
-            { name: "Turkey", flag: "https://flagcdn.com/w40/tr.png", timezones: ["Europe/Istanbul"] },
-            { name: "Turkmenistan", flag: "https://flagcdn.com/w40/tm.png", timezones: ["Asia/Ashgabat"] },
-            { name: "Tuvalu", flag: "https://flagcdn.com/w40/tv.png", timezones: ["Pacific/Funafuti"] },
-            { name: "Uganda", flag: "https://flagcdn.com/w40/ug.png", timezones: ["Africa/Kampala"] },
-            { name: "Ukraine", flag: "https://flagcdn.com/w40/ua.png", timezones: ["Europe/Kiev"] },
-            { name: "United Arab Emirates", flag: "https://flagcdn.com/w40/ae.png", timezones: ["Asia/Dubai"] },
-            { name: "United Kingdom", flag: "https://flagcdn.com/w40/gb.png", timezones: ["Europe/London"] },
-            { name: "United States", flag: "https://flagcdn.com/w40/us.png", timezones: ["America/New_York", "America/Los_Angeles", "America/Chicago", "Pacific/Honolulu", "America/Anchorage", "America/Phoenix"] },
-            { name: "Uruguay", flag: "https://flagcdn.com/w40/uy.png", timezones: ["America/Montevideo"] },
-            { name: "Uzbekistan", flag: "https://flagcdn.com/w40/uz.png", timezones: ["Asia/Tashkent"] },
-            { name: "Vanuatu", flag: "https://flagcdn.com/w40/vu.png", timezones: ["Pacific/Efate"] },
-            { name: "Venezuela", flag: "https://flagcdn.com/w40/ve.png", timezones: ["America/Caracas"] },
-            { name: "Vietnam", flag: "https://flagcdn.com/w40/vn.png", timezones: ["Asia/Ho_Chi_Minh"] },
-            { name: "Yemen", flag: "https://flagcdn.com/w40/ye.png", timezones: ["Asia/Aden"] },
-            { name: "Zambia", flag: "https://flagcdn.com/w40/zm.png", timezones: ["Africa/Lusaka"] },
-            { name: "Zimbabwe", flag: "https://flagcdn.com/w40/zw.png", timezones: ["Africa/Harare"] }
+        const cities = [
+            { name: 'New York', tz: 'America/New_York', continent: 'North America' },
+            { name: 'Los Angeles', tz: 'America/Los_Angeles', continent: 'North America' },
+            { name: 'Toronto', tz: 'America/Toronto', continent: 'North America' },
+            { name: 'Mexico City', tz: 'America/Mexico_City', continent: 'North America' },
+            { name: 'Chicago', tz: 'America/Chicago', continent: 'North America' },
+            { name: 'Vancouver', tz: 'America/Vancouver', continent: 'North America' },
+            { name: 'Havana', tz: 'America/Havana', continent: 'North America' },
+            { name: 'Nassau', tz: 'America/Nassau', continent: 'North America' },
+            { name: 'San Jose', tz: 'America/Costa_Rica', continent: 'North America' },
+            { name: 'Guatemala City', tz: 'America/Guatemala', continent: 'North America' },
+            { name: 'London', tz: 'Europe/London', continent: 'Europe' },
+            { name: 'Paris', tz: 'Europe/Paris', continent: 'Europe' },
+            { name: 'Berlin', tz: 'Europe/Berlin', continent: 'Europe' },
+            { name: 'Moscow', tz: 'Europe/Moscow', continent: 'Europe' },
+            { name: 'Rome', tz: 'Europe/Rome', continent: 'Europe' },
+            { name: 'Madrid', tz: 'Europe/Madrid', continent: 'Europe' },
+            { name: 'Kyiv', tz: 'Europe/Kyiv', continent: 'Europe' },
+            { name: 'Stockholm', tz: 'Europe/Stockholm', continent: 'Europe' },
+            { name: 'Amsterdam', tz: 'Europe/Amsterdam', continent: 'Europe' },
+            { name: 'Istanbul', tz: 'Europe/Istanbul', continent: 'Europe' },
+            { name: 'Tokyo', tz: 'Asia/Tokyo', continent: 'Asia' },
+            { name: 'Beijing', tz: 'Asia/Shanghai', continent: 'Asia' },
+            { name: 'Mumbai', tz: 'Asia/Kolkata', continent: 'Asia' },
+            { name: 'Dubai', tz: 'Asia/Dubai', continent: 'Asia' },
+            { name: 'Singapore', tz: 'Asia/Singapore', continent: 'Asia' },
+            { name: 'Hong Kong', tz: 'Asia/Hong_Kong', continent: 'Asia' },
+            { name: 'Seoul', tz: 'Asia/Seoul', continent: 'Asia' },
+            { name: 'Bangkok', tz: 'Asia/Bangkok', continent: 'Asia' },
+            { name: 'Jakarta', tz: 'Asia/Jakarta', continent: 'Asia' },
+            { name: 'Delhi', tz: 'Asia/Kolkata', continent: 'Asia' },
+            { name: 'Karachi', tz: 'Asia/Karachi', continent: 'Asia' },
+            { name: 'Manila', tz: 'Asia/Manila', continent: 'Asia' },
+            { name: 'Hanoi', tz: 'Asia/Ho_Chi_Minh', continent: 'Asia' },
+            { name: 'Colombo', tz: 'Asia/Colombo', continent: 'Asia' },
+            { name: 'Kathmandu', tz: 'Asia/Kathmandu', continent: 'Asia' },
+            { name: 'Dhaka', tz: 'Asia/Dhaka', continent: 'Asia' },
+            { name: 'Yangon', tz: 'Asia/Yangon', continent: 'Asia' },
+            { name: 'Riyadh', tz: 'Asia/Riyadh', continent: 'Asia' },
+            { name: 'Kuala Lumpur', tz: 'Asia/Kuala_Lumpur', continent: 'Asia' },
+            { name: 'Sydney', tz: 'Australia/Sydney', continent: 'Australia' },
+            { name: 'Melbourne', tz: 'Australia/Melbourne', continent: 'Australia' },
+            { name: 'Perth', tz: 'Australia/Perth', continent: 'Australia' },
+            { name: 'Adelaide', tz: 'Australia/Adelaide', continent: 'Australia' },
+            { name: 'Brisbane', tz: 'Australia/Brisbane', continent: 'Australia' },
+            { name: 'Auckland', tz: 'Pacific/Auckland', continent: 'Australia' },
+            { name: 'Cape Town', tz: 'Africa/Johannesburg', continent: 'Africa' },
+            { name: 'Cairo', tz: 'Africa/Cairo', continent: 'Africa' },
+            { name: 'Lagos', tz: 'Africa/Lagos', continent: 'Africa' },
+            { name: 'Nairobi', tz: 'Africa/Nairobi', continent: 'Africa' },
+            { name: 'Accra', tz: 'Africa/Accra', continent: 'Africa' },
+            { name: 'Algiers', tz: 'Africa/Algiers', continent: 'Africa' },
+            { name: 'Addis Ababa', tz: 'Africa/Addis_Ababa', continent: 'Africa' },
+            { name: 'Tunis', tz: 'Africa/Tunis', continent: 'Africa' },
+            { name: 'Buenos Aires', tz: 'America/Argentina/Buenos_Aires', continent: 'South America' },
+            { name: 'Rio de Janeiro', tz: 'America/Sao_Paulo', continent: 'South America' },
+            { name: 'Santiago', tz: 'America/Santiago', continent: 'South America' },
+            { name: 'Lima', tz: 'America/Lima', continent: 'South America' },
+            { name: 'Bogota', tz: 'America/Bogota', continent: 'South America' },
+            { name: 'Caracas', tz: 'America/Caracas', continent: 'South America' },
+            { name: 'La Paz', tz: 'America/La_Paz', continent: 'South America' },
+            { name: 'McMurdo', tz: 'Antarctica/McMurdo', continent: 'Antarctica' },
+            { name: 'Honolulu', tz: 'Pacific/Honolulu', continent: 'North America' },
+            { name: 'Anchorage', tz: 'America/Anchorage', continent: 'North America' },
+            { name: 'Reykjavik', tz: 'Atlantic/Reykjavik', continent: 'Europe' },
+            { name: 'Lisbon', tz: 'Europe/Lisbon', continent: 'Europe' },
+            { name: 'Athens', tz: 'Europe/Athens', continent: 'Europe' },
+            { name: 'Helsinki', tz: 'Europe/Helsinki', continent: 'Europe' },
+            { name: 'Warsaw', tz: 'Europe/Warsaw', continent: 'Europe' },
+            { name: 'Prague', tz: 'Europe/Prague', continent: 'Europe' },
+            { name: 'Budapest', tz: 'Europe/Budapest', continent: 'Europe' },
+            { name: 'Vienna', tz: 'Europe/Vienna', continent: 'Europe' },
+            { name: 'Bucharest', tz: 'Europe/Bucharest', continent: 'Europe' },
+            { name: 'Sofia', tz: 'Europe/Sofia', continent: 'Europe' },
+            { name: 'Minsk', tz: 'Europe/Minsk', continent: 'Europe' },
+            { name: 'Brussels', tz: 'Europe/Brussels', continent: 'Europe' },
+            { name: 'Copenhagen', tz: 'Europe/Copenhagen', continent: 'Europe' },
+            { name: 'Dublin', tz: 'Europe/Dublin', continent: 'Europe' },
+            { name: 'Oslo', tz: 'Europe/Oslo', continent: 'Europe' },
+            { name: 'Belgrade', tz: 'Europe/Belgrade', continent: 'Europe' },
+            { name: 'Zurich', tz: 'Europe/Zurich', continent: 'Europe' },
+            { name: 'Tehran', tz: 'Asia/Tehran', continent: 'Asia' },
+            { name: 'Baghdad', tz: 'Asia/Baghdad', continent: 'Asia' },
+            { name: 'Amman', tz: 'Asia/Amman', continent: 'Asia' },
+            { name: 'Beirut', tz: 'Asia/Beirut', continent: 'Asia' },
+            { name: 'Damascus', tz: 'Asia/Damascus', continent: 'Asia' },
+            { name: 'Kabul', tz: 'Asia/Kabul', continent: 'Asia' },
+            { name: 'Tashkent', tz: 'Asia/Tashkent', continent: 'Asia' },
+            { name: 'Almaty', tz: 'Asia/Almaty', continent: 'Asia' },
+            { name: 'Bishkek', tz: 'Asia/Bishkek', continent: 'Asia' },
+            { name: 'Dushanbe', tz: 'Asia/Dushanbe', continent: 'Asia' },
+            { name: 'Ashgabat', tz: 'Asia/Ashgabat', continent: 'Asia' },
+            { name: 'Islamabad', tz: 'Asia/Karachi', continent: 'Asia' },
+            { name: 'Ulaanbaatar', tz: 'Asia/Ulaanbaatar', continent: 'Asia' },
+            { name: 'Pyongyang', tz: 'Asia/Pyongyang', continent: 'Asia' },
+            { name: 'Taipei', tz: 'Asia/Taipei', continent: 'Asia' },
+            { name: 'Phnom Penh', tz: 'Asia/Phnom_Penh', continent: 'Asia' },
+            { name: 'Vientiane', tz: 'Asia/Vientiane', continent: 'Asia' },
+            { name: 'Dili', tz: 'Asia/Dili', continent: 'Asia' },
+            { name: 'Male', tz: 'Indian/Maldives', continent: 'Asia' },
+            { name: 'Thimphu', tz: 'Asia/Thimphu', continent: 'Asia' },
+            { name: 'Astana', tz: 'Asia/Almaty', continent: 'Asia' },
+            { name: 'Yerevan', tz: 'Asia/Yerevan', continent: 'Asia' },
+            { name: 'Tbilisi', tz: 'Asia/Tbilisi', continent: 'Asia' },
+            { name: 'Baku', tz: 'Asia/Baku', continent: 'Asia' },
+            { name: 'Ankara', tz: 'Europe/Istanbul', continent: 'Asia' },
+            { name: 'Muscat', tz: 'Asia/Muscat', continent: 'Asia' },
+            { name: 'Doha', tz: 'Asia/Qatar', continent: 'Asia' },
+            { name: 'Kuwait City', tz: 'Asia/Kuwait', continent: 'Asia' },
+            { name: 'Manama', tz: 'Asia/Bahrain', continent: 'Asia' },
+            { name: 'Sanaa', tz: 'Asia/Aden', continent: 'Asia' },
+            { name: 'Nouakchott', tz: 'Africa/Nouakchott', continent: 'Africa' },
+            { name: 'Rabat', tz: 'Africa/Casablanca', continent: 'Africa' },
+            { name: 'Tripoli', tz: 'Africa/Tripoli', continent: 'Africa' },
+            { name: 'Khartoum', tz: 'Africa/Khartoum', continent: 'Africa' },
+            { name: 'Juba', tz: 'Africa/Juba', continent: 'Africa' },
+            { name: 'Mogadishu', tz: 'Africa/Mogadishu', continent: 'Africa' },
+            { name: 'Dar es Salaam', tz: 'Africa/Dar_es_Salaam', continent: 'Africa' },
+            { name: 'Kampala', tz: 'Africa/Kampala', continent: 'Africa' },
+            { name: 'Kigali', tz: 'Africa/Kigali', continent: 'Africa' },
+            { name: 'Lusaka', tz: 'Africa/Lusaka', continent: 'Africa' },
+            { name: 'Harare', tz: 'Africa/Harare', continent: 'Africa' },
+            { name: 'Gaborone', tz: 'Africa/Gaborone', continent: 'Africa' },
+            { name: 'Maputo', tz: 'Africa/Maputo', continent: 'Africa' },
+            { name: 'Windhoek', tz: 'Africa/Windhoek', continent: 'Africa' },
+            { name: 'Luanda', tz: 'Africa/Luanda', continent: 'Africa' },
+            { name: 'Yaounde', tz: 'Africa/Yaounde', continent: 'Africa' },
+            { name: 'Malabo', tz: 'Africa/Malabo', continent: 'Africa' },
+            { name: 'Brazzaville', tz: 'Africa/Brazzaville', continent: 'Africa' },
+            { name: 'Kinshasa', tz: 'Africa/Kinshasa', continent: 'Africa' },
+            { name: 'Abuja', tz: 'Africa/Lagos', continent: 'Africa' },
+            { name: 'Monrovia', tz: 'Africa/Monrovia', continent: 'Africa' },
+            { name: 'Freetown', tz: 'Africa/Freetown', continent: 'Africa' },
+            { name: 'Conakry', tz: 'Africa/Conakry', continent: 'Africa' },
+            { name: 'Bamako', tz: 'Africa/Bamako', continent: 'Africa' },
+            { name: 'Dakar', tz: 'Africa/Dakar', continent: 'Africa' },
+            { name: 'Banjul', tz: 'Africa/Banjul', continent: 'Africa' },
+            { name: 'Bissau', tz: 'Africa/Bissau', continent: 'Africa' },
+            { name: 'Praia', tz: 'Atlantic/Cape_Verde', continent: 'Africa' },
+            { name: 'Sao Tome', tz: 'Africa/Sao_Tome', continent: 'Africa' },
+            { name: 'Port Louis', tz: 'Indian/Mauritius', continent: 'Africa' },
+            { name: 'Victoria', tz: 'Indian/Mahe', continent: 'Africa' },
+            { name: 'Moroni', tz: 'Indian/Comoro', continent: 'Africa' },
+            { name: 'Antananarivo', tz: 'Indian/Antananarivo', continent: 'Africa' },
+            { name: 'Montevideo', tz: 'America/Montevideo', continent: 'South America' },
+            { name: 'Asuncion', tz: 'America/Asuncion', continent: 'South America' },
+            { name: 'Georgetown', tz: 'America/Guyana', continent: 'South America' },
+            { name: 'Paramaribo', tz: 'America/Paramaribo', continent: 'South America' },
+            { name: 'La Paz', tz: 'America/La_Paz', continent: 'South America' },
+            { name: 'Quito', tz: 'America/Guayaquil', continent: 'South America' },
+            { name: 'Sucre', tz: 'America/La_Paz', continent: 'South America' },
+            { name: 'Stanley', tz: 'Atlantic/Stanley', continent: 'South America' },
+            { name: 'Wellington', tz: 'Pacific/Auckland', continent: 'Australia' },
+            { name: 'Canberra', tz: 'Australia/Canberra', continent: 'Australia' },
+            { name: 'Hobart', tz: 'Australia/Hobart', continent: 'Australia' },
+            { name: 'Darwin', tz: 'Australia/Darwin', continent: 'Australia' },
+            { name: 'Suva', tz: 'Pacific/Fiji', continent: 'Australia' },
+            { name: 'Port Moresby', tz: 'Pacific/Port_Moresby', continent: 'Australia' },
+            { name: 'Honiara', tz: 'Pacific/Guadalcanal', continent: 'Australia' },
+            { name: 'Nukuʻalofa', tz: 'Pacific/Tongatapu', continent: 'Australia' },
+            { name: 'Apia', tz: 'Pacific/Apia', continent: 'Australia' },
+            { name: 'Funafuti', tz: 'Pacific/Funafuti', continent: 'Australia' },
+            { name: 'Tarawa', tz: 'Pacific/Tarawa', continent: 'Australia' },
+            { name: 'Majuro', tz: 'Pacific/Majuro', continent: 'Australia' },
+            { name: 'Yaren', tz: 'Pacific/Nauru', continent: 'Australia' },
+            { name: 'Palikir', tz: 'Pacific/Pohnpei', continent: 'Australia' },
+            { name: 'Ngerulmud', tz: 'Pacific/Palau', continent: 'Australia' },
+            { name: 'South Pole', tz: 'Antarctica/South_Pole', continent: 'Antarctica' },
+            { name: 'Casey', tz: 'Antarctica/Casey', continent: 'Antarctica' },
+            { name: 'Davis', tz: 'Antarctica/Davis', continent: 'Antarctica' },
+            { name: 'DumontDUrville', tz: 'Antarctica/DumontDUrville', continent: 'Antarctica' },
+            { name: 'Mawson', tz: 'Antarctica/Mawson', continent: 'Antarctica' },
+            { name: 'Palmer', tz: 'Antarctica/Palmer', continent: 'Antarctica' },
+            { name: 'Rothera', tz: 'Antarctica/Rothera', continent: 'Antarctica' },
+            { name: 'Syowa', tz: 'Antarctica/Syowa', continent: 'Antarctica' },
+            { name: 'Troll', tz: 'Antarctica/Troll', continent: 'Antarctica' },
+            { name: 'Vostok', tz: 'Antarctica/Vostok', continent: 'Antarctica' }
         ];
 
-        // DOM elements
-        const timeContainer = document.getElementById('timeContainer');
-        const searchInput = document.getElementById('searchInput');
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const backToTop = document.getElementById('backToTop');
-        const pagination = document.getElementById('pagination');
-
-        // Pagination variables
-        let currentPage = 1;
-        const perPage = 30;
-
-        // Time display karo
-        function displayTime(searchTerm = '', pageNum = 1) {
-            timeContainer.innerHTML = '';
-            const filteredCountries = countries.filter(country => 
-                color.name.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            const start = (pageNum - 1) * perPage;
-            const end = start + perPage;
-            const paginatedCountries = filteredCountries.slice(start, end);
-
-            paginatedCountries.forEach(country => {
-                const timeCard = document.createElement('div');
-                timeCard.className = 'time-card p-4 rounded-lg';
-                timeCard.innerHTML = `
-                    <img src="${country.flag}" alt="${country.name} ka Jhanda" class="flag-img">
-                    <h2 class="text-xl font-bold mb-2">${country.name}</h2>
-                    <div class="grid grid-cols-1 gap-2">
-                        ${country.timezones.map(timezone => `
-                            <div class="p-3 rounded-lg text-center">
-                                <p class="font-bold">${timezone.split('/').pop()}</p>
-                                <p id="time-${country.name}-${timezone}">${moment().tz(timezone).format('HH:mm:ss, MMMM Do YYYY')}</p>
-                                <p class="text-sm">Timezone: ${timezone}</p>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-                timeContainer.appendChild(timeCard);
-            });
-
-            // Pagination buttons
-            pagination.innerHTML = `
-                <div class="flex justify-center gap-4">
-                    ${pageNum > 1 ? `<button onclick="displayTime('${searchTerm}', ${pageNum - 1})">Previous</button>` : ''}
-                    ${end < filteredCountries.length ? `<button onclick="displayTime('${searchTerm}', ${pageNum + 1})">Next</button>` : ''}
-                </div>
-            `;
-
-            updateClocks();
-        }
-
-        // Har second clock update karo
-        function updateClocks() {
-            countries.forEach(country => {
-                country.timezones.forEach(timezone => {
-                    const timeElement = document.getElementById(`time-${country.name}-${timezone}`);
-                    if (timeElement) {
-                        timeElement.textContent = moment().tz(timezone).format('HH:mm:ss, MMMM Do YYYY');
-                    }
+        function updateClocks(filter = 'all') {
+            const now = new Date();
+            const clocksDiv = document.getElementById('clocks');
+            clocksDiv.innerHTML = '';
+            const filteredCities = filter === 'all' ? cities : cities.filter(city => city.continent === filter);
+            filteredCities.forEach(city => {
+                const time = now.toLocaleTimeString('en-US', {
+                    timeZone: city.tz,
+                    hour12: true,
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    second: '2-digit'
                 });
+                const date = now.toLocaleDateString('en-US', { timeZone: city.tz });
+                const clockDiv = document.createElement('div');
+                clockDiv.className = 'clock';
+                clockDiv.innerHTML = `
+                    <div class="city">${city.name}</div>
+                    <div class="time">${time}</div>
+                    <div class="continent">${city.continent} - ${date}</div>
+                `;
+                clocksDiv.appendChild(clockDiv);
             });
         }
 
-        // Search ka event listener
-        searchInput.addEventListener('input', () => {
-            currentPage = 1;
-            displayTime(searchInput.value, currentPage);
-        });
+        function filterByContinent(continent) {
+            updateClocks(continent);
+        }
 
-        // Dark mode toggle
-        darkModeToggle.addEventListener('click', () => {
+        function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+
+        function lazyLoadClocks() {
+            updateClocks();
+            setInterval(() => updateClocks(document.querySelector('.continent-filter').value), 1000);
+        }
+
+        window.addEventListener('scroll', () => {
+            const backToTop = document.querySelector('.back-to-top');
+            backToTop.classList.toggle('show', window.scrollY > 300);
         });
 
-        // Dark mode preference load karo
+        // Restore dark mode preference
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark-mode');
         }
 
-        // Back to top button
-        window.addEventListener('scroll', () => {
-            backToTop.style.display = window.scrollY > 300 ? 'block' : 'none';
-        });
-
-        backToTop.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-        // Shuru mein display aur clock update
-        displayTime();
-        setInterval(updateClocks, 1000);
+        // Initialize
+        lazyLoadClocks();
     </script>
 </body>
 </html>
