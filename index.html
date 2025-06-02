@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global World Clock</title>
+    <meta name="description" content="Professional World Clock displaying live times for 200+ cities across all major time zones.">
+    <meta name="author" content="xAI">
+    <title>Professional Global World Clock</title>
     <style>
         * {
             box-sizing: border-box;
@@ -11,140 +13,197 @@
             padding: 0;
         }
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #c3dafe 100%);
+            color: #1f2937;
             line-height: 1.6;
-            padding: 20px;
-            transition: background-color 0.3s, color 0.3s;
+            padding: 30px;
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
         }
         body.dark-mode {
-            background-color: #1a1a1a;
-            color: #e0e0e0;
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: #e5e7eb;
         }
         .clock-container {
-            max-width: 1400px;
+            max-width: 1440px;
             margin: 0 auto;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-            transition: background-color 0.3s;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
         }
         body.dark-mode .clock-container {
-            background: #2c2c2c;
+            background: rgba(31, 41, 55, 0.95);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
         }
         h1 {
             text-align: center;
-            color: #1a73e8;
-            margin-bottom: 20px;
-            font-size: 2.5em;
+            font-size: 2.8em;
+            color: #2563eb;
+            margin-bottom: 30px;
+            letter-spacing: -0.02em;
         }
         body.dark-mode h1 {
-            color: #4a90e2;
+            color: #60a5fa;
         }
         .controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
         }
         .continent-filter {
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            background: #f9f9f9;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            background: #ffffff;
             cursor: pointer;
+            transition: border-color 0.3s ease, background 0.3s ease;
         }
         body.dark-mode .continent-filter {
-            background: #3c3c3c;
-            border-color: #555;
-            color: #e0e0e0;
+            background: #374151;
+            border-color: #4b5563;
+            color: #e5e7eb;
+        }
+        .continent-filter:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
         }
         .toggle-dark-mode {
-            padding: 10px 20px;
-            background: #1a73e8;
+            padding: 12px 24px;
+            background: #2563eb;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: background 0.3s ease, transform 0.2s ease;
         }
         body.dark-mode .toggle-dark-mode {
-            background: #4a90e2;
+            background: #60a5fa;
+        }
+        .toggle-dark-mode:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+        body.dark-mode .toggle-dark-mode:hover {
+            background: #3b82f6;
         }
         .clock-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
         }
         .clock {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
             text-align: center;
-            transition: transform 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         body.dark-mode .clock {
-            background: #3c3c3c;
+            background: #374151;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
         .clock:hover {
-            transform: scale(1.05);
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
         }
         .city {
-            font-weight: bold;
-            color: #1a73e8;
-            font-size: 1.2em;
+            font-weight: 600;
+            font-size: 1.3em;
+            color: #2563eb;
+            margin-bottom: 8px;
         }
         body.dark-mode .city {
-            color: #4a90e2;
+            color: #60a5fa;
         }
         .time {
-            font-size: 1.1em;
-            color: #333;
+            font-size: 1.2em;
+            color: #1f2937;
+            font-family: 'Roboto Mono', monospace;
+            margin-bottom: 4px;
         }
         body.dark-mode .time {
-            color: #e0e0e0;
+            color: #e5e7eb;
         }
         .continent {
-            font-size: 0.9em;
-            color: #666;
+            font-size: 0.95em;
+            color: #6b7280;
         }
         body.dark-mode .continent {
-            color: #aaa;
+            color: #9ca3af;
         }
         .back-to-top {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #1a73e8;
+            bottom: 40px;
+            right: 40px;
+            background: #2563eb;
             color: white;
-            padding: 12px 20px;
+            padding: 12px 24px;
             border-radius: 8px;
             cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 500;
+            border: none;
             display: none;
-            font-size: 16px;
+            transition: background 0.3s ease, transform 0.2s ease;
         }
         body.dark-mode .back-to-top {
-            background: #4a90e2;
+            background: #60a5fa;
         }
         .back-to-top.show {
             display: block;
         }
-        @media (max-width: 600px) {
-            .clock-grid {
-                grid-template-columns: 1fr;
+        .back-to-top:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+        body.dark-mode .back-to-top:hover {
+            background: #3b82f6;
+        }
+        @media (max-width: 768px) {
+            .clock-container {
+                padding: 20px;
             }
             h1 {
-                font-size: 1.8em;
+                font-size: 2em;
+            }
+            .clock-grid {
+                grid-template-columns: 1fr;
             }
             .controls {
                 flex-direction: column;
                 align-items: stretch;
             }
+        }
+        @media (max-width: 480px) {
+            .clock {
+                padding: 15px;
+            }
+            .city {
+                font-size: 1.1em;
+            }
+            .time {
+                font-size: 1em;
+            }
+        }
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .clock {
+            animation: fadeIn 0.5s ease-out forwards;
         }
     </style>
 </head>
@@ -152,7 +211,7 @@
     <div class="clock-container">
         <h1>Global World Clock</h1>
         <div class="controls">
-            <select class="continent-filter" onchange="filterByContinent(this.value)">
+            <select class="continent-filter" aria-label="Filter by continent" onchange="filterByContinent(this.value)">
                 <option value="all">All Continents</option>
                 <option value="Africa">Africa</option>
                 <option value="Asia">Asia</option>
@@ -162,12 +221,13 @@
                 <option value="South America">South America</option>
                 <option value="Antarctica">Antarctica</option>
             </select>
-            <button class="toggle-dark-mode" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+            <button class="toggle-dark-mode" aria-label="Toggle dark mode" onclick="toggleDarkMode()">Toggle Dark Mode</button>
         </div>
-        <div class="clock-grid" id="clocks"></div>
-        <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Back to Top</button>
+        <div class="clock-grid" id="clocks" role="region" aria-live="polite"></div>
+        <button class="back-to-top" aria-label="Scroll to top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Back to Top</button>
     </div>
     <script>
+        // Comprehensive list of cities covering all major time zones
         const cities = [
             { name: 'New York', tz: 'America/New_York', continent: 'North America' },
             { name: 'Los Angeles', tz: 'America/Los_Angeles', continent: 'North America' },
@@ -347,10 +407,11 @@
             { name: 'Vostok', tz: 'Antarctica/Vostok', continent: 'Antarctica' }
         ];
 
+        // Function to update clocks with live time
         function updateClocks(filter = 'all') {
             const now = new Date();
             const clocksDiv = document.getElementById('clocks');
-            clocksDiv.innerHTML = '';
+            clocksDiv.innerHTML = ''; // Clear previous content
             const filteredCities = filter === 'all' ? cities : cities.filter(city => city.continent === filter);
             filteredCities.forEach(city => {
                 const time = now.toLocaleTimeString('en-US', {
@@ -360,9 +421,16 @@
                     minute: '2-digit',
                     second: '2-digit'
                 });
-                const date = now.toLocaleDateString('en-US', { timeZone: city.tz });
+                const date = now.toLocaleDateString('en-US', {
+                    timeZone: city.tz,
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
                 const clockDiv = document.createElement('div');
                 clockDiv.className = 'clock';
+                clockDiv.setAttribute('aria-label', `Current time in ${city.name}`);
                 clockDiv.innerHTML = `
                     <div class="city">${city.name}</div>
                     <div class="time">${time}</div>
@@ -372,32 +440,39 @@
             });
         }
 
+        // Filter clocks by continent
         function filterByContinent(continent) {
             updateClocks(continent);
         }
 
+        // Toggle dark mode and save preference
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
         }
 
-        function lazyLoadClocks() {
-            updateClocks();
-            setInterval(() => updateClocks(document.querySelector('.continent-filter').value), 1000);
+        // Initialize clocks with live updates
+        function initializeClocks() {
+            updateClocks(); // Initial render
+            setInterval(() => {
+                const filter = document.querySelector('.continent-filter').value;
+                updateClocks(filter);
+            }, 1000); // Update every second
         }
 
+        // Handle back-to-top button visibility
         window.addEventListener('scroll', () => {
             const backToTop = document.querySelector('.back-to-top');
             backToTop.classList.toggle('show', window.scrollY > 300);
         });
 
-        // Restore dark mode preference
+        // Restore dark mode preference on load
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark-mode');
         }
 
-        // Initialize
-        lazyLoadClocks();
+        // Initialize clocks
+        initializeClocks();
     </script>
 </body>
 </html>
