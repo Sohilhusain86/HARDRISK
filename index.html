@@ -21,9 +21,18 @@
             background: linear-gradient(135deg, #f0f4f8, #d1d9e6);
             color: #333;
         }
+        .bismillah {
+            text-align: center;
+            font-size: 2.5em;
+            color: #27ae60;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            padding: 20px 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
         .header {
             text-align: center;
-            padding: 50px 20px;
+            padding: 30px 20px;
             background: rgba(0, 0, 0, 0.2);
             border-bottom: 2px solid #27ae60;
             position: relative;
@@ -39,6 +48,12 @@
             font-size: 1.2em;
             color: #a3bffa;
             margin-top: 10px;
+        }
+        .user-name {
+            font-size: 1.5em;
+            color: #27ae60;
+            margin-top: 10px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
         }
         .toggle-mode {
             position: absolute;
@@ -179,18 +194,22 @@
             color: #27ae60;
             margin-bottom: 20px;
         }
-        .instagram-link {
+        .social-links {
             text-align: center;
             padding: 20px;
             font-size: 1.2em;
             color: #a3bffa;
         }
-        .instagram-link a {
-            color: #e1306c;
+        .social-links a {
+            color: #25D366; /* व्हाट्सऐप ग्रीन */
             text-decoration: none;
+            margin: 0 10px;
         }
-        .instagram-link a:hover {
+        .social-links a:hover {
             text-decoration: underline;
+        }
+        .social-links .instagram {
+            color: #e1306c;
         }
         .footer {
             text-align: center;
@@ -200,19 +219,27 @@
             font-size: 0.9em;
             color: #a3bffa;
         }
+        .footer p.fiamanallah {
+            font-size: 1.2em;
+            color: #27ae60;
+            margin-top: 10px;
+        }
         @media (max-width: 700px) {
             .header h1 { font-size: 1.8em; }
             .book-card { width: 90%; }
             .books-section { padding: 20px 10px; }
             .search-bar, .request-form input, .request-form textarea { width: 90%; margin: 0 auto; }
             .audio-section { padding: 20px; }
+            .bismillah { font-size: 2em; }
         }
     </style>
 </head>
 <body>
+    <div class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
     <div class="header">
         <h1>اسلامی کتابیں ڈاؤن لوڈ کریں</h1>
-        <p>شاندار اسلامی کتابیں جو آپ کی روحانی ترقی میں مددگار ہیں - اب فوری ڈاؤن لوڈ کریں!</p>
+        <p>شاندار اسلامی کتابیں جو آپ کی روحانی ترقی میں مددگار ہیں</p>
+        <div id="userName" class="user-name"></div>
         <button class="toggle-mode" onclick="toggleMode()">موڈ تبدیل کریں</button>
         <input type="text" class="search-bar" placeholder="کتاب تلاش کریں..." onkeyup="searchBooks()">
     </div>
@@ -259,16 +286,19 @@
     </div>
     <div class="audio-section">
         <h2>سنوئیں خوبصورت نعت</h2>
-        <audio controls>
+        <audio id="naatAudio" autoplay>
             <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Koi%20Gul%20Baqi%20Rahega%20%5BSlowed%20_%20Reverb%5D%20Beautiful%20Naat%20__%20_lofinaatscreation(MP3_320K).mp3" type="audio/mpeg">
             Your browser does not support the audio element.
         </audio>
     </div>
-    <div class="instagram-link">
-        <p>ہمارے انسٹاگرام چینل کو فالو کریں: <a href="https://www.instagram.com/ansari_boyx6x?igsh=ajAzeGJyYjF2Z2p5" target="_blank">ansari_boyx6x</a></p>
+    <div class="social-links">
+        <p>ہم سے رابطہ کریں:</p>
+        <a href="https://www.instagram.com/ansari_boyx6x?igsh=ajAzeGJyYjF2Z2p5" target="_blank" class="instagram">انسٹاگرام</a>
+        <a href="https://chat.whatsapp.com/BC9MzzJqqJ99jsOdvDjNth" target="_blank">وہاٹس ایپ (مسالہ و مسائل)</a>
     </div>
     <div class="footer">
-        <p>© 2025 Sohilhusain86 | تمام حقوق محفوظ ہیں | بنائی گئی: 27 جولائی 2025، 05:03 PM IST</p>
+        <p>© 2025 Sohilhusain86 | تمام حقوق محفوظ ہیں | بنائی گئی: 27 جولائی 2025، 05:12 PM IST</p>
+        <p class="fiamanallah">فی امانﷲ</p>
     </div>
     <script>
         function toggleMode() {
@@ -297,9 +327,38 @@
             let name = document.querySelector('.request-form input[placeholder="آپ کا نام"]').value;
             let bookName = document.querySelector('.request-form input[placeholder="مطلوبہ کتاب کا نام"]').value;
             let message = document.querySelector('.request-form textarea').value || 'کوئی اضافی پیغام نہیں';
-            alert(`درخواست موصول ہوئی!\nنام: ${name}\nکتاب: ${bookName}\nپیغام: ${message}\nبراہ کرم اسے انسٹاگرام پر @ansari_boyx6x کو پیغام کریں۔`);
+            alert(`درخواست موصول ہوئی!\nنام: ${name}\nکتاب: ${bookName}\nپیغام: ${message}\nبراہ کرم اسے انسٹاگرام یا وہاٹس ایپ پر رابطہ کریں۔`);
             document.querySelector('.request-form').reset();
         }
+
+        // यूज़र का नाम हेडर में दिखाने के लिए
+        document.addEventListener('DOMContentLoaded', function() {
+            let userName = localStorage.getItem('userName');
+            if (!userName) {
+                userName = prompt('براہ کرم اپنا نام درج کریں:', 'مہمان');
+                if (userName) {
+                    localStorage.setItem('userName', userName);
+                } else {
+                    userName = 'مہمان';
+                    localStorage.setItem('userName', userName);
+                }
+            }
+            document.getElementById('userName').textContent = `خوش آمدید، ${userName}!`;
+
+            // ऑडियो को पेज लोड या इंटरैक्शन पर शुरू करने के लिए
+            const audio = document.getElementById('naatAudio');
+            audio.play().catch(function(error) {
+                console.log("ऑडियो ऑटो प्ले विफल: ", error);
+                document.body.addEventListener('click', function startAudio() {
+                    audio.play();
+                    document.body.removeEventListener('click', startAudio);
+                }, { once: true });
+                document.body.addEventListener('scroll', function startAudio() {
+                    audio.play();
+                    document.body.removeEventListener('scroll', startAudio);
+                }, { once: true });
+            });
+        });
     </script>
 </body>
 </html>
