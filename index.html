@@ -1,175 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Islamic Books Library</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #243b55, #141e30);
-            margin: 0;
-            padding: 0;
-            color: #f3f3f3;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        .dark-mode {
-            background: linear-gradient(135deg, #18222c, #243b55);
-            color: #e0e0e0;
-        }
-        .header {
-            text-align: center;
-            padding: 40px 20px 20px 20px;
-            background: rgba(0,0,0,0.1);
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 2.3em;
-            color: #27ae60;
-            letter-spacing: 2px;
-            text-shadow: 1px 2px 9px #141e30;
-        }
-        .header p {
-            color: #b2d8c7;
-            font-size: 1.1em;
-            margin-top: 10px;
-        }
-        .toggle-mode {
-            position: fixed;
-            top: 18px;
-            right: 18px;
-            padding: 8px 18px;
-            background-color: #27ae60;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            z-index: 99;
-            font-size: 1em;
-        }
-        .toggle-mode:hover {
-            background-color: #218c53;
-        }
-        .books-section {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 28px;
-            padding: 40px 15px 30px 15px;
-        }
-        .book-card {
-            background: rgba(255,255,255,0.08);
-            border-radius: 18px;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.2);
-            width: 320px;
-            padding: 26px 18px 22px 18px;
-            margin: 8px 0;
-            text-align: center;
-            transition: transform 0.2s;
-        }
-        .book-card:hover {
-            transform: scale(1.04);
-            background: rgba(39, 174, 96, 0.09);
-        }
-        .book-title {
-            font-size: 1.3em;
-            color: #27ae60;
-            margin-bottom: 7px;
-        }
-        .book-desc {
-            font-size: 1em;
-            color: #a9c5b8;
-            margin-bottom: 13px;
-        }
-        .download-btn {
-            background-color: #2980b9;
-            color: #fff;
-            padding: 10px 22px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1em;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background-color 0.2s;
-            display: inline-block;
-        }
-        .download-btn:hover {
-            background-color: #217dbb;
-        }
-        .note {
-            color: #e1e6e6;
-            text-align: center;
-            margin: 24px;
-            font-size: 0.98em;
-            font-style: italic;
-        }
-        .islamic-bg {
-            position: fixed;
-            top:0; left:0; width:100vw; height:100vh;
-            background: url('https://www.transparenttextures.com/patterns/arabesque.png') repeat;
-            opacity: 0.13;
-            z-index: -1;
-        }
-        @media (max-width: 600px) {
-            .header h1 { font-size: 1.4em; }
-            .books-section { flex-direction: column; align-items: center; }
-            .book-card { width: 98vw; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Islamic Books Download</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #243b55, #141e30);
+      color: #f3f3f3;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 500px;
+      margin: 60px auto 0 auto;
+      padding: 30px 20px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+      text-align: center;
+    }
+    h1 {
+      color: #27ae60;
+      margin-bottom: 18px;
+    }
+    .download-btn {
+      background-color: #2980b9;
+      color: #fff;
+      padding: 12px 32px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.1em;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 25px;
+      transition: background-color 0.2s;
+    }
+    .download-btn:hover {
+      background-color: #217dbb;
+    }
+    .note {
+      margin-top: 28px;
+      color: #e1e6e6;
+      font-size: 0.97em;
+      font-style: italic;
+    }
+  </style>
 </head>
 <body>
-    <div class="islamic-bg"></div>
-    <button class="toggle-mode" onclick="toggleDarkMode()">Toggle Dark Mode</button>
-    <div class="header">
-        <h1>Islamic Books Library</h1>
-        <p>Is website par aap Islamic books seedhe download kar sakte hain, bina kisi signup ke. <br>Neche apni pasand ki kitab par click karein aur turant download karein.</p>
-    </div>
-    <div class="books-section">
-        <!-- Book 1 -->
-        <div class="book-card">
-            <div class="book-title">Quran Majeed (PDF)</div>
-            <div class="book-desc">
-                Poora Quran Majeed Urdu tarjuma ke saath. Aasaan padhai ke liye.
-            </div>
-            <a href="https://github.com/Sohilhusain86/HARDRISK/raw/main/quran-majeed.pdf" class="download-btn" download>
-                Download PDF
-            </a>
-        </div>
-        <!-- Book 2 -->
-        <div class="book-card">
-            <div class="book-title">Namaz Ki Kitab</div>
-            <div class="book-desc">
-                Namaz aur uski ahmiyat par ek mukammal kitaab, aasan zubaan mein.
-            </div>
-            <a href="https://github.com/Sohilhusain86/HARDRISK/raw/main/namaz-book.pdf" class="download-btn" download>
-                Download PDF
-            </a>
-        </div>
-        <!-- Book 3 -->
-        <div class="book-card">
-            <div class="book-title">Islamic Stories (Bachon ke liye)</div>
-            <div class="book-desc">
-                Islami kahaniyan, bachon ki islahi wa ilmiyati tarbiyat ke liye.
-            </div>
-            <a href="https://github.com/Sohilhusain86/HARDRISK/raw/main/islamic-stories.pdf" class="download-btn" download>
-                Download PDF
-            </a>
-        </div>
-        <!-- Aur bhi books add kar sakte hain isi tarah -->
-    </div>
+  <div class="container">
+    <h1>بارہ تقریریں - PDF Islamic Book</h1>
+    <p>Yahan se aap seedhe book download kar sakte hain, bina kisi ad ya signup ke:</p>
+    <a href="https://github.com/Sohilhusain86/HARDRISK/raw/main/default.pdf" download class="download-btn">
+      Download "بارہ تقریریں" PDF
+    </a>
     <div class="note">
-        Note: Yeh PDFs direct GitHub repository se download hoti hain. Agar download na ho toh page ko refresh karein ya alag browser try karein.
+      Note: Agar download na ho toh page ko refresh karein ya alag browser try karein.<br>
+      Yeh link direct GitHub se hai.
     </div>
-
-    <script>
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-        }
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-        }
-    </script>
+  </div>
 </body>
 </html>
