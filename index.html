@@ -71,6 +71,12 @@
         .toggle-mode:hover {
             background-color: #27ae60;
         }
+        .toggle-mode.dark {
+            background-color: #34495e;
+        }
+        .toggle-mode.dark:hover {
+            background-color: #2c3e50;
+        }
         .search-bar {
             width: 70%;
             max-width: 400px;
@@ -85,6 +91,13 @@
         }
         .search-bar::placeholder {
             color: #a3bffa;
+        }
+        .light-mode .search-bar {
+            background-color: rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+        .light-mode .search-bar::placeholder {
+            color: #7f8c8d;
         }
         .books-section {
             display: flex;
@@ -111,6 +124,10 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             border: 1px solid #27ae60;
         }
+        .light-mode .book-card {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: #2ecc71;
+        }
         .book-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(39, 174, 96, 0.4);
@@ -122,11 +139,17 @@
             font-weight: 600;
             text-transform: uppercase;
         }
+        .light-mode .book-title {
+            color: #2ecc71;
+        }
         .book-desc {
             font-size: 1.1em;
             color: #b3c5ff;
             margin-bottom: 20px;
             padding: 0 10px;
+        }
+        .light-mode .book-desc {
+            color: #34495e;
         }
         .download-btn {
             background-color: #2ecc71;
@@ -143,6 +166,12 @@
             background-color: #27ae60;
             transform: scale(1.05);
         }
+        .light-mode .download-btn {
+            background-color: #27ae60;
+        }
+        .light-mode .download-btn:hover {
+            background-color: #219653;
+        }
         .request-section {
             text-align: center;
             padding: 40px 20px;
@@ -151,9 +180,15 @@
             max-width: 600px;
             border-radius: 15px;
         }
+        .light-mode .request-section {
+            background: rgba(0, 0, 0, 0.05);
+        }
         .request-section h2 {
             color: #27ae60;
             margin-bottom: 20px;
+        }
+        .light-mode .request-section h2 {
+            color: #2ecc71;
         }
         .request-form {
             display: flex;
@@ -169,6 +204,10 @@
             color: #e0e7ff;
             outline: none;
         }
+        .light-mode .request-form input, .light-mode .request-form textarea {
+            background-color: rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
         .request-form button {
             padding: 12px;
             background-color: #2ecc71;
@@ -182,6 +221,12 @@
         .request-form button:hover {
             background-color: #27ae60;
         }
+        .light-mode .request-form button {
+            background-color: #27ae60;
+        }
+        .light-mode .request-form button:hover {
+            background-color: #219653;
+        }
         .audio-section {
             text-align: center;
             padding: 40px 20px;
@@ -190,15 +235,24 @@
             max-width: 800px;
             border-radius: 15px;
         }
+        .light-mode .audio-section {
+            background: rgba(0, 0, 0, 0.05);
+        }
         .audio-section h2 {
             color: #27ae60;
             margin-bottom: 20px;
+        }
+        .light-mode .audio-section h2 {
+            color: #2ecc71;
         }
         .social-links {
             text-align: center;
             padding: 20px;
             font-size: 1.2em;
             color: #a3bffa;
+        }
+        .light-mode .social-links {
+            color: #34495e;
         }
         .social-links a {
             color: #25D366; /* व्हाट्सऐप ग्रीन */
@@ -211,6 +265,12 @@
         .social-links .instagram {
             color: #e1306c;
         }
+        .light-mode .social-links a {
+            color: #25D366;
+        }
+        .light-mode .social-links .instagram {
+            color: #e1306c;
+        }
         .footer {
             text-align: center;
             padding: 20px;
@@ -219,10 +279,17 @@
             font-size: 0.9em;
             color: #a3bffa;
         }
+        .light-mode .footer {
+            background: rgba(0, 0, 0, 0.05);
+            color: #34495e;
+        }
         .footer p.fiamanallah {
             font-size: 1.2em;
             color: #27ae60;
             margin-top: 10px;
+        }
+        .light-mode .footer p.fiamanallah {
+            color: #2ecc71;
         }
         @media (max-width: 700px) {
             .header h1 { font-size: 1.8em; }
@@ -240,7 +307,7 @@
         <h1>اسلامی کتابیں ڈاؤن لوڈ کریں</h1>
         <p>شاندار اسلامی کتابیں جو آپ کی روحانی ترقی میں مددگار ہیں</p>
         <div id="userName" class="user-name"></div>
-        <button class="toggle-mode" onclick="toggleMode()">موڈ تبدیل کریں</button>
+        <button id="modeToggle" class="toggle-mode" onclick="toggleMode()">موڈ تبدیل کریں</button>
         <input type="text" class="search-bar" placeholder="کتاب تلاش کریں..." onkeyup="searchBooks()">
     </div>
     <div class="books-section">
@@ -262,7 +329,7 @@
         <div class="book-card">
             <div class="book-title">اسلامی اخلاق و آداب (صدر الشریعه)</div>
             <div class="book-desc">اسلامی تعلیمات کے مطابق اخلاق اور آداب کی رہنمائی۔</div>
-            <a href="اسلامی اخلاق و آداب(صدر الشریعه).pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
+            <a href="اسلامی اخلاق و آداب(صدر الشریعه).pdf" class="download-btn" download>ڈاؤन لوڈ PDF</a>
         </div>
         <div class="book-card">
             <div class="book-title">مومن کی نماز (اردو)</div>
@@ -297,17 +364,78 @@
         <a href="https://chat.whatsapp.com/BC9MzzJqqJ99jsOdvDjNth" target="_blank">وہاٹس ایپ (مسالہ و مسائل)</a>
     </div>
     <div class="footer">
-        <p>© 2025 Sohilhusain86 | تمام حقوق محفوظ ہیں | بنائی گئی: 27 جولائی 2025، 05:12 PM IST</p>
+        <p>© 2025 Sohilhusain86 | تمام حقوق محفوظ ہیں | بنائی گئی: 27 جولائی 2025، 05:18 PM IST</p>
         <p class="fiamanallah">فی امانﷲ</p>
     </div>
     <script>
         function toggleMode() {
-            document.body.classList.toggle('light-mode');
-            localStorage.setItem('mode', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+            const body = document.body;
+            body.classList.toggle('light-mode');
+            const toggleBtn = document.getElementById('modeToggle');
+            if (body.classList.contains('light-mode')) {
+                toggleBtn.textContent = 'ڈارک موڈ';
+                toggleBtn.classList.add('dark');
+            } else {
+                toggleBtn.textContent = 'موڈ تبدیل کریں';
+                toggleBtn.classList.remove('dark');
+            }
+            localStorage.setItem('mode', body.classList.contains('light-mode') ? 'light' : 'dark');
         }
-        if (localStorage.getItem('mode') === 'light') {
-            document.body.classList.add('light-mode');
-        }
+
+        // डार्क/लाइट मोड की डिफॉल्ट सेटिंग
+        document.addEventListener('DOMContentLoaded', function() {
+            const body = document.body;
+            const savedMode = localStorage.getItem('mode');
+            const toggleBtn = document.getElementById('modeToggle');
+            if (savedMode === 'light') {
+                body.classList.add('light-mode');
+                toggleBtn.textContent = 'ڈارک موڈ';
+                toggleBtn.classList.add('dark');
+            } else {
+                body.classList.remove('light-mode');
+                toggleBtn.textContent = 'موڈ تبدیل کریں';
+                toggleBtn.classList.remove('dark');
+            }
+
+            // यूज़र का नाम पूछने के लिए कस्टम प्रॉम्प
+            let userName = localStorage.getItem('userName');
+            if (!userName) {
+                const customPrompt = `
+                    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; color: #fff; font-family: 'Segoe UI', Tahoma, sans-serif;">
+                        <div style="background: #1a2a44; padding: 20px; border-radius: 10px; text-align: center; max-width: 400px;">
+                            <h2 style="color: #27ae60;">خوش آمدید!</h2>
+                            <p style="margin: 10px 0;">یہ ویب سائٹ اسلامی کتابوں، نعتوں، اور دینی معلومات فراہم کرنے کے لیے ہے۔ آپ یہاں سے کتابیں ڈاؤن لوڈ کر سکتے ہیں، نعت سن سکتے ہیں، اور سوالات کے لیے رابطہ کر سکتے ہیں۔</p>
+                            <p style="margin: 10px 0;">براہ کرم اپنا نام درج کریں (صرف تعلیمی مقاصد کے لیے): <input type="text" id="nameInput" style="padding: 5px; border-radius: 5px; border: none; margin-top: 10px;" placeholder="اپنا نام"></p>
+                            <button onclick="saveName()" style="padding: 10px 20px; background: #2ecc71; color: #fff; border: none; border-radius: 5px; cursor: pointer;">جمع کروائیں</button>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', customPrompt);
+
+                window.saveName = function() {
+                    userName = document.getElementById('nameInput').value || 'مہمان';
+                    localStorage.setItem('userName', userName);
+                    document.querySelector('.custom-prompt').remove();
+                    document.getElementById('userName').textContent = `خوش آمدید، ${userName}!`;
+                };
+            } else {
+                document.getElementById('userName').textContent = `خوش آمدید، ${userName}!`;
+            }
+
+            // ऑडियो को पेज लोड या इंटरैक्शन पर शुरू करने के लिए
+            const audio = document.getElementById('naatAudio');
+            audio.play().catch(function(error) {
+                console.log("ऑडियो ऑटो प्ले विफल: ", error);
+                document.body.addEventListener('click', function startAudio() {
+                    audio.play();
+                    document.body.removeEventListener('click', startAudio);
+                }, { once: true });
+                document.body.addEventListener('scroll', function startAudio() {
+                    audio.play();
+                    document.body.removeEventListener('scroll', startAudio);
+                }, { once: true });
+            });
+        });
 
         function searchBooks() {
             let input = document.querySelector('.search-bar').value.toLowerCase();
@@ -330,35 +458,6 @@
             alert(`درخواست موصول ہوئی!\nنام: ${name}\nکتاب: ${bookName}\nپیغام: ${message}\nبراہ کرم اسے انسٹاگرام یا وہاٹس ایپ پر رابطہ کریں۔`);
             document.querySelector('.request-form').reset();
         }
-
-        // यूज़र का नाम हेडर में दिखाने के लिए
-        document.addEventListener('DOMContentLoaded', function() {
-            let userName = localStorage.getItem('userName');
-            if (!userName) {
-                userName = prompt('براہ کرم اپنا نام درج کریں:', 'مہمان');
-                if (userName) {
-                    localStorage.setItem('userName', userName);
-                } else {
-                    userName = 'مہمان';
-                    localStorage.setItem('userName', userName);
-                }
-            }
-            document.getElementById('userName').textContent = `خوش آمدید، ${userName}!`;
-
-            // ऑडियो को पेज लोड या इंटरैक्शन पर शुरू करने के लिए
-            const audio = document.getElementById('naatAudio');
-            audio.play().catch(function(error) {
-                console.log("ऑडियो ऑटो प्ले विफल: ", error);
-                document.body.addEventListener('click', function startAudio() {
-                    audio.play();
-                    document.body.removeEventListener('click', startAudio);
-                }, { once: true });
-                document.body.addEventListener('scroll', function startAudio() {
-                    audio.play();
-                    document.body.removeEventListener('scroll', startAudio);
-                }, { once: true });
-            });
-        });
     </script>
 </body>
 </html>
