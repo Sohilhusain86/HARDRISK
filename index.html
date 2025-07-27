@@ -1,65 +1,176 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ur">
 <head>
-  <meta charset="UTF-8">
-  <title>Islamic Books Download</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #243b55, #141e30);
-      color: #f3f3f3;
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-    }
-    .container {
-      max-width: 500px;
-      margin: 60px auto 0 auto;
-      padding: 30px 20px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 16px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.18);
-      text-align: center;
-    }
-    h1 {
-      color: #27ae60;
-      margin-bottom: 18px;
-    }
-    .download-btn {
-      background-color: #2980b9;
-      color: #fff;
-      padding: 12px 32px;
-      border: none;
-      border-radius: 6px;
-      font-size: 1.1em;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
-      margin-top: 25px;
-      transition: background-color 0.2s;
-    }
-    .download-btn:hover {
-      background-color: #217dbb;
-    }
-    .note {
-      margin-top: 28px;
-      color: #e1e6e6;
-      font-size: 0.97em;
-      font-style: italic;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Islamic Books Library</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #243b55, #141e30);
+            margin: 0;
+            padding: 0;
+            color: #f3f3f3;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .dark-mode {
+            background: linear-gradient(135deg, #18222c, #243b55);
+            color: #e0e0e0;
+        }
+        .header {
+            text-align: center;
+            padding: 40px 20px 20px 20px;
+            background: rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.3em;
+            color: #27ae60;
+            letter-spacing: 2px;
+            text-shadow: 1px 2px 9px #141e30;
+        }
+        .header p {
+            color: #b2d8c7;
+            font-size: 1.2em;
+            margin-top: 12px;
+        }
+        .toggle-mode {
+            position: fixed;
+            top: 18px;
+            right: 18px;
+            padding: 8px 18px;
+            background-color: #27ae60;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 99;
+            font-size: 1em;
+        }
+        .toggle-mode:hover {
+            background-color: #218c53;
+        }
+        .books-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 32px;
+            padding: 40px 15px 30px 15px;
+        }
+        .book-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 18px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+            width: 330px;
+            padding: 30px 18px 26px 18px;
+            margin: 10px 0;
+            text-align: center;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .book-card:hover {
+            transform: scale(1.04);
+            background: rgba(39, 174, 96, 0.09);
+        }
+        .book-title {
+            font-size: 1.4em;
+            color: #27ae60;
+            margin-bottom: 9px;
+            font-weight: bold;
+        }
+        .book-desc {
+            font-size: 1.05em;
+            color: #a9c5b8;
+            margin-bottom: 15px;
+        }
+        .download-btn {
+            background-color: #2980b9;
+            color: #fff;
+            padding: 12px 26px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.06em;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+        }
+        .download-btn:hover {
+            background-color: #217dbb;
+        }
+        .note {
+            color: #e1e6e6;
+            text-align: center;
+            margin: 30px 10px 10px 10px;
+            font-size: 1.01em;
+            font-style: italic;
+        }
+        .islamic-bg {
+            position: fixed;
+            top:0; left:0; width:100vw; height:100vh;
+            background: url('https://www.transparenttextures.com/patterns/arabesque.png') repeat;
+            opacity: 0.13;
+            z-index: -1;
+        }
+        @media (max-width: 700px) {
+            .header h1 { font-size: 1.5em; }
+            .books-section { flex-direction: column; align-items: center; }
+            .book-card { width: 98vw; }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>بارہ تقریریں - PDF Islamic Book</h1>
-    <p>Yahan se aap seedhe book download kar sakte hain, bina kisi ad ya signup ke:</p>
-    <a href="https://github.com/Sohilhusain86/HARDRISK/raw/main/default.pdf" download class="download-btn">
-      Download "بارہ تقریریں" PDF
-    </a>
-    <div class="note">
-      Note: Agar download na ho toh page ko refresh karein ya alag browser try karein.<br>
-      Yeh link direct GitHub se hai.
+    <div class="islamic-bg"></div>
+    <button class="toggle-mode" onclick="toggleDarkMode()">تبدیل طرز (Dark Mode)</button>
+    <div class="header">
+        <h1>اسلامی کتابیں ڈاؤن لوڈ کریں</h1>
+        <p>
+            یہاں آپ کو متعدد اسلامی کتابیں ملیں گی، جنہیں آپ براہ راست اور آسانی سے ڈاؤن لوڈ کر سکتے ہیں۔ نیچے اپنی پسندیدہ کتاب منتخب کریں۔
+        </p>
     </div>
-  </div>
+    <div class="books-section">
+        <div class="book-card">
+            <div class="book-title">قرآن مجید (اردو ترجمہ)</div>
+            <div class="book-desc">
+                مکمل قرآن مجید اردو ترجمہ کے ساتھ، پڑھنے اور سیکھنے کیلئے۔
+            </div>
+            <a https://github.com/Sohilhusain86/HARDRISK/releases/tag/%23taqreer class="download-btn" download>ڈاؤن لوڈ PDF</a>
+        </div>
+        <div class="book-card">
+            <div class="book-title">نماز کی کتاب</div>
+            <div class="book-desc">
+                نماز کی اہمیت اور طریقہ کار پر مبنی آسان کتاب۔
+            </div>
+            <a href="#" class="download-btn" download>ڈاؤن لوڈ PDF</a>
+        </div>
+        <div class="book-card">
+            <div class="book-title">بارہ تقریریں</div>
+            <div class="book-desc">
+                اصلاحی و علمی موضوعات پر بارہ اہم تقریریں۔
+            </div>
+            <a href="#" class="download-btn" download>ڈاؤن لوڈ PDF</a>
+        </div>
+        <div class="book-card">
+            <div class="book-title">اسلامی کہانیاں (بچوں کیلئے)</div>
+            <div class="book-desc">
+                بچوں کے لئے سبق آموز اور دلچسپ اسلامی کہانیاں۔
+            </div>
+            <a href="#" class="download-btn" download>ڈاؤن لوڈ PDF</a>
+        </div>
+        <!-- مزید کتابیں اسی انداز میں شامل کریں -->
+    </div>
+    <div class="note">
+        نوٹ: کتاب ڈاؤن لوڈ کرنے کے لیے صرف "ڈاؤن لوڈ PDF" پر کلک کریں۔ تمام کتب براہ راست ڈاؤن لوڈ ہوں گی، کوئی سائن اپ یا اشتہار نہیں۔
+    </div>
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
 </body>
 </html>
