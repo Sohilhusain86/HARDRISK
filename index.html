@@ -67,6 +67,7 @@
             cursor: pointer;
             font-size: 1em;
             transition: background-color 0.3s ease;
+            z-index: 10;
         }
         .toggle-mode:hover {
             background-color: #27ae60;
@@ -88,9 +89,6 @@
             background-color: rgba(255, 255, 255, 0.2);
             color: #e0e7ff;
             outline: none;
-        }
-        .search-bar::placeholder {
-            color: #a3bffa;
         }
         .light-mode .search-bar {
             background-color: rgba(0, 0, 0, 0.1);
@@ -245,6 +243,31 @@
         .light-mode .audio-section h2 {
             color: #2ecc71;
         }
+        .daily-dua {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            margin: 20px auto;
+            max-width: 800px;
+            border-radius: 15px;
+        }
+        .light-mode .daily-dua {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        .daily-dua h2 {
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+        .light-mode .daily-dua h2 {
+            color: #2ecc71;
+        }
+        .daily-dua p {
+            font-size: 1.2em;
+            color: #b3c5ff;
+        }
+        .light-mode .daily-dua p {
+            color: #34495e;
+        }
         .social-links {
             text-align: center;
             padding: 20px;
@@ -271,6 +294,32 @@
         .light-mode .social-links .instagram {
             color: #e1306c;
         }
+        .chat-support {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            margin: 20px auto;
+            max-width: 600px;
+            border-radius: 15px;
+        }
+        .light-mode .chat-support {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        .chat-support h2 {
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+        .light-mode .chat-support h2 {
+            color: #2ecc71;
+        }
+        .chat-support a {
+            color: #25D366;
+            text-decoration: none;
+            font-size: 1.2em;
+        }
+        .light-mode .chat-support a {
+            color: #25D366;
+        }
         .footer {
             text-align: center;
             padding: 20px;
@@ -296,8 +345,9 @@
             .book-card { width: 90%; }
             .books-section { padding: 20px 10px; }
             .search-bar, .request-form input, .request-form textarea { width: 90%; margin: 0 auto; }
-            .audio-section { padding: 20px; }
+            .audio-section, .daily-dua, .chat-support { padding: 15px; }
             .bismillah { font-size: 2em; }
+            .toggle-mode { top: 10px; right: 10px; padding: 8px 15px; }
         }
     </style>
 </head>
@@ -309,6 +359,10 @@
         <div id="userName" class="user-name"></div>
         <button id="modeToggle" class="toggle-mode" onclick="toggleMode()">موڈ تبدیل کریں</button>
         <input type="text" class="search-bar" placeholder="کتاب تلاش کریں..." onkeyup="searchBooks()">
+    </div>
+    <div class="daily-dua">
+        <h2>آج کی دُعا</h2>
+        <p id="duaText">اللّٰهُمَّ اغْفِرْ لِي ذَنْبِي كُلَّهُ، دِقَّهُ وَجِلَّهُ، وَأَوَّلَهُ وَآخِرَهُ وَعَلَانِيَتَهُ وَسِرَّهُ۔</p>
     </div>
     <div class="books-section">
         <div class="book-card">
@@ -329,17 +383,17 @@
         <div class="book-card">
             <div class="book-title">اسلامی اخلاق و آداب (صدر الشریعه)</div>
             <div class="book-desc">اسلامی تعلیمات کے مطابق اخلاق اور آداب کی رہنمائی۔</div>
-            <a href="اسلامی اخلاق و آداب(صدر الشریعه).pdf" class="download-btn" download>ڈاؤन لوڈ PDF</a>
+            <a href="اسلامی اخلاق و آداب(صدر الشریعه).pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
         </div>
         <div class="book-card">
             <div class="book-title">مومن کی نماز (اردو)</div>
             <div class="book-desc">نماز کی اہمیت اور طریقہ کار کی جامع کتاب۔</div>
-            <a href="Momin-ki-Namaz-Urdu.pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
+            <a href="Momin-ki-Namaz-Urdu.pdf" class="download-btn" download>डاؤن لوڈ PDF</a>
         </div>
         <div class="book-card">
             <div class="book-title">جہنم میں لے جانے والے اعمال (جلد 2)</div>
             <div class="book-desc">جہنم سے بچاؤ کے لیے عمل کی اہم تلقین۔</div>
-            <a href="jahannam-main-lay-janay-walay-amaal-jild-2 (1).pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
+            <a href="jahannam-main-lay-janay-walay-amaal-jild-2 (1).pdf" class="download-btn" download>ڈاؤन لوڈ PDF</a>
         </div>
     </div>
     <div class="request-section">
@@ -358,13 +412,17 @@
             Your browser does not support the audio element.
         </audio>
     </div>
+    <div class="chat-support">
+        <h2>لائیو چیٹ سپورٹ</h2>
+        <p>سوال کے لیے رابطہ کریں: <a href="https://wa.me/918439602526" target="_blank">+918439602526</a></p>
+    </div>
     <div class="social-links">
         <p>ہم سے رابطہ کریں:</p>
         <a href="https://www.instagram.com/ansari_boyx6x?igsh=ajAzeGJyYjF2Z2p5" target="_blank" class="instagram">انسٹاگرام</a>
         <a href="https://chat.whatsapp.com/BC9MzzJqqJ99jsOdvDjNth" target="_blank">وہاٹس ایپ (مسالہ و مسائل)</a>
     </div>
     <div class="footer">
-        <p>© 2025 Sohilhusain86 | تمام حقوق محفوظ ہیں | بنائی گئی: 27 جولائی 2025، 05:18 PM IST</p>
+        <p>© 2025 Sohilhusain86 | تمام حقوق محفوظ ہیں | بنائی گئی: 27 جولائی 2025، 05:37 PM IST</p>
         <p class="fiamanallah">فی امانﷲ</p>
     </div>
     <script>
@@ -382,7 +440,6 @@
             localStorage.setItem('mode', body.classList.contains('light-mode') ? 'light' : 'dark');
         }
 
-        // डार्क/लाइट मोड की डिफॉल्ट सेटिंग
         document.addEventListener('DOMContentLoaded', function() {
             const body = document.body;
             const savedMode = localStorage.getItem('mode');
@@ -397,11 +454,10 @@
                 toggleBtn.classList.remove('dark');
             }
 
-            // यूज़र का नाम पूछने के लिए कस्टम प्रॉम्प
             let userName = localStorage.getItem('userName');
             if (!userName) {
                 const customPrompt = `
-                    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; color: #fff; font-family: 'Segoe UI', Tahoma, sans-serif;">
+                    <div class="custom-prompt" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; color: #fff; font-family: 'Segoe UI', Tahoma, sans-serif; z-index: 1000;">
                         <div style="background: #1a2a44; padding: 20px; border-radius: 10px; text-align: center; max-width: 400px;">
                             <h2 style="color: #27ae60;">خوش آمدید!</h2>
                             <p style="margin: 10px 0;">یہ ویب سائٹ اسلامی کتابوں، نعتوں، اور دینی معلومات فراہم کرنے کے لیے ہے۔ آپ یہاں سے کتابیں ڈاؤن لوڈ کر سکتے ہیں، نعت سن سکتے ہیں، اور سوالات کے لیے رابطہ کر سکتے ہیں۔</p>
@@ -415,14 +471,29 @@
                 window.saveName = function() {
                     userName = document.getElementById('nameInput').value || 'مہمان';
                     localStorage.setItem('userName', userName);
-                    document.querySelector('.custom-prompt').remove();
+                    const promptDiv = document.querySelector('.custom-prompt');
+                    if (promptDiv) {
+                        promptDiv.remove();
+                    }
                     document.getElementById('userName').textContent = `خوش آمدید، ${userName}!`;
                 };
             } else {
                 document.getElementById('userName').textContent = `خوش آمدید، ${userName}!`;
             }
 
-            // ऑडियो को पेज लोड या इंटरैक्शन पर शुरू करने के लिए
+            // नोटिफिकेशन सिस्टम
+            if ("Notification" in window) {
+                if (Notification.permission === "granted") {
+                    new Notification("نئی تازہ کاری!", { body: "ایک نئی کتاب شامل کی گئی ہے! ویب سائٹ چیک کریں۔" });
+                } else if (Notification.permission !== "denied") {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") {
+                            new Notification("نئی تازہ کاری!", { body: "ایک نئی کتاب شامل کی گئی ہے! ویب سائٹ چیک کریں۔" });
+                        }
+                    });
+                }
+            }
+
             const audio = document.getElementById('naatAudio');
             audio.play().catch(function(error) {
                 console.log("ऑडियो ऑटो प्ले विफल: ", error);
