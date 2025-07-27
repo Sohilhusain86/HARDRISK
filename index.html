@@ -395,12 +395,12 @@
         <div class="book-card">
             <div class="book-title">اسلامی اخلاق و آداب (صدر الشریعه) (Islami Aakhlaq aur Aadaab - Sadr-e-Shariah)</div>
             <div class="book-desc">اسلامی تعلیمات کے مطابق اخلاق اور آداب کی رہنمائی۔ (इस्लामी शिक्षाओं के अनुसार नैतिकता और शिष्टाचार की मार्गदर्शन।)</div>
-            <a href="اسلامی اخلاق و آداب(صدر الشریعه).pdf" class="download-btn" download>ڈاؤन لوڈ PDF</a>
+            <a href="اسلامی اخلاق و آداب(صدر الشریعه).pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
         </div>
         <div class="book-card">
             <div class="book-title">مومن کی نماز (اردو) (Momin Ki Namaz - Urdu)</div>
             <div class="book-desc">نماز کی اہمیت اور طریقہ کار کی جامع کتاب۔ (नमाज़ की महत्वता और उसके तरीके की व्यापक पुस्तक।)</div>
-            <a href="Momin-ki-Namaz-Urdu.pdf" class="download-btn" download>डاؤन لوڈ PDF</a>
+            <a href="Momin-ki-Namaz-Urdu.pdf" class="download-btn" download>डاؤن لوڈ PDF</a>
         </div>
         <div class="book-card">
             <div class="book-title">جہنم میں لے جانے والے اعمال (جلد 2) (Jahannam Mein Lene Wale Aamaal - Jild 2)</div>
@@ -419,11 +419,12 @@
     </div>
     <div class="audio-section">
         <h2>سنوئیں خوبصورت نعت</h2>
-        <audio id="naatAudio">
+        <audio id="naatAudio" autoplay>
             <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Koi%20Gul%20Baqi%20Rahega%20%5BSlowed%20_%20Reverb%5D%20Beautiful%20Naat%20__%20_lofinaatscreation(MP3_320K).mp3" type="audio/mpeg">
             Your browser does not support the audio element.
         </audio>
         <button onclick="playAudio()" style="padding: 10px 20px; background: #2ecc71; color: #fff; border: none; border-radius: 25px; cursor: pointer; margin-top: 10px;">نعت چلائیں (Play Naat)</button>
+        <p id="audioStatus" style="color: #e0e7ff; margin-top: 10px;"></p>
     </div>
     <div class="chat-support">
         <h2>لائیو چیٹ سپورٹ</h2>
@@ -435,7 +436,7 @@
         <a href="https://chat.whatsapp.com/BC9MzzJqqJ99jsOdvDjNth" target="_blank">وہاٹس ایپ (مسالہ و مسائل)</a>
     </div>
     <div class="footer">
-        <p>© 2025 Suhail Husain | تمام حقوق محفوظ ہیں | بنائی گئی: 27 جولائی 2025، 08:50 PM IST</p>
+        <p>© 2025 Suhail Husain | تمام حقوق محفوظ ہیں | بنائی گئی: 27 جولائی 2025، 09:15 PM IST</p>
         <p class="fiamanallah">فی امانﷲ</p>
     </div>
     <script>
@@ -463,7 +464,7 @@
                 toggleBtn.classList.add('dark');
             } else {
                 body.classList.remove('light-mode');
-                toggleBtn.textContent = 'موڈ बदल کریں';
+                toggleBtn.textContent = 'موڈ تبدیل کریں';
                 toggleBtn.classList.remove('dark');
             }
 
@@ -494,6 +495,20 @@
                 document.getElementById('userName').textContent = `خوش آمدید، ${userName}!`;
             }
 
+            const audio = document.getElementById('naatAudio');
+            audio.play().catch(function(error) {
+                console.log("ऑडियो ऑटो प्ले विफल: ", error);
+                document.body.addEventListener('click', function startAudio() {
+                    audio.play().catch(err => console.log("क्लिक पर त्रुटि: ", err));
+                    document.body.removeEventListener('click', startAudio);
+                }, { once: true });
+                document.body.addEventListener('scroll', function startAudio() {
+                    audio.play().catch(err => console.log("स्क्रॉल पर त्रुटि: ", err));
+                    document.body.removeEventListener('scroll', startAudio);
+                }, { once: true });
+                document.getElementById('audioStatus').textContent = "نعت خودکار نہیں چل سکی۔ کلک یا سکرول کریں۔ (Auto play failed. Click or scroll to play.)";
+            });
+
             // नोटिफिकेशन सिस्टम
             if ("Notification" in window) {
                 if (Notification.permission === "granted") {
@@ -510,9 +525,12 @@
 
         function playAudio() {
             const audio = document.getElementById('naatAudio');
-            audio.play().catch(function(error) {
+            const status = document.getElementById('audioStatus');
+            audio.play().then(() => {
+                status.textContent = "نعت چل رہی ہے۔ (Naat is playing.)";
+            }).catch(error => {
                 console.log("ऑडियो प्ले में त्रुटि: ", error);
-                alert("ऑडियो प्ले करने में समस्या हुई। कृपया इंटरनेट कनेक्शन चेक करें या बाद में प्रयास करें।");
+                status.textContent = "نعت نہیں چل سکی۔ براہ کرم انٹرنیٹ چیک کریں یا بعد میں کوشش کریں۔ (Naat could not play. Check internet or try later.)";
             });
         }
 
