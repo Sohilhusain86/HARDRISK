@@ -3,210 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ashura 2025 Countdown</title>
+    <title>Islamic Books Library</title>
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #2c3e50, #3498db);
+            background: linear-gradient(135deg, #243b55, #141e30);
             margin: 0;
-            padding: 20px;
-            color: #ecf0f1;
-            position: relative;
-            overflow-x: hidden;
+            padding: 0;
+            color: #f3f3f3;
             min-height: 100vh;
-            transition: background 0.3s;
+            overflow-x: hidden;
         }
-        body.dark-mode {
-            background: linear-gradient(135deg, #1a252f, #2c3e50);
+        .dark-mode {
+            background: linear-gradient(135deg, #18222c, #243b55);
+            color: #e0e0e0;
         }
-        .background-animation {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/arabesque.png') repeat;
-            opacity: 0.1;
-            z-index: -1;
-            animation: moveBackground 20s linear infinite;
-        }
-        @keyframes moveBackground {
-            from { background-position: 0 0; }
-            to { background-position: 100% 100%; }
-        }
-        h1 {
-            color: #27ae60;
+        .header {
             text-align: center;
-            margin-bottom: 20px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            padding: 40px 20px 20px 20px;
+            background: rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.3em;
+            color: #27ae60;
+            letter-spacing: 2px;
+            text-shadow: 1px 2px 9px #141e30;
+        }
+        .header p {
+            color: #b2d8c7;
+            font-size: 1.1em;
+            margin-top: 10px;
         }
         .toggle-mode {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
+            top: 18px;
+            right: 18px;
+            padding: 8px 18px;
             background-color: #27ae60;
             color: #fff;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            z-index: 99;
+            font-size: 1em;
         }
         .toggle-mode:hover {
-            background-color: #219653;
+            background-color: #218c53;
         }
-        .festival-card {
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            padding: 20px;
-            margin: 20px auto;
-            width: 100%;
-            max-width: 500px;
+        .books-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 28px;
+            padding: 40px 15px 30px 15px;
+        }
+        .book-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 18px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+            width: 320px;
+            padding: 26px 18px 22px 18px;
+            margin: 8px 0;
             text-align: center;
-            transition: transform 0.3s ease-in-out;
+            transition: transform 0.2s;
         }
-        .festival-card:hover {
-            transform: scale(1.05);
+        .book-card:hover {
+            transform: scale(1.04);
+            background: rgba(39, 174, 96, 0.09);
         }
-        body.dark-mode .festival-card {
-            background-color: rgba(52, 73, 94, 0.9);
-            color: #ecf0f1;
-        }
-        .festival-card h2 {
+        .book-title {
+            font-size: 1.3em;
             color: #27ae60;
-            margin-bottom: 10px;
+            margin-bottom: 7px;
         }
-        .festival-card .description {
-            font-size: 0.9em;
-            color: #7f8c8d;
-            margin-bottom: 15px;
+        .book-desc {
+            font-size: 1em;
+            color: #a9c5b8;
+            margin-bottom: 13px;
         }
-        .festival-card .dua {
-            font-style: italic;
-            color: #34495e;
-            margin: 15px 0;
-            font-size: 0.95em;
-            background-color: rgba(39, 174, 96, 0.1);
-            padding: 10px;
+        .download-btn {
+            background-color: #2980b9;
+            color: #fff;
+            padding: 10px 22px;
+            border: none;
             border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            display: inline-block;
         }
-        body.dark-mode .dua {
-            color: #bdc3c7;
-            background-color: rgba(39, 174, 96, 0.2);
-        }
-        .countdown {
-            font-size: 1.5em;
-            color: #e74c3c;
-            font-weight: bold;
-            margin: 10px 0;
+        .download-btn:hover {
+            background-color: #217dbb;
         }
         .note {
-            font-style: italic;
-            color: #bdc3c7;
-            margin-top: 20px;
+            color: #e1e6e6;
             text-align: center;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 24px;
+            font-size: 0.98em;
+            font-style: italic;
+        }
+        .islamic-bg {
+            position: fixed;
+            top:0; left:0; width:100vw; height:100vh;
+            background: url('https://www.transparenttextures.com/patterns/arabesque.png') repeat;
+            opacity: 0.13;
+            z-index: -1;
         }
         @media (max-width: 600px) {
-            .festival-card {
-                width: 90%;
-            }
-            .toggle-mode {
-                top: 10px;
-                right: 10px;
-                padding: 8px 15px;
-            }
-            h1 {
-                font-size: 1.5em;
-            }
+            .header h1 { font-size: 1.4em; }
+            .books-section { flex-direction: column; align-items: center; }
+            .book-card { width: 98vw; }
         }
     </style>
 </head>
 <body>
-    <div class="background-animation"></div>
+    <div class="islamic-bg"></div>
     <button class="toggle-mode" onclick="toggleDarkMode()">Toggle Dark Mode</button>
-    <h1>Ashura 2025 Countdown</h1>
-    <div id="countdown-container"></div>
-    <p class="note">Note: The date for Ashura (10 Muharram 1447) is estimated for 7 July 2025 and may vary based on local moon sightings. Please confirm with local authorities.</p>
+    <div class="header">
+        <h1>Islamic Books Library</h1>
+        <p>Is website par aap Islamic books seedhe download kar sakte hain, bina kisi signup ke. <br>Neche apni pasand ki kitab par click karein aur turant download karein.</p>
+    </div>
+    <div class="books-section">
+        <!-- Book 1 -->
+        <div class="book-card">
+            <div class="book-title">Quran Majeed (PDF)</div>
+            <div class="book-desc">
+                Poora Quran Majeed Urdu tarjuma ke saath. Aasaan padhai ke liye.
+            </div>
+            <a href="https://github.com/Sohilhusain86/HARDRISK/raw/main/quran-majeed.pdf" class="download-btn" download>
+                Download PDF
+            </a>
+        </div>
+        <!-- Book 2 -->
+        <div class="book-card">
+            <div class="book-title">Namaz Ki Kitab</div>
+            <div class="book-desc">
+                Namaz aur uski ahmiyat par ek mukammal kitaab, aasan zubaan mein.
+            </div>
+            <a href="https://github.com/Sohilhusain86/HARDRISK/raw/main/namaz-book.pdf" class="download-btn" download>
+                Download PDF
+            </a>
+        </div>
+        <!-- Book 3 -->
+        <div class="book-card">
+            <div class="book-title">Islamic Stories (Bachon ke liye)</div>
+            <div class="book-desc">
+                Islami kahaniyan, bachon ki islahi wa ilmiyati tarbiyat ke liye.
+            </div>
+            <a href="https://github.com/Sohilhusain86/HARDRISK/raw/main/islamic-stories.pdf" class="download-btn" download>
+                Download PDF
+            </a>
+        </div>
+        <!-- Aur bhi books add kar sakte hain isi tarah -->
+    </div>
+    <div class="note">
+        Note: Yeh PDFs direct GitHub repository se download hoti hain. Agar download na ho toh page ko refresh karein ya alag browser try karein.
+    </div>
 
     <script>
-        const ashura = {
-            name: "Ashura (10 Muharram 1447)",
-            date: "2025-07-07 18:00:00",
-        };
-
-        // Function to toggle dark mode
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
         }
-
-        // Load dark mode preference
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark-mode');
         }
-
-        // Function to calculate countdown
-        function updateCountdown() {
-            const now = new Date();
-            const festivalDate = new Date(ashura.date);
-            const timeDiff = festivalDate - now;
-            const container = document.getElementById('countdown-container');
-            container.innerHTML = ''; // Clear previous content
-
-            // Check for notification (within 24 hours)
-            if (timeDiff > 0 && timeDiff < 24 * 60 * 60 * 1000) {
-                if (Notification.permission === 'granted') {
-                    new Notification(`${ashura.name} is less than 24 hours away!`);
-                } else if (Notification.permission !== 'denied') {
-                    Notification.requestPermission().then(permission => {
-                        if (permission === 'granted') {
-                            new Notification(`${ashura.name} is less than 24 hours away!`);
-                        }
-                    });
-                }
-            }
-
-            const card = document.createElement('div');
-            card.className = 'festival-card';
-
-            if (timeDiff < 0) {
-                // Ashura has passed
-                card.innerHTML = `
-                    <h2>${ashura.name}</h2>
-                    <p class="description">${ashura.description}</p>
-                    <p class="dua">${ashura.dua}</p>
-                    <p class="countdown">This event has passed.</p>
-                `;
-            } else {
-                const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-
-                card.innerHTML = `
-                    <h2>${ashura.name}</h2>
-                    <p class="description">${ashura.description}</p>
-                    <p class="dua">${ashura.dua}</p>
-                    <p class="countdown">${days}d ${hours}h ${minutes}m ${seconds}s</p>
-                `;
-            }
-            container.appendChild(card);
-        }
-
-        // Request notification permission on load
-        if (Notification && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-            Notification.requestPermission();
-        }
-
-        // Update countdown every second
-        setInterval(updateCountdown, 1000);
-
-        // Initial call to display countdown immediately
-        updateCountdown();
     </script>
 </body>
 </html>
