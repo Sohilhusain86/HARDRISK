@@ -463,17 +463,20 @@
                 toggleBtn.classList.remove('dark');
             }
 
-            let userName = localStorage.getItem('userName');
-            if (!userName) {
-                const nameInput = document.getElementById('nameInput');
-                nameInput.addEventListener('input', function() {
-                    userName = nameInput.value || 'مہمان';
-                    localStorage.setItem('userName', userName);
-                    document.getElementById('userName').textContent = `خوش آمدید، ${userName}!`;
-                });
-            } else {
+            // نام پوچھنے اور ڈسپلے کرنے کی خصوصیت
+            function updateUserName() {
+                let userName = localStorage.getItem('userName');
+                if (!userName) {
+                    userName = prompt("اپنا نام درج کریں:");
+                    if (userName) {
+                        localStorage.setItem('userName', userName);
+                    } else {
+                        userName = "مہمان";
+                    }
+                }
                 document.getElementById('userName').textContent = `خوش آمدید، ${userName}!`;
             }
+            updateUserName(); // صفحہ لوڈ ہوتے ہی نام چیک اور ڈسپلے
 
             const audio = document.getElementById('naatAudio');
             audio.play().catch(function(error) {
