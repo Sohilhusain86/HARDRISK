@@ -3,352 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="اسلامی کتابیں ڈاؤن لوڈ کریں - بارہ تقریریں، آسان تقریریں، دور حاضر کی تقریریں، اور دیگر دینی کتب">
+    <meta name="description" content="اسلامی کتابیں ڈاؤن لوڈ کریں - بارہ تقریریں، آسان تقریریں، اور دینی کتب">
     <title>اسلامی کتابیں - شاندار لائبریری</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            margin: 0;
-            padding: 0;
-            color: #e0e7ff;
-            min-height: 100vh;
-            overflow-x: hidden;
-            line-height: 1.6;
-            transition: background 0.3s ease, color 0.3s ease;
-        }
-        .light-mode { color: #333; }
-        .bismillah {
-            text-align: center;
-            font-size: 2.5em;
-            color: #27ae60;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-            padding: 20px 0;
-            background: rgba(0, 0, 0, 0.3);
-        }
-        .header {
-            text-align: center;
-            padding: 30px 20px;
-            background: rgba(0, 0, 0, 0.2);
-            border-bottom: 2px solid #27ae60;
-            position: relative;
-        }
-        .header h1 { font-size: 2.5em; color: #27ae60; margin: 0; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); letter-spacing: 2px; }
-        .header p { font-size: 1.2em; color: #a3bffa; margin-top: 10px; }
-        .user-name { font-size: 1.8em; color: #2ecc71; margin-top: 10px; text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5); animation: fadeIn 2s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .toggle-mode { position: absolute; top: 20px; right: 20px; padding: 10px 20px; background-color: #2ecc71; color: #fff; border: none; border-radius: 25px; cursor: pointer; font-size: 1em; transition: background-color 0.3s ease; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #1a2a44; margin: 0; padding: 0; color: #e0e7ff; min-height: 100vh; overflow-x: hidden; line-height: 1.6; transition: background 0.5s ease; }
+        .light-mode { background: #f0f4f8; color: #333; }
+        .bismillah { text-align: center; font-size: 2em; color: #27ae60; padding: 15px 0; background: rgba(0, 0, 0, 0.3); }
+        .header { text-align: center; padding: 20px; background: rgba(0, 0, 0, 0.2); border-bottom: 1px solid #27ae60; }
+        .header h1 { font-size: 2em; color: #27ae60; margin: 0; }
+        .header p { font-size: 1em; color: #a3bffa; margin-top: 5px; }
+        .user-name { font-size: 1.5em; color: #2ecc71; margin-top: 5px; }
+        .toggle-mode { padding: 8px 15px; background-color: #2ecc71; color: #fff; border: none; border-radius: 20px; cursor: pointer; font-size: 1em; transition: background-color 0.3s; }
         .toggle-mode:hover { background-color: #27ae60; }
-        .toggle-mode.dark { background-color: #34495e; }
-        .toggle-mode.dark:hover { background-color: #2c3e50; }
-        .search-bar { width: 70%; max-width: 400px; padding: 10px; margin: 20px auto; border: none; border-radius: 25px; font-size: 1em; background-color: rgba(255, 255, 255, 0.2); color: #e0e7ff; outline: none; }
-        .light-mode .search-bar { background-color: rgba(0, 0, 0, 0.1); color: #333; }
-        .light-mode .search-bar::placeholder { color: #7f8c8d; }
-        .books-section { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; padding: 40px 20px; max-width: 1200px; margin: 0 auto; opacity: 0; transform: translateY(50px); animation: fadeInUp 1s ease forwards; }
-        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
-        .book-card { background: rgba(255, 255, 255, 0.1); border-radius: 15px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); width: 300px; padding: 25px; text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease; border: 1px solid #27ae60; }
-        .special-book-card { background: rgba(39, 174, 96, 0.2); border: 2px solid #27ae60; position: relative; z-index: 1; transform: scale(1.05); box-shadow: 0 10px 20px rgba(39, 174, 96, 0.5); }
-        .special-book-card .book-title { color: #2ecc71; font-size: 1.8em; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); }
-        .special-book-card .book-desc { color: #e0e7ff; font-size: 1.2em; }
-        .special-book-card .request-note { font-size: 0.9em; color: #fff; background: #27ae60; padding: 5px 10px; border-radius: 10px; margin-top: 10px; }
-        .light-mode .special-book-card { background: rgba(39, 174, 96, 0.1); border-color: #2ecc71; }
-        .light-mode .special-book-card .book-title { color: #2ecc71; }
-        .light-mode .special-book-card .book-desc { color: #34495e; }
-        .light-mode .special-book-card .request-note { background: #2ecc71; color: #fff; }
-        .book-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(39, 174, 96, 0.4); }
-        .book-title { font-size: 1.6em; color: #27ae60; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; }
-        .light-mode .book-title { color: #2ecc71; }
-        .book-desc { font-size: 1.1em; color: #b3c5ff; margin-bottom: 20px; padding: 0 10px; }
-        .light-mode .book-desc { color: #34495e; }
-        .download-btn { background-color: #2ecc71; color: #fff; padding: 12px 25px; border: none; border-radius: 25px; font-size: 1.1em; text-decoration: none; display: inline-block; transition: background-color 0.3s ease, transform 0.2s ease; }
-        .download-btn:hover { background-color: #27ae60; transform: scale(1.05); }
-        .light-mode .download-btn { background-color: #27ae60; }
-        .light-mode .download-btn:hover { background-color: #219653; }
-        .request-section, .feedback-section { text-align: center; padding: 40px 20px; background: rgba(0, 0, 0, 0.2); margin: 20px auto; max-width: 600px; border-radius: 15px; }
-        .light-mode .request-section, .light-mode .feedback-section { background: rgba(0, 0, 0, 0.05); }
-        .request-section h2, .feedback-section h2 { color: #27ae60; margin-bottom: 20px; }
-        .light-mode .request-section h2, .light-mode .feedback-section h2 { color: #2ecc71; }
-        .request-form, .feedback-form { display: flex; flex-direction: column; gap: 15px; }
-        .request-form input, .request-form textarea, .feedback-form input, .feedback-form textarea { padding: 10px; border: none; border-radius: 25px; font-size: 1em; background-color: rgba(255, 255, 255, 0.2); color: #e0e7ff; outline: none; }
-        .light-mode .request-form input, .light-mode .request-form textarea, .light-mode .feedback-form input, .light-mode .feedback-form textarea { background-color: rgba(0, 0, 0, 0.1); color: #333; }
-        .request-form button, .feedback-form button { padding: 12px; background-color: #2ecc71; color: #fff; border: none; border-radius: 25px; cursor: pointer; font-size: 1.1em; transition: background-color 0.3s ease; }
-        .request-form button:hover, .feedback-form button:hover { background-color: #27ae60; }
-        .light-mode .request-form button, .light-mode .feedback-form button { background-color: #27ae60; }
-        .light-mode .request-form button:hover, .light-mode .feedback-form button:hover { background-color: #219653; }
-        .audio-section { text-align: center; padding: 40px 20px; background: rgba(0, 0, 0, 0.2); margin: 20px auto; max-width: 800px; border-radius: 15px; }
-        .light-mode .audio-section { background: rgba(0, 0, 0, 0.05); }
-        .audio-section h2 { color: #27ae60; margin-bottom: 20px; }
-        .light-mode .audio-section h2 { color: #2ecc71; }
-        .social-links { text-align: center; padding: 20px; font-size: 1.2em; color: #a3bffa; }
-        .light-mode .social-links { color: #34495e; }
-        .social-links a { color: #25D366; text-decoration: none; margin: 0 10px; }
-        .social-links a:hover { text-decoration: underline; }
-        .social-links .instagram { color: #e1306c; }
-        .light-mode .social-links a { color: #25D366; }
-        .light-mode .social-links .instagram { color: #e1306c; }
-        .chat-support { text-align: center; padding: 20px; background: rgba(0, 0, 0, 0.2); margin: 20px auto; max-width: 600px; border-radius: 15px; }
-        .light-mode .chat-support { background: rgba(0, 0, 0, 0.05); }
-        .chat-support h2 { color: #27ae60; margin-bottom: 10px; }
-        .light-mode .chat-support h2 { color: #2ecc71; }
-        .chat-support a { color: #25D366; text-decoration: none; font-size: 1.2em; }
-        .light-mode .chat-support a { color: #25D366; }
-        .footer { text-align: center; padding: 20px; background: rgba(0, 0, 0, 0.2); margin-top: 40px; font-size: 0.9em; color: #a3bffa; }
-        .light-mode .footer { background: rgba(0, 0, 0, 0.05); color: #34495e; }
-        .footer p.fiamanallah { font-size: 1.2em; color: #27ae60; margin-top: 10px; }
-        .light-mode .footer p.fiamanallah { color: #2ecc71; }
-        .text-to-speech-btn { padding: 10px 20px; background-color: #2ecc71; color: #fff; border: none; border-radius: 25px; cursor: pointer; font-size: 1em; margin: 10px; transition: background-color 0.3s ease; }
-        .text-to-speech-btn:hover { background-color: #27ae60; }
-        .light-mode .text-to-speech-btn { background-color: #27ae60; }
-        .light-mode .text-to-speech-btn:hover { background-color: #219653; }
-        @media (max-width: 700px) {
-            .header h1 { font-size: 1.8em; }
-            .book-card, .special-book-card { width: 90%; }
-            .books-section { padding: 20px 10px; }
-            .search-bar, .request-form input, .request-form textarea, .feedback-form input, .feedback-form textarea { width: 90%; margin: 0 auto; }
-            .audio-section, .chat-support { padding: 15px; }
-            .bismillah { font-size: 2em; }
-            .toggle-mode { top: 10px; right: 10px; padding: 8px 15px; }
-        }
+        .search-bar { width: 70%; max-width: 350px; padding: 8px; margin: 15px auto; border: none; border-radius: 20px; font-size: 1em; background-color: rgba(255, 255, 255, 0.2); color: #e0e7ff; }
+        .books-section { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px; max-width: 1100px; margin: 0 auto; opacity: 0; animation: fadeIn 1s forwards; }
+        @keyframes fadeIn { to { opacity: 1; } }
+        .book-card { background: rgba(255, 255, 255, 0.1); border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); width: 280px; padding: 15px; text-align: center; transition: transform 0.3s; }
+        .book-title { font-size: 1.4em; color: #27ae60; margin-bottom: 10px; }
+        .book-desc { font-size: 1em; color: #b3c5ff; margin-bottom: 10px; }
+        .download-btn { background-color: #2ecc71; color: #fff; padding: 10px 20px; border: none; border-radius: 20px; font-size: 1em; text-decoration: none; transition: background-color 0.3s; }
+        .download-btn:hover { background-color: #27ae60; }
+        .request-section, .feedback-section { text-align: center; padding: 20px; background: rgba(0, 0, 0, 0.1); margin: 15px auto; max-width: 500px; border-radius: 10px; }
+        .request-form, .feedback-form { display: flex; flex-direction: column; gap: 10px; }
+        .request-form input, .request-form textarea, .feedback-form input, .feedback-form textarea { padding: 8px; border: none; border-radius: 20px; font-size: 1em; background-color: rgba(255, 255, 255, 0.2); }
+        .request-form button, .feedback-form button { padding: 10px; background-color: #2ecc71; color: #fff; border: none; border-radius: 20px; cursor: pointer; }
+        .audio-section { text-align: center; padding: 20px; background: rgba(0, 0, 0, 0.1); margin: 15px auto; max-width: 700px; border-radius: 10px; }
+        .social-links { text-align: center; padding: 15px; font-size: 1em; }
+        .chat-support { text-align: center; padding: 15px; background: rgba(0, 0, 0, 0.1); margin: 15px auto; max-width: 500px; border-radius: 10px; }
+        .footer { text-align: center; padding: 15px; background: rgba(0, 0, 0, 0.1); margin-top: 20px; }
+        @media (max-width: 700px) { .book-card { width: 90%; } .search-bar { width: 90%; } }
     </style>
 </head>
 <body>
     <div class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
     <div class="header">
         <h1>اسلامی کتابیں ڈاؤن لوڈ کریں</h1>
-        <p>شاندار اسلامی کتابیں جو آپ کی روحانی ترقی میں مددگار ہیں</p>
+        <p>روحانی ترقی کے لیے دینی کتب</p>
         <div id="userName" class="user-name"></div>
         <button id="modeToggle" class="toggle-mode" onclick="toggleMode()">موڈ تبدیل کریں</button>
         <input type="text" class="search-bar" placeholder="کتاب تلاش کریں..." onkeyup="searchBooks()">
-        <p id="sitePurpose" style="font-size: 1em; color: #a3bffa;">یہ سائٹ تعلیمی اور دینی مقاصد کے لیے بنائی گئی ہے، جیسے اسلامی کتابیں، نعت، اور تقریریں فراہم کرنا۔ آپ کا نام قانونی طور پر استعمال نہیں کیا جا رہا، یہ صرف خوش آمدید پیغام کے لیے ہے۔ یہاں بارہ تقریریں، آسان تقریریں، دور حاضر کی تقریریں، اسلامی اخلاق، نماز، اور دیگر موضوعات پر کتابیں دستیاب ہیں۔</p>
+        <p id="sitePurpose">یہ سائٹ دینی کتب اور نعت فراہم کرتی ہے۔ نام قانونی استعمال کے لیے نہیں، صرف خوش آمدید کے لیے ہے۔</p>
     </div>
     <div class="books-section">
-        <div class="book-card special-book-card">
-            <div class="book-title">کمالاتِ مصطفیٰ (Kamalat-e-Mustafa)</div>
-            <div class="book-desc">یہ کتاب احمد رضا رضوی کی درخواست پر پیش کی گئی ہے۔</div>
-            <div class="request-note">خصوصی طور پر احمد رضا رضوی کی درخواست پر اپلوڈ کی گئی۔</div>
-            <a href="Kamalat e Mustafa.pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
+        <div class="book-card">
+            <div class="book-title">بارہ تقریریں</div>
+            <div class="book-desc">اصلاحی تقریریں</div>
+            <a href="#" class="download-btn">ڈاؤن لوڈ</a>
         </div>
         <div class="book-card">
-            <div class="book-title">بارہ تقریریں (Barah Taqreerein)</div>
-            <div class="book-desc">اصلاحی و علمی موضوعات پر بارہ اہم تقریریں۔</div>
-            <a href="بارہ تقریریں.pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
-        </div>
-        <div class="book-card">
-            <div class="book-title">آسان تقریریں (مکمل 4 حصہ - ابو الکلام)</div>
-            <div class="book-desc">سادہ اور جامع تقریریں جو روحانی ترقی کے لیے ہیں، 4 حصوں میں۔</div>
-            <a href="آسان تقریریں)مکمل4حصہ(ابو الکلام).pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
-        </div>
-        <div class="book-card">
-            <div class="book-title">دور حاضر کی تقریریں (Dour-e-Hazir Ki Taqreerein)</div>
-            <div class="book-desc">موجودہ دور کے مسائل پر مبنی اہم تقریریں۔</div>
-            <a href="دور حاضر کی تقریریں۔pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
-        </div>
-        <div class="book-card">
-            <div class="book-title">اسلامی اخلاق و آداب (صدر الشریعه)</div>
-            <div class="book-desc">اسلامی تعلیمات کے مطابق اخلاق اور آداب کی رہنمائی۔</div>
-            <a href="اسلامی اخلاق و آداب(صدر الشریعه).pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
-        </div>
-        <div class="book-card">
-            <div class="book-title">مومن کی نماز (اردو)</div>
-            <div class="book-desc">نماز کی اہمیت اور طریقہ کار کی جامع کتاب۔</div>
-            <a href="Momin-ki-Namaz-Urdu.pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
-        </div>
-        <div class="book-card">
-            <div class="book-title">جہنم میں لے جانے والے اعمال (جلد 2)</div>
-            <div class="book-desc">جہنم سے بچاؤ کے لیے عمل کی اہم تلقین۔</div>
-            <a href="jahannam-main-lay-janay-walay-amaal-jild-2 (1).pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
-        </div>
-        <div class="book-card">
-            <div class="book-title">دلچسپ معلومات سوالا جوابا حصہ 1</div>
-            <div class="book-desc">دینی اور عام معلومات کے دلچسپ سوالات و جوابات۔</div>
-            <a href="دلچسپ معلومات سوالا جوابا حصہ1.pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
+            <div class="book-title">آسان تقریریں</div>
+            <div class="book-desc">روحانی ترقی کے لیے</div>
+            <a href="#" class="download-btn">ڈاؤن لوڈ</a>
         </div>
     </div>
     <div class="request-section">
-        <h2>کتاب کی درخواست کریں</h2>
+        <h2>کتاب کی درخواست</h2>
         <form class="request-form" onsubmit="submitRequest(event)">
-            <input type="text" placeholder="آپ کا نام" id="nameInput" required>
-            <input type="text" placeholder="مطلوبہ کتاب کا نام" required>
-            <textarea placeholder="اپنی درخواست (اختیاری)" rows="4"></textarea>
-            <button type="submit">درخواست جمع کروائیں</button>
+            <input type="text" placeholder="آپ کا نام" required>
+            <input type="text" placeholder="کتاب کا نام" required>
+            <button type="submit">جمع کروائیں</button>
         </form>
     </div>
     <div class="feedback-section">
-        <h2>اپنی رائے دیں</h2>
+        <h2>رائے دیں</h2>
         <form class="feedback-form" onsubmit="submitFeedback(event)">
             <input type="text" placeholder="آپ کا نام" required>
-            <textarea placeholder="اپنی رائے درج کریں" rows="4" required></textarea>
-            <button type="submit">رائے جمع کروائیں</button>
+            <textarea placeholder="رائے" rows="3" required></textarea>
+            <button type="submit">جمع کروائیں</button>
         </form>
     </div>
     <div class="audio-section">
-        <h2>سنوئیں خوبصورت نعت</h2>
+        <h2>نعت سنائیں</h2>
         <audio id="naatAudio" controls>
             <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Koi%20Gul%20Baqi%20Rahega%20%5BSlowed%20_%20Reverb%5D%20Beautiful%20Naat%20__%20_lofinaatscreation(MP3_320K).mp3" type="audio/mpeg">
-            Your browser does not support the audio element.
         </audio>
-        <p id="audioStatus" style="color: #e0e7ff; margin-top: 10px;"></p>
     </div>
     <div class="chat-support">
-        <h2>لائیو چیٹ سپورٹ</h2>
-        <p>سوال کے لیے رابطہ کریں: <a href="https://wa.me/918439602526" target="_blank">+918439602526</a></p>
+        <h2>چیٹ سپورٹ</h2>
+        <p>رابطہ: <a href="https://wa.me/918439602526">+918439602526</a></p>
     </div>
     <div class="social-links">
-        <p>ہم سے رابطہ کریں:</p>
-        <a href="https://www.instagram.com/ansari_boyx6x?igsh=ajAzeGJyYjF2Z2p5" target="_blank" class="instagram">انسٹاگرام</a>
-        <a href="https://chat.whatsapp.com/BC9MzzJqqJ99jsOdvDjNth" target="_blank">وہاٹس ایپ (مسالہ و مسائل)</a>
+        <p>رابطہ: <a href="https://www.instagram.com/ansari_boyx6x">انسٹاگرام</a></p>
     </div>
     <div class="footer">
-        <p>© 2025 Suhail Husain | تمام حقوق محفوظ ہیں</p>
-        <p class="fiamanallah">فی امانﷲ</p>
+        <p>© 2025 Suhail Husain</p>
     </div>
-    <button id="textToSpeechBtn" class="text-to-speech-btn" onclick="textToSpeech()">بولائیں</button>
-    <div id="notificationPrompt" style="display:none; text-align:center; padding:10px; background:#2ecc71; color:#fff; margin:10px;">
-        <p>کیا آپ کوکیز کی اجازت دینا چاہتے ہیں؟ <button onclick="acceptCookies()">ہاں</button> <button onclick="rejectCookies()">نہیں</button></p>
-    </div>
-    <div id="loginPrompt" style="display:none; text-align:center; padding:10px; background:#2ecc71; color:#fff; margin:10px;">
-        <p>لاگ ان کریں: <input type="text" id="loginName" placeholder="نام درج کریں"><button onclick="loginUser()">لاگ ان</button></p>
-    </div>
+    <button id="textToSpeechBtn" class="toggle-mode" onclick="textToSpeech()">بولائیں</button>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', () => {
             const body = document.body;
-            const savedMode = localStorage.getItem('mode');
             const toggleBtn = document.getElementById('modeToggle');
+            const savedMode = localStorage.getItem('mode');
             if (savedMode === 'light') {
                 body.classList.add('light-mode');
                 toggleBtn.textContent = 'ڈارک موڈ';
-                toggleBtn.classList.add('dark');
             } else {
                 body.classList.remove('light-mode');
                 toggleBtn.textContent = 'موڈ تبدیل کریں';
-                toggleBtn.classList.remove('dark');
             }
 
-            // نام پوچھنے اور ڈسپلے
             function updateUserName() {
                 let userName = localStorage.getItem('userName');
                 if (!userName) {
-                    userName = prompt("اپنا نام درج کریں:");
-                    if (userName) localStorage.setItem('userName', userName);
-                    else userName = "مہمان";
+                    userName = prompt('اپنا نام درج کریں:') || 'مہمان';
+                    localStorage.setItem('userName', userName);
                 }
                 document.getElementById('userName').textContent = `خوش آمدید، ${userName}!`;
             }
             updateUserName();
 
-            // رنگز کی تبدیلی
-            const colors = ['#1a2a44', '#0d1b2a', '#152238', '#0f172a', '#1e2a44'];
-            function changeBackgroundColor() {
-                const randomColor = colors[Math.floor(Math.random() * colors.length)];
-                body.style.background = `linear-gradient(135deg, ${randomColor}, #000)`;
-            }
-            window.addEventListener('load', changeBackgroundColor);
-            window.addEventListener('refresh', changeBackgroundColor);
-
-            // نعت کا بے ترتیب آغاز
-            const audio = document.getElementById('naatAudio');
-            function playNaatRandomly() {
-                const duration = audio.duration || 300; // اگر ڈیٹا لوڈ نہ ہو تو ڈیفالٹ 300 سیکنڈ
-                const startTime = Math.random() * duration;
-                audio.currentTime = startTime;
-                audio.play().catch(err => {
-                    console.log("آڈیو تپشت: ", err);
-                    document.getElementById('audioStatus').textContent = "نعت چلانے میں تپشت۔ انٹرنیٹ چیک کریں۔";
-                });
-            }
-            audio.addEventListener('canplaythrough', playNaatRandomly);
-            audio.addEventListener('ended', playNaatRandomly);
-
-            // کوکیز کی منظوری
-            function showCookiePrompt() {
-                document.getElementById('notificationPrompt').style.display = 'block';
-            }
-            setTimeout(showCookiePrompt, 2000);
-
-            function acceptCookies() {
-                localStorage.setItem('cookiesAccepted', 'yes');
-                document.getElementById('notificationPrompt').style.display = 'none';
-                requestNotificationPermission();
-            }
-
-            function rejectCookies() {
-                localStorage.setItem('cookiesAccepted', 'no');
-                document.getElementById('notificationPrompt').style.display = 'none';
-            }
-
-            // لاگ ان
-            function showLoginPrompt() {
-                if (!localStorage.getItem('loggedIn')) {
-                    document.getElementById('loginPrompt').style.display = 'block';
-                }
-            }
-            setTimeout(showLoginPrompt, 1000);
-
-            function loginUser() {
-                const name = document.getElementById('loginName').value;
-                if (name) {
-                    localStorage.setItem('loggedIn', name);
-                    document.getElementById('loginPrompt').style.display = 'none';
-                    updateUserName();
-                }
-            }
-
-            // ٹیکسٹ ٹو اسپیک
-            function textToSpeech() {
-                const text = document.body.innerText;
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'ur-PK';
-                window.speechSynthesis.speak(utterance);
-            }
-
-            // نوٹیفکیشنز
-            function requestNotificationPermission() {
-                if ('Notification' in window && localStorage.getItem('cookiesAccepted') === 'yes') {
-                    Notification.requestPermission().then(permission => {
-                        if (permission === 'granted') {
-                            new Notification('خوش آمدید!', { body: 'آپ کو نوٹیفکیشنز فعال کر دیے گئے ہیں۔' });
-                        }
-                    });
-                }
-            }
-
             function toggleMode() {
                 body.classList.toggle('light-mode');
-                if (body.classList.contains('light-mode')) {
-                    toggleBtn.textContent = 'ڈارک موڈ';
-                    toggleBtn.classList.add('dark');
-                } else {
-                    toggleBtn.textContent = 'موڈ تبدیل کریں';
-                    toggleBtn.classList.remove('dark');
-                }
+                toggleBtn.textContent = body.classList.contains('light-mode') ? 'ڈارک موڈ' : 'موڈ تبدیل کریں';
                 localStorage.setItem('mode', body.classList.contains('light-mode') ? 'light' : 'dark');
             }
 
             function searchBooks() {
-                let input = document.querySelector('.search-bar').value.toLowerCase();
-                let cards = document.querySelectorAll('.book-card');
-                cards.forEach(card => {
-                    let title = card.querySelector('.book-title').textContent.toLowerCase();
-                    if (title.includes(input)) card.style.display = 'block';
-                    else card.style.display = 'none';
+                const input = document.querySelector('.search-bar').value.toLowerCase();
+                document.querySelectorAll('.book-card').forEach(card => {
+                    const title = card.querySelector('.book-title').textContent.toLowerCase();
+                    card.style.display = title.includes(input) ? 'block' : 'none';
                 });
             }
 
             function submitRequest(event) {
                 event.preventDefault();
-                let name = document.querySelector('.request-form input[placeholder="آپ کا نام"]').value;
-                let bookName = document.querySelector('.request-form input[placeholder="مطلوبہ کتاب کا نام"]').value;
-                let message = document.querySelector('.request-form textarea').value || 'کوئی اضافی پیغام نہیں';
-                alert(`درخواست موصول ہوئی!\nنام: ${name}\nکتاب: ${bookName}\nپیغام: ${message}\nبراہ کرم انسٹاگرام یا وہاٹس ایپ پر رابطہ کریں۔`);
+                const name = document.querySelector('.request-form input[placeholder="آپ کا نام"]').value;
+                const bookName = document.querySelector('.request-form input[placeholder="کتاب کا نام"]').value;
+                alert(`درخواست موصول: ${name}, ${bookName}`);
                 document.querySelector('.request-form').reset();
             }
 
             function submitFeedback(event) {
                 event.preventDefault();
-                let name = document.querySelector('.feedback-form input[placeholder="آپ کا نام"]').value;
-                let feedback = document.querySelector('.feedback-form textarea').value;
-                alert(`شکریہ ${name}! آپ کی رائے "${feedback}" موصول ہوئی۔ ہم اسے بہتری کے لیے استعمال کریں گے۔`);
+                const name = document.querySelector('.feedback-form input[placeholder="آپ کا نام"]').value;
+                const feedback = document.querySelector('.feedback-form textarea').value;
+                localStorage.setItem(`feedback_${Date.now()}`, `${name}: ${feedback}`);
+                alert(`شکریہ ${name}!`);
                 document.querySelector('.feedback-form').reset();
+            }
+
+            function textToSpeech() {
+                const text = document.querySelector('.header').innerText.substring(0, 100);
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ur';
+                speechSynthesis.speak(utterance);
             }
         });
     </script>
