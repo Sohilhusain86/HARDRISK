@@ -1,232 +1,315 @@
 <!DOCTYPE html>
-<html lang="ur">
+<html lang="ur" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="اسلامی کتابیں، نعت، تقریریں، اور دینی معلومات کی جامع ویب سائٹ - بارہ تقریریں، آسان تقریریں، دور حاضر کی تقریریں، اور دیگر دینی کتب">
-    <meta name="keywords" content="اسلامی کتابیں، نعت، تقریریں، دینی معلومات، بارہ تقریریں، آسان تقریریں، دور حاضر، PDF ڈاؤن لوڈ">
+    <meta name="description" content="اسلامی کتابیں، نعت، تقریریں، اور دینی معلومات کی جامع ویب سائٹ">
+    <meta name="keywords" content="اسلامی کتابیں، نعت، تقریریں، دینی معلومات، PDF ڈاؤن لوڈ">
     <meta name="author" content="Suhail Husain">
+    <meta name="theme-color" content="#27ae60">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icon.png">
     <title>اسلامی کتابیں - شاندار لائبریری</title>
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f6fff8, #e0e7ff, #fdf6e3, #e0f6ff);
-            margin: 0;
-            padding: 0;
+            font-family: 'Noto Nastaliq Urdu', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f6fff8, #e0e7ff);
             color: #226422;
+            line-height: 1.8;
             min-height: 100vh;
             overflow-x: hidden;
-            line-height: 1.8;
             transition: background 0.5s, color 0.5s;
         }
-        .bismillah, .header, .request-section, .audio-section, .chat-support, .social-links, .footer {
-            background: rgba(255,255,255,0.92);
-            color: #166534 !important;
-            border-radius: 12px;
-            margin-bottom: 18px;
+        .light-mode { background: #fff; color: #333; }
+        .navbar {
+            background: #27ae60; color: #fff; padding: 10px; position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-        .bismillah { font-size: 2.5em; font-weight: bold; padding: 25px 0; box-shadow: 0 0 16px #e0e7ff; }
-        .header { text-align: center; padding: 30px 10px 10px 10px; box-shadow: 0 0 16px #e0e7ff; }
-        .header h1 { font-size: 2em; color: #27ae60; margin: 0; }
-        .header p { font-size: 1.1em; color: #226422; margin: 10px 0; }
-        .user-name { font-size: 1.3em; color: #2ecc71; margin-top: 5px; }
-        .toggle-mode {
-            margin: 10px 0;
-            padding: 7px 20px;
-            background-color: #2ecc71;
-            color: #fff;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s;
+        .navbar a { color: #fff; text-decoration: none; margin: 0 15px; font-size: 1.1em; }
+        .navbar .hamburger { display: none; font-size: 1.5em; cursor: pointer; }
+        .bismillah { font-size: 2.5em; text-align: center; padding: 20px; background: #fff; box-shadow: 0 0 10px #e0e7ff; }
+        .header { text-align: center; padding: 20px; background: rgba(255,255,255,0.9); margin: 10px; border-radius: 10px; }
+        .search-bar { width: 90%; max-width: 400px; padding: 10px; margin: 10px auto; border-radius: 20px; border: 1px solid #27ae60; }
+        .filter-section { text-align: center; margin: 10px; }
+        .books-section { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 15px; max-width: 1200px; margin: 0 auto; }
+        .book-card {
+            background: #f3f4f6; border: 2px solid #c1e1c1; border-radius: 10px; width: 280px; padding: 15px;
+            text-align: center; box-shadow: 0 2px 8px #e0e7ff; transition: transform 0.3s;
         }
-        .toggle-mode:hover { background-color: #27ae60; }
-        .search-bar {
-            width: 70%; max-width: 350px; padding: 8px; margin: 15px auto; border: none; border-radius: 20px;
-            font-size: 1em; background-color: #e0e7ff; color: #226422; display: block;
+        .book-card:hover { transform: translateY(-5px); }
+        .book-title { font-size: 1.2em; color: #27ae60; }
+        .book-desc { font-size: 0.95em; color: #226422; }
+        .download-btn, .preview-btn, .bookmark-btn, .share-btn {
+            background: #27ae60; color: #fff; padding: 8px 15px; border-radius: 20px; border: none; margin: 5px; cursor: pointer;
         }
-        .books-section {
-            display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; padding: 18px; max-width: 1200px; margin: 0 auto; 
+        .bookmark-btn.bookmarked { background: #e74c3c; }
+        .rating-section .stars { color: #f1c40f; cursor: pointer; }
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;
+            justify-content: center; align-items: center;
         }
-        .book-card, .special-book-card {
-            background: #f3f4f6;
-            border: 2px solid #c1e1c1;
-            border-radius: 15px;
-            width: 270px;
-            padding: 15px 10px;
-            text-align: center;
-            box-shadow: 0 2px 8px #e0e7ff;
-            color: #166534;
-            transition: transform 0.3s;
+        .modal-content { background: #fff; padding: 20px; border-radius: 10px; max-width: 600px; width: 90%; }
+        .request-section, .audio-section, .bookmark-section, .faq-section, .footer {
+            background: rgba(255,255,255,0.9); margin: 15px; padding: 20px; border-radius: 10px; text-align: center;
         }
-        .book-card:hover, .special-book-card:hover { transform: translateY(-4px) scale(1.04); }
-        .book-title { font-size: 1.1em; color: #27ae60; margin-bottom: 7px; }
-        .book-desc { font-size: 0.95em; color: #226422; margin-bottom: 8px; }
-        .download-btn {
-            background-color: #27ae60; color: #fff; padding: 8px 18px; border: none; border-radius: 20px;
-            font-size: 1em; text-decoration: none; display: inline-block; transition: background-color 0.3s;
-        }
-        .download-btn:hover { background-color: #219653; }
-        .request-section, .audio-section, .chat-support, .social-links, .footer {
-            text-align: center; padding: 20px 10px; box-shadow: 0 0 8px #e0e7ff;
-        }
-        .audio-item { margin-bottom: 10px; }
-        .footer { font-size: 0.95em; margin-top: 30px; }
-        @media (max-width:700px) {
-            .books-section { flex-direction: column; align-items: center; }
-            .book-card, .special-book-card { width: 96%; }
+        .audio-item audio { width: 100%; max-width: 300px; }
+        .footer { font-size: 0.95em; margin-top: 20px; }
+        .social-links a { margin: 0 10px; color: #27ae60; text-decoration: none; }
+        .progress-bar { position: fixed; top: 0; left: 0; height: 5px; background: #27ae60; width: 0; z-index: 1001; }
+        .loader { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 5px solid #27ae60; border-top: 5px solid #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @media (max-width: 700px) {
+            .navbar a { display: none; }
+            .navbar .hamburger { display: block; }
+            .navbar.responsive a { display: block; margin: 10px 0; }
+            .book-card { width: 90%; }
             .search-bar { width: 95%; }
         }
     </style>
 </head>
 <body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="loader" id="loader"></div>
+    <nav class="navbar">
+        <span class="hamburger" onclick="toggleNav()">☰</span>
+        <a href="#home">ہوم</a>
+        <a href="#books">کتابیں</a>
+        <a href="#audio">نعت</a>
+        <a href="#request">درخواست</a>
+        <a href="#faq">سوالات</a>
+    </nav>
     <div class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
     <div class="header">
         <h1>اسلامی کتابیں ڈاؤن لوڈ کریں</h1>
         <p>شاندار اسلامی کتابیں جو آپ کی روحانی ترقی میں مددگار ہیں</p>
         <div id="userName" class="user-name"></div>
-        <button id="modeToggle" class="toggle-mode" onclick="toggleMode()">موڈ تبدیل کریں</button>
+        <button id="modeToggle" class="download-btn">موڈ تبدیل کریں</button>
         <input type="text" class="search-bar" placeholder="کتاب تلاش کریں..." onkeyup="searchBooks()">
+        <div class="filter-section">
+            <label>زمرہ جات: </label>
+            <select onchange="filterBooks(this.value)">
+                <option value="all">تمام</option>
+                <option value="taqreer">تقریریں</option>
+                <option value="akhlaq">اخلاق و آداب</option>
+                <option value="naat">نعت</option>
+                <option value="quran">قرآنی تفسیر</option>
+            </select>
+        </div>
     </div>
-    <div class="books-section">
-        <!-- آپ کی کتابیں ویسے ہی رہیں گی -->
-        <div class="book-card special-book-card">
-            <div class="book-title">کمالاتِ مصطفیٰ (Kamalat-e-Mustafa)</div>
-            <div class="book-desc">یہ کتاب احمد رضا رضوی کی درخواست پر پیش کی گئی ہے۔ یہ رسول اللہ صلی اللہ علیہ وسلم کی عظمت کو بیان کرتی ہے۔</div>
-            <div class="request-note">خصوصی طور پر احمد رضا رضوی کی درخواست پر اپلوڈ کی گئی۔</div>
-            <a href="Kamalat e Mustafa.pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
+    <div class="books-section" id="books">
+        <div class="book-card" data-category="taqreer">
+            <div class="book-title">بارہ تقریریں</div>
+            <div class="book-desc">اصلاحی و علمی موضوعات پر بارہ اہم تقریریں...</div>
+            <div class="rating-section">
+                <span class="stars" onclick="rateBook('barah-taqreerein', this)">★★★★☆</span>
+                <span class="rating-count" id="rating-barah-taqreerein">(4.5/5, 120 ووٹس)</span>
+            </div>
+            <button class="preview-btn" onclick="openPreview('بارہ تقریریں.pdf')">پریویو</button>
+            <a href="بارہ تقریریں.pdf" class="download-btn" onclick="trackDownload('barah-taqreerein')">ڈاؤن لوڈ PDF</a>
+            <button class="bookmark-btn" onclick="toggleBookmark('barah-taqreerein')">☆ بک مارک</button>
+            <button class="share-btn" onclick="shareBook('بارہ تقریریں', 'بارہ تقریریں.pdf')">شیئر</button>
         </div>
-        <div class="book-card">
-            <div class="book-title">بارہ تقریریں (Barah Taqreerein)</div>
-            <div class="book-desc">اصلاحی و علمی موضوعات پر بارہ اہم تقریریں جو دینی تعلیمات کو سمجھنے میں مدد دیتی ہیں۔</div>
-            <a href="بارہ تقریریں.pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
+        <!-- अन्य किताबें (संक्षेप में) -->
+        <div class="book-card" data-category="akhlaq">
+            <div class="book-title">اسلامی اخلاق و آداب</div>
+            <div class="book-desc">اسلامی تعلیمات کے مطابق اخلاق اور آداب...</div>
+            <div class="rating-section">
+                <span class="stars" onclick="rateBook('akhlaq', this)">★★★★☆</span>
+                <span class="rating-count" id="rating-akhlaq">(4.0/5, 80 ووٹس)</span>
+            </div>
+            <button class="preview-btn" onclick="openPreview('اسلامی اخلاق و آداب.pdf')">پریویو</button>
+            <a href="اسلامی اخلاق و آداب.pdf" class="download-btn" onclick="trackDownload('akhlaq')">ڈاؤن لوڈ PDF</a>
+            <button class="bookmark-btn" onclick="toggleBookmark('akhlaq')">☆ بک مارک</button>
+            <button class="share-btn" onclick="shareBook('اسلامی اخلاق و آداب', 'اسلامی اخلاق و آداب.pdf')">شیئر</button>
         </div>
-        <div class="book-card">
-            <div class="book-title">آسان تقریریں (مکمل 4 حصہ - ابو الکلام)</div>
-            <div class="book-desc">سادہ اور جامع تقریریں جو روحانی ترقی کے لیے ہیں، 4 حصوں میں ترتیب دی گئی ہیں۔</div>
-            <a href="آسان تقریریں)مکمل4حصہ(ابو الکلام).pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
-        </div>
-        <div class="book-card">
-            <div class="book-title">دور حاضر کی تقریریں (Dour-e-Hazir Ki Taqreerein)</div>
-            <div class="book-desc">موجودہ دور کے مسائل پر مبنی اہم تقریریں جو عملی زندگی میں رہنمائی کرتی ہیں۔</div>
-            <a href="دور حاضر کی تقریریں۔pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
-        </div>
-        <div class="book-card">
-            <div class="book-title">اسلامی اخلاق و آداب (صدر الشریعه)</div>
-            <div class="book-desc">اسلامی تعلیمات کے مطابق اخلاق اور آداب کی تفصیلی رہنمائی، جو روزمرہ زندگی کو بہتر بناتی ہے۔</div>
-            <a href="اسلامی اخلاق و آداب(صدر الشریعه).pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
-        </div>
-        <div class="book-card">
-            <div class="book-title">مومن کی نماز (اردو)</div>
-            <div class="book-desc">نماز کی اہمیت اور طریقہ کار کی جامع کتاب، جو ہر مومن کے لیے ضروری ہے۔</div>
-            <a href="Momin-ki-Namaz-Urdu.pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
-        </div>
-        <div class="book-card">
-            <div class="book-title">جہنم میں لے جانے والے اعمال (جلد 2)</div>
-            <div class="book-desc">جہنم سے بچاؤ کے لیے عمل کی اہم تلقین، جو دینی احتیاط کو سکھاتی ہے۔</div>
-            <a href="jahannam-main-lay-janay-walay-amaal-jild-2 (1).pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
-        </div>
-        <div class="book-card">
-            <div class="book-title">دلچسپ معلومات سوالا جوابا حصہ 1</div>
-            <div class="book-desc">دینی اور عام معلومات کے دلچسپ سوالات و جوابات جو علم بڑھاتے ہیں۔</div>
-            <a href="دلچسپ معلومات سوالا جوابا حصہ1.pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
-        </div>
-        <div class="book-card">
-            <div class="book-title">احادیث کی روشنی میں زندگی</div>
-            <div class="book-desc">احادیث مبارکہ کی روشنی میں روزمرہ زندگی کو بہتر بنانے کی رہنمائی۔</div>
-            <a href="Ahadith-ki-Roshni-Main-Zindagi.pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
-        </div>
-        <div class="book-card">
-            <div class="book-title">قرآنی آیات کا مفہوم</div>
-            <div class="book-desc">قرآن مجید کی اہم آیات کے مفہوم اور ان کے اطلاق کی تفصیل۔</div>
-            <a href="Qurani-Ayaat-ka-Mafoom.pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
-        </div>
-        <div class="book-card">
-            <div class="book-title">روحانی ترقی کے مراحل</div>
-            <div class="book-desc">روحانی ترقی کے لیے عملی مراحل اور مشورے شامل ہیں۔</div>
-            <a href="Roohani-Tarqee-ke-Marahil.pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
-        </div>
+        <!-- अन्य किताबें यहाँ जोड़ें -->
+    </div>
+    <div class="bookmark-section">
+        <h2>میرے بک مارکس</h2>
+        <div id="bookmarkList"></div>
     </div>
     <div class="request-section">
         <h2>کتاب کی درخواست کریں</h2>
         <form class="request-form" onsubmit="submitRequest(event)">
-            <input type="text" placeholder="آپ کا نام" id="nameInput" required>
+            <input type="text" id="nameInput" placeholder="آپ کا نام" required>
             <input type="text" placeholder="مطلوبہ کتاب کا نام" required>
             <textarea placeholder="اپنی درخواست (اختیاری)" rows="5"></textarea>
-            <button type="submit">درخواست جمع کروائیں</button>
+            <button type="submit" class="download-btn">درخواست جمع کروائیں</button>
         </form>
     </div>
     <div class="audio-section">
-        <h2>سنوئیں خوبصورت نعت اور دینی آوازیں</h2>
-        <div class="audio-list">
-            <div class="audio-item">
-                <audio id="naatAudio1">
-                    <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Koi%20Gul%20Baqi%20Rahega%20%5BSlowed%20_%20Reverb%5D%20Beautiful%20Naat%20__%20_lofinaatscreation(MP3_320K).mp3" type="audio/mpeg">
-                    آپ کا براؤزر آڈیو سپورٹ نہیں کرتا۔
-                </audio>
-                <p>نعت: کوئی گل باقی رہے گا</p>
-            </div>
+        <h2>سنوئیں خوبصورت نعت</h2>
+        <div class="audio-item">
+            <audio id="naatAudio1" controls>
+                <source src="naat.mp3" type="audio/mpeg">
+                آپ کا براؤزر آڈیو سپورٹ نہیں کرتا۔
+            </audio>
+            <p>نعت: کوئی گل باقی رہے گا</p>
         </div>
-        <p id="audioStatus" style="color: #226422; margin-top: 20px;"></p>
     </div>
-    <div class="chat-support">
-        <h2>لائیو چیٹ سپورٹ</h2>
-        <p>سوال کے لیے رابطہ کریں: <a href="https://wa.me/918439602526" target="_blank">+918439602526</a></p>
-        <p>یا ہم سے انسٹاگرام پر رابطہ کریں: <a href="https://www.instagram.com/ansari_boyx6x?igsh=ajAzeGJyYjF2Z2p5" target="_blank">انسٹاگرام</a></p>
-    </div>
-    <div class="social-links">
-        <p>ہم سے رابطہ کریں:</p>
-        <a href="https://www.instagram.com/ansari_boyx6x?igsh=ajAzeGJyYjF2Z2p5" target="_blank" class="instagram">انسٹاگرام</a>
-        <a href="https://chat.whatsapp.com/BC9MzzJqqJ99jsOdvDjNth" target="_blank">وہاٹس ایپ گروپ</a>
-        <a href="https://www.facebook.com/example" target="_blank">فیس بک</a>
-        <a href="https://www.twitter.com/example" target="_blank">ٹوئٹر</a>
+    <div class="faq-section">
+        <h2>عمومی سوالات</h2>
+        <div class="faq-item">
+            <h3>کتابیں کیسے ڈاؤن لوڈ کریں؟</h3>
+            <p>کتاب کے کارڈ پر "ڈاؤن لوڈ PDF" بٹن پر کلک کریں۔</p>
+        </div>
+        <!-- अन्य FAQ जोड़ें -->
     </div>
     <div class="footer">
-        <p>© 2025 Suhail Husain | تمام حقوق محفوظ ہیں | بنائی گئی: 29 جولائی 2025، 07:06 PM IST</p>
+        <p>© 2025 Suhail Husain | تمام حقوق محفوظ ہیں</p>
+        <p>رابطہ: <a href="mailto:example@email.com">example@email.com</a> | <a href="https://wa.me/918439602526">WhatsApp</a></p>
+        <div class="social-links">
+            <a href="https://www.instagram.com/ansari_boyx6x">انسٹاگرام</a>
+            <a href="https://www.facebook.com/example">فیس بک</a>
+        </div>
         <p class="fiamanallah">فی امانﷲ</p>
-        <p>یہ ویب سائٹ اسلامی تعلیمات، کتابیں، نعت، اور دینی معلومات فراہم کرنے کے لیے وقف ہے۔ ہماری کوشش ہے کہ آپ کو بہترین مواد مہیا کیا جائے۔</p>
-        <p>رابطہ کریں: <a href="mailto:example@email.com">example@email.com</a></p>
-        <p>ہماری ویب سائٹ کا مقصد آپ کی دینی ترقی اور روحانی سکون کو فروغ دینا ہے۔</p>
+    </div>
+    <!-- मॉडल्स -->
+    <div id="previewModal" class="modal">
+        <div class="modal-content">
+            <h3>کتاب کا پریویو</h3>
+            <iframe id="pdfViewer" style="width: 100%; height: 500px; border: none;"></iframe>
+            <button class="download-btn" onclick="closePreview()">بند کریں</button>
+        </div>
+    </div>
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <h3>ریویو لکھیں</h3>
+            <input type="hidden" id="reviewBookId">
+            <div class="star-rating">
+                <span onclick="setRating(1)">★</span>
+                <span onclick="setRating(2)">★</span>
+                <span onclick="setRating(3)">★</span>
+                <span onclick="setRating(4)">★</span>
+                <span onclick="setRating(5)">★</span>
+            </div>
+            <textarea id="reviewText" placeholder="آپ کا ریویو..." rows="4" style="width: 100%;"></textarea>
+            <button class="download-btn" onclick="submitReview()">جمع کروائیں</button>
+            <button class="download-btn" onclick="closeReviewModal()">بند کریں</button>
+        </div>
     </div>
     <script>
-        // --- Theme Toggle ---
+        // Theme Toggle
         function toggleMode() {
-            const body = document.body;
+            document.body.classList.toggle('light-mode');
             const toggleBtn = document.getElementById('modeToggle');
-            body.classList.toggle('light-mode');
-            if (body.classList.contains('light-mode')) {
-                toggleBtn.textContent = 'ڈارک موڈ';
-                toggleBtn.classList.add('dark');
-            } else {
-                toggleBtn.textContent = 'موڈ تبدیل کریں';
-                toggleBtn.classList.remove('dark');
-            }
-            localStorage.setItem('mode', body.classList.contains('light-mode') ? 'light' : 'dark');
+            toggleBtn.textContent = document.body.classList.contains('light-mode') ? 'ڈارک موڈ' : 'لائٹ موڈ';
+            localStorage.setItem('mode', document.body.classList.contains('light-mode') ? 'light' : 'dark');
         }
-        // --- Search Books ---
+
+        // Search Books
         function searchBooks() {
-            let input = document.querySelector('.search-bar').value.toLowerCase();
-            let cards = document.querySelectorAll('.book-card');
-            cards.forEach(card => {
-                let title = card.querySelector('.book-title').textContent.toLowerCase();
-                if (title.includes(input)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
+            const input = document.querySelector('.search-bar').value.toLowerCase();
+            document.querySelectorAll('.book-card').forEach(card => {
+                const title = card.querySelector('.book-title').textContent.toLowerCase();
+                card.style.display = title.includes(input) ? 'block' : 'none';
+            });
+        }
+
+        // Filter Books
+        function filterBooks(category) {
+            document.querySelectorAll('.book-card').forEach(card => {
+                card.style.display = (category === 'all' || card.dataset.category === category) ? 'block' : 'none';
+            });
+        }
+
+        // Bookmark
+        function toggleBookmark(bookId) {
+            let bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+            const btn = document.querySelector(`button[onclick="toggleBookmark('${bookId}')"]`);
+            if (bookmarks.includes(bookId)) {
+                bookmarks = bookmarks.filter(id => id !== bookId);
+                btn.textContent = '☆ بک مارک';
+                btn.classList.remove('bookmarked');
+            } else {
+                bookmarks.push(bookId);
+                btn.textContent = '★ بک مارک شدہ';
+                btn.classList.add('bookmarked');
+            }
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+            updateBookmarkList();
+        }
+
+        function updateBookmarkList() {
+            const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+            const bookmarkList = document.getElementById('bookmarkList');
+            bookmarkList.innerHTML = '';
+            bookmarks.forEach(bookId => {
+                const bookCard = document.querySelector(`.book-card:has(button[onclick="toggleBookmark('${bookId}')"])`);
+                if (bookCard) {
+                    const title = bookCard.querySelector('.book-title').textContent;
+                    const link = bookCard.querySelector('.download-btn').href;
+                    bookmarkList.innerHTML += `<a href="${link}" class="download-btn">${title}</a><br>`;
                 }
             });
         }
-        // --- Request Form ---
+
+        // PDF Preview
+        function openPreview(pdfUrl) {
+            document.getElementById('loader').style.display = 'block';
+            const pdfViewer = document.getElementById('pdfViewer');
+            pdfViewer.src = pdfUrl + '#page=1&zoom=100';
+            document.getElementById('previewModal').style.display = 'flex';
+            pdfViewer.onload = () => document.getElementById('loader').style.display = 'none';
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').style.display = 'none';
+            document.getElementById('pdfViewer').src = '';
+        }
+
+        // Rating
+        let selectedRating = 0;
+        function setRating(rating) {
+            selectedRating = rating;
+            document.querySelectorAll('.star-rating span').forEach((star, index) => {
+                star.classList.toggle('selected', index < rating);
+            });
+        }
+
+        function rateBook(bookId, starsElement) {
+            document.getElementById('reviewModal').style.display = 'flex';
+            document.getElementById('reviewBookId').value = bookId;
+        }
+
+        function submitReview() {
+            const bookId = document.getElementById('reviewBookId').value;
+            const reviewText = document.getElementById('reviewText').value;
+            if (selectedRating === 0 || !reviewText) {
+                alert('براہ کرم ریٹنگ اور ریویو درج کریں!');
+                return;
+            }
+            alert(`ریویو موصول ہوا!\nکتاب: ${bookId}\nریٹنگ: ${selectedRating}\nریویو: ${reviewText}`);
+            closeReviewModal();
+        }
+
+        function closeReviewModal() {
+            document.getElementById('reviewModal').style.display = 'none';
+            document.getElementById('reviewText').value = '';
+            setRating(0);
+        }
+
+        // Share
+        function shareBook(title, url) {
+            if (navigator.share) {
+                navigator.share({ title, url }).catch(console.error);
+            } else {
+                alert(`شیئر لنک: ${url}`);
+            }
+        }
+
+        // Request Form
         function submitRequest(event) {
             event.preventDefault();
-            let name = document.querySelector('.request-form input[placeholder="آپ کا نام"]').value;
-            let bookName = document.querySelector('.request-form input[placeholder="مطلوبہ کتاب کا نام"]').value;
-            let message = document.querySelector('.request-form textarea').value || 'کوئی اضافی پیغام نہیں';
-            alert(`درخواست موصول ہوئی!\nنام: ${name}\nکتاب: ${bookName}\nپیغام: ${message}\nبراہ کرم انسٹاگرام یا وہاٹس ایپ پر رابطہ کریں۔`);
+            const name = document.getElementById('nameInput').value;
+            const bookName = document.querySelector('.request-form input[placeholder="مطلوبہ کتاب کا نام"]').value;
+            const message = document.querySelector('.request-form textarea').value || 'کوئی پیغام نہیں';
+            alert(`درخواست موصول ہوئی!\nنام: ${name}\nکتاب: ${bookName}\nپیغام: ${message}`);
             document.querySelector('.request-form').reset();
         }
-        // --- User Name Show ---
+
+        // User Name
         function updateUserName() {
             let userName = localStorage.getItem('userName');
             const nameInput = document.getElementById('nameInput');
@@ -240,49 +323,31 @@
                 document.getElementById('userName').textContent = `خوش آمدید، ${userName}!`;
             }
         }
-        // --- Theme & User Name Initialization ---
-        document.addEventListener('DOMContentLoaded', function() {
-            // Theme
-            const body = document.body;
-            const savedMode = localStorage.getItem('mode');
-            const toggleBtn = document.getElementById('modeToggle');
-            if (savedMode === 'light') {
-                body.classList.add('light-mode');
-                toggleBtn.textContent = 'ڈارک موڈ';
-                toggleBtn.classList.add('dark');
-            } else {
-                body.classList.remove('light-mode');
-                toggleBtn.textContent = 'موڈ تبدیل کریں';
-                toggleBtn.classList.remove('dark');
-            }
-            // User Name
-            updateUserName();
+
+        // Progress Bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
         });
 
-        // --- Naat Auto Play (scroll, click, keydown) with random start ---
-        let naatPlayed = false;
-        function playNaatRandom() {
-            if (naatPlayed) return;
-            const audio = document.getElementById('naatAudio1');
-            // Wait for metadata to load to get duration
-            function startAtRandom() {
-                let duration = audio.duration || 120;
-                let min = 0;
-                let max = duration > 30 ? duration - 30 : Math.max(duration - 5, 0);
-                let randomStart = Math.random() * (max - min) + min;
-                audio.currentTime = randomStart;
-                audio.play();
-                naatPlayed = true;
-            }
-            if (audio.readyState >= 2) {
-                startAtRandom();
-            } else {
-                audio.addEventListener('loadedmetadata', startAtRandom, { once: true });
-            }
+        // Navbar Toggle
+        function toggleNav() {
+            const navbar = document.querySelector('.navbar');
+            navbar.classList.toggle('responsive');
         }
-        window.addEventListener('scroll', playNaatRandom);
-        window.addEventListener('keydown', playNaatRandom);
-        window.addEventListener('click', playNaatRandom);
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedMode = localStorage.getItem('mode');
+            if (savedMode === 'light') toggleMode();
+            updateUserName();
+            updateBookmarkList();
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').then(() => console.log('Service Worker Registered'));
+            }
+        });
     </script>
 </body>
 </html>
