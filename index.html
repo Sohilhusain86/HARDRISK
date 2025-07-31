@@ -8,8 +8,76 @@
     <meta name="author" content="Suhail Husain">
     <title>اسلامی کتابیں - شاندار لائبریری</title>
     <style>
-        /* ... آپ کی ساری CSS ویسے ہی رہے گی ... */
-        /* یہاں سے اپنی CSS کو paste کریں */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f6fff8, #e0e7ff, #fdf6e3, #e0f6ff);
+            margin: 0;
+            padding: 0;
+            color: #226422;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.8;
+            transition: background 0.5s, color 0.5s;
+        }
+        .bismillah, .header, .request-section, .audio-section, .chat-support, .social-links, .footer {
+            background: rgba(255,255,255,0.92);
+            color: #166534 !important;
+            border-radius: 12px;
+            margin-bottom: 18px;
+        }
+        .bismillah { font-size: 2.5em; font-weight: bold; padding: 25px 0; box-shadow: 0 0 16px #e0e7ff; }
+        .header { text-align: center; padding: 30px 10px 10px 10px; box-shadow: 0 0 16px #e0e7ff; }
+        .header h1 { font-size: 2em; color: #27ae60; margin: 0; }
+        .header p { font-size: 1.1em; color: #226422; margin: 10px 0; }
+        .user-name { font-size: 1.3em; color: #2ecc71; margin-top: 5px; }
+        .toggle-mode {
+            margin: 10px 0;
+            padding: 7px 20px;
+            background-color: #2ecc71;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        .toggle-mode:hover { background-color: #27ae60; }
+        .search-bar {
+            width: 70%; max-width: 350px; padding: 8px; margin: 15px auto; border: none; border-radius: 20px;
+            font-size: 1em; background-color: #e0e7ff; color: #226422; display: block;
+        }
+        .books-section {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; padding: 18px; max-width: 1200px; margin: 0 auto; 
+        }
+        .book-card, .special-book-card {
+            background: #f3f4f6;
+            border: 2px solid #c1e1c1;
+            border-radius: 15px;
+            width: 270px;
+            padding: 15px 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px #e0e7ff;
+            color: #166534;
+            transition: transform 0.3s;
+        }
+        .book-card:hover, .special-book-card:hover { transform: translateY(-4px) scale(1.04); }
+        .book-title { font-size: 1.1em; color: #27ae60; margin-bottom: 7px; }
+        .book-desc { font-size: 0.95em; color: #226422; margin-bottom: 8px; }
+        .download-btn {
+            background-color: #27ae60; color: #fff; padding: 8px 18px; border: none; border-radius: 20px;
+            font-size: 1em; text-decoration: none; display: inline-block; transition: background-color 0.3s;
+        }
+        .download-btn:hover { background-color: #219653; }
+        .request-section, .audio-section, .chat-support, .social-links, .footer {
+            text-align: center; padding: 20px 10px; box-shadow: 0 0 8px #e0e7ff;
+        }
+        .audio-item { margin-bottom: 10px; }
+        .footer { font-size: 0.95em; margin-top: 30px; }
+        @media (max-width:700px) {
+            .books-section { flex-direction: column; align-items: center; }
+            .book-card, .special-book-card { width: 96%; }
+            .search-bar { width: 95%; }
+        }
     </style>
 </head>
 <body>
@@ -22,6 +90,7 @@
         <input type="text" class="search-bar" placeholder="کتاب تلاش کریں..." onkeyup="searchBooks()">
     </div>
     <div class="books-section">
+        <!-- آپ کی کتابیں ویسے ہی رہیں گی -->
         <div class="book-card special-book-card">
             <div class="book-title">کمالاتِ مصطفیٰ (Kamalat-e-Mustafa)</div>
             <div class="book-desc">یہ کتاب احمد رضا رضوی کی درخواست پر پیش کی گئی ہے۔ یہ رسول اللہ صلی اللہ علیہ وسلم کی عظمت کو بیان کرتی ہے۔</div>
@@ -92,14 +161,14 @@
         <h2>سنوئیں خوبصورت نعت اور دینی آوازیں</h2>
         <div class="audio-list">
             <div class="audio-item">
-                <audio id="naatAudio1" controls>
+                <audio id="naatAudio1">
                     <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Koi%20Gul%20Baqi%20Rahega%20%5BSlowed%20_%20Reverb%5D%20Beautiful%20Naat%20__%20_lofinaatscreation(MP3_320K).mp3" type="audio/mpeg">
-                    Your browser does not support the audio element.
+                    آپ کا براؤزر آڈیو سپورٹ نہیں کرتا۔
                 </audio>
                 <p>نعت: کوئی گل باقی رہے گا</p>
             </div>
         </div>
-        <p id="audioStatus" style="color: #e0e7ff; margin-top: 20px;"></p>
+        <p id="audioStatus" style="color: #226422; margin-top: 20px;"></p>
     </div>
     <div class="chat-support">
         <h2>لائیو چیٹ سپورٹ</h2>
@@ -140,7 +209,13 @@
             let input = document.querySelector('.search-bar').value.toLowerCase();
             let cards = document.querySelectorAll('.book-card');
             cards.forEach(card => {
-                let title = card.querySelector('.book-title').textContent.toLower            });
+                let title = card.querySelector('.book-title').textContent.toLowerCase();
+                if (title.includes(input)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
         // --- Request Form ---
         function submitRequest(event) {
@@ -183,6 +258,31 @@
             // User Name
             updateUserName();
         });
+
+        // --- Naat Auto Play (scroll, click, keydown) with random start ---
+        let naatPlayed = false;
+        function playNaatRandom() {
+            if (naatPlayed) return;
+            const audio = document.getElementById('naatAudio1');
+            // Wait for metadata to load to get duration
+            function startAtRandom() {
+                let duration = audio.duration || 120;
+                let min = 0;
+                let max = duration > 30 ? duration - 30 : Math.max(duration - 5, 0);
+                let randomStart = Math.random() * (max - min) + min;
+                audio.currentTime = randomStart;
+                audio.play();
+                naatPlayed = true;
+            }
+            if (audio.readyState >= 2) {
+                startAtRandom();
+            } else {
+                audio.addEventListener('loadedmetadata', startAtRandom, { once: true });
+            }
+        }
+        window.addEventListener('scroll', playNaatRandom);
+        window.addEventListener('keydown', playNaatRandom);
+        window.addEventListener('click', playNaatRandom);
     </script>
 </body>
 </html>
