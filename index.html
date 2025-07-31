@@ -137,6 +137,7 @@
             text-align: center;
             transition: transform 0.4s ease, box-shadow 0.4s ease;
             border: 2px solid #27ae60;
+            display: block; /* یقینی بنائیں کہ کتابیں ڈیفالٹ دکھائی دیں */
         }
         .special-book-card {
             background: rgba(39, 174, 96, 0.25);
@@ -482,18 +483,6 @@
             <div class="book-desc">روحانی ترقی کے لیے عملی مراحل اور مشورے شامل ہیں۔</div>
             <a href="Roohani-Tarqee-ke-Marahil.pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
         </div>
-        <!-- نیچے نئی کتابیں شامل کی گئیں -->
-        <div class="book-card">
-            <div class="book-title">مومن کی نماز (اردو)</div>
-            <div class="book-desc">نماز کی اہمیت اور طریقہ کار کی جامع کتاب جو ہر مومن کے لیے ضروری ہے۔</div>
-            <a href="Momin-ki-Namaz-Urdu.pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
-        </div>
-        <div class="book-card">
-            <div class="book-title">دلچسپ معلومات سوالا جوابا حصہ 1</div>
-            <div class="book-desc">دینی اور عام معلومات کے دلچسپ سوالات و جوابات جو علم بڑھاتے ہیں۔</div>
-            <a href="دلچسپ معلومات سوالا جوابا حصہ1.pdf" class="download-btn" download>ڈاؤن لوڈ PDF</a>
-        </div>
-        <!-- مزید کتابیں شامل کرنے کے لیے یہاں جگہ رکھی گئی -->
     </div>
     <div class="request-section">
         <h2>کتاب کی درخواست کریں</h2>
@@ -513,20 +502,6 @@
                     Your browser does not support the audio element.
                 </audio>
                 <p>نعت: کوئی گل باقی رہے گا</p>
-            </div>
-            <div class="audio-item">
-                <audio id="naatAudio2" controls>
-                    <source src="https://example.com/another-naat.mp3" type="audio/mpeg">
-                    Your browser does not support the audio element.
-                </audio>
-                <p>نعت: مدح رسول</p>
-            </div>
-            <div class="audio-item">
-                <audio id="naatAudio3" controls>
-                    <source src="https://example.com/third-naat.mp3" type="audio/mpeg">
-                    Your browser does not support the audio element.
-                </audio>
-                <p>نعت: سلام تیری محفل کو</p>
             </div>
         </div>
         <p id="audioStatus" style="color: #e0e7ff; margin-top: 20px;"></p>
@@ -580,9 +555,7 @@
             }
 
             const audios = [
-                document.getElementById('naatAudio1'),
-                document.getElementById('naatAudio2'),
-                document.getElementById('naatAudio3')
+                document.getElementById('naatAudio1')
             ];
             let currentAudioIndex = 0;
 
@@ -590,12 +563,12 @@
                 if (currentAudioIndex < audios.length) {
                     audios[currentAudioIndex].play().catch(function(error) {
                         console.log("آڈیو چلانے میں تپشت: ", error);
-                        document.getElementById('audioStatus').textContent = "نعت چلانے میں تپشت ہوئی۔ اگلی کوشش کریں۔";
+                        document.getElementById('audioStatus').textContent = "نعت چلانے میں تپشت ہوئی۔ براہ کرم انٹرنیٹ چیک کریں۔";
                         currentAudioIndex++;
                         playNextAudio();
                     });
                 } else {
-                    document.getElementById('audioStatus').textContent = "تمام نعتیں مکمل ہو گئیں۔";
+                    document.getElementById('audioStatus').textContent = "نعت مکمل ہو گئی۔";
                 }
             }
 
@@ -606,11 +579,8 @@
                 });
             });
 
-            playNextAudio();
-
-            document.body.addEventListener('click', playNextAudio, { once: true });
-            document.body.addEventListener('scroll', playNextAudio, { once: true });
-            document.body.addEventListener('touchstart', playNextAudio, { once: true });
+            // خودکار چلانے کے بجائے دستی کنٹرول
+            document.getElementById('naatAudio1').addEventListener('click', playNextAudio);
 
             function toggleMode() {
                 body.classList.toggle('light-mode');
