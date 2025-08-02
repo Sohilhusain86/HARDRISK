@@ -8,40 +8,26 @@
     <meta name="author" content="Suhail Husain">
     <title>اسلامی کتابیں - شاندار لائبریری</title>
     <style>
-        body {
-            font-family: 'Noto Nastaliq Urdu', 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #f6fff8, #e0e7ff);
-            color: #226422;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-        }
-        .navbar {
-            background: #27ae60; color: #fff; padding: 10px;
-            position: sticky; top: 0; z-index: 1000;
-            display: flex; gap: 10px; align-items: center;
-        }
+        body { font-family: 'Noto Nastaliq Urdu', 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f6fff8, #e0e7ff); color: #226422; margin: 0; padding: 0; min-height: 100vh; }
+        .navbar { background: #27ae60; color: #fff; padding: 10px; position: sticky; top: 0; z-index: 1000; display: flex; gap: 10px; align-items: center;}
         .navbar a { color: #fff; text-decoration: none; margin: 0 8px; font-size: 1.1em; }
-        .navbar .bookmark-nav-btn {
-            background: #fff; color: #27ae60; border-radius: 18px; padding: 4px 18px; font-size: 1em; margin-right: 10px; cursor: pointer; border: none;
-        }
+        .navbar .bookmark-nav-btn { background: #fff; color: #27ae60; border-radius: 18px; padding: 4px 18px; font-size: 1em; margin-right: 10px; cursor: pointer; border: none;}
         .bismillah { font-size: 2em; text-align: center; padding: 18px; background: #fff; box-shadow: 0 0 10px #e0e7ff;}
         .header { text-align: center; padding: 16px; background: rgba(255,255,255,0.95); margin: 10px; border-radius: 10px; }
         .search-bar { width: 90%; max-width: 400px; padding: 10px; margin: 10px auto 0; border-radius: 20px; border: 1px solid #27ae60; }
         .books-section { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 15px; max-width: 1200px; margin: 0 auto; }
         .book-card {
             background: #f3f4f6; border: 2px solid #c1e1c1; border-radius: 10px; width: 280px; padding: 16px;
-            text-align: center; box-shadow: 0 2px 8px #e0e7ff; transition: transform 0.3s;
-            margin-bottom: 10px;
+            text-align: center; box-shadow: 0 2px 8px #e0e7ff; transition: transform 0.3s; margin-bottom: 10px;
         }
         .book-card:hover { transform: translateY(-5px);}
         .book-title { font-size: 1.13em; color: #27ae60; font-weight: bold; margin-bottom: 5px;}
         .book-desc { font-size: 0.95em; color: #226422; margin-bottom: 8px;}
         .book-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 10px 0;}
-        .download-btn, .preview-btn, .bookmark-btn, .share-btn {
+        .download-btn, .preview-btn, .bookmark-btn {
             background: #27ae60; color: #fff; padding: 7px 17px; border-radius: 18px; border: none; cursor: pointer; font-size: 1em; transition: background 0.2s;
         }
-        .download-btn:hover, .preview-btn:hover, .bookmark-btn:hover, .share-btn:hover { background: #219653;}
+        .download-btn:hover, .preview-btn:hover, .bookmark-btn:hover { background: #219653;}
         .bookmark-btn.bookmarked { background: #e74c3c; }
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.25); z-index: 1000;
@@ -50,6 +36,8 @@
         .modal-content { background: #fff; padding: 24px; border-radius: 10px; max-width: 520px; width: 96%; }
         .close-btn { background: #27ae60; color: #fff; border: none; border-radius: 16px; padding: 5px 17px; cursor: pointer; float: left;}
         .bookmark-section { background: rgba(255,255,255,0.93); margin: 16px; padding: 18px; border-radius: 10px; text-align: center;}
+        .footer { font-size: 0.95em; margin-top: 24px; background: #f6fff8; padding: 10px 0;}
+        .social-links a { margin: 0 10px; color: #27ae60; text-decoration: none; }
         @media (max-width: 700px) {
             .books-section { flex-direction: column; align-items: center;}
             .book-card { width: 96%;}
@@ -68,7 +56,7 @@
     <div class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
     <div class="header">
         <h1>اسلامی کتابیں ڈاؤن لوڈ کریں</h1>
-        <p>کتابیں نام سے تلاش کریں، پریویو دیکھیں، ڈاؤن لوڈ کریں، یا بک مارک میں ڈالیں!</p>
+        <p>کتابیں تلاش کریں، پریویو دیکھیں، ڈاؤن لوڈ کریں، یا بک مارک میں ڈالیں!</p>
         <input type="text" class="search-bar" placeholder="کتاب تلاش کریں..." onkeyup="searchBooks()">
     </div>
     <div class="books-section" id="books">
@@ -96,6 +84,17 @@
     <div class="bookmark-section">
         <h2>میرے بک مارکس (نیچے بھی)</h2>
         <div id="bookmarkListSection"></div>
+    </div>
+
+    <div class="footer">
+        <p>© 2025 Suhail Husain | تمام حقوق محفوظ ہیں</p>
+        <p>رابطہ: <a href="mailto:example@email.com">example@email.com</a> | <a href="https://wa.me/918439602526">WhatsApp</a></p>
+        <div class="social-links">
+            <a href="https://www.instagram.com/ansari_boyx6x">انسٹاگرام</a>
+            <a href="https://www.facebook.com/example">فیس بک</a>
+            <a href="https://chat.whatsapp.com/BC9MzzJqqJ99jsOdvDjNth">وہاٹس ایپ گروپ</a>
+        </div>
+        <p class="fiamanallah">فی امانﷲ</p>
     </div>
 
     <script>
@@ -127,95 +126,4 @@
                     <div class="book-desc">${b.desc}</div>
                     <div class="book-actions">
                         <button class="preview-btn" onclick="openPreview('${b.file}','${b.title}')">پریویو</button>
-                        <a href="${getRawUrl(b.file)}" class="download-btn" download onclick="trackDownload('${b.id}')">ڈاؤن لوڈ PDF</a>
-                        <button class="bookmark-btn${isBookmarked?' bookmarked':''}" onclick="toggleBookmark('${b.id}')">
-                            ${isBookmarked?'★ بُک مارکڈ':'☆ بک مارک'}
-                        </button>
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-    // Get correct raw download url for GitHub pages
-    function getRawUrl(filename) {
-        // If self-hosted: just filename, else: raw github url (edit as needed for your own repo/hosting)
-        // For GitHub Pages, files in root: './filename'
-        return encodeURI(filename);
-        // Or for GitHub raw:
-        // return "https://github.com/Sohilhusain86/HARDRISK/raw/main/" + encodeURIComponent(filename);
-    }
-
-    // Search
-    function searchBooks() {
-        const val = document.querySelector('.search-bar').value.trim();
-        renderBooks(val);
-    }
-
-    // Bookmark functions
-    function getBookmarks() {
-        return JSON.parse(localStorage.getItem('bookmarks') || '[]');
-    }
-    function toggleBookmark(bookId) {
-        let bookmarks = getBookmarks();
-        if(bookmarks.includes(bookId)) {
-            bookmarks = bookmarks.filter(id => id !== bookId);
-        } else {
-            bookmarks.push(bookId);
-        }
-        localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
-        renderBooks(document.querySelector('.search-bar').value.trim());
-        updateBookmarkList();
-    }
-    function openBookmarkPage() {
-        document.getElementById('bookmarkModal').style.display = 'flex';
-        updateBookmarkList();
-    }
-    function closeBookmarkPage() {
-        document.getElementById('bookmarkModal').style.display = 'none';
-    }
-    function updateBookmarkList() {
-        const bookmarks = getBookmarks();
-        const list = document.getElementById('bookmarkList');
-        const listSection = document.getElementById('bookmarkListSection');
-        let html = '';
-        bookmarks.forEach(bookId => {
-            const book = books.find(b => b.id === bookId);
-            if(book) {
-                html += `<div>
-                    <span class="book-title">${book.title}</span>
-                    <a href="${getRawUrl(book.file)}" class="download-btn" download>ڈاؤن لوڈ</a>
-                    <button class="preview-btn" onclick="openPreview('${book.file}','${book.title}')">پریویو</button>
-                </div>`;
-            }
-        });
-        list.innerHTML = html || "<p>کوئی بک مارکڈ کتاب نہیں۔</p>";
-        listSection.innerHTML = html || "<p>کوئی بک مارکڈ کتاب نہیں۔</p>";
-    }
-
-    // Preview
-    function openPreview(pdfUrl, bookTitle) {
-        document.getElementById('previewModal').style.display = 'flex';
-        document.getElementById('pdfViewer').src = getRawUrl(pdfUrl) + "#toolbar=0";
-        document.getElementById('previewTitle').textContent = bookTitle || '';
-    }
-    function closePreview() {
-        document.getElementById('previewModal').style.display = 'none';
-        document.getElementById('pdfViewer').src = '';
-    }
-
-    // Download tracking
-    function trackDownload(bookId) {
-        let downloads = JSON.parse(localStorage.getItem('downloads') || '{}');
-        downloads[bookId] = (downloads[bookId] || 0) + 1;
-        localStorage.setItem('downloads', JSON.stringify(downloads));
-    }
-
-    // Initial Render
-    document.addEventListener('DOMContentLoaded', () => {
-        renderBooks();
-        updateBookmarkList();
-    });
-    </script>
-</body>
-</html>
+                        <a href="${encodeURI(b.file)}" class="download-btn" download onclick="trackDownload('${b.id}')">ڈاؤن لوڈ
