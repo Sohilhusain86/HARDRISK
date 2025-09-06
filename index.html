@@ -309,6 +309,27 @@
             </audio>
             <p>نعت: کوئی گل باقی رہے گا</p>
         </div>
+        <div class="audio-item">
+            <audio id="naatAudio2" controls>
+                <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Kalam%20Mumtaz%20Qadri%20.%20Full%20janaza%20HD%20video(MP3_320K).mp3" type="audio/mpeg">
+                آپ کا براؤزر آڈیو سپورٹ نہیں کرتا۔
+            </audio>
+            <p>نعت: کلمات ممتاز قادری</p>
+        </div>
+        <div class="audio-item">
+            <audio id="naatAudio3" controls>
+                <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Ho%20Karam%20Sarkar%20Abto%20Owais%20Raza%20Qadri%202019(MP3_160K).mp3" type="audio/mpeg">
+                آپ کا براؤزر آڈیو سپورٹ نہیں کرتا۔
+            </audio>
+            <p>نعت: ہو کرم سرکار اب تو</p>
+        </div>
+        <div class="audio-item">
+            <audio id="naatAudio4" controls>
+                <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/pohchu%20dare%20sarkar_sabir%20raza%20azhari%20manqabat%20in%20Surat_shorts_video_(MP3_160K).mp3" type="audio/mpeg">
+                آپ کا براؤزر آڈیو سپورٹ نہیں کرتا۔
+            </audio>
+            <p>نعت: پہنچو در سرکار</p>
+        </div>
         <p id="audioStatus" style="color: #226422; margin-top: 20px;"></p>
     </div>
     <div class="chat-support">
@@ -391,4 +412,209 @@
                 btn.classList.remove('bookmarked');
             } else {
                 bookmarks.push(bookId);
-                btn.textContent = '★ ب
+                btn.textContent = '★ بک مارک شدہ';
+                btn.classList.add('bookmarked');
+            }
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+            updateBookmarkList();
+        }
+
+        function updateBookmarkList() {
+            const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+            const bookmarkList = document.getElementById('bookmarkList');
+            bookmarkList.innerHTML = '';
+            bookmarks.forEach(bookId => {
+                const bookCard = Array.from(document.querySelectorAll('.book-card')).find(card =>
+                    card.querySelector(`button[onclick="toggleBookmark('${bookId}')"]`)
+                );
+                if (bookCard) {
+                    const title = bookCard.querySelector('.book-title').textContent;
+                    const link = bookCard.querySelector('.download-btn').href;
+                    bookmarkList.innerHTML += `<a href="${link}" class="download-btn">${title}</a><br>`;
+                }
+            });
+        }
+
+        // PDF Preview
+        function openPreview(pdfUrl) {
+            document.getElementById('loader').style.display = 'block';
+            const pdfViewer = document.getElementById('pdfViewer');
+            pdfViewer.src = pdfUrl + '#page=1&zoom=100';
+            document.getElementById('previewModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('loader').style.display = 'none', 1000);
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').style.display = 'none';
+            document.getElementById('pdfViewer').src = '';
+        }
+
+        // Rating
+        let selectedRating = 0;
+        function setRating(rating) {
+            selectedRating = rating;
+            document.querySelectorAll('.star-rating span').forEach((star, index) => {
+                star.classList.toggle('selected', index < rating);
+            });
+        }
+
+        function rateBook(bookId, starsElement) {
+            document.getElementById('reviewModal').style.display = 'flex';
+            document.getElementById('reviewBookId').value = bookId;
+        }
+
+        function submitReview() {
+            const bookId = document.getElementById('reviewBookId').value;
+            const reviewText = document.getElementById('reviewText').value;
+            if (selectedRating === 0 || !reviewText) {
+                alert('براہ کرم ریٹنگ اور ریویو درج کریں!');
+                return;
+            }
+            alert(`ریویو موصول ہوا!\nکتاب: ${bookId}\nریٹنگ: ${selectedRating}\nریویو: ${reviewText}`);
+            closeReviewModal();
+        }
+
+        function closeReviewModal() {
+            document.getElementById('reviewModal').style.display = 'none';
+            document.getElementById('reviewText').value = '';
+            setRating(0);
+        }
+
+        // Share
+        function shareBook(title, url) {
+            if (navigator.share) {
+                navigator.share({ title: `اسلامی کتابیں: ${title}`, url }).catch(console.error);
+            } else {
+                alert(`شیئر لنک: ${url}`);
+            }
+        }
+
+        // Request Form
+        function submitRequest(event) {
+            event.preventDefault();
+            const name = document.getElementById('nameInput').value;
+            const bookName = document.querySelector('.request-form input[placeholder="مطلوبہ کتاب کا نام"]').value;
+            const message = document.querySelector('.request-form textarea').value || 'کوئی پیغام نہیں';
+            alert(`درخواست موصول ہوئی!\nنام: ${name}\nکتاب: ${bookName}\nپیغام: ${message}`);
+            document.querySelector('.request-form').reset();
+        }
+
+        // User Name
+        function updateUserName() {
+            let userName = localStorage.getItem('userName');
+            const nameInput = document.getElementById('nameInput');
+            if (!userName) {
+                nameInput.addEventListener('input', function() {
+                    userName = nameInput.value || 'مہمان';
+                    localStorage.setItem('userName', userName);
+                    document.getElementById('userName').textContent = `خوش آمدید، ${userName}!`;
+                });
+            } else {
+                document.getElementById('userName').textContent = `خوش آمدید، ${userName}!`;
+            }
+        }
+
+        // Progress Bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+
+        // Navbar Toggle
+        function toggleNav() {
+            const navbar = document.querySelector('.navbar');
+            navbar.classList.toggle('responsive');
+        }
+
+        // Naat Auto Play with Four Naats
+        let naatPlayed = false;
+        function playNaatRandom(event) {
+            if (naatPlayed) return;
+            const naats = [
+                { id: 'naatAudio1', title: 'کوئی گل باقی رہے گا' },
+                { id: 'naatAudio2', title: 'کلمات ممتاز قادری' },
+                { id: 'naatAudio3', title: 'ہو کرم سرکار اب تو' },
+                { id: 'naatAudio4', title: 'پہنچو در سرکار' }
+            ];
+            const randomIndex = Math.floor(Math.random() * naats.length);
+            const selectedNaat = naats[randomIndex];
+            const audio = document.getElementById(selectedNaat.id);
+
+            // Set default volume
+            audio.volume = 0.5;
+
+            // Show loader
+            document.getElementById('loader').style.display = 'block';
+
+            // Stop any currently playing audio
+            naats.forEach(naat => {
+                const otherAudio = document.getElementById(naat.id);
+                if (otherAudio !== audio) {
+                    otherAudio.pause();
+                    otherAudio.currentTime = 0;
+                }
+            });
+
+            function startAtRandom() {
+                const duration = audio.duration || 120;
+                const min = 0;
+                const max = duration > 30 ? duration - 30 : Math.max(duration - 5, 0);
+                const randomStart = Math.random() * (max - min) + min;
+                audio.currentTime = randomStart;
+                audio.play().then(() => {
+                    document.getElementById('audioStatus').textContent = `عید میلاد النبی کی نعت چل رہی ہے: ${selectedNaat.title}`;
+                    document.getElementById('loader').style.display = 'none';
+                    naatPlayed = true;
+                }).catch(err => {
+                    document.getElementById('audioStatus').textContent = `آڈیو چلانے میں خرابی: ${err.message}`;
+                    document.getElementById('loader').style.display = 'none';
+                    console.error('Audio play error:', err);
+                });
+            }
+
+            // Check if audio is ready
+            if (audio.readyState >= 2) {
+                startAtRandom();
+            } else {
+                audio.load(); // Force reload audio
+                audio.addEventListener('loadedmetadata', startAtRandom, { once: true });
+                audio.addEventListener('error', () => {
+                    document.getElementById('audioStatus').textContent = `آڈیو لوڈ کرنے میں خرابی: نعت "${selectedNaat.title}" کی فائل چیک کریں`;
+                    document.getElementById('loader').style.display = 'none';
+                    console.error('Audio load error for:', selectedNaat.title);
+                }, { once: true });
+            }
+        }
+
+        // Add event listeners for scroll, click, keydown, and touchstart
+        window.addEventListener('scroll', playNaatRandom);
+        window.addEventListener('click', playNaatRandom);
+        window.addEventListener('keydown', playNaatRandom);
+        window.addEventListener('touchstart', playNaatRandom);
+
+        // Download Tracking
+        function trackDownload(bookId) {
+            let downloads = JSON.parse(localStorage.getItem('downloads') || '{}');
+            downloads[bookId] = (downloads[bookId] || 0) + 1;
+            localStorage.setItem('downloads', JSON.stringify(downloads));
+            console.log(`ڈاؤن لوڈ: ${bookId}, کل: ${downloads[bookId]}`);
+        }
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedMode = localStorage.getItem('mode');
+            if (savedMode === 'light') toggleMode();
+            updateUserName();
+            updateBookmarkList();
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').catch(err => console.error('Service Worker Error:', err));
+            }
+            // Preload audio to reduce delay
+            const naats = ['naatAudio1', 'naatAudio2', 'naatAudio3', 'naatAudio4'];
+            naats.forEach(id => document.getElementById(id).load());
+        });
+    </script>
+</body>
+</html>
