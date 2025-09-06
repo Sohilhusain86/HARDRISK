@@ -25,8 +25,7 @@
         .light-mode { background: #fff; color: #333; }
         .navbar {
             background: #27ae60; color: #fff; padding: 10px; position: sticky; top: 0; z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center;
         }
         .navbar a {
             color: #fff; text-decoration: none; margin: 0 15px; font-size: 1.1em; transition: color 0.3s;
@@ -387,4 +386,9 @@
             let bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
             const btn = document.querySelector(`button[onclick="toggleBookmark('${bookId}')"]`);
             if (bookmarks.includes(bookId)) {
-                bookmarks = bookmarks.filter(id
+                bookmarks = bookmarks.filter(id => id !== bookId);
+                btn.textContent = '☆ بک مارک';
+                btn.classList.remove('bookmarked');
+            } else {
+                bookmarks.push(bookId);
+                btn.textContent = '★ ب
