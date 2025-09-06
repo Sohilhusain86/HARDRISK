@@ -3,125 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="عید میلاد النبی کے موقع پر اسلامی کتابیں، نعت، تقریریں، اور دینی معلومات کی جامع ویب سائٹ">
-    <meta name="keywords" content="عید میلاد النبی، اسلامی کتابیں، نعت، تقریریں، دینی معلومات، PDF ڈاؤن لوڈ">
+    <meta name="description" content="اسلامی کتابیں، نعت، تقریریں، اور دینی معلومات کی جامع ویب سائٹ">
+    <meta name="keywords" content="اسلامی کتابیں، نعت، تقریریں، دینی معلومات، PDF ڈاؤن لوڈ">
     <meta name="author" content="Suhail Husain">
-    <meta name="theme-color" content="#1a3c34">
+    <meta name="theme-color" content="#27ae60">
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/icon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&family=Amiri&display=swap" rel="stylesheet">
-    <title>عید میلاد النبی - شاندار اسلامی لائبریری</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">
+    <title>اسلامی کتابیں - شاندار لائبریری</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Noto Nastaliq Urdu', 'Amiri', sans-serif;
-            background: linear-gradient(135deg, #1a3c34, #2c6e49);
-            color: #f4f1de;
+            font-family: 'Noto Nastaliq Urdu', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f6fff8, #e0e7ff);
+            color: #226422;
             line-height: 1.8;
             min-height: 100vh;
             overflow-x: hidden;
             transition: background 0.5s, color 0.5s;
-            background-image: url('https://www.transparenttextures.com/patterns/islamic-pattern.png');
-            background-size: cover;
-            background-attachment: fixed;
         }
-        .light-mode { background: #f4f1de; color: #1a3c34; }
+        .light-mode { background: #fff; color: #333; }
         .navbar {
-            background: #1a3c34; color: #f4f1de; padding: 15px; position: sticky; top: 0; z-index: 1000;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            background: #27ae60; color: #fff; padding: 10px; position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             display: flex; justify-content: space-between; align-items: center;
         }
         .navbar a {
-            color: #f4f1de; text-decoration: none; margin: 0 20px; font-size: 1.2em; transition: color 0.3s;
+            color: #fff; text-decoration: none; margin: 0 15px; font-size: 1.1em; transition: color 0.3s;
         }
-        .navbar a:hover { color: #e07a5f; }
-        .navbar .hamburger { display: none; font-size: 1.8em; cursor: pointer; }
-        .welcome-section {
-            text-align: center; padding: 40px 20px; background: rgba(42, 99, 75, 0.9); margin: 20px;
-            border-radius: 15px; animation: fadeIn 2s ease-in-out; box-shadow: 0 0 20px rgba(0,0,0,0.2);
-        }
-        .welcome-section h1 { font-size: 2.8em; color: #f4f1de; text-shadow: 0 0 10px #e07a5f; }
-        .welcome-section p { font-size: 1.3em; margin: 15px 0; }
+        .navbar a:hover { color: #e74c3c; }
+        .navbar .hamburger { display: none; font-size: 1.5em; cursor: pointer; }
         .bismillah {
-            font-size: 3em; text-align: center; padding: 25px; background: rgba(255,255,255,0.1);
-            box-shadow: 0 0 15px #e07a5f; margin: 15px; border-radius: 10px;
+            font-size: 2.5em; text-align: center; padding: 20px; background: #fff;
+            box-shadow: 0 0 10px #e0e7ff; margin: 15px; border-radius: 10px;
         }
         .header {
-            text-align: center; padding: 30px; background: rgba(42, 99, 75, 0.9); margin: 20px; border-radius: 15px;
+            text-align: center; padding: 20px; background: rgba(255,255,255,0.9); margin: 10px;
+            border-radius: 10px;
         }
+        .header h1 { font-size: 2em; }
+        .header p { font-size: 1.1em; margin: 10px 0; }
         .search-bar {
-            width: 90%; max-width: 500px; padding: 12px; margin: 15px auto; border-radius: 25px;
-            border: 2px solid #e07a5f; background: #f4f1de; color: #1a3c34; font-size: 1em;
+            width: 90%; max-width: 400px; padding: 10px; margin: 10px auto; border-radius: 20px;
+            border: 1px solid #27ae60; background: #fff; color: #226422; font-size: 1em;
         }
-        .filter-section { text-align: center; margin: 15px; }
+        .filter-section {
+            text-align: center; margin: 10px;
+        }
         .filter-section select {
-            padding: 10px; border-radius: 10px; border: 2px solid #e07a5f; background: #f4f1de;
-            color: #1a3c34; font-size: 1em;
+            padding: 10px; border-radius: 10px; border: 1px solid #27ae60; background: #fff;
+            color: #226422; font-size: 1em;
         }
         .books-section {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;
-            padding: 20px; max-width: 1400px; margin: 0 auto;
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 15px;
+            max-width: 1200px; margin: 0 auto;
         }
         .book-card, .special-book-card {
-            background: rgba(255,255,255,0.1); border: 2px solid #e07a5f; border-radius: 15px; padding: 20px;
-            text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: transform 0.3s, box-shadow 0.3s;
+            background: #f3f4f6; border: 2px solid #c1e1c1; border-radius: 10px; width: 280px;
+            padding: 15px; text-align: center; box-shadow: 0 2px 8px #e0e7ff; transition: transform 0.3s;
         }
         .book-card:hover, .special-book-card:hover {
-            transform: translateY(-10px); box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transform: translateY(-5px);
         }
-        .special-book-card { border: 3px solid #f4f1de; background: rgba(224, 122, 95, 0.2); }
-        .book-title { font-size: 1.4em; color: #f4f1de; margin-bottom: 10px; }
-        .book-desc { font-size: 1em; color: #f4f1de; opacity: 0.9; }
-        .request-note { font-size: 0.95em; color: #f4f1de; font-style: italic; }
+        .special-book-card { border: 3px solid #27ae60; background: rgba(39, 174, 96, 0.1); }
+        .book-title { font-size: 1.2em; color: #27ae60; margin-bottom: 10px; }
+        .book-desc { font-size: 0.95em; color: #226422; opacity: 0.9; }
+        .request-note { font-size: 0.9em; color: #e74c3c; font-style: italic; }
         .download-btn, .preview-btn, .bookmark-btn, .share-btn {
-            background: #e07a5f; color: #f4f1de; padding: 10px 20px; border-radius: 25px;
-            border: none; margin: 8px; cursor: pointer; font-size: 1em; transition: background 0.3s;
+            background: #27ae60; color: #fff; padding: 8px 15px; border-radius: 20px;
+            border: none; margin: 5px; cursor: pointer; font-size: 1em; transition: background 0.3s;
         }
         .download-btn:hover, .preview-btn:hover, .bookmark-btn:hover, .share-btn:hover {
-            background: #d00000;
+            background: #e74c3c;
         }
-        .bookmark-btn.bookmarked { background: #f4f1de; color: #1a3c34; }
-        .rating-section .stars { color: #f4f1de; cursor: pointer; font-size: 1.2em; }
+        .bookmark-btn.bookmarked { background: #e74c3c; color: #fff; }
+        .rating-section .stars { color: #f1c40f; cursor: pointer; font-size: 1.2em; }
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
         }
         .modal-content {
-            background: #f4f1de; padding: 25px; border-radius: 15px; max-width: 700px; width: 90%;
-            color: #1a3c34;
+            background: #fff; padding: 20px; border-radius: 10px; max-width: 600px; width: 90%;
+            color: #226422;
         }
         .request-section, .audio-section, .bookmark-section, .chat-support, .faq-section, .footer {
-            background: rgba(42, 99, 75, 0.9); margin: 20px; padding: 25px; border-radius: 15px;
+            background: rgba(255,255,255,0.9); margin: 15px; padding: 20px; border-radius: 10px;
             text-align: center;
         }
         .audio-section audio {
-            width: 100%; max-width: 400px; border-radius: 10px; background: #f4f1de;
+            width: 100%; max-width: 300px; border-radius: 10px; background: #fff;
         }
-        .audio-item p { font-size: 1.1em; color: #f4f1de; margin-top: 10px; }
-        .footer { font-size: 1em; margin-top: 30px; }
+        .audio-item p { font-size: 1em; color: #226422; margin-top: 10px; }
+        .footer { font-size: 0.95em; margin-top: 20px; }
         .social-links a {
-            margin: 0 15px; color: #f4f1de; text-decoration: none; font-size: 1.1em;
+            margin: 0 10px; color: #27ae60; text-decoration: none; font-size: 1em;
             transition: color 0.3s;
         }
-        .social-links a:hover { color: #e07a5f; }
+        .social-links a:hover { color: #e74c3c; }
         .progress-bar {
-            position: fixed; top: 0; left: 0; height: 6px; background: #e07a5f; width: 0; z-index: 1001;
+            position: fixed; top: 0; left: 0; height: 5px; background: #27ae60; width: 0; z-index: 1001;
         }
         .loader {
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            border: 6px solid #e07a5f; border-top: 6px solid #f4f1de; border-radius: 50%;
-            width: 50px; height: 50px; animation: spin 1s linear infinite;
+            border: 5px solid #27ae60; border-top: 5px solid #fff; border-radius: 50%;
+            width: 40px; height: 40px; animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 768px) {
+        @media (max-width: 700px) {
             .navbar a { display: none; }
             .navbar .hamburger { display: block; }
-            .navbar.responsive a { display: block; margin: 15px 0; }
-            .book-card, .special-book-card { width: 100%; }
+            .navbar.responsive a { display: block; margin: 10px 0; }
+            .book-card, .special-book-card { width: 90%; }
             .search-bar { width: 95%; }
-            .welcome-section h1 { font-size: 2em; }
-            .welcome-section p { font-size: 1.1em; }
+            .header h1 { font-size: 1.8em; }
+            .header p { font-size: 1em; }
             .bismillah { font-size: 2em; }
         }
     </style>
@@ -139,14 +134,10 @@
             <a href="#faq">سوالات</a>
         </div>
     </nav>
-    <div class="welcome-section">
-        <h1>عید میلاد النبی مبارک!</h1>
-        <p>حضور صلی اللہ علیہ وسلم کی آمد کی خوشی میں ہماری شاندار اسلامی لائبریری سے استفادہ کریں</p>
-    </div>
     <div class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
     <div class="header">
         <h1>اسلامی کتابیں ڈاؤن لوڈ کریں</h1>
-        <p>عید میلاد النبی کے موقع پر روحانی ترقی کے لیے شاندار اسلامی کتابیں</p>
+        <p>شاندار اسلامی کتابیں جو آپ کی روحانی ترقی میں مددگار ہیں</p>
         <div id="userName" class="user-name"></div>
         <button id="modeToggle" class="download-btn">موڈ تبدیل کریں</button>
         <input type="text" class="search-bar" placeholder="کتاب تلاش کریں..." onkeyup="searchBooks()">
@@ -319,7 +310,7 @@
             </audio>
             <p>نعت: کوئی گل باقی رہے گا</p>
         </div>
-        <p id="audioStatus" style="color: #f4f1de; margin-top: 20px;"></p>
+        <p id="audioStatus" style="color: #226422; margin-top: 20px;"></p>
     </div>
     <div class="chat-support">
         <h2>لائیو چیٹ سپورٹ</h2>
@@ -396,171 +387,4 @@
             let bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
             const btn = document.querySelector(`button[onclick="toggleBookmark('${bookId}')"]`);
             if (bookmarks.includes(bookId)) {
-                bookmarks = bookmarks.filter(id => id !== bookId);
-                btn.textContent = '☆ بک مارک';
-                btn.classList.remove('bookmarked');
-            } else {
-                bookmarks.push(bookId);
-                btn.textContent = '★ بک مارک شدہ';
-                btn.classList.add('bookmarked');
-            }
-            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
-            updateBookmarkList();
-        }
-
-        function updateBookmarkList() {
-            const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
-            const bookmarkList = document.getElementById('bookmarkList');
-            bookmarkList.innerHTML = '';
-            bookmarks.forEach(bookId => {
-                const bookCard = document.querySelector(`.book-card:has(button[onclick="toggleBookmark('${bookId}')"])`);
-                if (bookCard) {
-                    const title = bookCard.querySelector('.book-title').textContent;
-                    const link = bookCard.querySelector('.download-btn').href;
-                    bookmarkList.innerHTML += `<a href="${link}" class="download-btn">${title}</a><br>`;
-                }
-            });
-        }
-
-        // PDF Preview
-        function openPreview(pdfUrl) {
-            document.getElementById('loader').style.display = 'block';
-            const pdfViewer = document.getElementById('pdfViewer');
-            pdfViewer.src = pdfUrl + '#page=1&zoom=100';
-            document.getElementById('previewModal').style.display = 'flex';
-            pdfViewer.onload = () => document.getElementById('loader').style.display = 'none';
-        }
-
-        function closePreview() {
-            document.getElementById('previewModal').style.display = 'none';
-            document.getElementById('pdfViewer').src = '';
-        }
-
-        // Rating
-        let selectedRating = 0;
-        function setRating(rating) {
-            selectedRating = rating;
-            document.querySelectorAll('.star-rating span').forEach((star, index) => {
-                star.classList.toggle('selected', index < rating);
-            });
-        }
-
-        function rateBook(bookId, starsElement) {
-            document.getElementById('reviewModal').style.display = 'flex';
-            document.getElementById('reviewBookId').value = bookId;
-        }
-
-        function submitReview() {
-            const bookId = document.getElementById('reviewBookId').value;
-            const reviewText = document.getElementById('reviewText').value;
-            if (selectedRating === 0 || !reviewText) {
-                alert('براہ کرم ریٹنگ اور ریویو درج کریں!');
-                return;
-            }
-            alert(`ریویو موصول ہوا!\nکتاب: ${bookId}\nریٹنگ: ${selectedRating}\nریویو: ${reviewText}`);
-            closeReviewModal();
-        }
-
-        function closeReviewModal() {
-            document.getElementById('reviewModal').style.display = 'none';
-            document.getElementById('reviewText').value = '';
-            setRating(0);
-        }
-
-        // Share
-        function shareBook(title, url) {
-            if (navigator.share) {
-                navigator.share({ title: `عید میلاد النبی: ${title}`, url }).catch(console.error);
-            } else {
-                alert(`شیئر لنک: ${url}`);
-            }
-        }
-
-        // Request Form
-        function submitRequest(event) {
-            event.preventDefault();
-            const name = document.getElementById('nameInput').value;
-            const bookName = document.querySelector('.request-form input[placeholder="مطلوبہ کتاب کا نام"]').value;
-            const message = document.querySelector('.request-form textarea').value || 'کوئی پیغام نہیں';
-            alert(`درخواست موصول ہوئی!\nنام: ${name}\nکتاب: ${bookName}\nپیغام: ${message}`);
-            document.querySelector('.request-form').reset();
-        }
-
-        // User Name
-        function updateUserName() {
-            let userName = localStorage.getItem('userName');
-            const nameInput = document.getElementById('nameInput');
-            if (!userName) {
-                nameInput.addEventListener('input', function() {
-                    userName = nameInput.value || 'مہمان';
-                    localStorage.setItem('userName', userName);
-                    document.getElementById('userName').textContent = `خوش آمدید، ${userName}!`;
-                });
-            } else {
-                document.getElementById('userName').textContent = `خوش آمدید، ${userName}!`;
-            }
-        }
-
-        // Progress Bar
-        window.addEventListener('scroll', () => {
-            const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
-            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrolled = (winScroll / height) * 100;
-            document.getElementById('progressBar').style.width = scrolled + '%';
-        });
-
-        // Navbar Toggle
-        function toggleNav() {
-            const navbar = document.querySelector('.navbar');
-            navbar.classList.toggle('responsive');
-        }
-
-        // Naat Auto Play
-        let naatPlayed = false;
-        function playNaatRandom() {
-            if (naatPlayed) return;
-            const audio = document.getElementById('naatAudio1');
-            function startAtRandom() {
-                let duration = audio.duration || 120;
-                let min = 0;
-                let max = duration > 30 ? duration - 30 : Math.max(duration - 5, 0);
-                let randomStart = Math.random() * (max - min) + min;
-                audio.currentTime = randomStart;
-                audio.play().then(() => {
-                    document.getElementById('audioStatus').textContent = 'عید میلاد النبی کی نعت چل رہی ہے...';
-                }).catch(err => {
-                    document.getElementById('audioStatus').textContent = 'آڈیو چلانے میں خرابی: ' + err.message;
-                });
-                naatPlayed = true;
-            }
-            if (audio.readyState >= 2) {
-                startAtRandom();
-            } else {
-                audio.addEventListener('loadedmetadata', startAtRandom, { once: true });
-            }
-        }
-        window.addEventListener('scroll', playNaatRandom);
-        window.addEventListener('keydown', playNaatRandom);
-        window.addEventListener('click', playNaatRandom);
-
-        // Download Tracking
-        function trackDownload(bookId) {
-            let downloads = JSON.parse(localStorage.getItem('downloads') || '{}');
-            downloads[bookId] = (downloads[bookId] || 0) + 1;
-            localStorage.setItem('downloads', JSON.stringify(downloads));
-            console.log(`ڈاؤن لوڈ: ${bookId}, کل: ${downloads[bookId]}`);
-        }
-
-        // Initialization
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedMode = localStorage.getItem('mode');
-            if (savedMode === 'light') toggleMode();
-            updateUserName();
-            updateBookmarkList();
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/sw.js').then(() => console.log('Service Worker Registered'));
-            }
-        });
-    </script>
-</body>
-</html>
+                bookmarks = bookmarks.filter(id
