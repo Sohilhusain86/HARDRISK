@@ -3,69 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="اسلامی کتابیں، نعت، تقریریں، اور دینی معلومات کی جامع ویب سائٹ">
-    <meta name="keywords" content="اسلامی کتابیں، نعت، تقریریں، دینی معلومات، PDF ڈاؤن لوڈ">
+    <meta name="description" content="عید میلاد النبی کے موقع پر اسلامی کتابیں، نعت، تقریریں، اور دینی معلومات کی جامع ویب سائٹ">
+    <meta name="keywords" content="عید میلاد النبی، اسلامی کتابیں، نعت، تقریریں، دینی معلومات، PDF ڈاؤن لوڈ">
     <meta name="author" content="Suhail Husain">
-    <meta name="theme-color" content="#27ae60">
+    <meta name="theme-color" content="#1a3c34">
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/icon.png">
-    <title>اسلامی کتابیں - شاندار لائبریری</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&family=Amiri&display=swap" rel="stylesheet">
+    <title>عید میلاد النبی - شاندار اسلامی لائبریری</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Noto Nastaliq Urdu', 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #f6fff8, #e0e7ff);
-            color: #226422;
+            font-family: 'Noto Nastaliq Urdu', 'Amiri', sans-serif;
+            background: linear-gradient(135deg, #1a3c34, #2c6e49);
+            color: #f4f1de;
             line-height: 1.8;
             min-height: 100vh;
             overflow-x: hidden;
             transition: background 0.5s, color 0.5s;
+            background-image: url('https://www.transparenttextures.com/patterns/islamic-pattern.png');
+            background-size: cover;
+            background-attachment: fixed;
         }
-        .light-mode { background: #fff; color: #333; }
+        .light-mode { background: #f4f1de; color: #1a3c34; }
         .navbar {
-            background: #27ae60; color: #fff; padding: 10px; position: sticky; top: 0; z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            background: #1a3c34; color: #f4f1de; padding: 15px; position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .navbar a { color: #fff; text-decoration: none; margin: 0 15px; font-size: 1.1em; }
-        .navbar .hamburger { display: none; font-size: 1.5em; cursor: pointer; }
-        .bismillah { font-size: 2.5em; text-align: center; padding: 20px; background: #fff; box-shadow: 0 0 10px #e0e7ff; }
-        .header { text-align: center; padding: 20px; background: rgba(255,255,255,0.9); margin: 10px; border-radius: 10px; }
-        .search-bar { width: 90%; max-width: 400px; padding: 10px; margin: 10px auto; border-radius: 20px; border: 1px solid #27ae60; }
-        .filter-section { text-align: center; margin: 10px; }
-        .books-section { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 15px; max-width: 1200px; margin: 0 auto; }
+        .navbar a {
+            color: #f4f1de; text-decoration: none; margin: 0 20px; font-size: 1.2em; transition: color 0.3s;
+        }
+        .navbar a:hover { color: #e07a5f; }
+        .navbar .hamburger { display: none; font-size: 1.8em; cursor: pointer; }
+        .welcome-section {
+            text-align: center; padding: 40px 20px; background: rgba(42, 99, 75, 0.9); margin: 20px;
+            border-radius: 15px; animation: fadeIn 2s ease-in-out; box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+        .welcome-section h1 { font-size: 2.8em; color: #f4f1de; text-shadow: 0 0 10px #e07a5f; }
+        .welcome-section p { font-size: 1.3em; margin: 15px 0; }
+        .bismillah {
+            font-size: 3em; text-align: center; padding: 25px; background: rgba(255,255,255,0.1);
+            box-shadow: 0 0 15px #e07a5f; margin: 15px; border-radius: 10px;
+        }
+        .header {
+            text-align: center; padding: 30px; background: rgba(42, 99, 75, 0.9); margin: 20px; border-radius: 15px;
+        }
+        .search-bar {
+            width: 90%; max-width: 500px; padding: 12px; margin: 15px auto; border-radius: 25px;
+            border: 2px solid #e07a5f; background: #f4f1de; color: #1a3c34; font-size: 1em;
+        }
+        .filter-section { text-align: center; margin: 15px; }
+        .filter-section select {
+            padding: 10px; border-radius: 10px; border: 2px solid #e07a5f; background: #f4f1de;
+            color: #1a3c34; font-size: 1em;
+        }
+        .books-section {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;
+            padding: 20px; max-width: 1400px; margin: 0 auto;
+        }
         .book-card, .special-book-card {
-            background: #f3f4f6; border: 2px solid #c1e1c1; border-radius: 10px; width: 280px; padding: 15px;
-            text-align: center; box-shadow: 0 2px 8px #e0e7ff; transition: transform 0.3s;
+            background: rgba(255,255,255,0.1); border: 2px solid #e07a5f; border-radius: 15px; padding: 20px;
+            text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: transform 0.3s, box-shadow 0.3s;
         }
-        .book-card:hover, .special-book-card:hover { transform: translateY(-5px); }
-        .book-title { font-size: 1.2em; color: #27ae60; }
-        .book-desc { font-size: 0.95em; color: #226422; }
-        .request-note { font-size: 0.9em; color: #e74c3c; }
+        .book-card:hover, .special-book-card:hover {
+            transform: translateY(-10px); box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .special-book-card { border: 3px solid #f4f1de; background: rgba(224, 122, 95, 0.2); }
+        .book-title { font-size: 1.4em; color: #f4f1de; margin-bottom: 10px; }
+        .book-desc { font-size: 1em; color: #f4f1de; opacity: 0.9; }
+        .request-note { font-size: 0.95em; color: #f4f1de; font-style: italic; }
         .download-btn, .preview-btn, .bookmark-btn, .share-btn {
-            background: #27ae60; color: #fff; padding: 8px 15px; border-radius: 20px; border: none; margin: 5px; cursor: pointer;
+            background: #e07a5f; color: #f4f1de; padding: 10px 20px; border-radius: 25px;
+            border: none; margin: 8px; cursor: pointer; font-size: 1em; transition: background 0.3s;
         }
-        .bookmark-btn.bookmarked { background: #e74c3c; }
-        .rating-section .stars { color: #f1c40f; cursor: pointer; }
+        .download-btn:hover, .preview-btn:hover, .bookmark-btn:hover, .share-btn:hover {
+            background: #d00000;
+        }
+        .bookmark-btn.bookmarked { background: #f4f1de; color: #1a3c34; }
+        .rating-section .stars { color: #f4f1de; cursor: pointer; font-size: 1.2em; }
         .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;
-            justify-content: center; align-items: center;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;
         }
-        .modal-content { background: #fff; padding: 20px; border-radius: 10px; max-width: 600px; width: 90%; }
+        .modal-content {
+            background: #f4f1de; padding: 25px; border-radius: 15px; max-width: 700px; width: 90%;
+            color: #1a3c34;
+        }
         .request-section, .audio-section, .bookmark-section, .chat-support, .faq-section, .footer {
-            background: rgba(255,255,255,0.9); margin: 15px; padding: 20px; border-radius: 10px; text-align: center;
+            background: rgba(42, 99, 75, 0.9); margin: 20px; padding: 25px; border-radius: 15px;
+            text-align: center;
         }
-        .audio-item audio { width: 100%; max-width: 300px; }
-        .footer { font-size: 0.95em; margin-top: 20px; }
-        .social-links a { margin: 0 10px; color: #27ae60; text-decoration: none; }
-        .progress-bar { position: fixed; top: 0; left: 0; height: 5px; background: #27ae60; width: 0; z-index: 1001; }
-        .loader { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 5px solid #27ae60; border-top: 5px solid #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        .audio-section audio {
+            width: 100%; max-width: 400px; border-radius: 10px; background: #f4f1de;
+        }
+        .audio-item p { font-size: 1.1em; color: #f4f1de; margin-top: 10px; }
+        .footer { font-size: 1em; margin-top: 30px; }
+        .social-links a {
+            margin: 0 15px; color: #f4f1de; text-decoration: none; font-size: 1.1em;
+            transition: color 0.3s;
+        }
+        .social-links a:hover { color: #e07a5f; }
+        .progress-bar {
+            position: fixed; top: 0; left: 0; height: 6px; background: #e07a5f; width: 0; z-index: 1001;
+        }
+        .loader {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            border: 6px solid #e07a5f; border-top: 6px solid #f4f1de; border-radius: 50%;
+            width: 50px; height: 50px; animation: spin 1s linear infinite;
+        }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @media (max-width: 700px) {
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) {
             .navbar a { display: none; }
             .navbar .hamburger { display: block; }
-            .navbar.responsive a { display: block; margin: 10px 0; }
-            .book-card, .special-book-card { width: 90%; }
+            .navbar.responsive a { display: block; margin: 15px 0; }
+            .book-card, .special-book-card { width: 100%; }
             .search-bar { width: 95%; }
+            .welcome-section h1 { font-size: 2em; }
+            .welcome-section p { font-size: 1.1em; }
+            .bismillah { font-size: 2em; }
         }
     </style>
 </head>
@@ -74,16 +131,22 @@
     <div class="loader" id="loader"></div>
     <nav class="navbar">
         <span class="hamburger" onclick="toggleNav()">☰</span>
-        <a href="#home">ہوم</a>
-        <a href="#books">کتابیں</a>
-        <a href="#audio">نعت</a>
-        <a href="#request">درخواست</a>
-        <a href="#faq">سوالات</a>
+        <div>
+            <a href="#home">ہوم</a>
+            <a href="#books">کتابیں</a>
+            <a href="#audio">نعت</a>
+            <a href="#request">درخواست</a>
+            <a href="#faq">سوالات</a>
+        </div>
     </nav>
+    <div class="welcome-section">
+        <h1>عید میلاد النبی مبارک!</h1>
+        <p>حضور صلی اللہ علیہ وسلم کی آمد کی خوشی میں ہماری شاندار اسلامی لائبریری سے استفادہ کریں</p>
+    </div>
     <div class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
     <div class="header">
         <h1>اسلامی کتابیں ڈاؤن لوڈ کریں</h1>
-        <p>شاندار اسلامی کتابیں جو آپ کی روحانی ترقی میں مددگار ہیں</p>
+        <p>عید میلاد النبی کے موقع پر روحانی ترقی کے لیے شاندار اسلامی کتابیں</p>
         <div id="userName" class="user-name"></div>
         <button id="modeToggle" class="download-btn">موڈ تبدیل کریں</button>
         <input type="text" class="search-bar" placeholder="کتاب تلاش کریں..." onkeyup="searchBooks()">
@@ -248,15 +311,15 @@
         </form>
     </div>
     <div class="audio-section">
-        <h2>سنوئیں خوبصورت نعت</h2>
+        <h2>عید میلاد النبی کی خوبصورت نعت</h2>
         <div class="audio-item">
-            <audio id="naatAudio1">
+            <audio id="naatAudio1" controls>
                 <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Koi%20Gul%20Baqi%20Rahega%20%5BSlowed%20_%20Reverb%5D%20Beautiful%20Naat%20__%20_lofinaatscreation(MP3_320K).mp3" type="audio/mpeg">
                 آپ کا براؤزر آڈیو سپورٹ نہیں کرتا۔
             </audio>
             <p>نعت: کوئی گل باقی رہے گا</p>
         </div>
-        <p id="audioStatus" style="color: #226422; margin-top: 20px;"></p>
+        <p id="audioStatus" style="color: #f4f1de; margin-top: 20px;"></p>
     </div>
     <div class="chat-support">
         <h2>لائیو چیٹ سپورٹ</h2>
@@ -280,7 +343,6 @@
         </div>
         <p class="fiamanallah">فی امانﷲ</p>
     </div>
-    <!-- मॉडल्स -->
     <div id="previewModal" class="modal">
         <div class="modal-content">
             <h3>کتاب کا پریویو</h3>
@@ -408,7 +470,7 @@
         // Share
         function shareBook(title, url) {
             if (navigator.share) {
-                navigator.share({ title, url }).catch(console.error);
+                navigator.share({ title: `عید میلاد النبی: ${title}`, url }).catch(console.error);
             } else {
                 alert(`شیئر لنک: ${url}`);
             }
@@ -465,7 +527,7 @@
                 let randomStart = Math.random() * (max - min) + min;
                 audio.currentTime = randomStart;
                 audio.play().then(() => {
-                    document.getElementById('audioStatus').textContent = 'نعت چل رہی ہے...';
+                    document.getElementById('audioStatus').textContent = 'عید میلاد النبی کی نعت چل رہی ہے...';
                 }).catch(err => {
                     document.getElementById('audioStatus').textContent = 'آڈیو چلانے میں خرابی: ' + err.message;
                 });
