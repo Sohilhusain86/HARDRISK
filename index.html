@@ -204,7 +204,7 @@
         </div>
         <div class="book-card" data-category="akhlaq">
             <div class="book-title">اسلامی اخلاق و آداب (صدر الشریعه)</div>
-            <div class="book-desc">اسلامی تعلیمات کے مطابق اخلاق اور آداب کی تفصیلی رہنمائی۔</div>
+            <div class="book-desc">اسلامی تعلیمات کے مطابق اخلاق و آداب کی تفصیلی رہنمائی۔</div>
             <div class="rating-section">
                 <span class="stars" onclick="rateBook('akhlaq', this)">★★★★☆</span>
                 <span class="rating-count" id="rating-akhlaq">(4.0/5, 80 ووٹس)</span>
@@ -301,7 +301,7 @@
         </form>
     </div>
     <div class="audio-section">
-        <h2>عید میلاد النبی کی خوبصورت نعت</h2>
+        <h2>عید میلاد النبی کے موقع 4 خوبصورت نعت</h2>
         <div class="audio-item">
             <audio id="naatAudio1" controls>
                 <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Koi%20Gul%20Baqi%20Rahega%20%5BSlowed%20_%20Reverb%5D%20Beautiful%20Naat%20__%20_lofinaatscreation(MP3_320K).mp3" type="audio/mpeg">
@@ -528,10 +528,11 @@
             navbar.classList.toggle('responsive');
         }
 
-        // Naat Auto Play with Four Naats
+        // Naat Auto Play with Four Naats (Fixed to Play Only One at a Time)
         let naatPlayed = false;
+        let currentAudio = null; // Track the currently playing audio
         function playNaatRandom(event) {
-            if (naatPlayed) return;
+            if (naatPlayed) return; // Prevent multiple triggers
             const naats = [
                 { id: 'naatAudio1', title: 'کوئی گل باقی رہے گا' },
                 { id: 'naatAudio2', title: 'کلمات ممتاز قادری' },
@@ -549,6 +550,10 @@
             document.getElementById('loader').style.display = 'block';
 
             // Stop any currently playing audio
+            if (currentAudio && currentAudio !== audio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
             naats.forEach(naat => {
                 const otherAudio = document.getElementById(naat.id);
                 if (otherAudio !== audio) {
@@ -557,25 +562,31 @@
                 }
             });
 
+            // Update current audio
+            currentAudio = audio;
+
             function startAtRandom() {
-                const duration = audio.duration || 120;
+                const duration = audio.duration || 120; // Fallback duration if metadata not loaded
                 const min = 0;
                 const max = duration > 30 ? duration - 30 : Math.max(duration - 5, 0);
                 const randomStart = Math.random() * (max - min) + min;
                 audio.currentTime = randomStart;
+
+                // Play audio and handle errors
                 audio.play().then(() => {
                     document.getElementById('audioStatus').textContent = `عید میلاد النبی کی نعت چل رہی ہے: ${selectedNaat.title}`;
                     document.getElementById('loader').style.display = 'none';
-                    naatPlayed = true;
+                    naatPlayed = true; // Mark as played to prevent further triggers
                 }).catch(err => {
                     document.getElementById('audioStatus').textContent = `آڈیو چلانے میں خرابی: ${err.message}`;
                     document.getElementById('loader').style.display = 'none';
                     console.error('Audio play error:', err);
+                    naatPlayed = false; // Allow retry if playback fails
                 });
             }
 
             // Check if audio is ready
-            if (audio.readyState >= 2) {
+            if (audio.readyState >= 2) { // HAVE_CURRENT_DATA or higher
                 startAtRandom();
             } else {
                 audio.load(); // Force reload audio
@@ -584,15 +595,37 @@
                     document.getElementById('audioStatus').textContent = `آڈیو لوڈ کرنے میں خرابی: نعت "${selectedNaat.title}" کی فائل چیک کریں`;
                     document.getElementById('loader').style.display = 'none';
                     console.error('Audio load error for:', selectedNaat.title);
+                    naatPlayed = false; // Allow retry if load fails
                 }, { once: true });
             }
         }
 
-        // Add event listeners for scroll, click, keydown, and touchstart
-        window.addEventListener('scroll', playNaatRandom);
-        window.addEventListener('click', playNaatRandom);
-        window.addEventListener('keydown', playNaatRandom);
-        window.addEventListener('touchstart', playNaatRandom);
+        // Add event listeners for scroll, click, keydown, and touchstart with debouncing
+        let isProcessing = false;
+        function handleNaatTrigger(event) {
+            if (isProcessing || naatPlayed) return;
+            isProcessing = true;
+            playNaatRandom(event);
+            setTimeout(() => { isProcessing = false; }, 500); // Debounce for 500ms
+        }
+
+        window.addEventListener('scroll', handleNaatTrigger);
+        window.addEventListener('click', handleNaatTrigger);
+        window.addEventListener('keydown', handleNaatTrigger);
+        window.addEventListener('touchstart', handleNaatTrigger);
+
+        // Stop all audios when a new one is manually played via controls
+        document.querySelectorAll('audio').forEach(audio => {
+            audio.addEventListener('play', () => {
+                if (currentAudio && currentAudio !== audio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                }
+                currentAudio = audio;
+                naatPlayed = true; // Mark as played to prevent auto-play
+                document.getElementById('audioStatus').textContent = `نعت چل رہی ہے: ${audio.parentElement.querySelector('p').textContent.replace('نعت: ', '')}`;
+            });
+        });
 
         // Download Tracking
         function trackDownload(bookId) {
@@ -617,4 +650,4 @@
         });
     </script>
 </body>
-</html> 
+</html>
