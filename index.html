@@ -301,7 +301,7 @@
         </form>
     </div>
     <div class="audio-section">
-        <h2>عید میلاد النبی کے موقع 4 خوبصورت نعت</h2>
+        <h2>عید میلاد النبی کی خوبصورت نعت</h2>
         <div class="audio-item">
             <audio id="naatAudio1" controls>
                 <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Koi%20Gul%20Baqi%20Rahega%20%5BSlowed%20_%20Reverb%5D%20Beautiful%20Naat%20__%20_lofinaatscreation(MP3_320K).mp3" type="audio/mpeg">
@@ -528,11 +528,9 @@
             navbar.classList.toggle('responsive');
         }
 
-        // Naat Auto Play with Four Naats (Fixed to Play Only One at a Time)
-        let naatPlayed = false;
+        // Naat Auto Play with 2-Minute Interval
         let currentAudio = null; // Track the currently playing audio
-        function playNaatRandom(event) {
-            if (naatPlayed) return; // Prevent multiple triggers
+        function playNaatRandom() {
             const naats = [
                 { id: 'naatAudio1', title: 'کوئی گل باقی رہے گا' },
                 { id: 'naatAudio2', title: 'کلمات ممتاز قادری' },
@@ -576,12 +574,10 @@
                 audio.play().then(() => {
                     document.getElementById('audioStatus').textContent = `عید میلاد النبی کی نعت چل رہی ہے: ${selectedNaat.title}`;
                     document.getElementById('loader').style.display = 'none';
-                    naatPlayed = true; // Mark as played to prevent further triggers
                 }).catch(err => {
                     document.getElementById('audioStatus').textContent = `آڈیو چلانے میں خرابی: ${err.message}`;
                     document.getElementById('loader').style.display = 'none';
                     console.error('Audio play error:', err);
-                    naatPlayed = false; // Allow retry if playback fails
                 });
             }
 
@@ -595,24 +591,15 @@
                     document.getElementById('audioStatus').textContent = `آڈیو لوڈ کرنے میں خرابی: نعت "${selectedNaat.title}" کی فائل چیک کریں`;
                     document.getElementById('loader').style.display = 'none';
                     console.error('Audio load error for:', selectedNaat.title);
-                    naatPlayed = false; // Allow retry if load fails
                 }, { once: true });
             }
         }
 
-        // Add event listeners for scroll, click, keydown, and touchstart with debouncing
-        let isProcessing = false;
-        function handleNaatTrigger(event) {
-            if (isProcessing || naatPlayed) return;
-            isProcessing = true;
-            playNaatRandom(event);
-            setTimeout(() => { isProcessing = false; }, 500); // Debounce for 500ms
+        // Start the 2-minute interval for auto-playing naats
+        function startNaatInterval() {
+            playNaatRandom(); // Play immediately on page load
+            setInterval(playNaatRandom, 120000); // Play every 2 minutes (120,000ms)
         }
-
-        window.addEventListener('scroll', handleNaatTrigger);
-        window.addEventListener('click', handleNaatTrigger);
-        window.addEventListener('keydown', handleNaatTrigger);
-        window.addEventListener('touchstart', handleNaatTrigger);
 
         // Stop all audios when a new one is manually played via controls
         document.querySelectorAll('audio').forEach(audio => {
@@ -622,7 +609,6 @@
                     currentAudio.currentTime = 0;
                 }
                 currentAudio = audio;
-                naatPlayed = true; // Mark as played to prevent auto-play
                 document.getElementById('audioStatus').textContent = `نعت چل رہی ہے: ${audio.parentElement.querySelector('p').textContent.replace('نعت: ', '')}`;
             });
         });
@@ -647,6 +633,8 @@
             // Preload audio to reduce delay
             const naats = ['naatAudio1', 'naatAudio2', 'naatAudio3', 'naatAudio4'];
             naats.forEach(id => document.getElementById(id).load());
+            // Start the naat interval
+            startNaatInterval();
         });
     </script>
 </body>
