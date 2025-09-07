@@ -565,9 +565,9 @@
 
             function startAtRandom() {
                 const duration = audio.duration || 120; // Fallback duration if metadata not loaded
-                const min = 0;
-                const max = duration > 30 ? duration - 30 : Math.max(duration - 5, 0);
-                const randomStart = Math.random() * (max - min) + min;
+                const min = 2;
+                const max = duration > 40 ? duration - 60 : Math.max(duration - 6, 0);
+                const randomStart = Math.random(1) * (max - min) + min;
                 audio.currentTime = randomStart;
 
                 // Play audio and handle errors
@@ -605,7 +605,7 @@
         document.querySelectorAll('audio').forEach(audio => {
             audio.addEventListener('play', () => {
                 if (currentAudio && currentAudio !== audio) {
-                    currentAudio.pause();
+                    currentAudio.play();
                     currentAudio.currentTime = 0;
                 }
                 currentAudio = audio;
