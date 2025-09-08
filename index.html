@@ -32,6 +32,17 @@
         }
         .navbar a:hover { color: #e74c3c; }
         .navbar .hamburger { display: none; font-size: 1.5em; cursor: pointer; }
+        .info-clock {
+            width: 40px; height: 40px; border: 2px solid #fff; border-radius: 50%; position: absolute; top: 15px; left: 15px;
+            overflow: hidden; z-index: 1001; background: #27ae60; display: flex; align-items: center;
+        }
+        .info-text {
+            color: #fff; font-size: 0.7em; white-space: nowrap; padding: 0 5px; animation: scrollText 20s linear infinite;
+        }
+        @keyframes scrollText {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
         .bismillah {
             font-size: 2.5em; text-align: center; padding: 20px; background: #fff;
             box-shadow: 0 0 10px #e0e7ff; margin: 15px; border-radius: 10px;
@@ -117,6 +128,8 @@
             .header h1 { font-size: 1.8em; }
             .header p { font-size: 1em; }
             .bismillah { font-size: 2em; }
+            .info-clock { width: 30px; height: 30px; top: 10px; left: 10px; }
+            .info-text { font-size: 0.6em; }
         }
     </style>
 </head>
@@ -124,6 +137,11 @@
     <div class="progress-bar" id="progressBar"></div>
     <div class="loader" id="loader"></div>
     <nav class="navbar">
+        <div class="info-clock">
+            <div class="info-text">
+                اس ویب سائٹ کا مقصد اسلامی کتابیں، نعت، اور دینی معلومات کو آسان انداز میں فراہم کرنا ہے۔ یہ سائٹ Suhail Husain نے بنائی ہے جو دینی تعلیمات کو عام کرنے کے لیے وقف شدہ ہے۔ یہاں آپ کتابیں ڈاؤن لوڈ کر سکتے ہیں، نعت سن سکتے ہیں، اور روحانی ترقی کے لیے رہنمائی حاصل کر سکتے ہیں۔ ہماری کوشش ہے کہ معیاری مواد کو مفت فراہم کیا جائے تاکہ ہر شخص اس سے فائدہ اٹھا سکے۔ رابطہ: example@email.com | © 2025 | یہ ویب سائٹ دینی جذبات کو اجاگر کرنے اور لوگوں کو اسلامی تعلیمات سے جوڑنے کے لیے ہے۔ ہم روزانہ نئے مواد کو شامل کرتے ہیں اور صارفین کی رہنمائی کے لیے کوشاں ہیں۔ یہ ایک غیر منافع بخش منصوبہ ہے جو دینی خدمت کے لیے چلایا جا رہا ہے۔ اگر آپ کے کوئی مشورے ہیں تو ہمیں بتائیں! آپ کی رائے ہمارے لیے قیمتی ہے۔
+            </div>
+        </div>
         <span class="hamburger" onclick="toggleNav()">☰</span>
         <div>
             <a href="#home">ہوم</a>
@@ -343,6 +361,10 @@
             <h3>کتابیں کیسے ڈاؤن لوڈ کریں؟</h3>
             <p>کتاب کے کارڈ پر "ڈاؤن لوڈ PDF" بٹن پر کلک کریں۔</p>
         </div>
+        <div class="faq-item">
+            <h3>نعت کیوں خود بخود نہیں چلتی؟</h3>
+            <p>نعت صرف آپ کے پہلے کلک کے بعد چلتی ہے تاکہ براؤزر کی پالیسیز پوری کی جا سکیں۔</p>
+        </div>
     </div>
     <div class="footer">
         <p>© 2025 Suhail Husain | تمام حقوق محفوظ ہیں</p>
@@ -528,9 +550,15 @@
             navbar.classList.toggle('responsive');
         }
 
-        // Naat Auto Play with 2-Minute Interval
+        // Naat Auto Play with 2-Minute Interval and Manual Control
         let currentAudio = null; // Track the currently playing audio
+        let naatInterval = null; // Track the interval ID
+        let isAutoPlayEnabled = false; // Control auto-play state
+        let hasUserInteracted = false; // Track if user has interacted
+
         function playNaatRandom() {
+            if (!isAutoPlayEnabled || !hasUserInteracted) return; // Skip if auto-play is disabled or no interaction
+
             const naats = [
                 { id: 'naatAudio1', title: 'کوئی گل باقی رہے گا' },
                 { id: 'naatAudio2', title: 'کلمات ممتاز قادری' },
@@ -567,7 +595,7 @@
                 const duration = audio.duration || 120; // Fallback duration if metadata not loaded
                 const min = 2;
                 const max = duration > 40 ? duration - 60 : Math.max(duration - 6, 0);
-                const randomStart = Math.random(1) * (max - min) + min;
+                const randomStart = Math.random() * (max - min) + min;
                 audio.currentTime = randomStart;
 
                 // Play audio and handle errors
@@ -575,7 +603,7 @@
                     document.getElementById('audioStatus').textContent = `عید میلاد النبی کی نعت چل رہی ہے: ${selectedNaat.title}`;
                     document.getElementById('loader').style.display = 'none';
                 }).catch(err => {
-                    document.getElementById('audioStatus').textContent = `آڈیو چلانے میں خرابی: ${err.message}`;
+                    document.getElementById('audioStatus').textContent = `آڈیو چلانے میں خرابی: ${err.message === 'NotAllowedError' ? 'براہ کرم آڈیو چلانے کے لیے ویب سائٹ کے ساتھ تعامل کریں (مثلاً کلک کریں)' : 'انٹرنیٹ کنکشن چیک کریں یا فائل دوبارہ لوڈ کریں'}`;
                     document.getElementById('loader').style.display = 'none';
                     console.error('Audio play error:', err);
                 });
@@ -588,29 +616,68 @@
                 audio.load(); // Force reload audio
                 audio.addEventListener('loadedmetadata', startAtRandom, { once: true });
                 audio.addEventListener('error', () => {
-                    document.getElementById('audioStatus').textContent = `آڈیو لوڈ کرنے میں خرابی: نعت "${selectedNaat.title}" کی فائل چیک کریں`;
+                    document.getElementById('audioStatus').textContent = `آڈیو لوڈ کرنے میں خرابی: نعت "${selectedNaat.title}" کی فائل چیک کریں یا انٹرنیٹ کنکشن دیکھیں`;
                     document.getElementById('loader').style.display = 'none';
                     console.error('Audio load error for:', selectedNaat.title);
                 }, { once: true });
             }
         }
 
-        // Start the 2-minute interval for auto-playing naats
+        // Start or restart the 2-minute interval
         function startNaatInterval() {
-            playNaatRandom(); // Play immediately on page load
-            setInterval(playNaatRandom, 120000); // Play every 2 minutes (120,000ms)
+            if (naatInterval) clearInterval(naatInterval); // Clear any existing interval
+            playNaatRandom(); // Play immediately after enabling
+            naatInterval = setInterval(playNaatRandom, 120000); // Play every 2 minutes
         }
 
-        // Stop all audios when a new one is manually played via controls
+        // Stop the interval
+        function stopNaatInterval() {
+            if (naatInterval) {
+                clearInterval(naatInterval);
+                naatInterval = null;
+            }
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+        }
+
+        // Handle manual audio play and stop auto-play
         document.querySelectorAll('audio').forEach(audio => {
             audio.addEventListener('play', () => {
                 if (currentAudio && currentAudio !== audio) {
-                    currentAudio.play();
+                    currentAudio.pause();
                     currentAudio.currentTime = 0;
                 }
                 currentAudio = audio;
+                isAutoPlayEnabled = false; // Disable auto-play when manual play starts
+                stopNaatInterval(); // Stop the auto-play interval
                 document.getElementById('audioStatus').textContent = `نعت چل رہی ہے: ${audio.parentElement.querySelector('p').textContent.replace('نعت: ', '')}`;
+                hasUserInteracted = true; // Mark interaction
             });
+
+            audio.addEventListener('pause', () => {
+                // Do not restart interval automatically
+            });
+
+            audio.addEventListener('ended', () => {
+                // Do not restart interval automatically
+            });
+        });
+
+        // Enable auto-play only after user interaction and clear on page unload
+        document.addEventListener('click', () => {
+            if (!hasUserInteracted) {
+                hasUserInteracted = true;
+                isAutoPlayEnabled = true;
+                startNaatInterval();
+            }
+        }, { once: true });
+
+        window.addEventListener('unload', () => {
+            stopNaatInterval(); // Stop interval when leaving the page
+            isAutoPlayEnabled = false;
+            hasUserInteracted = false;
         });
 
         // Download Tracking
@@ -633,8 +700,6 @@
             // Preload audio to reduce delay
             const naats = ['naatAudio1', 'naatAudio2', 'naatAudio3', 'naatAudio4'];
             naats.forEach(id => document.getElementById(id).load());
-            // Start the naat interval
-            startNaatInterval();
         });
     </script>
 </body>
