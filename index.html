@@ -21,6 +21,7 @@
             min-height: 100vh;
             overflow-x: hidden;
             transition: background 0.5s, color 0.5s;
+            position: relative;
         }
         .light-mode { background: #fff; color: #333; }
         .navbar {
@@ -33,15 +34,24 @@
         .navbar a:hover { color: #e74c3c; }
         .navbar .hamburger { display: none; font-size: 1.5em; cursor: pointer; }
         .info-clock {
-            width: 40px; height: 40px; border: 2px solid #fff; border-radius: 50%; position: absolute; top: 15px; left: 15px;
-            overflow: hidden; z-index: 1001; background: #27ae60; display: flex; align-items: center;
+            width: 80px; height: 80px; border: 4px solid #fff; border-radius: 50%; position: absolute; top: 15px; left: 15px;
+            overflow: hidden; z-index: 1001; background: #27ae60; display: flex; align-items: center; justify-content: center;
         }
         .info-text {
-            color: #fff; font-size: 0.7em; white-space: nowrap; padding: 0 5px; animation: scrollText 20s linear infinite;
+            color: #fff; font-size: 0.9em; white-space: nowrap; padding: 0 5px; animation: scrollText 40s linear infinite;
         }
         @keyframes scrollText {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
+        }
+        .train-animation {
+            position: fixed; top: 50%; left: -350px; width: 350px; height: 120px; z-index: 2000;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 120"><rect x="0" y="0" width="350" height="120" fill="%2327ae60"/><text x="10" y="60" font-size="16" fill="%23fff">اسلامی کتابیں، نعت، دینی معلومات | بنایا گیا: Suhail Husain | رابطہ: example@email.com | © 2025 | مفت مواد، دینی خدمت کے لیے</text></svg>') no-repeat;
+            animation: trainMove 10s linear forwards;
+        }
+        @keyframes trainMove {
+            0% { left: -350px; }
+            100% { left: 100%; }
         }
         .bismillah {
             font-size: 2.5em; text-align: center; padding: 20px; background: #fff;
@@ -128,14 +138,16 @@
             .header h1 { font-size: 1.8em; }
             .header p { font-size: 1em; }
             .bismillah { font-size: 2em; }
-            .info-clock { width: 30px; height: 30px; top: 10px; left: 10px; }
-            .info-text { font-size: 0.6em; }
+            .info-clock { width: 60px; height: 60px; top: 10px; left: 10px; }
+            .info-text { font-size: 0.8em; }
+            .train-animation { width: 280px; height: 100px; }
         }
     </style>
 </head>
 <body>
     <div class="progress-bar" id="progressBar"></div>
     <div class="loader" id="loader"></div>
+    <div class="train-animation" id="trainAnim"></div>
     <nav class="navbar">
         <div class="info-clock">
             <div class="info-text">
@@ -400,6 +412,13 @@
         </div>
     </div>
     <script>
+        // Train Animation Control
+        document.addEventListener('DOMContentLoaded', () => {
+            const trainAnim = document.getElementById('trainAnim');
+            trainAnim.style.display = 'block';
+            setTimeout(() => trainAnim.style.display = 'none', 10000); // 10-second animation
+        });
+
         // Theme Toggle
         function toggleMode() {
             document.body.classList.toggle('light-mode');
