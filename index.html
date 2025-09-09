@@ -38,26 +38,19 @@
             overflow: hidden; z-index: 1001; background: #27ae60; display: flex; align-items: center; justify-content: center;
         }
         .info-text {
-            color: #fff; font-size: 0.7em; white-space: nowrap; padding: 0 5px; animation: scrollText 60s linear infinite;
+            color: #fff; font-size: 0.7em; white-space: nowrap; padding: 0 5px; animation: scrollText 120s linear infinite;
+            direction: ltr; /* Urdu ko seedha dikhane ke liye direction badla */
         }
         @keyframes scrollText {
-            0% { transform: translateX(100%); }
+            0% { transform: translateX(0); }
             100% { transform: translateX(-100%); }
         }
         .about-us {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; height: 400px;
-            background: rgba(39, 174, 96, 0.9); color: #fff; padding: 20px; border-radius: 10px; z-index: 2000;
-            display: none; overflow: hidden; box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(39, 174, 96, 0.9); color: #fff; padding: 20px; border-radius: 10px;
+            z-index: 2000; max-width: 600px; width: 90%; text-align: center; box-shadow: 0 0 15px rgba(0,0,0,0.5);
         }
         .about-us.active { display: block; }
-        .rain-drop {
-            position: absolute; background: rgba(255, 255, 255, 0.8); border-radius: 50%; animation: fall 6s linear infinite;
-            font-size: 0.9em; padding: 5px 10px; text-align: center; opacity: 0;
-        }
-        @keyframes fall {
-            0% { top: -10%; left: calc(var(--left) * 1%); opacity: 1; transform: scale(0.5); }
-            100% { top: 110%; opacity: 0; transform: scale(1.5); }
-        }
         .bismillah {
             font-size: 2.5em; text-align: center; padding: 20px; background: #fff;
             box-shadow: 0 0 10px #e0e7ff; margin: 15px; border-radius: 10px;
@@ -134,20 +127,6 @@
             width: 40px; height: 40px; animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .calculator-section {
-            background: rgba(255,255,255,0.9); margin: 15px; padding: 20px; border-radius: 10px;
-            text-align: center; max-width: 600px; margin-left: auto; margin-right: auto;
-        }
-        .calculator-section input, .calculator-section select {
-            padding: 10px; margin: 5px; border-radius: 10px; border: 1px solid #27ae60;
-            background: #fff; color: #226422; font-size: 1em;
-        }
-        .calculator-section button {
-            background: #27ae60; color: #fff; padding: 10px 20px; border-radius: 20px;
-            border: none; margin: 5px; cursor: pointer; transition: background 0.3s;
-        }
-        .calculator-section button:hover { background: #e74c3c; }
-        .calculator-result { margin-top: 10px; font-size: 1.1em; color: #27ae60; }
         @media (max-width: 700px) {
             .navbar a { display: none; }
             .navbar .hamburger { display: block; }
@@ -159,8 +138,6 @@
             .bismillah { font-size: 2em; }
             .info-clock { width: 60px; height: 60px; top: 10px; left: 10px; }
             .info-text { font-size: 0.6em; }
-            .about-us { width: 250px; height: 350px; }
-            .rain-drop { font-size: 0.8em; }
         }
     </style>
 </head>
@@ -350,7 +327,7 @@
             <button type="submit" class="download-btn">درخواست جمع کروائیں</button>
         </form>
     </div>
-    <div class="audio-section">
+    <div class="audio-section" id="audio">
         <h2>عید میلاد النبی کی خوبصورت نعت</h2>
         <div class="audio-item">
             <audio id="naatAudio1" controls>
@@ -395,27 +372,7 @@
         </div>
         <div class="faq-item">
             <h3>نعت کیوں خود بخود نہیں چلتی؟</h3>
-            <p>نعت خود بخود چلتی ہے، لیکن براؤزر کی اجازت کے بعد۔</p>
-        </div>
-    </div>
-    <div class="calculator-section">
-        <h2>دینی کیلکولیٹر</h2>
-        <p>نماز کے اوقات یا زکوٰة کی گنتی کریں</p>
-        <select id="calcType">
-            <option value="zakat">زکوٰة</option>
-            <option value="prayer">نماز کا وقت</option>
-        </select>
-        <div id="zakatCalc" style="display: block;">
-            <input type="number" id="zakatAmount" placeholder="کل رقم (روپوں میں)" required>
-            <button onclick="calculateZakat()">زکوٰة کی گنتی</button>
-            <div id="zakatResult" class="calculator-result"></div>
-        </div>
-        <div id="prayerCalc" style="display: none;">
-            <input type="number" id="prayerDay" placeholder="دن (1-30)" required>
-            <input type="number" id="prayerMonth" placeholder="مہینہ (1-12)" required>
-            <input type="number" id="prayerYear" placeholder="سال (مثال: 2025)" required>
-            <button onclick="calculatePrayerTime()">نماز کا وقت</button>
-            <div id="prayerResult" class="calculator-result"></div>
+            <p>نعت سکرول یا کلک پر خود بخود چلتی ہے۔</p>
         </div>
     </div>
     <div class="footer">
@@ -452,53 +409,19 @@
         </div>
     </div>
     <div class="about-us" id="aboutUs">
-        <!-- Rain drops will be added dynamically via JavaScript -->
+        <!-- Simple text content will be added via JavaScript -->
     </div>
     <script>
-        // About Us with Rain Effect
+        // About Us with Simple Text
         function showAboutUs() {
             const aboutUs = document.getElementById('aboutUs');
             aboutUs.classList.add('active');
-            aboutUs.innerHTML = ''; // Clear previous drops
-            const text = `**اسلامی تقریر: سہیل حسین کی ویب سائٹ کے بارے میں**
-
-بسم اللہ الرحمن الرحیم!  
-آداب، محترم سامعین! آج میں آپ کو سہیل حسین کی بنائی ہوئی ایک شاندار ویب سائٹ کے بارے میں بتاؤں گا۔ یہ ویب سائٹ اسلامی کتابوں، نعتوں، تقریروں اور دینی معلومات کا خزانہ ہے۔ یہاں آپ کو قرآنی تفاسیر، احادیث، اخلاق و آداب، اور روحانی ترقی سے متعلق کتابیں PDF کی شکل میں ملتی ہیں۔ خاص طور پر "کمالاتِ مصطفیٰ" جیسی کتابیں آپ کی دینی تربیت کے لیے موجود ہیں۔ اس کے علاوہ، عید میلاد النبی کی خوبصورت نعتوں جیسے کہ "کوئی گل باقی رہے گا" اور "ہو کرم سرکار اب تو" کا لطف بھی اٹھایا جا سکتا ہے۔ ویب سائٹ صارف دوست ہے، جہاں آپ کتابیں تلاش کر سکتے ہیں، بک مارک کر سکتے ہیں، اور اپنی پسندیدہ کتابوں کی درخواست بھی دے سکتے ہیں۔ سہیل حسین کا یہ کارنامہ ہر Muslim کے لیے ایک عظیم تحفہ ہے۔ آئیے، اس ویب سائٹ سے استفادہ کریں اور اپنی دینی معلومات کو بڑھائیں۔ فی امان اللہ!`;
-            const sentences = text.split('\n').filter(s => s.trim());
-            let dropId = 0;
-
-            function createRainDrop() {
-                const drop = document.createElement('div');
-                drop.className = 'rain-drop';
-                const randomSentence = sentences[Math.floor(Math.random() * sentences.length)];
-                drop.textContent = randomSentence.trim();
-                drop.style.setProperty('--left', Math.random() * 100);
-                drop.style.animationDelay = `${Math.random() * 2}s`;
-                drop.style.width = `${50 + Math.random() * 50}px`;
-                drop.style.height = `${20 + Math.random() * 10}px`;
-                aboutUs.appendChild(drop);
-
-                // Remove drop after animation
-                drop.addEventListener('animationend', () => drop.remove());
-
-                // Create new drop after a random delay
-                if (aboutUs.classList.contains('active')) {
-                    setTimeout(createRainDrop, 500 + Math.random() * 1000);
-                }
-            }
-
-            // Start creating drops
-            for (let i = 0; i < 5; i++) createRainDrop(); // Initial 5 drops
-
-            // Close button
-            const closeBtn = document.createElement('button');
-            closeBtn.textContent = 'بند کریں';
-            closeBtn.className = 'download-btn';
-            closeBtn.style.position = 'absolute';
-            closeBtn.style.top = '10px';
-            closeBtn.style.right = '10px';
-            closeBtn.onclick = () => aboutUs.classList.remove('active');
-            aboutUs.appendChild(closeBtn);
+            aboutUs.innerHTML = `
+                <h2>ہمارے بارے میں</h2>
+                <p>**اسلامی تقریر: سہیل حسین کی ویب سائٹ کے بارے میں**</p>
+                <p>بسم اللہ الرحمن الرحیم! آداب، محترم سامعین! آج میں آپ کو سہیل حسین کی بنائی ہوئی ایک شاندار ویب سائٹ کے بارے میں بتاؤں گا۔ یہ ویب سائٹ اسلامی کتابوں، نعتوں، تقریروں اور دینی معلومات کا خزانہ ہے۔ یہاں آپ کو قرآنی تفاسیر، احادیث، اخلاق و آداب، اور روحانی ترقی سے متعلق کتابیں PDF کی شکل میں ملتی ہیں۔ خاص طور پر "کمالاتِ مصطفیٰ" جیسی کتابیں آپ کی دینی تربیت کے لیے موجود ہیں۔ اس کے علاوہ، عید میلاد النبی کی خوبصورت نعتوں جیسے کہ "کوئی گل باقی رہے گا" اور "ہو کرم سرکار اب تو" کا لطف بھی اٹھایا جا سکتا ہے۔ ویب سائٹ صارف دوست ہے، جہاں آپ کتابیں تلاش کر سکتے ہیں، بک مارک کر سکتے ہیں، اور اپنی پسندیدہ کتابوں کی درخواست بھی دے سکتے ہیں۔ سہیل حسین کا یہ کارنامہ ہر Muslim کے لیے ایک عظیم تحفہ ہے۔ آئیے، اس ویب سائٹ سے استفادہ کریں اور اپنی دینی معلومات کو بڑھائیں۔ فی امان اللہ!</p>
+                <button class="download-btn" onclick="document.getElementById('aboutUs').classList.remove('active')">بند کریں</button>
+            `;
         }
 
         // Theme Toggle
@@ -643,6 +566,7 @@
             const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
             const scrolled = (winScroll / height) * 100;
             document.getElementById('progressBar').style.width = scrolled + '%';
+            if (scrolled > 0 && !audioStarted) startNaatPlayback(); // Scroll pe naat shuru
         });
 
         // Navbar Toggle
@@ -651,64 +575,74 @@
             navbar.classList.toggle('responsive');
         }
 
-        // Naat Auto Play
+        // Naat Playback with Fixes
         let currentAudio = null;
         let naatInterval = null;
+        let audioStarted = false;
 
         function playNaatRandom() {
-            const naats = [
-                { id: 'naatAudio1', title: 'کوئی گل باقی رہے گا' },
-                { id: 'naatAudio2', title: 'کلمات ممتاز قادری' },
-                { id: 'naatAudio3', title: 'ہو کرم سرکار اب تو' },
-                { id: 'naatAudio4', title: 'پہنچو در سرکار' }
-            ];
-            const randomIndex = Math.floor(Math.random() * naats.length);
-            const selectedNaat = naats[randomIndex];
-            const audio = document.getElementById(selectedNaat.id);
+            if (audioStarted) {
+                const naats = [
+                    { id: 'naatAudio1', title: 'کوئی گل باقی رہے گا' },
+                    { id: 'naatAudio2', title: 'کلمات ممتاز قادری' },
+                    { id: 'naatAudio3', title: 'ہو کرم سرکار اب تو' },
+                    { id: 'naatAudio4', title: 'پہنچو در سرکار' }
+                ];
+                const randomIndex = Math.floor(Math.random() * naats.length);
+                const selectedNaat = naats[randomIndex];
+                const audio = document.getElementById(selectedNaat.id);
 
-            audio.volume = 0.5;
-            document.getElementById('loader').style.display = 'block';
+                audio.volume = 0.5;
+                document.getElementById('loader').style.display = 'block';
 
-            if (currentAudio && currentAudio !== audio) {
-                currentAudio.pause();
-                currentAudio.currentTime = 0;
-            }
-            naats.forEach(naat => {
-                const otherAudio = document.getElementById(naat.id);
-                if (otherAudio !== audio) {
-                    otherAudio.pause();
-                    otherAudio.currentTime = 0;
+                if (currentAudio && currentAudio !== audio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
                 }
-            });
-
-            currentAudio = audio;
-
-            function startAtRandom() {
-                const duration = audio.duration || 120;
-                const min = 2;
-                const max = duration > 40 ? duration - 60 : Math.max(duration - 6, 0);
-                const randomStart = Math.random() * (max - min) + min;
-                audio.currentTime = randomStart;
-
-                audio.play().then(() => {
-                    document.getElementById('audioStatus').textContent = `عید میلاد النبی کی نعت چل رہی ہے: ${selectedNaat.title}`;
-                    document.getElementById('loader').style.display = 'none';
-                }).catch(err => {
-                    document.getElementById('audioStatus').textContent = `آڈیو چلانے میں خرابی: ${err.message === 'NotAllowedError' ? 'براہ کرم آڈیو کے لیے اجازت دیں' : 'انٹرنیٹ چیک کریں'}`;
-                    document.getElementById('loader').style.display = 'none';
-                    console.error('Audio play error:', err);
+                naats.forEach(naat => {
+                    const otherAudio = document.getElementById(naat.id);
+                    if (otherAudio !== audio) {
+                        otherAudio.pause();
+                        otherAudio.currentTime = 0;
+                    }
                 });
-            }
 
-            if (audio.readyState >= 2) {
-                startAtRandom();
-            } else {
-                audio.load();
-                audio.addEventListener('loadedmetadata', startAtRandom, { once: true });
-                audio.addEventListener('error', () => {
-                    document.getElementById('audioStatus').textContent = `آڈیو لوڈ میں خرابی: "${selectedNaat.title}" چیک کریں`;
-                    document.getElementById('loader').style.display = 'none';
-                }, { once: true });
+                currentAudio = audio;
+
+                function startAtRandom() {
+                    const duration = audio.duration || 120;
+                    const min = 2;
+                    const max = duration > 40 ? duration - 60 : Math.max(duration - 6, 0);
+                    const randomStart = Math.random() * (max - min) + min;
+                    audio.currentTime = randomStart;
+
+                    audio.play().then(() => {
+                        document.getElementById('audioStatus').textContent = `عید میلاد النبی کی نعت چل رہی ہے: ${selectedNaat.title}`;
+                        document.getElementById('loader').style.display = 'none';
+                    }).catch(err => {
+                        document.getElementById('audioStatus').textContent = `آڈیو چلانے میں خرابی: ${err.message === 'NotAllowedError' ? 'براہ کرم اجازت دیں' : 'انٹرنیٹ چیک کریں'}`;
+                        document.getElementById('loader').style.display = 'none';
+                        console.error('Audio play error:', err);
+                    });
+                }
+
+                if (audio.readyState >= 2) {
+                    startAtRandom();
+                } else {
+                    audio.load();
+                    audio.addEventListener('loadedmetadata', startAtRandom, { once: true });
+                    audio.addEventListener('error', () => {
+                        document.getElementById('audioStatus').textContent = `آڈیو لوڈ میں خرابی: "${selectedNaat.title}" چیک کریں`;
+                        document.getElementById('loader').style.display = 'none';
+                    }, { once: true });
+                }
+            }
+        }
+
+        function startNaatPlayback() {
+            if (!audioStarted) {
+                audioStarted = true;
+                startNaatInterval();
             }
         }
 
@@ -718,17 +652,14 @@
             naatInterval = setInterval(playNaatRandom, 120000); // 2 minutes
         }
 
-        // Start auto-play on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            startNaatInterval();
-        });
+        // Start on scroll or click
+        document.addEventListener('scroll', startNaatPlayback, { once: true });
+        document.addEventListener('click', startNaatPlayback, { once: true });
 
-        // Stop on page unload
+        // Background play after leaving site
         window.addEventListener('unload', () => {
-            if (naatInterval) clearInterval(naatInterval);
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio.currentTime = 0;
+            if (currentAudio && audioStarted) {
+                currentAudio.play(); // Try to keep playing in background (browser dependent)
             }
         });
 
@@ -739,43 +670,6 @@
             localStorage.setItem('downloads', JSON.stringify(downloads));
             console.log(`ڈاؤن لوڈ: ${bookId}, کل: ${downloads[bookId]}`);
         }
-
-        // Calculator
-        function calculateZakat() {
-            const amount = parseFloat(document.getElementById('zakatAmount').value);
-            if (isNaN(amount) || amount < 0) {
-                document.getElementById('zakatResult').textContent = 'براہ کرم درست رقم درج کریں!';
-                return;
-            }
-            const nisab = 87.48 * 61235; // 87.48 tola gold at current rate (approx.)
-            const zakat = amount >= nisab ? (amount * 0.025).toFixed(2) : 0;
-            document.getElementById('zakatResult').textContent = zakat > 0 ? `زکوٰة: ${zakat} روپے` : 'زکوٰة قابل نہیں، نصاب ${nisab.toLocaleString()} روپے سے زیادہ جمع کریں';
-        }
-
-        function calculatePrayerTime() {
-            const day = parseInt(document.getElementById('prayerDay').value);
-            const month = parseInt(document.getElementById('prayerMonth').value);
-            const year = parseInt(document.getElementById('prayerYear').value);
-            if (isNaN(day) || isNaN(month) || isNaN(year) || day < 1 || day > 31 || month < 1 || month > 12 || year < 2020) {
-                document.getElementById('prayerResult').textContent = 'براہ کرم درست تاریخ درج کریں!';
-                return;
-            }
-            // Simple approximation based on IST (09:17 AM, 09-09-2025 as base)
-            const baseDate = new Date('2025-09-09T09:17:00+05:30');
-            const inputDate = new Date(year, month - 1, day);
-            const diffDays = Math.floor((inputDate - baseDate) / (1000 * 60 * 60 * 24));
-            const fajr = `فجر: ${Math.floor(4 + diffDays * 0.01)}:${Math.floor(30 + diffDays * 0.02)} AM`;
-            const dhuhr = `ظہر: ${Math.floor(12 + diffDays * 0.01)}:${Math.floor(30 + diffDays * 0.03)} PM`;
-            const asr = `عصر: ${Math.floor(15 + diffDays * 0.01)}:${Math.floor(30 + diffDays * 0.04)} PM`;
-            const maghrib = `مغرب: ${Math.floor(18 + diffDays * 0.01)}:${Math.floor(30 + diffDays * 0.05)} PM`;
-            const isha = `عشاء: ${Math.floor(19 + diffDays * 0.01)}:${Math.floor(30 + diffDays * 0.06)} PM`;
-            document.getElementById('prayerResult').textContent = `${fajr}, ${dhuhr}, ${asr}, ${maghrib}, ${isha} (اندازہ)`;
-        }
-
-        document.getElementById('calcType').addEventListener('change', (e) => {
-            document.getElementById('zakatCalc').style.display = e.target.value === 'zakat' ? 'block' : 'none';
-            document.getElementById('prayerCalc').style.display = e.target.value === 'prayer' ? 'block' : 'none';
-        });
 
         // Initialization
         document.addEventListener('DOMContentLoaded', () => {
