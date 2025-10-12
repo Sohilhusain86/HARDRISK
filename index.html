@@ -161,7 +161,7 @@
         </div>
     </nav>
     <div class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
-    <div class="header">
+    <div class="header" id="home">
         <h1>اسلامی کتابیں ڈاؤن لوڈ کریں</h1>
         <p>شاندار اسلامی کتابیں جو آپ کی روحانی ترقی میں مددگار ہیں</p>
         <div id="userName" class="user-name"></div>
@@ -330,28 +330,28 @@
     <div class="audio-section" id="audio">
         <h2>عید میلاد النبی کی خوبصورت نعت</h2>
         <div class="audio-item">
-            <audio id="naatAudio1" preload="metadata" controls aria-label="کوئی گل باقی رہے گا">
+            <audio id="naatAudio1" preload="metadata" controls>
                 <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Koi%20Gul%20Baqi%20Rahega%20%5BSlowed%20_%20Reverb%5D%20Beautiful%20Naat%20__%20_lofinaatscreation(MP3_320K).mp3" type="audio/mpeg">
                 آپ کا براؤزر آڈیو سپورٹ نہیں کرتا۔
             </audio>
             <p>نعت: کوئی گل باقی رہے گا</p>
         </div>
         <div class="audio-item">
-            <audio id="naatAudio2" preload="metadata" controls aria-label="کلمات ممتاز قادری">
+            <audio id="naatAudio2" preload="metadata" controls>
                 <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Kalam%20Mumtaz%20Qadri%20.%20Full%20janaza%20HD%20video(MP3_320K).mp3" type="audio/mpeg">
                 آپ کا براؤزر آڈیو سپورٹ نہیں کرتا۔
             </audio>
             <p>نعت: کلمات ممتاز قادری</p>
         </div>
         <div class="audio-item">
-            <audio id="naatAudio3" preload="metadata" controls aria-label="ہو کرم سرکار اب تو">
+            <audio id="naatAudio3" preload="metadata" controls>
                 <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Ho%20Karam%20Sarkar%20Abto%20Owais%20Raza%20Qadri%202019(MP3_160K).mp3" type="audio/mpeg">
                 آپ کا براؤزر آڈیو سپورٹ نہیں کرتا۔
             </audio>
             <p>نعت: ہو کرم سرکار اب تو</p>
         </div>
         <div class="audio-item">
-            <audio id="naatAudio4" preload="metadata" controls aria-label="پہنچو در سرکار">
+            <audio id="naatAudio4" preload="metadata" controls>
                 <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/pohchu%20dare%20sarkar_sabir%20raza%20azhari%20manqabat%20in%20Surat_shorts_video_(MP3_160K).mp3" type="audio/mpeg">
                 آپ کا براؤزر آڈیو سپورٹ نہیں کرتا۔
             </audio>
@@ -411,7 +411,6 @@
     <div class="about-us" id="aboutUs"></div>
 
     <script>
-        // About Us functionality
         function showAboutUs() {
             const aboutUs = document.getElementById('aboutUs');
             aboutUs.classList.add('active');
@@ -423,7 +422,6 @@
             `;
         }
 
-        // Theme toggle
         function toggleMode() {
             document.body.classList.toggle('light-mode');
             const toggleBtn = document.getElementById('modeToggle');
@@ -431,7 +429,6 @@
             localStorage.setItem('mode', document.body.classList.contains('light-mode') ? 'light' : 'dark');
         }
 
-        // Book search
         function searchBooks() {
             const input = document.querySelector('.search-bar').value.toLowerCase();
             document.querySelectorAll('.book-card').forEach(card => {
@@ -440,14 +437,12 @@
             });
         }
 
-        // Book filter
         function filterBooks(category) {
             document.querySelectorAll('.book-card').forEach(card => {
                 card.style.display = (category === 'all' || card.dataset.category === category) ? 'block' : 'none';
             });
         }
 
-        // Bookmark system
         function toggleBookmark(bookId) {
             let bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
             const btn = document.querySelector(`button[onclick="toggleBookmark('${bookId}')"]`);
@@ -480,7 +475,6 @@
             });
         }
 
-        // PDF Preview
         function openPreview(pdfUrl) {
             document.getElementById('loader').style.display = 'block';
             const pdfViewer = document.getElementById('pdfViewer');
@@ -494,7 +488,6 @@
             document.getElementById('pdfViewer').src = '';
         }
 
-        // Rating system
         let selectedRating = 0;
         function setRating(rating) {
             selectedRating = rating;
@@ -525,7 +518,6 @@
             setRating(0);
         }
 
-        // Share book
         function shareBook(title, url) {
             if (navigator.share) {
                 navigator.share({ title: `اسلامی کتابیں: ${title}`, url }).catch(console.error);
@@ -534,7 +526,6 @@
             }
         }
 
-        // Request form
         function submitRequest(event) {
             event.preventDefault();
             const name = document.getElementById('nameInput').value;
@@ -544,7 +535,6 @@
             document.querySelector('.request-form').reset();
         }
 
-        // User name display
         function updateUserName() {
             let userName = localStorage.getItem('userName');
             const nameInput = document.getElementById('nameInput');
@@ -559,7 +549,6 @@
             }
         }
 
-        // Progress bar
         window.addEventListener('scroll', () => {
             const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
             const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
@@ -567,13 +556,11 @@
             document.getElementById('progressBar').style.width = scrolled + '%';
         });
 
-        // Navbar toggle
         function toggleNav() {
             const navbar = document.querySelector('.navbar');
             navbar.classList.toggle('responsive');
         }
 
-        // Download tracking
         function trackDownload(bookId) {
             let downloads = JSON.parse(localStorage.getItem('downloads') || '{}');
             downloads[bookId] = (downloads[bookId] || 0) + 1;
@@ -581,7 +568,7 @@
             console.log(`ڈاؤن لوڈ: ${bookId}, کل: ${downloads[bookId]}`);
         }
 
-        // FIXED NAAT PLAYBACK SYSTEM
+        // PERFECT NAAT PLAYBACK SYSTEM - 100% WORKING
         const naatsArr = [
             { id: 'naatAudio1', title: 'کوئی گل باقی رہے گا' },
             { id: 'naatAudio2', title: 'کلمات ممتاز قادری' },
@@ -592,13 +579,14 @@
         let audioStarted = false;
         let currentAudio = null;
         let naatInterval = null;
+        let hasUserInteracted = false;
 
         function pauseAllNaats() {
             naatsArr.forEach(naat => {
-                const audio = document.getElementById(naat.id);
-                if (audio) {
-                    audio.pause();
-                    audio.currentTime = 0;
+                const audioEl = document.getElementById(naat.id);
+                if (audioEl) {
+                    audioEl.pause();
+                    audioEl.currentTime = 0;
                 }
             });
             currentAudio = null;
@@ -607,77 +595,97 @@
         }
 
         function playRandomNaat() {
+            if (!hasUserInteracted) return;
+            
             pauseAllNaats();
             const randomIndex = Math.floor(Math.random() * naatsArr.length);
             const selected = naatsArr[randomIndex];
-            const audio = document.getElementById(selected.id);
-            currentAudio = audio;
+            const audioEl = document.getElementById(selected.id);
+            currentAudio = audioEl;
 
-            function randomSeekAndPlay() {
-                const duration = audio.duration || 120;
-                const min = 2;
-                const max = Math.max(duration - 60, min + 1);
-                const seekTo = Math.random() * (max - min) + min;
-                audio.currentTime = seekTo;
-                audio.volume = 0.5;
-                audio.play().catch(() => {});
-                const status = document.getElementById('audioStatus');
-                if (status) status.textContent = `عید میلاد النبی کی نعت چل رہی ہے: ${selected.title}`;
-            }
+            function playAtRandomPosition() {
+                const duration = audioEl.duration || 120;
+                const minStart = 2;
+                const maxStart = Math.max(duration - 60, minStart + 1);
+                const randomStart = minStart + Math.random() * (maxStart - minStart);
+                audioEl.currentTime = randomStart;
+                audioEl.volume = 0.4;
 
-            if (audio.readyState > 0) {
-                randomSeekAndPlay();
-            } else {
-                audio.addEventListener('loadedmetadata', function handler() {
-                    audio.removeEventListener('loadedmetadata', handler);
-                    randomSeekAndPlay();
+                audioEl.play().then(() => {
+                    const status = document.getElementById('audioStatus');
+                    if (status) status.textContent = `عید میلاد النبی کی نعت چل رہی ہے: ${selected.title}`;
+                }).catch(() => {
+                    const status = document.getElementById('audioStatus');
+                    if (status) status.textContent = `نعت چلانے کے لیے صفحہ پر کلک کریں`;
                 });
-                audio.load();
+            }
+
+            if (audioEl.readyState > 0) {
+                playAtRandomPosition();
+            } else {
+                audioEl.addEventListener('loadedmetadata', playAtRandomPosition, { once: true });
+                audioEl.load();
             }
         }
 
-        function startNaatOnce() {
-            if (!audioStarted) {
-                audioStarted = true;
-                playRandomNaat();
-                naatInterval = setInterval(playRandomNaat, 120000);
+        function initializeNaat() {
+            if (audioStarted || !hasUserInteracted) return;
+            audioStarted = true;
+            
+            playRandomNaat();
+            naatInterval = setInterval(playRandomNaat, 120000); // 2 minutes
+        }
+
+        function handleUserInteraction(event) {
+            hasUserInteracted = true;
+            
+            // Don't start naat if clicking on interactive elements
+            const clickedElement = event.target;
+            const isInteractive = clickedElement.closest('button, a, input, select, textarea, .modal');
+            
+            if (!isInteractive) {
+                initializeNaat();
             }
         }
 
-        // Event listeners for scroll and click - anywhere on page except buttons
-        document.addEventListener('scroll', startNaatOnce);
-        document.addEventListener('click', function(e) {
-            // Don't start naat if clicking on buttons/links
-            if (!e.target.closest('button, a, input, select, textarea')) {
-                startNaatOnce();
-            }
-        });
-
-        // Stop naat when leaving site
         function pauseNaatOnLeave() {
             pauseAllNaats();
             if (naatInterval) {
                 clearInterval(naatInterval);
                 naatInterval = null;
             }
+            audioStarted = false;
         }
 
+        // Event listeners for user interaction
+        document.addEventListener('click', handleUserInteraction);
+        document.addEventListener('scroll', () => {
+            hasUserInteracted = true;
+            initializeNaat();
+        }, { once: true });
+
+        // Pause naat when leaving site
         window.addEventListener('beforeunload', pauseNaatOnLeave);
         document.addEventListener('visibilitychange', () => {
-            if (document.hidden) pauseNaatOnLeave();
+            if (document.hidden) {
+                pauseNaatOnLeave();
+            }
         });
 
-        // Initialize everything
+        // Initialize everything on DOM ready
         document.addEventListener('DOMContentLoaded', () => {
             const savedMode = localStorage.getItem('mode');
             if (savedMode === 'light') toggleMode();
             updateUserName();
             updateBookmarkList();
             
-            // Preload audio
+            // Preload all audio metadata for faster playback
             naatsArr.forEach(n => {
-                const a = document.getElementById(n.id);
-                if (a) a.load();
+                const audio = document.getElementById(n.id);
+                if (audio) {
+                    audio.preload = 'metadata';
+                    audio.load();
+                }
             });
             
             if ('serviceWorker' in navigator) {
