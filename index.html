@@ -3,215 +3,596 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="صرف نعتوں کی جامع ویب سائٹ، سنیں، ڈاؤن لوڈ کریں۔" />
-  <title>صرف نعتیں - شاندار نعت لائبریری</title>
+  <meta name="description" content="صرف نعتیں اور اسلامی کتب کی جامع لائبریری، سنیں، پڑھیں اور ڈاؤن لوڈ کریں۔" />
+  <title>صرف نعتیں و کتب - اسلامی لائبریری</title>
+
+  <!-- Urdu Font -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet" />
+
+  <!-- Basic PWA hooks (optional, if you already have manifest & sw.js) -->
+  <!-- <link rel="manifest" href="manifest.json"> -->
+  <!-- <meta name="theme-color" content="#14532d" /> -->
+
   <style>
+    :root {
+      --primary: #14532d;
+      --primary-soft: #dcfce7;
+      --accent: #22c55e;
+      --danger: #ef4444;
+      --bg: #f1f5f9;
+      --card-bg: rgba(255,255,255,0.92);
+      --shadow-soft: 0 10px 30px rgba(15,23,42,0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Noto Nastaliq Urdu', 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #f6fff8, #e0e7ff);
-      color: #226422;
-      line-height: 1.8;
-      direction: rtl;
-      min-height: 100vh;
       margin: 0;
       padding: 0;
+      font-family: 'Noto Nastaliq Urdu', 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top, #e0f2fe, #f1f5f9);
+      color: var(--primary);
+      direction: rtl;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
-    .header {
-      text-align: center;
-      padding: 20px;
-      background: rgba(255,255,255,0.95);
-      margin: 10px;
-      border-radius: 10px;
-    }
-    .header h1 { font-size: 2em; margin-bottom: 10px; }
-    .audio-list {
-      max-width: 600px;
-      margin: 20px auto;
-    }
-    .audio-item {
-      margin-bottom: 25px;
-      background: #f3f4f6;
-      border: 2px solid #c1e1c1;
-      border-radius: 10px;
+
+    .app-shell {
+      max-width: 1100px;
+      margin: 0 auto;
       padding: 15px;
-      text-align: center;
-      box-shadow: 0 2px 8px #e0e7ff;
     }
-    .audio-item p {
-      margin-top: 10px;
-      font-size: 1.1em;
-      color: #226422;
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #bbf7d0, #e0f2fe);
+      border-radius: 18px;
+      padding: 18px 16px;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 18px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(10px);
     }
-    .download-btn {
-      display: inline-block;
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .brand-title {
+      font-size: 1.6rem;
+      margin: 0;
+    }
+
+    .brand-sub {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #065f46;
+    }
+
+    .badge {
+      background: #022c22;
+      color: #ecfdf5;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background: rgba(255,255,255,0.7);
+      color: #0f172a;
+      box-shadow: 0 1px 4px rgba(15,23,42,0.12);
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ecfdf5;
+      transform: translateY(-1px);
+    }
+
+    /* Search */
+    .search-row {
       margin-top: 10px;
-      background: #27ae60;
-      color: white;
-      padding: 8px 20px;
-      border-radius: 20px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 180px;
+      border-radius: 999px;
+      border: 1px solid #cbd5f5;
+      padding: 6px 14px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(34,197,94,0.3);
+    }
+
+    .pill-info {
+      font-size: 0.8rem;
+      color: #0f766e;
+      background: rgba(45,212,191,0.12);
+      padding: 4px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    /* Content */
+    .content {
+      margin-top: 16px;
+      margin-bottom: 30px;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 14px 12px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset-inline-start: -40px;
+      inset-block-start: -40px;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, rgba(34,197,94,0.18), transparent 60%);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 1.05rem;
+      color: #022c22;
+    }
+
+    .card-meta {
+      margin: 0;
+      font-size: 0.8rem;
+      color: #4b5563;
+    }
+
+    audio {
+      width: 100%;
+    }
+
+    .card-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
       text-decoration: none;
-      font-weight: bold;
-      transition: background 0.3s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      white-space: nowrap;
     }
-    .download-btn:hover {
-      background: #e74c3c;
+
+    .btn-primary {
+      background: var(--accent);
+      color: #ecfdf5;
     }
-    #audioStatus {
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #9ca3af;
+      color: #111827;
+    }
+
+    .status-bar {
       text-align: center;
-      margin-top: 20px;
-      font-size: 1.1em;
-      color: #226422;
+      font-size: 0.9rem;
+      color: #065f46;
+      margin-top: 10px;
+      min-height: 1.2em;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 12px;
+      font-size: 0.8rem;
+      color: #4b5563;
+      border-top: 1px solid #e5e7eb;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(8px);
+    }
+
+    @media (max-width: 600px) {
+      .brand-title {
+        font-size: 1.3rem;
+      }
+      .header {
+        padding: 14px 12px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1>نعتوں کی شاندر لائبریری</h1>
-    <p>صرف نعتیں - سنیں اور ڈاؤن لوڈ کریں</p>
-  </div>
-  <div class="audio-list">
-    <!-- 1. کوئی گل باقی رہے گا (Auto Play) -->
-    <div class="audio-item">
-      <audio id="naatAudio1" preload="metadata" controls>
-        <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Koi%20Gul%20Baqi%20Rahega%20%5BSlowed%20_%20Reverb%5D%20Beautiful%20Naat%20__%20_lofinaatscreation(MP3_320K).mp3" type="audio/mpeg" />
-        آپ کا براؤزر آڈیو سپورٹ نہیں کرتا۔
-      </audio>
-      <p>کوئی گل باقی رہے گا</p>
-      <a href="https://github.com/Sohilhusain86/HARDRISK/raw/main/Koi%20Gul%20Baqi%20Rahega%20%5BSlowed%20_%20Reverb%5D%20Beautiful%20Naat%20__%20_lofinaatscreation(MP3_320K).mp3" class="download-btn" download>ڈاؤن لوڈ کریں</a>
-    </div>
-    <!-- 2. کلمات ممتاز قادری -->
-    <div class="audio-item">
-      <audio id="naatAudio2" preload="metadata" controls>
-        <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Kalam%20Mumtaz%20Qadri%20.%20Full%20janaza%20HD%20video(MP3_320K).mp3" type="audio/mpeg" />
-      </audio>
-      <p>کلمات ممتاز قادری</p>
-      <a href="https://github.com/Sohilhusain86/HARDRISK/raw/main/Kalam%20Mumtaz%20Qadri%20.%20Full%20janaza%20HD%20video(MP3_320K).mp3" class="download-btn" download>ڈاؤن لوڈ کریں</a>
-    </div>
-    <!-- 3. ہو کرم سرکار اب تو -->
-    <div class="audio-item">
-      <audio id="naatAudio3" preload="metadata" controls>
-        <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Ho%20Karam%20Sarkar%20Abto%20Owais%20Raza%20Qadri%202019(MP3_160K).mp3" type="audio/mpeg" />
-      </audio>
-      <p>ہو کرم سرکار اب تو</p>
-      <a href="https://github.com/Sohilhusain86/HARDRISK/raw/main/Ho%20Karam%20Sarkar%20Abto%20Owais%20Raza%20Qadri%202019(MP3_160K).mp3" class="download-btn" download>ڈاؤن لوڈ کریں</a>
-    </div>
-    <!-- 4. پہنچو در سرکار -->
-    <div class="audio-item">
-      <audio id="naatAudio4" preload="metadata" controls>
-        <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/pohchu%20dare%20sarkar_sabir%20raza%20azhari%20manqabat%20in%20Surat_shorts_video_(MP3_160K).mp3" type="audio/mpeg" />
-      </audio>
-      <p>پہنچو در سرکار</p>
-      <a href="https://github.com/Sohilhusain86/HARDRISK/raw/main/pohchu%20dare%20sarkar_sabir%20raza%20azhari%20manqabat%20in%20Surat_shorts_video_(MP3_160K).mp3" class="download-btn" download>ڈاؤن لوڈ کریں</a>
-    </div>
-    <!-- 5. Durood e Paak -->
-    <div class="audio-item">
-      <audio id="naatAudio5" preload="metadata" controls>
-        <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Durood%20e%20Paak%20__%20Sabir%20Raza%20Azhari_shorts_video_(MP3_160K).mp3" type="audio/mpeg" />
-      </audio>
-      <p>Durood e Paak (Sabir Raza Azhari)</p>
-      <a href="https://github.com/Sohilhusain86/HARDRISK/raw/main/Durood%20e%20Paak%20__%20Sabir%20Raza%20Azhari_shorts_video_(MP3_160K).mp3" class="download-btn" download>ڈاؤن لوڈ کریں</a>
-    </div>
-    <!-- 6. Karam Jis Par Tumhara Sayyed e Abrar Hota Hai -->
-    <div class="audio-item">
-      <audio id="naatAudio6" preload="metadata" controls>
-        <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Karam%20Jis%20Par%20Tumhara%20Sayyed%20e%20Abrar%20Hota%20Hai%20__%20%E2%99%94%20Sabir%20Raza%20Azhari%20Surat%20__%20Royal%20Channel(MP3_160K).mp3" type="audio/mpeg" />
-      </audio>
-      <p>Karam Jis Par Tumhara Sayyed e Abrar Hota Hai</p>
-      <a href="https://github.com/Sohilhusain86/HARDRISK/raw/main/Karam%20Jis%20Par%20Tumhara%20Sayyed%20e%20Abrar%20Hota%20Hai%20__%20%E2%99%94%20Sabir%20Raza%20Azhari%20Surat%20__%20Royal%20Channel(MP3_160K).mp3" class="download-btn" download>ڈاؤن لوڈ کریں</a>
-    </div>
-    <!-- 7. Arsh Haq Hai Masnade Rifat Rasool Allah Ki -->
-    <div class="audio-item">
-      <audio id="naatAudio7" preload="metadata" controls>
-        <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Arsh%20Haq%20Hai%20Masnade%20Rifat%20Rasool%20Allah%20Ki%20__%20%E2%99%94%20Sabir%20Raza%20Azhari%20Surat%20__%20Royal%20Channel(MP3_160K).mp3" type="audio/mpeg" />
-      </audio>
-      <p>Arsh Haq Hai Masnade Rifat Rasool Allah Ki</p>
-      <a href="https://github.com/Sohilhusain86/HARDRISK/raw/main/Arsh%20Haq%20Hai%20Masnade%20Rifat%20Rasool%20Allah%20Ki%20__%20%E2%99%94%20Sabir%20Raza%20Azhari%20Surat%20__%20Royal%20Channel(MP3_160K).mp3" class="download-btn" download>ڈاؤن لوڈ کریں</a>
-    </div>
-    <!-- 8. Kalam e Tajushshariya __ Bul Hawas Sun Seemo Zar Ki -->
-    <div class="audio-item">
-      <audio id="naatAudio8" preload="metadata" controls>
-        <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Kalam%20e%20Tajushshariya%20__%20Bul%20Hawas%20Sun%20Seemo%20Zar%20Ki%20__%20%E2%99%94%20Sabir%20Raza%20Azhari%20Surat%20__%20Royal%20Channel(MP3_160K).mp3" type="audio/mpeg" />
-      </audio>
-      <p>Kalam e Tajushshariya - Bul Hawas Sun Seemo Zar Ki</p>
-      <a href="https://github.com/Sohilhusain86/HARDRISK/raw/main/Kalam%20e%20Tajushshariya%20__%20Bul%20Hawas%20Sun%20Seemo%20Zar%20Ki%20__%20%E2%99%94%20Sabir%20Raza%20Azhari%20Surat%20__%20Royal%20Channel(MP3_160K).mp3" class="download-btn" download>ڈاؤن لوڈ کریں</a>
-    </div>
-    <!-- 9. Kalam e Huzoor Tajushshariya _ Apne Darpar Jo Bulao To Bahut Acha Ho -->
-    <div class="audio-item">
-      <audio id="naatAudio9" preload="metadata" controls>
-        <source src="https://github.com/Sohilhusain86/HARDRISK/raw/main/Kalam%20e%20Huzoor%20Tajushshariya%20_%20Apne%20Darpar%20Jo%20Bulao%20To%20Bahut%20Acha%20Ho%20_%20%E2%99%94%20Sabir%20Raza%20Azhari%20Surat(MP3_160K).mp3" type="audio/mpeg" />
-      </audio>
-      <p>Kalam e Huzoor Tajushshariya - Apne Darpar Jo Bulao To Bahut Acha Ho</p>
-      <a href="https://github.com/Sohilhusain86/HARDRISK/raw/main/Kalam%20e%20Huzoor%20Tajushshariya%20_%20Apne%20Darpar%20Jo%20Bulao%20To%20Bahut%20Acha%20Ho%20_%20%E2%99%94%20Sabir%20Raza%20Azhari%20Surat(MP3_160K).mp3" class="download-btn" download>ڈاؤن لوڈ کریں</a>
-    </div>
-    <!-- 10. (Add your additional 10th naat here if desired) -->
-  </div>
-  <p id="audioStatus"></p>
-  <script>
-    // Play only "کوئی گل باقی رہے گا" on scroll or first click (autoplay)
-    let audioStarted = false;
-    let mainAudio = document.getElementById('naatAudio1');
+  <div class="app-shell">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-top">
+        <div class="brand">
+          <h1 class="brand-title">صرف نعتیں و اسلامی کتب</h1>
+          <p class="brand-sub">سنیں، پڑھیں اور ڈاؤن لوڈ کریں — بالکل مفت، تیز اور خوبصورت انداز میں</p>
+        </div>
+        <div class="badge">Z TECH · Premium Islamic Library</div>
+      </div>
 
-    function pauseAllAudiosExceptMain() {
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" data-target="naatsSection">نعتیں</button>
+        <button class="tab-btn" data-target="booksSection">اسلامی کتب (PDF)</button>
+      </div>
+
+      <!-- Search -->
+      <div class="search-row">
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="نعت یا کتاب کا نام تلاش کریں..."
+        />
+        <div class="pill-info">100+ سہولیات کے لیے تیار اسٹرکچر — آہستہ آہستہ سب شامل ہوں گی ان شاء اللہ</div>
+      </div>
+    </header>
+
+    <!-- STATUS -->
+    <p id="audioStatus" class="status-bar"></p>
+
+    <!-- CONTENT -->
+    <main class="content">
+      <!-- Naat Section -->
+      <section id="naatsSection" class="section active">
+        <div class="grid" id="naatsGrid">
+          <!-- JS se fill hoga -->
+        </div>
+      </section>
+
+      <!-- Books Section -->
+      <section id="booksSection" class="section">
+        <div class="grid" id="booksGrid">
+          <!-- JS se fill hoga -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    © 2026 Z TECH · Sohil Hussain · صرف نعتیں و کتب — سب کچھ فی سبیل اللہ
+  </footer>
+
+  <script>
+    // ---------- DATA (yahan sirf arrays badhaate jao) ----------
+
+    const naats = [
+      {
+        id: 'naat1',
+        title: 'کوئی گل باقی رہے گا',
+        reciter: 'نامعلوم / Slowed & Reverb',
+        src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Koi%20Gul%20Baqi%20Rahega%20%5BSlowed%20_%20Reverb%5D%20Beautiful%20Naat%20__%20_lofinaatscreation(MP3_320K).mp3'
+      },
+      {
+        id: 'naat2',
+        title: 'کلمات ممتاز قادری',
+        reciter: 'ممتاز قادری',
+        src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Kalam%20Mumtaz%20Qadri%20.%20Full%20janaza%20HD%20video(MP3_320K).mp3'
+      },
+      {
+        id: 'naat3',
+        title: 'ہو کرم سرکار اب تو',
+        reciter: 'اوویس رضا قادری',
+        src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Ho%20Karam%20Sarkar%20Abto%20Owais%20Raza%20Qadri%202019(MP3_160K).mp3'
+      },
+      {
+        id: 'naat4',
+        title: 'پہنچو در سرکار',
+        reciter: 'صابر رضا ازہری',
+        src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/pohchu%20dare%20sarkar_sabir%20raza%20azhari%20manqabat%20in%20Surat_shorts_video_(MP3_160K).mp3'
+      },
+      {
+        id: 'naat5',
+        title: 'درود پاک',
+        reciter: 'صابر رضا ازہری',
+        src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Durood%20e%20Paak%20__%20Sabir%20Raza%20Azhari_shorts_video_(MP3_160K).mp3'
+      },
+      {
+        id: 'naat6',
+        title: 'کرم جس پر تمہارا سید ابرار ہوتا ہے',
+        reciter: 'صابر رضا ازہری',
+        src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Karam%20Jis%20Par%20Tumhara%20Sayyed%20e%20Abrar%20Hota%20Hai%20__%20%E2%99%94%20Sabir%20Raza%20Azhari%20Surat%20__%20Royal%20Channel(MP3_160K).mp3'
+      },
+      {
+        id: 'naat7',
+        title: 'عرش حق ہے مسند رفعت رسول اللہ کی',
+        reciter: 'صابر رضا ازہری',
+        src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Arsh%20Haq%20Hai%20Masnade%20Rifat%20Rasool%20Allah%20Ki%20__%20%E2%99%94%20Sabir%20Raza%20Azhari%20Surat%20__%20Royal%20Channel(MP3_160K).mp3'
+      },
+      {
+        id: 'naat8',
+        title: 'کلام تاج الشریعہ - بل ہوس سن سیمو زر کی',
+        reciter: 'صابر رضا ازہری',
+        src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Kalam%20e%20Tajushshariya%20__%20Bul%20Hawas%20Sun%20Seemo%20Zar%20Ki%20__%20%E2%99%94%20Sabir%20Raza%20Azhari%20Surat%20__%20Royal%20Channel(MP3_160K).mp3'
+      },
+      {
+        id: 'naat9',
+        title: 'کلام حضور تاج الشریعہ - اپنے در پر جو بلاؤ تو بہت اچھا ہو',
+        reciter: 'صابر رضا ازہری',
+        src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Kalam%20e%20Huzoor%20Tajushshariya%20_%20Apne%20Darpar%20Jo%20Bulao%20To%20Bahut%20Acha%20Ho%20_%20%E2%99%94%20Sabir%20Raza%20Azhari%20Surat(MP3_160K).mp3'
+      }
+    ];
+
+    const books = [
+      {
+        title: 'مومن کی نماز (اردو)',
+        author: 'نامعلوم',
+        src: 'Momin-ki-Namaz-Urdu.pdf'
+      },
+      {
+        title: 'کمالات مصطفیٰ',
+        author: 'نامعلوم',
+        src: 'Kamalat%20e%20Mustafa.pdf'
+      },
+      {
+        title: 'جہنم میں لے جانے والے اعمال جلد 2',
+        author: 'نامعلوم',
+        src: 'jahanam-main-lay-janay-walay-amaal-jild-2%20(1).pdf'
+      },
+      {
+        title: 'انسان تقریری (ابوالکلام)',
+        author: 'ابوالکلام',
+        src: '%D8%A7%D9%86%D8%B3%D8%A7%D9%86%20%D8%AA%D9%82%D8%B1%DB%8C%D8%B1%DB%8C%D9%94%DB%94%D9%85%DA%A9%D9%85%D9%84%20%D8%AD%D8%B5%DB%81(%D8%A7%D8%A8%D9%88%20%D8%A7%D9%84%DA%A9%D9%84%D8%A7%D9%85).pdf'
+      },
+      {
+        title: 'اسلامی اخلاق و آداب (صدر الشریعہ)',
+        author: 'صدر الشریعہ',
+        src: '%D8%A7%D8%B3%D9%84%D8%A7%D9%85%DB%8C%20%D8%A7%D8%AE%D9%84%D8%A7%D9%82%20%D9%88%20%D8%A2%D8%AF%D8%A7%D8%A8(%D8%B5%D8%AF%D8%B1%20%D8%A7%D9%84%D8%B4%D8%B1%DB%8C%D8%B9%DB%81).pdf'
+      },
+      {
+        title: 'دلچسپ معلومات سوال جواب حصہ 1',
+        author: 'نامعلوم',
+        src: '%D8%AF%D9%84%DA%86%D8%B3%D9%BE%20%D9%85%D8%B9%D9%84%D9%88%D9%85%D8%A7%D8%AA%20%D8%B3%D9%88%D8%A7%D9%84%20%D8%AC%D9%88%D8%A7%D8%A8%20%D8%AD%D8%B5%DB%81%201.pdf'
+      },
+      {
+        title: 'دور حاضر کی تقریری',
+        author: 'نامعلوم',
+        src: '%D8%AF%D9%88%D8%B1%20%D8%AD%D8%A7%D8%B6%D8%B1%20%DA%A9%DB%8C%20%D8%AA%D9%82%D8%B1%DB%8C%D8%B1%DB%8C.pdf'
+      },
+      {
+        title: 'موت کیا ہے (جلال الدین سیوطی)',
+        author: 'جلال الدین سیوطی',
+        src: '%D9%85%D9%88%D8%AA%20%DA%A9%DB%8C%D8%A7%20%DB%81%DB%92%20%D8%A7%D8%B2%20%D8%AC%D9%84%D8%A7%D9%84%20%D8%A7%D9%84%D8%AF%DB%8C%D9%86%20%D8%B3%DB%8C%D9%88%D8%B7%DB%8C.pdf'
+      }
+    ];
+
+    const GITHUB_BASE = 'https://github.com/Sohilhusain86/HARDRISK/raw/main/';
+
+    // ---------- RENDER FUNCTIONS ----------
+
+    const naatsGrid = document.getElementById('naatsGrid');
+    const booksGrid = document.getElementById('booksGrid');
+    const audioStatus = document.getElementById('audioStatus');
+    let mainAudioElement = null;
+
+    function renderNaats(list) {
+      naatsGrid.innerHTML = '';
+      list.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.type = 'naat';
+        card.dataset.search = (item.title + ' ' + (item.reciter || '')).toLowerCase();
+
+        const title = document.createElement('h3');
+        title.className = 'card-title';
+        title.textContent = item.title;
+
+        const meta = document.createElement('p');
+        meta.className = 'card-meta';
+        meta.textContent = item.reciter ? 'نعت خواں: ' + item.reciter : '';
+
+        const audio = document.createElement('audio');
+        audio.controls = true;
+        audio.preload = 'metadata';
+        audio.src = item.src;
+        audio.dataset.id = item.id;
+
+        const actions = document.createElement('div');
+        actions.className = 'card-actions';
+
+        const playBtn = document.createElement('button');
+        playBtn.className = 'btn btn-primary';
+        playBtn.textContent = 'چلائیں';
+        playBtn.addEventListener('click', () => {
+          pauseAllAudios();
+          audio.volume = 0.7;
+          audio.play();
+          audioStatus.textContent = 'نعت چل رہی ہے: ' + item.title;
+        });
+
+        const downloadLink = document.createElement('a');
+        downloadLink.className = 'btn btn-outline';
+        downloadLink.href = item.src;
+        downloadLink.setAttribute('download', '');
+        downloadLink.textContent = 'ڈاؤن لوڈ';
+
+        actions.appendChild(playBtn);
+        actions.appendChild(downloadLink);
+
+        card.appendChild(title);
+        card.appendChild(meta);
+        card.appendChild(audio);
+        card.appendChild(actions);
+
+        naatsGrid.appendChild(card);
+      });
+
+      // ensure only one audio plays at a time
       document.querySelectorAll('audio').forEach(aud => {
-        if(aud !== mainAudio) { aud.pause(); aud.currentTime = 0;}
+        aud.addEventListener('play', function () {
+          document.querySelectorAll('audio').forEach(other => {
+            if (other !== this) other.pause();
+          });
+        });
       });
     }
 
-    function playMainNaat() {
-      pauseAllAudiosExceptMain();
-      if(mainAudio){
-        mainAudio.volume = 0.5;
-        mainAudio.play().then(() => {
-          document.getElementById('audioStatus').textContent = 'عید میلاد النبی کی نعت چل رہی ہے: کوئی گل باقی رہے گا';
-        }).catch(()=> {
-          document.getElementById('audioStatus').textContent = 'نعت چلانے کے لیے صفحہ پر کلک کریں';
-        });
-      }
+    function renderBooks(list) {
+      booksGrid.innerHTML = '';
+      list.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.type = 'book';
+        card.dataset.search = (item.title + ' ' + (item.author || '')).toLowerCase();
+
+        const title = document.createElement('h3');
+        title.className = 'card-title';
+        title.textContent = item.title;
+
+        const meta = document.createElement('p');
+        meta.className = 'card-meta';
+        meta.textContent = item.author ? 'مصنف: ' + item.author : '';
+
+        const actions = document.createElement('div');
+        actions.className = 'card-actions';
+
+        const viewLink = document.createElement('a');
+        viewLink.className = 'btn btn-primary';
+        viewLink.href = GITHUB_BASE + item.src;
+        viewLink.target = '_blank';
+        viewLink.textContent = 'آن لائن پڑھیں';
+
+        const downloadLink = document.createElement('a');
+        downloadLink.className = 'btn btn-outline';
+        downloadLink.href = GITHUB_BASE + item.src;
+        downloadLink.setAttribute('download', '');
+        downloadLink.textContent = 'ڈاؤن لوڈ';
+
+        actions.appendChild(viewLink);
+        actions.appendChild(downloadLink);
+
+        card.appendChild(title);
+        card.appendChild(meta);
+        card.appendChild(actions);
+
+        booksGrid.appendChild(card);
+      });
     }
 
-    function startNaatOnInteraction(event) {
-      if(audioStarted) return;
-      const ignoreSelectors = ['button', 'a', 'input', 'select', 'textarea'];
-      for(let sel of ignoreSelectors){
-        if(event.target.closest(sel)){
-          return;
-        }
-      }
-      audioStarted = true;
-      playMainNaat();
-      document.removeEventListener('scroll', startNaatOnInteraction);
-      document.removeEventListener('click', startNaatOnInteraction);
-    }
-    document.addEventListener('scroll', startNaatOnInteraction);
-    document.addEventListener('click', startNaatOnInteraction);
-
-    function pauseAllAudios(){
+    function pauseAllAudios() {
       document.querySelectorAll('audio').forEach(aud => {
         aud.pause();
-        aud.currentTime = 0;
       });
     }
-    window.addEventListener('beforeunload', pauseAllAudios);
-    document.addEventListener('visibilitychange', () => {
-      if(document.hidden){ pauseAllAudios(); audioStarted=false; }
-    });
 
-    // Prevent auto playback of others if user clicks/pause/seek!
-    document.querySelectorAll('audio').forEach(aud => {
-      aud.addEventListener('play', function(){
-        document.querySelectorAll('audio').forEach(other => {
-          if(other !== this) { other.pause(); }
+    // ---------- TABS ----------
+
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const sections = document.querySelectorAll('.section');
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const target = btn.dataset.target;
+        sections.forEach(sec => {
+          sec.classList.toggle('active', sec.id === target);
         });
-        // If user plays another naat, pause main autoplay loop
-        if(this !== mainAudio) {
-          document.getElementById('audioStatus').textContent = '';
-        }
       });
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      if(mainAudio){ mainAudio.load(); }
+    // ---------- SEARCH ----------
+
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.toLowerCase();
+      document.querySelectorAll('.card').forEach(card => {
+        const text = card.dataset.search || '';
+        card.style.display = text.includes(q) ? 'flex' : 'none';
+      });
+    });
+
+    // ---------- INITIAL RENDER ----------
+
+    renderNaats(naats);
+    renderBooks(books);
+
+    // ---------- EXTRA SAFETY: PAUSE ON HIDE / UNLOAD ----------
+
+    window.addEventListener('beforeunload', pauseAllAudios);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        pauseAllAudios();
+        audioStatus.textContent = '';
+      }
     });
   </script>
 </body>
