@@ -396,4 +396,153 @@
                 }
 
                 filtered.forEach(item => {
-                    const ca
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    const isNaat = item.type === 'naat';
+
+                    card.innerHTML = `
+                        <span class="card-type ${isNaat ? 'type-naat' : 'type-book'}">${isNaat ? 'Naat' : 'Book'}</span>
+                        <h3 class="card-title">${item.title}</h3>
+                        <p class="card-author">${isNaat ? item.artist : item.meta}</p>
+                        <div class="card-actions">
+                            <button class="btn-action btn-primary" onclick="${isNaat ? `AudioController.load('${item.id}')` : `LibraryController.view('${item.id}')`}">
+                                ${isNaat ? '▶ چلائیں' : '📖 پڑھیں'}
+                            </button>
+                            <a href="${APP_CONFIG.githubBase + item.src}" download class="btn-action btn-secondary" title="ڈاؤن لوڈ">📥</a>
+                        </div>
+                    `;
+                    mainGrid.appendChild(card);
+                });
+            },
+
+            toast(msg) {
+                const t = document.createElement('div');
+                t.className = 'toast';
+                t.innerText = msg;
+                $('toast-shelf').appendChild(t);
+                setTimeout(() => t.remove(), 3000);
+            },
+
+            setupPWA() {
+                if ('serviceWorker' in navigator) {
+                    window.addEventListener('load', () => {
+                        navigator.serviceWorker.register('sw.js').catch(() => {});
+                    });
+                }
+            }
+        };
+
+        /**
+         * Advanced Audio Engine
+         */
+        const AudioController = {
+            init() {
+                engine.addEventListener('timeupdate', () => this.updateUI());
+                engine.addEventListener('ended', () => this.stop());
+                engine.addEventListener('error', () => UI.toast("آڈیو لوڈ کرنے میں خرابی ہوئی"));
+
+                $('p-main-toggle').onclick = () => this.toggle();
+                $('p-stop').onclick = () => this.stop();
+                $('p-seek-bar').onclick = (e) => this.seek(e);
+                $('p-volume').oninput = (e) => engine.volume = e.target.value;
+                $('p-speed').onchange = (e) => engine.playbackRate = parseFloat(e.target.value);
+            },
+
+            load(id) {
+                const track = DATABASE.naats.find(n => n.id === id);
+                if (!track) return;
+
+                State.currentTrack = track;
+                engine.src = APP_CONFIG.githubBase + track.src;
+                engine.play();
+
+                $('p-title').innerText = track.title;
+                $('p-artist').innerText = track.artist;
+                playerBar.classList.add('is-active');
+                $('p-main-toggle').innerText = '⏸';
+
+                this.addToRecent({...track, type: 'naat'});
+                this.updateMediaSession(track);
+            },
+
+            toggle() {
+                if (engine.paused) {
+                    engine.play();
+                    $('p-main-toggle').innerText = '⏸';
+                } else {
+                    engine.pause();
+                    $('p-main-toggle').innerText = '▶';
+                }
+            },
+
+            stop() {
+                engine.pause();
+                engine.currentTime = 0;
+                playerBar.classList.remove('is-active');
+            },
+
+            seek(e) {
+                const rect = $('p-seek-bar').getBoundingClientRect();
+                const pos = (e.clientX - rect.left) / rect.width;
+                engine.currentTime = pos * engine.duration;
+            },
+
+            updateUI() {
+                const per = (engine.currentTime / engine.duration) * 100;
+                $('p-fill').style.width = per + '%';
+                $('p-current').innerText = this.formatTime(engine.currentTime);
+                $('p-duration').innerText = this.formatTime(engine.duration || 0);
+            },
+
+            formatTime(s) {
+                const m = Math.floor(s / 60);
+                const sec = Math.floor(s % 60);
+                return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+            },
+
+            addToRecent(item) {
+                State.recent = [item, ...State.recent.filter(r => r.id !== item.id)].slice(0, 10);
+                localStorage.setItem('zn_recent', JSON.stringify(State.recent));
+            },
+
+            updateMediaSession(track) {
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.metadata = new MediaMetadata({
+                        title: track.title,
+                        artist: track.artist,
+                        album: APP_CONFIG.brand,
+                        artwork: [{ src: 'https://via.placeholder.com/512', sizes: '512x512', type: 'image/png' }]
+                    });
+                }
+            }
+        };
+
+        /**
+         * Library Engine
+         */
+        const LibraryController = {
+            view(id) {
+                const book = DATABASE.books.find(b => b.id === id);
+                if (!book) return;
+
+                const url = APP_CONFIG.githubBase + book.src;
+                $('modal-title').innerText = book.title;
+                $('pdf-frame').src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+                $('pdf-modal').style.display = 'grid';
+
+                AudioController.addToRecent({...book, type: 'book'});
+            }
+        };
+
+        // Boot
+        window.addEventListener('DOMContentLoaded', () => {
+            UI.init();
+            AudioController.init();
+            
+            // Handle offline state
+            window.addEventListener('online', () => UI.toast("آپ آن لائن ہیں"));
+            window.addEventListener('offline', () => UI.toast("انٹرنیٹ کنکشن دستیاب نہیں ہے"));
+        });
+    </script>
+</body>
+</html>
