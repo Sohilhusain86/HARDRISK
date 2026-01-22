@@ -3,42 +3,51 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
-    <meta name="description" content="Zikr-o-Nazar: The most advanced Islamic Digital Library for Naats and PDF Books." />
+    <meta name="description" content="Zikr-o-Nazar: A premium Islamic Digital Library for high-quality Naats and authentic PDF Books." />
+    <meta name="author" content="Zikr-o-Nazar" />
     <meta name="theme-color" id="themeColor" content="#064e3b" />
     
-    <meta property="og:title" content="Zikr-o-Nazar | Premium Islamic Library" />
-    <meta property="og:description" content="Listen to Naats and Read Islamic Books with professional UI." />
+    <meta property="og:title" content="Zikr-o-Nazar | Islamic Digital Library" />
+    <meta property="og:description" content="Access a curated collection of Naats and Islamic literature." />
     <meta property="og:type" content="website" />
-    
-    <title>Zikr-o-Nazar</title>
+    <meta property="og:url" content="https://zikronazar.com" />
+
+    <title>Zikr-o-Nazar | Islamic Digital Library</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
     <style>
         :root {
             --p-h: 162; --p-s: 84%; --p-l: 14%;
             --primary: hsl(var(--p-h), var(--p-s), var(--p-l));
-            --primary-light: hsl(var(--p-h), var(--p-s), 25%);
-            --accent: #f59e0b;
+            --primary-light: hsl(var(--p-h), var(--p-s), 30%);
+            --accent: #fbbf24;
+            --success: #10b981;
+            --danger: #ef4444;
             --bg-base: #f8fafc;
-            --bg-card: #ffffff;
-            --text-main: #1e293b;
+            --bg-surface: #ffffff;
+            --text-main: #0f172a;
             --text-muted: #64748b;
-            --glass: rgba(255, 255, 255, 0.8);
             --border: rgba(0, 0, 0, 0.08);
-            --shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
-            --radius: 16px;
-            --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+            --font-urdu: 'Noto Nastaliq Urdu', serif;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
         }
 
         [data-theme="dark"] {
-            --bg-base: #0f172a;
-            --bg-card: #1e293b;
+            --bg-base: #020617;
+            --bg-surface: #0f172a;
             --text-main: #f1f5f9;
             --text-muted: #94a3b8;
-            --glass: rgba(15, 23, 42, 0.8);
             --border: rgba(255, 255, 255, 0.1);
             --primary: #10b981;
         }
@@ -47,384 +56,344 @@
             * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
         }
 
-        * { box-sizing: border-box; outline-offset: 3px; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body {
-            margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', 'Noto Nastaliq Urdu', sans-serif;
+            margin: 0; padding: 0; font-family: var(--font-main);
             background: var(--bg-base); color: var(--text-main);
             direction: rtl; overflow-x: hidden; min-height: 100vh;
-            transition: background 0.3s ease;
+            scroll-behavior: smooth; transition: background 0.3s ease;
         }
 
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 
-        /* --- UI COMPONENTS --- */
-        .sticky-nav {
+        /* HEADER & NAVIGATION */
+        .app-header {
             position: sticky; top: 0; z-index: 1100;
-            background: var(--glass); backdrop-filter: blur(12px);
+            background: rgba(var(--bg-surface), 0.8); backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border); padding: 0.75rem 1rem;
+            transition: var(--transition);
         }
 
-        .nav-wrapper {
-            max-width: 1200px; margin: 0 auto;
+        .header-container {
+            max-width: 1280px; margin: 0 auto;
             display: flex; justify-content: space-between; align-items: center;
         }
 
-        .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.5rem; color: var(--primary); text-decoration: none; }
-        
-        .btn-circle {
-            width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border);
-            background: var(--bg-card); color: var(--text-main); cursor: pointer;
+        .brand {
+            display: flex; align-items: center; gap: 12px;
+            text-decoration: none; color: var(--primary);
+            font-weight: 800; font-size: 1.4rem;
+        }
+
+        .brand-logo { width: 40px; height: 40px; background: var(--primary); color: white; border-radius: 10px; display: grid; place-items: center; }
+
+        .btn-icon {
+            width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border);
+            background: var(--bg-surface); color: var(--text-main); cursor: pointer;
             display: flex; align-items: center; justify-content: center; transition: var(--transition);
         }
+        .btn-icon:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
 
-        .main-hero {
-            padding: 4rem 1rem 2rem; text-align: center;
-            background: radial-gradient(circle at top right, var(--primary-light), transparent);
+        /* HERO SECTION */
+        .hero {
+            padding: 4rem 1.5rem 3rem; text-align: center;
+            background: radial-gradient(circle at top right, rgba(var(--p-h), 80%, 30%, 0.05), transparent);
         }
 
-        .search-container {
-            max-width: 600px; margin: -2rem auto 2rem; position: relative; padding: 0 1rem;
+        .hero h1 { font-family: var(--font-urdu); font-size: clamp(2.5rem, 8vw, 4rem); margin: 0; color: var(--primary); }
+        .hero p { font-size: 1.1rem; color: var(--text-muted); margin-top: 1rem; }
+
+        /* DISCOVERY ENGINE */
+        .discovery-bar {
+            max-width: 720px; margin: -2.5rem auto 2.5rem; padding: 0 1.5rem; position: relative; z-index: 10;
         }
+
+        .search-box {
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: 100px; padding: 0.5rem 0.5rem 0.5rem 1.5rem;
+            display: flex; align-items: center; box-shadow: var(--shadow-lg); transition: var(--transition);
+        }
+
+        .search-box:focus-within { border-color: var(--primary); transform: translateY(-3px); }
 
         .search-input {
-            width: 100%; padding: 1.2rem 3rem 1.2rem 1.5rem;
-            border-radius: 50px; border: 1px solid var(--border);
-            background: var(--bg-card); color: var(--text-main);
-            box-shadow: var(--shadow); font-size: 1rem; transition: var(--transition);
+            flex: 1; border: none; background: transparent; padding: 0.8rem;
+            font-size: 1rem; color: var(--text-main); outline: none;
         }
 
-        .search-input:focus { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 20px 40px -15px rgba(0,0,0,0.15); }
-
-        .filter-tabs {
-            display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap;
+        .filter-chip-container {
+            display: flex; justify-content: center; gap: 0.75rem; margin: 1.5rem 0; flex-wrap: wrap;
         }
 
-        .tab {
-            padding: 0.6rem 1.5rem; border-radius: 50px; border: 1px solid var(--border);
-            background: var(--bg-card); cursor: pointer; font-weight: 600; transition: var(--transition);
+        .chip {
+            padding: 0.6rem 1.4rem; border-radius: 50px; border: 1px solid var(--border);
+            background: var(--bg-surface); cursor: pointer; font-weight: 600; font-size: 0.9rem;
+            transition: var(--transition); display: flex; align-items: center; gap: 8px;
         }
+        .chip.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        .tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-
-        /* --- GRID & CARDS --- */
+        /* CONTENT GRID */
         .content-grid {
-            max-width: 1200px; margin: 0 auto; padding: 0 1rem 10rem;
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;
+            max-width: 1280px; margin: 0 auto; padding: 0 1.5rem 8rem;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;
         }
 
         .card {
-            background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border);
+            background: var(--bg-surface); border-radius: var(--radius-lg); border: 1px solid var(--border);
             padding: 1.5rem; position: relative; transition: var(--transition);
-            display: flex; flex-direction: column; gap: 1rem; contain: content;
+            display: flex; flex-direction: column; gap: 1.25rem; overflow: hidden; contain: content;
         }
+        .card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: var(--primary-light); }
 
-        .card:hover { transform: translateY(-10px); box-shadow: var(--shadow); }
+        .card-type { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 10px; border-radius: 6px; width: fit-content; }
+        .type-naat { background: #dcfce7; color: #166534; }
+        .type-book { background: #e0f2fe; color: #0369a1; }
 
-        .card-meta { display: flex; justify-content: space-between; align-items: center; }
-        .badge { font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
-        .badge-naat { background: #dcfce7; color: #166534; }
-        .badge-book { background: #dbeafe; color: #1e40af; }
+        .card-title { font-size: 1.25rem; font-weight: 700; margin: 0; line-height: 1.4; color: var(--text-main); }
+        .card-author { color: var(--text-muted); font-size: 0.9rem; margin-top: -0.5rem; }
 
-        .action-group { display: flex; gap: 0.5rem; margin-top: auto; }
+        .card-actions { display: flex; gap: 0.75rem; margin-top: auto; }
+        
         .btn-action {
-            flex: 1; padding: 0.8rem; border-radius: 12px; border: none;
-            font-weight: 700; cursor: pointer; transition: var(--transition);
-            display: flex; align-items: center; justify-content: center; gap: 5px;
+            flex: 1; padding: 0.85rem; border-radius: 12px; border: none; font-weight: 700;
+            cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;
         }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-secondary { background: var(--bg-base); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-action:active { transform: scale(0.95); }
 
-        .btn-p { background: var(--primary); color: #fff; }
-        .btn-s { background: var(--bg-base); color: var(--text-main); border: 1px solid var(--border); }
-
-        /* --- AUDIO PLAYER BAR --- */
-        .player-bar {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: var(--glass); backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border); padding: 1rem;
-            transform: translateY(100%); transition: transform 0.4s ease;
-            z-index: 2000;
+        /* GLOBAL PLAYER */
+        .master-player {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 2000;
+            background: var(--bg-surface); border-top: 1px solid var(--border);
+            padding: 1rem 1.5rem; transform: translateY(110%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 -10px 25px -5px rgba(0,0,0,0.1);
         }
+        .master-player.is-active { transform: translateY(0); padding-bottom: calc(1rem + var(--safe-bottom)); }
 
-        .player-bar.active { transform: translateY(0); }
+        .player-inner { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 2fr 1fr; align-items: center; gap: 2rem; }
 
-        .player-ui {
-            max-width: 1000px; margin: 0 auto;
-            display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1.5rem;
-        }
+        .track-display { display: flex; flex-direction: column; min-width: 0; }
+        .track-title { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-artist { font-size: 0.8rem; color: var(--text-muted); }
 
-        .progress-container { width: 100%; height: 6px; background: var(--border); border-radius: 10px; cursor: pointer; position: relative; }
-        .progress-bar { height: 100%; background: var(--primary); border-radius: 10px; width: 0%; transition: width 0.1s linear; }
+        .player-controls { display: flex; flex-direction: column; gap: 8px; }
+        .progress-wrapper { height: 6px; width: 100%; background: var(--bg-base); border-radius: 10px; cursor: pointer; position: relative; }
+        .progress-fill { height: 100%; background: var(--primary); border-radius: 10px; width: 0%; transition: width 0.1s linear; }
+        .time-labels { display: flex; justify-content: space-between; font-size: 0.75rem; font-family: var(--font-main); color: var(--text-muted); }
 
-        /* --- TOASTS --- */
-        #toastContainer { position: fixed; top: 1rem; left: 1rem; z-index: 3000; display: flex; flex-direction: column; gap: 0.5rem; }
-        .toast {
-            background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border);
-            padding: 1rem 1.5rem; border-radius: 12px; box-shadow: var(--shadow);
-            animation: slideIn 0.3s ease forwards;
-        }
+        .control-btns { display: flex; align-items: center; justify-content: center; gap: 1.5rem; }
+        .btn-play-master { width: 52px; height: 52px; border-radius: 50%; background: var(--primary); color: white; border: none; cursor: pointer; display: grid; place-items: center; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(var(--p-h), 80%, 20%, 0.3); }
 
-        @keyframes slideIn { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        /* SKELETON LOADERS */
+        .skeleton { background: linear-gradient(90deg, var(--bg-base) 25%, var(--border) 50%, var(--bg-base) 75%); background-size: 200% 100%; animation: skeleton-loading 1.5s infinite; }
+        @keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-        /* --- RESPONSIVE --- */
-        @media (max-width: 768px) {
-            .player-ui { grid-template-columns: 1fr; gap: 0.5rem; text-align: center; }
+        /* TOASTS */
+        #toast-shelf { position: fixed; top: 1.5rem; left: 1.5rem; z-index: 3000; display: flex; flex-direction: column; gap: 0.75rem; }
+        .toast { background: var(--bg-surface); border: 1px solid var(--border); padding: 1rem 1.5rem; border-radius: 12px; box-shadow: var(--shadow-lg); border-right: 4px solid var(--primary); animation: slide-in 0.3s ease forwards; }
+        @keyframes slide-in { from { transform: translateX(-120%); } to { transform: translateX(0); } }
+
+        /* MODAL (PDF VIEW) */
+        .modal { position: fixed; inset: 0; z-index: 2100; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; place-items: center; padding: 1.5rem; }
+        .modal-content { background: var(--bg-surface); width: 100%; max-width: 900px; height: 90vh; border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; }
+        .modal-header { padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+
+        @media (max-width: 900px) {
+            .player-inner { grid-template-columns: 1fr; gap: 1rem; }
+            .track-display { text-align: center; }
+            .discovery-bar { margin-top: -1.5rem; }
             .content-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <div id="toastContainer" role="alert" aria-live="polite"></div>
+    <div id="toast-shelf" role="alert" aria-live="polite"></div>
 
-    <nav class="sticky-nav">
-        <div class="nav-wrapper">
-            <a href="#" class="brand">
-                <span>🕌</span>
-                <span>Zikr-o-Nazar</span>
+    <header class="app-header">
+        <div class="header-container">
+            <a href="#" class="brand" aria-label="Zikr-o-Nazar Home">
+                <div class="brand-logo">🕌</div>
+                <span>ذکر و نظر</span>
             </a>
-            <div style="display: flex; gap: 10px;">
-                <button id="themeToggle" class="btn-circle" title="Toggle Dark Mode" aria-label="Dark Mode">🌓</button>
+            <div style="display: flex; gap: 8px;">
+                <button id="theme-toggle" class="btn-icon" title="تبدیل تھیم" aria-label="Toggle dark mode">🌙</button>
+                <button id="pwa-install" class="btn-icon" style="display: none;" title="ایپ انسٹال کریں">📥</button>
             </div>
         </div>
-    </nav>
-
-    <header class="main-hero">
-        <h1 style="font-weight: 800; font-size: clamp(2rem, 5vw, 3.5rem); margin: 0;">ذکر و نظر</h1>
-        <p style="color: var(--text-muted); font-size: 1.2rem;">اسلامی نعتیں اور مستند کتب کا جامع مرکز</p>
     </header>
 
-    <section class="search-container">
-        <input type="text" id="mainSearch" class="search-input" placeholder="نعت، نعت خواں یا کتاب تلاش کریں..." aria-label="Search content">
-        <div class="filter-tabs" id="filterTabs" style="margin-top: 2rem;">
-            <button class="tab active" data-filter="all">سب دیکھیں</button>
-            <button class="tab" data-filter="naat">نعتیں</button>
-            <button class="tab" data-filter="book">کتب</button>
-        </div>
-    </section>
+    <main>
+        <section class="hero">
+            <h1>ذکر و نظر</h1>
+            <p>پاکیزہ نعتیں اور مستند اسلامی کتب کا ڈیجیٹل ذخیرہ</p>
+        </section>
 
-    <main id="contentGrid" class="content-grid">
-        </main>
-
-    <footer class="player-bar" id="playerBar">
-        <div class="player-ui">
-            <div id="trackInfo">
-                <div id="trackTitle" style="font-weight: 700;">--</div>
-                <div id="trackArtist" style="font-size: 0.8rem; color: var(--text-muted);">--</div>
+        <section class="discovery-bar">
+            <div class="search-box">
+                <span aria-hidden="true">🔍</span>
+                <input type="text" id="global-search" class="search-input" placeholder="نعت، نعت خواں یا کتاب تلاش کریں..." />
             </div>
             
-            <div style="display: flex; flex-direction: column; gap: 5px;">
-                <div class="progress-container" id="progressArea">
-                    <div class="progress-bar" id="progressBar"></div>
+            <div class="filter-chip-container" id="filter-shelf">
+                <button class="chip active" data-type="all">سب دیکھیں</button>
+                <button class="chip" data-type="naat">📿 نعتیں</button>
+                <button class="chip" data-type="book">📚 کتب</button>
+                <button class="chip" data-type="recent">🕒 حال ہی میں</button>
+            </div>
+        </section>
+
+        <section id="main-grid" class="content-grid">
+            </section>
+    </main>
+
+    <div class="master-player" id="global-player">
+        <div class="player-inner">
+            <div class="track-display">
+                <div id="p-title" class="track-title">ٹریک کا نام</div>
+                <div id="p-artist" class="track-artist">فنکار</div>
+            </div>
+            
+            <div class="player-controls">
+                <div class="progress-wrapper" id="p-seek-bar">
+                    <div class="progress-fill" id="p-fill"></div>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.7rem; font-family: monospace;">
-                    <span id="currTime">00:00</span>
-                    <span id="durTime">00:00</span>
+                <div class="time-labels">
+                    <span id="p-current">00:00</span>
+                    <span id="p-duration">00:00</span>
+                </div>
+                <div class="control-btns">
+                    <select id="p-speed" class="btn-icon" style="width: auto; height: 32px; font-size: 0.7rem; padding: 0 4px;">
+                        <option value="1">1.0x</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="2">2.0x</option>
+                    </select>
+                    <button class="btn-play-master" id="p-main-toggle" aria-label="پلے / پوز">▶</button>
+                    <button class="btn-icon" id="p-stop" style="width: 32px; height: 32px;">⏹</button>
                 </div>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <select id="speedCtrl" style="background: none; border: 1px solid var(--border); color: var(--text-main); border-radius: 4px;">
-                    <option value="1">1.0x</option>
-                    <option value="1.25">1.25x</option>
-                    <option value="1.5">1.5x</option>
-                    <option value="2">2.0x</option>
-                </select>
-                <button id="mainPlayBtn" class="btn-circle" style="background: var(--primary); color: #fff; border: none;">▶</button>
+            <div style="display: flex; justify-content: flex-end; align-items: center; gap: 10px;">
+                <span>🔊</span>
+                <input type="range" id="p-volume" min="0" max="1" step="0.1" value="0.8" style="width: 80px;" />
             </div>
         </div>
-    </footer>
+    </div>
 
-    <audio id="audioEngine" preload="none"></audio>
+    <div class="modal" id="pdf-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title" style="margin:0; font-size: 1.1rem;">کتاب کا مطالعہ</h2>
+                <button class="btn-icon" id="close-modal">✕</button>
+            </div>
+            <iframe id="pdf-frame" src="" style="flex:1; border:none;"></iframe>
+        </div>
+    </div>
+
+    <audio id="audio-engine" preload="none"></audio>
 
     <script>
-        // --- CORE CONFIG & STATE ---
-        const CONFIG = {
-            brand: "Zikr-o-Nazar",
-            version: "2.1.0",
-            basePdf: "https://github.com/Sohilhusain86/HARDRISK/raw/main/",
+        /**
+         * Zikr-o-Nazar | Enterprise Architecture
+         */
+        const APP_CONFIG = {
+            brand: 'Zikr-o-Nazar',
+            githubBase: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/',
+            storageKey: 'zn_prefs',
+            features: { darkTheme: true, pwa: true, analytics: false }
+        };
+
+        const DATABASE = {
             naats: [
-                { id: 1, title: 'کوئی گل باقی رہے گا', artist: 'نامعلوم', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Koi%20Gul%20Baqi%20Rahega%20%5BSlowed%20_%20Reverb%5D%20Beautiful%20Naat%20__%20_lofinaatscreation(MP3_320K).mp3' },
-                { id: 2, title: 'کلمات ممتاز قادری', artist: 'ممتاز قادری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Kalam%20Mumtaz%20Qadri%20.%20Full%20janaza%20HD%20video(MP3_320K).mp3' },
-                { id: 3, title: 'ہو کرم سرکار اب تو', artist: 'اوویس رضا قادری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Ho%20Karam%20Sarkar%20Abto%20Owais%20Raza%20Qadri%202019(MP3_160K).mp3' },
-                { id: 4, title: 'پہنچو در سرکار', artist: 'صابر رضا ازہری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/pohchu%20dare%20sarkar_sabir%20raza%20azhari%20manqabat%20in%20Surat_shorts_video_(MP3_160K).mp3' },
-                { id: 5, title: 'درود پاک', artist: 'صابر رضا ازہری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Durood%20e%20Paak%20__%20Sabir%20Raza%20Azhari_shorts_video_(MP3_160K).mp3' }
+                { id: 'n1', title: 'کوئی گل باقی رہے گا', artist: 'نامعلوم / Slowed', src: 'Koi%20Gul%20Baqi%20Rahega%20%5BSlowed%20_%20Reverb%5D%20Beautiful%20Naat%20__%20_lofinaatscreation(MP3_320K).mp3' },
+                { id: 'n2', title: 'کلمات ممتاز قادری', artist: 'ممتاز قادری', src: 'Kalam%20Mumtaz%20Qadri%20.%20Full%20janaza%20HD%20video(MP3_320K).mp3' },
+                { id: 'n3', title: 'ہو کرم سرکار اب تو', artist: 'اوویس رضا قادری', src: 'Ho%20Karam%20Sarkar%20Abto%20Owais%20Raza%20Qadri%202019(MP3_160K).mp3' },
+                { id: 'n4', title: 'پہنچو در سرکار', artist: 'صابر رضا ازہری', src: 'pohchu%20dare%20sarkar_sabir%20raza%20azhari%20manqabat%20in%20Surat_shorts_video_(MP3_160K).mp3' },
+                { id: 'n5', title: 'درود پاک', artist: 'صابر رضا ازہری', src: 'Durood%20e%20Paak%20__%20Sabir%20Raza%20Azhari_shorts_video_(MP3_160K).mp3' }
             ],
             books: [
-                { id: 101, title: 'مومن کی نماز (اردو)', info: 'نماز کا مکمل طریقہ', src: 'Momin-ki-Namaz-Urdu.pdf' },
-                { id: 102, title: 'کمالات مصطفیٰ', info: 'سیرت النبی ﷺ', src: 'Kamalat%20e%20Mustafa.pdf' },
-                { id: 103, title: 'جہنم میں لے جانے والے اعمال', info: 'اصلاحی کتاب', src: 'jahanam-main-lay-janay-walay-amaal-jild-2%20(1).pdf' }
+                { id: 'b1', title: 'مومن کی نماز (اردو)', meta: 'نماز کا مکمل طریقہ', src: 'Momin-ki-Namaz-Urdu.pdf' },
+                { id: 'b2', title: 'کمالات مصطفیٰ', meta: 'سیرت النبی ﷺ', src: 'Kamalat%20e%20Mustafa.pdf' },
+                { id: 'b3', title: 'جہنم میں لے جانے والے اعمال', meta: 'جلد 2', src: 'jahanam-main-lay-janay-walay-amaal-jild-2%20(1).pdf' },
+                { id: 'b4', title: 'انسان تقریری', meta: 'ابوالکلام', src: '%D8%A7%D9%86%D8%B3%D8%A7%D9%86%20%D8%AA%D9%82%D8%B1%DB%8C%D8%B1%DB%8C%D9%94%DB%94%D9%85%DA%A9%D9%85%D9%84%20%D8%AD%D8%B5%DB%81(%D8%A7%D8%A8%D9%88%20%D8%A7%D9%84%DA%A9%D9%84%D8%A7%D9%85).pdf' }
             ]
         };
 
-        const state = {
-            currentFilter: 'all',
-            searchTerm: '',
-            activeTrack: null,
-            isPlaying: false
+        const State = {
+            filter: 'all',
+            search: '',
+            currentTrack: null,
+            recent: JSON.parse(localStorage.getItem('zn_recent') || '[]'),
+            theme: localStorage.getItem('zn_theme') || 'light'
         };
 
-        // --- UTILS ---
+        // DOM Elements
         const $ = (id) => document.getElementById(id);
-        const formatTime = (s) => {
-            const min = Math.floor(s / 60);
-            const sec = Math.floor(s % 60);
-            return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-        };
+        const engine = $('audio-engine');
+        const playerBar = $('global-player');
+        const mainGrid = $('main-grid');
 
-        function showToast(msg) {
-            const t = document.createElement('div');
-            t.className = 'toast';
-            t.innerText = msg;
-            $('toastContainer').appendChild(t);
-            setTimeout(() => t.remove(), 3000);
-        }
+        /**
+         * UI Engine
+         */
+        const UI = {
+            init() {
+                this.bindEvents();
+                this.applyTheme();
+                this.renderContent();
+                this.setupPWA();
+            },
 
-        // --- AUDIO ENGINE ---
-        const audio = $('audioEngine');
-        const playBtn = $('mainPlayBtn');
-
-        function togglePlay() {
-            if (audio.paused) {
-                audio.play().catch(e => showToast("Error playing audio"));
-                playBtn.innerText = '⏸';
-            } else {
-                audio.pause();
-                playBtn.innerText = '▶';
-            }
-        }
-
-        function playTrack(id) {
-            const track = CONFIG.naats.find(n => n.id === id);
-            if (!track) return;
-
-            if (state.activeTrack?.id === id) {
-                togglePlay();
-                return;
-            }
-
-            state.activeTrack = track;
-            audio.src = track.src;
-            audio.play();
-            
-            $('playerBar').classList.add('active');
-            $('trackTitle').innerText = track.title;
-            $('trackArtist').innerText = track.artist;
-            playBtn.innerText = '⏸';
-
-            if ('mediaSession' in navigator) {
-                navigator.mediaSession.metadata = new MediaMetadata({
-                    title: track.title,
-                    artist: track.artist,
-                    album: CONFIG.brand
+            bindEvents() {
+                $('global-search').addEventListener('input', e => {
+                    State.search = e.target.value.toLowerCase();
+                    this.renderContent();
                 });
-            }
-        }
 
-        audio.ontimeupdate = () => {
-            const per = (audio.currentTime / audio.duration) * 100;
-            $('progressBar').style.width = per + '%';
-            $('currTime').innerText = formatTime(audio.currentTime);
-            $('durTime').innerText = formatTime(audio.duration || 0);
-        };
+                $('filter-shelf').addEventListener('click', e => {
+                    if (e.target.tagName === 'BUTTON') {
+                        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+                        e.target.classList.add('active');
+                        State.filter = e.target.dataset.type;
+                        this.renderContent();
+                    }
+                });
 
-        $('progressArea').onclick = (e) => {
-            const rect = $('progressArea').getBoundingClientRect();
-            const pos = (e.clientX - rect.left) / rect.width;
-            audio.currentTime = pos * audio.duration;
-        };
+                $('theme-toggle').onclick = () => {
+                    State.theme = State.theme === 'light' ? 'dark' : 'light';
+                    localStorage.setItem('zn_theme', State.theme);
+                    this.applyTheme();
+                };
 
-        $('speedCtrl').onchange = (e) => audio.playbackRate = e.target.value;
-        playBtn.onclick = togglePlay;
+                $('close-modal').onclick = () => $('pdf-modal').style.display = 'none';
+            },
 
-        // --- SEARCH & RENDER ---
-        function render() {
-            const grid = $('contentGrid');
-            grid.innerHTML = '';
+            applyTheme() {
+                document.documentElement.setAttribute('data-theme', State.theme);
+                $('theme-toggle').innerText = State.theme === 'light' ? '🌙' : '☀️';
+                $('themeColor').content = State.theme === 'light' ? '#064e3b' : '#020617';
+            },
 
-            const filteredNaats = (state.currentFilter === 'all' || state.currentFilter === 'naat') 
-                ? CONFIG.naats.filter(n => n.title.includes(state.searchTerm)) : [];
-            
-            const filteredBooks = (state.currentFilter === 'all' || state.currentFilter === 'book') 
-                ? CONFIG.books.filter(b => b.title.includes(state.searchTerm)) : [];
+            renderContent() {
+                mainGrid.innerHTML = '';
+                let pool = [];
 
-            if (!filteredNaats.length && !filteredBooks.length) {
-                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 4rem;">نتیجہ نہیں ملا</div>`;
-                return;
-            }
+                if (State.filter === 'all' || State.filter === 'naat') pool = pool.concat(DATABASE.naats.map(n => ({...n, type: 'naat'})));
+                if (State.filter === 'all' || State.filter === 'book') pool = pool.concat(DATABASE.books.map(b => ({...b, type: 'book'})));
+                if (State.filter === 'recent') pool = State.recent;
 
-            filteredNaats.forEach(n => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <div class="card-meta"><span class="badge badge-naat">Audio Naat</span></div>
-                    <h3 style="margin:0">${n.title}</h3>
-                    <p style="font-size:0.9rem; color:var(--text-muted)">${n.artist}</p>
-                    <div class="action-group">
-                        <button class="btn-action btn-p" onclick="playTrack(${n.id})">🎧 چلائیں</button>
-                        <a href="${n.src}" download class="btn-action btn-s">📥</a>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
+                const filtered = pool.filter(item => 
+                    item.title.toLowerCase().includes(State.search) || 
+                    (item.artist && item.artist.toLowerCase().includes(State.search))
+                );
 
-            filteredBooks.forEach(b => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <div class="card-meta"><span class="badge badge-book">PDF Book</span></div>
-                    <h3 style="margin:0">${b.title}</h3>
-                    <p style="font-size:0.8rem; color:var(--text-muted)">${b.info}</p>
-                    <div class="action-group">
-                        <a href="${CONFIG.basePdf + b.src}" target="_blank" class="btn-action btn-p">📖 مطالعہ کریں</a>
-                        <a href="${CONFIG.basePdf + b.src}" download class="btn-action btn-s">📥</a>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
+                if (filtered.length === 0) {
+                    mainGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted)">کوئی ریکارڈ نہیں ملا</div>`;
+                    return;
+                }
 
-        // --- DEBOUNCED SEARCH ---
-        let debounceTimer;
-        $('mainSearch').oninput = (e) => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-                state.searchTerm = e.target.value;
-                render();
-            }, 300);
-        };
-
-        $('filterTabs').onclick = (e) => {
-            if (!e.target.classList.contains('tab')) return;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            e.target.classList.add('active');
-            state.currentFilter = e.target.dataset.filter;
-            render();
-        };
-
-        // --- THEME ---
-        const themeBtn = $('themeToggle');
-        themeBtn.onclick = () => {
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            const next = isDark ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem('zn_theme', next);
-            $('themeColor').setAttribute('content', next === 'dark' ? '#0f172a' : '#064e3b');
-        };
-
-        // Initialization
-        const savedTheme = localStorage.getItem('zn_theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        render();
-
-        // PWA Placeholder for production logic
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                // Production Service Worker Registration would go here
-            });
-        }
-
-        window.addEventListener('offline', () => showToast("انٹرنیٹ کنکشن منقطع ہو گیا ہے"));
-        window.addEventListener('online', () => showToast("آپ اب آن لائن ہیں"));
-    </script>
-</body>
-</html>
+                filtered.forEach(item => {
+                    const ca
