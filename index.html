@@ -1,1277 +1,397 @@
 <!DOCTYPE html>
-<html lang="ur">
+<html lang="ur" dir="rtl" class="no-js">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zikr-o-Nazar • Digital Islamic Library</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    
+    <title>Zikr-o-Nazar | Premium Islamic Digital Platform</title>
+    <meta name="description" content="Zikr-o-Nazar: An elite, high-performance Islamic Digital Library hosting thousands of Naats and authentic PDF Books. Engineered for spiritual excellence.">
+    <meta name="author" content="Zikr-o-Nazar Team">
+    <meta name="theme-color" id="theme-color-meta" content="#064e3b">
 
-<style>
-/* =========================
-   ROOT & THEME SYSTEM
-========================= */
-:root{
-  --bg:#0f1115;
-  --panel:#161922;
-  --card:#1f2330;
-  --text:#e9ecf1;
-  --muted:#9aa3b2;
-  --accent:#4dd0e1;
-  --danger:#ff6b6b;
-  --radius:14px;
-  --shadow:0 20px 40px rgba(0,0,0,.35);
-}
-[data-theme="light"]{
-  --bg:#f5f7fb;
-  --panel:#ffffff;
-  --card:#f0f2f7;
-  --text:#1b1e28;
-  --muted:#5b6475;
-  --accent:#0066ff;
-  --shadow:0 20px 40px rgba(0,0,0,.12);
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  background:var(--bg);
-  color:var(--text);
-  overflow-x:hidden;
-}
+    <meta property="og:title" content="Zikr-o-Nazar | Islamic Library">
+    <meta property="og:description" content="Access thousands of Naats and Islamic literature on a professional platform.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
 
-/* =========================
-   LAYOUT
-========================= */
-header{
-  position:sticky;
-  top:0;
-  z-index:50;
-  background:linear-gradient(180deg,var(--panel),transparent);
-  backdrop-filter:blur(10px);
-}
-.topbar{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  padding:14px 16px;
-}
-.logo{
-  font-weight:800;
-  letter-spacing:.5px;
-}
-.logo span{color:var(--accent)}
-.search{
-  flex:1;
-  position:relative;
-}
-.search input{
-  width:100%;
-  padding:12px 40px 12px 14px;
-  border-radius:999px;
-  border:none;
-  outline:none;
-  background:var(--card);
-  color:var(--text);
-}
-.search svg{
-  position:absolute;
-  right:14px;
-  top:50%;
-  transform:translateY(-50%);
-  opacity:.6;
-}
-.actions button{
-  background:var(--card);
-  border:none;
-  color:var(--text);
-  padding:10px 14px;
-  border-radius:999px;
-  cursor:pointer;
-}
-.actions button:hover{opacity:.8}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-/* =========================
-   TABS
-========================= */
-.tabs{
-  display:flex;
-  gap:8px;
-  padding:0 16px 12px;
-}
-.tabs button{
-  flex:1;
-  padding:10px;
-  border-radius:999px;
-  border:none;
-  cursor:pointer;
-  background:var(--card);
-  color:var(--muted);
-}
-.tabs button.active{
-  background:var(--accent);
-  color:#000;
-  font-weight:700;
-}
+    <style>
+        /* DESIGN SYSTEM 5.0: THE ENTERPRISE CORE */
+        :root {
+            /* Palette Engineering */
+            --primary: #064e3b;
+            --primary-light: #0d9488;
+            --primary-soft: rgba(6, 78, 59, 0.05);
+            --accent: #d97706;
+            --bg-base: #f8fafc;
+            --bg-surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: rgba(15, 23, 42, 0.08);
+            
+            /* Sizing & Elevation */
+            --radius-md: 16px;
+            --radius-lg: 28px;
+            --radius-xl: 40px;
+            --shadow-lux: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-/* =========================
-   CONTENT
-========================= */
-main{padding:16px}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-  gap:14px;
-}
-.card{
-  background:var(--card);
-  border-radius:var(--radius);
-  padding:12px;
-  box-shadow:var(--shadow);
-  cursor:pointer;
-  transition:.25s;
-}
-.card:hover{transform:translateY(-4px)}
-.card .icon{
-  font-size:36px;
-  opacity:.8;
-}
-.card .title{
-  margin-top:8px;
-  font-size:14px;
-  font-weight:600;
-}
-.card .meta{
-  font-size:12px;
-  color:var(--muted);
-}
+        [data-theme="dark"] {
+            --bg-base: #020617;
+            --bg-surface: #0f172a;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --primary: #10b981;
+        }
 
-/* =========================
-   PLAYER
-========================= */
-.player{
-  position:fixed;
-  left:0;right:0;bottom:0;
-  background:var(--panel);
-  padding:10px 14px;
-  display:none;
-  gap:10px;
-  align-items:center;
-}
-.player.active{display:flex}
-.player button{
-  background:none;
-  border:none;
-  color:var(--text);
-  font-size:20px;
-  cursor:pointer;
-}
-.player .info{
-  flex:1;
-  overflow:hidden;
-}
-.player .info div{
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.player input[type=range]{width:100%}
+        /* --- GLOBAL RESET & ACCESSABILITY --- */
+        *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-base); color: var(--text-main);
+            direction: rtl; overflow-x: hidden; min-height: 100vh;
+            line-height: 1.6; transition: background 0.5s ease;
+        }
 
-/* =========================
-   MODAL
-========================= */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:100;
-}
-.modal.active{display:flex}
-.modal .box{
-  width:92%;
-  height:92%;
-  background:var(--panel);
-  border-radius:var(--radius);
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-}
-.modal header{
-  padding:10px;
-  display:flex;
-  justify-content:space-between;
-}
-.modal iframe{
-  flex:1;
-  width:100%;
-  border:none;
-}
+        .urdu { font-family: 'Noto Nastaliq Urdu', serif; line-height: 2.5; }
 
-/* =========================
-   FOOTER
-========================= */
-footer{
-  text-align:center;
-  padding:40px 16px 90px;
-  font-size:12px;
-  color:var(--muted);
-}
+        /* --- SMART HEADER --- */
+        .zn-header {
+            position: sticky; top: 0; z-index: 1000;
+            background: rgba(var(--bg-surface), 0.8); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); transition: transform 0.3s ease;
+        }
+        .nav-inner {
+            max-width: 1400px; margin: 0 auto; padding: 1rem 1.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .brand {
+            display: flex; align-items: center; gap: 12px;
+            text-decoration: none; color: var(--primary);
+            font-weight: 800; font-size: 1.6rem;
+        }
 
-<header>
-  <div class="topbar">
-    <div class="logo">Zikr-o-<span>Nazar</span></div>
-    <div class="search">
-      <input id="search" placeholder="Search Naat, Bayan, Book…">
-      <svg width="18" height="18"><circle cx="8" cy="8" r="7" stroke="currentColor" fill="none"/></svg>
-    </div>
-    <div class="actions">
-      <button id="themeBtn">🌓</button>
-    </div>
-  </div>
-  <div class="tabs">
-    <button class="active" data-tab="audio">Audio</button>
-    <button data-tab="pdf">Books</button>
-  </div>
-</header>
+        /* --- SEARCH ENGINE UI --- */
+        .hero { padding: 5rem 1.5rem 2rem; text-align: center; }
+        .search-area { max-width: 800px; margin: 0 auto 4rem; padding: 0 1.5rem; }
+        .search-wrapper {
+            background: var(--bg-surface); border-radius: 100px; border: 1px solid var(--border);
+            padding: 0.6rem; display: flex; align-items: center; box-shadow: var(--shadow-lux);
+            transition: var(--transition);
+        }
+        .search-wrapper:focus-within { border-color: var(--primary); transform: translateY(-5px); }
+        .search-input {
+            flex: 1; border: none; background: transparent; padding: 0.8rem 1.5rem;
+            font-size: 1.1rem; color: var(--text-main); outline: none;
+        }
 
-<main>
-  <div id="audio" class="grid"></div>
-  <div id="pdf" class="grid" style="display:none"></div>
-</main>
+        /* --- CONTENT DISCOVERY GRID --- */
+        .content-grid {
+            max-width: 1400px; margin: 0 auto; padding: 0 1.5rem 12rem;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2rem;
+        }
+        .asset-card {
+            background: var(--bg-surface); border-radius: var(--radius-md); border: 1px solid var(--border);
+            padding: 1.8rem; position: relative; transition: var(--transition);
+            display: flex; flex-direction: column; gap: 1.2rem;
+        }
+        .asset-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-lux); }
+        
+        .badge {
+            font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+            padding: 4px 12px; border-radius: 6px; width: fit-content;
+        }
+        .tag-naat { background: #dcfce7; color: #166534; }
+        .tag-book { background: #e0f2fe; color: #0369a1; }
 
-<footer>
-  Digital Islamic Library • Non-commercial • Educational purpose only
-</footer>
+        /* --- MASTER AUDIO CONTROLLER --- */
+        .audio-dock {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 2000;
+            background: var(--bg-surface); border-top: 1px solid var(--border);
+            padding: 1.2rem 2rem; transform: translateY(110%);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.05);
+        }
+        .audio-dock.active { transform: translateY(0); padding-bottom: calc(1.2rem + env(safe-area-inset-bottom)); }
+        
+        .dock-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 2fr 1fr; align-items: center; gap: 2.5rem; }
+        .progress-rail { height: 6px; background: var(--bg-base); border-radius: 10px; cursor: pointer; position: relative; }
+        .progress-fill { height: 100%; background: var(--primary); border-radius: 10px; width: 0%; transition: width 0.1s linear; }
 
-<!-- PLAYER -->
-<div class="player" id="player">
-  <button id="prev">⏮</button>
-  <button id="play">▶️</button>
-  <button id="next">⏭</button>
-  <div class="info">
-    <div id="nowTitle"></div>
-    <input type="range" id="seek" min="0" max="100" value="0">
-  </div>
-</div>
+        /* --- MODAL SYSTEM --- */
+        .modal { position: fixed; inset: 0; z-index: 3000; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: none; place-items: center; padding: 2rem; }
+        .modal-inner { background: white; width: 100%; max-width: 1100px; height: 90vh; border-radius: 24px; overflow: hidden; display: flex; flex-direction: column; }
 
-<!-- PDF MODAL -->
-<div class="modal" id="pdfModal">
-  <div class="box">
-    <header>
-      <div id="pdfTitle"></div>
-      <button onclick="closePDF()">✖</button>
+        /* --- NOTIFICATION TOASTS --- */
+        #toast-shelf { position: fixed; top: 1.5rem; left: 1.5rem; z-index: 4000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: var(--bg-surface); border-right: 5px solid var(--primary); padding: 1.2rem 2rem; border-radius: 12px; box-shadow: var(--shadow-lux); animation: slideIn 0.4s ease forwards; }
+        @keyframes slideIn { from { transform: translateX(-120%); } to { transform: translateX(0); } }
+
+        @media (max-width: 900px) {
+            .dock-grid { grid-template-columns: 1fr; gap: 1rem; text-align: center; }
+            .content-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body data-theme="light">
+
+    <div id="toast-shelf" role="alert" aria-live="polite"></div>
+
+    <header class="zn-header" id="main-header">
+        <nav class="nav-inner">
+            <a href="#" class="brand">
+                <span style="font-size: 2rem;">🕌</span>
+                <span class="urdu">ذکر و نظر</span>
+            </a>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <div class="urdu" id="hijri-clock" style="font-weight: 700; color: var(--primary);">Loading...</div>
+                <button id="theme-toggle" style="background:none; border:1px solid var(--border); padding:8px; border-radius:12px; cursor:pointer;">🌓</button>
+            </div>
+        </nav>
     </header>
-    <iframe id="pdfFrame"></iframe>
-  </div>
-</div>
 
-<audio id="audioEl"></audio>
-
-<script>
-/* =========================
-   STATE
-========================= */
-const state={
-  tab:'audio',
-  list:[],
-  index:0
-};
-const repo={
-  owner:'YOUR_GITHUB_USERNAME',
-  name:'YOUR_REPO_NAME',
-  branch:'main'
-};
-
-/* =========================
-   THEME
-========================= */
-const themeBtn=document.getElementById('themeBtn');
-const savedTheme=localStorage.getItem('theme');
-if(savedTheme)document.documentElement.dataset.theme=savedTheme;
-themeBtn.onclick=()=>{
-  const t=document.documentElement.dataset.theme==='light'?'':'light';
-  document.documentElement.dataset.theme=t;
-  localStorage.setItem('theme',t);
-};
-
-/* =========================
-   TABS
-========================= */
-document.querySelectorAll('.tabs button').forEach(b=>{
-  b.onclick=()=>{
-    document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-    state.tab=b.dataset.tab;
-    document.getElementById('audio').style.display=state.tab==='audio'?'grid':'none';
-    document.getElementById('pdf').style.display=state.tab==='pdf'?'grid':'none';
-  };
-});
-
-/* =========================
-   FETCH FILES
-========================= */
-async function loadFiles(){
-  const url=`https://api.github.com/repos/${repo.owner}/${repo.name}/contents`;
-  const res=await fetch(url);
-  const data=await res.json();
-  const audio=data.filter(f=>f.name.match(/\.(mp3|wav)$/i));
-  const pdf=data.filter(f=>f.name.match(/\.pdf$/i));
-  render(audio,'audio');
-  render(pdf,'pdf');
-}
-function render(files,type){
-  const box=document.getElementById(type);
-  box.innerHTML='';
-  files.forEach((f,i)=>{
-    const d=document.createElement('div');
-    d.className='card';
-    d.innerHTML=`
-      <div class="icon">${type==='audio'?'🎧':'📘'}</div>
-      <div class="title">${f.name}</div>
-      <div class="meta">${type.toUpperCase()}</div>`;
-    d.onclick=()=> type==='audio'?play(i,files):openPDF(f);
-    box.appendChild(d);
-  });
-}
-
-/* =========================
-   AUDIO
-========================= */
-const audioEl=document.getElementById('audioEl');
-const player=document.getElementById('player');
-const playBtn=document.getElementById('play');
-const seek=document.getElementById('seek');
-function play(i,list){
-  state.list=list;
-  state.index=i;
-  audioEl.src=list[i].download_url;
-  audioEl.play();
-  player.classList.add('active');
-  document.getElementById('nowTitle').textContent=list[i].name;
-  playBtn.textContent='⏸';
-}
-playBtn.onclick=()=>{
-  if(audioEl.paused){audioEl.play();playBtn.textContent='⏸'}
-  else{audioEl.pause();playBtn.textContent='▶️'}
-};
-audioEl.ontimeupdate=()=>{
-  seek.value=(audioEl.currentTime/audioEl.duration||0)*100;
-};
-seek.oninput=()=>{
-  audioEl.currentTime=(seek.value/100)*audioEl.duration;
-};
-document.getElementById('next').onclick=()=>{
-  if(state.index<state.list.length-1)play(state.index+1,state.list);
-};
-document.getElementById('prev').onclick=()=>{
-  if(state.index>0)play(state.index-1,state.list);
-};
-
-/* =========================
-   PDF
-========================= */
-function openPDF(f){
-  pdfModal.classList.add('active');
-  pdfFrame.src=f.download_url;
-  pdfTitle.textContent=f.name;
-}
-function closePDF(){
-  pdfModal.classList.remove('active');
-  pdfFrame.src='';
-}
-
-/* =========================
-   SEARCH
-========================= */
-document.getElementById('search').oninput=e=>{
-  const q=e.target.value.toLowerCase();
-  document.querySelectorAll('.card').forEach(c=>{
-    c.style.display=c.innerText.toLowerCase().includes(q)?'':'none';
-  });
-};
-
-loadFiles();
-</script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="ur" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Zikr-o-Nazar | Offline Islamic Library</title>
-
-<meta name="description" content="Zikr-o-Nazar – Professional Islamic Digital Library with Offline Audio & Books">
-<meta name="theme-color" content="#064e3b">
-
-<link rel="manifest" href="data:application/json,{
-  &quot;name&quot;:&quot;Zikr-o-Nazar&quot;,
-  &quot;short_name&quot;:&quot;Zikr&quot;,
-  &quot;start_url&quot;:&quot;.&quot;,
-  &quot;display&quot;:&quot;standalone&quot;,
-  &quot;background_color&quot;:&quot;#020617&quot;,
-  &quot;theme_color&quot;:&quot;#064e3b&quot;,
-  &quot;icons&quot;:[{
-    &quot;src&quot;:&quot;https://cdn-icons-png.flaticon.com/512/4205/4205906.png&quot;,
-    &quot;sizes&quot;:&quot;512x512&quot;,
-    &quot;type&quot;:&quot;image/png&quot;
-  }]
-}">
-
-<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-
-<style>
-:root{
---primary:#064e3b;
---bg:#020617;
---surface:#0f172a;
---text:#f1f5f9;
---muted:#94a3b8;
---border:rgba(255,255,255,.08);
---radius:18px;
-}
-*{box-sizing:border-box}
-body{
-margin:0;
-font-family:'Plus Jakarta Sans',sans-serif;
-background:var(--bg);
-color:var(--text);
-min-height:100vh;
-}
-.urdu{font-family:'Noto Nastaliq Urdu';line-height:2.3}
-header{
-position:sticky;top:0;z-index:100;
-background:rgba(15,23,42,.9);
-backdrop-filter:blur(14px);
-border-bottom:1px solid var(--border);
-}
-nav{
-max-width:1300px;
-margin:auto;
-padding:1rem;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-.brand{
-display:flex;gap:10px;
-align-items:center;
-font-weight:800;
-font-size:1.4rem;
-color:#10b981;
-}
-main{max-width:1300px;margin:auto;padding:1.5rem}
-.search{
-background:var(--surface);
-border:1px solid var(--border);
-border-radius:999px;
-padding:.7rem 1.2rem;
-display:flex;
-gap:10px;
-align-items:center;
-}
-.search input{
-flex:1;
-background:none;
-border:none;
-outline:none;
-color:var(--text);
-font-size:1rem;
-}
-.grid{
-margin-top:1.5rem;
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
-gap:1.2rem;
-}
-.card{
-background:var(--surface);
-border:1px solid var(--border);
-border-radius:var(--radius);
-padding:1.4rem;
-display:flex;
-flex-direction:column;
-gap:.8rem;
-transition:.3s;
-}
-.card:hover{transform:translateY(-5px);border-color:#10b981}
-.tag{
-font-size:.7rem;
-font-weight:800;
-padding:4px 10px;
-border-radius:6px;
-width:max-content;
-}
-.audio{background:#064e3b;color:#ecfdf5}
-.book{background:#075985;color:#e0f2fe}
-button,a.btn{
-padding:.7rem;
-border-radius:12px;
-border:none;
-cursor:pointer;
-font-weight:700;
-}
-.play{background:#10b981;color:#022c22}
-.down{background:#020617;border:1px solid var(--border);color:var(--text)}
-.player{
-position:fixed;
-bottom:0;left:0;right:0;
-background:var(--surface);
-border-top:1px solid var(--border);
-padding:1rem;
-transform:translateY(120%);
-transition:.4s;
-}
-.player.active{transform:translateY(0)}
-.progress{height:6px;background:#020617;border-radius:10px;overflow:hidden}
-.bar{height:100%;width:0;background:#10b981}
-.install{
-position:fixed;
-bottom:90px;
-right:20px;
-background:#10b981;
-color:#022c22;
-padding:.8rem 1.1rem;
-border-radius:999px;
-font-weight:800;
-display:none;
-z-index:999;
-}
-.offline{
-position:fixed;
-top:0;left:0;right:0;
-background:#7c2d12;
-color:#fff;
-text-align:center;
-padding:.5rem;
-display:none;
-z-index:200;
-}
-
-<div class="offline" id="offlineBar">آپ اس وقت آف لائن ہیں</div>
-
-<header>
-<nav>
-<div class="brand">🕌 <span class="urdu">ذکر و نظر</span></div>
-<span id="count" style="font-size:.8rem;color:var(--muted)">Indexing…</span>
-</nav>
-</header>
-
-<main>
-<div class="search">
-🔍 <input id="q" placeholder="نعت یا کتاب تلاش کریں…">
-</div>
-<div class="grid" id="grid"></div>
-</main>
-
-<div class="player" id="player">
-<div class="urdu" id="ptitle">—</div>
-<div style="font-size:.8rem;color:var(--muted)" id="partist">—</div>
-<div class="progress" id="seek"><div class="bar" id="bar"></div></div>
-<div style="margin-top:.6rem;text-align:center">
-<button id="toggle">▶</button>
-</div>
-</div>
-
-<button class="install" id="installBtn">📲 Install App</button>
-
-<audio id="audio"></audio>
-
-<script>
-/* ================= CONFIG ================= */
-const REPO={
-owner:'Sohilhusain86',
-name:'HARDRISK',
-branch:'main'
-};
-const API=`https://api.github.com/repos/${REPO.owner}/${REPO.name}/contents/`;
-const RAW=`https://github.com/${REPO.owner}/${REPO.name}/raw/${REPO.branch}/`;
-
-/* ================= STATE ================= */
-const state={
-list:[],
-playlist:[],
-index:-1,
-deferred:null
-};
-
-/* ================= DOM ================= */
-const grid=document.getElementById('grid');
-const q=document.getElementById('q');
-const audio=document.getElementById('audio');
-const player=document.getElementById('player');
-const bar=document.getElementById('bar');
-
-/* ================= INIT ================= */
-init();
-async function init(){
-await loadFiles();
-bind();
-registerSW();
-}
-
-/* ================= LOAD ================= */
-async function loadFiles(){
-const r=await fetch(API);
-const f=await r.json();
-state.list=f.filter(x=>x.name.endsWith('.mp3')||x.name.endsWith('.pdf'))
-.map(x=>{
-const isAudio=x.name.endsWith('.mp3');
-return{
-id:btoa(x.name),
-title:decodeURIComponent(x.name).replace(/\.(mp3|pdf)/,''),
-artist:'Zikr-o-Nazar',
-type:isAudio?'audio':'book',
-url:RAW+x.name
-};
-});
-document.getElementById('count').innerText=
-`${state.list.filter(x=>x.type==='audio').length} Naats | ${state.list.filter(x=>x.type==='book').length} Books`;
-render();
-}
-
-/* ================= RENDER ================= */
-function render(v=''){
-grid.innerHTML='';
-state.list.filter(i=>i.title.toLowerCase().includes(v.toLowerCase()))
-.forEach(i=>{
-const d=document.createElement('div');
-d.className='card';
-d.innerHTML=`
-<div class="tag ${i.type}">${i.type==='audio'?'Naat':'Book'}</div>
-<div class="urdu">${i.title}</div>
-<div style="display:flex;gap:10px;margin-top:auto">
-<button class="play" onclick="openItem('${i.id}')">${i.type==='audio'?'▶ سنیں':'📖 پڑھیں'}</button>
-<a class="btn down" href="${i.url}" download>📥</a>
-</div>`;
-grid.appendChild(d);
-});
-}
-
-/* ================= ACTION ================= */
-function openItem(id){
-const item=state.list.find(x=>x.id===id);
-if(item.type==='audio'){
-state.playlist=state.list.filter(x=>x.type==='audio');
-state.index=state.playlist.findIndex(x=>x.id===id);
-play(item);
-}else{
-window.open(item.url,'_blank');
-}
-}
-
-function play(i){
-audio.src=i.url;
-audio.play();
-player.classList.add('active');
-document.getElementById('ptitle').innerText=i.title;
-document.getElementById('partist').innerText=i.artist;
-document.getElementById('toggle').innerText='⏸';
-}
-
-document.getElementById('toggle').onclick=()=>{
-if(audio.paused){audio.play();toggle.innerText='⏸'}
-else{audio.pause();toggle.innerText='▶'}
-};
-
-audio.ontimeupdate=()=>{
-bar.style.width=(audio.currentTime/audio.duration*100)+'%';
-};
-
-/* ================= SEARCH ================= */
-q.oninput=e=>render(e.target.value);
-
-/* ================= OFFLINE ================= */
-window.addEventListener('online',()=>offlineBar.style.display='none');
-window.addEventListener('offline',()=>offlineBar.style.display='block');
-
-/* ================= INSTALL ================= */
-window.addEventListener('beforeinstallprompt',e=>{
-e.preventDefault();
-state.deferred=e;
-installBtn.style.display='block';
-});
-installBtn.onclick=()=>{
-state.deferred.prompt();
-installBtn.style.display='none';
-};
-
-/* ================= SERVICE WORKER ================= */
-function registerSW(){
-if(!('serviceWorker'in navigator))return;
-const sw=`
-const CACHE='zikr-cache-v2';
-self.addEventListener('install',e=>{
-e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./'])));
-});
-self.addEventListener('fetch',e=>{
-e.respondWith(
-caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{
-const copy=res.clone();
-caches.open(CACHE).then(c=>c.put(e.request,copy));
-return res;
-}).catch(()=>r))
-);
-});
-`;
-const blob=new Blob([sw],{type:'text/javascript'});
-navigator.serviceWorker.register(URL.createObjectURL(blob));
-}
-CENTRAL CONFIG
-========================= */
-const CONFIG = {
-  version: "1.0.0",
-  storageKey: "zikr_o_nazar_prefs",
-  audioKey: "zikr_o_nazar_audio",
-  cacheName: "zikr-o-nazar-cache-v1",
-  maxDownloadPerMinute: 3
-};
-
-/* =========================
-SAFE STORAGE
-========================= */
-const SafeStorage = (() => {
-  let memory = {};
-  function isAvailable() {
-    try {
-      const t = "__t";
-      localStorage.setItem(t, t);
-      localStorage.removeItem(t);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-  const ok = isAvailable();
-  return {
-    get(k, d = null) {
-      try {
-        return ok ? JSON.parse(localStorage.getItem(k)) ?? d : memory[k] ?? d;
-      } catch {
-        return d;
-      }
-    },
-    set(k, v) {
-      try {
-        ok ? localStorage.setItem(k, JSON.stringify(v)) : (memory[k] = v);
-      } catch {}
-    }
-  };
-})();
-
-/* =========================
-THEME & PREFERENCES
-========================= */
-const Preferences = (() => {
-  const defaults = {
-    theme: "system",
-    fontScale: 1,
-    reducedMotion: false,
-    volume: 0.8
-  };
-  let state = { ...defaults, ...SafeStorage.get(CONFIG.storageKey, {}) };
-
-  function apply() {
-    const root = document.documentElement;
-    let theme = state.theme;
-    if (theme === "system") {
-      theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    }
-    root.dataset.theme = theme;
-    root.style.fontSize = `${state.fontScale * 100}%`;
-    root.dataset.motion = state.reducedMotion ? "reduced" : "normal";
-  }
-
-  function save() {
-    SafeStorage.set(CONFIG.storageKey, state);
-  }
-
-  apply();
-
-  return {
-    get: () => state,
-    set(k, v) {
-      state[k] = v;
-      apply();
-      save();
-    }
-  };
-})();
-
-/* =========================
-DATE & HIJRI ENGINE
-========================= */
-const DateEngine = (() => {
-  function hijriFromGregorian(date) {
-    const jd = Math.floor((date / 86400000) + 2440587.5);
-    const l = jd - 1948440 + 10632;
-    const n = Math.floor((l - 1) / 10631);
-    const r = l - 10631 * n + 354;
-    const j = (Math.floor((10985 - r) / 5316)) *
-              (Math.floor((50 * r) / 17719)) +
-              (Math.floor(r / 5670)) *
-              (Math.floor((43 * r) / 15238));
-    const r2 = r - (Math.floor((30 - j) / 15)) *
-               (Math.floor((17719 * j) / 50)) -
-               (Math.floor(j / 16)) *
-               (Math.floor((15238 * j) / 43)) + 29;
-    const m = Math.floor((24 * r2) / 709);
-    const d = r2 - Math.floor((709 * m) / 24);
-    const y = 30 * n + j - 30;
-    return { d, m, y };
-  }
-
-  function format() {
-    const now = new Date();
-    const hijri = hijriFromGregorian(now.getTime());
-    return {
-      gregorian: now.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }),
-      hijri: `${hijri.d} / ${hijri.m} / ${hijri.y} AH`
-    };
-  }
-
-  return { format };
-})();
-
-/* =========================
-AUDIO ENTERPRISE ENGINE
-========================= */
-const AudioEngine = (() => {
-  let audio = new Audio();
-  audio.preload = "metadata";
-  audio.volume = Preferences.get().volume;
-
-  let state = SafeStorage.get(CONFIG.audioKey, {
-    src: null,
-    time: 0,
-    playing: false
-  });
-
-  function load(src) {
-    if (audio.src !== src) {
-      audio.src = src;
-      audio.currentTime = 0;
-    }
-  }
-
-  function play(src) {
-    load(src);
-    audio.play().catch(() => {});
-    state.src = src;
-    state.playing = true;
-    persist();
-  }
-
-  function pause() {
-    audio.pause();
-    state.playing = false;
-    persist();
-  }
-
-  function stop() {
-    audio.pause();
-    audio.currentTime = 0;
-    state.playing = false;
-    persist();
-  }
-
-  function persist() {
-    state.time = audio.currentTime;
-    SafeStorage.set(CONFIG.audioKey, state);
-  }
-
-  audio.addEventListener("timeupdate", persist);
-  audio.addEventListener("volumechange", () => {
-    Preferences.set("volume", audio.volume);
-  });
-
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) persist();
-  });
-
-  return { play, pause, stop, audio };
-})();
-
-/* =========================
-CONTENT DATA (AUDIO + BOOKS)
-========================= */
-const ContentStore = {
-  audio: [
-    { id: 1, title: "Naat-e-Rasool ﷺ", src: "audio/naat1.mp3", category: "Naat", views: 0 },
-    { id: 2, title: "Salam Ya Nabi ﷺ", src: "audio/naat2.mp3", category: "Naat", views: 0 }
-  ],
-  books: [
-    { id: 1, title: "Seerat-un-Nabi ﷺ", file: "books/seerat.pdf", views: 0 }
-  ]
-};
-
-/* =========================
-SEARCH & FILTER ENGINE
-========================= */
-const SearchEngine = (() => {
-  function search(q) {
-    q = q.trim().toLowerCase();
-    if (!q) return ContentStore;
-    return {
-      audio: ContentStore.audio.filter(a => a.title.toLowerCase().includes(q)),
-      books: ContentStore.books.filter(b => b.title.toLowerCase().includes(q))
-    };
-  }
-  return { search };
-})();
-
-/* =========================
-PDF VIEWER ENGINE
-========================= */
-const PDFEngine = (() => {
-  let currentURL = null;
-  function open(file) {
-    close();
-    currentURL = file;
-    const iframe = document.createElement("iframe");
-    iframe.src = file;
-    iframe.setAttribute("aria-label", "PDF Viewer");
-    iframe.style.width = "100%";
-    iframe.style.height = "100%";
-    document.getElementById("pdf-modal-body").appendChild(iframe);
-    document.getElementById("pdf-modal").hidden = false;
-  }
-  function close() {
-    const body = document.getElementById("pdf-modal-body");
-    body.innerHTML = "";
-    document.getElementById("pdf-modal").hidden = true;
-    currentURL = null;
-  }
-  return { open, close };
-})();
-
-/* =========================
-OFFLINE SERVICE WORKER
-========================= */
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js").catch(() => {});
-  });
-}
-
-/* =========================
-INIT
-========================= */
-document.addEventListener("DOMContentLoaded", () => {
-  const dates = DateEngine.format();
-  const g = document.getElementById("gregorian-date");
-  const h = document.getElementById("hijri-date");
-  if (g) g.textContent = dates.gregorian;
-  if (h) h.textContent = dates.hijri;
-});
-</script>
-
-<!-- =========================
-PART 3 END
-NEXT PART = UI RENDERING + SERVICE WORKER INLINE
-========================= -->
-</html>
-<!-- =========================
-PART 4 – MEGA FEATURES LAYER
-UI RENDERING • SEARCH • INTERACTIONS • OFFLINE • SECURITY
-PROJECT: Zikr-o-Nazar
-========================= -->
-
-<script>
-/* =========================
-DOM HELPERS (SAFE)
-========================= */
-const DOM = {
-  qs: (s, r = document) => r.querySelector(s),
-  qsa: (s, r = document) => Array.from(r.querySelectorAll(s)),
-  el(tag, attrs = {}, text) {
-    const e = document.createElement(tag);
-    for (const k in attrs) e.setAttribute(k, attrs[k]);
-    if (text) e.textContent = text;
-    return e;
-  },
-  clear(n) {
-    while (n.firstChild) n.removeChild(n.firstChild);
-  }
-};
-
-/* =========================
-SCROLL SYSTEM
-========================= */
-(() => {
-  const bar = DOM.qs("#scroll-progress");
-  if (!bar) return;
-  const onScroll = () => {
-    const h = document.documentElement;
-    const scrolled = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
-    bar.style.width = scrolled + "%";
-  };
-  window.addEventListener("scroll", onScroll, { passive: true });
-})();
-
-/* =========================
-HEADER AUTO-HIDE
-========================= */
-(() => {
-  const header = DOM.qs("header");
-  if (!header) return;
-  let last = 0;
-  window.addEventListener("scroll", () => {
-    const y = window.scrollY;
-    header.classList.toggle("hide", y > last && y > 80);
-    last = y;
-  }, { passive: true });
-})();
-
-/* =========================
-AUDIO UI RENDER
-========================= */
-function renderAudio(list) {
-  const wrap = DOM.qs("#audio-list");
-  if (!wrap) return;
-  DOM.clear(wrap);
-  list.forEach(item => {
-    const card = DOM.el("div", { class: "card audio-card", tabindex: "0" });
-    const title = DOM.el("h3", {}, item.title);
-    const play = DOM.el("button", { class: "btn play" }, "▶");
-    const stop = DOM.el("button", { class: "btn stop" }, "■");
-
-    play.addEventListener("click", () => AudioEngine.play(item.src));
-    stop.addEventListener("click", () => AudioEngine.stop());
-
-    card.append(title, play, stop);
-    wrap.appendChild(card);
-  });
-}
-
-/* =========================
-BOOK UI RENDER
-========================= */
-function renderBooks(list) {
-  const wrap = DOM.qs("#book-list");
-  if (!wrap) return;
-  DOM.clear(wrap);
-  list.forEach(item => {
-    const card = DOM.el("div", { class: "card book-card", tabindex: "0" });
-    const title = DOM.el("h3", {}, item.title);
-    const open = DOM.el("button", { class: "btn open" }, "Open");
-
-    open.addEventListener("click", () => PDFEngine.open(item.file));
-
-    card.append(title, open);
-    wrap.appendChild(card);
-  });
-}
-
-/* =========================
-SEARCH UI BINDING
-========================= */
-(() => {
-  const input = DOM.qs("#search");
-  if (!input) return;
-  let t;
-  input.addEventListener("input", e => {
-    clearTimeout(t);
-    t = setTimeout(() => {
-      const res = SearchEngine.search(e.target.value);
-      renderAudio(res.audio);
-      renderBooks(res.books);
-    }, 200);
-  });
-})();
-
-/* =========================
-THEME TOGGLE
-========================= */
-(() => {
-  const btn = DOM.qs("#theme-toggle");
-  if (!btn) return;
-  btn.addEventListener("click", () => {
-    const cur = Preferences.get().theme;
-    Preferences.set("theme", cur === "dark" ? "light" : "dark");
-  });
-})();
-
-/* =========================
-REDUCED MOTION TOGGLE
-========================= */
-(() => {
-  const btn = DOM.qs("#motion-toggle");
-  if (!btn) return;
-  btn.addEventListener("click", () => {
-    Preferences.set("reducedMotion", !Preferences.get().reducedMotion);
-  });
-})();
-
-/* =========================
-DOWNLOAD THROTTLING
-========================= */
-const DownloadGuard = (() => {
-  let timestamps = [];
-  return {
-    allow() {
-      const now = Date.now();
-      timestamps = timestamps.filter(t => now - t < 60000);
-      if (timestamps.length >= CONFIG.maxDownloadPerMinute) return false;
-      timestamps.push(now);
-      return true;
-    }
-  };
-})();
-
-/* =========================
-VISIBILITY & CLEANUP
-========================= */
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) AudioEngine.pause();
-});
-
-/* =========================
-INSTALL PROMPT HANDLER
-========================= */
-let deferredPrompt;
-window.addEventListener("beforeinstallprompt", e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  const btn = DOM.qs("#install-app");
-  if (btn) btn.hidden = false;
-});
-(() => {
-  const btn = DOM.qs("#install-app");
-  if (!btn) return;
-  btn.addEventListener("click", async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    btn.hidden = true;
-  });
-})();
-
-/* =========================
-INITIAL RENDER
-========================= */
-document.addEventListener("DOMContentLoaded", () => {
-  renderAudio(ContentStore.audio);
-  renderBooks(ContentStore.books);
-  const year = DOM.qs("#year");
-  if (year) year.textContent = new Date().getFullYear();
-});
-</script>
-
-<!-- =========================
-PART 4 END
-NEXT PART = SERVICE WORKER INLINE + SEO + FINAL HARDENING
-========================= -->
-</html>
-<!-- =========================
-PART 5 – FINAL PACK (ULTIMATE HARDENING)
-SERVICE WORKER • OFFLINE • SEO • STRUCTURED DATA
-PROJECT: Zikr-o-Nazar
-========================= -->
-
-<script>
-/* =========================
-INLINE SERVICE WORKER
-========================= */
-(function(){
-  if(!('serviceWorker' in navigator)) return;
-
-  const swCode = `
-    const CACHE_NAME = 'zikr-o-nazar-v1';
-    const OFFLINE_URL = '/';
-    const CORE_ASSETS = [OFFLINE_URL];
-
-    self.addEventListener('install', e=>{
-      e.waitUntil(
-        caches.open(CACHE_NAME).then(c=>c.addAll(CORE_ASSETS))
-      );
-      self.skipWaiting();
-    });
-
-    self.addEventListener('activate', e=>{
-      e.waitUntil(
-        caches.keys().then(keys=>{
-          return Promise.all(
-            keys.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k))
-          );
-        })
-      );
-      self.clients.claim();
-    });
-
-    self.addEventListener('fetch', e=>{
-      if(e.request.method!=='GET') return;
-      e.respondWith(
-        caches.match(e.request).then(r=>{
-          return r || fetch(e.request).then(res=>{
-            const copy=res.clone();
-            caches.open(CACHE_NAME).then(c=>c.put(e.request,copy));
-            return res;
-          }).catch(()=>caches.match(OFFLINE_URL));
-        })
-      );
-    });
-  `;
-
-  const blob = new Blob([swCode],{type:'text/javascript'});
-  const url = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(url);
-})();
-</script>
-
-<!-- =========================
-SEO META (DYNAMIC SAFE)
-========================= -->
-<script>
-(function(){
-  const head=document.head;
-  const set=(n,c)=>{
-    let m=document.querySelector('meta[name="'+n+'"]');
-    if(!m){m=document.createElement('meta');m.name=n;head.appendChild(m);}
-    m.content=c;
-  };
-  set('description','Zikr-o-Nazar Islamic knowledge and media platform');
-  set('robots','index, follow');
-})();
-</script>
-
-<!-- =========================
-JSON-LD STRUCTURED DATA
-========================= -->
-<script type="application/ld+json">
-{
-  "@context":"https://schema.org",
-  "@type":"WebApplication",
-  "name":"Zikr-o-Nazar",
-  "applicationCategory":"Education",
-  "operatingSystem":"All",
-  "description":"Islamic digital knowledge and media platform"
-}
-</script>
-
-<!-- =========================
-GLOBAL ERROR BOUNDARY
-========================= -->
-<script>
-window.addEventListener('error',()=>{
-  document.body.classList.add('error-safe');
-});
-window.addEventListener('unhandledrejection',()=>{
-  document.body.classList.add('error-safe');
-});
-</script>
-
-<!-- =========================
-FINAL CLEANUP
-========================= -->
-<script>
-window.addEventListener('pagehide',()=>{
-  AudioEngine.stop();
-});
-</script>
-
+    <main>
+        <section class="hero">
+            <h1 class="urdu" style="font-size: clamp(3rem, 10vw, 5rem); color: var(--primary); margin: 0;">ذکر و نظر</h1>
+            <p class="urdu" style="font-size: 1.3rem; color: var(--text-muted);">اعلیٰ حضرت کی نعتیں اور مستند اسلامی کتب کا ڈیجیٹل مرکز</p>
+        </section>
+
+        <section class="search-area">
+            <div class="search-wrapper">
+                <input type="text" id="global-search" class="search-input urdu" placeholder="نعت، کتاب یا نعت خواں تلاش کریں..." />
+                <button class="urdu" style="background:var(--primary); color:white; border:none; padding:10px 25px; border-radius:50px; cursor:pointer;">تلاش</button>
+            </div>
+        </section>
+
+        <div id="asset-grid" class="content-grid">
+            </div>
+    </main>
+
+    <footer class="audio-dock" id="global-player">
+        <div class="dock-grid">
+            <div class="track-meta">
+                <div id="p-title" class="urdu" style="font-weight: 700; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">ٹریک</div>
+                <div id="p-artist" style="font-size: 0.85rem; color: var(--text-muted);">فنکار</div>
+            </div>
+            <div class="player-core">
+                <div class="progress-rail" id="p-seek-area">
+                    <div class="progress-fill" id="p-fill"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-top: 8px; font-family: monospace;">
+                    <span id="p-cur">00:00</span>
+                    <span id="p-dur">00:00</span>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 10px;">
+                    <button id="p-toggle" style="width:56px; height:56px; border-radius:50%; border:none; background:var(--primary); color:white; font-size:1.5rem; cursor:pointer;">▶</button>
+                    <button id="p-stop" style="background:none; border:1px solid var(--border); padding:5px 15px; border-radius:10px; cursor:pointer;">⏹</button>
+                </div>
+            </div>
+            <div class="vol-control" style="display: flex; align-items: center; gap: 10px; justify-content: flex-end;">
+                <span>🔊</span>
+                <input type="range" id="p-vol" min="0" max="1" step="0.1" value="0.8" style="width: 80px;">
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal" id="reader-modal">
+        <div class="modal-inner">
+            <div style="padding: 1rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                <h3 id="modal-label" class="urdu" style="margin:0;">مطالعہ کتب</h3>
+                <button onclick="document.getElementById('reader-modal').style.display='none'" style="cursor:pointer; border:none; background:none; font-size:1.2rem;">✕</button>
+            </div>
+            <iframe id="reader-frame" style="flex:1; border:none; background: #525659;"></iframe>
+        </div>
+    </div>
+
+    <audio id="core-engine" preload="none"></audio>
+
+    <script>
+        /**
+         * ZIKR-O-NAZAR | ENTERPRISE CORE ENGINE
+         * Logic for: Auto-Indexing, Media Management, Persistent State
+         */
+
+        const CONFIG = {
+            brand: 'Zikr-o-Nazar',
+            baseUrl: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/',
+            apiBase: 'https://api.github.com/repos/Sohilhusain86/HARDRISK/contents/',
+            storageKey: 'zn_pro_state'
+        };
+
+        const Core = {
+            state: {
+                registry: [],
+                activeAsset: null,
+                theme: 'light',
+                volume: 0.8
+            },
+
+            async init() {
+                this.setupListeners();
+                this.updateHijri();
+                await this.scanRepository();
+            },
+
+            async scanRepository() {
+                this.toast("ڈیٹا اپڈیٹ ہو رہا ہے...");
+                try {
+                    const response = await fetch(CONFIG.apiBase);
+                    const files = await response.json();
+                    
+                    this.state.registry = files.filter(f => f.type === 'file' && (f.name.endsWith('.mp3') || f.name.endsWith('.pdf')))
+                        .map(f => {
+                            const isAudio = f.name.endsWith('.mp3');
+                            const meta = this.parseMeta(f.name);
+                            return {
+                                id: btoa(f.name),
+                                title: meta.title,
+                                artist: meta.artist,
+                                type: isAudio ? 'audio' : 'book',
+                                url: CONFIG.baseUrl + f.name
+                            };
+                        });
+                    this.render(this.state.registry);
+                } catch (e) {
+                    this.toast("سرور سے رابطہ نہ ہو سکا", "danger");
+                }
+            },
+
+            parseMeta(name) {
+                let clean = decodeURIComponent(name).replace(/\.(mp3|pdf)$/i, '');
+                let parts = clean.split(/[_-]/);
+                return {
+                    title: parts[0]?.trim() || clean,
+                    artist: parts[1]?.trim() || 'Zikr-o-Nazar Archive'
+                };
+            },
+
+            render(list) {
+                const grid = document.getElementById('asset-grid');
+                grid.innerHTML = '';
+                list.forEach(item => {
+                    const isAudio = item.type === 'audio';
+                    const card = document.createElement('div');
+                    card.className = 'asset-card';
+                    card.innerHTML = `
+                        <div class="badge ${isAudio ? 'tag-naat' : 'tag-book'}">${isAudio ? 'Audio Naat' : 'Digital Book'}</div>
+                        <h3 class="urdu" style="margin:0; font-size:1.4rem;">${item.title}</h3>
+                        <p style="color:var(--text-muted); font-size:0.9rem;">${item.artist}</p>
+                        <div style="display:flex; gap:10px; margin-top:auto;">
+                            <button onclick="Core.handleAction('${item.id}')" style="flex:1; padding:12px; border:none; border-radius:12px; background:var(--primary); color:white; font-weight:700; cursor:pointer;">
+                                ${isAudio ? '▶ سنیں' : '📖 پڑھیں'}
+                            </button>
+                            <a href="${item.url}" download style="padding:12px; border:1px solid var(--border); border-radius:12px; text-decoration:none;">📥</a>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            },
+
+            handleAction(id) {
+                const asset = this.state.registry.find(a => a.id === id);
+                if (!asset) return;
+                
+                if (asset.type === 'audio') this.playAudio(asset);
+                else this.openBook(asset);
+            },
+
+            playAudio(asset) {
+                const engine = document.getElementById('core-engine');
+                if (this.state.activeAsset?.id === asset.id) {
+                    this.togglePlay();
+                    return;
+                }
+                this.state.activeAsset = asset;
+                engine.src = asset.url;
+                engine.play();
+                document.getElementById('global-player').classList.add('active');
+                document.getElementById('p-title').innerText = asset.title;
+                document.getElementById('p-artist').innerText = asset.artist;
+                document.getElementById('p-toggle').innerText = '⏸';
+                this.toast(asset.title + " چل رہا ہے");
+            },
+
+            togglePlay() {
+                const engine = document.getElementById('core-engine');
+                if (engine.paused) {
+                    engine.play();
+                    document.getElementById('p-toggle').innerText = '⏸';
+                } else {
+                    engine.pause();
+                    document.getElementById('p-toggle').innerText = '▶';
+                }
+            },
+
+            openBook(asset) {
+                document.getElementById('modal-label').innerText = asset.title;
+                document.getElementById('reader-frame').src = `https://docs.google.com/viewer?url=${encodeURIComponent(asset.url)}&embedded=true`;
+                document.getElementById('reader-modal').style.display = 'grid';
+            },
+
+            setupListeners() {
+                const engine = document.getElementById('core-engine');
+                const search = document.getElementById('global-search');
+
+                search.oninput = (e) => {
+                    const q = e.target.value.toLowerCase();
+                    const filtered = this.state.registry.filter(a => a.title.toLowerCase().includes(q) || a.artist.toLowerCase().includes(q));
+                    this.render(filtered);
+                };
+
+                engine.ontimeupdate = () => {
+                    const per = (engine.currentTime / engine.duration) * 100;
+                    document.getElementById('p-fill').style.width = per + '%';
+                    document.getElementById('p-cur').innerText = this.fmtTime(engine.currentTime);
+                    document.getElementById('p-dur').innerText = this.fmtTime(engine.duration || 0);
+                };
+
+                document.getElementById('p-toggle').onclick = () => this.togglePlay();
+                document.getElementById('p-stop').onclick = () => {
+                    engine.pause();
+                    document.getElementById('global-player').classList.remove('active');
+                };
+
+                document.getElementById('theme-toggle').onclick = () => {
+                    this.state.theme = this.state.theme === 'light' ? 'dark' : 'light';
+                    document.body.dataset.theme = this.state.theme;
+                };
+
+                document.getElementById('p-vol').oninput = (e) => engine.volume = e.target.value;
+                
+                document.getElementById('p-seek-area').onclick = (e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const pos = (e.clientX - rect.left) / rect.width;
+                    engine.currentTime = pos * engine.duration;
+                };
+            },
+
+            fmtTime(s) {
+                const m = Math.floor(s / 60);
+                const r = Math.floor(s % 60);
+                return `${m.toString().padStart(2, '0')}:${r.toString().padStart(2, '0')}`;
+            },
+
+            updateHijri() {
+                const now = new Date();
+                const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-uma', {day:'numeric', month:'long', year:'numeric'}).format(now);
+                document.getElementById('hijri-clock').innerText = hijri;
+            },
+
+            toast(msg) {
+                const t = document.createElement('div');
+                t.className = 'toast urdu';
+                t.innerText = msg;
+                document.getElementById('toast-shelf').appendChild(t);
+                setTimeout(() => t.remove(), 4000);
+            }
+        };
+
+        window.onload = () => Core.init();
+    </script>
 </body>
 </html>
