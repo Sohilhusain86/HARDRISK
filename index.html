@@ -1,438 +1,1086 @@
 <!DOCTYPE html>
-<html lang="ur" dir="rtl" class="no-js">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
-    <meta name="description" content="Zikr-o-Nazar: The definitive Islamic Digital Library. Premium Naats and authentic PDF Books in a high-performance environment." />
-    <meta name="theme-color" id="theme-meta" content="#064e3b" />
-    <title>Zikr-o-Nazar | Islamic Digital Platform</title>
+<html lang="ur" dir="rtl">
+[data-theme="dark"] {
+        --background: #020617;
+        --surface: #0f172a;
+        --text: #f1f5f9;
+        --text-low: #94a3b8;
+        --border: rgba(255, 255, 255, 0.06);
+        --primary: #10b981;
+        --accent: #fdba74;
+    }
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        outline-offset: 4px;
+        margin: 0;
+        padding: 0;
+    }
 
-    <style>
-        :root {
-            /* Enterprise Design System */
-            --p-h: 162; --p-s: 84%; --p-l: 14%;
-            --primary: hsl(var(--p-h), var(--p-s), var(--p-l));
-            --primary-soft: hsla(var(--p-h), var(--p-s), var(--p-l), 0.08);
-            --accent: #b45309;
-            --bg: #f8fafc;
-            --surface: #ffffff;
-            --text: #0f172a;
-            --text-low: #64748b;
-            --border: rgba(15, 23, 42, 0.08);
-            --radius-xl: 32px;
-            --radius-lg: 20px;
-            --shadow-lux: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
-            --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            --safe-bottom: env(safe-area-inset-bottom);
+    body {
+        background: var(--background);
+        color: var(--text);
+        font-family: var(--font-sans);
+        transition: var(--transition-medium);
+        overflow-x: hidden;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        line-height: 1.6;
+    }
+
+    .urdu {
+        font-family: var(--font-urdu);
+        line-height: 2.4;
+        direction: rtl;
+        text-align: right;
+    }
+
+    .header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: rgba(var(--surface), 0.8);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+        transition: var(--transition-medium);
+    }
+
+    .nav-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: var(--spacing-medium) var(--spacing-large);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        font-size: var(--font-size-title);
+        font-weight: var(--font-weight-bold);
+        color: var(--primary);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-small);
+    }
+
+    .controls {
+        display: flex;
+        gap: var(--spacing-small);
+    }
+
+    .button {
+        padding: var(--spacing-small) var(--spacing-medium);
+        border-radius: var(--radius-medium);
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+        font-weight: var(--font-weight-medium);
+        cursor: pointer;
+        transition: var(--transition-fast);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-extra-small);
+    }
+
+    .button:hover {
+        transform: translateY(-2px);
+        border-color: var(--primary);
+        color: var(--primary);
+        box-shadow: var(--shadow-small);
+    }
+
+    .button-primary {
+        background: var(--primary);
+        color: #ffffff;
+        border: none;
+    }
+
+    .button-primary:hover {
+        background: hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) + 10%));
+    }
+
+    .hero {
+        padding: var(--spacing-giant) var(--spacing-large) var(--spacing-huge);
+        text-align: center;
+    }
+
+    .hero-title {
+        font-size: var(--font-size-hero);
+        margin: 0 0 var(--spacing-medium);
+        color: var(--primary);
+    }
+
+    .hero-subtitle {
+        font-size: var(--font-size-body);
+        color: var(--text-low);
+        margin: 0 0 var(--spacing-large);
+    }
+
+    .search-section {
+        max-width: 800px;
+        margin: -var(--spacing-huge) auto var(--spacing-huge);
+        padding: 0 var(--spacing-large);
+        position: sticky;
+        top: calc( var(--spacing-large) + var(--safe-area-inset-top) );
+        z-index: 90;
+    }
+
+    .search-wrapper {
+        background: var(--surface);
+        border-radius: 100px;
+        padding: var(--spacing-extra-small);
+        box-shadow: var(--shadow-medium);
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--border);
+        transition: var(--transition-fast);
+    }
+
+    .search-wrapper:focus-within {
+        box-shadow: var(--shadow-luxury);
+        border-color: var(--primary);
+    }
+
+    .search-input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        padding: 0 var(--spacing-medium);
+        font-size: var(--font-size-body);
+        color: var(--text);
+        outline: none;
+        font-family: var(--font-sans);
+    }
+
+    .filter-buttons {
+        display: flex;
+        justify-content: center;
+        gap: var(--spacing-small);
+        margin-top: var(--spacing-medium);
+    }
+
+    .filter-button {
+        padding: var(--spacing-small) var(--spacing-medium);
+        border-radius: var(--radius-medium);
+        background: var(--surface);
+        color: var(--text);
+        border: 1px solid var(--border);
+        cursor: pointer;
+        transition: var(--transition-fast);
+    }
+
+    .filter-button.active {
+        background: var(--primary);
+        color: #ffffff;
+        border: none;
+    }
+
+    .filter-button:hover {
+        background: var(--primary-soft);
+    }
+
+    .main-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 var(--spacing-large) var(--spacing-giant);
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: var(--spacing-large);
+    }
+
+    .card {
+        background: var(--surface);
+        border-radius: var(--radius-large);
+        border: 1px solid var(--border);
+        padding: var(--spacing-large);
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-medium);
+        transition: var(--transition-medium);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card:hover {
+        transform: scale(1.02) translateY(-10px);
+        box-shadow: var(--shadow-luxury);
+    }
+
+    .tag {
+        font-size: var(--font-size-small);
+        font-weight: var(--font-weight-bold);
+        padding: var(--spacing-extra-small) var(--spacing-small);
+        border-radius: var(--radius-small);
+        width: fit-content;
+    }
+
+    .tag-audio {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .tag-book {
+        background: #e0f2fe;
+        color: #0369a1;
+    }
+
+    .card-title {
+        font-size: 1.4rem;
+        font-weight: var(--font-weight-bold);
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .card-description {
+        font-size: var(--font-size-small);
+        color: var(--text-low);
+        margin: 0;
+    }
+
+    .card-actions {
+        display: flex;
+        gap: var(--spacing-small);
+        margin-top: auto;
+    }
+
+    .media-player {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 2000;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        padding: var(--spacing-medium) var(--spacing-large);
+        transform: translateY(110%);
+        transition: var(--transition-medium);
+    }
+
+    .media-player.active {
+        transform: translateY(0);
+        padding-bottom: calc(var(--spacing-medium) + var(--safe-area-inset-bottom));
+    }
+
+    .player-layout {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        align-items: center;
+        gap: var(--spacing-large);
+    }
+
+    .track-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .track-title {
+        font-weight: var(--font-weight-bold);
+        font-size: var(--font-size-body);
+    }
+
+    .track-artist {
+        font-size: var(--font-size-small);
+        color: var(--text-low);
+    }
+
+    .player-controls {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-small);
+    }
+
+    .progress-bar {
+        height: 8px;
+        background: var(--background);
+        border-radius: 10px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: var(--primary);
+        width: 0%;
+        transition: width 0.1s linear;
+    }
+
+    .time-display {
+        display: flex;
+        justify-content: space-between;
+        font-size: var(--font-size-small);
+        color: var(--text-low);
+        font-family: monospace;
+    }
+
+    .control-buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: var(--spacing-large);
+    }
+
+    .play-button {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: #ffffff;
+        border: none;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        font-size: 1.5rem;
+        box-shadow: 0 10px 20px hsla(var(--primary-hue), 80%, 20%, 0.2);
+        transition: var(--transition-fast);
+    }
+
+    .play-button:hover {
+        transform: scale(1.1);
+    }
+
+    .stop-button {
+        padding: var(--spacing-small);
+        border-radius: var(--radius-small);
+        background: var(--surface);
+        color: var(--text);
+        border: 1px solid var(--border);
+        cursor: pointer;
+    }
+
+    .volume-control {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-small);
+    }
+
+    .volume-slider {
+        width: 100px;
+    }
+
+    .notification-hub {
+        position: fixed;
+        top: var(--spacing-large);
+        left: var(--spacing-large);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-small);
+    }
+
+    .toast {
+        background: var(--surface);
+        border-left: 5px solid var(--primary);
+        padding: var(--spacing-medium) var(--spacing-large);
+        border-radius: var(--radius-medium);
+        box-shadow: var(--shadow-luxury);
+        animation: slide-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        color: var(--text);
+        font-size: var(--font-size-body);
+    }
+
+    @keyframes slide-in {
+        from { transform: translateX(-120%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    .pdf-reader {
+        position: fixed;
+        inset: 0;
+        z-index: 3000;
+        background: rgba(0,0,0,0.9);
+        backdrop-filter: blur(15px);
+        display: none;
+        place-items: center;
+        padding: var(--spacing-large);
+    }
+
+    .pdf-container {
+        background: #ffffff;
+        width: 100%;
+        max-width: 1200px;
+        height: 90vh;
+        border-radius: var(--radius-extra-large);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .pdf-header {
+        padding: var(--spacing-medium);
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f9f9f9;
+    }
+
+    .pdf-title {
+        margin: 0;
+        font-size: var(--font-size-title);
+    }
+
+    .close-button {
+        padding: var(--spacing-small) var(--spacing-medium);
+        border-radius: var(--radius-medium);
+        background: #eee;
+        color: #333;
+        border: none;
+        cursor: pointer;
+    }
+
+    .pdf-viewer {
+        flex: 1;
+        width: 100%;
+        border: none;
+    }
+
+    @media (max-width: 900px) {
+        .player-layout {
+            grid-template-columns: 1fr;
+            gap: var(--spacing-medium);
         }
 
-        [data-theme="dark"] {
-            --bg: #020617; --surface: #0f172a; --text: #f1f5f9; --text-low: #94a3b8;
-            --border: rgba(255, 255, 255, 0.06); --primary: #10b981;
+        .volume-control {
+            display: none;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline-offset: 4px; }
-        
-        body {
-            margin: 0; padding: 0; background: var(--bg); color: var(--text);
-            font-family: 'Plus Jakarta Sans', sans-serif; transition: var(--transition);
-            overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+        .hero-title {
+            font-size: 3rem;
         }
 
-        .urdu { font-family: 'Noto Nastaliq Urdu', serif; line-height: 2.4; }
-
-        /* --- Enterprise Header --- */
-        .smart-header {
-            position: sticky; top: 0; z-index: 1000;
-            background: rgba(var(--surface), 0.8); backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border); transition: var(--transition);
+        .main-content {
+            grid-template-columns: 1fr;
         }
 
-        .nav-inner {
-            max-width: 1400px; margin: 0 auto; padding: 1rem 1.5rem;
-            display: flex; justify-content: space-between; align-items: center;
+        .card {
+            padding: var(--spacing-medium);
+        }
+    }
+
+    /* Additional Feature: Accessibility Enhancements */
+    [aria-hidden="true"] {
+        display: none;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+    /* Additional Feature: Animation Utilities */
+    .fade-in {
+        animation: fade-in 0.5s ease-in forwards;
+    }
+
+    @keyframes fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .slide-up {
+        animation: slide-up 0.5s ease-out forwards;
+    }
+
+    @keyframes slide-up {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Additional Feature: Custom Scrollbars */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--background);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--primary-soft);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--primary);
+    }
+
+    /* Additional Feature: Loading Spinners */
+    .loader {
+        border: 4px solid var(--primary-soft);
+        border-top: 4px solid var(--primary);
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        animation: spin 1s linear infinite;
+        margin: auto;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Additional Feature: Tooltip System */
+    .tooltip {
+        position: relative;
+        display: inline-block;
+    }
+
+    .tooltip .tooltip-text {
+        visibility: hidden;
+        width: 200px;
+        background: var(--surface);
+        color: var(--text);
+        text-align: center;
+        border-radius: var(--radius-small);
+        padding: var(--spacing-small);
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -100px;
+        opacity: 0;
+        transition: opacity var(--transition-fast);
+        box-shadow: var(--shadow-small);
+        border: 1px solid var(--border);
+    }
+
+    .tooltip:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    /* Additional Feature: Modal Dialogs */
+    .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 4000;
+    }
+
+    .modal-content {
+        background: var(--surface);
+        padding: var(--spacing-large);
+        border-radius: var(--radius-large);
+        max-width: 600px;
+        width: 90%;
+        box-shadow: var(--shadow-luxury);
+    }
+
+    .modal-title {
+        font-size: var(--font-size-title);
+        margin-bottom: var(--spacing-medium);
+    }
+
+    .modal-body {
+        margin-bottom: var(--spacing-large);
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--spacing-small);
+    }
+
+    /* Additional Feature: Accordion Components */
+    .accordion {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-medium);
+        overflow: hidden;
+    }
+
+    .accordion-item {
+        border-bottom: 1px solid var(--border);
+    }
+
+    .accordion-item:last-child {
+        border-bottom: none;
+    }
+
+    .accordion-header {
+        padding: var(--spacing-medium);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background var(--transition-fast);
+    }
+
+    .accordion-header:hover {
+        background: var(--primary-soft);
+    }
+
+    .accordion-content {
+        padding: 0 var(--spacing-medium);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height var(--transition-medium);
+    }
+
+    .accordion-content.active {
+        padding: var(--spacing-medium);
+        max-height: 500px; /* Adjust based on content */
+    }
+
+    /* Additional Feature: Tab System */
+    .tabs {
+        display: flex;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .tab {
+        padding: var(--spacing-medium) var(--spacing-large);
+        cursor: pointer;
+        transition: color var(--transition-fast);
+    }
+
+    .tab.active {
+        border-bottom: 2px solid var(--primary);
+        color: var(--primary);
+    }
+
+    .tab-content {
+        display: none;
+        padding: var(--spacing-large);
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    /* Additional Feature: Progress Indicators */
+    .progress-container {
+        width: 100%;
+        background: var(--background);
+        border-radius: var(--radius-small);
+        overflow: hidden;
+    }
+
+    .progress-bar-inner {
+        height: 20px;
+        background: var(--primary);
+        width: 0%;
+        transition: width var(--transition-slow);
+    }
+
+    /* Additional Feature: Form Elements */
+    .form-group {
+        margin-bottom: var(--spacing-medium);
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: var(--spacing-extra-small);
+        font-weight: var(--font-weight-medium);
+    }
+
+    .form-input {
+        width: 100%;
+        padding: var(--spacing-small) var(--spacing-medium);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-medium);
+        background: var(--surface);
+        color: var(--text);
+        transition: border-color var(--transition-fast);
+    }
+
+    .form-input:focus {
+        border-color: var(--primary);
+    }
+
+    .form-button {
+        padding: var(--spacing-small) var(--spacing-medium);
+        border-radius: var(--radius-medium);
+        background: var(--primary);
+        color: #ffffff;
+        border: none;
+        cursor: pointer;
+        transition: background var(--transition-fast);
+    }
+
+    .form-button:hover {
+        background: hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) + 10%));
+    }
+
+    /* Additional Feature: Alert Boxes */
+    .alert {
+        padding: var(--spacing-medium);
+        border-radius: var(--radius-medium);
+        margin-bottom: var(--spacing-large);
+    }
+
+    .alert-success {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .alert-error {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .alert-info {
+        background: #e0f2fe;
+        color: #0369a1;
+    }
+
+    .alert-warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    /* Additional Feature: Badge System */
+    .badge {
+        padding: var(--spacing-extra-small) var(--spacing-small);
+        border-radius: var(--radius-small);
+        font-size: var(--font-size-small);
+        font-weight: var(--font-weight-medium);
+    }
+
+    .badge-primary {
+        background: var(--primary);
+        color: #ffffff;
+    }
+
+    .badge-secondary {
+        background: var(--text-low);
+        color: #ffffff;
+    }
+
+    /* Additional Feature: Avatar Components */
+    .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--primary-soft);
+        display: grid;
+        place-items: center;
+        font-weight: var(--font-weight-bold);
+    }
+
+    .avatar-large {
+        width: 80px;
+        height: 80px;
+    }
+
+    /* Additional Feature: Dropdown Menus */
+    .dropdown {
+        position: relative;
+    }
+
+    .dropdown-toggle {
+        cursor: pointer;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-medium);
+        box-shadow: var(--shadow-medium);
+        display: none;
+        z-index: 1000;
+    }
+
+    .dropdown-menu.active {
+        display: block;
+    }
+
+    .dropdown-item {
+        padding: var(--spacing-small) var(--spacing-medium);
+        cursor: pointer;
+        transition: background var(--transition-fast);
+    }
+
+    .dropdown-item:hover {
+        background: var(--primary-soft);
+    }
+
+    /* Additional Feature: Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: var(--spacing-small);
+        margin-top: var(--spacing-large);
+    }
+
+    .page-item {
+        padding: var(--spacing-small) var(--spacing-medium);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-small);
+        cursor: pointer;
+        transition: background var(--transition-fast);
+    }
+
+    .page-item.active {
+        background: var(--primary);
+        color: #ffffff;
+        border: none;
+    }
+
+    .page-item:hover {
+        background: var(--primary-soft);
+    }
+/* Additional Feature: Sidebar Navigation */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -320px;
+    width: 320px;
+    height: 100vh;
+    background: var(--surface);
+    box-shadow: var(--shadow-luxury);
+    transition: var(--transition-medium);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+}
+    /* Accordion Header */
+.accordion-header {
+    padding: var(--spacing-medium);
+    cursor: pointer;
+    background: var(--surface);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: var(--font-weight-medium);
+}
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height var(--transition-medium);
+            padding: 0 var(--spacing-medium);
+            background: var(--background);
         }
 
-        .brand-logo {
-            font-size: 1.6rem; font-weight: 800; color: var(--primary);
-            text-decoration: none; display: flex; align-items: center; gap: 12px;
+        .accordion-item.active .accordion-content {
+            max-height: 500px;
+            padding: var(--spacing-medium);
         }
 
-        .controls-row { display: flex; gap: 10px; }
-
-        .btn-action {
-            padding: 0.8rem 1.5rem; border-radius: 12px; border: 1px solid var(--border);
-            background: var(--surface); color: var(--text); font-weight: 600;
-            cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 8px;
-        }
-        .btn-action:hover { transform: translateY(-2px); border-color: var(--primary); color: var(--primary); }
-        .btn-primary { background: var(--primary); color: white; border: none; }
-
-        /* --- Hero Discovery --- */
-        .hero-section { padding: 6rem 1.5rem 4rem; text-align: center; }
-        .hero-title { font-size: clamp(3rem, 10vw, 5.5rem); margin: 0; color: var(--primary); }
-        
-        .search-engine {
-            max-width: 800px; margin: -2rem auto 3rem; padding: 0 1.5rem; position: sticky; top: 90px; z-index: 100;
+        /* Additional Feature: Tabs System */
+        .tabs {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-medium);
         }
 
-        .search-container {
-            background: var(--surface); border-radius: 100px; padding: 0.6rem;
-            box-shadow: var(--shadow-lux); display: flex; border: 1px solid var(--border);
+        .tab-headers {
+            display: flex;
+            gap: var(--spacing-small);
+            border-bottom: 1px solid var(--border);
         }
 
-        .search-input {
-            flex: 1; border: none; background: transparent; padding: 0 1.5rem;
-            font-size: 1.1rem; color: var(--text); outline: none;
+        .tab-header {
+            padding: var(--spacing-small) var(--spacing-medium);
+            cursor: pointer;
+            border-radius: var(--radius-small) var(--radius-small) 0 0;
         }
 
-        /* --- Content Layout --- */
-        .main-grid {
-            max-width: 1400px; margin: 0 auto; padding: 0 1.5rem 12rem;
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2rem;
+        .tab-header.active {
+            background: var(--primary);
+            color: #fff;
         }
 
-        .asset-card {
-            background: var(--surface); border-radius: var(--radius-lg);
-            border: 1px solid var(--border); padding: 1.8rem;
-            display: flex; flex-direction: column; gap: 1.2rem;
-            transition: var(--transition); position: relative;
-        }
-        .asset-card:hover { transform: scale(1.02) translateY(-10px); box-shadow: var(--shadow-lux); }
-
-        .tag { font-size: 0.75rem; font-weight: 800; padding: 4px 12px; border-radius: 6px; width: fit-content; }
-        .tag-audio { background: #dcfce7; color: #166534; }
-        .tag-pdf { background: #e0f2fe; color: #0369a1; }
-
-        .asset-title { font-size: 1.4rem; font-weight: 700; margin: 0; line-height: 1.4; }
-
-        /* --- Unified Media Player --- */
-        .media-dock {
-            position: fixed; bottom: 0; left: 0; right: 0; z-index: 2000;
-            background: var(--surface); border-top: 1px solid var(--border);
-            padding: 1.2rem 2rem; transform: translateY(110%); transition: var(--transition);
-        }
-        .media-dock.is-active { transform: translateY(0); padding-bottom: calc(1.2rem + var(--safe-bottom)); }
-
-        .dock-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 2fr 1fr; align-items: center; gap: 3rem; }
-
-        .progress-rail { height: 8px; background: var(--bg); border-radius: 10px; cursor: pointer; position: relative; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.1s linear; }
-
-        .btn-play {
-            width: 64px; height: 64px; border-radius: 50%; background: var(--primary);
-            color: white; border: none; cursor: pointer; display: grid; place-items: center;
-            font-size: 1.5rem; box-shadow: 0 10px 20px rgba(var(--p-h), 80%, 20%, 0.2);
+        .tab-content {
+            display: none;
+            padding: var(--spacing-medium);
+            background: var(--surface);
+            border-radius: 0 0 var(--radius-medium) var(--radius-medium);
         }
 
-        /* --- Global Toast System --- */
-        #notify-hub { position: fixed; top: 2rem; left: 2rem; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast {
-            background: var(--surface); border-left: 5px solid var(--primary);
-            padding: 1.2rem 2rem; border-radius: 12px; box-shadow: var(--shadow-lux);
-            animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        .tab-content.active {
+            display: block;
         }
 
-        @keyframes slideIn { from { transform: translateX(-120%); } to { transform: translateX(0); } }
-
-        /* --- Reader Modal --- */
-        .reader-overlay {
-            position: fixed; inset: 0; z-index: 3000; background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(15px); display: none; place-items: center; padding: 2rem;
+        /* Additional Feature: Grid Utilities */
+        .grid {
+            display: grid;
+            gap: var(--spacing-large);
         }
-        .reader-frame { background: white; width: 100%; max-width: 1200px; height: 90vh; border-radius: 24px; overflow: hidden; }
 
-        @media (max-width: 900px) {
-            .dock-grid { grid-template-columns: 1fr; gap: 1rem; }
-            .volume-box { display: none; }
-            .hero-title { font-size: 3rem; }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+        /* Additional Feature: Badge System */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: var(--font-size-small);
+            font-weight: var(--font-weight-bold);
+            background: var(--primary-soft);
+            color: var(--primary);
+        }
+
+        /* Additional Feature: Skeleton Loader */
+        .skeleton {
+            background: linear-gradient(
+                90deg,
+                var(--background) 25%,
+                var(--surface) 37%,
+                var(--background) 63%
+            );
+            background-size: 400% 100%;
+            animation: skeleton 1.4s ease infinite;
+        }
+
+        @keyframes skeleton {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
         }
     </style>
 </head>
-<body data-theme="light">
+<body>
 
-    <div id="notify-hub"></div>
-
-    <header class="smart-header">
-        <nav class="nav-inner">
-            <a href="#" class="brand-logo">
-                <span style="font-size: 2rem;">🕌</span>
-                <span class="urdu">ذکر و نظر</span>
-            </a>
-            <div class="controls-row">
-                <button id="theme-btn" class="btn-action" aria-label="Toggle Dark Mode">🌙</button>
-            </div>
-        </nav>
-    </header>
-
-    <main>
-        <div class="hero-section">
-            <h1 class="hero-title urdu">ذکر و نظر</h1>
-            <p class="urdu" style="font-size: 1.4rem; color: var(--text-low);">اعلیٰ حضرت کی نعتیں اور مستند اسلامی کتب</p>
-        </div>
-
-        <section class="search-engine">
-            <div class="search-container">
-                <input type="text" id="main-search" class="search-input" placeholder="نعت یا کتاب کا نام لکھیں..." />
-                <button class="btn-primary btn-action" style="border-radius: 100px;">تلاش کریں</button>
-            </div>
-            <div style="display: flex; justify-content: center; gap: 12px; margin-top: 1.5rem;">
-                <button class="btn-action active-filter" data-type="all">تمام</button>
-                <button class="btn-action" data-type="naat">نعتیں</button>
-                <button class="btn-action" data-type="book">کتب</button>
-            </div>
-        </section>
-
-        <div id="render-target" class="main-grid">
-            </div>
-    </main>
-
-    <footer class="media-dock" id="global-dock">
-        <div class="dock-grid">
-            <div class="track-meta">
-                <div id="dock-title" class="urdu" style="font-weight: 700; font-size: 1.1rem;">ٹریک</div>
-                <div id="dock-artist" style="font-size: 0.85rem; color: var(--text-low);">آرٹسٹ</div>
-            </div>
-
-            <div class="player-core">
-                <div class="progress-rail" id="progress-area">
-                    <div class="progress-fill" id="progress-bar"></div>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-top: 8px; font-family: monospace;">
-                    <span id="time-cur">00:00</span>
-                    <span id="time-dur">00:00</span>
-                </div>
-                <div style="display: flex; justify-content: center; align-items: center; gap: 2rem; margin-top: 10px;">
-                    <button class="btn-play" id="play-toggle">▶</button>
-                    <button class="btn-action" id="stop-btn" style="padding: 0.5rem;">⏹</button>
-                </div>
-            </div>
-
-            <div class="volume-box" style="display: flex; align-items: center; gap: 10px;">
-                <span>🔊</span>
-                <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="0.8" />
-            </div>
-        </div>
-    </footer>
-
-    <div class="reader-overlay" id="pdf-modal">
-        <div class="reader-frame">
-            <div style="padding: 1rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
-                <h2 id="pdf-label" class="urdu" style="margin:0;">کتاب کا نام</h2>
-                <button class="btn-action" id="close-reader">بند کریں ✕</button>
-            </div>
-            <iframe id="pdf-view" src="" style="width:100%; height:100%; border:none;"></iframe>
+<header class="header">
+    <div class="nav-container">
+        <a class="logo urdu" href="#">ذکر و نظر</a>
+        <div class="controls">
+            <button class="button" id="themeToggle">🌙</button>
+            <button class="button">اردو</button>
+            <button class="button">हिंदी</button>
+            <button class="button button-primary">Login</button>
         </div>
     </div>
+</header>
 
-    <audio id="audio-engine" preload="none"></audio>
+<section class="hero">
+    <h1 class="hero-title urdu">علم، نعت، کتاب — ایک جگہ</h1>
+    <p class="hero-subtitle urdu">
+        مستند اسلامی کتب، نعتیں، آڈیو اور جدید ڈیجیٹل سہولیات
+    </p>
+</section>
 
-    <script>
-        /**
-         * Zikr-o-Nazar | Permanent Digital Asset Architecture
-         */
-         
-const MASTER_DATA = {
-    naats: [
-        { id: 'n1',  title: 'کوئی گل باقی رہے گا', artist: 'لو فائی نعت', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Koi%20Gul%20Baqi%20Rahega%20%5BSlowed%20_%20Reverb%5D%20Beautiful%20Naat%20__%20_lofinaatscreation(MP3_320K).mp3' },
-        
-        { id: 'n2',  title: 'عرش ہلال رفیعت رسول کی', artist: 'صابر رضا ازہری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Arsh%20Halal%20Rifat%20Rasool%20Ki_Sabir%20Raza%20Azhari_Surat(MP3_160K).mp3' },
-        { id: 'n3',  title: 'اللہ اللہ ماہ ربُّنا', artist: 'صابر رضا ازہری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Allah%20Allah%20Maah%20Rabbuna%20Haloo_By%20Sabir%20Raza%20_Royal(MP3_160K).mp3' },
-        { id: 'n4',  title: 'احمد خواجہ و دین نو محبت', artist: 'صابر رضا ازہری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Ahmad%20Khawaja%20o%20Deen_New%20Manqabat%20o%20Garib%20Nawaz_%20Sabir%20Raza%20Azhari_Surat_Royal(MP3_160K).mp3' },
-        { id: 'n5',  title: 'ال مدد پیرانِ پیر صابر رضا', artist: 'صابر رضا ازہری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Al%20Madad%20Peeraan%20Peer%20Sabir%20Raza_Dubi%20Kul%20Hasti%20Bhi%2011vi%20Sharif%20Naat%20Sabir%20Raza%20Azhari.mp3' },
-        { id: 'n6',  title: 'عائشہ ہمارے نبی کی', artist: 'صابر رضا ازہری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Aise%20Hamare%20Peer%20Track%2006_By%20Sabir%20Sahab%20Surat_Royal(MP3_160K).mp3' },
-        { id: 'n7',  title: 'ابرو احسانِ نات یا مصطفیٰ', artist: 'صابر رضا ازہری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Abroo%20Ahsaanmat%20Hai%20Ya%20Mustafa_By%20Sabir%20Raza%20Surat_Royal(MP3_160K).mp3' },
-        { id: 'n8',  title: 'آپ لاکھوں درود آپ لاکھوں سلام', artist: 'صابر رضا ازہری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Aap%20Lakho%20Durood%20or%20Aap%20Lakho%20Salaam_By%20Sabir%20Raza%20_Royal(MP3_160K).mp3' },
-        { id: 'n9',  title: 'آلہ حضرت ہمیں جانِ عُمر مُبارَک', artist: 'صابر رضا ازہری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Aala%20Hazrat%20Hamaari%20Jaan%20Hai%20Use%20Razaai%20Mubarik_Sabir%20Raza%20Surat(MP3_160K).mp3' },
-        { id: 'n10', title: 'سفینہ بکشیخش دار و جان پہ کوئی اجالا ہو', artist: 'سید عبدالواسع قدری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Safeena%20E%20Bakhshish_Dar%20o%20Jaana%20Pe%20Koi%20Ajal%20Ho%20Aya_Sayyed%20Abdul%20Wasi%20Qadri(MP3_160K).mp3' },
-        { id: 'n11', title: 'میرے مُشکِل کشا آسان کر دے', artist: 'سید عبدالواسع قدری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Mere%20Mushkil%20Ko%20Ya%20Aasaan%20Mere%20Mushkil%20Kusha%20Karde_Sayyed%20Abdul%20Wasi_Safeena%20E%20Bakhshish(MP3_160K).mp3' },
-        { id: 'n12', title: 'مدینہ آنے والا ہے', artist: 'سید عبدالواسع قدری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Madeena%20Aane%20Wala%20Hai_Sayyed%20Abdul%20Wasi_Safeena%20E%20Bakhshish(MP3_160K).mp3' },
-        { id: 'n13', title: 'حدیثِ اخترِ ناشم', artist: 'سید عبدالواسع قدری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Hadees%20Akhtara%20Nasham_Sayyed%20Abdul%20Wasi_Safeena%20E%20Bakhshish(MP3_160K).mp3' },
-        { id: 'n14', title: 'سربتا قدم ہائے سلطان زمان', artist: 'سید اعلیٰ حضرت', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Sarbatta%20Qadam%20Haane%20Sultan%20e%20Zaman%20Phool%20Andaaza%20Sultan_Saiyyed%20Aala%20Hazrat(MP3_160K).mp3' },
-        { id: 'n15', title: 'حافظ قادری نعت ۲۰۱۷', artist: 'حافظ قادری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Hafiz%20Qadri%20Naat%202017%20-%20Sahara%20Chaliye%20Sarkar%20Full%20HD(MP3_160K).mp3' },
-        { id: 'n16', title: 'آسان کو در تمہارا مل گیا', artist: 'اویس رضا قادری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Aasan%20Ko%20Dar%20Tumhara%20Mil%20Gaya%20-%20Owais%20Qadri%202024(MP3_160K).mp3' },
-        { id: 'n17', title: 'جبینِ میرے در تمہارا یا رسول اللہ', artist: 'صابر رضا ازہری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Jabee.n%20Meri%20Ho%20Sange%20Dar%20Tumhara%20Ya%20RasoolAllah_Sabir%20Raza%20Surat.mp3' },
-        { id: 'n18', title: 'کچھ کرم اپنے کی بستیں نیو ٹریک', artist: 'صفا بکشیخش', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Kuch%20Kare%20Apne%20Ki%20Bastein%20New_Track%20With%20Safina%20Bakhshish_Sabir%20Raza%20Year.mp3' },
-        { id: 'n19', title: 'خلد میں ہوگا ہمارا عقیقہ یا رسول اللہ', artist: 'مولانا ممتاز قادری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Khuld%20Me%20Hoga%20Hamara%20Aqiqa%20Ya%20RasoolAllah%20Slowed%20Reverb%20Naat%20Molana%20Mumtaz%20Qadri.mp3' },
-        { id: 'n20', title: 'ہر دِل میں گوگیا گا', artist: 'صابر رضا ازہری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Har%20Dil%20Main%20Googaya%20Ga(MP3_160K).mp3' },
-        { id: 'n21', title: 'دنیا کے آئے مسافر', artist: 'رنگتوں میں', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Duniya%20Ke%20Aaye%20Musafir_Ringtones%20m4a.mp3' },
-        
-        // ────────────────────────────────────────
-        //             Extra ones from second column
-        // ────────────────────────────────────────
-        { id: 'n22', title: 'کیا بتاؤں کیا کیا مدینہ', artist: 'زاہد اظہری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Kya%20Bataun%20Kya%20Kya%20Madina%20Hai_Zohail%20Azhari%20Heart%20Touching%20Kalam%202023.mp3' },
-        { id: 'n23', title: 'چہرہ کلیاں کھل گئیں', artist: 'رانجھن کا مہینہ', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Add%20Naat%3A%20Chehrey%20Kaliyaan%20Khil%20Gayi%20(Ranjan%20Ka%20Mahina).mp3' },
-        { id: 'n24', title: 'ہر وقت تصور میں', artist: 'صابر رضا ازہری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Add%20Naat%3A%20Har%20Waqt%20Tasawwar%20Main.mp3' },
-        { id: 'n25', title: 'آ جائیں حضورِ اختر رضا', artist: 'صابر رضا ازہری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Aa%20Jayen%20Akhtar%20Raza_Latest%20Kalam_Sabir%20Raza%20Surat.mp3' }
-    ],
+<section class="search-section">
+    <div class="search-wrapper">
+        <input class="search-input urdu" type="search" placeholder="کتاب، نعت، موضوع تلاش کریں">
+        <button class="button-primary">🔍</button>
+    </div>
+    <div class="filter-buttons">
+        <button class="filter-button active">All</button>
+        <button class="filter-button">Naats</button>
+        <button class="filter-button">Books</button>
+        <button class="filter-button">Audio</button>
+    </div>
+</section>
 
-    // books array remains same as before
-    books: [ /* ... your existing books ... */ ],
+<main class="main-content">
+    <article class="card fade-in">
+        <span class="tag tag-audio">Audio</span>
+        <h2 class="card-title urdu">نعتِ رسول ﷺ</h2>
+        <p class="card-description urdu">اعلیٰ معیار کی نعت آڈیو</p>
+        <div class="card-actions">
+            <button class="button-primary">▶ Play</button>
+            <button class="button">♡ Save</button>
+        </div>
+    </article>
 
-    base: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/'
+    <article class="card fade-in">
+        <span class="tag tag-book">Book</span>
+        <h2 class="card-title urdu">فقہی مسائل</h2>
+        <p class="card-description urdu">مستند پی ڈی ایف کتاب</p>
+        <div class="card-actions">
+            <button class="button-primary">📖 Read</button>
+            <button class="button">⬇ Download</button>
+        </div>
+    </article>
+</main>
+
+<div class="media-player" id="player">
+    <div class="player-layout">
+        <div class="track-info">
+            <span class="track-title urdu">نعت چل رہی ہے</span>
+            <span class="track-artist urdu">قاری</span>
+        </div>
+
+        <div class="player-controls">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="time-display">
+                <span>00:00</span>
+                <span>05:12</span>
+            </div>
+            <div class="control-buttons">
+                <button class="stop-button">⏹</button>
+                <button class="play-button">⏯</button>
+            </div>
+        </div>
+
+        <div class="volume-control">
+            🔊 <input class="volume-slider" type="range" min="0" max="100">
+        </div>
+    </div>
+</div>
+
+<script>
+/* CORE STATE */
+const state = {
+    theme: localStorage.getItem('theme') || 'light',
+    playerVisible: false
 };
-        };
 
-        const App = {
-            state: {
-                view: 'all',
-                query: '',
-                current: null,
-                theme: localStorage.getItem('zn_theme') || 'light'
-            },
+/* THEME ENGINE */
+const themeToggle = document.getElementById('themeToggle');
+const root = document.documentElement;
 
-            init() {
-                this.cacheDOM();
-                this.bindEvents();
-                this.applyTheme();
-                this.render();
-                this.notify("Zikr-o-Nazar میں خوش آمدید");
-            },
+function applyTheme(theme) {
+    root.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+}
 
-            cacheDOM() {
-                this.engine = document.getElementById('audio-engine');
-                this.grid = document.getElementById('render-target');
-                this.dock = document.getElementById('global-dock');
-            },
+applyTheme(state.theme);
 
-            bindEvents() {
-                document.getElementById('theme-btn').onclick = () => this.toggleTheme();
-                document.getElementById('main-search').oninput = (e) => {
-                    this.state.query = e.target.value.toLowerCase();
-                    this.render();
-                };
+themeToggle.addEventListener('click', () => {
+    state.theme = state.theme === 'dark' ? 'light' : 'dark';
+    applyTheme(state.theme);
+});
 
-                document.querySelectorAll('[data-type]').forEach(btn => {
-                    btn.onclick = (e) => {
-                        this.state.view = e.target.dataset.type;
-                        this.render();
-                    };
-                });
+/* MEDIA PLAYER ENGINE */
+const player = document.getElementById('player');
 
-                this.engine.ontimeupdate = () => this.updatePlayer();
-                document.getElementById('play-toggle').onclick = () => this.togglePlayback();
-                document.getElementById('progress-area').onclick = (e) => this.seek(e);
-            },
+document.querySelectorAll('.button-primary').forEach(btn => {
+    btn.addEventListener('click', () => {
+        player.classList.add('active');
+    });
+});
 
-            render() {
-                this.grid.innerHTML = '';
-                let assets = [];
-                if (this.state.view === 'all' || this.state.view === 'naat') {
-                    assets = assets.concat(MASTER_DATA.naats.map(n => ({...n, type: 'audio'})));
-                }
-                if (this.state.view === 'all' || this.state.view === 'book') {
-                    assets = assets.concat(MASTER_DATA.books.map(b => ({...b, type: 'pdf'})));
-                }
+/* NOTIFICATION SYSTEM */
+function notify(message) {
+    const hub = document.querySelector('.notification-hub') || (() => {
+        const h = document.createElement('div');
+        h.className = 'notification-hub';
+        document.body.appendChild(h);
+        return h;
+    })();
 
-                const filtered = assets.filter(a => a.title.includes(this.state.query));
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    hub.appendChild(toast);
 
-                filtered.forEach(asset => {
-                    const isAudio = asset.type === 'audio';
-                    const card = document.createElement('div');
-                    card.className = 'asset-card';
-                    card.innerHTML = `
-                        <span class="tag ${isAudio ? 'tag-audio' : 'tag-pdf'}">${isAudio ? 'Audio Naat' : 'Islamic Book'}</span>
-                        <h3 class="asset-title urdu">${asset.title}</h3>
-                        <p style="color: var(--text-low); font-size: 0.9rem;">${isAudio ? asset.artist : asset.desc}</p>
-                        <div style="display: flex; gap: 10px; margin-top: auto;">
-                            <button class="btn-action btn-primary" style="flex: 1" onclick="App.handleAction('${asset.id}', '${asset.type}')">
-                                ${isAudio ? '▶ سنیں' : '📖 پڑھیں'}
-                            </button>
-                            <a href="${isAudio ? asset.src : MASTER_DATA.base + asset.file}" download class="btn-action">📥</a>
-                        </div>
-                    `;
-                    this.grid.appendChild(card);
-                });
-            },
+    setTimeout(() => toast.remove(), 4000);
+}
 
-            handleAction(id, type) {
-                if (type === 'audio') {
-                    const track = MASTER_DATA.naats.find(n => n.id === id);
-                    this.playAudio(track);
-                } else {
-                    const book = MASTER_DATA.books.find(b => b.id === id);
-                    this.openReader(book);
-                }
-            },
+/* SERVICE WORKER */
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+}
+</script>
 
-            playAudio(track) {
-                this.state.current = track;
-                this.engine.src = track.src;
-                this.engine.play();
-                this.dock.classList.add('is-active');
-                document.getElementById('dock-title').innerText = track.title;
-                document.getElementById('dock-artist').innerText = track.artist;
-                document.getElementById('play-toggle').innerText = '⏸';
-                this.notify(`${track.title} چل رہا ہے...`);
-            },
-
-            togglePlayback() {
-                if (this.engine.paused) {
-                    this.engine.play();
-                    document.getElementById('play-toggle').innerText = '⏸';
-                } else {
-                    this.engine.pause();
-                    document.getElementById('play-toggle').innerText = '▶';
-                }
-            },
-
-            updatePlayer() {
-                const per = (this.engine.currentTime / this.engine.duration) * 100;
-                document.getElementById('progress-bar').style.width = per + '%';
-                document.getElementById('time-cur').innerText = this.formatTime(this.engine.currentTime);
-                document.getElementById('time-dur').innerText = this.formatTime(this.engine.duration || 0);
-            },
-
-            formatTime(s) {
-                const m = Math.floor(s / 60);
-                const r = Math.floor(s % 60);
-                return `${m.toString().padStart(2, '0')}:${r.toString().padStart(2, '0')}`;
-            },
-
-            seek(e) {
-                const rect = document.getElementById('progress-area').getBoundingClientRect();
-                const pos = (e.clientX - rect.left) / rect.width;
-                this.engine.currentTime = pos * this.engine.duration;
-            },
-
-            openReader(book) {
-                const url = MASTER_DATA.base + book.file;
-                document.getElementById('pdf-label').innerText = book.title;
-                document.getElementById('pdf-view').src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
-                document.getElementById('pdf-modal').style.display = 'grid';
-            },
-
-            toggleTheme() {
-                this.state.theme = this.state.theme === 'light' ? 'dark' : 'light';
-                localStorage.setItem('zn_theme', this.state.theme);
-                this.applyTheme();
-            },
-
-            applyTheme() {
-                document.body.dataset.theme = this.state.theme;
-                document.getElementById('theme-btn').innerText = this.state.theme === 'light' ? '🌙' : '☀️';
-            },
-
-            notify(msg) {
-                const toast = document.createElement('div');
-                toast.className = 'toast urdu';
-                toast.innerText = msg;
-                document.getElementById('notify-hub').appendChild(toast);
-                setTimeout(() => toast.remove(), 4000);
-            }
-        };
-
-        // Modal Close Logic
-        document.getElementById('close-reader').onclick = () => {
-            document.getElementById('pdf-modal').style.display = 'none';
-        };
-
-        // Start Engine
-        window.onload = () => App.init();
-    </script>
 </body>
 </html>
