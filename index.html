@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
-    <meta name="description" content="Zikr-o-Nazar: A professional, scalable Islamic Digital Library for high-fidelity Naats and authentic PDF Books." />
-    <meta name="author" content="Zikr-o-Nazar" />
-    <meta name="theme-color" id="theme-color-meta" content="#064e3b" />
-    
-    <title>Zikr-o-Nazar | Enterprise Islamic Library</title>
+    <meta name="description" content="Zikr-o-Nazar: The definitive Islamic Digital Library. Premium Naats and authentic PDF Books in a high-performance environment." />
+    <meta name="theme-color" id="theme-meta" content="#064e3b" />
+    <title>Zikr-o-Nazar | Islamic Digital Platform</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,372 +13,401 @@
 
     <style>
         :root {
+            /* Enterprise Design System */
             --p-h: 162; --p-s: 84%; --p-l: 14%;
             --primary: hsl(var(--p-h), var(--p-s), var(--p-l));
-            --primary-rgb: 6, 78, 59;
-            --accent: #d97706;
-            --bg-base: #f8fafc;
-            --bg-surface: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
+            --primary-soft: hsla(var(--p-h), var(--p-s), var(--p-l), 0.08);
+            --accent: #b45309;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --text-low: #64748b;
             --border: rgba(15, 23, 42, 0.08);
-            --radius-md: 16px;
-            --radius-lg: 28px;
-            --shadow-lux: 0 20px 25px -5px rgba(0,0,0,0.1);
-            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-xl: 32px;
+            --radius-lg: 20px;
+            --shadow-lux: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            --safe-bottom: env(safe-area-inset-bottom);
         }
 
         [data-theme="dark"] {
-            --bg-base: #020617; --bg-surface: #0f172a; --text-main: #f1f5f9; --text-muted: #94a3b8;
-            --border: rgba(255, 255, 255, 0.1); --primary: #10b981;
+            --bg: #020617; --surface: #0f172a; --text: #f1f5f9; --text-low: #94a3b8;
+            --border: rgba(255, 255, 255, 0.06); --primary: #10b981;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline-offset: 4px; }
         
         body {
-            margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--bg-base); color: var(--text-main);
-            direction: rtl; overflow-x: hidden; min-height: 100vh;
-            line-height: 1.6; transition: background 0.5s ease;
+            margin: 0; padding: 0; background: var(--bg); color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif; transition: var(--transition);
+            overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
         }
 
-        .urdu { font-family: 'Noto Nastaliq Urdu', serif; line-height: 2.5; }
+        .urdu { font-family: 'Noto Nastaliq Urdu', serif; line-height: 2.4; }
 
-        .app-header {
+        /* --- Enterprise Header --- */
+        .smart-header {
             position: sticky; top: 0; z-index: 1000;
-            background: rgba(var(--bg-surface), 0.85); backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
+            background: rgba(var(--surface), 0.8); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); transition: var(--transition);
         }
 
-        .nav-container {
-            max-width: 1400px; margin: 0 auto; padding: 0.8rem 1.5rem;
+        .nav-inner {
+            max-width: 1400px; margin: 0 auto; padding: 1rem 1.5rem;
             display: flex; justify-content: space-between; align-items: center;
         }
 
-        .brand {
-            display: flex; align-items: center; gap: 12px;
-            text-decoration: none; color: var(--primary);
-            font-weight: 800; font-size: 1.6rem;
+        .brand-logo {
+            font-size: 1.6rem; font-weight: 800; color: var(--primary);
+            text-decoration: none; display: flex; align-items: center; gap: 12px;
         }
 
-        .search-area { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; position: relative; }
-        .search-box {
-            background: var(--bg-surface); border: 1px solid var(--border);
-            border-radius: 100px; padding: 0.5rem 1.8rem;
-            display: flex; align-items: center; box-shadow: var(--shadow-lux);
-            gap: 12px;
+        .controls-row { display: flex; gap: 10px; }
+
+        .btn-action {
+            padding: 0.8rem 1.5rem; border-radius: 12px; border: 1px solid var(--border);
+            background: var(--surface); color: var(--text); font-weight: 600;
+            cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 8px;
+        }
+        .btn-action:hover { transform: translateY(-2px); border-color: var(--primary); color: var(--primary); }
+        .btn-primary { background: var(--primary); color: white; border: none; }
+
+        /* --- Hero Discovery --- */
+        .hero-section { padding: 6rem 1.5rem 4rem; text-align: center; }
+        .hero-title { font-size: clamp(3rem, 10vw, 5.5rem); margin: 0; color: var(--primary); }
+        
+        .search-engine {
+            max-width: 800px; margin: -2rem auto 3rem; padding: 0 1.5rem; position: sticky; top: 90px; z-index: 100;
+        }
+
+        .search-container {
+            background: var(--surface); border-radius: 100px; padding: 0.6rem;
+            box-shadow: var(--shadow-lux); display: flex; border: 1px solid var(--border);
         }
 
         .search-input {
-            flex: 1; border: none; background: transparent; padding: 0.8rem 0;
-            font-size: 1.15rem; color: var(--text-main); outline: none;
+            flex: 1; border: none; background: transparent; padding: 0 1.5rem;
+            font-size: 1.1rem; color: var(--text); outline: none;
         }
 
-        .stats-badge { font-size: 0.8rem; background: var(--primary); color: white; padding: 4px 12px; border-radius: 50px; margin-right: auto; }
-
-        .content-grid {
+        /* --- Content Layout --- */
+        .main-grid {
             max-width: 1400px; margin: 0 auto; padding: 0 1.5rem 12rem;
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2rem;
         }
 
         .asset-card {
-            background: var(--bg-surface); border: 1px solid var(--border);
-            border-radius: var(--radius-md); padding: 1.8rem;
-            transition: var(--transition); display: flex; flex-direction: column; gap: 1.2rem;
-            animation: fadeIn 0.5s ease forwards;
+            background: var(--surface); border-radius: var(--radius-lg);
+            border: 1px solid var(--border); padding: 1.8rem;
+            display: flex; flex-direction: column; gap: 1.2rem;
+            transition: var(--transition); position: relative;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .asset-card:hover { transform: scale(1.02) translateY(-10px); box-shadow: var(--shadow-lux); }
 
-        .asset-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lux); border-color: var(--primary); }
+        .tag { font-size: 0.75rem; font-weight: 800; padding: 4px 12px; border-radius: 6px; width: fit-content; }
+        .tag-audio { background: #dcfce7; color: #166534; }
+        .tag-pdf { background: #e0f2fe; color: #0369a1; }
 
-        .card-type { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; padding: 4px 12px; border-radius: 6px; width: fit-content; }
-        .type-audio { background: #dcfce7; color: #166534; }
-        .type-book { background: #e0f2fe; color: #0369a1; }
+        .asset-title { font-size: 1.4rem; font-weight: 700; margin: 0; line-height: 1.4; }
 
-        .btn-group { display: flex; gap: 10px; margin-top: auto; }
-        .btn-p { background: var(--primary); color: white; border: none; padding: 0.9rem; border-radius: 12px; font-weight: 700; cursor: pointer; flex: 1; transition: var(--transition); }
-        .btn-s { background: var(--bg-base); color: var(--text-main); border: 1px solid var(--border); padding: 0.9rem; border-radius: 12px; cursor: pointer; transition: var(--transition); }
-        .btn-p:hover { opacity: 0.9; transform: scale(1.02); }
-
-        .audio-dock {
+        /* --- Unified Media Player --- */
+        .media-dock {
             position: fixed; bottom: 0; left: 0; right: 0; z-index: 2000;
-            background: var(--bg-surface); border-top: 1px solid var(--border);
-            padding: 1.2rem 2rem; transform: translateY(110%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
+            background: var(--surface); border-top: 1px solid var(--border);
+            padding: 1.2rem 2rem; transform: translateY(110%); transition: var(--transition);
         }
-        .audio-dock.active { transform: translateY(0); padding-bottom: calc(1.2rem + env(safe-area-inset-bottom)); }
+        .media-dock.is-active { transform: translateY(0); padding-bottom: calc(1.2rem + var(--safe-bottom)); }
 
         .dock-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 2fr 1fr; align-items: center; gap: 3rem; }
 
-        .progress-rail { height: 8px; background: var(--bg-base); border-radius: 10px; cursor: pointer; position: relative; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); border-radius: 10px; width: 0%; transition: width 0.1s linear; }
+        .progress-rail { height: 8px; background: var(--bg); border-radius: 10px; cursor: pointer; position: relative; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.1s linear; }
 
-        .modal { position: fixed; inset: 0; z-index: 3000; background: rgba(0,0,0,0.95); display: none; place-items: center; padding: 2rem; backdrop-filter: blur(10px); }
-        .modal-inner { background: white; width: 100%; max-width: 1100px; height: 92vh; border-radius: 24px; overflow: hidden; display: flex; flex-direction: column; }
-        
-        .disclaimer-bar { background: var(--primary); color: white; padding: 8px; text-align: center; font-size: 0.8rem; position: relative; z-index: 10; }
+        .btn-play {
+            width: 64px; height: 64px; border-radius: 50%; background: var(--primary);
+            color: white; border: none; cursor: pointer; display: grid; place-items: center;
+            font-size: 1.5rem; box-shadow: 0 10px 20px rgba(var(--p-h), 80%, 20%, 0.2);
+        }
+
+        /* --- Global Toast System --- */
+        #notify-hub { position: fixed; top: 2rem; left: 2rem; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            background: var(--surface); border-left: 5px solid var(--primary);
+            padding: 1.2rem 2rem; border-radius: 12px; box-shadow: var(--shadow-lux);
+            animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes slideIn { from { transform: translateX(-120%); } to { transform: translateX(0); } }
+
+        /* --- Reader Modal --- */
+        .reader-overlay {
+            position: fixed; inset: 0; z-index: 3000; background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(15px); display: none; place-items: center; padding: 2rem;
+        }
+        .reader-frame { background: white; width: 100%; max-width: 1200px; height: 90vh; border-radius: 24px; overflow: hidden; }
 
         @media (max-width: 900px) {
-            .dock-grid { grid-template-columns: 1fr; gap: 1rem; text-align: center; }
-            .vol-zone { display: none; }
-            .content-grid { grid-template-columns: 1fr; }
+            .dock-grid { grid-template-columns: 1fr; gap: 1rem; }
+            .volume-box { display: none; }
+            .hero-title { font-size: 3rem; }
         }
     </style>
 </head>
 <body data-theme="light">
 
-    <div class="disclaimer-bar urdu">تمام مواد تعلیمی اور حوالہ جاتی مقاصد کے لیے شیئر کیا گیا ہے۔ ملکیت متعلقہ مصنفین/نعت خوانوں کے پاس رہتی ہے۔</div>
+    <div id="notify-hub"></div>
 
-    <header class="app-header">
-        <nav class="nav-container">
-            <a href="#" class="brand">
-                <span>🕌</span>
+    <header class="smart-header">
+        <nav class="nav-inner">
+            <a href="#" class="brand-logo">
+                <span style="font-size: 2rem;">🕌</span>
                 <span class="urdu">ذکر و نظر</span>
             </a>
-            <div style="display: flex; gap: 15px; align-items: center;">
-                <span id="content-stats" class="stats-badge">Indexing...</span>
-                <button id="theme-toggle" class="btn-s">🌓</button>
+            <div class="controls-row">
+                <button id="theme-btn" class="btn-action" aria-label="Toggle Dark Mode">🌙</button>
             </div>
         </nav>
     </header>
 
     <main>
-        <section class="search-area">
-            <div class="search-box">
-                <span>🔍</span>
-                <input type="text" id="global-search" class="search-input" placeholder="نعت، کتاب یا فنکار تلاش کریں..." />
+        <div class="hero-section">
+            <h1 class="hero-title urdu">ذکر و نظر</h1>
+            <p class="urdu" style="font-size: 1.4rem; color: var(--text-low);">اعلیٰ حضرت کی نعتیں اور مستند اسلامی کتب</p>
+        </div>
+
+        <section class="search-engine">
+            <div class="search-container">
+                <input type="text" id="main-search" class="search-input" placeholder="نعت یا کتاب کا نام لکھیں..." />
+                <button class="btn-primary btn-action" style="border-radius: 100px;">تلاش کریں</button>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 12px; margin-top: 1.5rem;">
+                <button class="btn-action active-filter" data-type="all">تمام</button>
+                <button class="btn-action" data-type="naat">نعتیں</button>
+                <button class="btn-action" data-type="book">کتب</button>
             </div>
         </section>
 
-        <div id="asset-grid" class="content-grid"></div>
+        <div id="render-target" class="main-grid">
+            </div>
     </main>
 
-    <div class="audio-dock" id="global-player">
+    <footer class="media-dock" id="global-dock">
         <div class="dock-grid">
-            <div class="meta">
-                <div id="p-title" class="urdu" style="font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">--</div>
-                <div id="p-artist" style="font-size: 0.85rem; opacity: 0.7;">--</div>
+            <div class="track-meta">
+                <div id="dock-title" class="urdu" style="font-weight: 700; font-size: 1.1rem;">ٹریک</div>
+                <div id="dock-artist" style="font-size: 0.85rem; color: var(--text-low);">آرٹسٹ</div>
             </div>
-            <div class="controls">
-                <div class="progress-rail" id="p-seek">
-                    <div class="progress-fill" id="p-fill"></div>
+
+            <div class="player-core">
+                <div class="progress-rail" id="progress-area">
+                    <div class="progress-fill" id="progress-bar"></div>
                 </div>
-                <div style="display: flex; justify-content: center; align-items: center; gap: 2.5rem; margin-top: 12px;">
-                    <button class="btn-s" id="p-prev" style="border:none;">⏮</button>
-                    <button class="btn-p" id="p-toggle" style="width:60px; height:60px; border-radius:50%; display: grid; place-items: center; font-size: 1.5rem;">▶</button>
-                    <button class="btn-s" id="p-next" style="border:none;">⏭</button>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-top: 8px; font-family: monospace;">
+                    <span id="time-cur">00:00</span>
+                    <span id="time-dur">00:00</span>
+                </div>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 2rem; margin-top: 10px;">
+                    <button class="btn-play" id="play-toggle">▶</button>
+                    <button class="btn-action" id="stop-btn" style="padding: 0.5rem;">⏹</button>
                 </div>
             </div>
-            <div class="vol-zone" style="display: flex; align-items: center; gap: 15px; justify-content: flex-end;">
-                <span style="font-size: 1.2rem;">🔊</span>
-                <input type="range" id="p-vol" min="0" max="1" step="0.1" value="0.8" style="accent-color: var(--primary);">
+
+            <div class="volume-box" style="display: flex; align-items: center; gap: 10px;">
+                <span>🔊</span>
+                <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="0.8" />
             </div>
+        </div>
+    </footer>
+
+    <div class="reader-overlay" id="pdf-modal">
+        <div class="reader-frame">
+            <div style="padding: 1rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                <h2 id="pdf-label" class="urdu" style="margin:0;">کتاب کا نام</h2>
+                <button class="btn-action" id="close-reader">بند کریں ✕</button>
+            </div>
+            <iframe id="pdf-view" src="" style="width:100%; height:100%; border:none;"></iframe>
         </div>
     </div>
 
-    <div class="modal" id="reader-modal">
-        <div class="modal-inner">
-            <div style="padding:15px 25px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items: center;">
-                <span id="modal-label" class="urdu" style="font-weight: 700; font-size: 1.2rem;">مطالعہ کتب</span>
-                <button class="btn-s" onclick="document.getElementById('reader-modal').style.display='none'" style="padding: 5px 15px;">بند کریں ✕</button>
-            </div>
-            <iframe id="reader-frame" style="flex:1; border:none; background: #525659;"></iframe>
-        </div>
-    </div>
-
-    <audio id="core-engine"></audio>
+    <audio id="audio-engine" preload="none"></audio>
 
     <script>
         /**
-         * Zikr-o-Nazar | Enterprise Content Indexing & Discovery System
+         * Zikr-o-Nazar | Permanent Digital Asset Architecture
          */
-        const System = {
-            config: {
-                repo: 'Sohilhusain86/HARDRISK',
-                branch: 'main',
-                api: 'https://api.github.com/repos/Sohilhusain86/HARDRISK/contents/',
-                raw: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/'
-            },
-            registry: [],
-            playlist: [],
-            currentIndex: -1,
-            state: JSON.parse(localStorage.getItem('zn_state')) || { theme: 'light', volume: 0.8, lastPos: 0, lastTrack: null },
+        
+        const MASTER_DATA = {
+            naats: [
+                { id: 'n1', title: 'کوئی گل باقی رہے گا', artist: 'اعلیٰ حضرت', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Koi%20Gul%20Baqi%20Rahega%20%5BSlowed%20_%20Reverb%5D%20Beautiful%20Naat%20__%20_lofinaatscreation(MP3_320K).mp3' },
+                { id: 'n2', title: 'کلمات ممتاز قادری', artist: 'ممتاز قادری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Kalam%20Mumtaz%20Qadri%20.%20Full%20janaza%20HD%20video(MP3_320K).mp3' },
+                { id: 'n3', title: 'ہو کرم سرکار اب تو', artist: 'اوویس رضا قادری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Ho%20Karam%20Sarkar%20Abto%20Owais%20Raza%20Qadri%202019(MP3_160K).mp3' },
+                { id: 'n4', title: 'پہنچو در سرکار', artist: 'صابر رضا ازہری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/pohchu%20dare%20sarkar_sabir%20raza%20azhari%20manqabat%20in%20Surat_shorts_video_(MP3_160K).mp3' },
+                { id: 'n5', title: 'درود پاک', artist: 'صابر رضا ازہری', src: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/Durood%20e%20Paak%20__%20Sabir%20Raza%20Azhari_shorts_video_(MP3_160K).mp3' }
+            ],
+            books: [
+                { id: 'b1', title: 'مومن کی نماز', desc: 'نماز کا مکمل طریقہ', file: 'Momin-ki-Namaz-Urdu.pdf' },
+                { id: 'b2', title: 'کمالات مصطفیٰ', desc: 'سیرت النبی ﷺ', file: 'Kamalat%20e%20Mustafa.pdf' },
+                { id: 'b3', title: 'جہنم میں لے جانے والے اعمال', desc: 'اصلاحی کتاب', file: 'jahanam-main-lay-janay-walay-amaal-jild-2%20(1).pdf' }
+            ],
+            base: 'https://github.com/Sohilhusain86/HARDRISK/raw/main/'
+        };
 
-            async init() {
-                this.dom();
-                await this.indexContent();
-                this.bind();
-                this.applyState();
+        const App = {
+            state: {
+                view: 'all',
+                query: '',
+                current: null,
+                theme: localStorage.getItem('zn_theme') || 'light'
             },
 
-            dom() {
-                this.engine = document.getElementById('core-engine');
-                this.grid = document.getElementById('asset-grid');
-                this.search = document.getElementById('global-search');
-                this.stats = document.getElementById('content-stats');
+            init() {
+                this.cacheDOM();
+                this.bindEvents();
+                this.applyTheme();
+                this.render();
+                this.notify("Zikr-o-Nazar میں خوش آمدید");
             },
 
-            async indexContent() {
-                try {
-                    const response = await fetch(this.config.api);
-                    const files = await response.json();
-                    
-                    this.registry = files.filter(f => f.type === 'file' && (f.name.endsWith('.mp3') || f.name.endsWith('.pdf')))
-                        .map(f => {
-                            const isAudio = f.name.endsWith('.mp3');
-                            const metadata = this.parseName(f.name);
-                            return {
-                                id: btoa(f.name),
-                                name: f.name,
-                                title: metadata.title,
-                                artist: metadata.artist,
-                                type: isAudio ? 'audio' : 'book',
-                                url: this.config.raw + f.name,
-                                quality: metadata.quality
-                            };
-                        });
-                    
-                    this.stats.innerText = `${this.registry.filter(i=>i.type==='audio').length} Naats | ${this.registry.filter(i=>i.type==='book').length} Books`;
+            cacheDOM() {
+                this.engine = document.getElementById('audio-engine');
+                this.grid = document.getElementById('render-target');
+                this.dock = document.getElementById('global-dock');
+            },
+
+            bindEvents() {
+                document.getElementById('theme-btn').onclick = () => this.toggleTheme();
+                document.getElementById('main-search').oninput = (e) => {
+                    this.state.query = e.target.value.toLowerCase();
                     this.render();
-                } catch (e) {
-                    console.error("Indexing Failed", e);
-                }
+                };
+
+                document.querySelectorAll('[data-type]').forEach(btn => {
+                    btn.onclick = (e) => {
+                        this.state.view = e.target.dataset.type;
+                        this.render();
+                    };
+                });
+
+                this.engine.ontimeupdate = () => this.updatePlayer();
+                document.getElementById('play-toggle').onclick = () => this.togglePlayback();
+                document.getElementById('progress-area').onclick = (e) => this.seek(e);
             },
 
-            parseName(filename) {
-                let clean = decodeURIComponent(filename).replace(/\.(mp3|pdf)$/i, '');
-                let parts = clean.split(/[_-]/);
-                let quality = filename.match(/\d+K/i) ? filename.match(/\d+K/i)[0] : 'Standard';
-                
-                return {
-                    title: parts[0]?.trim() || clean,
-                    artist: parts[1]?.trim() || 'Zikr-o-Nazar Archive',
-                    quality: quality
-                };
-            },
-
-            bind() {
-                this.search.oninput = () => this.render(this.search.value);
-                
-                document.getElementById('theme-toggle').onclick = () => {
-                    this.state.theme = this.state.theme === 'dark' ? 'light' : 'dark';
-                    this.applyState();
-                };
-
-                this.engine.ontimeupdate = () => {
-                    const per = (this.engine.currentTime / this.engine.duration) * 100;
-                    document.getElementById('p-fill').style.width = per + '%';
-                    this.state.lastPos = this.engine.currentTime;
-                    this.saveState();
-                };
-
-                this.engine.onended = () => this.next();
-
-                document.getElementById('p-toggle').onclick = () => this.toggle();
-                document.getElementById('p-prev').onclick = () => this.prev();
-                document.getElementById('p-next').onclick = () => this.next();
-                document.getElementById('p-vol').oninput = (e) => {
-                    this.engine.volume = e.target.value;
-                    this.state.volume = e.target.value;
-                    this.saveState();
-                };
-
-                document.getElementById('p-seek').onclick = (e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const pos = (e.clientX - rect.left) / rect.width;
-                    this.engine.currentTime = pos * this.engine.duration;
-                };
-            },
-
-            render(query = '') {
+            render() {
                 this.grid.innerHTML = '';
-                const q = query.toLowerCase();
-                const filtered = this.registry.filter(i => 
-                    i.title.toLowerCase().includes(q) || 
-                    i.artist.toLowerCase().includes(q)
-                );
+                let assets = [];
+                if (this.state.view === 'all' || this.state.view === 'naat') {
+                    assets = assets.concat(MASTER_DATA.naats.map(n => ({...n, type: 'audio'})));
+                }
+                if (this.state.view === 'all' || this.state.view === 'book') {
+                    assets = assets.concat(MASTER_DATA.books.map(b => ({...b, type: 'pdf'})));
+                }
 
-                filtered.forEach(item => {
-                    const isAudio = item.type === 'audio';
+                const filtered = assets.filter(a => a.title.includes(this.state.query));
+
+                filtered.forEach(asset => {
+                    const isAudio = asset.type === 'audio';
                     const card = document.createElement('div');
                     card.className = 'asset-card';
                     card.innerHTML = `
-                        <div class="card-type ${isAudio ? 'type-audio' : 'type-book'}">${isAudio ? 'Audio Naat' : 'Digital Book'}</div>
-                        <h3 class="urdu" style="margin:0; font-size:1.35rem;">${item.title}</h3>
-                        <p style="font-size:0.9rem; margin:0; opacity:0.8;">${item.artist}${isAudio ? ` • ${item.quality}` : ''}</p>
-                        <div class="btn-group">
-                            <button class="btn-p" onclick="System.handleAction('${item.id}')">
+                        <span class="tag ${isAudio ? 'tag-audio' : 'tag-pdf'}">${isAudio ? 'Audio Naat' : 'Islamic Book'}</span>
+                        <h3 class="asset-title urdu">${asset.title}</h3>
+                        <p style="color: var(--text-low); font-size: 0.9rem;">${isAudio ? asset.artist : asset.desc}</p>
+                        <div style="display: flex; gap: 10px; margin-top: auto;">
+                            <button class="btn-action btn-primary" style="flex: 1" onclick="App.handleAction('${asset.id}', '${asset.type}')">
                                 ${isAudio ? '▶ سنیں' : '📖 پڑھیں'}
                             </button>
-                            <a href="${item.url}" download class="btn-s" style="text-decoration:none; display:grid; place-items:center;">📥</a>
+                            <a href="${isAudio ? asset.src : MASTER_DATA.base + asset.file}" download class="btn-action">📥</a>
                         </div>
                     `;
                     this.grid.appendChild(card);
                 });
             },
 
-            handleAction(id) {
-                const item = this.registry.find(i => i.id === id);
-                if (item.type === 'audio') {
-                    this.playlist = this.registry.filter(i => i.type === 'audio');
-                    this.currentIndex = this.playlist.findIndex(i => i.id === id);
-                    this.play(item);
+            handleAction(id, type) {
+                if (type === 'audio') {
+                    const track = MASTER_DATA.naats.find(n => n.id === id);
+                    this.playAudio(track);
                 } else {
-                    document.getElementById('modal-label').innerText = item.title;
-                    document.getElementById('reader-frame').src = item.url;
-                    document.getElementById('reader-modal').style.display = 'grid';
+                    const book = MASTER_DATA.books.find(b => b.id === id);
+                    this.openReader(book);
                 }
             },
 
-            play(item) {
-                this.engine.src = item.url;
+            playAudio(track) {
+                this.state.current = track;
+                this.engine.src = track.src;
                 this.engine.play();
-                document.getElementById('global-player').classList.add('active');
-                document.getElementById('p-title').innerText = item.title;
-                document.getElementById('p-artist').innerText = item.artist;
-                document.getElementById('p-toggle').innerText = '⏸';
-                this.state.lastTrack = item.id;
-                this.saveState();
+                this.dock.classList.add('is-active');
+                document.getElementById('dock-title').innerText = track.title;
+                document.getElementById('dock-artist').innerText = track.artist;
+                document.getElementById('play-toggle').innerText = '⏸';
+                this.notify(`${track.title} چل رہا ہے...`);
             },
 
-            toggle() {
-                this.engine.paused ? this.engine.play() : this.engine.pause();
-                document.getElementById('p-toggle').innerText = this.engine.paused ? '▶' : '⏸';
-            },
-
-            next() {
-                if (this.currentIndex < this.playlist.length - 1) {
-                    this.currentIndex++;
-                    this.play(this.playlist[this.currentIndex]);
+            togglePlayback() {
+                if (this.engine.paused) {
+                    this.engine.play();
+                    document.getElementById('play-toggle').innerText = '⏸';
+                } else {
+                    this.engine.pause();
+                    document.getElementById('play-toggle').innerText = '▶';
                 }
             },
 
-            prev() {
-                if (this.currentIndex > 0) {
-                    this.currentIndex--;
-                    this.play(this.playlist[this.currentIndex]);
-                }
+            updatePlayer() {
+                const per = (this.engine.currentTime / this.engine.duration) * 100;
+                document.getElementById('progress-bar').style.width = per + '%';
+                document.getElementById('time-cur').innerText = this.formatTime(this.engine.currentTime);
+                document.getElementById('time-dur').innerText = this.formatTime(this.engine.duration || 0);
             },
 
-            applyState() {
+            formatTime(s) {
+                const m = Math.floor(s / 60);
+                const r = Math.floor(s % 60);
+                return `${m.toString().padStart(2, '0')}:${r.toString().padStart(2, '0')}`;
+            },
+
+            seek(e) {
+                const rect = document.getElementById('progress-area').getBoundingClientRect();
+                const pos = (e.clientX - rect.left) / rect.width;
+                this.engine.currentTime = pos * this.engine.duration;
+            },
+
+            openReader(book) {
+                const url = MASTER_DATA.base + book.file;
+                document.getElementById('pdf-label').innerText = book.title;
+                document.getElementById('pdf-view').src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+                document.getElementById('pdf-modal').style.display = 'grid';
+            },
+
+            toggleTheme() {
+                this.state.theme = this.state.theme === 'light' ? 'dark' : 'light';
+                localStorage.setItem('zn_theme', this.state.theme);
+                this.applyTheme();
+            },
+
+            applyTheme() {
                 document.body.dataset.theme = this.state.theme;
-                this.engine.volume = this.state.volume;
-                document.getElementById('p-vol').value = this.state.volume;
-                if (this.state.lastTrack) {
-                    const track = this.registry.find(i => i.id === this.state.lastTrack);
-                    if (track) {
-                        document.getElementById('p-title').innerText = track.title;
-                        document.getElementById('p-artist').innerText = track.artist;
-                    }
-                }
+                document.getElementById('theme-btn').innerText = this.state.theme === 'light' ? '🌙' : '☀️';
             },
 
-            saveState() {
-                localStorage.setItem('zn_state', JSON.stringify(this.state));
+            notify(msg) {
+                const toast = document.createElement('div');
+                toast.className = 'toast urdu';
+                toast.innerText = msg;
+                document.getElementById('notify-hub').appendChild(toast);
+                setTimeout(() => toast.remove(), 4000);
             }
         };
 
-        window.onload = () => System.init();
+        // Modal Close Logic
+        document.getElementById('close-reader').onclick = () => {
+            document.getElementById('pdf-modal').style.display = 'none';
+        };
+
+        // Start Engine
+        window.onload = () => App.init();
     </script>
 </body>
 </html>
