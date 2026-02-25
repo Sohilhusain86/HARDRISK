@@ -3,461 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zikr-o-Nazar</title>
-    <style>
-        /* :root mein hum tamaam colors aur sizes define karte hain taake design theek se kaam kare */
-        :root {
-            /* Light Theme Colors */
-            --background: #f8fafc;
-            --surface: #ffffff;
-            --text: #0f172a;
-            --text-low: #64748b;
-            --border: #e2e8f0;
-            --primary: #10b981;
-            --primary-soft: #d1fae5;
-            --accent: #fdba74;
-            
-            /* HSL values for button hover effects */
-            --primary-hue: 160;
-            --primary-saturation: 84%;
-            --primary-lightness: 39%;
-
-            /* Fonts & Typography */
-            --font-sans: system-ui, -apple-system, sans-serif;
-            --font-urdu: 'Jameel Noori Nastaleeq', 'Nafees Web Naskh', Arial, sans-serif;
-            --font-weight-medium: 500;
-            --font-weight-bold: 700;
-            
-            /* Sizes & Spacing */
-            --font-size-small: 0.875rem;
-            --font-size-body: 1rem;
-            --font-size-title: 1.5rem;
-            --font-size-hero: 2.5rem;
-            
-            --spacing-extra-small: 0.25rem;
-            --spacing-small: 0.5rem;
-            --spacing-medium: 1rem;
-            --spacing-large: 2rem;
-            --spacing-giant: 3rem;
-            --spacing-huge: 4rem;
-            
-            /* Border Radius & Shadows */
-            --radius-small: 0.25rem;
-            --radius-medium: 0.5rem;
-            --radius-large: 1rem;
-            --radius-extra-large: 1.5rem;
-            
-            --shadow-small: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow-medium: 0 4px 6px -1px rgba(0,0,0,0.1);
-            --shadow-luxury: 0 10px 15px -3px rgba(0,0,0,0.1);
-            
-            /* Transitions */
-            --transition-fast: 0.15s ease;
-            --transition-medium: 0.3s ease;
-            --transition-slow: 0.5s ease;
-            
-            --safe-area-inset-top: 0px;
-            --safe-area-inset-bottom: 0px;
-        }
-
-        /* Dark Theme Colors */
-        [data-theme="dark"] {
-            --background: #020617;
-            --surface: #0f172a;
-            --text: #f1f5f9;
-            --text-low: #94a3b8;
-            --border: rgba(255, 255, 255, 0.06);
-        }
-
-        /* Yahan se aap ka baqi CSS shuru hota hai */
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            outline-offset: 4px;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background: var(--background);
-            color: var(--text);
-            font-family: var(--font-sans);
-            transition: var(--transition-medium);
-            overflow-x: hidden;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            line-height: 1.6;
-        }
-
-        .urdu {
-            font-family: var(--font-urdu);
-            line-height: 2.4;
-            direction: rtl;
-            text-align: right;
-        }
-
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            transition: var(--transition-medium);
-        }
-
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: var(--spacing-medium) var(--spacing-large);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: var(--font-size-title);
-            font-weight: var(--font-weight-bold);
-            color: var(--primary);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-small);
-        }
-
-        .controls {
-            display: flex;
-            gap: var(--spacing-small);
-        }
-
-        .button {
-            padding: var(--spacing-small) var(--spacing-medium);
-            border-radius: var(--radius-medium);
-            border: 1px solid var(--border);
-            background: var(--surface);
-            color: var(--text);
-            font-weight: var(--font-weight-medium);
-            cursor: pointer;
-            transition: var(--transition-fast);
-        }
-
-        .button:hover {
-            transform: translateY(-2px);
-            border-color: var(--primary);
-            color: var(--primary);
-            box-shadow: var(--shadow-small);
-        }
-
-        .button-primary {
-            background: var(--primary);
-            color: #ffffff;
-            border: none;
-        }
-
-        .button-primary:hover {
-            background: hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) + 10%));
-        }
-
-        .hero {
-            padding: var(--spacing-giant) var(--spacing-large) var(--spacing-huge);
-            text-align: center;
-        }
-
-        .hero-title {
-            font-size: var(--font-size-hero);
-            margin: 0 0 var(--spacing-medium);
-            color: var(--primary);
-        }
-
-        .hero-subtitle {
-            font-size: var(--font-size-body);
-            color: var(--text-low);
-            margin: 0 0 var(--spacing-large);
-        }
-
-        .search-section {
-            max-width: 800px;
-            margin: -var(--spacing-huge) auto var(--spacing-huge);
-            padding: 0 var(--spacing-large);
-            position: sticky;
-            top: calc( var(--spacing-large) + var(--safe-area-inset-top) );
-            z-index: 90;
-        }
-
-        .search-wrapper {
-            background: var(--surface);
-            border-radius: 100px;
-            padding: var(--spacing-extra-small);
-            box-shadow: var(--shadow-medium);
-            display: flex;
-            align-items: center;
-            border: 1px solid var(--border);
-            transition: var(--transition-fast);
-        }
-
-        .search-wrapper:focus-within {
-            box-shadow: var(--shadow-luxury);
-            border-color: var(--primary);
-        }
-
-        .search-input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            padding: 0 var(--spacing-medium);
-            font-size: var(--font-size-body);
-            color: var(--text);
-            outline: none;
-        }
-
-        .filter-buttons {
-            display: flex;
-            justify-content: center;
-            gap: var(--spacing-small);
-            margin-top: var(--spacing-medium);
-        }
-
-        .filter-button {
-            padding: var(--spacing-small) var(--spacing-medium);
-            border-radius: var(--radius-medium);
-            background: var(--surface);
-            color: var(--text);
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: var(--transition-fast);
-        }
-
-        .filter-button.active {
-            background: var(--primary);
-            color: #ffffff;
-            border: none;
-        }
-
-        .main-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 var(--spacing-large) var(--spacing-giant);
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: var(--spacing-large);
-        }
-
-        .card {
-            background: var(--surface);
-            border-radius: var(--radius-large);
-            border: 1px solid var(--border);
-            padding: var(--spacing-large);
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-medium);
-            transition: var(--transition-medium);
-        }
-
-        .card:hover {
-            transform: scale(1.02) translateY(-10px);
-            box-shadow: var(--shadow-luxury);
-        }
-
-        .tag {
-            font-size: var(--font-size-small);
-            font-weight: var(--font-weight-bold);
-            padding: var(--spacing-extra-small) var(--spacing-small);
-            border-radius: var(--radius-small);
-            width: fit-content;
-        }
-
-        .tag-audio { background: #dcfce7; color: #166534; }
-        .tag-book { background: #e0f2fe; color: #0369a1; }
-
-        .card-title {
-            font-size: 1.4rem;
-            font-weight: var(--font-weight-bold);
-            margin: 0;
-            line-height: 1.4;
-        }
-
-        .card-description {
-            font-size: var(--font-size-small);
-            color: var(--text-low);
-            margin: 0;
-        }
-
-        .card-actions {
-            display: flex;
-            gap: var(--spacing-small);
-            margin-top: auto;
-        }
-
-        .media-player {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 2000;
-            background: var(--surface);
-            border-top: 1px solid var(--border);
-            padding: var(--spacing-medium) var(--spacing-large);
-            transform: translateY(110%);
-            transition: var(--transition-medium);
-        }
-
-        .media-player.active {
-            transform: translateY(0);
-        }
-
-        .player-layout {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
-            align-items: center;
-            gap: var(--spacing-large);
-        }
-
-        .track-info { display: flex; flex-direction: column; }
-        .track-title { font-weight: var(--font-weight-bold); }
-        .track-artist { font-size: var(--font-size-small); color: var(--text-low); }
-
-        .player-controls { display: flex; flex-direction: column; gap: var(--spacing-small); }
-        
-        .progress-bar {
-            height: 8px;
-            background: var(--border);
-            border-radius: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: var(--primary);
-            width: 30%; /* Demo progress */
-        }
-
-        .control-buttons {
-            display: flex;
-            justify-content: center;
-            gap: var(--spacing-large);
-        }
-
-        .play-button {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 900px) {
-            .player-layout { grid-template-columns: 1fr; }
-            .hero-title { font-size: 2rem; }
-            .main-content { grid-template-columns: 1fr; }
-        }
-    </style>
+    <title>Zikr-o-Nazar | ذکر و نظر</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
 </head>
-<body>
+<body data-theme="light">
 
-<header class="header">
-    <div class="nav-container">
-        <a class="logo urdu" href="#">ذکر و نظر</a>
-        <div class="controls">
-            <button class="button" id="themeToggle">🌙</button>
-            <button class="button">اردو</button>
-            <button class="button button-primary">Login</button>
+    <div id="toast-container" class="toast-container"></div>
+
+    <header class="system-header">
+        <div class="nav-container">
+            <h1 class="logo urdu">ذکر و نظر</h1>
+            <div class="header-controls">
+                <button id="themeToggle" class="btn btn-icon" title="Theme">🌙</button>
+            </div>
         </div>
-    </div>
-</header>
+    </header>
 
-<section class="hero">
-    <h1 class="hero-title urdu">علم، نعت، کتاب — ایک جگہ</h1>
-    <p class="hero-subtitle urdu">مستند اسلامی کتب، نعتیں، آڈیو اور جدید ڈیجیٹل سہولیات</p>
-</section>
+    <main class="app-container">
+        
+        <section class="toolbar">
+            <div class="search-box">
+                <span class="icon">🔍</span>
+                <input type="text" id="searchInput" class="urdu" placeholder="نعت، کلام یا کتاب تلاش کریں...">
+            </div>
+            <div class="filter-group">
+                <button class="filter-btn active" data-filter="all">سب دیکھیں</button>
+                <button class="filter-btn" data-filter="audio">صوتی کلام (Audio)</button>
+                <button class="filter-btn" data-filter="pdf">کتب (PDF)</button>
+            </div>
+        </section>
 
-<section class="search-section">
-    <div class="search-wrapper">
-        <input class="search-input urdu" type="search" placeholder="کتاب، نعت، موضوع تلاش کریں...">
-        <button class="button-primary">🔍</button>
-    </div>
-    <div class="filter-buttons">
-        <button class="filter-button active">All</button>
-        <button class="filter-button">Naats</button>
-        <button class="filter-button">Books</button>
-        <button class="filter-button">Audio</button>
-    </div>
-</section>
+        <section id="contentGrid" class="content-grid">
+            </section>
+    </main>
 
-<main class="main-content">
-    <article class="card">
-        <span class="tag tag-audio">Audio</span>
-        <h2 class="card-title urdu">نعتِ رسول ﷺ</h2>
-        <p class="card-description urdu">اعلیٰ معیار کی نعت آڈیو</p>
-        <div class="card-actions">
-            <button class="button-primary play-trigger">▶ Play</button>
-            <button class="button">♡ Save</button>
-        </div>
-    </article>
-
-    <article class="card">
-        <span class="tag tag-book">Book</span>
-        <h2 class="card-title urdu">فقہی مسائل</h2>
-        <p class="card-description urdu">مستند پی ڈی ایف کتاب</p>
-        <div class="card-actions">
-            <button class="button-primary">📖 Read</button>
-            <button class="button">⬇ Download</button>
-        </div>
-    </article>
-</main>
-
-<div class="media-player" id="player">
-    <div class="player-layout">
-        <div class="track-info">
-            <span class="track-title urdu">نعت چل رہی ہے</span>
-            <span class="track-artist urdu">قاری</span>
+    <div id="mediaPlayer" class="media-player hidden">
+        <div class="player-info">
+            <h3 id="nowPlayingTitle" class="urdu">...</h3>
+            <p id="nowPlayingType" class="tag tag-audio">Audio</p>
         </div>
         <div class="player-controls">
-            <div class="progress-bar"><div class="progress-fill"></div></div>
-            <div class="control-buttons">
-                <button class="button stop-button">⏹</button>
-                <button class="play-button">⏯</button>
+            <button id="playPauseBtn" class="btn btn-primary btn-round">▶</button>
+            <div class="progress-wrapper">
+                <span id="currentTime">00:00</span>
+                <input type="range" id="audioProgress" min="0" max="100" value="0">
+                <span id="totalTime">00:00</span>
+            </div>
+        </div>
+        <button id="closePlayerBtn" class="btn btn-icon">❌</button>
+    </div>
+
+    <div id="pdfModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="pdfTitle" class="urdu">کتاب پڑھیں</h2>
+                <button id="closePdfBtn" class="btn btn-icon">❌</button>
+            </div>
+            <div class="modal-body">
+                <p class="urdu">پی ڈی ایف فائل یہاں لوڈ ہوگی۔ (حقیقی استعمال کے لیے iframe یا PDF.js کی ضرورت ہوگی)</p>
+                <div id="pdfContainer" class="pdf-placeholder"></div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    // Theme Engine (Dark / Light Mode)
-    const themeToggle = document.getElementById('themeToggle');
-    const root = document.documentElement;
-    
-    let currentTheme = localStorage.getItem('theme') || 'light';
-    root.setAttribute('data-theme', currentTheme);
-
-    themeToggle.addEventListener('click', () => {
-        currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        root.setAttribute('data-theme', currentTheme);
-        localStorage.setItem('theme', currentTheme);
-    });
-
-    // Media Player Trigger
-    const player = document.getElementById('player');
-    const playButtons = document.querySelectorAll('.play-trigger');
-    const stopButton = document.querySelector('.stop-button');
-
-    // Play button dabane par player show hoga
-    playButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            player.classList.add('active');
-        });
-    });
-
-    // Stop button dabane par player hide hoga
-    stopButton.addEventListener('click', () => {
-        player.classList.remove('active');
-    });
-</script>
-
+    <script src="system-core.js"></script>
+    <script src="modules.js"></script>
+    <script src="components.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
