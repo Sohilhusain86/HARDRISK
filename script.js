@@ -1,97 +1,139 @@
-/**
- * MAIN SYSTEM CONTROLLER
- * یہ فائل کلکس، ٹائپنگ اور دیگر ایونٹس کو کنٹرول کرتی ہے۔
- */
+const contentGrid = document.getElementById("contentGrid");
+const searchInput = document.getElementById("searchInput");
+const filterBtns = document.querySelectorAll(".filter-btn");
+const themeToggle = document.getElementById("themeToggle");
 
-const SystemController = {
-    // DOM Elements
-    grid: 'contentGrid',
-    searchInput: document.getElementById('searchInput'),
-    filterBtns: document.querySelectorAll('.filter-btn'),
-    player: document.getElementById('mediaPlayer'),
-    pdfModal: document.getElementById('pdfModal'),
+const mediaPlayer = document.getElementById("mediaPlayer");
+const nowPlayingTitle = document.getElementById("nowPlayingTitle");
+const nowPlayingType = document.getElementById("nowPlayingType");
+const playPauseBtn = document.getElementById("playPauseBtn");
+const closePlayerBtn = document.getElementById("closePlayerBtn");
+const audioProgress = document.getElementById("audioProgress");
+const currentTime = document.getElementById("currentTime");
+const totalTime = document.getElementById("totalTime");
 
-    init() {
-        this.bindEvents();
-        this.updateView();
-    },
+const pdfModal = document.getElementById("pdfModal");
+const pdfTitle = document.getElementById("pdfTitle");
+const pdfFrame = document.getElementById("pdfFrame");
+const closePdfBtn = document.getElementById("closePdfBtn");
 
-    bindEvents() {
-        // Search Input
-        this.searchInput.addEventListener('input', (e) => {
-            AppState.searchQuery = e.target.value;
-            this.updateView();
-        });
+let activeFilter = "all";
+let activeAudio = null;
+let activeItem = null;
 
-        // Filter Buttons
-        this.filterBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.filterBtns.forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                AppState.currentFilter = e.target.dataset.filter;
-                this.updateView();
-            });
-        });
+const audio = new Audio();
 
-        // Theme Toggle
-        document.getElementById('themeToggle').addEventListener('click', () => AppState.toggleTheme());
+function renderItems() {
+  const query = searchInput.value.toLowerCase().trim();
 
-        // Player & Modal Close Buttons
-        document.getElementById('closePlayerBtn').addEventListener('click', () => this.closePlayer());
-        document.getElementById('closePdfBtn').addEventListener('click', () => this.closePdfModal());
-    },
+  const filtered = contentItems.filter(item => {
+    const matchFilter = activeFilter === "all" || item.type === activeFilter;
+    const text = `${item.title} ${item.description || ""} ${(item.tags || []).join(" ")}`.toLowerCase();
+    const matchSearch = text.includes(query);
+    return matchFilter && matchSearch;
+  });
 
-    updateView() {
-        const filteredData = DataModule.getFilteredData(AppState.currentFilter, AppState.searchQuery);
-        UIComponents.renderGrid(this.grid, filteredData);
-    },
+  contentGrid.innerHTML = filtered.map(item => `
+    <article class="card ${item.type}">
+      <div class="card-badge">${item.type === "audio" ? "Audio" : "PDF"}</div>
+      <h3 class="urdu">${item.title}</h3>
+      <p class="urdu">${item.description || ""}</p>
+      <div class="tag-row">
+        ${(item.tags || []).map(tag => `<span class="tag">${tag}</span>`).join("")}
+      </div>
+      <button class="action-btn" data-id="${item.id}">
+        ${item.type === "audio" ? "سنیں" : "پڑھیں"}
+      </button>
+    </article>
+  `).join("");
 
-    // Actions
-    playAudio(id) {
-        const item = DataModule.items.find(i => i.id === id);
-        if(!item) return;
-        
-        document.getElementById('nowPlayingTitle').innerText = item.title;
-        this.player.classList.remove('hidden');
-        setTimeout(() => this.player.classList.add('active'), 10);
-        
-        const playBtn = document.getElementById('playPauseBtn');
-        playBtn.innerText = '⏸';
-        this.showToast('آڈیو لوڈ ہو رہی ہے: ' + item.title);
-        // Note: Actual Audio() object logic goes here when connecting real files.
-    },
+  document.querySelectorAll(".action-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const item = contentItems.find(x => x.id == btn.dataset.id);
+      if (item.type === "audio") openAudio(item);
+      else openPdf(item);
+    });
+  });
+}
 
-    closePlayer() {
-        this.player.classList.remove('active');
-        setTimeout(() => this.player.classList.add('hidden'), 400);
-    },
+function openAudio(item) {
+  activeItem = item;
+  nowPlayingTitle.textContent = item.title;
+  nowPlayingType.textContent = "Audio";
+  mediaPlayer.classList.remove("hidden");
 
-    openPdf(id) {
-        const item = DataModule.items.find(i => i.id === id);
-        if(!item) return;
+  if (activeAudio !== item.file) {
+    audio.src = item.file;
+    activeAudio = item.file;
+  }
+  audio.play();
+  playPauseBtn.textContent = "⏸";
+}
 
-        document.getElementById('pdfTitle').innerText = item.title;
-        this.pdfModal.classList.remove('hidden');
-        setTimeout(() => this.pdfModal.classList.add('active'), 10);
-    },
+function openPdf(item) {
+  pdfTitle.textContent = item.title;
+  pdfFrame.src = item.file;
+  pdfModal.classList.remove("hidden");
+}
 
-    closePdfModal() {
-        this.pdfModal.classList.remove('active');
-        setTimeout(() => this.pdfModal.classList.add('hidden'), 300);
-    },
-
-    showToast(message) {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = 'toast urdu';
-        toast.innerText = message;
-        container.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-};
-
-// Start the application when HTML is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    SystemController.init();
+playPauseBtn.addEventListener("click", () => {
+  if (audio.paused) {
+    audio.play();
+    playPauseBtn.textContent = "⏸";
+  } else {
+    audio.pause();
+    playPauseBtn.textContent = "▶";
+  }
 });
 
+closePlayerBtn.addEventListener("click", () => {
+  audio.pause();
+  mediaPlayer.classList.add("hidden");
+});
+
+closePdfBtn.addEventListener("click", () => {
+  pdfModal.classList.add("hidden");
+  pdfFrame.src = "";
+});
+
+audio.addEventListener("timeupdate", () => {
+  if (!audio.duration) return;
+  audioProgress.value = (audio.currentTime / audio.duration) * 100;
+  currentTime.textContent = formatTime(audio.currentTime);
+  totalTime.textContent = formatTime(audio.duration);
+});
+
+audioProgress.addEventListener("input", () => {
+  if (audio.duration) {
+    audio.currentTime = (audioProgress.value / 100) * audio.duration;
+  }
+});
+
+audio.addEventListener("ended", () => {
+  playPauseBtn.textContent = "▶";
+});
+
+function formatTime(sec) {
+  const m = Math.floor(sec / 60) || 0;
+  const s = Math.floor(sec % 60) || 0;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+searchInput.addEventListener("input", renderItems);
+
+filterBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    filterBtns.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeFilter = btn.dataset.filter;
+    renderItems();
+  });
+});
+
+themeToggle.addEventListener("click", () => {
+  const theme = document.body.getAttribute("data-theme");
+  document.body.setAttribute("data-theme", theme === "light" ? "dark" : "light");
+  themeToggle.textContent = theme === "light" ? "☀️" : "🌙";
+});
+
+renderItems();
