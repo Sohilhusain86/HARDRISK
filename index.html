@@ -1,75 +1,73 @@
 <!DOCTYPE html>
 <html lang="ur" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zikr-o-Nazar | ذکر و نظر</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zikr-o-Nazar | ذکر و نظر</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body data-theme="light">
-
-    <div id="toast-container" class="toast-container"></div>
-
-    <header class="system-header">
-        <div class="nav-container">
-            <h1 class="logo urdu">ذکر و نظر</h1>
-            <div class="header-controls">
-                <button id="themeToggle" class="btn btn-icon" title="Theme">🌙</button>
-            </div>
-        </div>
-    </header>
-
-    <main class="app-container">
-        
-        <section class="toolbar">
-            <div class="search-box">
-                <span class="icon">🔍</span>
-                <input type="text" id="searchInput" class="urdu" placeholder="نعت، کلام یا کتاب تلاش کریں...">
-            </div>
-            <div class="filter-group">
-                <button class="filter-btn active" data-filter="all">سب دیکھیں</button>
-                <button class="filter-btn" data-filter="audio">صوتی کلام (Audio)</button>
-                <button class="filter-btn" data-filter="pdf">کتب (PDF)</button>
-            </div>
-        </section>
-
-        <section id="contentGrid" class="content-grid">
-            </section>
-    </main>
-
-    <div id="mediaPlayer" class="media-player hidden">
-        <div class="player-info">
-            <h3 id="nowPlayingTitle" class="urdu">...</h3>
-            <p id="nowPlayingType" class="tag tag-audio">Audio</p>
-        </div>
-        <div class="player-controls">
-            <button id="playPauseBtn" class="btn btn-primary btn-round">▶</button>
-            <div class="progress-wrapper">
-                <span id="currentTime">00:00</span>
-                <input type="range" id="audioProgress" min="0" max="100" value="0">
-                <span id="totalTime">00:00</span>
-            </div>
-        </div>
-        <button id="closePlayerBtn" class="btn btn-icon">❌</button>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div>
+        <h1 class="logo">ذکر و نظر</h1>
+        <p class="subtitle">نعت، کلام، اور کتب ایک جگہ</p>
+      </div>
+      <button id="themeToggle" class="icon-btn">🌙</button>
     </div>
+  </header>
 
-    <div id="pdfModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="pdfTitle" class="urdu">کتاب پڑھیں</h2>
-                <button id="closePdfBtn" class="btn btn-icon">❌</button>
-            </div>
-            <div class="modal-body">
-                <p class="urdu">پی ڈی ایف فائل یہاں لوڈ ہوگی۔ (حقیقی استعمال کے لیے iframe یا PDF.js کی ضرورت ہوگی)</p>
-                <div id="pdfContainer" class="pdf-placeholder"></div>
-            </div>
-        </div>
+  <main class="container">
+    <section class="hero">
+      <h2 class="urdu">خوش آمدید</h2>
+      <p class="urdu">یہاں آپ آڈیو سن سکتے ہیں اور کتابیں پڑھ سکتے ہیں۔</p>
+    </section>
+
+    <section class="toolbar">
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" id="searchInput" class="urdu" placeholder="نعت، کلام یا کتاب تلاش کریں..." />
+      </div>
+
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="all">سب دیکھیں</button>
+        <button class="filter-btn" data-filter="audio">صوتی کلام</button>
+        <button class="filter-btn" data-filter="pdf">کتب</button>
+      </div>
+    </section>
+
+    <section id="contentGrid" class="content-grid"></section>
+  </main>
+
+  <div id="mediaPlayer" class="media-player hidden">
+    <div class="player-info">
+      <h3 id="nowPlayingTitle" class="urdu">...</h3>
+      <p id="nowPlayingType" class="tag">Audio</p>
     </div>
+    <div class="player-controls">
+      <button id="playPauseBtn" class="btn-round">▶</button>
+      <div class="progress-wrapper">
+        <span id="currentTime">00:00</span>
+        <input type="range" id="audioProgress" min="0" max="100" value="0" />
+        <span id="totalTime">00:00</span>
+      </div>
+    </div>
+    <button id="closePlayerBtn" class="icon-btn">❌</button>
+  </div>
 
-    <script src="system-core.js"></script>
-    <script src="modules.js"></script>
-    <script src="components.js"></script>
-    <script src="script.js"></script>
+  <div id="pdfModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="pdfTitle" class="urdu">کتاب پڑھیں</h2>
+        <button id="closePdfBtn" class="icon-btn">❌</button>
+      </div>
+      <div class="modal-body">
+        <iframe id="pdfFrame" class="pdf-frame"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script src="modules.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
