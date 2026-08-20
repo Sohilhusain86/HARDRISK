@@ -1,73 +1,616 @@
 <!DOCTYPE html>
 <html lang="ur" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zikr-o-Nazar | ذکر و نظر</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>جشنِ عید میلاد النبی ﷺ | 12 ربیع الاول شریف</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Gulzar&family=Noto+Nastaliq+Urdu:wght@400;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --primary-gold: #d4af37;
+      --secondary-gold: #f3e5ab;
+      --emerald-green: #064e3b;
+      --deep-green: #022c22;
+      --accent-green: #047857;
+      --dark-bg: #03140e;
+      --card-bg: rgba(6, 78, 59, 0.55);
+      --card-border: rgba(212, 175, 55, 0.35);
+      --text-light: #f8fafc;
+      --text-gold: #fbbf24;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: radial-gradient(circle at top center, #064e3b 0%, #031c14 50%, #010d09 100%);
+      color: var(--text-light);
+      font-family: 'Noto Nastaliq Urdu', 'Amiri', serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient Decorative Stars & Lights */
+    .stars {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      background: radial-gradient(2px 2px at 20px 30px, #ffd700, rgba(0,0,0,0)),
+                  radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                  radial-gradient(1px 1px at 90px 40px, #ffd700, rgba(0,0,0,0)),
+                  radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0));
+      background-repeat: repeat;
+      background-size: 200px 200px;
+      opacity: 0.35;
+      z-index: 0;
+    }
+
+    /* Landing / Welcome Screen */
+    #welcome-screen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #065f46 0%, #022c22 60%, #01130d 100%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 25px;
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #welcome-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(1.05);
+      pointer-events: none;
+    }
+
+    .welcome-card {
+      background: rgba(3, 30, 21, 0.85);
+      border: 2px solid var(--primary-gold);
+      border-radius: 24px;
+      padding: 40px 25px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 0 35px rgba(212, 175, 55, 0.3), inset 0 0 20px rgba(212, 175, 55, 0.15);
+      backdrop-filter: blur(10px);
+      animation: pulseGlow 4s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 25px rgba(212, 175, 55, 0.25); }
+      100% { box-shadow: 0 0 45px rgba(212, 175, 55, 0.55); }
+    }
+
+    .bismillah {
+      font-size: 1.8rem;
+      color: var(--primary-gold);
+      margin-bottom: 20px;
+      line-height: 2.2;
+    }
+
+    .welcome-title {
+      font-family: 'Gulzar', 'Noto Nastaliq Urdu', serif;
+      font-size: 2.2rem;
+      color: #fff;
+      text-shadow: 0 2px 10px rgba(212, 175, 55, 0.5);
+      margin-bottom: 15px;
+      line-height: 1.8;
+    }
+
+    .welcome-sher {
+      font-size: 1.25rem;
+      line-height: 2.4;
+      color: var(--secondary-gold);
+      margin-bottom: 30px;
+      border-top: 1px dashed rgba(212, 175, 55, 0.4);
+      border-bottom: 1px dashed rgba(212, 175, 55, 0.4);
+      padding: 15px 10px;
+    }
+
+    .enter-btn {
+      background: linear-gradient(135deg, #d4af37, #f59e0b, #b45309);
+      color: #03140e;
+      font-family: 'Amiri', 'Noto Nastaliq Urdu', serif;
+      font-size: 1.4rem;
+      font-weight: bold;
+      border: none;
+      padding: 14px 45px;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4);
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .enter-btn:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 15px 30px rgba(212, 175, 55, 0.6);
+    }
+
+    /* Main Dashboard Layout */
+    .main-container {
+      position: relative;
+      z-index: 1;
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 30px 18px 100px 18px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .top-badge {
+      display: inline-block;
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid var(--primary-gold);
+      color: var(--primary-gold);
+      padding: 6px 20px;
+      border-radius: 30px;
+      font-size: 0.95rem;
+      margin-bottom: 15px;
+    }
+
+    .site-title {
+      font-family: 'Gulzar', 'Noto Nastaliq Urdu', serif;
+      font-size: 2.6rem;
+      color: #ffd700;
+      text-shadow: 0 3px 15px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.4);
+      line-height: 1.7;
+    }
+
+    .subtitle {
+      font-size: 1.15rem;
+      color: #e2e8f0;
+      margin-top: 5px;
+    }
+
+    /* Countdown Grid */
+    .timer-section {
+      background: linear-gradient(145deg, rgba(6, 78, 59, 0.8), rgba(2, 44, 34, 0.95));
+      border: 2px solid var(--card-border);
+      border-radius: 24px;
+      padding: 30px 20px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(212, 175, 55, 0.1);
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .timer-heading {
+      font-size: 1.5rem;
+      color: var(--secondary-gold);
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      direction: ltr; /* numbers look standard */
+    }
+
+    @media (max-width: 600px) {
+      .countdown-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+    }
+
+    .time-card {
+      background: rgba(1, 20, 14, 0.8);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 18px;
+      padding: 18px 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .time-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, transparent, var(--primary-gold), transparent);
+    }
+
+    .time-val {
+      font-family: 'Poppins', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #ffd700;
+      line-height: 1;
+      text-shadow: 0 2px 10px rgba(212, 175, 55, 0.4);
+    }
+
+    .time-lbl {
+      font-family: 'Amiri', 'Noto Nastaliq Urdu', serif;
+      font-size: 1.1rem;
+      color: #e5e7eb;
+      margin-top: 8px;
+      font-weight: 600;
+    }
+
+    /* Floating Audio Player */
+    .audio-player-panel {
+      background: linear-gradient(135deg, rgba(6, 78, 59, 0.95), rgba(3, 30, 21, 0.95));
+      border: 2px solid var(--primary-gold);
+      border-radius: 20px;
+      padding: 22px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    .player-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+      padding-bottom: 10px;
+    }
+
+    .current-track-title {
+      font-size: 1.25rem;
+      color: var(--secondary-gold);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .player-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 15px;
+    }
+
+    .ctrl-btn {
+      background: rgba(212, 175, 55, 0.2);
+      border: 1px solid var(--primary-gold);
+      color: #ffd700;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1.2rem;
+    }
+
+    .ctrl-btn.play-btn {
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
+      background: var(--primary-gold);
+      color: #022c22;
+    }
+
+    .ctrl-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px var(--primary-gold);
+    }
+
+    /* Content Cards / Maslak-e-Aala Hazrat Deeni Baatein */
+    .content-section {
+      margin-bottom: 40px;
+    }
+
+    .section-header {
+      font-size: 1.6rem;
+      color: var(--primary-gold);
+      margin-bottom: 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .section-header::after {
+      content: '◆ ❁ ◆';
+      display: block;
+      font-size: 0.9rem;
+      color: var(--secondary-gold);
+      margin-top: 5px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 22px;
+    }
+
+    .deeni-card {
+      background: linear-gradient(145deg, rgba(6, 78, 59, 0.65), rgba(2, 35, 27, 0.85));
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .deeni-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary-gold);
+    }
+
+    .card-topic {
+      font-size: 1.3rem;
+      color: var(--primary-gold);
+      margin-bottom: 12px;
+      border-bottom: 1px dashed rgba(212, 175, 55, 0.3);
+      padding-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-body {
+      font-size: 1.05rem;
+      line-height: 2.1;
+      color: #f1f5f9;
+      text-align: justify;
+    }
+
+    .kalam-box {
+      background: rgba(1, 20, 14, 0.6);
+      border-right: 4px solid var(--primary-gold);
+      padding: 12px 16px;
+      margin: 12px 0;
+      border-radius: 6px;
+      color: var(--secondary-gold);
+      font-size: 1.15rem;
+      line-height: 2.2;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      border-top: 1px solid rgba(212, 175, 55, 0.2);
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+  </style>
 </head>
-<body data-theme="light">
-  <header class="site-header">
-    <div class="container header-inner">
-      <div>
-        <h1 class="logo">ذکر و نظر</h1>
-        <p class="subtitle">نعت، کلام، اور کتب ایک جگہ</p>
-      </div>
-      <button id="themeToggle" class="icon-btn">🌙</button>
-    </div>
-  </header>
+<body>
 
-  <main class="container">
-    <section class="hero">
-      <h2 class="urdu">خوش آمدید</h2>
-      <p class="urdu">یہاں آپ آڈیو سن سکتے ہیں اور کتابیں پڑھ سکتے ہیں۔</p>
-    </section>
+  <div class="stars"></div>
 
-    <section class="toolbar">
-      <div class="search-box">
-        <span>🔍</span>
-        <input type="text" id="searchInput" class="urdu" placeholder="نعت، کلام یا کتاب تلاش کریں..." />
+  <!-- Welcome / Intro First Page Screen -->
+  <div id="welcome-screen">
+    <div class="welcome-card">
+      <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+      <h1 class="welcome-title">مرحبا یا مصطفیٰ ﷺ</h1>
+      
+      <div class="welcome-sher">
+        وہ سوئے لالہ زار پھرتے ہیں<br>
+        تیرے دن اے بہار پھرتے ہیں<br>
+        <span style="font-size: 1rem; color: #cbd5e1;">(امام احمد رضا خان بریلوی علیہ الرحمہ)</span>
       </div>
 
-      <div class="filter-group">
-        <button class="filter-btn active" data-filter="all">سب دیکھیں</button>
-        <button class="filter-btn" data-filter="audio">صوتی کلام</button>
-        <button class="filter-btn" data-filter="pdf">کتب</button>
-      </div>
-    </section>
+      <p style="color: #cbd5e1; font-size: 1.1rem; margin-bottom: 25px; line-height: 2;">
+        آمدِ مصطفیٰ ﷺ مرحبا مرحبا! عید میلاد النبی ﷺ کے پُرمسرت موقع پر نعت شریف اور آمدِ مصطفیٰ ﷺ کا مبارک ٹائمر دیکھنے کے لیے تشریف لائیں۔
+      </p>
 
-    <section id="contentGrid" class="content-grid"></section>
-  </main>
-
-  <div id="mediaPlayer" class="media-player hidden">
-    <div class="player-info">
-      <h3 id="nowPlayingTitle" class="urdu">...</h3>
-      <p id="nowPlayingType" class="tag">Audio</p>
-    </div>
-    <div class="player-controls">
-      <button id="playPauseBtn" class="btn-round">▶</button>
-      <div class="progress-wrapper">
-        <span id="currentTime">00:00</span>
-        <input type="range" id="audioProgress" min="0" max="100" value="0" />
-        <span id="totalTime">00:00</span>
-      </div>
-    </div>
-    <button id="closePlayerBtn" class="icon-btn">❌</button>
-  </div>
-
-  <div id="pdfModal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="pdfTitle" class="urdu">کتاب پڑھیں</h2>
-        <button id="closePdfBtn" class="icon-btn">❌</button>
-      </div>
-      <div class="modal-body">
-        <iframe id="pdfFrame" class="pdf-frame"></iframe>
-      </div>
+      <button class="enter-btn" id="enter-btn" onclick="enterSite()">
+        <i class="fa-solid fa-volume-high"></i>
+        <span>داخل ہوں اور نعت شریف سنیں</span>
+      </button>
     </div>
   </div>
 
-  <script src="modules.js"></script>
-  <script src="script.js"></script>
-</body>
-</html>
+  <!-- Main Application Dashboard -->
+  <div class="main-container">
+    <header>
+      <div class="top-badge"><i class="fa-solid fa-moon"></i> جشنِ آمدِ رسول ﷺ مصلکِ اعلیٰ حضرت</div>
+      <h1 class="site-title">12 ربیع الاول شریف - عید میلاد النبی ﷺ</h1>
+      <p class="subtitle">سلسلہ قادریہ رضویہ عطاریہ و اہل سنت و جماعت حنفی بریلوی</p>
+    </header>
+
+    <!-- Real-time Countdown Timer Section -->
+    <section class="timer-section">
+      <div class="timer-heading">
+        <i class="fa-solid fa-hourglass-half" style="color: var(--primary-gold);"></i>
+        <span>12 ربیع الاول (اتوار شریف) کی آمد میں بقیہ وقت</span>
+      </div>
+
+      <div class="countdown-grid">
+        <div class="time-card">
+          <div class="time-val" id="days">00</div>
+          <div class="time-lbl">دن (Days)</div>
+        </div>
+        <div class="time-card">
+          <div class="time-val" id="hours">00</div>
+          <div class="time-lbl">گھنٹے (Hours)</div>
+        </div>
+        <div class="time-card">
+          <div class="time-val" id="minutes">00</div>
+          <div class="time-lbl">منٹ (Minutes)</div>
+        </div>
+        <div class="time-card">
+          <div class="time-val" id="seconds">00</div>
+          <div class="time-lbl">سیکنڈ (Seconds)</div>
+        </div>
+      </div>
+      
+      <div id="target-date-display" style="margin-top: 18px; color: var(--secondary-gold); font-size: 1rem;">
+        ہدف تاریخ: اتوار، 12 ربیع الاول شریف
+      </div>
+    </section>
+
+    <!-- Audio Player Section -->
+    <section class="audio-player-panel">
+      <div class="player-header">
+        <div class="current-track-title" id="track-name">
+          <i class="fa-solid fa-music" style="color: var(--primary-gold);"></i>
+          <span>کلام کا انتخاب ہو رہا ہے...</span>
+        </div>
+        <span style="font-size: 0.85rem; color: #94a3b8;" id="track-status">رینڈم وقت سے پلے</span>
+      </div>
+
+      <audio id="audio-player" preload="auto"></audio>
+
+      <div class="player-controls">
+        <button class="ctrl-btn" onclick="previousKalam()" title="پچھلا کلام"><i class="fa-solid fa-backward-step"></i></button>
+        <button class="ctrl-btn play-btn" id="play-pause-btn" onclick="togglePlay()" title="چلائیں / روکیں"><i class="fa-solid fa-pause"></i></button>
+        <button class="ctrl-btn" onclick="playRandomKalam()" title="نیا رینڈم کلام"><i class="fa-solid fa-shuffle"></i></button>
+      </div>
+    </section>
+
+    <!-- Maslak-e-Aala Hazrat Religious Insights & Quotes -->
+    <section class="content-section">
+      <h2 class="section-header">دینی ارشادات و پیغامِ مسلکِ اعلیٰ حضرت</h2>
+
+      <div class="cards-grid">
+        
+        <!-- Card 1: Milad-un-Nabi Shari Status -->
+        <div class="deeni-card">
+          <h3 class="card-topic"><i class="fa-solid fa-star-and-crescent"></i> میلاد النبی ﷺ کی فضیلت</h3>
+          <div class="card-body">
+            سیدی اعلیٰ حضرت امام احمد رضا خان فاضلِ بریلوی علیہ الرحمہ فرماتے ہیں:
+            <div class="kalam-box">
+              نبی کریم ﷺ کی ولادتِ باسعادت پر خوشی منانا، ذکرِ ولادت کرنا، درود و سلام کا نذرانہ پیش کرنا اور شیرینی تقسیم کرنا مستحب و باعثِ برکت و رحمتِ الٰہی ہے۔
+            </div>
+            اللہ تعالیٰ قرآنِ پاک میں فرماتا ہے: <em>"قُلْ بِفَضْلِ اللَّهِ وَبِرَحْمَتِهِ فَبِذَٰلِكَ فَلْيَفْرَحُوا"</em> (فرما دیجئے! اللہ ہی کے فضل اور اس کی رحمت پر چاہیے کہ وہ خوشی منائیں)۔
+          </div>
+        </div>
+
+        <!-- Card 2: Hadaiq-e-Bakhshish Kalam -->
+        <div class="deeni-card">
+          <h3 class="card-topic"><i class="fa-solid fa-feather-pointed"></i> کلامِ اعلیٰ حضرت علیہ الرحمہ</h3>
+          <div class="card-body">
+            حدائقِ بخشش شریف سے ایمان افروز کلام:
+            <div class="kalam-box">
+              سب سے اولیٰ و اعلیٰ ہمارا نبی<br>
+              سب سے بالا و والا ہمارا نبی<br>
+              اپنے مولا کا پیارا ہمارا نبی<br>
+              دونوں عالم کا دولہا ہمارا نبی ﷺ
+            </div>
+            حضور تاجدارِ مدینہ ﷺ کی آمد تمام جہانوں کے لیے رحمت ہے اور آپ کی محبت ہی ایمان کی اصل ہے۔
+          </div>
+        </div>
+
+        <!-- Card 3: Huzoor Tajushshariya & Ahle Sunnat -->
+        <div class="deeni-card">
+          <h3 class="card-topic"><i class="fa-solid fa-book-open"></i> کلامِ حضور تاج الشریعہ</h3>
+          <div class="card-body">
+            اخترِ قادری، حضور تاج الشریعہ مفتی اختر رضا خان قادری ازہری علیہ الرحمہ کا مشہور ترانہ:
+            <div class="kalam-box">
+              سفینہ بخششِ امت ہے دامنِ مصطفیٰ کا<br>
+              نہ چھوٹیگا کبھی ہاتھ سے یہ دامن یا رسول اللہ ﷺ
+            </div>
+            ہمیں مسلکِ اعلیٰ حضرت، سنتِ رسول ﷺ اور شریعتِ مطہرہ پر مضبوطی سے قائم رہنے کا درس دیتا ہے۔
+          </div>
+        </div>
+
+        <!-- Card 4: Daily Sunnah & Durood -->
+        <div class="deeni-card">
+          <h3 class="card-topic"><i class="fa-solid fa-hands-praying"></i> درود و سلام کا اہتمام</h3>
+          <div class="card-body">
+            ربیع الاول کے مبارک مہینے میں کثرت سے درود پاک پڑھیں:
+            <div class="kalam-box" style="text-align: center;">
+              <strong>الصَّلٰوةُ وَالسَّلَامُ عَلَيْكَ يَا رَسُوْلَ اللّٰهِ<br>
+              وَعَلٰى اٰلِكَ وَاَصْحٰبِكَ يَا حَبِيْبَ اللّٰهِ ﷺ</strong>
+            </div>
+            نماز پنجگانہ کی پابندی کریں اور خرافات سے بچ کر شریعت کے دائرے میں رہ کر خوشی منائیں۔
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <footer>
+      <p>عید میلاد النبی ﷺ مبارک | مسلکِ اعلیٰ حضرت سلامت رہے</p>
+      <p style="margin-top: 6px; font-size: 0.85rem; color: #64748b;">پیشکش: صہیل حسین رضوی</p>
+    </footer>
+  </div>
+
+  <script>
+    // Naat & Kalam Playlist extracted from user uploaded files
+    const BASE_AUDIO_URL = "https://sohilhusain86.github.io/HARDRISK/";
+    
+    const audioFiles = [
+      "Aa Jaiye Akhtar Raza _ Latest Kalam 2023 _ S.mp3",
+      "Aala Hazrat Hamari Jaan Hai _ Urse Razavi M.mp3",
+      "Aap Par Lakho Darud or Aap Par Lakho Salam.mp3",
+      "Aasion Ko Dar Tumhara Mil Gaya - Owais Raz.mp3",
+      "Abru e Ahlesunnat Hai Ziya Ul Mustafa __ By S.mp3",
+      "Aise The Hamare Peer __ Track 06 __ By Sabir.mp3",
+      "Al Madad Peerane Peer Sabir Raza _ Dubi Hui .mp3",
+      "Allah Allah Allahu Maali Rabbun illahu __ By Sa.mp3",
+      "Almadad Khawaja e Deen _ New Mankebat e .mp3",
+      "Arsh Haq Hai Masnade Rifat Rasool Allah Ki __.mp3",
+      "Chehry Khilay Khilay Hain (Ramzan Ka Mahin.mp3",
+      "Haadha Akhtaru Adnaakum _ Sayyed Abdul W.mp3",
+      "Hafiz Tahir Qadri New Naat 2017 - Sahara Ch.mp3",
+      "Har Des Main Goonje Ga(MP3_160K).mp3",
+      "Har Waqt Tasawar Main - AlHaj Muhamma.mp3",
+      "Ho Karam Sarkar Abto Owais Raza Qadri 201.mp3",
+      "Jaaliyon par nigahe jami hai __ sabir raza azha.mp3",
+      "Jabee_n Meri Ho Sange Dar Tumhara Ya Raso.mp3",
+      "Kalam Mumtaz Qadri . Full janaza HD video(M.mp3",
+      "Kalam e Huzoor Tajushshariya _ Apne Darpar .mp3",
+      "Kalam e Tajushshariya __ Bul Hawas Sun See.mp3",
+      "Karam Jis Par Tumhara Sayyed e Abrar Hota .mp3",
+      "Koi Gul Baqi Rahega [Slowed _ Reverb] Beauti.mp3",
+      "Kuch Kare Apne Yaar Ki Baatein With New Ta.mp3",
+      "Kya Bataon Ke Kya Madina Hai_ Zohaib Ashra.mp3",
+      "Madeena Aane Wala Hai _ Sayyed Abdul Wasi.mp3",
+      "Mere Mushkil Ko Yun Aasaan Mere Mushkil Ku.mp3",
+      "Safeena E Bakhshish...Dar e Jaana Pe Fidai Ko .mp3",
+      "Sartaba Qadam Hai Tane Sultan e Zaman Pho.mp3"
+    ];
+
+    const audioPlayer = document.getElementById('audio-player');
+    const trackNameEl = document.getElementById('track-name');
+    const playPauseBtn = document.getElementById('play-pause-btn');
+
+    let currentTrackIndex = -1;
+
+    function enterSite() {
+      const welcomeScreen = document.getElementById('welcome-screen');
+      welcomeScreen.classList.add('hidden');
+      playRandomKalam();
+    }
+
+    function playRandomKalam() {
+      const randomIndex = Math.floor(Math.random() * audioFiles.length);
+      currentTrackIndex = randomIndex;
+      const fileName = audioFiles[randomIndex];
+      
+      const cleanTitle = fileName
+        .replace(/_/g, ' ')
+        .replace('.mp3', '')
+        .replace('.m4a', '');
+      
+      trackNameEl.innerHTML = `<i class="fa-solid fa-music" style="color: var(--primary-gold);"></i> <span>${cleanTitle}</span>`;
+      
+      audioPlayer.src = BASE_AUDIO_URL + encodeURIComponent(fileName);
+
+      // Seek to a random middle point (darmiyan se) once metadata is loaded
+      audioPlayer.onloadedmetadata = function() {
+        if (audioPlayer.duration && audioPlayer.duration > 30) {
+          // pick a random time between 15% and 65% of the song
