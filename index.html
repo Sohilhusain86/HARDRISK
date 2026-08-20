@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <meta name="description" content="جشنِ عید میلاد النبی ﷺ - 12 ربیع الاول شریف بروز بدھ المبارک | مسلکِ اعلیٰ حضرت | نعت پلیئر، ٹائمر، ڈیجیٹل تسبیح، کلامِ رضا، شرحِ کلام، فتاویٰ میلاد و اسلامی انسائیکلوپیڈیا">
+  <meta name="description" content="جشنِ عید میلاد النبی ﷺ - 12 ربیع الاول شریف بروز بدھ المبارک | مسلکِ اعلیٰ حضرت | نعت پلیئر، ٹائمر، ڈیجیٹل تسبیح، تفسیر صراط الجنان و کلامِ رضا">
   <meta name="author" content="سہیل حسین (Sohil Husain)">
   <title>جشنِ عید میلاد النبی ﷺ | 12 ربیع الاول شریف (بروز بدھ المبارک) | مسلکِ اعلیٰ حضرت</title>
 
@@ -116,7 +116,7 @@
       transition: background 0.4s ease;
     }
 
-    /* Canvas Ambient Geometric Starry Lattice */
+    /* Canvas Ambient Geometric Starry Lattice (No Living Beings) */
     #ambient-star-canvas {
       position: fixed;
       inset: 0;
@@ -222,7 +222,7 @@
     }
 
     /* ==========================================================================
-       4. WELCOME SPLASH GATEWAY
+       4. WELCOME SPLASH GATEWAY (MILAD SHER & POPUP FIX)
        ========================================================================== */
     #welcome-splash {
       position: fixed;
@@ -248,7 +248,7 @@
       border: 2px solid var(--primary-gold);
       border-radius: 28px;
       padding: 38px 24px;
-      max-width: 660px;
+      max-width: 680px;
       width: 100%;
       text-align: center;
       box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 35px var(--gold-glow), inset 0 0 25px rgba(212, 175, 55, 0.18);
@@ -289,17 +289,17 @@
     }
 
     .splash-sher-text {
-      font-size: 1.35rem;
+      font-size: 1.4rem;
       color: var(--gold-light);
-      line-height: 2.5;
+      line-height: 2.6;
       font-weight: 600;
     }
 
     .splash-sher-poet {
-      font-size: 1rem;
+      font-size: 1.05rem;
       color: var(--text-muted);
       display: block;
-      margin-top: 6px;
+      margin-top: 8px;
     }
 
     .splash-info {
@@ -334,7 +334,7 @@
     }
 
     /* ==========================================================================
-       5. STICKY ACTION BAR & JUMP MENU
+       5. STICKY TOP ACTION BAR
        ========================================================================== */
     .top-action-bar {
       position: sticky;
@@ -939,140 +939,80 @@
     }
 
     /* ==========================================================================
-       10. SHARH-E-KALAM-E-RAZA & THEOLOGICAL COMMENTARY
+       10. TAFSEER SIRAT-UL-JINAN (USER VERIFIED CONTENT ONLY)
        ========================================================================== */
-    .sharh-grid-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 22px;
-    }
-
-    .sharh-card-box {
-      background: rgba(1, 20, 14, 0.75);
-      border: 1px solid var(--card-border);
+    .tafseer-box-panel {
+      background: rgba(1, 20, 14, 0.85);
+      border: 2px solid var(--primary-gold);
       border-radius: var(--radius-lg);
-      padding: 22px;
-      border-top: 4px solid var(--primary-gold);
+      padding: 28px 22px;
+      margin-top: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
 
-    .sharh-verse-head {
-      font-size: 1.25rem;
+    .quran-ayah-banner {
+      font-family: var(--font-arabic);
+      font-size: 2rem;
       color: #ffd700;
-      margin-bottom: 12px;
-      line-height: 2.2;
-      background: rgba(6, 78, 59, 0.4);
-      padding: 10px 14px;
-      border-radius: 8px;
-    }
-
-    .sharh-explanation-body {
-      font-size: 1.05rem;
-      line-height: 2.1;
-      color: #f1f5f9;
-      text-align: justify;
-    }
-
-    .sharh-aqeeda-tag {
-      display: inline-block;
-      background: rgba(212, 175, 55, 0.2);
-      color: var(--secondary-gold);
-      padding: 3px 12px;
-      border-radius: 15px;
-      font-size: 0.85rem;
-      margin-top: 10px;
-    }
-
-    /* ==========================================================================
-       11. 12-DAY SPIRITUAL ROUTINE & JADWAL-E-MILAD
-       ========================================================================== */
-    .jadwal-timeline-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 18px;
-    }
-
-    .jadwal-day-card {
-      background: rgba(1, 20, 14, 0.7);
-      border: 1px solid rgba(212, 175, 55, 0.35);
+      text-align: center;
+      background: rgba(6, 78, 59, 0.5);
+      border: 1px dashed var(--primary-gold);
       border-radius: var(--radius-md);
-      padding: 18px;
-      transition: transform 0.2s;
+      padding: 20px 14px;
+      margin-bottom: 25px;
+      line-height: 2.2;
+      text-shadow: 0 0 15px rgba(250, 204, 21, 0.4);
     }
 
-    .jadwal-day-card:hover {
-      transform: translateY(-3px);
-      border-color: var(--secondary-gold);
-    }
-
-    .jadwal-day-num {
+    .translation-header {
       font-family: var(--font-title);
-      font-size: 1.4rem;
+      font-size: 1.45rem;
       color: var(--secondary-gold);
       margin-bottom: 8px;
       border-bottom: 1px dashed rgba(212, 175, 55, 0.3);
       padding-bottom: 6px;
     }
 
-    .jadwal-day-task {
-      font-size: 1rem;
-      line-height: 2;
-      color: #e2e8f0;
+    .translation-text {
+      font-size: 1.25rem;
+      line-height: 2.4;
+      color: #ffffff;
+      margin-bottom: 25px;
+      background: rgba(6, 78, 59, 0.25);
+      padding: 14px 18px;
+      border-radius: 8px;
+      border-right: 4px solid var(--secondary-gold);
     }
 
-    /* ==========================================================================
-       12. FATAWA-E-MILAD (SHARI HUB)
-       ========================================================================== */
-    .fatawa-accordion-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .fatawa-item-box {
-      background: rgba(1, 20, 14, 0.75);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-    }
-
-    .fatawa-question-btn {
-      width: 100%;
-      background: none;
-      border: none;
-      padding: 16px 20px;
+    .tafseer-main-title {
+      font-family: var(--font-title);
+      font-size: 1.6rem;
       color: var(--secondary-gold);
-      font-family: var(--font-urdu);
-      font-size: 1.2rem;
-      text-align: right;
-      cursor: pointer;
+      margin: 25px 0 12px 0;
+      border-bottom: 2px solid rgba(212, 175, 55, 0.4);
+      padding-bottom: 8px;
+    }
+
+    .tafseer-subheading {
+      font-size: 1.35rem;
+      color: #ffd700;
+      margin: 22px 0 10px 0;
       display: flex;
-      justify-content: space-between;
       align-items: center;
       gap: 10px;
-      transition: background 0.2s;
+      font-family: var(--font-title);
     }
 
-    .fatawa-question-btn:hover {
-      background: rgba(212, 175, 55, 0.1);
-    }
-
-    .fatawa-answer-body {
-      padding: 0 20px 18px 20px;
-      font-size: 1.05rem;
-      line-height: 2.2;
+    .tafseer-content-paragraph {
+      font-size: 1.15rem;
+      line-height: 2.5;
       color: #f1f5f9;
       text-align: justify;
-      display: none;
-      border-top: 1px dashed rgba(212, 175, 55, 0.25);
-    }
-
-    .fatawa-item-box.open .fatawa-answer-body {
-      display: block;
-      padding-top: 14px;
+      margin-bottom: 16px;
     }
 
     /* ==========================================================================
-       13. KALAAM-E-AKABIREEN-E-AHLE SUNNAT (RICH MULTI-VERSE LIBRARY)
+       11. KALAAM-E-AKABIREEN-E-AHLE SUNNAT (RICH MULTI-VERSE LIBRARY)
        ========================================================================== */
     .kalam-tabs-row {
       display: flex;
@@ -1176,7 +1116,7 @@
     }
 
     /* ==========================================================================
-       14. 99 ASMA-UN-NABI ﷺ EXPLORER
+       12. 99 ASMA-UN-NABI ﷺ EXPLORER
        ========================================================================== */
     .names-filter-input {
       width: 100%;
@@ -1231,90 +1171,7 @@
     }
 
     /* ==========================================================================
-       15. AADAB-E-MILAD & GOLDEN PRINCIPLES
-       ========================================================================== */
-    .adab-grid-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-    }
-
-    .adab-item-card {
-      background: rgba(1, 20, 14, 0.75);
-      border-right: 4px solid var(--primary-gold);
-      border-radius: var(--radius-md);
-      padding: 18px 16px;
-    }
-
-    .adab-item-heading {
-      font-size: 1.25rem;
-      color: var(--secondary-gold);
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .adab-item-text {
-      font-size: 1.05rem;
-      line-height: 2.2;
-      color: #f1f5f9;
-      text-align: justify;
-    }
-
-    /* ==========================================================================
-       16. ISLAMIC QUIZ ENGINE
-       ========================================================================== */
-    .quiz-question-box {
-      background: rgba(1, 20, 14, 0.75);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .quiz-question-title {
-      font-size: 1.25rem;
-      color: var(--secondary-gold);
-      margin-bottom: 12px;
-    }
-
-    .quiz-options-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 10px;
-    }
-
-    .quiz-opt-btn {
-      background: rgba(6, 78, 59, 0.5);
-      border: 1px solid var(--card-border);
-      color: #fff;
-      padding: 10px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: var(--font-urdu);
-      font-size: 1.05rem;
-      transition: all 0.2s;
-      text-align: right;
-    }
-
-    .quiz-opt-btn:hover {
-      background: rgba(212, 175, 55, 0.2);
-      border-color: var(--primary-gold);
-    }
-
-    .quiz-opt-btn.correct {
-      background: #059669 !important;
-      border-color: #34d399 !important;
-    }
-
-    .quiz-opt-btn.wrong {
-      background: #dc2626 !important;
-      border-color: #f87171 !important;
-    }
-
-    /* ==========================================================================
-       17. SHAJRA-E-QADIRIA RAZAVIA LINEAGE
+       13. SHAJRA-E-QADIRIA RAZAVIA LINEAGE
        ========================================================================== */
     .shajra-chain-list {
       display: flex;
@@ -1337,25 +1194,7 @@
     }
 
     /* ==========================================================================
-       18. 40 FAZAIL-E-DAROOD SHAREEF
-       ========================================================================== */
-    .fazail-grid-display {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 18px;
-    }
-
-    .fazail-box-item {
-      background: rgba(1, 20, 14, 0.7);
-      border-left: 3px solid var(--primary-gold);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      font-size: 1.05rem;
-      line-height: 2.2;
-    }
-
-    /* ==========================================================================
-       19. GREETING CARD GENERATOR & WHATSAPP
+       14. GREETING CARD GENERATOR & WHATSAPP
        ========================================================================== */
     .sender-name-field {
       background: rgba(1, 20, 14, 0.9);
@@ -1408,7 +1247,7 @@
     }
 
     /* ==========================================================================
-       20. MEGA FOOTER
+       15. MEGA FOOTER
        ========================================================================== */
     footer.portal-mega-footer {
       text-align: center;
@@ -1429,7 +1268,7 @@
 </head>
 <body>
 
-  <!-- Ambient Star Canvas (Pure Geometric Aesthetics) -->
+  <!-- Ambient Star Canvas (Pure Geometric Aesthetics, No Living Beings) -->
   <canvas id="ambient-star-canvas"></canvas>
 
   <!-- Auto Darood Periodic Reminder Toast -->
@@ -1470,7 +1309,7 @@
     </button>
   </div>
 
-  <!-- WELCOME SPLASH SCREEN -->
+  <!-- WELCOME SPLASH SCREEN (WITH MILAD SHER BY AALA HAZRAT) -->
   <div id="welcome-splash">
     <div class="welcome-card-box">
       <div class="bismillah-art">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
@@ -1478,8 +1317,8 @@
 
       <div class="splash-sher-box">
         <div class="splash-sher-text">
-          وہ سوئے لالہ زار پھرتے ہیں<br>
-          تیرے دن اے بہار پھرتے ہیں
+          نثار تیری چہل پہل پر ہزاروں عیدیں ربیع الاول<br>
+          سوائے ابلیس کے جہاں میں سبھی تو خوشیاں منا رہے ہیں
         </div>
         <span class="splash-sher-poet">کلام: سیدی اعلیٰ حضرت امام احمد رضا خان فاضلِ بریلوی علیہ الرحمہ</span>
       </div>
@@ -1506,14 +1345,10 @@
       <a href="#sec-countdown" class="nav-link-btn"><i class="fa-solid fa-hourglass"></i> ٹائمر</a>
       <a href="#sec-audio" class="nav-link-btn"><i class="fa-solid fa-music"></i> نعت پلیئر</a>
       <a href="#sec-tasbeeh" class="nav-link-btn"><i class="fa-solid fa-hands-praying"></i> تسبیح</a>
-      <a href="#sec-sharh" class="nav-link-btn"><i class="fa-solid fa-book-open"></i> شرحِ کلام</a>
-      <a href="#sec-jadwal" class="nav-link-btn"><i class="fa-solid fa-calendar-days"></i> 12 روزہ جدول</a>
-      <a href="#sec-fatawa" class="nav-link-btn"><i class="fa-solid fa-scale-balanced"></i> احکامِ میلاد</a>
+      <a href="#sec-tafseer" class="nav-link-btn"><i class="fa-solid fa-book-open"></i> تفسیر صراط الجنان</a>
       <a href="#sec-kalam" class="nav-link-btn"><i class="fa-solid fa-feather"></i> کلام شریف</a>
       <a href="#sec-names" class="nav-link-btn"><i class="fa-solid fa-book-quran"></i> اسمائے مصطفیٰ ﷺ</a>
-      <a href="#sec-quiz" class="nav-link-btn"><i class="fa-solid fa-circle-question"></i> کوئز</a>
       <a href="#sec-shajra" class="nav-link-btn"><i class="fa-solid fa-sitemap"></i> شجرہ قادریہ</a>
-      <a href="#sec-fazail" class="nav-link-btn"><i class="fa-solid fa-heart"></i> فضائلِ درود</a>
       <a href="#sec-card" class="nav-link-btn"><i class="fa-solid fa-share-nodes"></i> کارڈ جنریٹر</a>
     </div>
 
@@ -1682,85 +1517,48 @@
       </div>
     </section>
 
-    <!-- 4. SHARH-E-KALAM-E-RAZA (THEOLOGICAL INSIGHTS) -->
-    <section class="portal-section-panel" id="sec-sharh">
-      <h2 class="section-title-tag">شرحِ کلامِ رضا و نکاتِ ایمانیہ</h2>
-      <p class="section-subtitle-tag">حدائقِ بخشش شریف کے مبارک اشعار کی ایمانی و عقائدی تشریح</p>
+    <!-- 4. TAFSEER SIRAT-UL-JINAN (EXACT USER CONTENT) -->
+    <section class="portal-section-panel" id="sec-tafseer">
+      <h2 class="section-title-tag">تفسیر صراط الجنان - سورہ یونس آیت 58</h2>
+      <p class="section-subtitle-tag">میلاد النبی ﷺ کے ثبوت میں قرآنی استدلال و تفسیری حقائق</p>
 
-      <div class="sharh-grid-container">
-        <div class="sharh-card-box">
-          <div class="sharh-verse-head">"وہ جو نہ تھے تو کچھ نہ تھا وہ جو نہ ہوں تو کچھ نہ ہو<br>جان ہیں وہ جہان کی جان ہے تو جہان ہے"</div>
-          <div class="sharh-explanation-body">
-            <strong>نکتہ ایمان:</strong> سیدی اعلیٰ حضرت اس شعر میں حدیثِ لولاک اور حقیقتِ محمدیہ ﷺ کو بیان فرماتے ہیں کہ کائنات کی ہر نعمت، ہر زندگی اور وجود اللہ تعالیٰ نے اپنے حبیب ﷺ کے صدقے پیدا فرمایا ہے۔ آپ ہی اس جہاں کی روحِ رواں ہیں۔
-          </div>
-          <span class="sharh-aqeeda-tag">عقیدہ: سببِ خلقتِ کائنات</span>
+      <div class="tafseer-box-panel">
+        <div class="quran-ayah-banner">
+          قُلْ بِفَضْلِ اللّٰهِ وَ بِرَحْمَتِهٖ فَبِذٰلِكَ فَلْیَفْرَحُوْاؕ-هُوَ خَیْرٌ مِّمَّا یَجْمَعُوْنَ(58)
         </div>
 
-        <div class="sharh-card-box">
-          <div class="sharh-verse-head">"سب سے اولیٰ و اعلیٰ ہمارا نبی<br>سب سے بالا و والا ہمارا نبی"</div>
-          <div class="sharh-explanation-body">
-            <strong>نکتہ ایمان:</strong> تمام مخلوقات، ملائکہ، اولیاء اور رسولوں میں سب سے بلند ترین مرتبہ صرف ذاتِ مصطفیٰ ﷺ کا ہے۔ اللہ تعالیٰ کے بعد کائنات میں کوئی ہستی حضور ﷺ کے مقام و مرتبے کو نہیں پہنچ سکتی۔
-          </div>
-          <span class="sharh-aqeeda-tag">عقیدہ: افضلیتِ سید الرسل ﷺ</span>
+        <div class="translation-header"><i class="fa-solid fa-book-quran"></i> ترجمۂ کنز الایمان:</div>
+        <div class="translation-text">
+          تم فرماؤ اللہ ہی کے فضل اور اسی کی رحمت اور اسی پر چاہئے کہ خوشی کریں وہ ان کے سب دھن دولت سے بہتر ہے۔
         </div>
 
-        <div class="sharh-card-box">
-          <div class="sharh-verse-head">"سرور کہوں کہ مالک و مولیٰ کہوں تجھے<br>باغِ خلیل کا گلِ زیبا کہوں تجھے"</div>
-          <div class="sharh-explanation-body">
-            <strong>نکتہ ایمان:</strong> اللہ تعالیٰ نے اپنے پیارے رسول ﷺ کو اپنی عطا سے دو جہاں کا مالک و مختار بنایا ہے۔ مومن کا دل ہمیشہ حضور ﷺ کی غلامی پر فخر محسوس کرتا ہے۔
-          </div>
-          <span class="sharh-aqeeda-tag">عقیدہ: اختیاراتِ مصطفیٰ ﷺ</span>
-        </div>
+        <div class="tafseer-main-title"><i class="fa-solid fa-scroll"></i> تفسیر صراط الجنان</div>
+        <p class="tafseer-content-paragraph">
+          <strong>{قُلْ بِفَضْلِ اللّٰهِ وَ بِرَحْمَتِهٖ فَبِذٰلِكَ فَلْیَفْرَحُوْا:</strong> تم فرماؤ: اللہ کے فضل اور اس کی رحمت پر ہی خوشی منانی چاہیے۔} کسی پیاری اور محبوب چیز کے پانے سے دل کو جو لذت حاصل ہوتی ہے اس کو ’’فَرح ‘‘کہتے ہیں ،اور آیت کے معنی یہ ہیں کہ ایمان والوں کو اللہ عَزَّوَجَلَّ کے فضل و رحمت پر خوش ہونا چاہئے کہ اس نے انہیں نصیحتیں ، سینوں کی شفاء اور ایمان کے ساتھ دل کی راحت و سکون عطا فرمایا۔
+        </p>
+
+        <div class="tafseer-subheading"><i class="fa-solid fa-star-and-crescent"></i> اللہ تعالیٰ کے فضل اور رحمت سے کیا مراد ہے؟</div>
+        <p class="tafseer-content-paragraph">
+          اس آیت میں اللہ تعالیٰ کے فضل اور اس کی رحمت سے کیا مراد ہے اس بارے میں مفسرین کے مختلف اَقوال ہیں ، چنانچہ حضرت عبداللہ بن عباس رَضِیَ اللہُ تَعَالٰی عَنْہُمَا ، حضرت حسن اور حضرت قتادہ رَضِیَ اللہُ تَعَالٰی عَنْہُمَا نے فرمایا کہ اللہ عَزَّوَجَلَّ کے فضل سے اسلام اور اس کی رحمت سے قرآن مراد ہے۔ ایک قول یہ ہے کہ اللہ عَزَّوَجَلَّ کے فضل سے قرآن اور رحمت سے اَ حادیث مراد ہیں۔ (خازن، یونس، تحت الآیۃ: ۵۸، ۲ / ۳۲۰)
+        </p>
+
+        <p class="tafseer-content-paragraph">
+          بعض علماء نے فرمایا کہ اللہ عَزَّوَجَلَّ کا فضل حضور پُر نور صَلَّی اللہُ تَعَالٰی عَلَیْہِ وَاٰلِہٖ وَسَلَّمَ ہیں اور اللہ عَزَّوَجَلَّ کی رحمت قرآنِ کریم۔ رب عَزَّوَجَلَّ فرماتا ہے: <em>’’وَ كَانَ فَضْلُ اللّٰهِ عَلَیْكَ عَظِیْمًا‘‘</em> (نساء ۱۱۳)<br>
+          <strong style="color:var(--secondary-gold);">ترجمۂ کنزُالعِرفان:</strong> اور آپ پر اللہ کافضل بہت بڑا ہے۔
+        </p>
+
+        <p class="tafseer-content-paragraph">
+          بعض نے فرمایا :اللہ عَزَّوَجَلَّ کا فضل قرآن ہے اور رحمت حضورِاقدس صَلَّی اللہُ تَعَالٰی عَلَیْہِ وَاٰلِہٖ وَسَلَّمَ ہیں جیسا کہ اللہ عَزَّوَجَلَّ فرماتا ہے: <em>’’وَ مَاۤ اَرْسَلْنٰكَ اِلَّا رَحْمَةً لِّلْعٰلَمِیْنَ‘‘</em> (انبیاء:۱۰۷)<br>
+          <strong style="color:var(--secondary-gold);">ترجمۂ کنزُالعِرفان:</strong> اور ہم نے تمہیں تمام جہانوں کیلئے رحمت بنا کر ہی بھیجا۔
+        </p>
+
+        <p class="tafseer-content-paragraph">
+          اور اگر بالفرض اِس آیت میں متعین طور پر فضل و رحمت سے مراد سرکارِ دوعالَم صَلَّی اللہُ تَعَالٰی عَلَیْہِ وَاٰلِہٖ وَسَلَّمَ کی ذاتِ مبارکہ نہ بھی ہو تو جداگانہ طور پر تواللہ کے رسول صَلَّی اللہُ تَعَالٰی عَلَیْہِ وَاٰلِہٖ وَسَلَّمَ یقینا اللہ تعالیٰ کا عظیم ترین فضل اور رحمت ہیں۔ لہٰذا فنِ تفسیر کے اس اصول پر کہ عمومِ الفاظ کا اعتبار ہوتا ہے ، خصوصِ سبب کا نہیں ، اس کے مطابق ہی نبی کریم صَلَّی اللہُ تَعَالٰی عَلَیْہِ وَاٰلِہٖ وَسَلَّمَ کی ذات ِ مبارکہ کے حوالے سے خوشی منائی جائے گی خواہ وہ میلاد شریف کرکے ہو یا معراج شریف منانے کے ذریعے، ہاں اگر کسی بدنصیب کیلئے یہ خوشی کامقام ہی نہیں ہے تو اس کا معاملہ جدا ہے، اسے اپنے ایمان کے متعلق سوچنا چاہیے۔
+        </p>
       </div>
     </section>
 
-    <!-- 5. 12-DAY SPIRITUAL JADWAL (ROUTINE) -->
-    <section class="portal-section-panel" id="sec-jadwal">
-      <h2 class="section-title-tag">12 روزہ جدولِ انوارِ ربیع الاول</h2>
-      <p class="section-subtitle-tag">یکم تا 12 ربیع الاول روزانہ کے مخصوص وظائف و درود شریف کا روحانی چارٹ</p>
-
-      <div class="jadwal-timeline-grid" id="jadwal-rendered-box"></div>
-    </section>
-
-    <!-- 6. FATAWA-E-MILAD (SHARI HUB) -->
-    <section class="portal-section-panel" id="sec-fatawa">
-      <h2 class="section-title-tag">فتاویٰ رضویہ کی روشنی میں احکامِ میلاد</h2>
-      <p class="section-subtitle-tag">امام احمد رضا خان فاضلِ بریلوی علیہ الرحمہ کی تحقیقات پر مبنی شرعی مسائل</p>
-
-      <div class="fatawa-accordion-wrap">
-        <div class="fatawa-item-box open">
-          <button class="fatawa-question-btn" onclick="toggleFatawa(this)">
-            <span><i class="fa-solid fa-circle-question"></i> سوال 1: میلاد النبی ﷺ منانے کی شرعی حیثیت کیا ہے؟</span>
-            <i class="fa-solid fa-chevron-down"></i>
-          </button>
-          <div class="fatawa-answer-body">
-            <strong>الجواب:</strong> سرکارِ دو عالم ﷺ کی ولادتِ باسعادت پر خوشی کا اظہار کرنا، ذکرِ ولادت سننا سنانا، نعت خوانی کرنا، درود و سلام بھیجنا اور شیرینی یا کھانا تقسیم کرنا مستحب و باعثِ اجرِ عظیم اور رحمتِ الٰہی ہے۔ اللہ تعالیٰ قرآن میں فرماتا ہے: <em>"قُلْ بِفَضْلِ اللَّهِ وَبِرَحْمَتِهِ فَبِذَٰلِكَ فَلْيَفْرَحُوا"</em> (فرما دیجئے! اللہ ہی کے فضل اور اس کی رحمت پر چاہیے کہ وہ خوشی منائیں)۔
-          </div>
-        </div>
-
-        <div class="fatawa-item-box">
-          <button class="fatawa-question-btn" onclick="toggleFatawa(this)">
-            <span><i class="fa-solid fa-circle-question"></i> سوال 2: جلوسِ میلاد میں کن باتوں کا پرہیز لازم ہے؟</span>
-            <i class="fa-solid fa-chevron-down"></i>
-          </button>
-          <div class="fatawa-answer-body">
-            <strong>الجواب:</strong> جلوسِ میلاد میں بے پردگی، نامحرموں کا اختلاط، گانے باجے یا ڈی جے، ناچ گانا اور نمازوں کی قضا کرنا سخت حرام و گناہ ہے۔ جلوس مکمل باادب، باوضو اور درود و سلام کے ورد کے ساتھ نکالنا چاہیے۔
-          </div>
-        </div>
-
-        <div class="fatawa-item-box">
-          <button class="fatawa-question-btn" onclick="toggleFatawa(this)">
-            <span><i class="fa-solid fa-circle-question"></i> سوال 3: نیاز و لنگر پر فاتحہ دلانے کا کیا حکم ہے؟</span>
-            <i class="fa-solid fa-chevron-down"></i>
-          </button>
-          <div class="fatawa-answer-body">
-            <strong>الجواب:</strong> طعام یا شیرینی پر قرآنِ مجید کی تلاوت اور درود شریف پڑھ کر حضور ﷺ اور بزرگانِ دین کی بارگاہ میں ایصالِ ثواب کرنا جائز و مستحسن عمل ہے جس سے کھانے میں برکت ہوتی ہے۔
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 7. KALAAM-E-AKABIREEN -->
+    <!-- 5. KALAAM-E-AKABIREEN -->
     <section class="portal-section-panel" id="sec-kalam">
       <h2 class="section-title-tag">کلامِ اکابرینِ اہل سنت و حدائقِ بخشش</h2>
       <p class="section-subtitle-tag">مسلکِ اعلیٰ حضرت کے مایہ ناز شعراء و اکابرین کا منتخب منظوم نذرانہ</p>
@@ -1890,7 +1688,7 @@
       </div>
     </section>
 
-    <!-- 8. 99 ASMA-UN-NABI ﷺ -->
+    <!-- 6. 99 ASMA-UN-NABI ﷺ -->
     <section class="portal-section-panel" id="sec-names">
       <h2 class="section-title-tag">مبارک اسمائے مصطفیٰ ﷺ</h2>
       <p class="section-subtitle-tag">حضور نبی کریم ﷺ کے پاکیزہ ناموں کا ورد دل و جان کے لیے برکت اور شفا کا ذریعہ ہے</p>
@@ -1900,15 +1698,7 @@
       <div class="names-grid-scroll" id="asma-rendered-container"></div>
     </section>
 
-    <!-- 9. ISLAMIC QUIZ -->
-    <section class="portal-section-panel" id="sec-quiz">
-      <h2 class="section-title-tag">اسلامی معلومات و کوئز (مسلکِ اعلیٰ حضرت)</h2>
-      <p class="section-subtitle-tag">اپنے دینی علم کا امتحان لیں اور درست جوابات پر کلک کریں</p>
-      
-      <div id="quiz-dynamic-container"></div>
-    </section>
-
-    <!-- 10. SHAJRA-E-QADIRIA RAZAVIA -->
+    <!-- 7. SHAJRA-E-QADIRIA RAZAVIA -->
     <section class="portal-section-panel" id="sec-shajra">
       <h2 class="section-title-tag">شجرہ عالیہ قادریہ رضویہ (سلسلہ اکابرین)</h2>
       <p class="section-subtitle-tag">سرورِ کائنات ﷺ سے سیدی اعلیٰ حضرت امام احمد رضا خان علیہ الرحمہ تک مبارک روحانی سلسلہ</p>
@@ -1916,14 +1706,7 @@
       <div class="shajra-chain-list" id="shajra-rendered-list"></div>
     </section>
 
-    <!-- 11. 40 FAZAIL-E-DAROOD -->
-    <section class="portal-section-panel" id="sec-fazail">
-      <h2 class="section-title-tag">فضائلِ کثرتِ درود و سلام (احادیثِ مبارکہ)</h2>
-      <p class="section-subtitle-tag">حضور نبی کریم ﷺ پر درود شریف بھیجنے کے انمول فضائل و برکات</p>
-      <div class="fazail-grid-display" id="fazail-rendered-list"></div>
-    </section>
-
-    <!-- 12. GREETING CARD GENERATOR -->
+    <!-- 8. GREETING CARD GENERATOR -->
     <section class="portal-section-panel" id="sec-card">
       <h2 class="section-title-tag">عید میلاد النبی ﷺ مبارکباد کارڈ جنریٹر</h2>
       <p class="section-subtitle-tag">اپنا نام درج کریں اور اپنے احباب کو خوبصورت انداز میں عید میلاد النبی ﷺ کی مبارکباد پیش کریں</p>
@@ -1934,7 +1717,8 @@
         <div style="font-size: 1.5rem; color: var(--secondary-gold); margin-bottom: 8px;">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
         <h3 style="font-family: var(--font-title); font-size: 2.2rem; color: #fff; margin-bottom: 10px;">عید میلاد النبی ﷺ مبارک!</h3>
         <p style="font-size: 1.15rem; color: var(--gold-light); line-height: 2.3; margin-bottom: 15px;">
-          وہ سوئے لالہ زار پھرتے ہیں • تیرے دن اے بہار پھرتے ہیں<br>
+          نثار تیری چہل پہل پر ہزاروں عیدیں ربیع الاول<br>
+          سوائے ابلیس کے جہاں میں سبھی تو خوشیاں منا رہے ہیں<br><br>
           آمدِ مصطفیٰ ﷺ کی یہ مبارک گھڑیاں آپ کو اور آپ کے اہل خانہ کو بے حد مبارک ہوں۔
         </p>
         <div style="font-size: 1.25rem; color: #fff; font-weight: bold; border-top: 1px dashed rgba(212, 175, 55, 0.4); padding-top: 10px;">
@@ -2272,7 +2056,6 @@
       const modal = document.getElementById('qiyam-modal-overlay');
       if (show) {
         modal.classList.add('active');
-        // auto play salam if exists
         const salamIdx = AUDIO_FILES_DATABASE.findIndex(f => f.toLowerCase().includes('salam') || f.toLowerCase().includes('darud'));
         if (salamIdx !== -1) {
           loadAndStreamTrack(salamIdx);
@@ -2292,48 +2075,11 @@
         const toast = document.getElementById('darood-toast');
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 5000);
-      }, 90000); // every 90 seconds
+      }, 90000);
     }
 
     // --------------------------------------------------------------------------
-    // 5. 12-Day Jadwal Database
-    // --------------------------------------------------------------------------
-    const JADWAL_DAYS_DATA = [
-      { d: "یکم ربیع الاول", t: "100 بار درودِ رضویہ + تلاوت سورہ یٰس شریف + ایصالِ ثوابِ مومنین" },
-      { d: "2 ربیع الاول", t: "313 بار صلوٰۃ و سلام + شکرانہ ولادت کے 2 رکعت نفل" },
-      { d: "3 ربیع الاول", t: "100 بار درودِ تاج + مطالعہ سیرت النبی ﷺ کا 1 باب" },
-      { d: "4 ربیع الاول", t: "100 بار استغفار + 313 بار درودِ پاک + غرباء میں صدقہ" },
-      { d: "5 ربیع الاول", t: "100 بار کلمہ طیبہ + 100 بار درودِ ابراہیمی" },
-      { d: "6 ربیع الاول", t: "313 بار صلوٰۃ و سلام + ذکرِ ولادت کی نیت سے اہلِ خانہ کے ساتھ بیٹھک" },
-      { d: "7 ربیع الاول", t: "100 بار درودِ غوثیہ + حضرت غوثِ اعظم رضی اللہ عنہ کو ایصالِ ثواب" },
-      { d: "8 ربیع الاول", t: "500 بار درود شریف + گھر میں میلاد کا پرچم آویزاں کرنا" },
-      { d: "9 ربیع الاول", t: "100 بار درودِ شفا + مریضوں کی شفا کے لیے خصوصی دعا" },
-      { d: "10 ربیع الاول", t: "1000 بار درود شریف + محفلِ میلاد کا انعقاد" },
-      { d: "11 ربیع الاول", t: "شبِ میلاد کا جاگنا + صلوٰۃ التسبیح + کثرت سے سلامِ رضا" },
-      { d: "12 ربیع الاول", t: "صبحِ بہار کا استقبال + روزہ رکھنا (سنت) + جلوسِ محمدی میں باادب شرکت" }
-    ];
-
-    function renderJadwal() {
-      const container = document.getElementById('jadwal-rendered-box');
-      container.innerHTML = '';
-      JADWAL_DAYS_DATA.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'jadwal-day-card';
-        div.innerHTML = `
-          <div class="jadwal-day-num"><i class="fa-solid fa-calendar-check" style="color:var(--secondary-gold);"></i> ${item.d}</div>
-          <div class="jadwal-day-task">${item.t}</div>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    function toggleFatawa(btn) {
-      const parent = btn.closest('.fatawa-item-box');
-      parent.classList.toggle('open');
-    }
-
-    // --------------------------------------------------------------------------
-    // 6. Kalaam Filter Tabs & Copy
+    // 5. Kalaam Filter Tabs & Copy
     // --------------------------------------------------------------------------
     function filterKalamGroup(cat) {
       const tabs = document.querySelectorAll('.kalam-tab-pill');
@@ -2361,7 +2107,7 @@
     }
 
     // --------------------------------------------------------------------------
-    // 7. 99 Asma-un-Nabi ﷺ Database & Render
+    // 6. 99 Asma-un-Nabi ﷺ Database & Render
     // --------------------------------------------------------------------------
     const ASMA_UN_NABI_DB = [
       { ar: "مُحَمَّد", ur: "بہت زیادہ تعریف کیا گیا ﷺ" },
@@ -2406,64 +2152,7 @@
     }
 
     // --------------------------------------------------------------------------
-    // 8. Islamic Quiz Database & Engine
-    // --------------------------------------------------------------------------
-    const QUIZ_QUESTIONS = [
-      {
-        q: "حضور نبی کریم ﷺ کی ولادتِ با سعادت کس مبارک مہینے اور تاریخ میں ہوئی؟",
-        opts: ["10 محرم الحرام", "12 ربیع الاول شریف", "15 شعبان المعظم", "27 رجب المرجب"],
-        ans: 1
-      },
-      {
-        q: "سیدی اعلیٰ حضرت امام احمد رضا خان علیہ الرحمہ کی مشہور تصنیف 'حدائقِ بخشش' کس صنف پر مشتمل ہے؟",
-        opts: ["فقہی فتاویٰ", "نعت و منقبت کا دیوان", "عربی گرامر", "تاریخی واقعات"],
-        ans: 1
-      },
-      {
-        q: "مسلکِ اعلیٰ حضرت سے کیا مراد ہے؟",
-        opts: ["اہل سنت و جماعت کا سچا راستہ", "ایک نیا طریقہ", "صرف ایک علاقائی نام", "کوئی نہیں"],
-        ans: 0
-      },
-      {
-        q: "حضور تاج الشریعہ مفتی اختر رضا خان قادری علیہ الرحمہ کا مزارِ پرانوار کہاں واقع ہے؟",
-        opts: ["بغداد شریف", "بریلی شریف", "اجمیر شریف", "لاہور"],
-        ans: 1
-      }
-    ];
-
-    function renderQuiz() {
-      const quizContainer = document.getElementById('quiz-dynamic-container');
-      quizContainer.innerHTML = '';
-      QUIZ_QUESTIONS.forEach((item, qIdx) => {
-        const box = document.createElement('div');
-        box.className = 'quiz-question-box';
-        box.innerHTML = `
-          <div class="quiz-question-title"><strong>سوال ${qIdx + 1}:</strong> ${item.q}</div>
-          <div class="quiz-options-list">
-            ${item.opts.map((opt, oIdx) => `
-              <button class="quiz-opt-btn" onclick="checkQuizAnswer(this, ${qIdx}, ${oIdx})">${opt}</button>
-            `).join('')}
-          </div>
-        `;
-        quizContainer.appendChild(box);
-      });
-    }
-
-    function checkQuizAnswer(btn, qIdx, oIdx) {
-      const parent = btn.parentElement;
-      const buttons = parent.querySelectorAll('.quiz-opt-btn');
-      buttons.forEach(b => b.disabled = true);
-
-      if (oIdx === QUIZ_QUESTIONS[qIdx].ans) {
-        btn.classList.add('correct');
-      } else {
-        btn.classList.add('wrong');
-        buttons[QUIZ_QUESTIONS[qIdx].ans].classList.add('correct');
-      }
-    }
-
-    // --------------------------------------------------------------------------
-    // 9. Shajra-e-Qadiria Razavia Nodes
+    // 7. Shajra-e-Qadiria Razavia Nodes
     // --------------------------------------------------------------------------
     const SHAJRA_NODES = [
       "حضور خاتم النبیین سیدنا محمد رسول اللہ ﷺ",
@@ -2498,30 +2187,7 @@
     }
 
     // --------------------------------------------------------------------------
-    // 10. 40 Fazail-e-Darood Database
-    // --------------------------------------------------------------------------
-    const FAZAIL_DAROOD_LIST = [
-      "1. جو مجھ پر ایک بار درود بھیجتا ہے، اللہ تعالیٰ اس پر دس رحمتیں نازل فرماتا ہے۔ (صحیح مسلم)",
-      "2. قیامت کے دن مجھ سے سب سے زیادہ قریب وہ ہوگا جو مجھ پر سب سے زیادہ درود پڑھتا ہے۔ (جامع ترمذی)",
-      "3. کنجوس وہ شخص ہے جس کے سامنے میرا ذکر ہو اور وہ مجھ پر درود نہ پڑھے۔ (ترمذی)",
-      "4. درود شریف پڑھنے سے گناہ معاف ہوتے ہیں اور درجات بلند ہوتے ہیں۔ (سنن نسائی)",
-      "5. جمعہ کے دن مجھ پر کثرت سے درود پڑھا کرو کیونکہ تمہارا درود مجھ پر پیش کیا جاتا ہے۔ (ابوداؤد)",
-      "6. جس نے مجھ پر صبح و شام دس دس بار درود پڑھا، اسے قیامت کے دن میری شفاعت نصیب ہوگی۔ (طبرانی)"
-    ];
-
-    function renderFazail() {
-      const container = document.getElementById('fazail-rendered-list');
-      container.innerHTML = '';
-      FAZAIL_DAROOD_LIST.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'fazail-box-item';
-        div.innerHTML = `<i class="fa-solid fa-gem" style="color:var(--secondary-gold); margin-left:6px;"></i> ${item}`;
-        container.appendChild(div);
-      });
-    }
-
-    // --------------------------------------------------------------------------
-    // 11. Greeting Card & WhatsApp Sharing
+    // 8. Greeting Card & WhatsApp Sharing
     // --------------------------------------------------------------------------
     function updateLiveCardGreeting(val) {
       document.getElementById('rendered-sender-name').innerText = (val.trim() || 'سہیل حسین') + ' (Sohil Husain)';
@@ -2529,12 +2195,12 @@
 
     function shareGreetingViaWhatsApp() {
       const sender = document.getElementById('greeting-custom-sender').value.trim() || 'سہیل حسین';
-      const text = `✨ *جشنِ عید میلاد النبی ﷺ مبارک!* ✨%0A%0Aوہ سوئے لالہ زار پھرتے ہیں%0Aتیرے دن اے بہار پھرتے ہیں%0A%0A12 ربیع الاول شریف بروز بدھ کی آمد تمام عالمِ اسلام کو مبارک ہو!%0A%0A*مسلکِ اعلیٰ حضرت سلامت رہے*%0A*منجانب:* ${encodeURIComponent(sender)}%0A🔗 ویب سائٹ دیکھیں: https://sohilhusain86.github.io/HARDRISK/`;
+      const text = `✨ *جشنِ عید میلاد النبی ﷺ مبارک!* ✨%0A%0Aنثار تیری چہل پہل پر ہزاروں عیدیں ربیع الاول%0Aسوائے ابلیس کے جہاں میں سبھی تو خوشیاں منا رہے ہیں%0A%0A12 ربیع الاول شریف بروز بدھ کی آمد تمام عالمِ اسلام کو مبارک ہو!%0A%0A*مسلکِ اعلیٰ حضرت سلامت رہے*%0A*منجانب:* ${encodeURIComponent(sender)}%0A🔗 ویب سائٹ دیکھیں: https://sohilhusain86.github.io/HARDRISK/`;
       window.open('https://api.whatsapp.com/send?text=' + text, '_blank');
     }
 
     // --------------------------------------------------------------------------
-    // 12. Ambient Geometric Canvas
+    // 9. Ambient Geometric Canvas (No living beings)
     // --------------------------------------------------------------------------
     function initStarCanvas() {
       const canvas = document.getElementById('ambient-star-canvas');
@@ -2574,7 +2240,7 @@
     }
 
     // --------------------------------------------------------------------------
-    // 13. Theme & Typography Controls
+    // 10. Theme & Typography Controls
     // --------------------------------------------------------------------------
     let currentScale = 16;
     function scaleTypography(delta) {
@@ -2591,11 +2257,8 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       renderPlaylistUI();
-      renderJadwal();
       renderAsmaNames();
-      renderQuiz();
       renderShajra();
-      renderFazail();
       initStarCanvas();
     });
   </script>
