@@ -613,4 +613,101 @@
       // Seek to a random middle point (darmiyan se) once metadata is loaded
       audioPlayer.onloadedmetadata = function() {
         if (audioPlayer.duration && audioPlayer.duration > 30) {
-          // pick a random time between 15% and 65% of the song
+          // pick a random time between 15% and 65% of the song duration
+const randomSeek = Math.floor(audioPlayer.duration * (0.15 + Math.random() * 0.5));
+audioPlayer.currentTime = randomSeek;
+        }
+        audioPlayer.play().catch(e => console.log('Autoplay policy caught:', e));
+        playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+      };
+
+      audioPlayer.play().catch(e => console.log('Audio play triggered'));
+    }
+
+    function togglePlay() {
+      if (audioPlayer.paused) {
+        audioPlayer.play();
+        playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+      } else {
+        audioPlayer.pause();
+        playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+      }
+    }
+
+    function previousKalam() {
+      if (currentTrackIndex > 0) {
+        currentTrackIndex--;
+      } else {
+        currentTrackIndex = audioFiles.length - 1;
+      }
+      playSpecificTrack(currentTrackIndex);
+    }
+
+    function playSpecificTrack(index) {
+      const fileName = audioFiles[index];
+      const cleanTitle = fileName.replace(/_/g, ' ').replace('.mp3', '');
+      trackNameEl.innerHTML = `<i class="fa-solid fa-music" style="color: var(--primary-gold);"></i> <span>${cleanTitle}</span>`;
+      audioPlayer.src = BASE_AUDIO_URL + encodeURIComponent(fileName);
+      audioPlayer.onloadedmetadata = function() {
+        if (audioPlayer.duration && audioPlayer.duration > 30) {
+          const randomSeek = Math.floor(audioPlayer.duration * (0.15 + Math.random() * 0.5));
+          audioPlayer.currentTime = randomSeek;
+        }
+        audioPlayer.play();
+        playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+      };
+    }
+
+    audioPlayer.addEventListener('ended', () => {
+      playRandomKalam();
+    });
+
+    /* Countdown Timer to upcoming 12 Rabi ul Awwal (Sunday) */
+    function getNextTargetDate() {
+      const now = new Date();
+      // Target: Next upcoming 12 Rabi ul Awwal Sunday (or setting realistic calculation)
+      // We calculate dynamic upcoming Sunday or specific Milad date
+      let target = new Date(now.getFullYear(), 8, 15, 0, 0, 0); // Example target or dynamically adjust to upcoming Sunday
+      if (now > target) {
+        target = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000));
+      }
+      return target;
+    }
+
+    // Set countdown target to upcoming Sunday 12 Rabi ul Awwal
+    const countdownTarget = new Date();
+    // find next Sunday or specified 12 Rabi ul awwal
+    const dayOfWeek = countdownTarget.getDay(); // 0 is Sunday
+    const daysUntilSunday = (7 - dayOfWeek) % 7 || 7;
+    countdownTarget.setDate(countdownTarget.getDate() + (daysUntilSunday === 0 ? 7 : daysUntilSunday));
+    countdownTarget.setHours(0, 0, 0, 0);
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const diff = countdownTarget.getTime() - now;
+
+      if (diff <= 0) {
+        document.getElementById('days').innerText = "00";
+        document.getElementById('hours').innerText = "00";
+        document.getElementById('minutes').innerText = "00";
+        document.getElementById('seconds').innerText = "00";
+        document.getElementById('target-date-display').innerHTML = "✨ عید میلاد النبی ﷺ مبارک ہو! صلوا علی الحبیب ﷺ ✨";
+        return;
+      }
+
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+      document.getElementById('days').innerText = String(d).padStart(2, '0');
+      document.getElementById('hours').innerText = String(h).padStart(2, '0');
+      document.getElementById('minutes').innerText = String(m).padStart(2, '0');
+      document.getElementById('seconds').innerText = String(s).padStart(2, '0');
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+  </script>
+</body>
+</html>
