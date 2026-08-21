@@ -1,0 +1,1811 @@
+/*
+===============================================================================
+اسلامی ڈیجیٹل پورٹل
+فائل: css/themes.css
+نسخہ: 1.0
+
+مقصد:
+پورے پورٹل کے رنگ، شفاف تہیں، کارڈز، بٹن، ہیڈر، نیویگیشن، پاپ اَپ،
+قرآن/حدیث/فتاویٰ/کتب خانہ، آڈیو پلیئر، تسبیح، سرچ، فیورٹ، شیئرنگ اور
+رسپانسو حالتوں کے لیے مرکزی Theme System۔
+
+اہم اصول:
+- تمام بنیادی رنگ CSS Variables کے ذریعے مرکزی طور پر قابو میں ہیں۔
+- مستقبل میں JavaScript صرف data-theme بدل کر مکمل Theme تبدیل کر سکتا ہے۔
+- رنگوں کو component کے بجائے semantic variables سے جوڑا گیا ہے۔
+- Light / Dark / Emerald / Sandal کے ساتھ مستقبل کے themes کے hooks موجود ہیں۔
+- index.html میں رنگوں کا غیر ضروری بوجھ نہیں ڈالا گیا۔
+===============================================================================
+*/
+
+/* ============================================================================
+   01 — THEME ROOT
+============================================================================ */
+:root{
+  color-scheme:dark;
+
+  --theme-bg:#071512;
+  --theme-bg-deep:#040d0b;
+  --theme-surface:#0c211c;
+  --theme-surface-2:#102a23;
+  --theme-surface-3:#14342b;
+  --theme-elevated:#173b31;
+
+  --theme-text:#f4f7f5;
+  --theme-text-soft:#d6e2de;
+  --theme-text-muted:#9fb4ae;
+  --theme-text-faint:#728984;
+
+  --theme-primary:#159a70;
+  --theme-primary-2:#0f7658;
+  --theme-primary-soft:#1eb986;
+  --theme-primary-glow:rgba(30,185,134,.24);
+
+  --theme-gold:#e7b94f;
+  --theme-gold-2:#c9952f;
+  --theme-gold-soft:#f4d47f;
+  --theme-gold-glow:rgba(231,185,79,.24);
+
+  --theme-border:rgba(255,255,255,.10);
+  --theme-border-strong:rgba(255,255,255,.18);
+  --theme-divider:rgba(231,185,79,.20);
+
+  --theme-success:#38c78b;
+  --theme-warning:#efb84c;
+  --theme-danger:#e96b6b;
+  --theme-info:#5eb7e8;
+
+  --theme-overlay:rgba(2,10,8,.76);
+  --theme-glass:rgba(12,33,28,.70);
+  --theme-glass-strong:rgba(10,28,24,.88);
+
+  --shadow-xs:0 2px 8px rgba(0,0,0,.16);
+  --shadow-sm:0 5px 18px rgba(0,0,0,.22);
+  --shadow-md:0 12px 34px rgba(0,0,0,.30);
+  --shadow-lg:0 22px 60px rgba(0,0,0,.42);
+  --shadow-gold:0 12px 35px rgba(231,185,79,.14);
+  --shadow-primary:0 12px 35px rgba(21,154,112,.16);
+
+  --radius-xs:7px;
+  --radius-sm:11px;
+  --radius-md:16px;
+  --radius-lg:22px;
+  --radius-xl:30px;
+  --radius-pill:999px;
+
+  --gradient-page:
+    radial-gradient(circle at 10% 0%,rgba(30,185,134,.10),transparent 28%),
+    radial-gradient(circle at 90% 12%,rgba(231,185,79,.08),transparent 25%),
+    linear-gradient(180deg,var(--theme-bg-deep),var(--theme-bg));
+
+  --gradient-primary:
+    linear-gradient(135deg,var(--theme-primary),var(--theme-primary-2));
+
+  --gradient-gold:
+    linear-gradient(135deg,var(--theme-gold-soft),var(--theme-gold-2));
+
+  --gradient-card:
+    linear-gradient(145deg,
+      rgba(255,255,255,.055),
+      rgba(255,255,255,.015));
+
+  --transition-fast:150ms ease;
+  --transition-normal:240ms ease;
+  --transition-slow:420ms ease;
+}
+
+/* ============================================================================
+   02 — GLOBAL APPLICATION
+============================================================================ */
+html,
+body{
+  background:var(--theme-bg);
+  color:var(--theme-text);
+}
+
+body{
+  background-image:var(--gradient-page);
+  background-attachment:fixed;
+}
+
+::selection{
+  background:rgba(231,185,79,.28);
+  color:#fff;
+}
+
+::-webkit-scrollbar{
+  width:9px;
+  height:9px;
+}
+
+::-webkit-scrollbar-track{
+  background:var(--theme-bg-deep);
+}
+
+::-webkit-scrollbar-thumb{
+  background:rgba(231,185,79,.35);
+  border-radius:var(--radius-pill);
+  border:2px solid var(--theme-bg-deep);
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background:rgba(231,185,79,.58);
+}
+
+/* ============================================================================
+   03 — HEADER
+============================================================================ */
+.site-header,
+header.site-header{
+  background:
+    linear-gradient(180deg,
+      rgba(4,13,11,.96),
+      rgba(7,21,18,.86));
+  border-bottom:1px solid var(--theme-border);
+  box-shadow:var(--shadow-sm);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+.site-header .brand,
+.site-header .logo{
+  color:var(--theme-gold-soft);
+  text-shadow:0 0 24px rgba(231,185,79,.12);
+}
+
+.site-header .tagline{
+  color:var(--theme-text-muted);
+}
+
+/* ============================================================================
+   04 — TOP BAR
+============================================================================ */
+.top-bar{
+  background:rgba(3,12,10,.70);
+  border-bottom:1px solid var(--theme-border);
+  color:var(--theme-text-muted);
+}
+
+.top-bar a{
+  color:var(--theme-text-soft);
+}
+
+.top-bar a:hover{
+  color:var(--theme-gold-soft);
+}
+
+/* ============================================================================
+   05 — NAVIGATION
+============================================================================ */
+.nav,
+.main-nav,
+.desktop-nav{
+  background:rgba(9,28,23,.74);
+}
+
+.nav-link,
+.main-nav a{
+  color:var(--theme-text-soft);
+  border-radius:var(--radius-sm);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.nav-link:hover,
+.main-nav a:hover{
+  color:#fff;
+  background:rgba(231,185,79,.08);
+}
+
+.nav-link.active,
+.main-nav a.active{
+  color:var(--theme-gold-soft);
+  background:rgba(231,185,79,.12);
+  box-shadow:inset 0 -2px 0 var(--theme-gold);
+}
+
+.nav-icon{
+  color:var(--theme-gold);
+}
+
+/* ============================================================================
+   06 — MOBILE NAVIGATION
+============================================================================ */
+.mobile-nav,
+.mobile-menu,
+.mobile-drawer{
+  background:
+    linear-gradient(180deg,
+      rgba(6,20,17,.98),
+      rgba(4,13,11,.99));
+  border-left:1px solid var(--theme-border);
+  box-shadow:var(--shadow-lg);
+}
+
+.mobile-nav .active,
+.mobile-menu .active{
+  color:var(--theme-gold-soft);
+  background:rgba(231,185,79,.10);
+}
+
+/* ============================================================================
+   07 — HERO
+============================================================================ */
+.hero,
+.hero-section{
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 0%,
+      rgba(21,154,112,.22),
+      transparent 42%),
+    radial-gradient(circle at 80% 70%,
+      rgba(231,185,79,.10),
+      transparent 35%),
+    linear-gradient(145deg,
+      #06130f,
+      #0b241d 55%,
+      #071511);
+  border:1px solid var(--theme-border);
+  box-shadow:var(--shadow-md);
+}
+
+.hero::before,
+.hero-section::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(115deg,
+      transparent 0 38%,
+      rgba(231,185,79,.05) 50%,
+      transparent 62%);
+}
+
+.hero h1,
+.hero-title{
+  color:#fff;
+  text-shadow:0 4px 25px rgba(0,0,0,.38);
+}
+
+.hero .eyebrow{
+  color:var(--theme-gold-soft);
+}
+
+.hero p{
+  color:var(--theme-text-soft);
+}
+
+/* ============================================================================
+   08 — WELCOME POPUP
+============================================================================ */
+.welcome-overlay,
+.splash-overlay,
+.modal-overlay{
+  background:var(--theme-overlay);
+  backdrop-filter:blur(9px);
+  -webkit-backdrop-filter:blur(9px);
+}
+
+.welcome-popup,
+.splash-card,
+.welcome-card{
+  background:
+    radial-gradient(circle at 50% 0%,
+      rgba(231,185,79,.10),
+      transparent 32%),
+    linear-gradient(145deg,
+      rgba(17,49,40,.97),
+      rgba(5,18,15,.98));
+  border:1px solid rgba(231,185,79,.24);
+  box-shadow:
+    var(--shadow-lg),
+    0 0 70px rgba(21,154,112,.10);
+}
+
+.welcome-popup::before,
+.splash-card::before,
+.welcome-card::before{
+  content:"";
+  position:absolute;
+  inset:1px;
+  border:1px solid rgba(255,255,255,.035);
+  border-radius:inherit;
+  pointer-events:none;
+}
+
+.welcome-bismillah{
+  color:var(--theme-gold-soft);
+  text-shadow:0 0 30px var(--theme-gold-glow);
+}
+
+.welcome-salawat{
+  color:var(--theme-text-soft);
+}
+
+.welcome-poetry{
+  color:#fff;
+  border-top:1px solid var(--theme-divider);
+  border-bottom:1px solid var(--theme-divider);
+  background:rgba(231,185,79,.035);
+}
+
+/* ============================================================================
+   09 — BUTTON SYSTEM
+============================================================================ */
+.btn,
+button{
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.btn:hover,
+button:hover{
+  transform:translateY(-1px);
+}
+
+.btn:active,
+button:active{
+  transform:translateY(0);
+}
+
+.btn-primary{
+  color:#fff;
+  background:var(--gradient-primary);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:var(--shadow-primary);
+}
+
+.btn-primary:hover{
+  box-shadow:
+    0 12px 34px rgba(21,154,112,.28),
+    0 0 0 3px rgba(21,154,112,.08);
+}
+
+.btn-gold,
+.btn-milad{
+  color:#15120a;
+  background:var(--gradient-gold);
+  border:1px solid rgba(255,255,255,.15);
+  box-shadow:var(--shadow-gold);
+}
+
+.btn-gold:hover,
+.btn-milad:hover{
+  box-shadow:
+    0 14px 38px rgba(231,185,79,.25),
+    0 0 0 3px rgba(231,185,79,.08);
+}
+
+.btn-outline{
+  color:var(--theme-gold-soft);
+  background:rgba(231,185,79,.045);
+  border:1px solid rgba(231,185,79,.35);
+}
+
+.btn-outline:hover{
+  background:rgba(231,185,79,.11);
+  border-color:rgba(231,185,79,.60);
+}
+
+.btn-ghost{
+  color:var(--theme-text-soft);
+  background:transparent;
+  border:1px solid transparent;
+}
+
+.btn-ghost:hover{
+  color:#fff;
+  background:rgba(255,255,255,.055);
+  border-color:var(--theme-border);
+}
+
+/* ============================================================================
+   10 — ICON BUTTONS
+============================================================================ */
+.icon-btn,
+.header-icon,
+.action-icon{
+  color:var(--theme-text-soft);
+  background:rgba(255,255,255,.045);
+  border:1px solid var(--theme-border);
+}
+
+.icon-btn:hover,
+.header-icon:hover,
+.action-icon:hover{
+  color:var(--theme-gold-soft);
+  background:rgba(231,185,79,.09);
+  border-color:rgba(231,185,79,.30);
+}
+
+/* ============================================================================
+   11 — CARDS
+============================================================================ */
+.card,
+.feature-card,
+.info-card,
+.book-card,
+.quote-card,
+.fatawa-card,
+.hadith-card,
+.audio-card,
+.tool-card,
+.portal-card{
+  color:var(--theme-text);
+  background:var(--gradient-card);
+  border:1px solid var(--theme-border);
+  box-shadow:var(--shadow-sm);
+}
+
+.card:hover,
+.feature-card:hover,
+.info-card:hover,
+.book-card:hover,
+.quote-card:hover,
+.tool-card:hover,
+.portal-card:hover{
+  border-color:rgba(231,185,79,.22);
+  box-shadow:
+    var(--shadow-md),
+    0 0 0 1px rgba(231,185,79,.03);
+}
+
+.card-icon,
+.feature-icon{
+  color:var(--theme-gold);
+  background:rgba(231,185,79,.08);
+  border:1px solid rgba(231,185,79,.15);
+}
+
+/* ============================================================================
+   12 — FEATURE GRID
+============================================================================ */
+.feature-grid{
+  background:transparent;
+}
+
+.feature-card .feature-title{
+  color:#fff;
+}
+
+.feature-card .feature-description{
+  color:var(--theme-text-muted);
+}
+
+.feature-card .feature-link{
+  color:var(--theme-gold-soft);
+}
+
+/* ============================================================================
+   13 — SECTION HEADINGS
+============================================================================ */
+.section-heading{
+  color:#fff;
+}
+
+.section-heading::after{
+  background:
+    linear-gradient(90deg,
+      transparent,
+      var(--theme-gold),
+      transparent);
+  box-shadow:0 0 18px rgba(231,185,79,.18);
+}
+
+.section-heading .eyebrow{
+  color:var(--theme-primary-soft);
+}
+
+.section-heading .subtitle{
+  color:var(--theme-text-muted);
+}
+
+/* ============================================================================
+   14 — BADGES
+============================================================================ */
+.badge,
+.tag,
+.chip,
+.category-chip{
+  color:var(--theme-text-soft);
+  background:rgba(255,255,255,.055);
+  border:1px solid var(--theme-border);
+}
+
+.badge-primary,
+.tag-primary{
+  color:#b8f2de;
+  background:rgba(21,154,112,.12);
+  border-color:rgba(21,154,112,.25);
+}
+
+.badge-gold,
+.tag-gold{
+  color:var(--theme-gold-soft);
+  background:rgba(231,185,79,.10);
+  border-color:rgba(231,185,79,.26);
+}
+
+/* ============================================================================
+   15 — SEARCH
+============================================================================ */
+.search-box,
+.global-search,
+.search-panel{
+  background:rgba(8,26,21,.82);
+  border:1px solid var(--theme-border-strong);
+  box-shadow:var(--shadow-sm);
+}
+
+.search-box:focus-within,
+.global-search:focus-within{
+  border-color:rgba(231,185,79,.48);
+  box-shadow:
+    0 0 0 3px rgba(231,185,79,.07),
+    var(--shadow-md);
+}
+
+.search-box input,
+.global-search input{
+  color:#fff;
+  background:transparent;
+}
+
+.search-box input::placeholder,
+.global-search input::placeholder{
+  color:var(--theme-text-faint);
+}
+
+.search-icon{
+  color:var(--theme-gold);
+}
+
+/* ============================================================================
+   16 — SEARCH RESULTS
+============================================================================ */
+.search-result{
+  background:rgba(255,255,255,.025);
+  border:1px solid transparent;
+}
+
+.search-result:hover{
+  background:rgba(231,185,79,.045);
+  border-color:rgba(231,185,79,.16);
+}
+
+.search-result-title{
+  color:#fff;
+}
+
+.search-result-snippet{
+  color:var(--theme-text-muted);
+}
+
+.search-result-source{
+  color:var(--theme-primary-soft);
+}
+
+/* ============================================================================
+   17 — LIBRARY
+============================================================================ */
+.library-shell{
+  background:
+    radial-gradient(circle at 0% 0%,
+      rgba(21,154,112,.07),
+      transparent 35%);
+}
+
+.library-toolbar{
+  background:rgba(9,28,23,.72);
+  border:1px solid var(--theme-border);
+}
+
+.book-cover{
+  background:
+    linear-gradient(145deg,
+      rgba(231,185,79,.16),
+      rgba(21,154,112,.10)),
+    var(--theme-surface);
+  border:1px solid rgba(231,185,79,.22);
+  box-shadow:var(--shadow-sm);
+}
+
+.book-card:hover .book-cover{
+  box-shadow:
+    var(--shadow-md),
+    0 0 25px rgba(231,185,79,.10);
+}
+
+.book-title{
+  color:#fff;
+}
+
+.book-author{
+  color:var(--theme-text-muted);
+}
+
+.book-meta{
+  color:var(--theme-text-faint);
+}
+
+/* ============================================================================
+   18 — READER
+============================================================================ */
+.reader-shell{
+  background:
+    radial-gradient(circle at 50% 0%,
+      rgba(21,154,112,.055),
+      transparent 35%);
+}
+
+.reader-toolbar{
+  background:rgba(7,21,18,.90);
+  border-bottom:1px solid var(--theme-border);
+}
+
+.reader-page,
+.reader-content{
+  background:rgba(8,23,19,.66);
+  border:1px solid var(--theme-border);
+}
+
+.reader-content{
+  box-shadow:var(--shadow-sm);
+}
+
+.reader-progress{
+  background:rgba(255,255,255,.08);
+}
+
+.reader-progress > span{
+  background:linear-gradient(90deg,var(--theme-primary),var(--theme-gold));
+  box-shadow:0 0 15px rgba(231,185,79,.18);
+}
+
+/* ============================================================================
+   19 — QURAN PANEL
+============================================================================ */
+.quran-panel,
+.mushaf-panel{
+  background:
+    radial-gradient(circle at 50% 0%,
+      rgba(231,185,79,.08),
+      transparent 38%),
+    linear-gradient(145deg,
+      rgba(14,42,34,.94),
+      rgba(5,17,14,.96));
+  border:1px solid rgba(231,185,79,.18);
+}
+
+.quran-panel .quran-surah-title,
+.mushaf-panel .quran-surah-title{
+  color:var(--theme-gold-soft);
+}
+
+.quran-panel .quran-ayah-number{
+  border-color:rgba(231,185,79,.42);
+  color:var(--theme-gold-soft);
+}
+
+/* ============================================================================
+   20 — TRANSLATION PANEL
+============================================================================ */
+.translation-panel{
+  background:rgba(255,255,255,.025);
+  border:1px solid var(--theme-border);
+}
+
+.translation-panel .translation-heading{
+  color:var(--theme-gold-soft);
+}
+
+/* ============================================================================
+   21 — TAFSEER
+============================================================================ */
+.tafseer-panel{
+  background:rgba(21,154,112,.045);
+  border-right:3px solid rgba(21,154,112,.42);
+  border-top:1px solid rgba(21,154,112,.10);
+  border-bottom:1px solid rgba(21,154,112,.10);
+  border-left:1px solid rgba(21,154,112,.10);
+}
+
+/* ============================================================================
+   22 — FATAWA
+============================================================================ */
+.fatawa-question{
+  background:rgba(231,185,79,.055);
+  border:1px solid rgba(231,185,79,.14);
+}
+
+.fatawa-answer{
+  background:rgba(21,154,112,.045);
+  border:1px solid rgba(21,154,112,.12);
+}
+
+.fatawa-reference{
+  color:#8fc6b4;
+}
+
+/* ============================================================================
+   23 — HADITH
+============================================================================ */
+.hadith-card{
+  background:
+    linear-gradient(145deg,
+      rgba(18,52,43,.65),
+      rgba(255,255,255,.02));
+}
+
+.hadith-arabic{
+  color:#fff;
+}
+
+.hadith-translation{
+  color:var(--theme-text-soft);
+}
+
+.hadith-reference{
+  color:var(--theme-gold-soft);
+}
+
+/* ============================================================================
+   24 — QUOTES
+============================================================================ */
+.quote-card{
+  position:relative;
+  overflow:hidden;
+}
+
+.quote-card::before{
+  content:"“";
+  position:absolute;
+  top:-18px;
+  right:16px;
+  color:rgba(231,185,79,.08);
+  font-size:7rem;
+  line-height:1;
+}
+
+.quote-card .quote-text{
+  color:#fff;
+}
+
+.quote-card .quote-source{
+  color:var(--theme-gold-soft);
+}
+
+/* ============================================================================
+   25 — AUDIO SUITE
+============================================================================ */
+.audio-suite{
+  background:
+    linear-gradient(145deg,
+      rgba(11,35,29,.92),
+      rgba(5,16,14,.94));
+  border:1px solid var(--theme-border);
+  box-shadow:var(--shadow-md);
+}
+
+.audio-player{
+  background:rgba(255,255,255,.035);
+  border:1px solid var(--theme-border);
+}
+
+.audio-progress{
+  background:rgba(255,255,255,.09);
+}
+
+.audio-progress > span{
+  background:linear-gradient(90deg,var(--theme-primary),var(--theme-gold));
+}
+
+.audio-control{
+  color:var(--theme-text-soft);
+  background:rgba(255,255,255,.045);
+  border:1px solid var(--theme-border);
+}
+
+.audio-control:hover{
+  color:#fff;
+  background:rgba(231,185,79,.10);
+  border-color:rgba(231,185,79,.25);
+}
+
+.audio-control.play{
+  color:#111;
+  background:var(--gradient-gold);
+  border-color:transparent;
+  box-shadow:var(--shadow-gold);
+}
+
+.visualizer{
+  background:
+    linear-gradient(90deg,
+      transparent,
+      rgba(21,154,112,.18),
+      rgba(231,185,79,.18),
+      transparent);
+}
+
+/* ============================================================================
+   26 — PLAYLIST
+============================================================================ */
+.playlist-item{
+  background:rgba(255,255,255,.02);
+  border:1px solid transparent;
+}
+
+.playlist-item:hover{
+  background:rgba(231,185,79,.045);
+  border-color:rgba(231,185,79,.12);
+}
+
+.playlist-item.active{
+  background:rgba(21,154,112,.10);
+  border-color:rgba(21,154,112,.28);
+}
+
+.playlist-item.active .item-title{
+  color:var(--theme-gold-soft);
+}
+
+/* ============================================================================
+   27 — TASBEEH
+============================================================================ */
+.tasbeeh-shell{
+  background:
+    radial-gradient(circle at 50% 20%,
+      rgba(21,154,112,.16),
+      transparent 35%),
+    linear-gradient(145deg,
+      #09221b,
+      #04100d);
+  border:1px solid rgba(21,154,112,.22);
+  box-shadow:var(--shadow-lg);
+}
+
+.tasbeeh-counter{
+  color:#fff;
+  text-shadow:
+    0 0 30px rgba(21,154,112,.25);
+}
+
+.tasbeeh-ring{
+  border-color:rgba(231,185,79,.18);
+  box-shadow:
+    inset 0 0 30px rgba(21,154,112,.08),
+    0 0 30px rgba(231,185,79,.06);
+}
+
+.tasbeeh-button{
+  color:#111;
+  background:var(--gradient-gold);
+  box-shadow:
+    0 15px 45px rgba(231,185,79,.18);
+}
+
+.tasbeeh-button:hover{
+  box-shadow:
+    0 18px 55px rgba(231,185,79,.28);
+}
+
+/* ============================================================================
+   28 — SHAJRA
+============================================================================ */
+.shajra-tree{
+  background:
+    radial-gradient(circle at 50% 0%,
+      rgba(231,185,79,.08),
+      transparent 35%);
+}
+
+.shajra-node{
+  background:rgba(255,255,255,.025);
+  border:1px solid var(--theme-border);
+}
+
+.shajra-node:hover{
+  border-color:rgba(231,185,79,.28);
+  background:rgba(231,185,79,.045);
+}
+
+.shajra-node.highlight{
+  background:rgba(21,154,112,.10);
+  border-color:rgba(21,154,112,.28);
+}
+
+.shajra-line{
+  background:linear-gradient(
+    180deg,
+    rgba(231,185,79,.55),
+    rgba(21,154,112,.30));
+}
+
+/* ============================================================================
+   29 — ASMA
+============================================================================ */
+.name-card{
+  background:
+    radial-gradient(circle at 50% 0%,
+      rgba(231,185,79,.08),
+      transparent 55%),
+    rgba(255,255,255,.025);
+  border:1px solid var(--theme-border);
+}
+
+.name-card:hover{
+  border-color:rgba(231,185,79,.25);
+  box-shadow:var(--shadow-sm);
+}
+
+.name-arabic{
+  color:var(--theme-gold-soft);
+}
+
+.name-meaning{
+  color:var(--theme-text-muted);
+}
+
+/* ============================================================================
+   30 — FAQ
+============================================================================ */
+.faq-item{
+  background:rgba(255,255,255,.025);
+  border:1px solid var(--theme-border);
+}
+
+.faq-item.open{
+  border-color:rgba(21,154,112,.25);
+  background:rgba(21,154,112,.045);
+}
+
+.faq-question{
+  color:#fff;
+}
+
+.faq-question:hover{
+  color:var(--theme-gold-soft);
+}
+
+.faq-answer{
+  color:var(--theme-text-soft);
+}
+
+/* ============================================================================
+   31 — COUNTDOWN
+============================================================================ */
+.countdown{
+  background:
+    linear-gradient(145deg,
+      rgba(21,154,112,.10),
+      rgba(231,185,79,.06));
+  border:1px solid rgba(231,185,79,.18);
+}
+
+.countdown-box{
+  background:rgba(3,13,11,.58);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:inset 0 0 22px rgba(0,0,0,.16);
+}
+
+.countdown-number{
+  color:var(--theme-gold-soft);
+  text-shadow:0 0 22px rgba(231,185,79,.16);
+}
+
+.countdown-label{
+  color:var(--theme-text-muted);
+}
+
+/* ============================================================================
+   32 — GREETING CARD GENERATOR
+============================================================================ */
+.card-generator{
+  background:
+    linear-gradient(145deg,
+      rgba(21,154,112,.09),
+      rgba(231,185,79,.055));
+  border:1px solid var(--theme-border);
+}
+
+.generated-card{
+  background:
+    radial-gradient(circle at 50% 0%,
+      rgba(231,185,79,.18),
+      transparent 38%),
+    linear-gradient(145deg,
+      #0a2a20,
+      #06130f);
+  border:1px solid rgba(231,185,79,.28);
+  box-shadow:var(--shadow-lg);
+}
+
+.generated-card .card-name{
+  color:var(--theme-gold-soft);
+}
+
+/* ============================================================================
+   33 — SHARE
+============================================================================ */
+.share-panel{
+  background:rgba(255,255,255,.025);
+  border:1px solid var(--theme-border);
+}
+
+.share-button{
+  color:var(--theme-text-soft);
+  background:rgba(255,255,255,.045);
+  border:1px solid var(--theme-border);
+}
+
+.share-button:hover{
+  color:#fff;
+  background:rgba(21,154,112,.12);
+  border-color:rgba(21,154,112,.28);
+}
+
+/* ============================================================================
+   34 — FAVORITES / BOOKMARKS
+============================================================================ */
+.favorite-button,
+.bookmark-button{
+  color:var(--theme-text-muted);
+  background:transparent;
+  border:1px solid transparent;
+}
+
+.favorite-button:hover,
+.bookmark-button:hover{
+  color:var(--theme-gold-soft);
+  background:rgba(231,185,79,.08);
+}
+
+.favorite-button.active,
+.bookmark-button.active{
+  color:var(--theme-gold-soft);
+  background:rgba(231,185,79,.10);
+  border-color:rgba(231,185,79,.20);
+}
+
+/* ============================================================================
+   35 — FORM CONTROLS
+============================================================================ */
+input,
+textarea,
+select{
+  color:var(--theme-text);
+  background:rgba(255,255,255,.035);
+  border:1px solid var(--theme-border);
+}
+
+input::placeholder,
+textarea::placeholder{
+  color:var(--theme-text-faint);
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+  outline:none;
+  border-color:rgba(231,185,79,.46);
+  box-shadow:0 0 0 3px rgba(231,185,79,.065);
+}
+
+option{
+  color:#fff;
+  background:#0b211b;
+}
+
+/* ============================================================================
+   36 — TOGGLE / SWITCH
+============================================================================ */
+.switch{
+  background:rgba(255,255,255,.10);
+  border:1px solid var(--theme-border);
+}
+
+.switch::after{
+  background:#dfe8e5;
+  box-shadow:var(--shadow-xs);
+}
+
+.switch.active,
+input:checked + .switch{
+  background:var(--theme-primary);
+  border-color:rgba(21,154,112,.45);
+}
+
+.switch.active::after,
+input:checked + .switch::after{
+  background:#fff;
+}
+
+/* ============================================================================
+   37 — TABS
+============================================================================ */
+.tabs{
+  border-bottom:1px solid var(--theme-border);
+}
+
+.tab{
+  color:var(--theme-text-muted);
+  background:transparent;
+  border-bottom:2px solid transparent;
+}
+
+.tab:hover{
+  color:var(--theme-text-soft);
+}
+
+.tab.active{
+  color:var(--theme-gold-soft);
+  border-bottom-color:var(--theme-gold);
+}
+
+/* ============================================================================
+   38 — DROPDOWNS
+============================================================================ */
+.dropdown,
+.menu-panel,
+.popover{
+  background:rgba(7,21,18,.97);
+  border:1px solid var(--theme-border-strong);
+  box-shadow:var(--shadow-lg);
+}
+
+.dropdown-item,
+.menu-item{
+  color:var(--theme-text-soft);
+}
+
+.dropdown-item:hover,
+.menu-item:hover{
+  color:#fff;
+  background:rgba(231,185,79,.08);
+}
+
+.dropdown-item.active{
+  color:var(--theme-gold-soft);
+}
+
+/* ============================================================================
+   39 — MODALS
+============================================================================ */
+.modal,
+.dialog{
+  background:
+    linear-gradient(145deg,
+      rgba(15,42,34,.98),
+      rgba(5,16,14,.99));
+  border:1px solid var(--theme-border-strong);
+  box-shadow:var(--shadow-lg);
+}
+
+.modal-header,
+.dialog-header{
+  border-bottom:1px solid var(--theme-border);
+}
+
+.modal-footer,
+.dialog-footer{
+  border-top:1px solid var(--theme-border);
+}
+
+/* ============================================================================
+   40 — ALERTS
+============================================================================ */
+.alert{
+  border:1px solid transparent;
+}
+
+.alert-success{
+  color:#bff2dd;
+  background:rgba(56,199,139,.08);
+  border-color:rgba(56,199,139,.22);
+}
+
+.alert-warning{
+  color:#f7df9d;
+  background:rgba(239,184,76,.08);
+  border-color:rgba(239,184,76,.22);
+}
+
+.alert-danger{
+  color:#f3b2b2;
+  background:rgba(233,107,107,.08);
+  border-color:rgba(233,107,107,.22);
+}
+
+.alert-info{
+  color:#b9e2f5;
+  background:rgba(94,183,232,.08);
+  border-color:rgba(94,183,232,.22);
+}
+
+/* ============================================================================
+   41 — TOASTS
+============================================================================ */
+.toast,
+.notification{
+  color:var(--theme-text);
+  background:rgba(8,24,20,.95);
+  border:1px solid var(--theme-border-strong);
+  box-shadow:var(--shadow-lg);
+}
+
+.toast.success{
+  border-color:rgba(56,199,139,.30);
+}
+
+.toast.warning{
+  border-color:rgba(239,184,76,.30);
+}
+
+.toast.error{
+  border-color:rgba(233,107,107,.30);
+}
+
+/* ============================================================================
+   42 — LOADING
+============================================================================ */
+.loading-overlay{
+  background:rgba(4,13,11,.86);
+}
+
+.loading-spinner{
+  border-color:rgba(255,255,255,.10);
+  border-top-color:var(--theme-gold);
+  border-right-color:var(--theme-primary);
+}
+
+.skeleton{
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.035),
+      rgba(255,255,255,.085),
+      rgba(255,255,255,.035));
+  background-size:200% 100%;
+}
+
+/* ============================================================================
+   43 — FOOTER
+============================================================================ */
+.site-footer,
+footer{
+  color:var(--theme-text-muted);
+  background:
+    linear-gradient(180deg,
+      rgba(4,13,11,.70),
+      rgba(2,8,7,.96));
+  border-top:1px solid var(--theme-border);
+}
+
+.site-footer a{
+  color:var(--theme-text-soft);
+}
+
+.site-footer a:hover{
+  color:var(--theme-gold-soft);
+}
+
+.footer-brand{
+  color:var(--theme-gold-soft);
+}
+
+/* ============================================================================
+   44 — DIVIDERS
+============================================================================ */
+.divider{
+  background:linear-gradient(
+    90deg,
+    transparent,
+    var(--theme-divider),
+    transparent);
+}
+
+.gold-divider{
+  background:linear-gradient(
+    90deg,
+    transparent,
+    var(--theme-gold),
+    transparent);
+  opacity:.48;
+}
+
+/* ============================================================================
+   45 — THEME SELECTOR
+============================================================================ */
+.theme-selector{
+  background:rgba(255,255,255,.035);
+  border:1px solid var(--theme-border);
+}
+
+.theme-option{
+  background:transparent;
+  border:1px solid transparent;
+}
+
+.theme-option:hover{
+  background:rgba(255,255,255,.05);
+  border-color:var(--theme-border);
+}
+
+.theme-option.active{
+  background:rgba(231,185,79,.08);
+  border-color:rgba(231,185,79,.28);
+}
+
+.theme-preview{
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);
+}
+
+/* ============================================================================
+   46 — LIGHT THEME
+============================================================================ */
+html[data-theme="light"],
+body[data-theme="light"]{
+  color-scheme:light;
+
+  --theme-bg:#f5f7f4;
+  --theme-bg-deep:#e9eeea;
+  --theme-surface:#ffffff;
+  --theme-surface-2:#f1f5f2;
+  --theme-surface-3:#e8efeb;
+  --theme-elevated:#ffffff;
+
+  --theme-text:#17221e;
+  --theme-text-soft:#35433d;
+  --theme-text-muted:#66756e;
+  --theme-text-faint:#8a9690;
+
+  --theme-primary:#087c59;
+  --theme-primary-2:#075d45;
+  --theme-primary-soft:#09966c;
+  --theme-primary-glow:rgba(8,124,89,.18);
+
+  --theme-gold:#b7811f;
+  --theme-gold-2:#996817;
+  --theme-gold-soft:#a87318;
+  --theme-gold-glow:rgba(183,129,31,.16);
+
+  --theme-border:rgba(20,48,39,.12);
+  --theme-border-strong:rgba(20,48,39,.20);
+  --theme-divider:rgba(183,129,31,.22);
+
+  --theme-overlay:rgba(17,29,24,.48);
+  --theme-glass:rgba(255,255,255,.76);
+  --theme-glass-strong:rgba(255,255,255,.94);
+
+  --gradient-page:
+    radial-gradient(circle at 10% 0%,rgba(8,124,89,.07),transparent 28%),
+    radial-gradient(circle at 90% 12%,rgba(183,129,31,.07),transparent 25%),
+    linear-gradient(180deg,#f9fbfa,#eef3ef);
+}
+
+html[data-theme="light"] .site-header,
+body[data-theme="light"] .site-header{
+  background:rgba(255,255,255,.90);
+}
+
+html[data-theme="light"] .nav,
+body[data-theme="light"] .nav{
+  background:rgba(255,255,255,.72);
+}
+
+html[data-theme="light"] .welcome-popup,
+body[data-theme="light"] .welcome-popup,
+html[data-theme="light"] .modal,
+body[data-theme="light"] .modal{
+  background:linear-gradient(145deg,#ffffff,#eef5f1);
+}
+
+html[data-theme="light"] .welcome-poetry{
+  color:var(--theme-text);
+}
+
+html[data-theme="light"] .card,
+html[data-theme="light"] .feature-card,
+html[data-theme="light"] .book-card,
+html[data-theme="light"] .quote-card{
+  background:rgba(255,255,255,.80);
+}
+
+html[data-theme="light"] .reader-page,
+html[data-theme="light"] .reader-content{
+  background:rgba(255,255,255,.88);
+}
+
+/* ============================================================================
+   47 — EMERALD THEME
+============================================================================ */
+html[data-theme="emerald"],
+body[data-theme="emerald"]{
+  color-scheme:dark;
+
+  --theme-bg:#031b14;
+  --theme-bg-deep:#01100b;
+  --theme-surface:#06251b;
+  --theme-surface-2:#083124;
+  --theme-surface-3:#0a3b2b;
+  --theme-elevated:#0d4633;
+
+  --theme-primary:#12b87c;
+  --theme-primary-2:#07865a;
+  --theme-primary-soft:#2ad596;
+
+  --theme-gold:#efc35a;
+  --theme-gold-2:#bd8d26;
+  --theme-gold-soft:#f7db88;
+
+  --theme-border:rgba(126,239,199,.11);
+  --theme-border-strong:rgba(126,239,199,.19);
+  --theme-divider:rgba(239,195,90,.24);
+
+  --gradient-page:
+    radial-gradient(circle at 20% 0%,rgba(18,184,124,.15),transparent 30%),
+    radial-gradient(circle at 90% 30%,rgba(239,195,90,.10),transparent 28%),
+    linear-gradient(180deg,#01100b,#031b14);
+}
+
+/* ============================================================================
+   48 — SANDAL THEME
+============================================================================ */
+html[data-theme="sandal"],
+body[data-theme="sandal"]{
+  color-scheme:dark;
+
+  --theme-bg:#17100a;
+  --theme-bg-deep:#0d0805;
+  --theme-surface:#24170d;
+  --theme-surface-2:#302014;
+  --theme-surface-3:#3a2718;
+  --theme-elevated:#48301d;
+
+  --theme-text:#fff8eb;
+  --theme-text-soft:#eadfcd;
+  --theme-text-muted:#bcae9b;
+  --theme-text-faint:#8f806d;
+
+  --theme-primary:#278b69;
+  --theme-primary-2:#176149;
+  --theme-primary-soft:#39aa83;
+
+  --theme-gold:#d8a443;
+  --theme-gold-2:#9f701d;
+  --theme-gold-soft:#f0c96e;
+
+  --theme-border:rgba(255,235,200,.10);
+  --theme-border-strong:rgba(255,235,200,.18);
+  --theme-divider:rgba(216,164,67,.22);
+
+  --gradient-page:
+    radial-gradient(circle at 20% 0%,rgba(216,164,67,.10),transparent 30%),
+    radial-gradient(circle at 85% 20%,rgba(39,139,105,.10),transparent 28%),
+    linear-gradient(180deg,#0d0805,#17100a);
+}
+
+/* ============================================================================
+   49 — MIDNIGHT THEME — FUTURE
+============================================================================ */
+html[data-theme="midnight"],
+body[data-theme="midnight"]{
+  color-scheme:dark;
+
+  --theme-bg:#070b18;
+  --theme-bg-deep:#03050c;
+  --theme-surface:#0d1326;
+  --theme-surface-2:#121b35;
+  --theme-surface-3:#172344;
+  --theme-elevated:#1d2a50;
+
+  --theme-text:#f4f7ff;
+  --theme-text-soft:#d8def0;
+  --theme-text-muted:#9ba7c2;
+  --theme-text-faint:#687594;
+
+  --theme-primary:#2ca4b8;
+  --theme-primary-2:#176b8a;
+  --theme-primary-soft:#53c6d9;
+
+  --theme-gold:#e6bd5b;
+  --theme-gold-2:#aa7c22;
+  --theme-gold-soft:#f4d582;
+
+  --theme-border:rgba(255,255,255,.09);
+  --theme-border-strong:rgba(255,255,255,.16);
+  --theme-divider:rgba(230,189,91,.22);
+
+  --gradient-page:
+    radial-gradient(circle at 20% 0%,rgba(44,164,184,.11),transparent 30%),
+    radial-gradient(circle at 90% 20%,rgba(230,189,91,.07),transparent 28%),
+    linear-gradient(180deg,#03050c,#070b18);
+}
+
+/* ============================================================================
+   50 — MILAD THEME — FUTURE
+============================================================================ */
+html[data-theme="milad"],
+body[data-theme="milad"]{
+  color-scheme:dark;
+
+  --theme-bg:#081a16;
+  --theme-bg-deep:#03100d;
+  --theme-surface:#0d2b22;
+  --theme-surface-2:#12382b;
+  --theme-surface-3:#174737;
+  --theme-elevated:#1d5642;
+
+  --theme-text:#fffdf5;
+  --theme-text-soft:#e9e5d8;
+  --theme-text-muted:#b3b4a8;
+  --theme-text-faint:#7f8981;
+
+  --theme-primary:#169b72;
+  --theme-primary-2:#087052;
+  --theme-primary-soft:#31c38f;
+
+  --theme-gold:#f0c85f;
+  --theme-gold-2:#b58525;
+  --theme-gold-soft:#ffe19a;
+
+  --theme-border:rgba(255,255,255,.11);
+  --theme-border-strong:rgba(255,255,255,.19);
+  --theme-divider:rgba(240,200,95,.28);
+
+  --gradient-page:
+    radial-gradient(circle at 50% -10%,rgba(240,200,95,.16),transparent 34%),
+    radial-gradient(circle at 10% 25%,rgba(22,155,114,.13),transparent 28%),
+    linear-gradient(180deg,#03100d,#081a16);
+}
+
+/* ============================================================================
+   51 — SYSTEM THEME
+============================================================================ */
+@media(prefers-color-scheme:light){
+  html[data-theme="system"],
+  body[data-theme="system"]{
+    color-scheme:light;
+    --theme-bg:#f5f7f4;
+    --theme-bg-deep:#e9eeea;
+    --theme-surface:#fff;
+    --theme-surface-2:#f1f5f2;
+    --theme-text:#17221e;
+    --theme-text-soft:#35433d;
+    --theme-text-muted:#66756e;
+    --theme-primary:#087c59;
+    --theme-primary-2:#075d45;
+    --theme-gold:#a87318;
+    --theme-gold-soft:#b7811f;
+    --theme-border:rgba(20,48,39,.12);
+    --theme-border-strong:rgba(20,48,39,.20);
+  }
+}
+
+/* ============================================================================
+   52 — REDUCED MOTION
+============================================================================ */
+@media(prefers-reduced-motion:reduce){
+  *,
+  *::before,
+  *::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    scroll-behavior:auto!important;
+    transition-duration:.01ms!important;
+  }
+}
+
+/* ============================================================================
+   53 — HIGH CONTRAST
+============================================================================ */
+body.high-contrast{
+  --theme-text:#ffffff;
+  --theme-text-soft:#f5f5f5;
+  --theme-text-muted:#d3d3d3;
+  --theme-border:rgba(255,255,255,.22);
+  --theme-border-strong:rgba(255,255,255,.38);
+}
+
+body.high-contrast .btn-outline,
+body.high-contrast .btn-ghost{
+  border-color:rgba(255,255,255,.38);
+}
+
+/* ============================================================================
+   54 — GOLD EMPHASIS MODE
+============================================================================ */
+body.gold-emphasis{
+  --theme-gold:#f3c85d;
+  --theme-gold-soft:#ffe39a;
+}
+
+body.gold-emphasis .section-heading::after{
+  box-shadow:0 0 25px rgba(243,200,93,.30);
+}
+
+/* ============================================================================
+   55 — MINIMAL MODE
+============================================================================ */
+body.minimal-theme{
+  --shadow-xs:none;
+  --shadow-sm:none;
+  --shadow-md:none;
+  --shadow-lg:none;
+  --shadow-gold:none;
+  --shadow-primary:none;
+}
+
+body.minimal-theme .card,
+body.minimal-theme .feature-card,
+body.minimal-theme .book-card,
+body.minimal-theme .quote-card{
+  box-shadow:none;
+}
+
+/* ============================================================================
+   56 — GLASS MODE
+============================================================================ */
+body.glass-theme .card,
+body.glass-theme .feature-card,
+body.glass-theme .book-card,
+body.glass-theme .quote-card,
+body.glass-theme .audio-suite,
+body.glass-theme .search-box{
+  background:rgba(255,255,255,.045);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+/* ============================================================================
+   57 — COMPACT MOBILE
+============================================================================ */
+@media(max-width:760px){
+  .hero,
+  .hero-section{
+    box-shadow:var(--shadow-sm);
+  }
+
+  .card,
+  .feature-card,
+  .book-card,
+  .quote-card{
+    box-shadow:var(--shadow-xs);
+  }
+
+  .welcome-popup,
+  .splash-card,
+  .modal{
+    box-shadow:var(--shadow-lg);
+  }
+}
+
+/* ============================================================================
+   58 — PRINT
+============================================================================ */
+@media print{
+  :root{
+    color-scheme:light;
+    --theme-bg:#fff;
+    --theme-bg-deep:#fff;
+    --theme-surface:#fff;
+    --theme-text:#111;
+    --theme-text-soft:#222;
+    --theme-text-muted:#444;
+    --theme-gold:#333;
+    --theme-primary:#222;
+    --theme-border:rgba(0,0,0,.20);
+  }
+
+  body{
+    background:#fff!important;
+    color:#111!important;
+  }
+
+  .site-header,
+  .top-bar,
+  .nav,
+  .mobile-nav,
+  .site-footer,
+  .welcome-overlay,
+  .modal-overlay{
+    display:none!important;
+  }
+
+  .card,
+  .feature-card,
+  .book-card,
+  .quote-card,
+  .reader-content{
+    box-shadow:none!important;
+    background:#fff!important;
+    border:1px solid #bbb!important;
+  }
+}
+
+/* ============================================================================
+   59 — FUTURE THEME HOOKS
+============================================================================ */
+html[data-theme="ramadan"]{
+  --theme-primary:#168a67;
+  --theme-primary-2:#0b5d48;
+  --theme-gold:#d9b14c;
+}
+
+html[data-theme="eid"]{
+  --theme-primary:#0d8d69;
+  --theme-primary-2:#075c45;
+  --theme-gold:#eac15a;
+}
+
+html[data-theme="knowledge"]{
+  --theme-primary:#347c91;
+  --theme-primary-2:#245569;
+  --theme-gold:#c8a24a;
+}
+
+html[data-theme="heritage"]{
+  --theme-primary:#5c7b63;
+  --theme-primary-2:#3d5745;
+  --theme-gold:#c19a4a;
+}
+
+/* ============================================================================
+   60 — THEME TRANSITION
+============================================================================ */
+html.theme-transition,
+html.theme-transition body,
+html.theme-transition body *{
+  transition:
+    background-color var(--transition-normal),
+    border-color var(--transition-normal),
+    color var(--transition-normal),
+    box-shadow var(--transition-normal)!important;
+}
+
+/* ============================================================================
+   61 — COLOR UTILITY CLASSES
+============================================================================ */
+.text-primary{color:var(--theme-primary-soft)!important}
+.text-gold{color:var(--theme-gold-soft)!important}
+.text-muted{color:var(--theme-text-muted)!important}
+.text-soft{color:var(--theme-text-soft)!important}
+.text-success{color:var(--theme-success)!important}
+.text-warning{color:var(--theme-warning)!important}
+.text-danger{color:var(--theme-danger)!important}
+.text-info{color:var(--theme-info)!important}
+
+.bg-primary{background:var(--theme-primary)!important}
+.bg-gold{background:var(--theme-gold)!important}
+.bg-surface{background:var(--theme-surface)!important}
+.bg-deep{background:var(--theme-bg-deep)!important}
+
+.border-primary{border-color:rgba(21,154,112,.35)!important}
+.border-gold{border-color:rgba(231,185,79,.35)!important}
+
+/* ============================================================================
+   62 — FINAL FALLBACK
+============================================================================ */
+@supports not ((backdrop-filter:blur(1px))){
+  .site-header,
+  .mobile-nav,
+  .welcome-popup,
+  .modal,
+  .dropdown,
+  .search-box{
+    background:var(--theme-surface);
+  }
+}
+
+/* ============================================================================
+   اختتام
+============================================================================ */
