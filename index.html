@@ -1,0 +1,3612 @@
+
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#075b43">
+<meta name="application-name" content="اسلامی علمی و مطالعاتی پورٹل">
+<meta name="description" content="قرآن، حدیث، تفسیر، فقہ، فتاویٰ، اسلامی کتب، اقوال، نعت، اذکار، سیرت اور تحقیقی مواد کے لیے جامع ڈیجیٹل پورٹل۔">
+<title>اسلامی علمی و مطالعاتی پورٹل — جامع ڈیجیٹل مرکز</title>
+<style>
+
+:root{
+  --bg:#f4f7fb; --surface:#ffffff; --surface-soft:#f8fbff; --text:#17221e;
+  --muted:#66746e; --primary:#075b43; --primary2:#0b8d67; --gold:#b78a2d;
+  --blue:#2563eb; --purple:#7c3aed; --rose:#db2777; --teal:#0f766e;
+  --cyan:#0891b2; --orange:#ea580c; --lime:#65a30d; --border:#dce6e1;
+  --shadow:0 16px 50px rgba(20,55,45,.10); --radius:24px; --max:1320px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;color:var(--text);background:
+  radial-gradient(circle at 10% 0%,rgba(37,99,235,.08),transparent 24rem),
+  radial-gradient(circle at 90% 10%,rgba(219,39,119,.06),transparent 25rem),
+  var(--bg);
+  font-family:"Noto Naskh Arabic","Noto Nastaliq Urdu",serif;
+  line-height:1.9;
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+a{text-decoration:none;color:inherit}
+.shell{width:min(var(--max),calc(100% - 28px));margin:auto}
+.top{
+  position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.90);
+  backdrop-filter:blur(18px);border-bottom:1px solid var(--border)
+}
+.top-row{min-height:76px;display:flex;align-items:center;gap:12px}
+.logo{display:flex;align-items:center;gap:11px;min-width:0}
+.logo-mark{
+  width:48px;height:48px;border-radius:16px;display:grid;place-items:center;color:#fff;
+  font-weight:800;font-size:25px;background:linear-gradient(135deg,var(--primary),var(--blue),var(--purple));
+  box-shadow:0 10px 25px rgba(37,99,235,.22)
+}
+.logo-title{font-size:18px;font-weight:800;white-space:nowrap}
+.logo-sub{font-size:11px;color:var(--muted);display:block}
+.nav{display:flex;gap:5px;align-items:center;margin-right:auto}
+.nav a{padding:9px 10px;border-radius:12px;font-size:14px}
+.nav a:hover{background:#eef6ff;color:var(--blue)}
+.actions{display:flex;gap:7px}
+.icon{
+  width:43px;height:43px;border:1px solid var(--border);border-radius:13px;background:#fff;
+  display:grid;place-items:center;color:var(--text)
+}
+.hero{
+  padding:58px 0 40px;overflow:hidden;position:relative;
+  background:
+   linear-gradient(125deg,rgba(7,91,67,.96),rgba(37,99,235,.94) 48%,rgba(124,58,237,.92));
+  color:#fff
+}
+.hero:before,.hero:after{content:"";position:absolute;border-radius:50%;filter:blur(2px);opacity:.18}
+.hero:before{width:320px;height:320px;background:#fff;top:-170px;left:-80px}
+.hero:after{width:420px;height:420px;background:#ffd166;bottom:-250px;right:-100px}
+.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.25fr .75fr;gap:26px;align-items:center}
+.kicker{
+  display:inline-flex;padding:6px 13px;border:1px solid rgba(255,255,255,.35);
+  background:rgba(255,255,255,.10);border-radius:999px;font-size:13px
+}
+.hero h1{
+  font-family:"Noto Nastaliq Urdu","Noto Naskh Arabic",serif;
+  font-size:clamp(34px,5vw,65px);line-height:1.55;margin:17px 0 10px
+}
+.hero p{font-size:18px;max-width:800px;color:rgba(255,255,255,.88)}
+.hero-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}
+.btn{
+  border:0;border-radius:14px;padding:11px 17px;display:inline-flex;align-items:center;
+  justify-content:center;gap:8px;font-weight:800
+}
+.btn-white{background:#fff;color:var(--primary)}
+.btn-glass{background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.32)}
+.hero-card{
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+  border-radius:28px;padding:22px;backdrop-filter:blur(16px);box-shadow:0 25px 70px rgba(0,0,0,.16)
+}
+.hero-card h3{margin:0 0 5px;font-size:25px}
+.count-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:14px}
+.count{background:rgba(0,0,0,.16);border:1px solid rgba(255,255,255,.14);border-radius:15px;text-align:center;padding:8px}
+.count b{display:block;font-size:23px}.count small{font-size:11px;opacity:.8}
+.search-band{margin-top:-18px;position:relative;z-index:10}
+.search-box{
+  display:flex;gap:8px;padding:9px;background:#fff;border:1px solid var(--border);
+  border-radius:19px;box-shadow:var(--shadow)
+}
+.search-box input{flex:1;min-width:0;border:0;outline:0;padding:10px;background:transparent}
+.search-box button{border:0;border-radius:13px;background:linear-gradient(135deg,var(--primary),var(--blue));color:#fff;padding:9px 18px}
+.quick-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:9px;margin-top:13px}
+.quick{
+  background:#fff;border:1px solid var(--border);border-radius:16px;padding:10px;text-align:center;
+  box-shadow:0 7px 20px rgba(30,65,55,.05);font-size:13px
+}
+.quick:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.section-shell{width:min(var(--max),calc(100% - 28px));margin:auto}
+.mega-section{padding:48px 0}
+.mega-section:nth-child(even){background:rgba(255,255,255,.45)}
+.section-heading{display:flex;align-items:end;justify-content:space-between;gap:15px;margin-bottom:20px}
+.section-kicker{display:inline-block;color:var(--blue);font-size:12px;font-weight:800}
+.section-heading h2{margin:2px 0;font-size:31px}
+.section-heading p{margin:0;color:var(--muted)}
+.outline-btn{
+  border:1px solid var(--border);background:#fff;color:var(--primary);
+  padding:8px 13px;border-radius:12px
+}
+.feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.feature-card{
+  position:relative;overflow:hidden;min-height:155px;background:#fff;border:1px solid var(--border);
+  border-radius:21px;padding:17px;display:flex;gap:12px;box-shadow:0 9px 28px rgba(20,55,45,.055);
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease
+}
+.feature-card:before{content:"";position:absolute;top:0;right:0;left:0;height:4px;background:var(--accent)}
+.feature-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:rgba(37,99,235,.30)}
+.feature-icon{
+  flex:0 0 42px;height:42px;border-radius:14px;display:grid;place-items:center;
+  background:var(--soft);color:var(--accent);font-size:12px;font-weight:900
+}
+.feature-body h3{margin:0 0 5px;font-size:19px}.feature-body p{margin:0;color:var(--muted);font-size:13px}
+.feature-arrow{position:absolute;left:13px;bottom:10px;color:var(--accent);opacity:.7}
+.tone-mint{--accent:#07845e;--soft:#e8f8f2}.tone-blue{--accent:#2563eb;--soft:#eaf1ff}
+.tone-gold{--accent:#b78a2d;--soft:#fbf4df}.tone-purple{--accent:#7c3aed;--soft:#f0eaff}
+.tone-rose{--accent:#db2777;--soft:#fdeaf4}.tone-teal{--accent:#0f766e;--soft:#e5f7f4}
+.panel{
+  background:#fff;border:1px solid var(--border);border-radius:25px;padding:22px;box-shadow:0 10px 32px rgba(20,55,45,.06)
+}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.pill-row{display:flex;gap:7px;flex-wrap:wrap}.pill{padding:5px 10px;border-radius:999px;background:#f0f6ff;color:#245aa8;font-size:12px}
+.notice{padding:15px;border-radius:17px;background:#fff8e8;border:1px solid #ead8a6}
+.footer{background:#101e19;color:#dfe9e4;padding:50px 0 25px}
+.footer-grid{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:24px}
+.footer h3{color:#fff}.footer a{color:#c8d8d0}.bottom{border-top:1px solid rgba(255,255,255,.12);margin-top:25px;padding-top:15px;font-size:12px;color:#aebdb5}
+.gateway{
+  position:fixed;inset:0;z-index:5000;background:rgba(4,19,14,.75);display:flex;align-items:center;justify-content:center;
+  padding:18px;backdrop-filter:blur(10px)
+}
+.gateway.hidden{display:none}
+.gateway-card{
+  width:min(720px,100%);background:#fff;border-radius:30px;padding:28px;text-align:center;
+  box-shadow:0 35px 100px rgba(0,0,0,.28)
+}
+.gateway-bismillah{font-size:40px;color:var(--gold)}
+.toast{
+  position:fixed;left:18px;bottom:18px;z-index:6000;background:#12251e;color:#fff;padding:11px 16px;
+  border-radius:14px;box-shadow:var(--shadow);opacity:0;transform:translateY(15px);pointer-events:none;transition:.2s
+}
+.toast.show{opacity:1;transform:none}
+.modal{
+  position:fixed;inset:0;z-index:4500;background:rgba(4,19,14,.62);display:none;align-items:center;justify-content:center;padding:18px
+}
+.modal.open{display:flex}
+.modal-card{width:min(760px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:26px;padding:22px}
+.tabs{display:flex;gap:7px;flex-wrap:wrap}.tab{border:1px solid var(--border);background:#fff;border-radius:12px;padding:8px 12px}.tab.active{background:var(--primary);color:#fff}
+.dashboard{
+  background:linear-gradient(135deg,#fff,#eef8f4);border:1px solid var(--border);border-radius:28px;padding:24px
+}
+.metric-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.metric{background:#fff;border:1px solid var(--border);border-radius:17px;padding:13px}.metric b{font-size:22px;color:var(--primary);display:block}
+@media(max-width:1100px){.nav{display:none}.hero-grid{grid-template-columns:1fr}.feature-grid{grid-template-columns:repeat(3,1fr)}.quick-grid{grid-template-columns:repeat(4,1fr)}.metric-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){
+  .shell,.section-shell{width:calc(100% - 18px)}
+  .feature-grid,.two,.three{grid-template-columns:1fr}
+  .quick-grid{grid-template-columns:repeat(2,1fr)}
+  .hero{padding:40px 0 30px}.hero h1{font-size:36px}.hero p{font-size:16px}
+  .section-heading{display:block}.section-heading h2{font-size:25px}.section-heading .outline-btn{margin-top:10px}
+  .footer-grid{grid-template-columns:1fr}.metric-grid{grid-template-columns:repeat(2,1fr)}
+  .count-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+
+/* === Visual refresh: dark, colorful, mobile-app inspired === */
+:root{
+  --bg:#071016; --surface:#101a22; --surface-soft:#15222c; --text:#eef7f5; --muted:#9eb0b8;
+  --primary:#087f74; --primary2:#1677ff; --gold:#f4b942; --blue:#1677ff; --purple:#9b5cff;
+  --border:rgba(255,255,255,.12); --shadow:0 18px 55px rgba(0,0,0,.34);
+}
+body{
+  background:
+    radial-gradient(circle at 12% 0%,rgba(22,119,255,.17),transparent 24rem),
+    radial-gradient(circle at 88% 8%,rgba(155,92,255,.13),transparent 24rem),
+    #071016;
+  color:var(--text);
+}
+.top{
+  background:rgba(6,13,18,.88);border-bottom:1px solid rgba(255,255,255,.10);
+}
+.logo-title{color:#fff}
+.logo-sub{color:#8ea4ad}
+.nav a{color:#cbd9de}.nav a:hover{background:rgba(22,119,255,.14);color:#fff}
+.icon,.outline-btn,.quick,.panel,.feature-card{
+  background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.035));
+  color:var(--text);border-color:rgba(255,255,255,.12);
+}
+.icon:hover,.outline-btn:hover{background:rgba(22,119,255,.15)}
+.hero{
+  padding:34px 0 35px;
+  background:
+    linear-gradient(135deg,rgba(4,12,17,.98),rgba(8,24,32,.98) 45%,rgba(12,10,27,.98)),
+    #071016;
+}
+.hero:before{
+  width:420px;height:420px;left:-130px;top:-230px;
+  background:radial-gradient(circle,#1677ff,transparent 65%);opacity:.18;
+}
+.hero:after{
+  width:480px;height:480px;right:-160px;bottom:-300px;
+  background:radial-gradient(circle,#9b5cff,transparent 65%);opacity:.17;
+}
+.kicker{
+  border-color:rgba(84,192,255,.35);background:rgba(22,119,255,.10);color:#bfeaff;
+}
+.hero h1{font-size:clamp(32px,5vw,59px)}
+.hero p{color:#a9bac2}
+.hero-card{
+  background:linear-gradient(145deg,rgba(17,30,40,.92),rgba(9,18,26,.92));
+  border:1px solid rgba(97,200,255,.30);
+}
+.count{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.08)}
+.search-band{margin-top:-12px}
+.search-box{
+  background:#0e1820;border-color:rgba(255,255,255,.12);box-shadow:0 18px 45px rgba(0,0,0,.28)
+}
+.search-box input{color:#fff}
+.quick{box-shadow:none}
+.quick:hover{background:rgba(22,119,255,.12)}
+.mega-section{background:transparent!important;padding:34px 0}
+.section-heading h2{color:#fff}
+.section-heading p{color:#91a4ad}
+.section-kicker{color:#61c9ff}
+.feature-card{
+  min-height:145px;
+  box-shadow:0 12px 34px rgba(0,0,0,.20);
+}
+.feature-card:hover{
+  box-shadow:0 20px 55px rgba(0,0,0,.35);
+  border-color:rgba(97,200,255,.38)
+}
+.feature-body h3{color:#f4fbff}
+.feature-body p{color:#94a8b1}
+.dashboard{
+  background:
+    radial-gradient(circle at 85% 10%,rgba(22,119,255,.15),transparent 20rem),
+    linear-gradient(145deg,#101b23,#0b141b);
+  border-color:rgba(255,255,255,.12);
+  box-shadow:var(--shadow);
+}
+.metric{
+  background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.08)
+}
+.metric b{color:#69d6ff}
+.pill{background:rgba(22,119,255,.13);color:#a8dcff;border:1px solid rgba(22,119,255,.20)}
+.notice{background:rgba(244,185,66,.08);border-color:rgba(244,185,66,.30);color:#ffe6a7}
+.footer{background:#04090d;border-top:1px solid rgba(255,255,255,.08)}
+.footer a{color:#b9d4df}
+.gateway{
+  background:
+    radial-gradient(circle at 20% 20%,rgba(22,119,255,.18),transparent 23rem),
+    rgba(2,7,11,.88);
+}
+.gateway-card{
+  background:
+    radial-gradient(circle at 85% 10%,rgba(155,92,255,.13),transparent 18rem),
+    linear-gradient(145deg,#111d25,#091219);
+  color:#fff;border:1px solid rgba(97,200,255,.45);
+  box-shadow:0 35px 110px rgba(0,0,0,.55);
+}
+.gateway-card p{color:#a7b9c0}
+.gateway-bismillah{color:#f4b942;text-shadow:0 0 28px rgba(244,185,66,.22)}
+.btn-white{
+  background:linear-gradient(135deg,#0c8f80,#1677ff)!important;color:#fff!important;
+  box-shadow:0 10px 28px rgba(22,119,255,.20)
+}
+.btn-glass{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.20)}
+.modal{background:rgba(2,7,11,.78)}
+.modal-card{background:#101a22;color:#eef7f5;border:1px solid rgba(255,255,255,.12)}
+.modal-card input,.modal-card textarea{
+  background:#0b141b!important;color:#fff;border-color:rgba(255,255,255,.12)!important;
+}
+.toast{background:#0e2730;border:1px solid rgba(97,200,255,.25)}
+/* Mobile bottom navigation, matching the compact app-like feel */
+.mobile-nav{
+  display:none;
+}
+@media(max-width:760px){
+  .top{position:sticky}
+  .logo-title{font-size:15px}
+  .logo-mark{width:42px;height:42px}
+  .hero{padding:27px 0 28px}
+  .hero-card{border-radius:22px}
+  .feature-card{min-height:132px}
+  .mobile-nav{
+    display:flex;position:fixed;z-index:3000;bottom:9px;left:9px;right:9px;
+    padding:7px;border:1px solid rgba(255,255,255,.12);border-radius:19px;
+    background:rgba(7,15,21,.92);backdrop-filter:blur(16px);
+    box-shadow:0 15px 45px rgba(0,0,0,.45);justify-content:space-around
+  }
+  .mobile-nav a{
+    color:#9eafb7;font-size:11px;text-align:center;padding:4px 9px;border-radius:12px
+  }
+  .mobile-nav a.active{background:rgba(22,119,255,.16);color:#fff}
+  .footer{padding-bottom:95px}
+}
+
+</style>
+</head>
+<body>
+
+<div class="gateway" id="gateway" role="dialog" aria-modal="true">
+  <div class="gateway-card">
+    <div class="gateway-bismillah">﷽</div>
+    <span class="section-kicker">اسلامی علمی و مطالعاتی پورٹل</span>
+    <h2 style="font-size:31px;margin:7px 0">علم، تحقیق اور مطالعہ کے ایک نئے ڈیجیٹل مرکز میں خوش آمدید</h2>
+    <p style="color:var(--muted)">
+      یہ صرف ایک عام ویب صفحہ نہیں؛ اس کا مقصد ایک ایسے وسیع پورٹل کی بنیاد رکھنا ہے
+      جس میں کتاب، قرآن، حدیث، فقہ، فتاویٰ، اقوال، نعت، اذکار، سیرت، تحقیق اور ذاتی مطالعہ
+      ایک مربوط ماحول میں جمع ہوں۔
+    </p>
+    <div class="notice">
+      <strong>اہم اصول:</strong> مستند حوالہ کے بغیر کسی عبارت کو مستند قرار نہیں دیا جائے گا۔
+    </div>
+    <button class="btn btn-white" style="margin-top:15px;background:linear-gradient(135deg,var(--primary),var(--blue));color:#fff" id="enterPortal">داخل ہوں</button>
+    <button class="outline-btn" style="margin-top:8px" id="resetWelcome">استقبالیہ دوبارہ دکھائیں</button>
+  </div>
+</div>
+
+<header class="top">
+  <div class="shell top-row">
+    <a class="logo" href="#home">
+      <span class="logo-mark">ب</span>
+      <span><span class="logo-title">اسلامی علمی و مطالعاتی پورٹل</span><span class="logo-sub">تحقیق • مطالعہ • استفادہ</span></span>
+    </a>
+    <nav class="nav">
+      <a href="#library">کتب خانہ</a>
+      <a href="#fatawa">فتاویٰ</a>
+      <a href="#quran">قرآن</a>
+      <a href="#hadith">حدیث</a>
+      <a href="#milad">میلاد</a>
+      <a href="#audio">آڈیو</a>
+      <a href="#research">تحقیق</a>
+    </nav>
+    <div class="actions">
+      <button class="icon" id="themeCycle" type="button" title="رنگ بدلیں">رنگ</button>
+      <button class="icon" id="darkToggle" type="button" title="روشن یا تاریک موڈ">◐</button>
+      <button class="icon" data-open-modal="settingsModal" type="button" title="مطالعہ ترتیبات">A</button>
+    </div>
+  </div>
+</header>
+
+<main id="home">
+
+<section class="hero">
+  <div class="shell hero-grid">
+    <div>
+      <span class="kicker">مستقبل کے وسیع اسلامی ڈیجیٹل پورٹل کی بنیاد</span>
+      <h1>علمِ دین کو جدید، خوب صورت اور انتہائی وسیع ڈیجیٹل تجربے میں بدلنا</h1>
+      <p>
+        ایک ایسا مرکزی مقام جہاں ہزاروں نہیں بلکہ مستقبل میں لاکھوں indexed علمی records،
+        کتابیں، فتاویٰ، آیات، احادیث، اقوال، آڈیو، سیرت اور ذاتی مطالعاتی سہولیات
+        ایک منظم architecture کے تحت کام کر سکیں۔
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-white" href="#library">۳۰,۰۰۰+ کتب خانہ</a>
+        <a class="btn btn-glass" href="#searchArea">جامع تلاش</a>
+        <button class="btn btn-glass" id="sharePortal" type="button">پورٹل شیئر کریں</button>
+      </div>
+      <div class="pill-row" style="margin-top:18px">
+        <span class="pill">موبائل فرسٹ</span><span class="pill">نستعلیق دوست</span>
+        <span class="pill">ماڈیولر</span><span class="pill">قابلِ توسیع</span>
+        <span class="pill">حوالہ جاتی</span><span class="pill">آف لائن تیاری</span>
+      </div>
+    </div>
+    <aside class="hero-card">
+      <span style="opacity:.8">آج کا پورٹل خلاصہ</span>
+      <h3>ایک index، سینکڑوں امکانات</h3>
+      <p style="opacity:.82">موجودہ فائل میں بڑے future modules کے لیے UI، navigation، local preferences اور architecture hooks موجود ہیں۔</p>
+      <div class="count-grid">
+        <div class="count"><b>۳۰,۰۰۰+</b><small>کتب کا ہدف</small></div>
+        <div class="count"><b>۱,۰۰۰+</b><small>اقوال</small></div>
+        <div class="count"><b>۱۲+</b><small>بڑے مراکز</small></div>
+        <div class="count"><b>۱۰۰+</b><small>ذیلی امکانات</small></div>
+      </div>
+      <p style="font-size:12px;opacity:.7;margin-bottom:0">اصل اعداد بعد کے data modules سے dynamic ہوں گے؛ یہاں صرف architecture targets ہیں۔</p>
+    </aside>
+  </div>
+</section>
+
+<section class="search-band" id="searchArea">
+  <div class="shell">
+    <div class="search-box">
+      <input id="globalSearch" type="search" placeholder="کتاب، مسئلہ، آیت، حدیث، قول یا کسی feature کا نام تلاش کریں…" autocomplete="off">
+      <button id="searchButton" type="button">تلاش کریں</button>
+    </div>
+    <div class="quick-grid">
+      <button class="quick" data-q="کتاب" type="button">کتاب</button>
+      <button class="quick" data-q="فتاویٰ" type="button">فتاویٰ</button>
+      <button class="quick" data-q="قرآن" type="button">قرآن</button>
+      <button class="quick" data-q="حدیث" type="button">حدیث</button>
+      <button class="quick" data-q="میلاد" type="button">میلاد</button>
+      <button class="quick" data-q="تسبیح" type="button">تسبیح</button>
+      <button class="quick" data-q="تحقیق" type="button">تحقیق</button>
+      <button class="quick" data-q="بک مارک" type="button">بک مارک</button>
+    </div>
+    <div class="panel" style="margin-top:10px;padding:13px" id="searchResults">جامع search engine کے مکمل نتائج اگلے data اور JavaScript modules سے آئیں گے۔</div>
+  </div>
+</section>
+
+<section class="mega-section">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div><span class="section-kicker">مرکزی جائزہ</span><h2>پورٹل کا ذاتی مطالعہ ڈیش بورڈ</h2><p>روزمرہ کے اہم کام ایک جگہ</p></div>
+      <span id="themeLabel" class="pill">سبز و زمردی</span>
+    </div>
+    <div class="dashboard">
+      <div class="metric-grid">
+        <div class="metric"><b>۳۰,۰۰۰+</b><span>کتب کا ہدف</span></div>
+        <div class="metric"><b>۱,۰۰۰+</b><span>اقوال کا ہدف</span></div>
+        <div class="metric"><b id="zikrValue">۰</b><span>آج کا ذکر</span></div>
+        <div class="metric"><b id="zikrTarget">۱۰۰</b><span>ذکر کا ہدف</span></div>
+        <div class="metric"><b id="fontValue">۱۰۰%</b><span>متن سائز</span></div>
+        <div class="metric"><b id="today">—</b><span>آج کی تاریخ</span></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:15px">
+        <button class="btn" style="background:var(--primary);color:#fff" id="zikrAdd" type="button">ذکر شمار کریں</button>
+        <button class="outline-btn" id="zikrReset" type="button">شمار صفر</button>
+        <button class="outline-btn" data-open-modal="notesModal" type="button">ذاتی نوٹ</button>
+        <a class="outline-btn" href="#reader" style="display:inline-flex;align-items:center">مطالعہ گاہ</a>
+      </div>
+      <div style="margin-top:14px;background:#e7eee9;border-radius:999px;height:9px;overflow:hidden"><div id="zikrBar" style="width:0;height:100%;background:linear-gradient(90deg,var(--primary),var(--blue),var(--purple));transition:.25s"></div></div>
+      <div class="pill-row" style="margin-top:12px">
+        <button class="pill" data-target="100" type="button">ہدف ۱۰۰</button>
+        <button class="pill" data-target="313" type="button">ہدف ۳۱۳</button>
+        <button class="pill" data-target="1000" type="button">ہدف ۱۰۰۰</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mega-section" id="library">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 01</span>
+        <h2>ڈیجیٹل کتب خانہ</h2>
+        <p>۳۰,۰۰۰+ کتب کے لیے قابلِ توسیع، تیز اور تحقیقی مطالعہ مرکز</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="library">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>کتابوں کی مرکزی فہرست</h3>
+            <p>نام، مصنف، موضوع، زبان، جلد اور اشاعت کے مطابق جامع فہرست</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>مصنف اشاریہ</h3>
+            <p>مصنفین کے نام سے تمام متعلقہ کتب تک فوری رسائی</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>موضوعاتی درجہ بندی</h3>
+            <p>عقائد، فقہ، فتاویٰ، تفسیر، حدیث، سیرت، تصوف، اخلاق اور مزید</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>کتاب کا مکمل تعارف</h3>
+            <p>مصنف، ناشر، صفحات، جلد، موضوع اور دستیاب حوالہ جات</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>جلد بہ جلد مطالعہ</h3>
+            <p>کثیر جلدی کتب کو الگ جلدوں اور حصوں میں منظم کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>پی ڈی ایف مرکز</h3>
+            <p>معتبر اور قانونی طور پر دستیاب اصل فائل سے مطالعہ یا ڈاؤن لوڈ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>آن لائن ریڈر</h3>
+            <p>براؤزر کے اندر صفحہ وار کتاب پڑھنے کا مستقبل کا نظام</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>صفحہ نمبر پر جائیں</h3>
+            <p>براہِ راست مطلوبہ صفحے پر جانے کی سہولت</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>متن تلاش</h3>
+            <p>کتاب کے اندر لفظ یا جملہ تلاش کرنے کا نظام</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>کتاب کا اقتباس</h3>
+            <p>منتخب عبارت کو حوالہ سمیت نقل کرنے کی سہولت</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>کتاب پسندیدہ</h3>
+            <p>مکمل کتاب کو پسندیدہ فہرست میں محفوظ کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>حالیہ مطالعہ</h3>
+            <p>جہاں مطالعہ چھوڑا تھا وہیں سے دوبارہ شروع کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="fatawa">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 02</span>
+        <h2>فتاویٰ و فقہی تحقیق</h2>
+        <p>شرعی مسائل کے لیے موضوعاتی، حوالہ جاتی اور قابلِ تلاش نظام</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="fatawa">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>مسئلہ تلاش</h3>
+            <p>روزمرہ شرعی مسئلہ لکھ کر متعلقہ مواد تلاش کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>باب وار فتاویٰ</h3>
+            <p>طہارت، نماز، روزہ، زکوٰۃ، حج، معاملات اور دیگر ابواب</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>ماخذ فلٹر</h3>
+            <p>فتاویٰ رضویہ، بہارِ شریعت اور دیگر مقررہ معتبر ماخذ الگ دیکھنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>حوالہ محفوظ کریں</h3>
+            <p>مسئلے کے ساتھ کتاب، جلد، صفحہ اور دیگر دستیاب حوالہ محفوظ کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>متعلقہ مسائل</h3>
+            <p>ایک مسئلے کے ساتھ اسی باب کے قریب ترین مسائل دکھانا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>سوال کی بہتر تشکیل</h3>
+            <p>عام الفاظ سے مسئلے کے ممکنہ علمی عنوانات تک رہنمائی</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>نتائج کی درجہ بندی</h3>
+            <p>موضوع، ماخذ، باب اور متعلقہ الفاظ کے مطابق نتائج</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>غلط نسبت سے بچاؤ</h3>
+            <p>غیر مصدقہ فتوے کو مستند فتویٰ کے طور پر پیش نہ کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>تحقیقی نوٹ</h3>
+            <p>صارف کے ذاتی مطالعہ کے لیے نوٹ محفوظ کرنے کی جگہ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>حوالہ کاپی</h3>
+            <p>مسئلہ اور حوالہ ایک ساتھ کاپی کرنے کی سہولت</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>مسئلہ شیئر</h3>
+            <p>حوالہ سمیت واٹس ایپ یا دیگر دستیاب ذرائع سے اشتراک</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>متعلقہ کتاب کھولیں</h3>
+            <p>فتویٰ سے اصل کتاب یا متعلقہ باب تک جانے کا مستقبل کا ربط</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="quran">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 03</span>
+        <h2>قرآن پاک و تفاسیر</h2>
+        <p>قرآنی متن، تراجم، تفاسیر اور آیت پر مبنی تحقیق</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="quran">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>سورت فہرست</h3>
+            <p>تمام سورتوں کی منظم فہرست</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>آیت نمبر تلاش</h3>
+            <p>سورت اور آیت نمبر کے ذریعے براہِ راست رسائی</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>لفظی تلاش</h3>
+            <p>قرآنی متن میں لفظ تلاش کرنے کا اشاریہ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>ترجمہ منتخب کریں</h3>
+            <p>دستیاب معتبر ترجموں میں سے مطالعہ کے لیے انتخاب</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>تفسیر منتخب کریں</h3>
+            <p>مربوط تفاسیر میں سے متعلقہ تفسیر کا انتخاب</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>آیت کا حوالہ</h3>
+            <p>سورت، آیت اور دیگر دستیاب حوالہ معلومات کے ساتھ اشتراک</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>آیت بک مارک</h3>
+            <p>اہم آیات کو ذاتی فہرست میں محفوظ کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>تلاوت موڈ</h3>
+            <p>مستقبل میں آڈیو تلاوت سے آیت کو مربوط کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>آیت کے ساتھ نوٹ</h3>
+            <p>مطالعہ کے دوران ذاتی علمی نوٹ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>موضوعاتی آیات</h3>
+            <p>موضوع کے لحاظ سے آیات کا curated index</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>قرآنی لغت</h3>
+            <p>اہم الفاظ کے معنی اور متعلقہ مقامات تک رسائی</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>آیت سے تفسیر</h3>
+            <p>آیت سے متعلق تفسیری مواد کے درمیان فوری navigation</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="hadith">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 04</span>
+        <h2>احادیث کی ڈیجیٹل لائبریری</h2>
+        <p>کتبِ حدیث، ابواب، متن، ترجمہ اور حوالہ جاتی مطالعہ</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="hadith">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>کتبِ حدیث فہرست</h3>
+            <p>کتاب کے نام سے حدیثی ذخیرے میں داخلہ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>باب تلاش</h3>
+            <p>کتاب اور باب کے ذریعے حدیث تک رسائی</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>حدیث نمبر</h3>
+            <p>حدیث نمبر کے ذریعے براہِ راست navigation</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>عربی متن</h3>
+            <p>اصل عربی متن کو الگ اور واضح انداز میں دکھانا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>اردو ترجمہ</h3>
+            <p>دستیاب معتبر ترجمہ کے ساتھ مطالعہ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>حوالہ جاتی کارڈ</h3>
+            <p>کتاب، باب اور حدیث نمبر کے ساتھ shareable card</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>حدیث بک مارک</h3>
+            <p>مخصوص حدیث کو محفوظ فہرست میں رکھنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>متن تلاش</h3>
+            <p>الفاظ کے ذریعے متعلقہ احادیث تلاش کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>موضوعاتی حدیث</h3>
+            <p>موضوع کے اعتبار سے قابلِ تلاش index</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>متعلقہ روایات</h3>
+            <p>ممکنہ طور پر متعلقہ entries کی future linking</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>مطالعہ نوٹس</h3>
+            <p>حدیث کے ساتھ ذاتی نوٹ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>تحقیقی export</h3>
+            <p>حوالہ جاتی معلومات کو منظم متن کی صورت میں copy کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="milad">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 05</span>
+        <h2>میلاد النبی ﷺ مرکزی مرکز</h2>
+        <p>فضائل، دلائل، سیرت، واقعات اور متعلقہ تحقیقی مواد</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="milad">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>مرکزی تعارف</h3>
+            <p>میلاد النبی ﷺ کے موضوع کا جامع تعارفی صفحہ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>قرآنی دلائل</h3>
+            <p>متعلقہ قرآنی آیات کو اصل حوالہ کے ساتھ مرتب کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>حدیثی دلائل</h3>
+            <p>مستند حدیثی ماخذ سے متعلقہ مواد تک رسائی</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>سیرتی واقعات</h3>
+            <p>سیرتِ طیبہ کے متعلقہ واقعات کا منظم مطالعہ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>ربیع الاول مرکز</h3>
+            <p>ماہِ ربیع الاول کے لیے خصوصی موسمی مرکز</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>۱۲ ربیع الاول</h3>
+            <p>مقررہ قمری تاریخ سے مربوط خصوصی صفحہ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>سوال و جواب</h3>
+            <p>میلاد سے متعلق عام سوالات کا searchable database</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>حوالہ جاتی فہرست</h3>
+            <p>استدلال میں استعمال ہونے والے اصل ماخذ کی فہرست</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>مضمون سازی</h3>
+            <p>مستند مواد سے تحقیقی مضمون ترتیب دینے کے لیے structure</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>اشتراک کارڈ</h3>
+            <p>مختصر علمی اقتباس حوالہ کے ساتھ share کرنے کا نظام</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>موضوعاتی index</h3>
+            <p>میلاد، سیرت، فضائل اور دیگر ذیلی موضوعات</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>سالانہ مرکز</h3>
+            <p>ہر ربیع الاول کے لیے archive بنانے کی گنجائش</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="quotes">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 06</span>
+        <h2>مستند اقوالِ زریں</h2>
+        <p>۱,۰۰۰+ حوالہ شدہ اقوال کے لیے verification-first database</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="quotes">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>وقت</h3>
+            <p>وقت کی قدر سے متعلق مستند اقوال</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>علم</h3>
+            <p>طلبِ علم اور مطالعے سے متعلق اقوال</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>عشقِ رسول ﷺ</h3>
+            <p>محبتِ رسول ﷺ سے متعلق حوالہ شدہ اقوال</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>مسلک</h3>
+            <p>مسلکی اصول و اکابر کے متعلق مستند اقوال</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>نماز</h3>
+            <p>نماز اور عبادت سے متعلق اقوال</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>اخلاق</h3>
+            <p>حسنِ اخلاق اور معاشرتی آداب</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>توبہ</h3>
+            <p>توبہ اور اصلاحِ نفس</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>صبر</h3>
+            <p>صبر اور ثابت قدمی</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>حقوق</h3>
+            <p>حقوق العباد اور ذمہ داری</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>دنیا</h3>
+            <p>دنیا کی حقیقت اور آخرت کی فکر</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>شخصیت فلٹر</h3>
+            <p>قائل یا شخصیت کے اعتبار سے اقوال</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>ماخذ فلٹر</h3>
+            <p>کتاب، رسالہ یا دستیاب اصل ماخذ کے مطابق filter</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="audio">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 07</span>
+        <h2>نعت، منقبت، دروس و آڈیو مرکز</h2>
+        <p>پسندیدہ آڈیو مواد کے لیے مکمل مستقبل کا player</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="audio">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>پلے لسٹ</h3>
+            <p>موضوع یا شخصیت کے لحاظ سے playlists</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>آڈیو تلاش</h3>
+            <p>عنوان، قاری یا مقرر کے ذریعے تلاش</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>پلے، توقف</h3>
+            <p>بنیادی playback controls</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>درمیان سے پلے</h3>
+            <p>جہاں چھوڑا تھا وہیں سے دوبارہ سننا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>آواز کنٹرول</h3>
+            <p>آڈیو volume control</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>رفتار ۰٫۷۵ تا ۱٫۵</h3>
+            <p>رفتار کم یا زیادہ کرنے کی سہولت</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>ویو وژولائزر</h3>
+            <p>آڈیو کے دوران waveform visualization</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>اگلا مواد</h3>
+            <p>playlist میں اگلی entry خودکار منتخب کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>سابقہ</h3>
+            <p>حال ہی میں سنے گئے مواد کی فہرست</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>پسندیدہ آڈیو</h3>
+            <p>پسندیدہ recordings محفوظ کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>شیئر</h3>
+            <p>عنوان اور حوالہ کے ساتھ آڈیو شیئر</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>آف لائن queue</h3>
+            <p>مستقبل میں دستیاب offline files کے لیے queue</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="zikr">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 08</span>
+        <h2>اذکار و ڈیجیٹل تسبیح پرو</h2>
+        <p>درود و اذکار کے لیے ذاتی اور محفوظ شمار کا نظام</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="zikr">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>۱۰۰ کا ہدف</h3>
+            <p>عام روزانہ شمار</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>۳۱۳ کا ہدف</h3>
+            <p>منتخب عدد کے مطابق شمار</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>۱۰۰۰ کا ہدف</h3>
+            <p>زیادہ ہدف کے لیے شمار</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>اپنا ہدف</h3>
+            <p>مستقبل میں custom target</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>درود فہرست</h3>
+            <p>منتخب صیغوں کے لیے data-driven list</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>ذکر فہرست</h3>
+            <p>مختلف اذکار کو الگ profiles میں رکھنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>آج کا شمار</h3>
+            <p>موجودہ دن کا خلاصہ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>ہفتہ وار خلاصہ</h3>
+            <p>تاریخی استعمال کا summary</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>ری سیٹ</h3>
+            <p>شمار صفر کرنے کی سہولت</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>مقامی محفوظ کاری</h3>
+            <p>براؤزر میں بنیادی data persistence</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>آواز یا vibration</h3>
+            <p>مستقبل میں optional feedback</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>رازداری</h3>
+            <p>ذاتی شمار کو سرور پر بھیجنے کے بغیر local mode</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="heritage">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 09</span>
+        <h2>روحانی، سیرتی اور تاریخی گوشے</h2>
+        <p>شجرہ، اسمائے مصطفیٰ ﷺ اور اکابر سے متعلق منظم مواد</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="heritage">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>شجرہ قادریہ رضویہ</h3>
+            <p>روحانی واسطوں کو interactive انداز میں دکھانا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>شجرہ navigation</h3>
+            <p>ہر واسطے سے اگلے اور پچھلے مقام تک navigation</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>مقامات</h3>
+            <p>دستیاب مقام یا شہر کی معلومات</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>اسمائے مصطفیٰ ﷺ</h3>
+            <p>مبارک ناموں کی عربی و اردو فہرست</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>نام کا معنی</h3>
+            <p>ہر نام کے ساتھ معنی کا field</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>ماخذ</h3>
+            <p>جہاں دستیاب ہو وہاں نام کے ماخذ کی معلومات</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>اعلیٰ حضرت مرکز</h3>
+            <p>سیدی اعلیٰ حضرت سے متعلق منتخب مواد</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>تاج الشریعہ مرکز</h3>
+            <p>حضور تاج الشریعہ سے متعلق منتخب مواد</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>اکابرین فہرست</h3>
+            <p>مستند طور پر درج شخصیات کا index</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>کتب سے ربط</h3>
+            <p>شخصیت سے متعلق کتب تک future linking</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>واقعات</h3>
+            <p>منتخب سیرتی و تاریخی واقعات</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>ٹائم لائن</h3>
+            <p>تاریخی واقعات کی مستقبل کی timeline</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="jamia">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 10</span>
+        <h2>جامعۃ الرضا بریلی شریف</h2>
+        <p>ادارے، تعلیم، شعبہ جات اور متعلقہ علمی معلومات کا گوشہ</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="jamia">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>مرکزی تعارف</h3>
+            <p>ادارے کا مستند تعارفی صفحہ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>درسِ نظامی</h3>
+            <p>تعلیمی نصاب کے لیے الگ information architecture</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>شعبہ جات</h3>
+            <p>مختلف شعبہ جات کو الگ cards میں منظم کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>تعلیمی مواد</h3>
+            <p>طلبہ کے لیے متعلقہ مواد کی directory</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>کتب فہرست</h3>
+            <p>متعلقہ کتب یا نصابی مواد کا future index</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>اعلانات</h3>
+            <p>مستقبل میں مستند اعلانات کا گوشہ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>رابطہ</h3>
+            <p>دستیاب سرکاری یا معتبر رابطہ معلومات</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>تاریخی مواد</h3>
+            <p>ادارے کی تاریخ کے لیے archive</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>تعلیمی سوالات</h3>
+            <p>طلبہ کے لیے موضوعاتی FAQ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>مطالعہ فہرست</h3>
+            <p>طلبہ کے لیے منتخب مطالعہ مواد</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>کورس navigation</h3>
+            <p>مستقبل میں کلاس/مضمون کے لحاظ سے navigation</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>ماخذ اصول</h3>
+            <p>ادارے سے متعلق معلومات صرف معتبر ماخذ سے</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="qa">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 11</span>
+        <h2>اسلامی سوال و جواب</h2>
+        <p>عام سوالات کو مستند حوالہ جاتی جواب کے ساتھ منظم کرنے کا نظام</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="qa">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>سوال تلاش</h3>
+            <p>عام الفاظ میں سوال تلاش کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>موضوع فلٹر</h3>
+            <p>عقائد، عبادات، معاملات، سیرت اور دیگر موضوعات</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>جواب کا خلاصہ</h3>
+            <p>مختصر جواب کا الگ حصہ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>تفصیلی جواب</h3>
+            <p>تفصیلی علمی جواب کے لیے expanded view</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>حوالہ</h3>
+            <p>ہر جواب کے ساتھ source field</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>متعلقہ سوالات</h3>
+            <p>اسی موضوع کے دوسرے سوالات</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>سوال محفوظ کریں</h3>
+            <p>بعد میں پڑھنے کے لیے bookmark</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>سوال شیئر</h3>
+            <p>حوالہ سمیت copy/share</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>غلط سوال رہنمائی</h3>
+            <p>سوال واضح نہ ہو تو متعلقہ موضوعات دکھانا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>تاریخ</h3>
+            <p>اضافہ یا update کی تاریخ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>ماخذ status</h3>
+            <p>مستند، زیرِ تحقیق یا مسودہ status</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>تحقیقی version</h3>
+            <p>جواب کی تبدیلیوں کے لیے version field</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="search">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 12</span>
+        <h2>عالمگیر سرچ انجن</h2>
+        <p>پورے پورٹل کو ایک ہی تلاش کے ذریعے جوڑنے والا مرکزی engine</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="search">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>ایک سرچ بار</h3>
+            <p>کتب، قرآن، حدیث، فتاویٰ، اقوال اور دیگر مواد</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>فوری تجاویز</h3>
+            <p>لکھتے وقت ممکنہ نتائج دکھانا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>زمرہ filter</h3>
+            <p>کتاب، فتویٰ، آیت، حدیث، قول، آڈیو وغیرہ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>مصنف filter</h3>
+            <p>مصنف یا شخصیت کے مطابق filter</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>موضوع filter</h3>
+            <p>موضوعی search refinement</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>عین عبارت</h3>
+            <p>exact phrase search</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>متبادل الفاظ</h3>
+            <p>مستقبل میں اردو spelling variants کی مدد</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>نتائج sorting</h3>
+            <p>متعلقہ، تازہ یا ماخذ کے مطابق ترتیب</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>نتائج pagination</h3>
+            <p>بڑے نتائج کو pages میں تقسیم کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>نتائج history</h3>
+            <p>حالیہ searches محفوظ کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>saved searches</h3>
+            <p>اہم تلاش کو محفوظ کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>deep links</h3>
+            <p>نتیجے سے اصل content page تک direct link</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="reader">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 13</span>
+        <h2>جدید مطالعہ گاہ</h2>
+        <p>لمبی کتابوں اور علمی مضامین کے لیے آرام دہ reading environment</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="reader">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>فونٹ سائز</h3>
+            <p>A+ اور A-</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>سطر کا فاصلہ</h3>
+            <p>line-height control</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>متن کی چوڑائی</h3>
+            <p>reading width control</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>رات کا مطالعہ</h3>
+            <p>dark reading mode</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>سیپیا موڈ</h3>
+            <p>آنکھوں کے لیے نرم background</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>اسکرول progress</h3>
+            <p>کتنا مواد پڑھا جا چکا ہے</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>جہاں چھوڑا</h3>
+            <p>last reading position</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>bookmark</h3>
+            <p>مخصوص مقام محفوظ کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>highlight</h3>
+            <p>منتخب متن کو نمایاں کرنے کا future UI</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>نوٹ</h3>
+            <p>مخصوص مقام پر ذاتی نوٹ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>پرنٹ موڈ</h3>
+            <p>صاف printable view</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>focus mode</h3>
+            <p>غیر ضروری navigation چھپا کر مطالعہ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="cards">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 14</span>
+        <h2>اسلامی کارڈ ساز</h2>
+        <p>مبارکباد، اقوال اور حوالہ جاتی cards بنانے کا مستقبل کا نظام</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="cards">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>نام کا live preview</h3>
+            <p>نام درج کرتے ہی preview</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>ربیع الاول کارڈ</h3>
+            <p>ربیع الاول شریف کے لیے template</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>عید میلاد کارڈ</h3>
+            <p>مستقبل میں متعلقہ template</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>قول کارڈ</h3>
+            <p>مستند قول اور حوالہ کے لیے template</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>آیت کارڈ</h3>
+            <p>آیت اور حوالہ کے لیے template</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>حدیث کارڈ</h3>
+            <p>حدیث اور source کے لیے template</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>رنگ منتخب کریں</h3>
+            <p>مختلف رنگی palettes</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>فونٹ منتخب کریں</h3>
+            <p>دستیاب اردو/عربی fonts</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>واٹرمارک</h3>
+            <p>اختیاری portal attribution</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>تصویر محفوظ</h3>
+            <p>مستقبل میں canvas export</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>واٹس ایپ اشتراک</h3>
+            <p>share API یا image share</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>حوالہ لازمی</h3>
+            <p>علمی cards میں source field کی گنجائش</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="favorites">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 15</span>
+        <h2>پسندیدہ، بک مارک اور ذاتی کتب خانہ</h2>
+        <p>صارف کے اپنے مطالعاتی ماحول کے لیے</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="favorites">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>پسندیدہ کتب</h3>
+            <p>اہم کتابیں محفوظ کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>پسندیدہ فتاویٰ</h3>
+            <p>اہم مسائل محفوظ کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>پسندیدہ آیات</h3>
+            <p>اہم آیات محفوظ کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>پسندیدہ احادیث</h3>
+            <p>اہم احادیث محفوظ کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>پسندیدہ اقوال</h3>
+            <p>اہم اقوال محفوظ کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>مطالعہ فہرست</h3>
+            <p>بعد میں پڑھنے والی فہرست</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>حال ہی میں دیکھا</h3>
+            <p>recent history</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>حال ہی میں پڑھا</h3>
+            <p>reading history</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>حال ہی میں سنا</h3>
+            <p>audio history</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>ذاتی tags</h3>
+            <p>مواد پر personal tags</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>ذاتی نوٹس</h3>
+            <p>مواد کے ساتھ notes</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>backup/export</h3>
+            <p>مستقبل میں local data export</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="sharing">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 16</span>
+        <h2>اسمارٹ اشتراک و حوالہ</h2>
+        <p>علمی مواد کو حوالہ کے ساتھ ذمہ داری سے شیئر کرنے کا نظام</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="sharing">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>حوالہ سمیت copy</h3>
+            <p>متن اور source ایک ساتھ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>مختصر copy</h3>
+            <p>صرف منتخب عبارت</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>لنک copy</h3>
+            <p>اصل صفحے کا direct link</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>واٹس ایپ</h3>
+            <p>دستیاب share mechanism</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>کلپ بورڈ</h3>
+            <p>ایک tap سے copy</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>quote card</h3>
+            <p>قول کو card میں تبدیل کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>citation format</h3>
+            <p>حوالہ کی واضح formatting</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>source badge</h3>
+            <p>شیئر کیے گئے مواد میں source نمایاں</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>share preview</h3>
+            <p>شیئر سے پہلے preview</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>QR code</h3>
+            <p>مستقبل میں page link کا QR</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>embed card</h3>
+            <p>مستقبل میں web embed</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>غلط نسبت warning</h3>
+            <p>بغیر source کے quote کو verified label نہ دینا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="accessibility">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 17</span>
+        <h2>رسائی، پڑھنے میں آسانی اور زبان</h2>
+        <p>ہر عمر اور مختلف اسکرینوں کے لیے قابلِ استعمال واجہ</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="accessibility">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>موبائل فرسٹ</h3>
+            <p>چھوٹی screen کو بنیادی target بنانا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>بڑا متن</h3>
+            <p>فونٹ size controls</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>زیادہ contrast</h3>
+            <p>واضح text/background contrast</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>focus states</h3>
+            <p>keyboard اور accessibility focus</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>RTL مکمل</h3>
+            <p>اردو layout کے لیے RTL</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>عربی متن</h3>
+            <p>عربی کے لیے مناسب typography</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>keyboard navigation</h3>
+            <p>مستقبل میں مکمل keyboard support</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>reduced motion</h3>
+            <p>animation کم کرنے کا اختیار</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>screen reader labels</h3>
+            <p>buttons اور controls کے واضح labels</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>touch targets</h3>
+            <p>موبائل پر مناسب touch area</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>reading preferences</h3>
+            <p>صارف کی پسند محفوظ کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>زبان architecture</h3>
+            <p>مستقبل میں اضافی زبانوں کے لیے structure</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="pwa">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 18</span>
+        <h2>موبائل ایپ جیسا تجربہ</h2>
+        <p>PWA کے لیے index سطح کی تیاری</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="pwa">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>manifest linkage</h3>
+            <p>manifest.json سے application metadata</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>standalone mode</h3>
+            <p>مستقبل میں app-like opening</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>install prompt</h3>
+            <p>دستیاب ہونے پر install UI</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>offline shell</h3>
+            <p>مستقبل میں service worker کے ذریعے</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>cache strategy</h3>
+            <p>static assets کے لیے caching</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>update notice</h3>
+            <p>نئی version دستیاب ہونے پر اطلاع</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>app icon</h3>
+            <p>مختلف sizes کے icons</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>splash screen</h3>
+            <p>موبائل app opening experience</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>network fallback</h3>
+            <p>کمزور internet پر بنیادی shell</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>storage layer</h3>
+            <p>local preferences کے لیے storage</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>versioning</h3>
+            <p>portal version واضح رکھنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>migration hooks</h3>
+            <p>future data structure migration</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="performance">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 19</span>
+        <h2>رفتار اور بڑے ڈیٹا کی تیاری</h2>
+        <p>۳۰,۰۰۰+ کتب کے باوجود قابلِ استعمال architecture</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="performance">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>lazy loading</h3>
+            <p>ضرورت کے وقت content load</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>pagination</h3>
+            <p>بڑے نتائج pages میں</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>chunked JSON</h3>
+            <p>data کو چھوٹے حصوں میں تقسیم</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>metadata index</h3>
+            <p>کتب کے metadata کا الگ index</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>search index</h3>
+            <p>تلاش کے لیے optimized structure</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>debounced search</h3>
+            <p>ہر keypress پر بھاری search نہ چلانا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>caching</h3>
+            <p>بار بار استعمال ہونے والے data کی cache</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>image lazy load</h3>
+            <p>تصاویر ضرورت پر load</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>code splitting</h3>
+            <p>بڑے JavaScript modules الگ load</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>error boundaries</h3>
+            <p>module failure کو پورٹل failure نہ بننے دینا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>loading states</h3>
+            <p>ہر asynchronous module کے لیے loading UI</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>empty states</h3>
+            <p>نتائج نہ ہونے پر واضح رہنمائی</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="security">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 20</span>
+        <h2>حفاظت، اعتماد اور ذمہ دار data handling</h2>
+        <p>پورٹل کے future production استعمال کے لیے بنیادی اصول</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="security">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>input sanitization</h3>
+            <p>صارف کے input کو محفوظ طریقے سے process کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>XSS protection</h3>
+            <p>غیر محفوظ HTML injection سے بچاؤ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>safe external links</h3>
+            <p>بیرونی روابط کے لیے محفوظ handling</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>content provenance</h3>
+            <p>مواد کا ماخذ محفوظ رکھنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>admin separation</h3>
+            <p>مستقبل میں انتظامی حصے کو public UI سے الگ رکھنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>backup policy</h3>
+            <p>اہم data کے backup strategy hooks</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>versioned content</h3>
+            <p>مواد کے versions کی گنجائش</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>audit trail</h3>
+            <p>مستقبل میں content changes کا record</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>privacy first</h3>
+            <p>ذاتی local data کو بلا ضرورت server پر نہ بھیجنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>permission model</h3>
+            <p>future admin/editor roles</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>rate limiting hook</h3>
+            <p>future API requests کے لیے</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>error logging</h3>
+            <p>technical errors کی diagnostic structure</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="admin">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 21</span>
+        <h2>مستقبل کا انتظامی مرکز</h2>
+        <p>مواد کے وسیع ذخیرے کو منظم کرنے کے لیے</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="admin">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>کتاب شامل کریں</h3>
+            <p>نئی کتاب کے metadata کا form</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>کتاب update</h3>
+            <p>موجودہ record میں تبدیلی</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>کتاب archive</h3>
+            <p>غیر فعال record کو archive کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>فتویٰ شامل کریں</h3>
+            <p>مسئلہ، جواب، ماخذ اور status</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>حدیث record</h3>
+            <p>کتاب، باب، نمبر، متن اور ترجمہ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>قول verification</h3>
+            <p>قول کی source checking workflow</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>آڈیو record</h3>
+            <p>title، speaker، category اور file</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>tag manager</h3>
+            <p>موضوعات اور tags کا انتظام</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>duplicate checker</h3>
+            <p>ممکنہ duplicate entries کی شناخت</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>source manager</h3>
+            <p>ماخذ کی مرکزی فہرست</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>draft/published</h3>
+            <p>مواد کے status کا نظام</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>revision history</h3>
+            <p>تبدیلیوں کا version record</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="notifications">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 22</span>
+        <h2>اطلاعات اور یاد دہانیاں</h2>
+        <p>صارف کو مفید اور اختیاری updates دینے کا future layer</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="notifications">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>نئی کتاب اطلاع</h3>
+            <p>نئی کتاب شامل ہونے پر optional notice</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>نیا مضمون</h3>
+            <p>نئے علمی مضمون کی اطلاع</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>ربیع الاول countdown</h3>
+            <p>اہم تاریخ کی optional reminder</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>مطالعہ reminder</h3>
+            <p>روزانہ مطالعے کی optional یاد دہانی</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>تسبیح reminder</h3>
+            <p>صارف کے مقررہ ہدف کی optional reminder</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>saved search alert</h3>
+            <p>مستقبل میں نئی متعلقہ entries پر alert</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>system notice</h3>
+            <p>maintenance یا version update</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>quiet mode</h3>
+            <p>اطلاعات بند رکھنے کا اختیار</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>notification center</h3>
+            <p>تمام alerts ایک جگہ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>read/unread</h3>
+            <p>پڑھی گئی اطلاع کا status</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>preferences</h3>
+            <p>ہر notification type کا الگ control</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>privacy control</h3>
+            <p>notifications کے لیے واضح consent</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="dashboard">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 23</span>
+        <h2>ذاتی ڈیش بورڈ</h2>
+        <p>صارف کے پورٹل استعمال کا مرکزی خلاصہ</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="dashboard">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>حالیہ مطالعہ</h3>
+            <p>آخری پڑھی ہوئی کتب اور صفحات</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>پسندیدہ</h3>
+            <p>محفوظ مواد کا خلاصہ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>بک مارکس</h3>
+            <p>اہم مقامات کی فہرست</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>حالیہ تلاش</h3>
+            <p>تلاش history</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>تسبیح</h3>
+            <p>آج کا ذکر شمار</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>آڈیو</h3>
+            <p>حال ہی میں سنا گیا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>نوٹس</h3>
+            <p>حالیہ ذاتی notes</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>مطالعہ وقت</h3>
+            <p>مستقبل میں reading analytics</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>ہفتہ وار خلاصہ</h3>
+            <p>مطالعے کی weekly summary</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>goal tracker</h3>
+            <p>مستقبل میں ذاتی study goals</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>quick actions</h3>
+            <p>عام کاموں کے فوری buttons</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>continue reading</h3>
+            <p>جہاں چھوڑا تھا وہیں سے آغاز</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="calendar">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 24</span>
+        <h2>اسلامی تاریخ و خصوصی مواقع</h2>
+        <p>مستقبل میں معتبر قمری تاریخ ماخذ سے مربوط موسمی نظام</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="calendar">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>ربیع الاول</h3>
+            <p>ماہِ ربیع الاول کا خصوصی مرکز</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>۱۲ ربیع الاول</h3>
+            <p>مقررہ قمری تاریخ کا dynamic view</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>رمضان</h3>
+            <p>رمضان کے لیے future seasonal hub</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>عید الفطر</h3>
+            <p>خصوصی معلوماتی مرکز</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>عید الاضحیٰ</h3>
+            <p>خصوصی معلوماتی مرکز</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>محرم</h3>
+            <p>محرم کے لیے معلوماتی مرکز</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>سالانہ archive</h3>
+            <p>ہر سال کے خصوصی صفحات محفوظ کرنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>countdown</h3>
+            <p>معتبر date source سے dynamic countdown</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>مقامی timezone</h3>
+            <p>صارف کے device timezone کے مطابق</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>تاریخ display</h3>
+            <p>اسلامی اور عیسوی تاریخ دونوں دکھانے کی گنجائش</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>event cards</h3>
+            <p>اہم دنوں کے لیے colorful cards</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>source indicator</h3>
+            <p>تاریخ کے ماخذ کو واضح دکھانا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="research">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 25</span>
+        <h2>تحقیقی ورک بینچ</h2>
+        <p>علمی تحقیق کرنے والے صارف کے لیے advanced workspace</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="research">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>multi-source view</h3>
+            <p>ایک موضوع کے کئی ماخذ ایک ساتھ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>citation shelf</h3>
+            <p>حوالہ جات کی ذاتی فہرست</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>research notes</h3>
+            <p>تحقیقی notes</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>source comparison</h3>
+            <p>دو ماخذ کے relevant حصوں کا future comparison</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>keyword map</h3>
+            <p>موضوع سے متعلق keywords</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>saved queries</h3>
+            <p>بار بار کی جانے والی searches</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>reading queue</h3>
+            <p>تحقیقی مطالعے کی queue</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>export notes</h3>
+            <p>notes کو منظم متن میں export</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>citation copy</h3>
+            <p>حوالہ جاتی copy</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>topic workspace</h3>
+            <p>ایک موضوع کے تمام محفوظ مواد</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>revision notes</h3>
+            <p>تحقیق میں تبدیلیوں کا record</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>research status</h3>
+            <p>زیرِ مطالعہ، مکمل، دوبارہ جانچ کے مراحل</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="mega-section" id="content-quality">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">شعبہ 26</span>
+        <h2>مواد کی تصدیق اور علمی معیار</h2>
+        <p>پورٹل کے سب سے اہم اصولوں میں سے ایک: source-first architecture</p>
+      </div>
+      <button class="outline-btn section-bookmark" type="button" data-section="content-quality">محفوظ کریں</button>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">01</div>
+          <div class="feature-body">
+            <h3>اصل ماخذ</h3>
+            <p>ہر ممکنہ علمی claim کے لیے source field</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">02</div>
+          <div class="feature-body">
+            <h3>حوالہ لازمی</h3>
+            <p>verified label صرف source موجود ہونے پر</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">03</div>
+          <div class="feature-body">
+            <h3>غیر مصدقہ label</h3>
+            <p>زیرِ تحقیق مواد کو واضح طور پر الگ رکھنا</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">04</div>
+          <div class="feature-body">
+            <h3>نسخہ بندی</h3>
+            <p>متن کی versioning</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">05</div>
+          <div class="feature-body">
+            <h3>duplicate control</h3>
+            <p>ایک ہی عبارت کی تکرار سے بچاؤ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">06</div>
+          <div class="feature-body">
+            <h3>spelling review</h3>
+            <p>عربی و اردو متن کی proofreading workflow</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-mint">
+          <div class="feature-icon" aria-hidden="true">07</div>
+          <div class="feature-body">
+            <h3>قرآنی تحفظ</h3>
+            <p>قرآنی متن کو data source سے جوں کا توں رکھنے کی حکمت عملی</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-blue">
+          <div class="feature-icon" aria-hidden="true">08</div>
+          <div class="feature-body">
+            <h3>حدیث source</h3>
+            <p>حدیث کے ساتھ کتاب اور نمبر</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-gold">
+          <div class="feature-icon" aria-hidden="true">09</div>
+          <div class="feature-body">
+            <h3>قول source</h3>
+            <p>قائل اور اصل ماخذ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-purple">
+          <div class="feature-icon" aria-hidden="true">10</div>
+          <div class="feature-body">
+            <h3>فتویٰ source</h3>
+            <p>کتاب، باب، جلد، صفحہ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-rose">
+          <div class="feature-icon" aria-hidden="true">11</div>
+          <div class="feature-body">
+            <h3>update date</h3>
+            <p>مواد کے آخری جائزے کی تاریخ</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+        <article class="feature-card tone-teal">
+          <div class="feature-icon" aria-hidden="true">12</div>
+          <div class="feature-body">
+            <h3>review status</h3>
+            <p>reviewed / pending / draft architecture</p>
+          </div>
+          <span class="feature-arrow" aria-hidden="true">←</span>
+        </article>
+    </div>
+  </div>
+</section>
+
+<section class="mega-section" id="reader-controls">
+  <div class="section-shell">
+    <div class="section-heading">
+      <div><span class="section-kicker">مطالعہ</span><h2>مطالعہ گاہ کے فوری کنٹرول</h2><p>پورٹل کے تمام reading modules کے لیے بنیادی preferences</p></div>
+    </div>
+    <div class="three">
+      <div class="panel"><h3>متن کا سائز</h3><div style="display:flex;gap:7px"><button class="outline-btn" id="fontMinusReader">A−</button><button class="outline-btn" id="fontResetReader">اصل</button><button class="outline-btn" id="fontPlusReader">A+</button></div></div>
+      <div class="panel"><h3>رنگی انداز</h3><p>موجودہ انداز: <strong id="themeLabelReader">سبز و زمردی</strong></p><button class="outline-btn" id="themeCycleReader">اگلا رنگی انداز</button></div>
+      <div class="panel"><h3>پڑھنے کا موڈ</h3><p>روشن، تاریک اور مستقبل میں سیپیا/فوکس موڈ</p><button class="outline-btn" id="darkToggleReader">روشن / تاریک</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="mega-section">
+  <div class="section-shell">
+    <div class="section-heading"><div><span class="section-kicker">ذاتی مواد</span><h2>آپ کا ذاتی مطالعاتی حصہ</h2><p>پسندیدہ، نوٹس اور مستقبل کے personal data modules</p></div></div>
+    <div class="three">
+      <div class="panel"><h3>پسندیدہ شعبے</h3><p>محفوظ کیے گئے بڑے sections بعد میں یہاں dynamic طور پر دکھائے جا سکتے ہیں۔</p></div>
+      <div class="panel"><h3>حالیہ مطالعہ</h3><p>کتاب، صفحہ، مضمون اور audio position کو local storage یا future account سے جوڑا جا سکتا ہے۔</p></div>
+      <div class="panel"><h3>ذاتی نوٹس</h3><p>علمی مطالعے کے دوران اپنے notes الگ محفوظ رکھنے کی سہولت۔</p><button class="outline-btn" data-open-modal="notesModal" type="button">نوٹ کھولیں</button></div>
+    </div>
+  </div>
+</section>
+
+
+<nav class="mobile-nav" aria-label="موبائل نیویگیشن">
+  <a class="active" href="#home">⌂<br>ہوم</a>
+  <a href="#library">▣<br>کتب</a>
+  <a href="#searchArea">⌕<br>تلاش</a>
+  <a href="#reader">◉<br>مطالعہ</a>
+  <a href="#research">☰<br>مزید</a>
+</nav>
+
+</main>
+
+<div class="modal" id="settingsModal">
+  <div class="modal-card">
+    <button class="outline-btn modal-close" type="button">بند کریں</button>
+    <h2>مطالعہ ترتیبات</h2>
+    <p>یہ index بنیادی preferences کو local browser میں محفوظ کرتا ہے۔ مکمل settings system بعد کی CSS/JS فائلوں میں منتقل کیا جا سکتا ہے۔</p>
+    <div class="three">
+      <div class="panel"><h3>متن</h3><button class="outline-btn" id="fontMinusModal">A−</button> <button class="outline-btn" id="fontResetModal">اصل</button> <button class="outline-btn" id="fontPlusModal">A+</button></div>
+      <div class="panel"><h3>رنگ</h3><button class="outline-btn" id="themeCycleModal">رنگ تبدیل کریں</button></div>
+      <div class="panel"><h3>تاریک موڈ</h3><button class="outline-btn" id="darkToggleModal">موڈ تبدیل کریں</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="notesModal">
+  <div class="modal-card">
+    <button class="outline-btn modal-close" type="button">بند کریں</button>
+    <h2>ذاتی علمی نوٹس</h2>
+    <input id="noteTitle" placeholder="نوٹ کا عنوان" style="width:100%;padding:11px;border:1px solid var(--border);border-radius:12px;margin:8px 0">
+    <textarea id="noteText" placeholder="اپنا نوٹ لکھیں…" rows="6" style="width:100%;padding:11px;border:1px solid var(--border);border-radius:12px"></textarea>
+    <button class="btn" style="background:var(--primary);color:#fff;margin-top:9px" id="saveNote" type="button">نوٹ محفوظ کریں</button>
+    <div id="notesList" style="margin-top:15px">ابھی کوئی ذاتی نوٹ محفوظ نہیں۔</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer class="footer">
+  <div class="shell">
+    <div class="footer-grid">
+      <div><h3>اسلامی علمی و مطالعاتی پورٹل</h3><p>ایک وسیع، حوالہ جاتی اور مستقبل میں مسلسل بڑھنے والے اسلامی ڈیجیٹل علمی مرکز کی بنیاد۔</p></div>
+      <div><h3>اہم مراکز</h3><p><a href="#library">ڈیجیٹل کتب خانہ</a></p><p><a href="#fatawa">فتاویٰ</a></p><p><a href="#quran">قرآن و تفسیر</a></p><p><a href="#hadith">احادیث</a></p></div>
+      <div><h3>مطالعہ</h3><p><a href="#reader">مطالعہ گاہ</a></p><p><a href="#research">تحقیقی ورک بینچ</a></p><p><a href="#favorites">پسندیدہ</a></p><p><a href="#sharing">اشتراک</a></p></div>
+      <div><h3>ذاتی رابطہ</h3><p>سہیل حسین</p><p><a href="tel:+918439602526">+۹۱ ۸۴۳۹۶۰۲۵۲۶</a></p><p><a href="tel:+919760833104">+۹۱ ۹۷۶۰۸۳۳۱۰۴</a></p></div>
+    </div>
+    <div class="bottom">© <span id="currentYear">—</span> اسلامی علمی و مطالعاتی پورٹل — موجودہ index مرحلہ</div>
+  </div>
+</footer>
+
+<script>
+
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const store={
+  get(k,f=null){try{const v=localStorage.getItem(k);return v===null?f:JSON.parse(v)}catch{return f}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}},
+  del(k){try{localStorage.removeItem(k)}catch{}}
+};
+const toast=(msg)=>{
+  const t=$("#toast"); if(!t)return;
+  t.textContent=msg;t.classList.add("show");clearTimeout(window.__toast);
+  window.__toast=setTimeout(()=>t.classList.remove("show"),2300);
+};
+const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+
+const gateway=$("#gateway");
+const enterPortal=$("#enterPortal");
+if(store.get("welcome_seen",false)) gateway?.classList.add("hidden");
+function enterThePortal(){
+  if(!gateway)return;
+  gateway.classList.add("hidden");
+  gateway.setAttribute("aria-hidden","true");
+  store.set("welcome_seen",true);
+  toast("پورٹل میں خوش آمدید");
+}
+enterPortal?.addEventListener("click",enterThePortal);
+gateway?.addEventListener("click",e=>{ if(e.target===gateway) enterThePortal(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && gateway && !gateway.classList.contains("hidden")) enterThePortal(); });
+$("#resetWelcome")?.addEventListener("click",()=>{
+  store.del("welcome_seen");gateway?.classList.remove("hidden");
+});
+
+const themeNames=["سبز و زمردی","نیلا و ارغوانی","سنہری و سبز","گلابی و جامنی","فیروزی"];
+let theme=store.get("theme_index",0);
+const themes=[
+  ["#075b43","#2563eb","#7c3aed"],
+  ["#174ea6","#7c3aed","#db2777"],
+  ["#166534","#b78a2d","#0f766e"],
+  ["#9d174d","#7c3aed","#2563eb"],
+  ["#0f766e","#0891b2","#2563eb"]
+];
+function applyTheme(){
+  const [a,b,c]=themes[theme%themes.length];
+  document.documentElement.style.setProperty("--primary",a);
+  document.documentElement.style.setProperty("--primary2",b);
+  document.documentElement.style.setProperty("--blue",b);
+  document.documentElement.style.setProperty("--purple",c);
+  document.documentElement.style.setProperty("--theme-label","'"+themeNames[theme%themeNames.length]+"'");
+  $$("#themeLabel,#themeLabelReader").forEach(el=>el.textContent=themeNames[theme%themeNames.length]);
+}
+applyTheme();
+$$("#themeCycle,#themeCycleReader,#themeCycleModal").forEach(btn=>btn?.addEventListener("click",()=>{
+  theme=(theme+1)%themes.length;store.set("theme_index",theme);applyTheme();toast("رنگی انداز تبدیل کر دیا گیا");
+}));
+
+let dark=store.get("dark",false);
+function applyDark(){
+  if(dark){
+    document.documentElement.style.setProperty("--bg","#0c1511");
+    document.documentElement.style.setProperty("--surface","#14211b");
+    document.documentElement.style.setProperty("--surface-soft","#182920");
+    document.documentElement.style.setProperty("--text","#e7eee9");
+    document.documentElement.style.setProperty("--muted","#aab9b1");
+    document.documentElement.style.setProperty("--border","#2b3c34");
+  }else{
+    document.documentElement.style.setProperty("--bg","#f4f7fb");
+    document.documentElement.style.setProperty("--surface","#ffffff");
+    document.documentElement.style.setProperty("--surface-soft","#f8fbff");
+    document.documentElement.style.setProperty("--text","#17221e");
+    document.documentElement.style.setProperty("--muted","#66746e");
+    document.documentElement.style.setProperty("--border","#dce6e1");
+  }
+}
+applyDark();
+$$("#darkToggle,#darkToggleReader,#darkToggleModal").forEach(btn=>btn?.addEventListener("click",()=>{dark=!dark;store.set("dark",dark);applyDark();toast(dark?"تاریک مطالعہ موڈ فعال":"روشن موڈ فعال")}));
+
+const search=$("#globalSearch"), results=$("#searchResults");
+const searchable=$$(".feature-card");
+function doSearch(q){
+  q=q.trim().toLowerCase();
+  if(!q){searchable.forEach(x=>x.style.display="");results.textContent="تمام شعبے دکھائے جا رہے ہیں۔";return}
+  let n=0;
+  searchable.forEach(x=>{
+    const ok=x.textContent.toLowerCase().includes(q);
+    x.style.display=ok?"":"none";if(ok)n++;
+  });
+  results.innerHTML="<strong>"+n.toLocaleString("ur-IN")+"</strong> نتائج — "+escapeHtml(q);
+  if(n===0) results.innerHTML="اس لفظ کے لیے index میں فوری feature match نہیں ملا۔ مکمل مواد کے بعد جامع search engine نتائج دے گا۔";
+}
+$("#searchButton")?.addEventListener("click",()=>doSearch(search?.value||""));
+search?.addEventListener("keydown",e=>{if(e.key==="Enter")doSearch(search.value)});
+$$(".quick[data-q]").forEach(b=>b.addEventListener("click",()=>{search.value=b.dataset.q;doSearch(b.dataset.q);$("#searchArea")?.scrollIntoView({behavior:"smooth"})}));
+
+$$(".section-bookmark").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const id=btn.dataset.section;
+    const fav=store.get("section_favorites",[]);
+    const has=fav.includes(id);
+    const next=has?fav.filter(x=>x!==id):[...fav,id];
+    store.set("section_favorites",next);
+    btn.textContent=has?"محفوظ کریں":"محفوظ ہے";
+    toast(has?"محفوظ فہرست سے نکال دیا گیا":"شعبہ محفوظ کر لیا گیا");
+  });
+});
+
+$$("[data-open-modal]").forEach(b=>b.addEventListener("click",()=>{
+  const m=$("#"+b.dataset.openModal);m?.classList.add("open");
+}));
+$$(".modal-close").forEach(b=>b.addEventListener("click",()=>b.closest(".modal")?.classList.remove("open")));
+
+let zikr=store.get("zikr",0), target=store.get("zikr_target",100);
+function renderZikr(){
+  $("#zikrValue") && ($("#zikrValue").textContent=zikr.toLocaleString("ur-IN"));
+  $("#zikrTarget") && ($("#zikrTarget").textContent=target.toLocaleString("ur-IN"));
+  const pct=Math.min(100,(zikr/Math.max(1,target))*100);
+  $("#zikrBar") && ($("#zikrBar").style.width=pct+"%");
+}
+renderZikr();
+$("#zikrAdd")?.addEventListener("click",()=>{zikr++;store.set("zikr",zikr);renderZikr()});
+$("#zikrReset")?.addEventListener("click",()=>{zikr=0;store.set("zikr",0);renderZikr();toast("شمار دوبارہ صفر کر دیا گیا")});
+$$("[data-target]").forEach(b=>b.addEventListener("click",()=>{target=Number(b.dataset.target);store.set("zikr_target",target);renderZikr();toast("نیا ہدف مقرر ہو گیا")}));
+
+let fontScale=store.get("font_scale",1);
+function applyFont(){document.body.style.fontSize=(fontScale*100)+"%";$("#fontValue")&&($("#fontValue").textContent=Math.round(fontScale*100)+"%")}
+applyFont();
+$$("#fontPlus,#fontPlusReader,#fontPlusModal").forEach(btn=>btn?.addEventListener("click",()=>{fontScale=Math.min(1.25,fontScale+.05);store.set("font_scale",fontScale);applyFont()}));
+$$("#fontMinus,#fontMinusReader,#fontMinusModal").forEach(btn=>btn?.addEventListener("click",()=>{fontScale=Math.max(.9,fontScale-.05);store.set("font_scale",fontScale);applyFont()}));
+$$("#fontReset,#fontResetReader,#fontResetModal").forEach(btn=>btn?.addEventListener("click",()=>{fontScale=1;store.set("font_scale",1);applyFont()}));
+
+$("#sharePortal")?.addEventListener("click",async()=>{
+  const data={title:"اسلامی علمی و مطالعاتی پورٹل",text:"اسلامی علمی و مطالعاتی پورٹل",url:location.href};
+  if(navigator.share){try{await navigator.share(data)}catch{}}
+  else if(navigator.clipboard){await navigator.clipboard.writeText(location.href);toast("پورٹل کا لنک نقل کر لیا گیا")};
+});
+
+const cardName=$("#cardName"),cardPreview=$("#cardNamePreview");
+cardName?.addEventListener("input",()=>{if(cardPreview)cardPreview.textContent=cardName.value.trim()||"آپ کا نام"});
+$("#copyCard")?.addEventListener("click",async()=>{
+  const text="ربیع الاول شریف مبارک — "+(cardName?.value.trim()||"آپ کا نام");
+  if(navigator.clipboard){await navigator.clipboard.writeText(text);toast("مبارکباد کا متن نقل ہو گیا")}
+});
+
+const now=new Date();
+$("#currentYear")&&( $("#currentYear").textContent=now.getFullYear().toLocaleString("ur-IN") );
+$("#today")&&( $("#today").textContent=now.toLocaleDateString("ur-IN",{year:"numeric",month:"long",day:"numeric"}) );
+
+let notes=store.get("notes",[]);
+function renderNotes(){
+  const box=$("#notesList");if(!box)return;
+  box.innerHTML=notes.length?notes.map((n,i)=>`<div class="panel" style="margin-top:8px"><strong>${escapeHtml(n.title)}</strong><p>${escapeHtml(n.text)}</p><button class="outline-btn" data-note="${i}">حذف</button></div>`).join(""):"ابھی کوئی ذاتی نوٹ محفوظ نہیں۔";
+  $$("[data-note]").forEach(b=>b.addEventListener("click",()=>{notes.splice(Number(b.dataset.note),1);store.set("notes",notes);renderNotes()}));
+}
+renderNotes();
+$("#saveNote")?.addEventListener("click",()=>{
+  const title=$("#noteTitle")?.value.trim(),text=$("#noteText")?.value.trim();
+  if(!text){toast("پہلے نوٹ لکھیں");return}
+  notes.unshift({title:title||"ذاتی نوٹ",text,date:Date.now()});store.set("notes",notes);renderNotes();
+  $("#noteTitle").value="";$("#noteText").value="";toast("نوٹ محفوظ ہو گیا");
+});
+
+let recent=store.get("recent_sections",[]);
+$$(".feature-card").forEach(card=>{
+  card.addEventListener("click",()=>{
+    const section=card.closest(".mega-section")?.id;if(!section)return;
+    recent=[section,...recent.filter(x=>x!==section)].slice(0,8);store.set("recent_sections",recent);
+  });
+});
+
+window.IslamicPortal={
+  version:"0.2.0-master-index",
+  search:doSearch,
+  theme:()=>themeNames[theme%themeNames.length],
+  zikr:()=>({count:zikr,target}),
+  favorites:()=>store.get("section_favorites",[]),
+  recent:()=>store.get("recent_sections",[])
+};
+})();
+
+</script>
+</body>
+</html>
