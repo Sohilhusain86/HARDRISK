@@ -1,0 +1,1138 @@
+/*
+===============================================================================
+اسلامی ڈیجیٹل پورٹل
+فائل: css/nastaliq.css
+نسخہ: 1.0
+مقصد:
+اردو، عربی، قرآنی متن، ترجمہ، حدیث، فقہی عبارت اور مطالعہ جاتی مواد کے لیے
+الگ، مضبوط اور قابلِ توسیع Typography System۔
+
+اہم اصول:
+1) عام واجہ اور علمی متن کی ٹائپوگرافی الگ رکھی گئی ہے۔
+2) عربی اور اردو کے لیے مناسب fallback سلسلہ موجود ہے۔
+3) قرآن کے متن کے لیے الگ کلاسز ہیں۔
+4) A+ / A- مستقبل کے JavaScript font-size controls کے ساتھ کام کر سکتے ہیں۔
+5) صرف فونٹ نہیں؛ line-height، letter-spacing، وزن، alignment اور reading-width
+   بھی الگ کنٹرول کیے گئے ہیں۔
+===============================================================================
+*/
+
+/* ============================================================================
+   01 — FONT VARIABLES
+============================================================================ */
+:root{
+  --font-ui:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+
+  --font-urdu:
+    "Noto Nastaliq Urdu",
+    "Noto Naskh Arabic",
+    "Noto Sans Arabic",
+    "Jameel Noori Nastaleeq",
+    "Alvi Nastaleeq",
+    "Mehr Nastaliq Web",
+    serif;
+
+  --font-arabic:
+    "Noto Naskh Arabic",
+    "Amiri",
+    "Scheherazade New",
+    "Noto Sans Arabic",
+    serif;
+
+  --font-quran:
+    "KFGQPC Uthmanic Script HAFS",
+    "Uthmanic",
+    "Amiri Quran",
+    "Amiri",
+    "Scheherazade New",
+    serif;
+
+  --font-reading:
+    "Noto Nastaliq Urdu",
+    "Noto Naskh Arabic",
+    "Jameel Noori Nastaleeq",
+    "Noto Sans Arabic",
+    serif;
+
+  --urdu-scale:1;
+  --arabic-scale:1;
+  --quran-scale:1;
+  --reading-width:900px;
+
+  --urdu-line-height:2.35;
+  --arabic-line-height:2.05;
+  --quran-line-height:2.65;
+}
+
+/* ============================================================================
+   02 — BASE TYPOGRAPHY
+============================================================================ */
+html{
+  font-family:var(--font-ui);
+}
+
+body,
+button,
+input,
+textarea,
+select{
+  font-family:var(--font-ui);
+}
+
+[lang="ur"],
+[lang="ur-PK"],
+[lang="ar"],
+[dir="rtl"]{
+  font-family:var(--font-reading);
+}
+
+[lang="ar"]{
+  font-family:var(--font-arabic);
+}
+
+/* ============================================================================
+   03 — URDU HEADINGS
+============================================================================ */
+.urdu,
+.urdu-text,
+.urdu-content,
+.urdu-heading,
+.urdu-title,
+.urdu-subtitle,
+.nastaliq,
+.nastaliq-text,
+.nastaliq-heading,
+.nastaliq-title{
+  font-family:var(--font-urdu);
+  font-weight:500;
+  font-style:normal;
+  text-rendering:optimizeLegibility;
+  font-kerning:normal;
+  font-synthesis:none;
+}
+
+.urdu-heading,
+.nastaliq-heading{
+  font-size:clamp(1.45rem,3.2vw,2.45rem);
+  line-height:1.95;
+  letter-spacing:0;
+}
+
+.urdu-title,
+.nastaliq-title{
+  font-size:clamp(1.8rem,4.5vw,3.6rem);
+  line-height:1.8;
+  letter-spacing:0;
+}
+
+.urdu-subtitle,
+.nastaliq-subtitle{
+  font-size:clamp(1rem,2vw,1.35rem);
+  line-height:2.1;
+}
+
+/* ============================================================================
+   04 — BODY READING
+============================================================================ */
+.reading-text,
+.reader-content,
+.article-body-content,
+.long-form,
+.long-read,
+.book-reader,
+.fatawa-reader,
+.hadith-reader{
+  font-family:var(--font-reading);
+  font-size:calc(1.08rem * var(--urdu-scale));
+  line-height:var(--urdu-line-height);
+  font-weight:400;
+  text-rendering:optimizeLegibility;
+}
+
+.reading-text{
+  max-width:var(--reading-width);
+  margin-inline:auto;
+}
+
+.reading-text p,
+.reader-content p,
+.article-body-content p,
+.long-form p,
+.long-read p,
+.book-reader p,
+.fatawa-reader p,
+.hadith-reader p{
+  margin:0 0 1.35em;
+  text-align:justify;
+  text-justify:inter-word;
+}
+
+.reading-text p:last-child,
+.reader-content p:last-child,
+.article-body-content p:last-child,
+.long-form p:last-child,
+.long-read p:last-child,
+.book-reader p:last-child,
+.fatawa-reader p:last-child,
+.hadith-reader p:last-child{
+  margin-bottom:0;
+}
+
+/* ============================================================================
+   05 — SHORT TEXT / CARDS
+============================================================================ */
+.card .urdu,
+.card .nastaliq,
+.feature-card .urdu,
+.feature-card .nastaliq,
+.quote-card .urdu,
+.quote-card .nastaliq,
+.book-card .urdu,
+.book-card .nastaliq{
+  font-family:var(--font-urdu);
+}
+
+.card .urdu,
+.card .nastaliq,
+.feature-card .urdu,
+.feature-card .nastaliq{
+  line-height:2;
+}
+
+.quote-text{
+  font-family:var(--font-urdu);
+  font-size:calc(1.08rem * var(--urdu-scale));
+  line-height:2.25;
+}
+
+.quote-title,
+.book-title,
+.article-title,
+.current-track-title,
+.feature-body h3,
+.section-heading h2,
+.section-title,
+.hero h1,
+.hero-title{
+  font-family:var(--font-urdu);
+  font-weight:600;
+}
+
+/* ============================================================================
+   06 — ARABIC TEXT
+============================================================================ */
+.arabic,
+.arabic-text,
+.arabic-content,
+.arabic-heading,
+.arabic-title,
+.hadith-arabic,
+.dua-arabic,
+.zikr-arabic{
+  font-family:var(--font-arabic);
+  direction:rtl;
+  text-align:right;
+  font-weight:400;
+  font-style:normal;
+  font-synthesis:none;
+  text-rendering:optimizeLegibility;
+}
+
+.arabic-text,
+.arabic-content{
+  font-size:calc(1.25rem * var(--arabic-scale));
+  line-height:var(--arabic-line-height);
+}
+
+.arabic-heading,
+.arabic-title{
+  font-size:calc(1.55rem * var(--arabic-scale));
+  line-height:1.9;
+}
+
+.hadith-arabic{
+  font-size:calc(1.35rem * var(--arabic-scale));
+  line-height:2.15;
+}
+
+.dua-arabic{
+  font-size:calc(1.5rem * var(--arabic-scale));
+  line-height:2.35;
+  text-align:center;
+}
+
+.zikr-arabic{
+  font-size:calc(1.45rem * var(--arabic-scale));
+  line-height:2.3;
+  text-align:center;
+}
+
+/* ============================================================================
+   07 — QURAN
+============================================================================ */
+.quran,
+.quran-text,
+.quran-ayah,
+.quran-page,
+.quran-reader,
+.mushaf-text{
+  font-family:var(--font-quran);
+  direction:rtl;
+  text-align:center;
+  font-weight:400;
+  font-style:normal;
+  font-synthesis:none;
+  font-variant-ligatures:normal;
+  text-rendering:optimizeLegibility;
+  unicode-bidi:plaintext;
+}
+
+.quran-text,
+.quran-reader,
+.mushaf-text{
+  font-size:calc(1.62rem * var(--quran-scale));
+  line-height:var(--quran-line-height);
+}
+
+.quran-ayah{
+  display:block;
+  margin:0 auto 1.4rem;
+  font-size:calc(1.6rem * var(--quran-scale));
+  line-height:2.75;
+}
+
+.quran-word{
+  display:inline;
+}
+
+.quran-ayah-number{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:1.8em;
+  min-height:1.8em;
+  margin-inline:.18em;
+  border:1px solid rgba(244,185,66,.45);
+  border-radius:50%;
+  color:#f4d37d;
+  font-family:var(--font-arabic);
+  font-size:.55em;
+  line-height:1;
+  vertical-align:middle;
+}
+
+.quran-surah-title{
+  margin:0 auto 1.5rem;
+  color:#f4d37d;
+  font-family:var(--font-arabic);
+  font-size:calc(1.8rem * var(--quran-scale));
+  line-height:2;
+  text-align:center;
+}
+
+.quran-bismillah{
+  margin:0 auto 1.7rem;
+  color:#f6e2a4;
+  font-family:var(--font-arabic);
+  font-size:calc(1.75rem * var(--quran-scale));
+  line-height:2;
+  text-align:center;
+}
+
+/* ============================================================================
+   08 — TRANSLATION
+============================================================================ */
+.translation,
+.kanz-ul-iman,
+.urdu-translation,
+.quran-translation{
+  font-family:var(--font-urdu);
+  font-size:calc(1.1rem * var(--urdu-scale));
+  line-height:2.35;
+  color:#d8e3e6;
+  text-align:justify;
+}
+
+.translation-label,
+.translation-heading{
+  margin-bottom:.45rem;
+  color:#f4d37d;
+  font-family:var(--font-urdu);
+  font-size:1rem;
+  font-weight:600;
+}
+
+.translation-block{
+  margin:1.2rem 0;
+  padding:1rem 1.1rem;
+  border-right:3px solid rgba(244,185,66,.55);
+  border-radius:12px;
+  background:rgba(244,185,66,.045);
+}
+
+/* ============================================================================
+   09 — TAFSEER / SHARH
+============================================================================ */
+.tafseer,
+.tafseer-text,
+.sharah,
+.explanation,
+.reference-note{
+  font-family:var(--font-urdu);
+  font-size:calc(1.03rem * var(--urdu-scale));
+  line-height:2.35;
+}
+
+.tafseer-heading,
+.sharah-heading{
+  font-family:var(--font-urdu);
+  font-size:1.35rem;
+  line-height:2;
+  color:#fff;
+}
+
+.tafseer-source,
+.reference-source{
+  display:block;
+  margin-top:.7rem;
+  color:#9eb0b7;
+  font-family:var(--font-urdu);
+  font-size:.88rem;
+  line-height:1.9;
+}
+
+/* ============================================================================
+   10 — FATAWA
+============================================================================ */
+.fatawa-question,
+.fatawa-answer,
+.fatawa-text{
+  font-family:var(--font-urdu);
+  font-size:calc(1.05rem * var(--urdu-scale));
+  line-height:2.35;
+}
+
+.fatawa-question{
+  color:#fff;
+  font-weight:600;
+}
+
+.fatawa-answer{
+  color:#d5e0e4;
+}
+
+.fatawa-reference{
+  display:block;
+  margin-top:.7rem;
+  color:#8fbac8;
+  font-family:var(--font-urdu);
+  font-size:.9rem;
+  line-height:2;
+}
+
+/* ============================================================================
+   11 — HADITH
+============================================================================ */
+.hadith-card{
+  direction:rtl;
+}
+
+.hadith-text{
+  font-family:var(--font-arabic);
+  font-size:calc(1.3rem * var(--arabic-scale));
+  line-height:2.25;
+  text-align:right;
+}
+
+.hadith-translation{
+  margin-top:1rem;
+  padding-top:1rem;
+  border-top:1px solid rgba(255,255,255,.08);
+  font-family:var(--font-urdu);
+  font-size:calc(1.02rem * var(--urdu-scale));
+  line-height:2.3;
+  color:#d4e0e4;
+}
+
+.hadith-reference{
+  margin-top:.65rem;
+  color:#8fa7b0;
+  font-family:var(--font-urdu);
+  font-size:.88rem;
+}
+
+/* ============================================================================
+   12 — NAAT / MANQABAT / ASHAAR
+============================================================================ */
+.naat-text,
+.manqabat-text,
+.ashaar,
+.sher,
+.sher-text{
+  font-family:var(--font-urdu);
+  font-size:calc(1.25rem * var(--urdu-scale));
+  line-height:2.5;
+  text-align:center;
+}
+
+.sher{
+  margin:1rem auto;
+  max-width:760px;
+}
+
+.sher-misra{
+  display:block;
+}
+
+.sher-separator{
+  display:block;
+  width:55px;
+  height:1px;
+  margin:.55rem auto;
+  background:rgba(244,185,66,.38);
+}
+
+/* ============================================================================
+   13 — DUA / AZKAR
+============================================================================ */
+.dua-text,
+.dua-translation,
+.azkar-text,
+.wazifa-text{
+  font-family:var(--font-urdu);
+  line-height:2.5;
+}
+
+.dua-translation,
+.wazifa-text{
+  font-size:calc(1.05rem * var(--urdu-scale));
+}
+
+/* ============================================================================
+   14 — ASMA / NAMES
+============================================================================ */
+.name-arabic{
+  display:block;
+  font-family:var(--font-arabic);
+  font-size:calc(1.5rem * var(--arabic-scale));
+  line-height:2;
+  text-align:center;
+}
+
+.name-urdu{
+  display:block;
+  margin-top:.3rem;
+  font-family:var(--font-urdu);
+  font-size:calc(1rem * var(--urdu-scale));
+  line-height:2;
+  text-align:center;
+}
+
+.name-meaning{
+  color:#9fb0b6;
+  font-family:var(--font-urdu);
+  font-size:calc(.9rem * var(--urdu-scale));
+  line-height:1.9;
+  text-align:center;
+}
+
+/* ============================================================================
+   15 — SHAJRA
+============================================================================ */
+.shajra-tree,
+.shajra-node,
+.shajra-name{
+  font-family:var(--font-urdu);
+}
+
+.shajra-node{
+  line-height:2.15;
+}
+
+.shajra-name{
+  font-size:calc(1.05rem * var(--urdu-scale));
+}
+
+.shajra-arabic-name{
+  font-family:var(--font-arabic);
+  font-size:calc(1.15rem * var(--arabic-scale));
+  line-height:2;
+}
+
+/* ============================================================================
+   16 — FAQ
+============================================================================ */
+.faq-question,
+.faq-answer{
+  font-family:var(--font-urdu);
+}
+
+.faq-question{
+  font-size:calc(1rem * var(--urdu-scale));
+  line-height:2;
+}
+
+.faq-answer{
+  font-size:calc(.98rem * var(--urdu-scale));
+  line-height:2.3;
+}
+
+/* ============================================================================
+   17 — NAVIGATION
+============================================================================ */
+.nav a,
+.nav-link,
+.mobile-nav a,
+.btn,
+.pill-btn,
+.quick,
+.form-label,
+.badge-count{
+  font-family:var(--font-ui);
+}
+
+.nav .urdu,
+.nav-link .urdu,
+.mobile-nav .urdu{
+  font-family:var(--font-urdu);
+}
+
+/* ============================================================================
+   18 — BUTTONS WITH URDU
+============================================================================ */
+.btn.urdu,
+.outline-btn.urdu,
+.pill-btn.urdu,
+.quick.urdu{
+  font-family:var(--font-urdu);
+  line-height:1.8;
+}
+
+.btn.urdu{
+  padding-top:7px;
+  padding-bottom:7px;
+}
+
+/* ============================================================================
+   19 — SEARCH RESULTS
+============================================================================ */
+.search-result-title,
+.result-title{
+  font-family:var(--font-urdu);
+  font-size:calc(1rem * var(--urdu-scale));
+  line-height:2;
+}
+
+.search-result-snippet,
+.result-snippet{
+  font-family:var(--font-urdu);
+  font-size:calc(.9rem * var(--urdu-scale));
+  line-height:2;
+  color:#9fb1b8;
+}
+
+/* ============================================================================
+   20 — LIBRARY METADATA
+============================================================================ */
+.book-title{
+  line-height:2;
+}
+
+.book-author,
+.book-meta,
+.book-category,
+.library-meta{
+  font-family:var(--font-urdu);
+  line-height:1.9;
+}
+
+/* ============================================================================
+   21 — AUDIO TEXT
+============================================================================ */
+.current-track-title{
+  line-height:2;
+}
+
+.current-track-poet,
+.item-title,
+.item-poet{
+  font-family:var(--font-urdu);
+}
+
+.item-title{
+  line-height:1.9;
+}
+
+.item-poet{
+  line-height:1.7;
+}
+
+/* ============================================================================
+   22 — FORM TEXT
+============================================================================ */
+.urdu-input,
+.urdu-textarea,
+.urdu-select{
+  direction:rtl;
+  text-align:right;
+  font-family:var(--font-urdu);
+  line-height:2;
+}
+
+.arabic-input,
+.arabic-textarea{
+  direction:rtl;
+  text-align:right;
+  font-family:var(--font-arabic);
+  line-height:2;
+}
+
+/* ============================================================================
+   23 — FONT SIZE ACCESSIBILITY
+============================================================================ */
+html.font-small{
+  --urdu-scale:.90;
+  --arabic-scale:.90;
+  --quran-scale:.90;
+}
+
+html.font-normal{
+  --urdu-scale:1;
+  --arabic-scale:1;
+  --quran-scale:1;
+}
+
+html.font-large{
+  --urdu-scale:1.12;
+  --arabic-scale:1.12;
+  --quran-scale:1.12;
+}
+
+html.font-xlarge{
+  --urdu-scale:1.25;
+  --arabic-scale:1.25;
+  --quran-scale:1.25;
+}
+
+html.font-xxlarge{
+  --urdu-scale:1.42;
+  --arabic-scale:1.42;
+  --quran-scale:1.42;
+}
+
+/* مستقبل کے A+ / A- کنٹرول کے لیے */
+body[data-font-size="small"]{
+  --urdu-scale:.90;
+  --arabic-scale:.90;
+  --quran-scale:.90;
+}
+
+body[data-font-size="normal"]{
+  --urdu-scale:1;
+  --arabic-scale:1;
+  --quran-scale:1;
+}
+
+body[data-font-size="large"]{
+  --urdu-scale:1.12;
+  --arabic-scale:1.12;
+  --quran-scale:1.12;
+}
+
+body[data-font-size="xlarge"]{
+  --urdu-scale:1.25;
+  --arabic-scale:1.25;
+  --quran-scale:1.25;
+}
+
+/* ============================================================================
+   24 — LINE HEIGHT MODES
+============================================================================ */
+body[data-line-height="compact"]{
+  --urdu-line-height:2;
+  --arabic-line-height:1.85;
+  --quran-line-height:2.35;
+}
+
+body[data-line-height="normal"]{
+  --urdu-line-height:2.35;
+  --arabic-line-height:2.05;
+  --quran-line-height:2.65;
+}
+
+body[data-line-height="wide"]{
+  --urdu-line-height:2.75;
+  --arabic-line-height:2.35;
+  --quran-line-height:3;
+}
+
+/* ============================================================================
+   25 — READING WIDTH MODES
+============================================================================ */
+body[data-reading-width="narrow"]{
+  --reading-width:700px;
+}
+
+body[data-reading-width="normal"]{
+  --reading-width:900px;
+}
+
+body[data-reading-width="wide"]{
+  --reading-width:1100px;
+}
+
+/* ============================================================================
+   26 — TEXT ALIGNMENT MODES
+============================================================================ */
+body[data-reading-align="right"] .reading-text p,
+body[data-reading-align="right"] .article-body-content p{
+  text-align:right;
+}
+
+body[data-reading-align="center"] .reading-text p,
+body[data-reading-align="center"] .article-body-content p{
+  text-align:center;
+}
+
+body[data-reading-align="justify"] .reading-text p,
+body[data-reading-align="justify"] .article-body-content p{
+  text-align:justify;
+}
+
+/* ============================================================================
+   27 — HIGH READABILITY MODE
+============================================================================ */
+body.high-readability{
+  --line:rgba(255,255,255,.16);
+}
+
+body.high-readability .reading-text,
+body.high-readability .article-body-content,
+body.high-readability .fatawa-text,
+body.high-readability .hadith-translation{
+  line-height:2.65;
+}
+
+body.high-readability .reading-text p,
+body.high-readability .article-body-content p{
+  max-width:var(--reading-width);
+}
+
+/* ============================================================================
+   28 — FOCUS READING MODE
+============================================================================ */
+body.focus-reading .reading-text,
+body.focus-reading .reader-content{
+  max-width:780px;
+  margin-inline:auto;
+}
+
+body.focus-reading .reader-content{
+  padding-inline:25px;
+}
+
+/* ============================================================================
+   29 — BILINGUAL DISPLAY
+============================================================================ */
+.bilingual{
+  display:grid;
+  gap:15px;
+}
+
+.bilingual-arabic{
+  direction:rtl;
+  font-family:var(--font-arabic);
+  font-size:calc(1.25rem * var(--arabic-scale));
+  line-height:2.25;
+}
+
+.bilingual-urdu{
+  direction:rtl;
+  font-family:var(--font-urdu);
+  font-size:calc(1.05rem * var(--urdu-scale));
+  line-height:2.35;
+  color:#d2dfe3;
+}
+
+.bilingual-divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(244,185,66,.35),transparent);
+}
+
+/* ============================================================================
+   30 — RTL SAFETY
+============================================================================ */
+[dir="rtl"]{
+  direction:rtl;
+}
+
+[dir="rtl"] .number,
+[dir="rtl"] .phone,
+[dir="rtl"] .numeric,
+[dir="rtl"] .ltr{
+  direction:ltr;
+  unicode-bidi:isolate;
+}
+
+.ltr-text{
+  direction:ltr;
+  text-align:left;
+  unicode-bidi:plaintext;
+}
+
+/* ============================================================================
+   31 — NUMBERS INSIDE URDU
+============================================================================ */
+.urdu-number{
+  font-family:var(--font-ui);
+  direction:ltr;
+  unicode-bidi:isolate;
+  font-variant-numeric:tabular-nums;
+}
+
+.arabic-number{
+  font-family:var(--font-arabic);
+  unicode-bidi:isolate;
+}
+
+/* ============================================================================
+   32 — DIACRITIC SAFETY
+============================================================================ */
+.diacritic-safe{
+  font-feature-settings:
+    "liga" 1,
+    "calt" 1,
+    "kern" 1;
+  font-kerning:normal;
+}
+
+.quran,
+.quran-text,
+.quran-ayah,
+.hadith-arabic,
+.arabic-text{
+  font-feature-settings:
+    "liga" 1,
+    "calt" 1,
+    "mark" 1,
+    "mkmk" 1,
+    "kern" 1;
+}
+
+/* ============================================================================
+   33 — TEXT SELECTION
+============================================================================ */
+.selectable-text{
+  user-select:text;
+  -webkit-user-select:text;
+}
+
+.no-select{
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+/* ============================================================================
+   34 — MOBILE TYPOGRAPHY
+============================================================================ */
+@media(max-width:760px){
+  .reading-text,
+  .reader-content,
+  .article-body-content,
+  .long-form,
+  .long-read,
+  .book-reader,
+  .fatawa-reader,
+  .hadith-reader{
+    font-size:calc(1rem * var(--urdu-scale));
+    line-height:2.3;
+  }
+
+  .quran-text,
+  .quran-reader,
+  .mushaf-text{
+    font-size:calc(1.35rem * var(--quran-scale));
+    line-height:2.55;
+  }
+
+  .quran-ayah{
+    font-size:calc(1.35rem * var(--quran-scale));
+    line-height:2.65;
+  }
+
+  .arabic-text,
+  .arabic-content{
+    font-size:calc(1.12rem * var(--arabic-scale));
+    line-height:2.05;
+  }
+
+  .hadith-text{
+    font-size:calc(1.16rem * var(--arabic-scale));
+    line-height:2.15;
+  }
+
+  .quote-text,
+  .naat-text,
+  .manqabat-text,
+  .ashaar,
+  .sher{
+    font-size:calc(1rem * var(--urdu-scale));
+    line-height:2.35;
+  }
+
+  .translation,
+  .kanz-ul-iman,
+  .urdu-translation,
+  .quran-translation{
+    font-size:calc(1rem * var(--urdu-scale));
+    line-height:2.3;
+  }
+}
+
+/* ============================================================================
+   35 — SMALL PHONE TYPOGRAPHY
+============================================================================ */
+@media(max-width:380px){
+  .reading-text,
+  .reader-content,
+  .article-body-content{
+    font-size:calc(.96rem * var(--urdu-scale));
+  }
+
+  .quran-text,
+  .quran-reader,
+  .mushaf-text{
+    font-size:calc(1.22rem * var(--quran-scale));
+  }
+
+  .quran-ayah{
+    font-size:calc(1.22rem * var(--quran-scale));
+  }
+}
+
+/* ============================================================================
+   36 — PRINT TYPOGRAPHY
+============================================================================ */
+@media print{
+  [lang="ur"],
+  [lang="ar"],
+  [dir="rtl"],
+  .urdu,
+  .nastaliq,
+  .arabic,
+  .quran,
+  .reading-text,
+  .reader-content,
+  .article-body-content{
+    color:#111!important;
+  }
+
+  .quran,
+  .quran-text,
+  .quran-ayah,
+  .mushaf-text{
+    font-size:18pt;
+    line-height:2.2;
+  }
+
+  .reading-text,
+  .reader-content,
+  .article-body-content{
+    font-size:13pt;
+    line-height:2;
+  }
+}
+
+/* ============================================================================
+   37 — FONT LOADING HOOKS
+   اگر مستقبل میں مقامی فونٹ فائلیں شامل کی جائیں تو @font-face یہاں رکھی جا
+   سکتی ہے۔ فی الحال بیرونی فونٹ فائلوں پر انحصار لازم نہیں رکھا گیا۔
+============================================================================ */
+/*
+@font-face{
+  font-family:"Portal Nastaliq";
+  src:url("../fonts/portal-nastaliq.woff2") format("woff2");
+  font-display:swap;
+  font-style:normal;
+  font-weight:400;
+}
+
+@font-face{
+  font-family:"Portal Arabic";
+  src:url("../fonts/portal-arabic.woff2") format("woff2");
+  font-display:swap;
+  font-style:normal;
+  font-weight:400;
+}
+*/
+
+/* ============================================================================
+   38 — FUTURE TYPOGRAPHY HOOKS
+============================================================================ */
+.typography-controls,
+.font-size-controls,
+.line-height-controls,
+.reading-width-controls,
+.reading-mode-controls,
+.translation-panel,
+.tafseer-panel,
+.hadith-panel,
+.quran-panel,
+.fatawa-panel,
+.reference-panel,
+.footnote-panel,
+.bookmark-panel,
+.reader-settings{
+  position:relative;
+}
+
+.is-reading-mode .site-chrome{
+  opacity:.35;
+}
+
+.is-reading-mode .reader-content{
+  max-width:780px;
+}
+
+.is-reading-mode .reader-content p{
+  line-height:2.7;
+}
+
+.is-dyslexia-friendly{
+  letter-spacing:.01em;
+}
+
+.is-compact-reading .reader-content p{
+  line-height:2.05;
+}
+
+.is-large-reading .reader-content p{
+  font-size:calc(1.25rem * var(--urdu-scale));
+}
+
+/* ============================================================================
+   39 — SAFE FALLBACKS
+============================================================================ */
+@supports not (font-variation-settings:normal){
+  .urdu,
+  .nastaliq,
+  .reading-text{
+    font-family:"Noto Nastaliq Urdu","Jameel Noori Nastaleeq",serif;
+  }
+
+  .arabic,
+  .quran,
+  .hadith-arabic{
+    font-family:"Noto Naskh Arabic","Amiri",serif;
+  }
+}
+
+/* ============================================================================
+   اختتام
+============================================================================ */
