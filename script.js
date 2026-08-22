@@ -1,5 +1,5 @@
 // 1. अपना ScaleDrone Channel ID यहाँ डालें (ScaleDrone वेबसाइट से मिलेगा)
-const CHANNEL_ID = 'YOUR_CHANNEL_ID_HERE'; 
+const CHANNEL_ID = uledCtWauV1C5nWP; 
 const ROOM_NAME = 'observable-chat-room'; // 'observable-' लगाना जरूरी है
 
 // ScaleDrone शुरू करें
