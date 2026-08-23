@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-  <!-- ScaleDrone Realtime WebSockets Live Network -->
+  <!-- ScaleDrone (सिर्फ ऑनलाइन मेंबर्स देखने और नोटिस के लिए) -->
   <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
 
   <style>
@@ -469,11 +469,10 @@
         });
 
         room.on('data', (data, member) => {
+          // अब यहाँ चैट नहीं आएगी, सिर्फ नोटिस अपडेट होंगे
           if (data.type === 'notice') {
             document.getElementById('notice-display').textContent = data.text;
-          } else {
-            appendMessage(data);
-          }
+          } 
         });
       });
     }
@@ -486,25 +485,14 @@
     const msgInput = document.getElementById('msg-input');
     const sendBtn = document.getElementById('btn-send');
 
+    // सेंड बटन अब सीधे Firebase का इस्तेमाल करेगा 
     function sendChatMessage() {
       const text = msgInput.value.trim();
-      if (!text || !drone) return;
+      if (!text) return;
 
-      const now = new Date();
-      const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      const payload = {
-        type: 'chat',
-        sender: currentUser.name,
-        role: currentUser.role,
-        text: text,
-        time: time
-      };
-
-      drone.publish({
-        room: 'observable-ula-alif-room',
-        message: payload
-      });
+      if(window.sendFirebaseMessage) {
+        window.sendFirebaseMessage(currentUser.name, currentUser.role, text);
+      }
 
       msgInput.value = "";
     }
@@ -514,7 +502,8 @@
       if (e.key === 'Enter') sendChatMessage();
     });
 
-    function appendMessage(data) {
+    // मैसेज स्क्रीन पर दिखाने का फंक्शन (यह अब Firebase से कॉल होगा)
+    window.appendMessage = function(data) {
       const isMine = data.sender === currentUser.name;
       const bubble = document.createElement('div');
       bubble.className = `msg-bubble ${isMine ? 'msg-mine' : 'msg-other'}`;
@@ -566,6 +555,8 @@
       document.getElementById('btn-sound').innerHTML = soundEnabled ? '<i class="fa-solid fa-volume-high"></i>' : '<i class="fa-solid fa-volume-xmark"></i>';
     });
   </script>
+
+<!-- Firebase Database Connection (असली डेटाबेस) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
   import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
@@ -580,6 +571,7 @@
     appId: "1:693272422991:web:081c07b083e3549b0dd83a"
   };
 
+  // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
   const chatRef = ref(db, 'messages');
@@ -604,25 +596,6 @@
         window.appendMessage(data);
     }
   });
-</script>
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyDpqKDayo6H0nVyjnT1JBPjpH8RjmwpvV0",
-    authDomain: "ula-alif.firebaseapp.com",
-    databaseURL: "https://ula-alif-default-rtdb.firebaseio.com",
-    projectId: "ula-alif",
-    storageBucket: "ula-alif.firebasestorage.app",
-    messagingSenderId: "693272422991",
-    appId: "1:693272422991:web:081c07b083e3549b0dd83a"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
 </script>
 </body>
 </html>
