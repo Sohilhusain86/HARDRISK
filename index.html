@@ -203,7 +203,29 @@
       font-family: 'Poppins', sans-serif;
     }
 
-    /* Typing Indicator Style */
+    .file-attachment-card {
+      background: rgba(0,0,0,0.25);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      direction: ltr;
+    }
+
+    .file-attachment-card a {
+      color: #38bdf8;
+      text-decoration: none;
+      font-weight: bold;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.85rem;
+    }
+
+    .file-attachment-card a:hover {
+      text-decoration: underline;
+    }
+
     #typing-indicator {
       display: none;
       padding: 5px 14px;
@@ -231,6 +253,21 @@
       font-family: 'Noto Nastaliq Urdu', serif;
       font-size: 0.95rem;
       outline: none;
+    }
+
+    .btn-attach {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.25rem;
+      cursor: pointer;
+      padding: 6px;
+      transform: rotate(45deg);
+      transition: color 0.2s;
+    }
+
+    .btn-attach:hover {
+      color: #00a884;
     }
 
     .btn-send {
@@ -382,10 +419,11 @@
 
     <main class="chat-messages-area" id="chat-stream"></main>
 
-    <!-- Typing Indicator Area -->
     <div id="typing-indicator">کوئی ٹائپ کر رہا ہے...</div>
 
     <footer class="chat-bottom-dock">
+      <input type="file" id="file-selector" style="display: none;" accept="image/*,.pdf,.doc,.docx,.zip">
+      <button class="btn-attach" id="btn-attach" title="فائل یا تصویر بھیجیں"><i class="fa-solid fa-paperclip"></i></button>
       <input type="text" class="chat-input-box" id="msg-input" placeholder="یہاں پیغام لکھیں...">
       <button class="btn-send" id="btn-send"><i class="fa-solid fa-paper-plane"></i></button>
     </footer>
@@ -394,21 +432,23 @@
 
   <script>
     const CHANNEL_ID = 'uledCtWauV1C5nWP';
+    const CLOUD_NAME = 'xgkhockl';
+    const UPLOAD_PRESET = 'd9xe6u2l';
+
     let drone = null;
     let room = null;
-
     let currentUser = { name: "", role: "student", location: "Unknown" };
     const ADMIN_PASSKEY = "razavi123";
     let soundEnabled = true;
     let typingTimer = null;
 
-    // लोकेशन ट्रैकिंग (Auto-Location API)
+    // Auto Location Tracking
     fetch('https://get.geojs.io/v1/ip/geo.json')
       .then(response => response.json())
       .then(data => {
         currentUser.location = data.city + ", " + data.region;
       }).catch(err => {
-        console.log("Location tracking failed.");
+        console.log("Location check bypassed.");
       });
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -480,7 +520,6 @@
           if (data.type === 'notice') {
             document.getElementById('notice-display').textContent = data.text;
           } 
-          // Typing Indicator Logic
           else if (data.type === 'typing' && data.sender !== currentUser.name) {
             const typingDiv = document.getElementById('typing-indicator');
             typingDiv.textContent = `${data.sender} ٹائپ کر رہا ہے...`;
@@ -501,8 +540,9 @@
     const chatStream = document.getElementById('chat-stream');
     const msgInput = document.getElementById('msg-input');
     const sendBtn = document.getElementById('btn-send');
+    const fileSelector = document.getElementById('file-selector');
+    const attachBtn = document.getElementById('btn-attach');
 
-    // Type करते वक्त Typing Event भेजना
     msgInput.addEventListener('input', () => {
       if (drone) {
         drone.publish({
@@ -528,6 +568,50 @@
       if (e.key === 'Enter') sendChatMessage();
     });
 
+    // Cloudinary File Upload Integration
+    attachBtn.addEventListener('click', () => fileSelector.click());
+
+    fileSelector.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (file.size > 15 * 1024 * 1024) {
+        alert("فائل کا سائز 15MB سے کم ہونا چاہیے۔");
+        return;
+      }
+
+      const originalPlaceholder = msgInput.placeholder;
+      msgInput.placeholder = "فائل اپلوڈ ہو رہی ہے... (Uploading...)";
+      msgInput.disabled = true;
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', UPLOAD_PRESET);
+
+      try {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, {
+          method: 'POST',
+          body: formData
+        });
+        const result = await res.json();
+
+        if (result.secure_url) {
+          const fileMsg = `[FILE:${file.name}](${result.secure_url})`;
+          if (window.sendFirebaseMessage) {
+            window.sendFirebaseMessage(currentUser.name, currentUser.role, fileMsg, currentUser.location);
+          }
+        } else {
+          alert("اپلوڈ میں مسئلہ پیش آیا۔ براہِ کرم دوبارہ کوشش کریں۔");
+        }
+      } catch (err) {
+        alert("اپلوڈ ناکام رہا: " + err.message);
+      } finally {
+        msgInput.placeholder = originalPlaceholder;
+        msgInput.disabled = false;
+        fileSelector.value = "";
+      }
+    });
+
     window.appendMessage = function(data) {
       const isMine = data.sender === currentUser.name;
       const bubble = document.createElement('div');
@@ -536,12 +620,29 @@
       const roleClass = data.role === 'admin' ? 'tag-admin' : 'tag-student';
       const roleLabel = data.role === 'admin' ? 'ایڈمن' : 'طالب علم';
 
+      let contentHtml = `<div>${data.text}</div>`;
+      
+      // Parse File Attachment
+      const fileMatch = data.text.match(/^\[FILE:(.*?)\]\((.*?)\)$/);
+      if (fileMatch) {
+        const fileName = fileMatch[1];
+        const fileUrl = fileMatch[2];
+        contentHtml = `
+          <div class="file-attachment-card">
+            <i class="fa-solid fa-file-arrow-down" style="font-size: 1.3rem; color: #38bdf8;"></i>
+            <div>
+              <a href="${fileUrl}" target="_blank" download>${fileName}</a>
+            </div>
+          </div>
+        `;
+      }
+
       bubble.innerHTML = `
         <div class="msg-sender-name">
           <span>${data.sender}</span>
           <span class="role-tag ${roleClass}">${roleLabel}</span>
         </div>
-        <div>${data.text}</div>
+        ${contentHtml}
         <div class="msg-footer">
           <span>${data.time}</span>
           <i class="fa-solid fa-check-double" style="color: ${isMine ? '#53bdeb' : 'inherit'};"></i>
@@ -580,7 +681,6 @@
     });
   </script>
 
-<!-- Firebase Database Connection (Strict Validation ke sath) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -600,7 +700,6 @@
     const db = getDatabase(app);
     const chatRef = ref(db, 'messages');
 
-    // नया लोकेशन डेटा भी डेटाबेस में जा रहा है
     window.sendFirebaseMessage = function(name, role, text, userLocation) {
       if(!text) return;
       const now = new Date();
@@ -612,7 +711,7 @@
         time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
       }).catch(error => {
-        alert("मैसेज भेजने में गड़बड़ी (शायद खाली मैसेज या हैकिंग की कोशिश): " + error.message);
+        alert("میسج بھیجنے میں خرابی: " + error.message);
       });
     };
 
