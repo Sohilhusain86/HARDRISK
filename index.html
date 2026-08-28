@@ -10,7 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-  <!-- ScaleDrone Realtime WebSockets Live Network -->
   <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
 
   <style>
@@ -237,10 +236,6 @@
       font-size: 0.85rem;
     }
 
-    .file-attachment-card a:hover {
-      text-decoration: underline;
-    }
-
     #typing-indicator {
       display: none;
       padding: 5px 14px;
@@ -452,18 +447,20 @@
 
     let drone = null;
     let room = null;
-    let currentUser = { name: "", role: "student", location: "Unknown" };
+    let currentUser = { name: "", role: "student", location: "India" };
     const ADMIN_PASSKEY = "razavi123";
     let soundEnabled = true;
     let typingTimer = null;
 
-    // Auto Location Tracking
-    fetch('https://get.geojs.io/v1/ip/geo.json')
+    // Reliable Auto Location Tracking
+    fetch('https://ipwho.is/')
       .then(response => response.json())
       .then(data => {
-        currentUser.location = data.city + ", " + data.region;
+        if (data.success && data.city) {
+          currentUser.location = data.city + ", " + (data.region_code || data.region || "IN");
+        }
       }).catch(err => {
-        console.log("Location check bypassed.");
+        console.log("Location fallback active.");
       });
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -583,7 +580,6 @@
       if (e.key === 'Enter') sendChatMessage();
     });
 
-    // Cloudinary File Upload Integration
     attachBtn.addEventListener('click', () => fileSelector.click());
 
     fileSelector.addEventListener('change', async (e) => {
@@ -637,7 +633,6 @@
 
       let contentHtml = `<div>${data.text}</div>`;
       
-      // Parse File Attachment
       const fileMatch = data.text.match(/^\[FILE:(.*?)\]\((.*?)\)$/);
       if (fileMatch) {
         const fileName = fileMatch[1];
@@ -652,8 +647,7 @@
         `;
       }
 
-      // صرف ایڈمن کو لوکیشن دکھانے کی شرط
-      const locationHtml = (currentUser.role === 'admin' && data.location)
+      const locationHtml = (currentUser.role === 'admin' && data.location && !data.location.includes('undefined'))
         ? `<span class="admin-loc-tag"><i class="fa-solid fa-location-dot"></i> ${data.location}</span>`
         : '';
 
@@ -728,7 +722,7 @@
         sender: name,
         role: role,
         text: text,
-        location: userLocation || "Unknown",
+        location: userLocation || "India",
         time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
       }).catch(error => {
