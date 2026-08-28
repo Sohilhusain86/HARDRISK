@@ -195,12 +195,27 @@
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      gap: 4px;
+      gap: 8px;
       font-size: 0.65rem;
       color: var(--text-muted);
       direction: ltr;
       margin-top: 3px;
       font-family: 'Poppins', sans-serif;
+    }
+
+    .admin-loc-tag {
+      color: #fb7185;
+      font-size: 0.72rem;
+      font-family: 'Poppins', sans-serif;
+      direction: ltr;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+      background: rgba(239, 68, 68, 0.15);
+      padding: 1px 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(239, 68, 68, 0.3);
     }
 
     .file-attachment-card {
@@ -637,6 +652,11 @@
         `;
       }
 
+      // صرف ایڈمن کو لوکیشن دکھانے کی شرط
+      const locationHtml = (currentUser.role === 'admin' && data.location)
+        ? `<span class="admin-loc-tag"><i class="fa-solid fa-location-dot"></i> ${data.location}</span>`
+        : '';
+
       bubble.innerHTML = `
         <div class="msg-sender-name">
           <span>${data.sender}</span>
@@ -644,6 +664,7 @@
         </div>
         ${contentHtml}
         <div class="msg-footer">
+          ${locationHtml}
           <span>${data.time}</span>
           <i class="fa-solid fa-check-double" style="color: ${isMine ? '#53bdeb' : 'inherit'};"></i>
         </div>
@@ -707,7 +728,7 @@
         sender: name,
         role: role,
         text: text,
-        location: userLocation,
+        location: userLocation || "Unknown",
         time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
       }).catch(error => {
