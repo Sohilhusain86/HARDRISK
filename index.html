@@ -447,25 +447,26 @@
 
     let drone = null;
     let room = null;
-    let currentUser = { name: "", role: "student", location: "Locating..." };
+    let currentUser = { name: "", role: "student", location: "Unknown" };
     const ADMIN_PASSKEY = "razavi123";
     let soundEnabled = true;
     let typingTimer = null;
 
-    // Dual Location Detection: GPS (Primary) + IP Fallback (Secondary)
+    // Pure Dynamic Real Location (GPS + Fallback IP)
     function detectLocation() {
       function fallbackToIP() {
         fetch('https://ipwho.is/')
           .then(res => res.json())
           .then(data => {
             if (data.success && data.city) {
-              currentUser.location = `${data.city}, ${data.region_code || data.region || 'UP'}`;
+              const region = data.region_code || data.region || "";
+              currentUser.location = region ? `${data.city}, ${region}` : data.city;
             } else {
-              currentUser.location = "Bareilly, UP";
+              currentUser.location = "Unknown";
             }
           })
           .catch(() => {
-            currentUser.location = "Bareilly, UP";
+            currentUser.location = "Unknown";
           });
       }
 
@@ -477,9 +478,13 @@
             fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
               .then(res => res.json())
               .then(data => {
-                const village = data.address.village || data.address.suburb || data.address.neighbourhood || data.address.hamlet || "";
-                const district = data.address.state_district || data.address.county || data.address.city || "Bareilly";
-                currentUser.location = village ? `${village}, ${district}` : `${district}, UP`;
+                if (data && data.address) {
+                  const place = data.address.village || data.address.suburb || data.address.neighbourhood || data.address.hamlet || data.address.town || data.address.city || "";
+                  const region = data.address.state_district || data.address.county || data.address.state || "";
+                  currentUser.location = (place && region) ? `${place}, ${region}` : (place || region || "Unknown");
+                } else {
+                  fallbackToIP();
+                }
               })
               .catch(() => {
                 fallbackToIP();
@@ -488,7 +493,7 @@
           () => {
             fallbackToIP();
           },
-          { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
       } else {
         fallbackToIP();
@@ -681,8 +686,8 @@
         `;
       }
 
-      // Location tag is strictly rendered only for Admin
-      const locationHtml = (currentUser.role === 'admin' && data.location && !data.location.includes('undefined'))
+      // Location strictly visible only to Admin
+      const locationHtml = (currentUser.role === 'admin' && data.location && data.location !== 'Unknown' && !data.location.includes('undefined'))
         ? `<span class="admin-loc-tag"><i class="fa-solid fa-location-dot"></i> ${data.location}</span>`
         : '';
 
@@ -757,11 +762,11 @@
         sender: name,
         role: role,
         text: text,
-        location: userLocation || "Bareilly, UP",
+        location: userLocation || "Unknown",
         time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
       }).catch(error => {
-        alert("میسج بھیجنے میں خرابی: " + error.message);
+        alert("خرابی: " + error.message);
       });
     };
 
