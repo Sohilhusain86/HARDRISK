@@ -226,17 +226,20 @@
 
     .msg-img-preview {
       max-width: 100%;
+      max-height: 250px;
       border-radius: 8px;
       margin-top: 5px;
       display: block;
       cursor: pointer;
+      object-fit: cover;
     }
 
     .msg-audio-player {
-      width: 100%;
+      width: 220px;
       margin-top: 6px;
       height: 36px;
       outline: none;
+      direction: ltr;
     }
 
     .file-attachment-card {
@@ -496,15 +499,22 @@
     let audioChunks = [];
     let isRecording = false;
 
-    // Push Notifications Request
-    if ("Notification" in window && Notification.permission !== "granted") {
-      Notification.requestPermission();
+    // Notification Handler
+    function requestPushPermission() {
+      if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission();
+      }
     }
 
     function showPushNotification(sender, text) {
       if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
+        let preview = text;
+        if (text.startsWith('[IMG](')) preview = '📷 تصویر موصول ہوئی';
+        else if (text.startsWith('[AUDIO](')) preview = '🎙️ وائس میسج موصول ہوا';
+        else if (text.startsWith('[FILE:')) preview = '📎 فائل موصول ہوئی';
+
         new Notification(`جماعت اولیٰ الف: ${sender}`, {
-          body: text.startsWith('[IMG:') ? 'تصویر موصول ہوئی' : (text.startsWith('[AUDIO:') ? 'وائس میسج موصول ہوا' : text),
+          body: preview,
           icon: 'https://cdn-icons-png.flaticon.com/512/1041/1041916.png'
         });
       }
@@ -592,6 +602,7 @@
       }
 
       loginScreen.style.display = "none";
+      requestPushPermission();
       connectRealtimeServer();
     });
 
@@ -664,7 +675,7 @@
     sendBtn.addEventListener('click', sendChatMessage);
     msgInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendChatMessage(); });
 
-    // Cloudinary Upload Helper
+    // Cloudinary Upload Handler
     async function uploadToCloudinary(file) {
       const formData = new FormData();
       formData.append('file', file);
@@ -705,12 +716,13 @@
       }
     });
 
-    // WhatsApp-Style Voice Recording (Mic)
+    // Voice Note (Mic) Integration
     micBtn.addEventListener('click', async () => {
       if (!isRecording) {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          mediaRecorder = new MediaRecorder(stream);
+          const options = MediaRecorder.isTypeSupported('audio/webm') ? { mimeType: 'audio/webm' } : {};
+          mediaRecorder = new MediaRecorder(stream, options);
           audioChunks = [];
 
           mediaRecorder.ondataavailable = event => {
@@ -718,8 +730,9 @@
           };
 
           mediaRecorder.onstop = async () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-            const audioFile = new File([audioBlob], "voice_note.mp3", { type: 'audio/mp3' });
+            stream.getTracks().forEach(track => track.stop());
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            const audioFile = new File([audioBlob], "voicenote.webm", { type: 'audio/webm' });
             
             msgInput.placeholder = "آڈیو اپلوڈ ہو رہی ہے...";
             try {
@@ -738,10 +751,12 @@
           isRecording = true;
           micBtn.classList.add('recording');
         } catch (err) {
-          alert("مائیک کی اجازت درکار ہے: " + err.message);
+          alert("مائیک استعمال کرنے کی اجازت نہیں ملی: " + err.message);
         }
       } else {
-        mediaRecorder.stop();
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.stop();
+        }
         isRecording = false;
         micBtn.classList.remove('recording');
       }
@@ -751,21 +766,27 @@
       const isMine = data.sender === currentUser.name;
       const bubble = document.createElement('div');
       bubble.className = `msg-bubble ${isMine ? 'msg-mine' : 'msg-other'}`;
-      bubble.id = `msg-${msgKey}`;
+      if (msgKey) bubble.id = `msg-${msgKey}`;
 
       const roleClass = data.role === 'admin' ? 'tag-admin' : 'tag-student';
       const roleLabel = data.role === 'admin' ? 'ایڈمن' : 'طالب علم';
 
       let contentHtml = `<div>${data.text}</div>`;
       
-      // Dynamic Rich Formats (Image Preview, Audio Note, Files)
-      if (data.text.startsWith('[IMG](')) {
-        const url = data.text.match(/\((.*?)\)/)[1];
-        contentHtml = `<img src="${url}" class="msg-img-preview" alt="Image Preview" onclick="window.open('${url}','_blank')"/>`;
-      } else if (data.text.startsWith('[AUDIO](')) {
-        const url = data.text.match(/\((.*?)\)/)[1];
-        contentHtml = `<audio src="${url}" controls class="msg-audio-player"></audio>`;
-      } else {
+      // Dynamic Rich Formats
+      if (typeof data.text === 'string' && data.text.startsWith('[IMG](')) {
+        const match = data.text.match(/\((.*?)\)/);
+        if (match) {
+          const url = match[1];
+          contentHtml = `<img src="${url}" class="msg-img-preview" alt="Image" onclick="window.open('${url}','_blank')"/>`;
+        }
+      } else if (typeof data.text === 'string' && data.text.startsWith('[AUDIO](')) {
+        const match = data.text.match(/\((.*?)\)/);
+        if (match) {
+          const url = match[1];
+          contentHtml = `<audio src="${url}" controls class="msg-audio-player"></audio>`;
+        }
+      } else if (typeof data.text === 'string') {
         const fileMatch = data.text.match(/^\[FILE:(.*?)\]\((.*?)\)$/);
         if (fileMatch) {
           contentHtml = `
@@ -777,13 +798,11 @@
         }
       }
 
-      // Location for Admin
-      const locationHtml = (currentUser.role === 'admin' && data.location && data.location !== 'Unknown')
+      const locationHtml = (currentUser.role === 'admin' && data.location && data.location !== 'Unknown' && !data.location.includes('undefined'))
         ? `<span class="admin-loc-tag"><i class="fa-solid fa-location-dot"></i> ${data.location}</span>`
         : '';
 
-      // Delete Button for Admin
-      const deleteHtml = (currentUser.role === 'admin')
+      const deleteHtml = (currentUser.role === 'admin' && msgKey)
         ? `<i class="fa-solid fa-trash msg-delete-btn" onclick="window.deleteFirebaseMessage('${msgKey}')" title="میسج ڈیلیٹ کریں"></i>`
         : '';
 
