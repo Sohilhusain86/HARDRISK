@@ -447,21 +447,55 @@
 
     let drone = null;
     let room = null;
-    let currentUser = { name: "", role: "student", location: "India" };
+    let currentUser = { name: "", role: "student", location: "Locating..." };
     const ADMIN_PASSKEY = "razavi123";
     let soundEnabled = true;
     let typingTimer = null;
 
-    // Reliable Auto Location Tracking
-    fetch('https://ipwho.is/')
-      .then(response => response.json())
-      .then(data => {
-        if (data.success && data.city) {
-          currentUser.location = data.city + ", " + (data.region_code || data.region || "IN");
-        }
-      }).catch(err => {
-        console.log("Location fallback active.");
-      });
+    // Dual Location Detection: GPS (Primary) + IP Fallback (Secondary)
+    function detectLocation() {
+      function fallbackToIP() {
+        fetch('https://ipwho.is/')
+          .then(res => res.json())
+          .then(data => {
+            if (data.success && data.city) {
+              currentUser.location = `${data.city}, ${data.region_code || data.region || 'UP'}`;
+            } else {
+              currentUser.location = "Bareilly, UP";
+            }
+          })
+          .catch(() => {
+            currentUser.location = "Bareilly, UP";
+          });
+      }
+
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+              .then(res => res.json())
+              .then(data => {
+                const village = data.address.village || data.address.suburb || data.address.neighbourhood || data.address.hamlet || "";
+                const district = data.address.state_district || data.address.county || data.address.city || "Bareilly";
+                currentUser.location = village ? `${village}, ${district}` : `${district}, UP`;
+              })
+              .catch(() => {
+                fallbackToIP();
+              });
+          },
+          () => {
+            fallbackToIP();
+          },
+          { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+        );
+      } else {
+        fallbackToIP();
+      }
+    }
+
+    detectLocation();
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playBeep() {
@@ -647,6 +681,7 @@
         `;
       }
 
+      // Location tag is strictly rendered only for Admin
       const locationHtml = (currentUser.role === 'admin' && data.location && !data.location.includes('undefined'))
         ? `<span class="admin-loc-tag"><i class="fa-solid fa-location-dot"></i> ${data.location}</span>`
         : '';
@@ -722,7 +757,7 @@
         sender: name,
         role: role,
         text: text,
-        location: userLocation || "India",
+        location: userLocation || "Bareilly, UP",
         time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
       }).catch(error => {
