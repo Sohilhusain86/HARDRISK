@@ -385,7 +385,7 @@
         <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 16px;">اپنا نام اور موبائل نمبر / رول نمبر درج کریں</p>
         
         <input type="text" id="user-name" class="login-input" placeholder="آپ کا مبارک نام (مثلاً: زید)">
-        <input type="tel" id="user-phone" class="login-input" placeholder="موبائل نمبر یا رول نمبر (Unique ID)">
+        <input type="text" id="user-phone" class="login-input" placeholder="موبائل نمبر یا رول نمبر (Unique ID)">
         <input type="password" id="user-pass" class="login-input" placeholder="پاسورڈ (صرف ایڈمن کے لیے)">
         
         <button class="btn-login" id="btn-login">گروپ جوائن کریں</button>
@@ -461,17 +461,17 @@
     let isRecording = false;
     let currentStream = null;
 
+    // Location Tracking (Pure Dynamic)
     function detectLocation() {
       function fallbackToIP() {
         fetch('https://ipwho.is/')
           .then(res => res.json())
           .then(data => {
-            if (data.success && data.city) {
+            if (data && data.success && data.city) {
               const reg = data.region_code || data.region || "";
               currentUser.location = reg ? `${data.city}, ${reg}` : data.city;
             }
-          })
-          .catch(() => {});
+          }).catch(() => {});
       }
 
       if ("geolocation" in navigator) {
@@ -492,7 +492,7 @@
               }).catch(() => fallbackToIP());
           },
           () => fallbackToIP(),
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+          { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
         );
       } else {
         fallbackToIP();
@@ -525,9 +525,9 @@
     const loginBtn = document.getElementById('btn-login');
     const adminCrown = document.getElementById('btn-admin-crown');
 
-    loginBtn.addEventListener('click', async () => {
+    loginBtn.addEventListener('click', () => {
       const name = userNameInput.value.trim();
-      const phone = userPhoneInput.value.trim().replace(/[^0-9a-zA-Z]/g, '');
+      const phone = userPhoneInput.value.trim();
       const pass = userPassInput.value.trim();
 
       if (!name) {
@@ -548,12 +548,10 @@
         adminCrown.style.display = "block";
       }
 
-      if (window.checkUserBanned) {
-        const isBanned = await window.checkUserBanned(currentUser.phone);
-        if (isBanned) {
-          alert("آپ کو ایڈمن کی طرف سے مستقل بلاک کر دیا گیا ہے۔");
-          return;
-        }
+      // Check Ban in Local Memory if cached
+      if (window.isPhoneBanned && window.isPhoneBanned(phone)) {
+        alert("آپ کو ایڈمن کی طرف سے بلاک کر دیا گیا ہے۔");
+        return;
       }
 
       loginScreen.style.display = "none";
@@ -616,16 +614,13 @@
       }
     });
 
-    async function sendChatMessage() {
+    function sendChatMessage() {
       const text = msgInput.value.trim();
       if (!text) return;
 
-      if (window.checkUserBanned) {
-        const isBanned = await window.checkUserBanned(currentUser.phone);
-        if (isBanned) {
-          alert("آپ بلاک ہیں، میسج نہیں بھیج سکتے۔");
-          return;
-        }
+      if (window.isPhoneBanned && window.isPhoneBanned(currentUser.phone)) {
+        alert("آپ بلاک ہیں، میسج نہیں بھیج سکتے۔");
+        return;
       }
 
       if(window.sendFirebaseMessage) {
@@ -722,7 +717,6 @@
       }
     });
 
-    // Admin direct Ban Action Trigger
     window.triggerAdminBan = function(targetPhone, targetName) {
       if (!targetPhone) {
         alert("اس طالب علم کا فون نمبر دستیاب نہیں ہے۔");
@@ -781,7 +775,6 @@
         ? `<span class="admin-loc-tag"><i class="fa-solid fa-location-dot"></i> ${data.location}</span>`
         : '';
 
-      // Direct Action Buttons for Admin (Delete + Direct Ban)
       let adminActionsHtml = '';
       if (currentUser.role === 'admin') {
         const phoneArg = data.senderPhone || '';
@@ -840,7 +833,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, push, set, get, onChildAdded, onChildRemoved, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getDatabase, ref, push, set, onValue, onChildAdded, onChildRemoved, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDpqKDayo6H0nVyjnT1JBPjpH8RjmwpvV0",
@@ -856,18 +849,23 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const chatRef = ref(db, 'messages');
+    const bannedRef = ref(db, 'banned_users');
 
-    window.checkUserBanned = async function(phone) {
-      if (!phone) return false;
-      const snapshot = await get(ref(db, `banned_users/${phone}`));
-      return snapshot.exists();
+    let bannedPhoneCache = {};
+    onValue(bannedRef, (snapshot) => {
+      bannedPhoneCache = snapshot.val() || {};
+    });
+
+    window.isPhoneBanned = function(phone) {
+      const clean = (phone || "").replace(/[^0-9a-zA-Z]/g, '');
+      return !!bannedPhoneCache[clean];
     };
 
     window.banUserPermanently = function(phone) {
-      const cleanPhone = phone.replace(/[^0-9a-zA-Z]/g, '');
-      set(ref(db, `banned_users/${cleanPhone}`), {
-        bannedAt: Date.now()
-      });
+      const cleanPhone = (phone || "").replace(/[^0-9a-zA-Z]/g, '');
+      if(cleanPhone) {
+        set(ref(db, `banned_users/${cleanPhone}`), { bannedAt: Date.now() });
+      }
     };
 
     window.sendFirebaseMessage = function(name, phone, displayName, role, text, userLocation) {
