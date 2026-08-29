@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
 
@@ -138,7 +138,7 @@
     }
 
     .msg-bubble {
-      max-width: 82%;
+      max-width: 85%;
       padding: 9px 14px;
       border-radius: 14px;
       font-size: 0.95rem;
@@ -195,10 +195,10 @@
       justify-content: flex-end;
       align-items: center;
       gap: 8px;
-      font-size: 0.65rem;
+      font-size: 0.72rem;
       color: var(--text-muted);
       direction: ltr;
-      margin-top: 3px;
+      margin-top: 5px;
       font-family: 'Poppins', sans-serif;
     }
 
@@ -212,16 +212,24 @@
       gap: 4px;
       font-weight: 600;
       background: rgba(239, 68, 68, 0.15);
-      padding: 1px 6px;
+      padding: 2px 6px;
       border-radius: 6px;
       border: 1px solid rgba(239, 68, 68, 0.3);
     }
 
     .msg-delete-btn {
-      color: #ef4444;
+      color: #ff4d4d !important;
       cursor: pointer;
-      font-size: 0.85rem;
-      margin-right: 6px;
+      font-size: 0.95rem;
+      padding: 2px 5px;
+      margin-right: 4px;
+      border-radius: 4px;
+      background: rgba(255, 77, 77, 0.15);
+      display: inline-block;
+    }
+
+    .msg-delete-btn:hover {
+      background: rgba(255, 77, 77, 0.35);
     }
 
     .msg-img-preview {
@@ -231,14 +239,12 @@
       margin-top: 5px;
       display: block;
       cursor: pointer;
-      object-fit: cover;
     }
 
     .msg-audio-player {
       width: 220px;
       margin-top: 6px;
       height: 36px;
-      outline: none;
       direction: ltr;
     }
 
@@ -326,11 +332,6 @@
       justify-content: center;
       font-size: 1.1rem;
       cursor: pointer;
-      transition: transform 0.1s;
-    }
-
-    .btn-send:active {
-      transform: scale(0.92);
     }
 
     .login-overlay {
@@ -379,7 +380,6 @@
       font-size: 1.05rem;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(0, 168, 132, 0.4);
     }
 
     .admin-modal {
@@ -499,28 +499,7 @@
     let audioChunks = [];
     let isRecording = false;
 
-    // Notification Handler
-    function requestPushPermission() {
-      if ("Notification" in window && Notification.permission === "default") {
-        Notification.requestPermission();
-      }
-    }
-
-    function showPushNotification(sender, text) {
-      if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
-        let preview = text;
-        if (text.startsWith('[IMG](')) preview = '📷 تصویر موصول ہوئی';
-        else if (text.startsWith('[AUDIO](')) preview = '🎙️ وائس میسج موصول ہوا';
-        else if (text.startsWith('[FILE:')) preview = '📎 فائل موصول ہوئی';
-
-        new Notification(`جماعت اولیٰ الف: ${sender}`, {
-          body: preview,
-          icon: 'https://cdn-icons-png.flaticon.com/512/1041/1041916.png'
-        });
-      }
-    }
-
-    // Dynamic Real GPS Location + IP Fallback
+    // Real Location Detection
     function detectLocation() {
       function fallbackToIP() {
         fetch('https://ipwho.is/')
@@ -529,11 +508,9 @@
             if (data.success && data.city) {
               const reg = data.region_code || data.region || "";
               currentUser.location = reg ? `${data.city}, ${reg}` : data.city;
-            } else {
-              currentUser.location = "Unknown";
             }
           })
-          .catch(() => { currentUser.location = "Unknown"; });
+          .catch(() => {});
       }
 
       if ("geolocation" in navigator) {
@@ -545,9 +522,9 @@
               .then(res => res.json())
               .then(data => {
                 if (data && data.address) {
-                  const place = data.address.village || data.address.suburb || data.address.neighbourhood || data.address.town || data.address.city || "";
+                  const place = data.address.village || data.address.suburb || data.address.town || data.address.city || "";
                   const region = data.address.state_district || data.address.state || "";
-                  currentUser.location = (place && region) ? `${place}, ${region}` : (place || region || "Unknown");
+                  currentUser.location = (place && region) ? `${place}, ${region}` : (place || region || "India");
                 } else {
                   fallbackToIP();
                 }
@@ -602,8 +579,12 @@
       }
 
       loginScreen.style.display = "none";
-      requestPushPermission();
       connectRealtimeServer();
+      
+      // Login hone ke baad Firebase messages load honge taaki admin delete button render ho sake
+      if (window.startFirebaseListening) {
+        window.startFirebaseListening();
+      }
     });
 
     function connectRealtimeServer() {
@@ -675,7 +656,6 @@
     sendBtn.addEventListener('click', sendChatMessage);
     msgInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendChatMessage(); });
 
-    // Cloudinary Upload Handler
     async function uploadToCloudinary(file) {
       const formData = new FormData();
       formData.append('file', file);
@@ -688,7 +668,6 @@
       return await res.json();
     }
 
-    // Attach File / Image Preview Integration
     attachBtn.addEventListener('click', () => fileSelector.click());
 
     fileSelector.addEventListener('change', async (e) => {
@@ -716,7 +695,6 @@
       }
     });
 
-    // Voice Note (Mic) Integration
     micBtn.addEventListener('click', async () => {
       if (!isRecording) {
         try {
@@ -773,7 +751,6 @@
 
       let contentHtml = `<div>${data.text}</div>`;
       
-      // Dynamic Rich Formats
       if (typeof data.text === 'string' && data.text.startsWith('[IMG](')) {
         const match = data.text.match(/\((.*?)\)/);
         if (match) {
@@ -798,12 +775,13 @@
         }
       }
 
-      const locationHtml = (currentUser.role === 'admin' && data.location && data.location !== 'Unknown' && !data.location.includes('undefined'))
+      const locationHtml = (currentUser.role === 'admin' && data.location && data.location !== 'Unknown')
         ? `<span class="admin-loc-tag"><i class="fa-solid fa-location-dot"></i> ${data.location}</span>`
         : '';
 
+      // Admin Delete Button Explicit
       const deleteHtml = (currentUser.role === 'admin' && msgKey)
-        ? `<i class="fa-solid fa-trash msg-delete-btn" onclick="window.deleteFirebaseMessage('${msgKey}')" title="میسج ڈیلیٹ کریں"></i>`
+        ? `<span class="msg-delete-btn" onclick="window.deleteFirebaseMessage('${msgKey}')" title="ڈیلیٹ کریں"><i class="fa-solid fa-trash-can"></i></span>`
         : '';
 
       bubble.innerHTML = `
@@ -823,12 +801,6 @@
       chatStream.appendChild(bubble);
       chatStream.scrollTop = chatStream.scrollHeight;
       playBeep();
-      if (!isMine) showPushNotification(data.sender, data.text);
-    }
-
-    window.removeMessageFromUI = function(msgKey) {
-      const el = document.getElementById(`msg-${msgKey}`);
-      if (el) el.remove();
     }
 
     const adminPanel = document.getElementById('admin-panel');
@@ -903,24 +875,35 @@
     };
 
     window.deleteFirebaseMessage = function(key) {
-      if (confirm("کیا آپ واقعی یہ میسج ڈیلیٹ کرنا چاہتے ہیں؟")) {
-        const itemRef = ref(db, `messages/${key}`);
-        remove(itemRef);
-      }
+      if (!confirm("کیا آپ واقعی یہ میسج ڈیلیٹ کرنا چاہتے ہیں؟")) return;
+
+      const targetEl = document.getElementById(`msg-${key}`);
+      if (targetEl) targetEl.style.opacity = '0.3';
+
+      const itemRef = ref(db, `messages/${key}`);
+      remove(itemRef)
+        .then(() => {
+          if (targetEl) targetEl.remove();
+        })
+        .catch((error) => {
+          if (targetEl) targetEl.style.opacity = '1';
+          alert("ڈیلیٹ کرنے میں خرابی: " + error.message);
+        });
     };
 
-    onChildAdded(chatRef, (snapshot) => {
-      const data = snapshot.val();
-      if(window.appendMessage) {
-        window.appendMessage(data, snapshot.key);
-      }
-    });
+    window.startFirebaseListening = function() {
+      onChildAdded(chatRef, (snapshot) => {
+        const data = snapshot.val();
+        if(window.appendMessage) {
+          window.appendMessage(data, snapshot.key);
+        }
+      });
 
-    onChildRemoved(chatRef, (snapshot) => {
-      if(window.removeMessageFromUI) {
-        window.removeMessageFromUI(snapshot.key);
-      }
-    });
+      onChildRemoved(chatRef, (snapshot) => {
+        const el = document.getElementById(`msg-${snapshot.key}`);
+        if (el) el.remove();
+      });
+    };
     
   } catch(error) {
     console.error("Firebase Initialization Error:", error);
