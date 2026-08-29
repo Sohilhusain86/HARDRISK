@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>جماعت اولیٰ الف - واٹس ایپ میسنجر</title>
+  <title>جماعت اولیٰ الف - آل اِن وَن میسنجر</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,7 +53,7 @@
       overflow: hidden;
     }
 
-    /* Views */
+    /* Views Navigation */
     .view-screen {
       position: absolute;
       inset: 0;
@@ -364,6 +364,18 @@
       margin-bottom: 16px;
       color: var(--gold-accent);
     }
+
+    .banned-chip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #2a3942;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.85rem;
+    }
   </style>
 </head>
 <body>
@@ -384,10 +396,10 @@
       </div>
     </div>
 
-    <!-- Admin Panel -->
+    <!-- Admin Master Control Panel -->
     <div class="admin-modal" id="admin-panel">
       <div class="admin-header">
-        <h3><i class="fa-solid fa-shield-halved"></i> ایڈمن کنٹرول پینل</h3>
+        <h3><i class="fa-solid fa-shield-halved"></i> ایڈمن ماسٹر کنٹرول</h3>
         <button class="header-btn" id="btn-close-admin"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
@@ -397,6 +409,13 @@
         <button class="btn-login" id="btn-update-notice">نوٹس لائیو نشر کریں</button>
       </div>
 
+      <div style="margin-bottom: 16px;">
+        <label style="color: #ef4444; display: block; margin-bottom: 6px; font-size: 0.9rem;">بلاک شدہ طلبہ (Banned Students List):</label>
+        <div id="banned-users-list-container" style="max-height: 140px; overflow-y: auto; margin-bottom: 8px;">
+          <div style="color: var(--text-muted); font-size: 0.8rem;">کوئی بلاک شدہ طالب علم نہیں ہے۔</div>
+        </div>
+      </div>
+
       <div>
         <button class="btn-login" id="btn-clear-chat" style="background: #475569;">
           <i class="fa-solid fa-trash"></i> سکرین صاف کریں
@@ -404,7 +423,7 @@
       </div>
     </div>
 
-    <!-- SCREEN 1: Home Screen (Chats / Contacts List) -->
+    <!-- SCREEN 1: Home View (Group & 1-on-1 Contact List) -->
     <div class="view-screen view-active" id="screen-home">
       <header class="top-header">
         <div class="header-user-info">
@@ -421,7 +440,7 @@
       </header>
 
       <main class="chats-list-area" id="contacts-list">
-        <!-- Main Group Option -->
+        <!-- Group Channel Option -->
         <div class="chat-item" onclick="openChatRoom('group', 'جماعت اولیٰ الف (گروپ)', 'گروپ ڈسکشن')">
           <div class="item-avatar" style="background: #005c4b; color: #facc15;"><i class="fa-solid fa-users"></i></div>
           <div class="item-info">
@@ -431,13 +450,13 @@
         </div>
 
         <div style="padding: 10px 16px; font-size: 0.8rem; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.05);">
-          آن لائن اراکین اور پرائیویٹ چیٹس:
+          آن لائن طلبہ اور پرائیویٹ چیٹس:
         </div>
         <div id="users-dynamic-list"></div>
       </main>
     </div>
 
-    <!-- SCREEN 2: Chat Room (Group or 1-on-1 Private) -->
+    <!-- SCREEN 2: Chat Room (Group or Private) -->
     <div class="view-screen view-hidden" id="screen-chat">
       <header class="top-header">
         <div class="header-user-info">
@@ -488,7 +507,7 @@
     let isRecording = false;
     let currentStream = null;
 
-    // Location Tracking
+    // Pure Dynamic Real Location
     function detectLocation() {
       function fallbackToIP() {
         fetch('https://ipwho.is/')
@@ -545,7 +564,7 @@
       } catch(e) {}
     }
 
-    // Login Logic
+    // Login Handler
     const loginScreen = document.getElementById('login-screen');
     const userNameInput = document.getElementById('user-name');
     const userPhoneInput = document.getElementById('user-phone');
@@ -573,7 +592,7 @@
       }
 
       if (window.isPhoneBanned && window.isPhoneBanned(phone)) {
-        alert("آپ کو ایڈمن نے بلاک کیا ہوا ہے۔");
+        alert("آپ کو ایڈمن نے مستقل بلاک کر دیا ہے۔ آپ داخل نہیں ہو سکتے۔");
         return;
       }
 
@@ -583,12 +602,12 @@
       loginScreen.style.display = "none";
       connectRealtimeServer();
       
-      if (window.registerUserOnline) {
-        window.registerUserOnline(currentUser);
+      if (window.registerOnlineUser) {
+        window.registerOnlineUser(currentUser);
       }
     });
 
-    // ScaleDrone Connection for Live Status
+    // Real-Time Server
     function connectRealtimeServer() {
       drone = new ScaleDrone(CHANNEL_ID, {
         data: { name: currentUser.name, phone: currentUser.phone, role: currentUser.role }
@@ -639,14 +658,14 @@
           </div>
           <div class="item-info">
             <div class="item-name"><span>${u.name}</span> <span style="font-size:0.75rem; color:#38bdf8;">پرائیویٹ</span></div>
-            <div class="item-subtext">کلک کر کے پرائیویٹ چیٹ کریں</div>
+            <div class="item-subtext">کلک کر کے پرائیویٹ چیٹ کریں (${u.phone})</div>
           </div>
         `;
         container.appendChild(item);
       });
     }
 
-    // Room Navigation
+    // Room Switcher
     window.openChatRoom = function(roomId, title, subtext) {
       currentActiveRoomId = roomId;
       document.getElementById('chat-room-title').textContent = title;
@@ -667,7 +686,6 @@
     };
 
     window.openPrivateChat = function(otherPhone, otherName) {
-      // Create a deterministic unique room ID for two users
       const roomId = [currentUser.phone, otherPhone].sort().join('_');
       openChatRoom(roomId, otherName, `پرائیویٹ رابطہ (${otherPhone})`);
     };
@@ -679,7 +697,7 @@
       document.getElementById('screen-home').classList.add('view-active');
     };
 
-    // Chat Messaging Logic
+    // Chat Inputs
     const chatStream = document.getElementById('chat-stream');
     const msgInput = document.getElementById('msg-input');
     const sendBtn = document.getElementById('btn-send');
@@ -714,7 +732,7 @@
     sendBtn.addEventListener('click', sendChatMessage);
     msgInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendChatMessage(); });
 
-    // File / Image Upload
+    // File Upload
     async function uploadToCloudinary(file) {
       const formData = new FormData();
       formData.append('file', file);
@@ -783,7 +801,7 @@
           isRecording = true;
           micBtn.classList.add('recording');
         } catch (err) {
-          alert("مائیک کی اجازت درکار ہے: " + err.message);
+          alert("مائیک کی اجازت چیک کریں: " + err.message);
         }
       } else {
         if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
@@ -792,17 +810,17 @@
       }
     });
 
-    // Ban Action
+    // Admin Direct Ban Action Trigger
     window.triggerAdminBan = function(targetPhone, targetName) {
       if (!targetPhone) return;
       if (confirm(`کیا آپ واقعی ${targetName} (${targetPhone}) کو مستقل بلاک کرنا چاہتے ہیں؟`)) {
-        if (window.banUserPermanently) window.banUserPermanently(targetPhone);
+        if (window.banUserPermanently) window.banUserPermanently(targetPhone, targetName);
         if (drone) drone.publish({ room: 'observable-ula-alif-room', message: { type: 'ban', targetPhone: targetPhone } });
         alert(`${targetName} کو مستقل بلاک کر دیا گیا۔`);
       }
     };
 
-    // Render Message Bubble
+    // Render Chat Bubbles
     window.appendMessage = function(data, msgKey) {
       const isMine = data.senderPhone === currentUser.phone;
       const bubble = document.createElement('div');
@@ -908,18 +926,64 @@
     let activeChatListenerRef = null;
 
     let bannedPhoneCache = {};
-    onValue(ref(db, 'banned_users'), (snapshot) => {
+    const bannedUsersRef = ref(db, 'banned_users');
+
+    onValue(bannedUsersRef, (snapshot) => {
       bannedPhoneCache = snapshot.val() || {};
+      renderBannedUsersListInAdmin(bannedPhoneCache);
     });
+
+    function renderBannedUsersListInAdmin(bannedMap) {
+      const listDiv = document.getElementById('banned-users-list-container');
+      if (!listDiv) return;
+      listDiv.innerHTML = "";
+      const keys = Object.keys(bannedMap);
+      if (keys.length === 0) {
+        listDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 0.8rem;">کوئی بلاک شدہ طالب علم نہیں ہے۔</div>';
+        return;
+      }
+      keys.forEach(phone => {
+        const row = document.createElement('div');
+        row.className = 'banned-chip';
+        const name = bannedMap[phone].name || phone;
+        row.innerHTML = `
+          <span>${name} (${phone})</span>
+          <button onclick="window.unbanUser('${phone}')" style="background:#22c55e; border:none; color:#fff; border-radius:4px; padding:3px 8px; cursor:pointer; font-size:0.75rem;">ان بلاک</button>
+        `;
+        listDiv.appendChild(row);
+      });
+    }
 
     window.isPhoneBanned = function(phone) {
       const clean = (phone || "").replace(/[^0-9a-zA-Z]/g, '');
       return !!bannedPhoneCache[clean];
     };
 
-    window.banUserPermanently = function(phone) {
+    window.banUserPermanently = function(phone, name) {
       const cleanPhone = (phone || "").replace(/[^0-9a-zA-Z]/g, '');
-      if(cleanPhone) set(ref(db, `banned_users/${cleanPhone}`), { bannedAt: Date.now() });
+      if(cleanPhone) {
+        set(ref(db, `banned_users/${cleanPhone}`), { 
+          name: name || "Student",
+          bannedAt: Date.now() 
+        });
+      }
+    };
+
+    window.unbanUser = function(phone) {
+      const cleanPhone = (phone || "").replace(/[^0-9a-zA-Z]/g, '');
+      if(cleanPhone) {
+        remove(ref(db, `banned_users/${cleanPhone}`)).then(() => {
+          alert(`طالب علم (${phone}) کو ان بلاک کر دیا گیا۔`);
+        });
+      }
+    };
+
+    window.registerOnlineUser = function(user) {
+      set(ref(db, `registered_users/${user.phone}`), {
+        name: user.name,
+        phone: user.phone,
+        lastSeen: Date.now()
+      });
     };
 
     window.sendFirebaseMessage = function(roomId, name, phone, displayName, role, text, userLocation) {
