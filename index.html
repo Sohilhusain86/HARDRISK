@@ -131,6 +131,17 @@
       right: 0;
     }
 
+    .offline-indicator {
+      width: 13px;
+      height: 13px;
+      background: #64748b;
+      border: 2px solid var(--panel-bg);
+      border-radius: 50%;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    }
+
     .item-info { flex: 1; min-width: 0; }
     .item-name { font-size: 1rem; font-weight: bold; color: #fff; display: flex; justify-content: space-between; }
     .item-subtext { font-size: 0.8rem; color: var(--text-muted); font-family: 'Poppins', sans-serif; }
@@ -420,7 +431,7 @@
           <div class="header-avatar" id="my-avatar">उ</div>
           <div>
             <div class="header-title" id="my-display-name">जमात ऊला अलिफ़</div>
-            <div class="header-status" id="total-online-label">सभी छात्र</div>
+            <div class="header-status" id="total-online-label">ऑनलाइन सदस्य</div>
           </div>
         </div>
         <div class="header-actions">
@@ -440,7 +451,7 @@
         </div>
 
         <div style="padding: 10px 16px; font-size: 0.85rem; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.05);">
-          छात्रों की लिस्ट (ऑनलाइन / ऑफ़लाइन):
+          सभी छात्र और प्राइवेट चैट्स:
         </div>
         <div id="users-dynamic-list"></div>
       </main>
@@ -454,7 +465,7 @@
           <div class="header-avatar" id="chat-room-avatar">१</div>
           <div>
             <div class="header-title" id="chat-room-title">जमात ऊला अलिफ़</div>
-            <div class="header-status" id="chat-room-status">चैट रूम</div>
+            <div class="header-status" id="chat-room-status">ऑनलाइन...</div>
           </div>
         </div>
       </header>
@@ -617,8 +628,9 @@
       loginScreen.style.display = "none";
       requestNotificationAccess();
       
-      if (window.setUserOnlineFirebase) {
-        window.setUserOnlineFirebase(currentUser);
+      // Save User to Database & Set Presence
+      if (window.registerOrUpdateUserFirebase) {
+        window.registerOrUpdateUserFirebase(currentUser);
       }
       connectScaleDrone();
     });
@@ -654,32 +666,28 @@
       });
     }
 
-    // 100% Reliable Render Users List (Online & Offline) from Firebase
-    window.renderOnlineUsersList = function(onlineMap) {
+    // Render All Registered Users (Online & Offline with Last Seen)
+    window.renderAllUsersList = function(usersMap) {
       const container = document.getElementById('users-dynamic-list');
       if (!container) return;
       container.innerHTML = "";
 
-      const keys = Object.keys(onlineMap || {});
+      const keys = Object.keys(usersMap || {});
       let count = 0;
 
       keys.forEach(phone => {
         if (phone === currentUser.phone) return;
-        const u = onlineMap[phone];
+        const u = usersMap[phone];
         if (!u || !u.name) return;
 
         count++;
+        const isOnline = u.status === 'online';
         
-        const isOnline = u.status === "online";
-        const statusColor = isOnline ? "#22c55e" : "#8696a0"; 
-        const statusText = isOnline ? "ऑनलाइन 🟢" : "ऑफ़लाइन ⚪";
-        
-        let timeText = "";
+        let subTextDisplay = `रोल नंबर: ${phone} (ऑनलाइन 🟢)`;
         if (!isOnline && u.lastSeen) {
-            const dateObj = new Date(u.lastSeen);
-            const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const dateStr = dateObj.toLocaleDateString();
-            timeText = `(Last seen: ${dateStr} ${timeStr})`;
+          const dateObj = new Date(u.lastSeen);
+          const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          subTextDisplay = `अंतिम बार देखा गया: ${timeStr}`;
         }
 
         const item = document.createElement('div');
@@ -688,20 +696,18 @@
         item.innerHTML = `
           <div class="item-avatar">
             ${u.name.charAt(0)}
-            <div class="online-indicator" style="background: ${statusColor};"></div>
+            <div class="${isOnline ? 'online-indicator' : 'offline-indicator'}"></div>
           </div>
           <div class="item-info">
             <div class="item-name"><span>${u.name}</span> <span style="font-size:0.75rem; color:#38bdf8;">प्राइवेट चैट</span></div>
-            <div class="item-subtext" style="color: ${isOnline ? '#22c55e' : 'var(--text-muted)'};">
-              ${statusText} <span style="font-size: 0.7rem;">${timeText}</span>
-            </div>
+            <div class="item-subtext">${subTextDisplay}</div>
           </div>
         `;
         container.appendChild(item);
       });
 
       if (count === 0) {
-        container.innerHTML = `<div style="padding: 16px; color: var(--text-muted); font-size: 0.85rem; text-align: center;">अभी कोई अन्य छात्र लिस्ट में नहीं है।</div>`;
+        container.innerHTML = `<div style="padding: 16px; color: var(--text-muted); font-size: 0.85rem; text-align: center;">अभी कोई अन्य छात्र रजिस्टर्ड नहीं है।</div>`;
       }
     };
 
@@ -954,7 +960,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, push, set, update, onValue, onDisconnect, onChildAdded, onChildRemoved, remove, off, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getDatabase, ref, push, set, update, onValue, onDisconnect, onChildAdded, onChildRemoved, remove, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDpqKDayo6H0nVyjnT1JBPjpH8RjmwpvV0",
@@ -973,7 +979,7 @@
 
     let bannedPhoneCache = {};
     const bannedUsersRef = ref(db, 'banned_users');
-    const onlinePresenceRef = ref(db, 'online_presence');
+    const allUsersRef = ref(db, 'all_registered_users');
 
     // Realtime Ban Sync
     onValue(bannedUsersRef, (snapshot) => {
@@ -981,28 +987,29 @@
       renderBannedUsersListInAdmin(bannedPhoneCache);
     });
 
-    // Realtime Sync for ALL Registered Contacts (Online & Offline)
-    onValue(onlinePresenceRef, (snapshot) => {
+    // Realtime All Users Sync (Online & Offline Status + Last Seen)
+    onValue(allUsersRef, (snapshot) => {
       const data = snapshot.val() || {};
-      if (window.renderOnlineUsersList) {
-        window.renderOnlineUsersList(data);
+      if (window.renderAllUsersList) {
+        window.renderAllUsersList(data);
       }
     });
 
-    window.setUserOnlineFirebase = function(user) {
-      const userRef = ref(db, `online_presence/${user.phone}`);
-      // User connect hone par online status lagayen aur time update karein
+    window.registerOrUpdateUserFirebase = function(user) {
+      const userRef = ref(db, `all_registered_users/${user.phone}`);
+      
+      // Set Online Status
       set(userRef, {
         name: user.name,
         phone: user.phone,
-        status: "online",
-        lastSeen: serverTimestamp()
+        status: 'online',
+        lastSeen: Date.now()
       });
-      
-      // User disconnect hone par use delete nahi karna hai, sirf status offline karke lastSeen update karna hai
+
+      // When user disconnects or closes tab, update status to offline and record lastSeen time
       onDisconnect(userRef).update({
-        status: "offline",
-        lastSeen: serverTimestamp()
+        status: 'offline',
+        lastSeen: Date.now()
       });
     };
 
