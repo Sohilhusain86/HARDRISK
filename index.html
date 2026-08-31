@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>जमात ऊला अलिफ़ - व्हाट्सएप मैसेंजर</title>
+  <title>जमात ऊला अलिफ़ - वॉइस कॉल मैसेंजर</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -125,7 +125,6 @@
       padding: 8px 14px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; color: var(--gold-accent);
     }
 
-    /* WhatsApp Doodle Wallpaper Background */
     .chat-messages-area {
       flex: 1; overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; gap: 12px;
       background-color: #0b141a;
@@ -203,6 +202,13 @@
     .utility-card { background: var(--card-bg); padding: 12px 14px; border-radius: 10px; border-left: 4px solid var(--gold-accent); margin-bottom: 10px; position: relative; }
     .utility-title { font-weight: bold; font-size: 1rem; color: #fff; margin-bottom: 4px; }
     .utility-body { font-size: 0.85rem; color: var(--text-muted); }
+
+    /* Call Modal Overlay */
+    .call-overlay { position: absolute; inset: 0; background: rgba(11, 20, 26, 0.95); z-index: 200; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
+    .call-overlay.active { display: flex; }
+    .call-avatar-large { width: 100px; height: 100px; border-radius: 50%; background: #2a3942; background-size: cover; background-position: center; margin-bottom: 20px; border: 3px solid #00a884; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #00a884; }
+    .call-btn-danger { background: #ef4444; color: #fff; border: none; border-radius: 50px; padding: 12px 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+    .call-btn-success { background: #22c55e; color: #fff; border: none; border-radius: 50px; padding: 12px 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -367,6 +373,10 @@
             <div class="header-status" id="chat-room-status">ऑनलाइन...</div>
           </div>
         </div>
+        <!-- Voice Call Button (Only in Private Chat) -->
+        <div class="header-actions">
+          <button class="header-btn" id="btn-voice-call" title="वॉइस कॉल करें" style="display:none;"><i class="fa-solid fa-phone"></i></button>
+        </div>
       </header>
 
       <div class="pinned-notice-bar" id="pinned-notice-wrapper">
@@ -393,6 +403,19 @@
         <input type="text" class="chat-input-box" id="msg-input" placeholder="यहाँ मैसेज लिखें...">
         <button class="btn-send" id="btn-send"><i class="fa-solid fa-paper-plane"></i></button>
       </footer>
+    </div>
+
+    <!-- VOICE CALL MODAL SCREEN -->
+    <div class="call-overlay" id="call-screen">
+      <div class="call-avatar-large" id="call-target-avatar"><i class="fa-solid fa-user"></i></div>
+      <h2 id="call-status-text" style="color: #fff; margin-bottom: 6px;">कॉल हो रही है...</h2>
+      <p id="call-target-name" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px;"></p>
+      
+      <div style="display: flex; gap: 20px;">
+        <button class="call-btn-success" id="btn-accept-call" style="display:none;"><i class="fa-solid fa-phone"></i> रिसीव करें</button>
+        <button class="call-btn-danger" id="btn-end-call"><i class="fa-solid fa-phone-slash"></i> काटें / बंद करें</button>
+      </div>
+      <audio id="remote-audio" autoplay></audio>
     </div>
 
   </div>
@@ -435,6 +458,12 @@
     let generatedOtp = "";
     let otpStepSent = false;
 
+    // WebRTC Calling Variables
+    let peerConnection = null;
+    let localStream = null;
+    let currentCallRef = null;
+    const rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+
     window.switchTab = function(tabName) {
       const tabs = ['chats', 'notes', 'polls'];
       tabs.forEach(t => {
@@ -470,6 +499,7 @@
             window.registerUserFirebase(window.currentUser);
           }
           connectScaleDrone();
+          listenForIncomingCalls();
         } catch(e) {
           localStorage.removeItem('jamia_chat_saved_user');
           document.getElementById('login-screen').style.display = "flex";
@@ -534,7 +564,6 @@
       }
     }
 
-    // Dynamic GPS Location Detection
     function detectLocation() {
       function fallbackToIP() {
         fetch('https://ipwho.is/')
@@ -606,7 +635,6 @@
 
       if (!otpStepSent) {
         generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-        // Save OTP to Firebase live database node
         await set(ref(db, `otps/${phone}`), { otp: generatedOtp, time: Date.now() });
         alert(`[Firebase Live OTP]: आपका लॉगिन कोड है: ${generatedOtp}`);
         otpSection.style.display = 'block';
@@ -616,7 +644,6 @@
       }
 
       const enteredOtp = otpInput.value.trim();
-      // Verify from Firebase
       const otpSnapRef = ref(db, `otps/${phone}`);
       onValue(otpSnapRef, (snap) => {
         const otpData = snap.val();
@@ -655,6 +682,7 @@
           window.registerUserFirebase(window.currentUser);
         }
         connectScaleDrone();
+        listenForIncomingCalls();
       }, { onlyOnce: true });
     });
 
@@ -753,6 +781,14 @@
       }
       
       document.getElementById('pinned-notice-wrapper').style.display = (roomId === 'group') ? 'flex' : 'none';
+      
+      // Show voice call button ONLY in private chats
+      const voiceCallBtn = document.getElementById('btn-voice-call');
+      if (roomId !== 'group') {
+        voiceCallBtn.style.display = 'block';
+      } else {
+        voiceCallBtn.style.display = 'none';
+      }
 
       document.getElementById('screen-home').classList.remove('view-active');
       document.getElementById('screen-home').classList.add('view-hidden');
@@ -776,6 +812,152 @@
       document.getElementById('screen-home').classList.remove('view-hidden');
       document.getElementById('screen-home').classList.add('view-active');
     };
+
+    // --- WebRTC Voice Call Logic ---
+    const callScreen = document.getElementById('call-screen');
+    const callStatusText = document.getElementById('call-status-text');
+    const callTargetName = document.getElementById('call-target-name');
+    const callTargetAvatar = document.getElementById('call-target-avatar');
+    const btnAcceptCall = document.getElementById('btn-accept-call');
+    const btnEndCall = document.getElementById('btn-end-call');
+    const remoteAudio = document.getElementById('remote-audio');
+    const btnVoiceCall = document.getElementById('btn-voice-call');
+
+    function startPeerConnection() {
+      if (peerConnection) return peerConnection;
+      peerConnection = new RTCPeerConnection(rtcConfig);
+
+      peerConnection.ontrack = (event) => {
+        remoteAudio.srcObject = event.streams[0];
+      };
+
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate && currentCallRef) {
+          const candidatesRef = ref(db, `${currentCallRef}/${window.currentUser.phone === currentCallRef.split('_')[1] ? 'caller' : 'callee'}Candidates`);
+          push(candidatesRef, event.candidate.toJSON());
+        }
+      };
+
+      return peerConnection;
+    }
+
+    async function getLocalAudioStream() {
+      if (!localStream) {
+        localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      }
+      return localStream;
+    }
+
+    // Initiate Call
+    btnVoiceCall.addEventListener('click', async () => {
+      const otherPhone = window.currentActiveRoomId.replace('group', '').replace('_', '').replace(window.currentUser.phone, '');
+      if (!otherPhone) return;
+
+      callScreen.classList.add('active');
+      callStatusText.textContent = "रिंगिंग (Calling)...";
+      callTargetName.textContent = document.getElementById('chat-room-title').textContent;
+      btnAcceptCall.style.display = 'none';
+
+      currentCallRef = `calls/${window.currentActiveRoomId}`;
+      const callRef = ref(db, currentCallRef);
+
+      const pc = startPeerConnection();
+      const stream = await getLocalAudioStream();
+      stream.getTracks().forEach(track => pc.addTrack(track, stream));
+
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+
+      await set(callRef, {
+        offer: { type: offer.type, sdp: offer.sdp },
+        caller: window.currentUser.phone,
+        status: 'ringing'
+      });
+
+      // Listen for answer
+      onValue(ref(db, `${currentCallRef}/answer`), async (snapshot) => {
+        const answer = snapshot.val();
+        if (answer && !pc.currentRemoteDescription) {
+          await pc.setRemoteDescription(new RTCSessionDescription(answer));
+          callStatusText.textContent = "बातचीत शुरू (Connected)";
+        }
+      });
+
+      // Listen for callee candidates
+      onValue(ref(db, `${currentCallRef}/calleeCandidates`), (snapshot) => {
+        snapshot.forEach((childSnap) => {
+          if (pc && !pc.remoteDescription) return;
+          pc.addIceCandidate(new RTCIceCandidate(childSnap.val())).catch(()=>{});
+        });
+      });
+    });
+
+    // Listen for Incoming Calls
+    function listenForIncomingCalls() {
+      // Listen to all private rooms involving current user
+      const callsRef = ref(db, 'calls');
+      onValue(callsRef, (snapshot) => {
+        const calls = snapshot.val() || {};
+        Object.keys(calls).forEach(roomId => {
+          if (roomId.includes(window.currentUser.phone)) {
+            const callData = calls[roomId];
+            if (callData && callData.status === 'ringing' && callData.caller !== window.currentUser.phone && !currentCallRef) {
+              currentCallRef = `calls/${roomId}`;
+              callScreen.classList.add('active');
+              callStatusText.textContent = "इनकमिंग वॉइस कॉल...";
+              callTargetName.textContent = "कॉल आ रही है...";
+              btnAcceptCall.style.display = 'block';
+            }
+          }
+        });
+      });
+    }
+
+    // Accept Incoming Call
+    btnAcceptCall.addEventListener('click', async () => {
+      btnAcceptCall.style.display = 'none';
+      callStatusText.textContent = "कॉल कनेक्ट हो रही है...";
+
+      const pc = startPeerConnection();
+      const stream = await getLocalAudioStream();
+      stream.getTracks().forEach(track => pc.addTrack(track, stream));
+
+      const callRef = ref(db, currentCallRef);
+      onValue(ref(db, `${currentCallRef}/offer`), async (snapshot) => {
+        const offer = snapshot.val();
+        if (offer && !pc.currentRemoteDescription) {
+          await pc.setRemoteDescription(new RTCSessionDescription(offer));
+          const answer = await pc.createAnswer();
+          await pc.setLocalDescription(answer);
+          await update(callRef, { answer: { type: answer.type, sdp: answer.sdp }, status: 'connected' });
+          callStatusText.textContent = "बातचीत शुरू (Connected)";
+        }
+      }, { onlyOnce: true });
+
+      onValue(ref(db, `${currentCallRef}/callerCandidates`), (snapshot) => {
+        snapshot.forEach((childSnap) => {
+          pc.addIceCandidate(new RTCIceCandidate(childSnap.val())).catch(()=>{});
+        });
+      });
+    });
+
+    // End / Hangup Call
+    btnEndCall.addEventListener('click', () => {
+      if (currentCallRef) {
+        remove(ref(db, currentCallRef));
+      }
+      if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+      }
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+      }
+      currentCallRef = null;
+      callScreen.classList.remove('active');
+      callStatusText.textContent = "कॉल समाप्त";
+    });
 
     const chatStream = document.getElementById('chat-stream');
     const msgInput = document.getElementById('msg-input');
