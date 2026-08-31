@@ -1673,46 +1673,93 @@
     };
 
     window.fetchGeminiResponse = async function(userText, roomId) {
-      const typingDiv = document.getElementById('typing-indicator');
-      typingDiv.textContent = `AI उस्ताद सोच रहा है...`;
-      typingDiv.style.display = 'block';
+  const typingDiv = document.getElementById('typing-indicator');
+  typingDiv.textContent = 'AI उस्ताद सोच रहा है...';
+  typingDiv.style.display = 'block';
 
-      // आपकी नई वाली असली API Key
-      const GEMINI_API_KEY = "AQ.Ab8RN6IUr6MZYDYbHqOme6dI6sEG4UXIgRd5lKsK04w21G3i_g"; 
-      
-      // असली और सही स्टैंडर्ड URL (URL में ही key पास होगी)
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+  // यहाँ अपनी Gemini API Key डालें
+  const GEMINI_API_KEY = "AQ.Ab8RN6IUr6MZYDYbHqOme6dI6sEG4UXIgRd5lKsK04w21G3i_g";
+  // वर्तमान Gemini Flash मॉडल
+  const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent';
 
-      try {
-        const response = await fetch(url, {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{ text: `तुम एक बहुत ही इल्मी, शरीफ़ और मददगार 'AI उस्ताद' हो। उर्दू, हिंदी और इंग्लिश में तालीम से जुड़े सवालों के जवाब दो। सवाल: ${userText}` }]
-            }]
-          })
-        });
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': GEMINI_API_KEY
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: `तुम एक बहुत ही इल्मी, शरीफ़ और मददगार 'AI उस्ताद' हो।
+उर्दू, हिंदी और English में तालीम से जुड़े सवालों के जवाब दो।
+जवाब साफ़, आसान और समझने योग्य रखो।
 
-        const data = await response.json();
-        
-        if (data && data.candidates && data.candidates[0].content.parts[0].text) {
-          const aiText = data.candidates[0].content.parts[0].text;
-          window.sendFirebaseMessage(roomId, "AI उस्ताद", "gemini_bot", "🤖 AI उस्ताद", "admin", aiText, "Google Server");
-        } else if (data.error) {
-          window.sendFirebaseMessage(roomId, "AI उस्ताद", "gemini_bot", "🤖 AI उस्ताद", "admin", "API Error: " + data.error.message, "Google Server");
-        } else {
-          window.sendFirebaseMessage(roomId, "AI उस्ताद", "gemini_bot", "🤖 AI उस्ताद", "admin", "माफ़ कीजिए, AI से सही डेटा नहीं मिला।", "Google Server");
-        }
+सवाल:
+${userText}`
+          }]
+        }]
+      })
+    });
 
-      } catch (error) {
-        window.sendFirebaseMessage(roomId, "AI उस्ताद", "gemini_bot", "🤖 AI उस्ताद", "admin", "कनेक्शन एरर: " + error.message, "Google Server");
-      } finally {
-        typingDiv.style.display = 'none';
-      }
-    };
+    const data = await response.json();
+
+    if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+
+      const aiText = data.candidates[0].content.parts[0].text;
+
+      window.sendFirebaseMessage(
+        roomId,
+        'AI उस्ताद',
+        'gemini_bot',
+        '🤖 AI उस्ताद',
+        'admin',
+        aiText,
+        'Google Server'
+      );
+
+    } else if (data?.error) {
+
+      window.sendFirebaseMessage(
+        roomId,
+        'AI उस्ताद',
+        'gemini_bot',
+        '🤖 AI उस्ताद',
+        'admin',
+        'Gemini API Error: ' + data.error.message,
+        'Google Server'
+      );
+
+    } else {
+
+      window.sendFirebaseMessage(
+        roomId,
+        'AI उस्ताद',
+        'gemini_bot',
+        '🤖 AI उस्ताद',
+        'admin',
+        'माफ़ कीजिए, AI से कोई जवाब नहीं मिला।',
+        'Google Server'
+      );
+    }
+
+  } catch (error) {
+
+    window.sendFirebaseMessage(
+      roomId,
+      'AI उस्ताद',
+      'gemini_bot',
+      '🤖 AI उस्ताद',
+      'admin',
+      'Connection Error: ' + error.message,
+      'Google Server'
+    );
+
+  } finally {
+    typingDiv.style.display = 'none';
+  }
+};
     
   </script>
 </body>
