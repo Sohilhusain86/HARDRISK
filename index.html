@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>जमात ऊला अलिफ़ - लाइव मैसेंजर</title>
+  <title>व्हाट्सएप जैसा लाइव मैसेंजर</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Mukta:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
   <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
 
   <style>
@@ -77,37 +76,7 @@
 
     .header-user-info { display: flex; align-items: center; gap: 10px; }
 
-    .header-avatar {
-      width: 42px;
-      height: 42px;
-      background: linear-gradient(135deg, #d4af37, var(--gold-accent));
-      color: #01140e;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.15rem;
-      font-weight: bold;
-    }
-
-    .header-title { font-size: 1.1rem; font-weight: bold; color: #fff; line-height: 1.2; }
-    .header-status { font-size: 0.75rem; color: #bbf7d0; font-family: 'Poppins', sans-serif; }
-
-    .header-actions { display: flex; gap: 12px; }
-    .header-btn { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; }
-
-    .chats-list-area { flex: 1; overflow-y: auto; padding: 8px 0; background: var(--panel-bg); }
-
-    .chat-item {
-      display: flex;
-      align-items: center;
-      padding: 12px 16px;
-      gap: 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      cursor: pointer;
-    }
-
-    .item-avatar {
+    .header-avatar, .item-avatar {
       width: 48px;
       height: 48px;
       border-radius: 50%;
@@ -116,9 +85,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       position: relative;
+      overflow: hidden;
+      object-fit: cover;
+      background-size: cover;
+      background-position: center;
     }
+
+    .header-avatar { width: 42px; height: 42px; }
 
     .online-indicator {
       width: 13px;
@@ -140,6 +115,23 @@
       position: absolute;
       bottom: 0;
       right: 0;
+    }
+
+    .header-title { font-size: 1.1rem; font-weight: bold; color: #fff; line-height: 1.2; }
+    .header-status { font-size: 0.75rem; color: #bbf7d0; font-family: 'Poppins', sans-serif; }
+
+    .header-actions { display: flex; gap: 12px; }
+    .header-btn { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; }
+
+    .chats-list-area { flex: 1; overflow-y: auto; padding: 8px 0; background: var(--panel-bg); }
+
+    .chat-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      cursor: pointer;
     }
 
     .item-info { flex: 1; min-width: 0; }
@@ -210,34 +202,6 @@
       font-family: 'Poppins', sans-serif;
     }
 
-    .admin-loc-tag {
-      color: #fb7185;
-      font-size: 0.7rem;
-      font-family: 'Poppins', sans-serif;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-weight: 600;
-      background: rgba(239, 68, 68, 0.15);
-      padding: 1px 5px;
-      border-radius: 5px;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-
-    .msg-action-btn {
-      cursor: pointer;
-      font-size: 0.85rem;
-      padding: 2px 5px;
-      border-radius: 4px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .btn-delete { color: #ff4d4d; background: rgba(255, 77, 77, 0.15); }
-    .btn-ban { color: #f59e0b; background: rgba(245, 158, 11, 0.15); }
-    .btn-unban-inline { color: #22c55e; background: rgba(34, 197, 94, 0.15); }
-
     .msg-img-preview { max-width: 100%; max-height: 240px; border-radius: 8px; margin-top: 5px; display: block; cursor: pointer; }
     .msg-audio-player { width: 210px; margin-top: 6px; height: 36px; }
 
@@ -250,7 +214,6 @@
       align-items: center;
       gap: 10px;
     }
-
     .file-attachment-card a { color: #38bdf8; text-decoration: none; font-weight: bold; font-family: 'Poppins', sans-serif; font-size: 0.85rem; }
 
     #typing-indicator { display: none; padding: 4px 14px; font-size: 0.8rem; color: #00a884; font-style: italic; background: #202c33; }
@@ -295,6 +258,7 @@
       cursor: pointer;
     }
 
+    /* Login & DP Overlay */
     .login-overlay {
       position: absolute;
       inset: 0;
@@ -306,15 +270,35 @@
       align-items: center;
       padding: 20px;
       text-align: center;
+      overflow-y: auto;
     }
 
     .login-card {
       background: #202c33;
       border-radius: 20px;
-      padding: 26px 20px;
+      padding: 24px 20px;
       width: 100%;
       max-width: 380px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    }
+
+    .dp-upload-box {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #2a3942;
+      border: 2px dashed #00a884;
+      margin: 0 auto 14px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      background-size: cover;
+      background-position: center;
+      color: var(--text-muted);
+      font-size: 1.5rem;
     }
 
     .login-input {
@@ -353,9 +337,7 @@
       padding: 20px;
       overflow-y: auto;
     }
-
     .admin-modal.open { display: flex; }
-
     .admin-header {
       display: flex;
       justify-content: space-between;
@@ -365,7 +347,6 @@
       margin-bottom: 16px;
       color: var(--gold-accent);
     }
-
     .banned-chip {
       display: flex;
       justify-content: space-between;
@@ -383,17 +364,31 @@
 
   <div class="app-screen">
     
-    <!-- Login Screen -->
+    <!-- Login & DP & OTP Screen -->
     <div class="login-overlay" id="login-screen">
       <div class="login-card">
-        <h2 style="color: #00a884; margin-bottom: 8px; font-size: 1.5rem;">जमात ऊला अलिफ़ मैसेंजर</h2>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">अपना नाम और 4 अंकों का रोल नंबर दर्ज करें</p>
+        <h2 style="color: #00a884; margin-bottom: 6px; font-size: 1.4rem;">WhatsApp मैसेंजर</h2>
+        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 14px;">प्रोफाइल फोटो (DP) लगाएं और नंबर से लॉगिन करें</p>
         
-        <input type="text" id="user-name" class="login-input" placeholder="आपका नाम (जैसे: ज़ैद)">
-        <input type="number" id="user-phone" class="login-input" placeholder="रोल नंबर (4 अंक) या मोबाइल नंबर (10 अंक)">
-        <input type="password" id="user-pass" class="login-input" placeholder="पासवर्ड (केवल एडमिन के लिए)">
+        <!-- DP Picker -->
+        <input type="file" id="dp-file-input" accept="image/*" style="display: none;">
+        <div class="dp-upload-box" id="dp-preview-box" onclick="document.getElementById('dp-file-input').click()" title="प्रोफाइल फोटो चुनें">
+          <i class="fa-solid fa-camera" id="dp-camera-icon"></i>
+        </div>
+        <div style="font-size: 0.75rem; color: #00a884; margin-bottom: 12px;">फ़ोटो बदलने के लिए यहाँ क्लिक करें</div>
+
+        <input type="text" id="user-name" class="login-input" placeholder="आपका नाम">
+        <input type="tel" id="user-phone" class="login-input" placeholder="मोबाइल नंबर (10 अंक)">
         
-        <button class="btn-login" id="btn-login">ग्रुप जॉइन करें</button>
+        <!-- OTP Section -->
+        <div id="otp-section" style="display: none;">
+          <input type="number" id="otp-input" class="login-input" placeholder="6 अंकों का OTP दर्ज करें (जैसे: 123456)">
+          <div style="font-size: 0.75rem; color: var(--gold-accent); margin-bottom: 10px;" id="otp-sent-notice">आपके नंबर पर OTP भेज दिया गया है</div>
+        </div>
+
+        <input type="password" id="user-pass" class="login-input" placeholder="पासवर्ड (केवल एडमिन के लिए, वैकल्पिक)">
+        
+        <button class="btn-login" id="btn-action-auth">OTP भेजें (Send OTP)</button>
       </div>
     </div>
 
@@ -406,32 +401,30 @@
 
       <div style="margin-bottom: 16px;">
         <label style="color: #00a884; display: block; margin-bottom: 6px; font-size: 0.9rem;">पिन नोटिस बदलें:</label>
-        <input type="text" id="new-notice" class="login-input" placeholder="नया नोटिस या सबक लिखें...">
+        <input type="text" id="new-notice" class="login-input" placeholder="नया नोटिस लिखें...">
         <button class="btn-login" id="btn-update-notice">नोटिस लाइव पब्लिश करें</button>
       </div>
 
       <div style="margin-bottom: 16px;">
-        <label style="color: #ef4444; display: block; margin-bottom: 6px; font-size: 0.9rem;">ब्लॉक किए गए छात्र (Banned Students):</label>
+        <label style="color: #ef4444; display: block; margin-bottom: 6px; font-size: 0.9rem;">ब्लॉक किए गए यूजर्स (Banned Users):</label>
         <div id="banned-users-list-container" style="max-height: 140px; overflow-y: auto; margin-bottom: 8px;">
-          <div style="color: var(--text-muted); font-size: 0.8rem;">कोई छात्र ब्लॉक नहीं है।</div>
+          <div style="color: var(--text-muted); font-size: 0.8rem;">कोई यूजर ब्लॉक नहीं है।</div>
         </div>
       </div>
 
       <div>
-        <button class="btn-login" id="btn-clear-chat" style="background: #475569;">
-          <i class="fa-solid fa-trash"></i> स्क्रीन साफ़ करें
-        </button>
+        <button class="btn-login" id="btn-clear-chat" style="background: #475569;"><i class="fa-solid fa-trash"></i> स्क्रीन साफ़ करें</button>
       </div>
     </div>
 
-    <!-- SCREEN 1: Home View -->
+    <!-- SCREEN 1: Home / Chats View -->
     <div class="view-screen view-active" id="screen-home">
       <header class="top-header">
         <div class="header-user-info">
-          <div class="header-avatar" id="my-avatar">उ</div>
+          <div class="header-avatar" id="my-avatar"><i class="fa-solid fa-user"></i></div>
           <div>
-            <div class="header-title" id="my-display-name">जमात ऊला अलिफ़</div>
-            <div class="header-status" id="total-online-label">ऑनलाइन सदस्य</div>
+            <div class="header-title" id="my-display-name">मेरा WhatsApp</div>
+            <div class="header-status" id="total-online-label">ऑनलाइन</div>
           </div>
         </div>
         <div class="header-actions">
@@ -442,16 +435,16 @@
 
       <main class="chats-list-area" id="contacts-list">
         <!-- Group Channel -->
-        <div class="chat-item" onclick="openChatRoom('group', 'जमात ऊला अलिफ़ (ग्रुप)', 'मुख्य क्लासरूम')">
+        <div class="chat-item" onclick="openChatRoom('group', 'कम्युनिटी ग्रुप (Community)', 'सभी सदस्य')">
           <div class="item-avatar" style="background: #005c4b; color: #facc15;"><i class="fa-solid fa-users"></i></div>
           <div class="item-info">
-            <div class="item-name"><span>जमात ऊला अलिफ़ (ग्रुप)</span> <span style="font-size: 0.75rem; color: #22c55e;">सभी छात्र</span></div>
-            <div class="item-subtext">सभी छात्रों का मुख्य क्लासरूम</div>
+            <div class="item-name"><span>कम्युनिटी ग्रुप (Community)</span> <span style="font-size: 0.75rem; color: #22c55e;">पब्लिक</span></div>
+            <div class="item-subtext">सभी सदस्यों के लिए मुख्य ग्रुप चैट</div>
           </div>
         </div>
 
         <div style="padding: 10px 16px; font-size: 0.85rem; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.05);">
-          सभी छात्र और प्राइवेट चैट्स:
+          सभी कॉन्टैक्ट्स और प्राइवेट चैट्स:
         </div>
         <div id="users-dynamic-list"></div>
       </main>
@@ -464,7 +457,7 @@
           <button class="header-btn" onclick="backToHome()" style="margin-right: 8px;"><i class="fa-solid fa-arrow-left"></i></button>
           <div class="header-avatar" id="chat-room-avatar">१</div>
           <div>
-            <div class="header-title" id="chat-room-title">जमात ऊला अलिफ़</div>
+            <div class="header-title" id="chat-room-title">चैट</div>
             <div class="header-status" id="chat-room-status">ऑनलाइन...</div>
           </div>
         </div>
@@ -472,18 +465,17 @@
 
       <div class="pinned-notice-bar" id="pinned-notice-wrapper">
         <i class="fa-solid fa-thumbtack"></i>
-        <span id="notice-display">सभी छात्र समय पर क्लास में उपस्थित रहें और सबक याद रखें।</span>
+        <span id="notice-display">स्वागत है! व्हाट्सएप मैसेंजर पूरी तरह सुरक्षित और लाइव है।</span>
       </div>
 
       <main class="chat-messages-area" id="chat-stream"></main>
-
       <div id="typing-indicator">कोई टाइप कर रहा है...</div>
 
       <footer class="chat-bottom-dock">
         <input type="file" id="file-selector" style="display: none;" accept="image/*,.pdf,.doc,.docx,.zip">
         <button class="btn-dock-action" id="btn-attach" title="फ़ाइल या फ़ोटो भेजें"><i class="fa-solid fa-paperclip" style="transform: rotate(45deg);"></i></button>
         <button class="btn-dock-action btn-mic" id="btn-mic" title="ऑडियो रिकॉर्ड करें"><i class="fa-solid fa-microphone"></i></button>
-        <input type="text" class="chat-input-box" id="msg-input" placeholder="यहाँ मैसेज लिखें...">
+        <input type="text" class="chat-input-box" id="msg-input" placeholder="संदेश लिखें...">
         <button class="btn-send" id="btn-send"><i class="fa-solid fa-paper-plane"></i></button>
       </footer>
     </div>
@@ -497,7 +489,7 @@
 
     let drone = null;
     let droneRoom = null;
-    let currentUser = { name: "", phone: "", displayName: "", role: "student", location: "Unknown" };
+    let currentUser = { name: "", phone: "", displayName: "", role: "student", dpUrl: "" };
     let currentActiveRoomId = "group";
     const ADMIN_PASSKEY = "razavi123";
     let soundEnabled = true;
@@ -507,114 +499,83 @@
     let audioChunks = [];
     let isRecording = false;
     let currentStream = null;
+    let selectedDpUrl = "";
+    let generatedOtp = "";
+    let otpStepSent = false;
 
-    // Push Notification
-    function requestNotificationAccess() {
-      if ("Notification" in window && Notification.permission === "default") {
-        Notification.requestPermission();
-      }
-    }
+    // DP Image Upload Handler
+    const dpFileInput = document.getElementById('dp-file-input');
+    const dpPreviewBox = document.getElementById('dp-preview-box');
+    const dpCameraIcon = document.getElementById('dp-camera-icon');
 
-    function triggerSystemNotification(sender, text) {
-      if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
-        let preview = text;
-        if (text.startsWith('[IMG](')) preview = '📷 फ़ोटो भेजी गई';
-        else if (text.startsWith('[AUDIO](')) preview = '🎙️ वॉइस मैसेज भेजा गया';
-        else if (text.startsWith('[FILE:')) preview = '📎 फ़ाइल अटैचमेंट';
-
-        new Notification(`जमात ऊला अलिफ़: ${sender}`, {
-          body: preview,
-          icon: 'https://cdn-icons-png.flaticon.com/512/1041/1041916.png'
-        });
-      }
-    }
-
-    // Dynamic Real GPS Location
-    function detectLocation() {
-      function fallbackToIP() {
-        fetch('https://ipwho.is/')
-          .then(res => res.json())
-          .then(data => {
-            if (data && data.success && data.city) {
-              const reg = data.region_code || data.region || "";
-              currentUser.location = reg ? `${data.city}, ${reg}` : data.city;
-            }
-          }).catch(() => {});
-      }
-
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            const lat = pos.coords.latitude;
-            const lon = pos.coords.longitude;
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
-              .then(res => res.json())
-              .then(data => {
-                if (data && data.address) {
-                  const place = data.address.village || data.address.suburb || data.address.town || data.address.city || "";
-                  const region = data.address.state_district || data.address.state || "";
-                  currentUser.location = (place && region) ? `${place}, ${region}` : (place || region || "India");
-                } else {
-                  fallbackToIP();
-                }
-              }).catch(() => fallbackToIP());
-          },
-          () => fallbackToIP(),
-          { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
-        );
-      } else {
-        fallbackToIP();
-      }
-    }
-    detectLocation();
-
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playBeep() {
-      if (!soundEnabled) return;
-      if (audioCtx.state === 'suspended') audioCtx.resume();
+    dpFileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      dpPreviewBox.style.opacity = "0.5";
       try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(850, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.06);
-      } catch(e) {}
-    }
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', UPLOAD_PRESET);
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, { method: 'POST', body: formData });
+        const result = await res.json();
+        if (result.secure_url) {
+          selectedDpUrl = result.secure_url;
+          dpPreviewBox.style.backgroundImage = `url('${selectedDpUrl}')`;
+          dpCameraIcon.style.display = 'none';
+        }
+      } catch (err) {
+        alert("DP अपलोड विफल रही।");
+      } finally {
+        dpPreviewBox.style.opacity = "1";
+      }
+    });
 
-    const loginScreen = document.getElementById('login-screen');
+    const actionAuthBtn = document.getElementById('btn-action-auth');
+    const otpSection = document.getElementById('otp-section');
     const userNameInput = document.getElementById('user-name');
     const userPhoneInput = document.getElementById('user-phone');
     const userPassInput = document.getElementById('user-pass');
-    const loginBtn = document.getElementById('btn-login');
-    const adminCrown = document.getElementById('btn-admin-crown');
+    const otpInput = document.getElementById('otp-input');
 
-    loginBtn.addEventListener('click', () => {
+    actionAuthBtn.addEventListener('click', () => {
       const name = userNameInput.value.trim();
       const phone = userPhoneInput.value.trim().replace(/[^0-9]/g, '');
-      const pass = userPassInput.value.trim();
 
       if (!name) {
         alert("कृपया अपना नाम दर्ज करें।");
         return;
       }
+      if (phone.length < 10) {
+        alert("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।");
+        return;
+      }
 
-      if (phone.length !== 4 && phone.length !== 10) {
-        alert("कृपया 4 अंकों का रोल नंबर (जैसे: 7877) या 10 अंकों का मोबाइल नंबर दर्ज करें।");
+      if (!otpStepSent) {
+        // Send OTP Simulation
+        generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+        alert(`[सिम्युलेटेड SMS OTP]: आपका व्हाट्सएप लॉगिन कोड है: ${generatedOtp}`);
+        otpSection.style.display = 'block';
+        actionAuthBtn.textContent = "OTP सत्यापित करें और लॉगिन करें";
+        otpStepSent = true;
+        return;
+      }
+
+      // Verify OTP
+      const enteredOtp = otpInput.value.trim();
+      if (enteredOtp !== generatedOtp) {
+        alert("गलत OTP! कृपया सही OTP दर्ज करें।");
         return;
       }
 
       currentUser.name = name;
       currentUser.phone = phone;
       currentUser.displayName = `${name} (${phone})`;
+      currentUser.dpUrl = selectedDpUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`;
 
+      const pass = userPassInput.value.trim();
       if (pass === ADMIN_PASSKEY) {
         currentUser.role = "admin";
-        adminCrown.style.display = "block";
+        document.getElementById('btn-admin-crown').style.display = "block";
       }
 
       if (window.isPhoneBanned && window.isPhoneBanned(phone)) {
@@ -622,27 +583,28 @@
         return;
       }
 
-      document.getElementById('my-avatar').textContent = name.charAt(0);
+      // Set My Header DP
+      const myAvatar = document.getElementById('my-avatar');
+      myAvatar.innerHTML = "";
+      myAvatar.style.backgroundImage = `url('${currentUser.dpUrl}')`;
       document.getElementById('my-display-name').textContent = currentUser.displayName;
 
-      loginScreen.style.display = "none";
-      requestNotificationAccess();
-      
-      // Save User to Database & Set Presence
-      if (window.registerOrUpdateUserFirebase) {
-        window.registerOrUpdateUserFirebase(currentUser);
+      document.getElementById('login-screen').style.display = "none";
+
+      if (window.registerUserFirebase) {
+        window.registerUserFirebase(currentUser);
       }
       connectScaleDrone();
     });
 
     function connectScaleDrone() {
       drone = new ScaleDrone(CHANNEL_ID, {
-        data: { name: currentUser.name, phone: currentUser.phone, role: currentUser.role }
+        data: { name: currentUser.name, phone: currentUser.phone, role: currentUser.role, dp: currentUser.dpUrl }
       });
 
       drone.on('open', error => {
         if (error) return console.error(error);
-        droneRoom = drone.subscribe('observable-jamia-online-room');
+        droneRoom = drone.subscribe('observable-whatsapp-room');
 
         droneRoom.on('data', (data) => {
           if (data.type === 'notice') {
@@ -666,7 +628,7 @@
       });
     }
 
-    // Render All Registered Users (Online & Offline with Last Seen)
+    // Render All Registered Users with DP
     window.renderAllUsersList = function(usersMap) {
       const container = document.getElementById('users-dynamic-list');
       if (!container) return;
@@ -682,40 +644,51 @@
 
         count++;
         const isOnline = u.status === 'online';
+        const userDp = u.dpUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.name}`;
         
-        let subTextDisplay = `रोल नंबर: ${phone} (ऑनलाइन 🟢)`;
-        if (!isOnline && u.lastSeen) {
-          const dateObj = new Date(u.lastSeen);
-          const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          subTextDisplay = `अंतिम बार देखा गया: ${timeStr}`;
+        let subText = "ऑनलाइन 🟢";
+        if (!isOnline) {
+          if (u.lastSeen) {
+            const date = new Date(u.lastSeen);
+            subText = `अंतिम बार देखा गया: ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+          } else {
+            subText = "ऑफ़लाइन ⚪";
+          }
         }
 
         const item = document.createElement('div');
         item.className = 'chat-item';
-        item.onclick = () => openPrivateChat(phone, u.name);
+        item.onclick = () => openPrivateChat(phone, u.name, userDp);
         item.innerHTML = `
-          <div class="item-avatar">
-            ${u.name.charAt(0)}
+          <div class="item-avatar" style="background-image: url('${userDp}')">
             <div class="${isOnline ? 'online-indicator' : 'offline-indicator'}"></div>
           </div>
           <div class="item-info">
             <div class="item-name"><span>${u.name}</span> <span style="font-size:0.75rem; color:#38bdf8;">प्राइवेट चैट</span></div>
-            <div class="item-subtext">${subTextDisplay}</div>
+            <div class="item-subtext">${subText}</div>
           </div>
         `;
         container.appendChild(item);
       });
 
       if (count === 0) {
-        container.innerHTML = `<div style="padding: 16px; color: var(--text-muted); font-size: 0.85rem; text-align: center;">अभी कोई अन्य छात्र रजिस्टर्ड नहीं है।</div>`;
+        container.innerHTML = `<div style="padding: 16px; color: var(--text-muted); font-size: 0.85rem; text-align: center;">फिलहाल कोई अन्य यूजर रजिस्टर्ड नहीं है।</div>`;
       }
     };
 
-    window.openChatRoom = function(roomId, title, subtext) {
+    window.openChatRoom = function(roomId, title, subtext, avatarUrl) {
       currentActiveRoomId = roomId;
       document.getElementById('chat-room-title').textContent = title;
       document.getElementById('chat-room-status').textContent = subtext;
-      document.getElementById('chat-room-avatar').textContent = title.charAt(0);
+      
+      const roomAvatar = document.getElementById('chat-room-avatar');
+      if (avatarUrl) {
+        roomAvatar.innerHTML = "";
+        roomAvatar.style.backgroundImage = `url('${avatarUrl}')`;
+      } else {
+        roomAvatar.style.backgroundImage = 'none';
+        roomAvatar.innerHTML = '<i class="fa-solid fa-users"></i>';
+      }
       
       document.getElementById('pinned-notice-wrapper').style.display = (roomId === 'group') ? 'flex' : 'none';
 
@@ -730,9 +703,9 @@
       }
     };
 
-    window.openPrivateChat = function(otherPhone, otherName) {
+    window.openPrivateChat = function(otherPhone, otherName, otherDp) {
       const roomId = [currentUser.phone, otherPhone].sort().join('_');
-      openChatRoom(roomId, otherName, `प्राइवेट चैट (${otherPhone})`);
+      openChatRoom(roomId, otherName, `मोबाइल: ${otherPhone}`, otherDp);
     };
 
     window.backToHome = function() {
@@ -752,7 +725,7 @@
     msgInput.addEventListener('input', () => {
       if (drone) {
         drone.publish({
-          room: 'observable-jamia-online-room',
+          room: 'observable-whatsapp-room',
           message: { type: 'typing', roomId: currentActiveRoomId, sender: currentUser.name, senderPhone: currentUser.phone }
         });
       }
@@ -768,7 +741,7 @@
       }
 
       if(window.sendFirebaseMessage) {
-        window.sendFirebaseMessage(currentActiveRoomId, currentUser.name, currentUser.phone, currentUser.displayName, currentUser.role, text, currentUser.location);
+        window.sendFirebaseMessage(currentActiveRoomId, currentUser.name, currentUser.phone, currentUser.displayName, currentUser.role, text, currentUser.dpUrl);
       }
       msgInput.value = "";
     }
@@ -798,13 +771,13 @@
           const isImg = file.type.startsWith('image/');
           const fileMsg = isImg ? `[IMG](${result.secure_url})` : `[FILE:${file.name}](${result.secure_url})`;
           if (window.sendFirebaseMessage) {
-            window.sendFirebaseMessage(currentActiveRoomId, currentUser.name, currentUser.phone, currentUser.displayName, currentUser.role, fileMsg, currentUser.location);
+            window.sendFirebaseMessage(currentActiveRoomId, currentUser.name, currentUser.phone, currentUser.displayName, currentUser.role, fileMsg, currentUser.dpUrl);
           }
         }
       } catch (err) {
         alert("अपलोड विफल रहा: " + err.message);
       } finally {
-        msgInput.placeholder = "यहाँ मैसेज लिखें...";
+        msgInput.placeholder = "संदेश लिखें...";
         msgInput.disabled = false;
         fileSelector.value = "";
       }
@@ -830,12 +803,12 @@
             try {
               const res = await uploadToCloudinary(audioFile);
               if (res.secure_url && window.sendFirebaseMessage) {
-                window.sendFirebaseMessage(currentActiveRoomId, currentUser.name, currentUser.phone, currentUser.displayName, currentUser.role, `[AUDIO](${res.secure_url})`, currentUser.location);
+                window.sendFirebaseMessage(currentActiveRoomId, currentUser.name, currentUser.phone, currentUser.displayName, currentUser.role, `[AUDIO](${res.secure_url})`, currentUser.dpUrl);
               }
             } catch(e) {
               alert("ऑडियो अपलोड नहीं हो सकी");
             } finally {
-              msgInput.placeholder = "यहाँ मैसेज लिखें...";
+              msgInput.placeholder = "संदेश लिखें...";
             }
           };
 
@@ -857,16 +830,14 @@
       const isAlreadyBanned = window.isPhoneBanned && window.isPhoneBanned(targetPhone);
 
       if (isAlreadyBanned) {
-        if (confirm(`क्या आप ${targetName} (${targetPhone}) को अनब्लॉक (Unban) करना चाहते हैं?`)) {
+        if (confirm(`क्या आप ${targetName} (${targetPhone}) को अनब्लॉक करना चाहते हैं?`)) {
           if (window.unbanUser) window.unbanUser(targetPhone);
-          if (drone) drone.publish({ room: 'observable-jamia-online-room', message: { type: 'unban', targetPhone: targetPhone } });
-          alert(`${targetName} को अनब्लॉक कर दिया गया।`);
+          if (drone) drone.publish({ room: 'observable-whatsapp-room', message: { type: 'unban', targetPhone: targetPhone } });
         }
       } else {
-        if (confirm(`क्या आप सच में ${targetName} (${targetPhone}) को ब्लॉक (Ban) करना चाहते हैं?`)) {
+        if (confirm(`क्या आप ${targetName} (${targetPhone}) को ब्लॉक करना चाहते हैं?`)) {
           if (window.banUserPermanently) window.banUserPermanently(targetPhone, targetName);
-          if (drone) drone.publish({ room: 'observable-jamia-online-room', message: { type: 'ban', targetPhone: targetPhone } });
-          alert(`${targetName} को ब्लॉक कर दिया गया।`);
+          if (drone) drone.publish({ room: 'observable-whatsapp-room', message: { type: 'ban', targetPhone: targetPhone } });
         }
       }
     };
@@ -878,10 +849,9 @@
       if (msgKey) bubble.id = `msg-${msgKey}`;
 
       const roleClass = data.role === 'admin' ? 'tag-admin' : 'tag-student';
-      const roleLabel = data.role === 'admin' ? 'एडमिन' : 'छात्र';
+      const roleLabel = data.role === 'admin' ? 'एडमिन' : 'सदस्य';
 
       let contentHtml = `<div>${data.text}</div>`;
-      
       if (typeof data.text === 'string' && data.text.startsWith('[IMG](')) {
         const match = data.text.match(/\((.*?)\)/);
         if (match) contentHtml = `<img src="${match[1]}" class="msg-img-preview" alt="Image" onclick="window.open('${match[1]}','_blank')"/>`;
@@ -900,18 +870,14 @@
         }
       }
 
-      const locationHtml = (currentUser.role === 'admin' && data.location && data.location !== 'Unknown')
-        ? `<span class="admin-loc-tag"><i class="fa-solid fa-location-dot"></i> ${data.location}</span>`
-        : '';
-
       let adminActionsHtml = '';
       if (currentUser.role === 'admin') {
         const phoneArg = data.senderPhone || '';
         const nameArg = (data.sender || 'User').replace(/'/g, "\\'");
         const isBanned = window.isPhoneBanned && window.isPhoneBanned(phoneArg);
         
-        const deleteBtn = msgKey ? `<span class="msg-action-btn btn-delete" onclick="window.deleteFirebaseMessage('${currentActiveRoomId}','${msgKey}')" title="डिलीट"><i class="fa-solid fa-trash-can"></i></span>` : '';
-        const banBtn = (data.role !== 'admin' && phoneArg) ? `<span class="msg-action-btn ${isBanned ? 'btn-unban-inline' : 'btn-ban'}" onclick="window.triggerAdminBanToggle('${phoneArg}', '${nameArg}')" title="${isBanned ? 'अनब्लॉक करें' : 'ब्लॉक करें'}"><i class="fa-solid ${isBanned ? 'fa-lock-open' : 'fa-ban'}"></i></span>` : '';
+        const deleteBtn = msgKey ? `<span class="msg-action-btn" style="color:#ff4d4d; background:rgba(255,77,77,0.15); padding:2px 5px; border-radius:4px; cursor:pointer;" onclick="window.deleteFirebaseMessage('${currentActiveRoomId}','${msgKey}')" title="डिलीट"><i class="fa-solid fa-trash-can"></i></span>` : '';
+        const banBtn = (data.role !== 'admin' && phoneArg) ? `<span class="msg-action-btn" style="color:${isBanned?'#22c55e':'#f59e0b'}; background:rgba(245,158,11,0.15); padding:2px 5px; border-radius:4px; cursor:pointer;" onclick="window.triggerAdminBanToggle('${phoneArg}', '${nameArg}')"><i class="fa-solid ${isBanned?'fa-lock-open':'fa-ban'}"></i></span>` : '';
         adminActionsHtml = `${banBtn} ${deleteBtn}`;
       }
 
@@ -923,7 +889,6 @@
         ${contentHtml}
         <div class="msg-footer">
           ${adminActionsHtml}
-          ${locationHtml}
           <span>${data.time}</span>
           <i class="fa-solid fa-check-double" style="color: ${isMine ? '#53bdeb' : 'inherit'};"></i>
         </div>
@@ -931,18 +896,16 @@
 
       chatStream.appendChild(bubble);
       chatStream.scrollTop = chatStream.scrollHeight;
-      playBeep();
-      if (!isMine) triggerSystemNotification(data.sender, data.text);
     };
 
     const adminPanel = document.getElementById('admin-panel');
-    adminCrown.addEventListener('click', () => adminPanel.classList.add('open'));
+    document.getElementById('btn-admin-crown').addEventListener('click', () => adminPanel.classList.add('open'));
     document.getElementById('btn-close-admin').addEventListener('click', () => adminPanel.classList.remove('open'));
 
     document.getElementById('btn-update-notice').addEventListener('click', () => {
       const noticeVal = document.getElementById('new-notice').value.trim();
       if (!noticeVal || !drone) return;
-      drone.publish({ room: 'observable-jamia-online-room', message: { type: 'notice', text: noticeVal } });
+      drone.publish({ room: 'observable-whatsapp-room', message: { type: 'notice', text: noticeVal } });
       document.getElementById('new-notice').value = "";
       adminPanel.classList.remove('open');
     });
@@ -958,153 +921,139 @@
     });
   </script>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, push, set, update, onValue, onDisconnect, onChildAdded, onChildRemoved, remove, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  <!-- Firebase Integration -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, push, set, update, onValue, onDisconnect, onChildAdded, onChildRemoved, remove, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDpqKDayo6H0nVyjnT1JBPjpH8RjmwpvV0",
-    authDomain: "ula-alif.firebaseapp.com",
-    databaseURL: "https://ula-alif-default-rtdb.firebaseio.com",
-    projectId: "ula-alif",
-    storageBucket: "ula-alif.firebasestorage.app",
-    messagingSenderId: "693272422991",
-    appId: "1:693272422991:web:081c07b083e3549b0dd83a"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpqKDayo6H0nVyjnT1JBPjpH8RjmwpvV0",
+      authDomain: "ula-alif.firebaseapp.com",
+      databaseURL: "https://ula-alif-default-rtdb.firebaseio.com",
+      projectId: "ula-alif",
+      storageBucket: "ula-alif.firebasestorage.app",
+      messagingSenderId: "693272422991",
+      appId: "1:693272422991:web:081c07b083e3549b0dd83a"
+    };
 
-  try {
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    let activeChatListenerRef = null;
+    try {
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+      let activeChatListenerRef = null;
+      let bannedPhoneCache = {};
+      const bannedUsersRef = ref(db, 'banned_users');
+      const usersRef = ref(db, 'users');
 
-    let bannedPhoneCache = {};
-    const bannedUsersRef = ref(db, 'banned_users');
-    const allUsersRef = ref(db, 'all_registered_users');
+      onValue(bannedUsersRef, (snapshot) => {
+        bannedPhoneCache = snapshot.val() || {};
+        renderBannedUsersListInAdmin(bannedPhoneCache);
+      });
 
-    // Realtime Ban Sync
-    onValue(bannedUsersRef, (snapshot) => {
-      bannedPhoneCache = snapshot.val() || {};
-      renderBannedUsersListInAdmin(bannedPhoneCache);
-    });
+      onValue(usersRef, (snapshot) => {
+        const data = snapshot.val() || {};
+        if (window.renderAllUsersList) {
+          window.renderAllUsersList(data);
+        }
+      });
 
-    // Realtime All Users Sync (Online & Offline Status + Last Seen)
-    onValue(allUsersRef, (snapshot) => {
-      const data = snapshot.val() || {};
-      if (window.renderAllUsersList) {
-        window.renderAllUsersList(data);
+      window.registerUserFirebase = function(user) {
+        const userRef = ref(db, `users/${user.phone}`);
+        set(userRef, {
+          name: user.name,
+          phone: user.phone,
+          dpUrl: user.dpUrl,
+          status: "online",
+          lastSeen: Date.now()
+        });
+
+        onDisconnect(userRef).update({
+          status: "offline",
+          lastSeen: Date.now()
+        });
+      };
+
+      function renderBannedUsersListInAdmin(bannedMap) {
+        const listDiv = document.getElementById('banned-users-list-container');
+        if (!listDiv) return;
+        listDiv.innerHTML = "";
+        const keys = Object.keys(bannedMap);
+        if (keys.length === 0) {
+          listDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 0.8rem;">कोई यूजर ब्लॉक नहीं है।</div>';
+          return;
+        }
+        keys.forEach(phone => {
+          const row = document.createElement('div');
+          row.className = 'banned-chip';
+          const name = bannedMap[phone].name || phone;
+          row.innerHTML = `
+            <span>${name} (${phone})</span>
+            <button onclick="window.unbanUser('${phone}')" style="background:#22c55e; border:none; color:#fff; border-radius:4px; padding:4px 10px; cursor:pointer; font-size:0.8rem; font-weight:bold;">अनब्लॉक</button>
+          `;
+          listDiv.appendChild(row);
+        });
       }
-    });
 
-    window.registerOrUpdateUserFirebase = function(user) {
-      const userRef = ref(db, `all_registered_users/${user.phone}`);
+      window.isPhoneBanned = function(phone) {
+        const clean = (phone || "").replace(/[^0-9]/g, '');
+        return !!bannedPhoneCache[clean];
+      };
+
+      window.banUserPermanently = function(phone, name) {
+        const cleanPhone = (phone || "").replace(/[^0-9]/g, '');
+        if(cleanPhone) {
+          set(ref(db, `banned_users/${cleanPhone}`), { name: name || "User", bannedAt: Date.now() });
+        }
+      };
+
+      window.unbanUser = function(phone) {
+        const cleanPhone = (phone || "").replace(/[^0-9]/g, '');
+        if(cleanPhone) {
+          remove(ref(db, `banned_users/${cleanPhone}`)).then(() => alert(`यूजर (${phone}) अनब्लॉक हो गया।`));
+        }
+      };
+
+      window.sendFirebaseMessage = function(roomId, name, phone, displayName, role, text, userDp) {
+        if(!text) return;
+        const now = new Date();
+        const nodePath = (roomId === 'group') ? 'messages/group' : `messages_private/${roomId}`;
+        push(ref(db, nodePath), {
+          sender: name,
+          senderPhone: phone,
+          displayName: displayName,
+          role: role,
+          text: text,
+          dpUrl: userDp || "",
+          time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          timestamp: Date.now()
+        });
+      };
+
+      window.deleteFirebaseMessage = function(roomId, key) {
+        if (!confirm("मैसेज डिलीट करें?")) return;
+        const targetEl = document.getElementById(`msg-${key}`);
+        if (targetEl) targetEl.style.opacity = '0.3';
+        const nodePath = (roomId === 'group') ? `messages/group/${key}` : `messages_private/${roomId}/${key}`;
+        remove(ref(db, nodePath)).then(() => { if (targetEl) targetEl.remove(); });
+      };
+
+      window.listenToRoom = function(roomId) {
+        if (activeChatListenerRef) off(activeChatListenerRef);
+        const nodePath = (roomId === 'group') ? 'messages/group' : `messages_private/${roomId}`;
+        activeChatListenerRef = ref(db, nodePath);
+
+        onChildAdded(activeChatListenerRef, (snapshot) => {
+          if(window.appendMessage) window.appendMessage(snapshot.val(), snapshot.key);
+        });
+
+        onChildRemoved(activeChatListenerRef, (snapshot) => {
+          const el = document.getElementById(`msg-${snapshot.key}`);
+          if (el) el.remove();
+        });
+      };
       
-      // Set Online Status
-      set(userRef, {
-        name: user.name,
-        phone: user.phone,
-        status: 'online',
-        lastSeen: Date.now()
-      });
-
-      // When user disconnects or closes tab, update status to offline and record lastSeen time
-      onDisconnect(userRef).update({
-        status: 'offline',
-        lastSeen: Date.now()
-      });
-    };
-
-    function renderBannedUsersListInAdmin(bannedMap) {
-      const listDiv = document.getElementById('banned-users-list-container');
-      if (!listDiv) return;
-      listDiv.innerHTML = "";
-      const keys = Object.keys(bannedMap);
-      if (keys.length === 0) {
-        listDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 0.8rem;">कोई छात्र ब्लॉक नहीं है।</div>';
-        return;
-      }
-      keys.forEach(phone => {
-        const row = document.createElement('div');
-        row.className = 'banned-chip';
-        const name = bannedMap[phone].name || phone;
-        row.innerHTML = `
-          <span>${name} (${phone})</span>
-          <button onclick="window.unbanUser('${phone}')" style="background:#22c55e; border:none; color:#fff; border-radius:4px; padding:4px 10px; cursor:pointer; font-size:0.8rem; font-weight:bold;">अनब्लॉक (Unban)</button>
-        `;
-        listDiv.appendChild(row);
-      });
+    } catch(error) {
+      console.error("Firebase Error:", error);
     }
-
-    window.isPhoneBanned = function(phone) {
-      const clean = (phone || "").replace(/[^0-9]/g, '');
-      return !!bannedPhoneCache[clean];
-    };
-
-    window.banUserPermanently = function(phone, name) {
-      const cleanPhone = (phone || "").replace(/[^0-9]/g, '');
-      if(cleanPhone) {
-        set(ref(db, `banned_users/${cleanPhone}`), { 
-          name: name || "Student",
-          bannedAt: Date.now() 
-        });
-      }
-    };
-
-    window.unbanUser = function(phone) {
-      const cleanPhone = (phone || "").replace(/[^0-9]/g, '');
-      if(cleanPhone) {
-        remove(ref(db, `banned_users/${cleanPhone}`)).then(() => {
-          alert(`छात्र (${phone}) को अनब्लॉक कर दिया गया।`);
-        });
-      }
-    };
-
-    window.sendFirebaseMessage = function(roomId, name, phone, displayName, role, text, userLocation) {
-      if(!text) return;
-      const now = new Date();
-      const nodePath = (roomId === 'group') ? 'messages/group' : `messages_private/${roomId}`;
-      push(ref(db, nodePath), {
-        sender: name,
-        senderPhone: phone,
-        displayName: displayName,
-        role: role,
-        text: text,
-        location: userLocation || "Unknown",
-        time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now()
-      });
-    };
-
-    window.deleteFirebaseMessage = function(roomId, key) {
-      if (!confirm("क्या आप सच में यह मैसेज डिलीट करना चाहते हैं?")) return;
-      const targetEl = document.getElementById(`msg-${key}`);
-      if (targetEl) targetEl.style.opacity = '0.3';
-
-      const nodePath = (roomId === 'group') ? `messages/group/${key}` : `messages_private/${roomId}/${key}`;
-      remove(ref(db, nodePath)).then(() => {
-        if (targetEl) targetEl.remove();
-      }).catch(err => alert("डिलीट विफल: " + err.message));
-    };
-
-    window.listenToRoom = function(roomId) {
-      if (activeChatListenerRef) {
-        off(activeChatListenerRef);
-      }
-      const nodePath = (roomId === 'group') ? 'messages/group' : `messages_private/${roomId}`;
-      activeChatListenerRef = ref(db, nodePath);
-
-      onChildAdded(activeChatListenerRef, (snapshot) => {
-        if(window.appendMessage) window.appendMessage(snapshot.val(), snapshot.key);
-      });
-
-      onChildRemoved(activeChatListenerRef, (snapshot) => {
-        const el = document.getElementById(`msg-${snapshot.key}`);
-        if (el) el.remove();
-      });
-    };
-    
-  } catch(error) {
-    console.error("Firebase Initialization Error:", error);
-  }
-</script>
+  </script>
 </body>
 </html>
