@@ -127,12 +127,12 @@
     }
 
     .chat-messages-area {
-      flex: 1; overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; gap: 10px;
+      flex: 1; overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; gap: 12px;
       background-color: #0b141a; background-image: radial-gradient(#1f2c34 1px, transparent 1px); background-size: 18px 18px;
     }
 
     .msg-bubble {
-      max-width: 85%; padding: 8px 14px; border-radius: 12px; font-size: 0.95rem; line-height: 1.6; word-wrap: break-word; position: relative;
+      max-width: 85%; padding: 8px 14px 26px 14px; border-radius: 12px; font-size: 0.95rem; line-height: 1.6; word-wrap: break-word; position: relative;
     }
     .msg-mine { align-self: flex-end; background: var(--msg-mine); border-top-right-radius: 2px; }
     .msg-other { align-self: flex-start; background: var(--msg-other); border-top-left-radius: 2px; }
@@ -146,17 +146,23 @@
     .tag-student { background: var(--student-color); color: #01140e; font-weight: bold; }
 
     .msg-footer {
-      display: flex; justify-content: flex-end; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; font-family: 'Poppins', sans-serif;
+      position: absolute; bottom: 4px; right: 10px;
+      display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--text-muted); font-family: 'Poppins', sans-serif;
     }
 
-    .admin-loc-tag {
-      color: #fb7185; font-size: 0.7rem; font-family: 'Poppins', sans-serif; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; background: rgba(239, 68, 68, 0.15); padding: 1px 5px; border-radius: 5px; border: 1px solid rgba(239, 68, 68, 0.3);
+    /* Message Reactions UI */
+    .msg-reactions-container {
+      display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px;
     }
-
-    .msg-action-btn { cursor: pointer; font-size: 0.85rem; padding: 2px 5px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; }
-    .btn-delete { color: #ff4d4d; background: rgba(255, 77, 77, 0.15); }
-    .btn-ban { color: #f59e0b; background: rgba(245, 158, 11, 0.15); }
-    .btn-unban-inline { color: #22c55e; background: rgba(34, 197, 94, 0.15); }
+    .reaction-pill {
+      background: rgba(255,255,255,0.12); border-radius: 12px; padding: 2px 6px; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 3px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05);
+    }
+    .reaction-picker-bar {
+      position: absolute; bottom: -28px; left: 0; background: #202c33; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 2px 8px; display: none; gap: 6px; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .msg-bubble:hover .reaction-picker-bar { display: flex; }
+    .emoji-opt { cursor: pointer; font-size: 1rem; transition: transform 0.1s; }
+    .emoji-opt:hover { transform: scale(1.3); }
 
     .msg-img-preview { max-width: 100%; max-height: 240px; border-radius: 8px; margin-top: 5px; display: block; cursor: pointer; }
     .msg-audio-player { width: 210px; margin-top: 6px; height: 36px; }
@@ -222,7 +228,6 @@
         <h2 style="color: #00a884; margin-bottom: 6px; font-size: 1.4rem;">जमात ऊला अलिफ़ मैसेंजर</h2>
         <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 14px;">अपनी फोटो (DP) लगाएं और OTP से लॉगिन करें</p>
         
-        <!-- DP Picker -->
         <input type="file" id="dp-file-input" accept="image/*" style="display: none;">
         <div class="dp-upload-box" id="dp-preview-box" onclick="document.getElementById('dp-file-input').click()" title="प्रोफाइल फोटो चुनें">
           <i class="fa-solid fa-camera" id="dp-camera-icon"></i>
@@ -231,17 +236,14 @@
 
         <input type="text" id="user-name" class="login-input" placeholder="आपका नाम (जैसे: ज़ैद)">
         <input type="tel" id="user-phone" class="login-input" placeholder="मोबाइल नंबर (10 अंक)">
-        <!-- Roll Number Optional Input -->
         <input type="text" id="user-roll" class="login-input" placeholder="रोल नंबर (वैकल्पिक / इख्तियारन)">
         
-        <!-- OTP Section -->
         <div id="otp-section" style="display: none;">
           <input type="number" id="otp-input" class="login-input" placeholder="6 अंकों का OTP दर्ज करें">
           <div style="font-size: 0.75rem; color: var(--gold-accent); margin-bottom: 10px;">सिम्युलेटेड SMS OTP भेजा गया है</div>
         </div>
 
         <input type="password" id="user-pass" class="login-input" placeholder="पासवर्ड (केवल एडमिन के लिए)">
-        
         <button class="btn-login" id="btn-action-auth">OTP भेजें (Send OTP)</button>
       </div>
     </div>
@@ -289,7 +291,6 @@
       </header>
 
       <main class="chats-list-area" id="contacts-list">
-        <!-- Group Channel -->
         <div class="chat-item" onclick="openChatRoom('group', 'जमात ऊला अलिफ़ (ग्रुप)', 'मुख्य क्लासरूम')">
           <div class="item-avatar" style="background: #005c4b; color: #facc15;"><i class="fa-solid fa-users"></i></div>
           <div class="item-info">
@@ -358,7 +359,6 @@
     let generatedOtp = "";
     let otpStepSent = false;
 
-    // Check LocalStorage on startup for Auto-Login
     window.addEventListener('DOMContentLoaded', () => {
       const savedUser = localStorage.getItem('jamia_chat_saved_user');
       if (savedUser) {
@@ -400,7 +400,6 @@
       }
     }
 
-    // DP Upload Handler
     const dpFileInput = document.getElementById('dp-file-input');
     const dpPreviewBox = document.getElementById('dp-preview-box');
     const dpCameraIcon = document.getElementById('dp-camera-icon');
@@ -427,65 +426,29 @@
       }
     });
 
-    // Push Notification
     function requestNotificationAccess() {
-      if ("Notification" in window && Notification.permission === "default") {
-        Notification.requestPermission();
+      if ("Notification" in window) {
+        if (Notification.permission === "default") {
+          Notification.requestPermission();
+        }
       }
     }
 
     function triggerSystemNotification(sender, text) {
-      if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
+      if ("Notification" in window && Notification.permission === "granted") {
         let preview = text;
         if (text.startsWith('[IMG](')) preview = '📷 फ़ोटो भेजी गई';
         else if (text.startsWith('[AUDIO](')) preview = '🎙️ वॉइस मैसेज भेजा गया';
         else if (text.startsWith('[FILE:')) preview = '📎 फ़ाइल अटैचमेंट';
 
-        new Notification(`जमात ऊला अलिफ़: ${sender}`, {
-          body: preview,
-          icon: 'https://cdn-icons-png.flaticon.com/512/1041/1041916.png'
-        });
+        try {
+          new Notification(`जमात ऊला अलिफ़: ${sender}`, {
+            body: preview,
+            icon: 'https://cdn-icons-png.flaticon.com/512/1041/1041916.png'
+          });
+        } catch(e) {}
       }
     }
-
-    // Dynamic GPS Location
-    function detectLocation() {
-      function fallbackToIP() {
-        fetch('https://ipwho.is/')
-          .then(res => res.json())
-          .then(data => {
-            if (data && data.success && data.city) {
-              const reg = data.region_code || data.region || "";
-              currentUser.location = reg ? `${data.city}, ${reg}` : data.city;
-            }
-          }).catch(() => {});
-      }
-
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            const lat = pos.coords.latitude;
-            const lon = pos.coords.longitude;
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
-              .then(res => res.json())
-              .then(data => {
-                if (data && data.address) {
-                  const place = data.address.village || data.address.suburb || data.address.town || data.address.city || "";
-                  const region = data.address.state_district || data.address.state || "";
-                  currentUser.location = (place && region) ? `${place}, ${region}` : (place || region || "India");
-                } else {
-                  fallbackToIP();
-                }
-              }).catch(() => fallbackToIP());
-          },
-          () => fallbackToIP(),
-          { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
-        );
-      } else {
-        fallbackToIP();
-      }
-    }
-    detectLocation();
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playBeep() {
@@ -546,7 +509,6 @@
       currentUser.name = name;
       currentUser.phone = phone;
       currentUser.roll = roll;
-      // If roll is provided, display it, otherwise display name with phone last digits
       currentUser.displayName = roll ? `${name} (रोल: ${roll})` : `${name} (${phone.slice(-4)})`;
       currentUser.dpUrl = selectedDpUrl || "";
 
@@ -561,7 +523,6 @@
         return;
       }
 
-      // Save user details permanently to localStorage
       localStorage.setItem('jamia_chat_saved_user', JSON.stringify(currentUser));
 
       const myAvatar = document.getElementById('my-avatar');
@@ -614,7 +575,6 @@
       });
     }
 
-    // Render All Registered Users (Online & Offline with Last Seen & DP)
     window.renderAllUsersList = function(usersMap) {
       const container = document.getElementById('users-dynamic-list');
       if (!container) return;
@@ -824,13 +784,13 @@
       const isAlreadyBanned = window.isPhoneBanned && window.isPhoneBanned(targetPhone);
 
       if (isAlreadyBanned) {
-        if (confirm(`क्या आप ${targetName} को अनब्लॉक (Unban) करना चाहते हैं?`)) {
+        if (confirm(`क्या आप ${targetName} को अनब्लॉक करना चाहते हैं?`)) {
           if (window.unbanUser) window.unbanUser(targetPhone);
           if (drone) drone.publish({ room: 'observable-jamia-online-room', message: { type: 'unban', targetPhone: targetPhone } });
           alert(`यूजर को अनब्लॉक कर दिया गया।`);
         }
       } else {
-        if (confirm(`क्या आप सच में ${targetName} को ब्लॉक (Ban) करना चाहते हैं?`)) {
+        if (confirm(`क्या आप सच में ${targetName} को ब्लॉक करना चाहते हैं?`)) {
           if (window.banUserPermanently) window.banUserPermanently(targetPhone, targetName);
           if (drone) drone.publish({ room: 'observable-jamia-online-room', message: { type: 'ban', targetPhone: targetPhone } });
           alert(`यूजर को ब्लॉक कर दिया गया।`);
@@ -867,6 +827,29 @@
         }
       }
 
+      // Render Reactions (Emojis)
+      let reactionsHtml = '';
+      if (data.reactions) {
+        reactionsHtml = `<div class="msg-reactions-container" id="reactions-${msgKey}">`;
+        for (let userPhone in data.reactions) {
+          reactionsHtml += `<span class="reaction-pill">${data.reactions[userPhone]}</span>`;
+        }
+        reactionsHtml += `</div>`;
+      } else {
+        reactionsHtml = `<div class="msg-reactions-container" id="reactions-${msgKey}"></div>`;
+      }
+
+      // Reaction Picker Bar (👍, ❤️, 😂, 😮, 🙏)
+      const reactionPickerHtml = `
+        <div class="reaction-picker-bar">
+          <span class="emoji-opt" onclick="window.reactToMessage('${currentActiveRoomId}', '${msgKey}', '👍')">👍</span>
+          <span class="emoji-opt" onclick="window.reactToMessage('${currentActiveRoomId}', '${msgKey}', '❤️')">❤️</span>
+          <span class="emoji-opt" onclick="window.reactToMessage('${currentActiveRoomId}', '${msgKey}', '😂')">😂</span>
+          <span class="emoji-opt" onclick="window.reactToMessage('${currentActiveRoomId}', '${msgKey}', '😮')">😮</span>
+          <span class="emoji-opt" onclick="window.reactToMessage('${currentActiveRoomId}', '${msgKey}', '🙏')">🙏</span>
+        </div>
+      `;
+
       const locationHtml = (currentUser.role === 'admin' && data.location && data.location !== 'Unknown')
         ? `<span class="admin-loc-tag"><i class="fa-solid fa-location-dot"></i> ${data.location}</span>`
         : '';
@@ -888,6 +871,8 @@
           <span class="role-tag ${roleClass}">${roleLabel}</span>
         </div>
         ${contentHtml}
+        ${reactionsHtml}
+        ${reactionPickerHtml}
         <div class="msg-footer">
           ${adminActionsHtml}
           ${locationHtml}
@@ -1040,6 +1025,14 @@
         });
       };
 
+      window.reactToMessage = function(roomId, msgKey, emoji) {
+        const nodePath = (roomId === 'group') ? `messages/group/${msgKey}/reactions` : `messages_private/${roomId}/${msgKey}/reactions`;
+        const cleanPhoneKey = currentUser.phone.replace(/[.#$\/\[\]]/g, '_');
+        update(ref(db, nodePath), {
+          [cleanPhoneKey]: emoji
+        });
+      };
+
       window.deleteFirebaseMessage = function(roomId, key) {
         if (!confirm("क्या आप सच में यह मैसेज डिलीट करना चाहते हैं?")) return;
         const targetEl = document.getElementById(`msg-${key}`);
@@ -1058,8 +1051,25 @@
         const nodePath = (roomId === 'group') ? 'messages/group' : `messages_private/${roomId}`;
         activeChatListenerRef = ref(db, nodePath);
 
+        // Listen to Child Added (New Messages)
         onChildAdded(activeChatListenerRef, (snapshot) => {
           if(window.appendMessage) window.appendMessage(snapshot.val(), snapshot.key);
+        });
+
+        // Listen to Child Changed (For Realtime Reactions update)
+        onValue(activeChatListenerRef, (snapshot) => {
+          const allMsgs = snapshot.val() || {};
+          for (let key in allMsgs) {
+            const msgData = allMsgs[key];
+            const reactionsContainer = document.getElementById(`reactions-${key}`);
+            if (reactionsContainer && msgData.reactions) {
+              let html = "";
+              for (let phone in msgData.reactions) {
+                html += `<span class="reaction-pill">${msgData.reactions[phone]}</span>`;
+              }
+              reactionsContainer.innerHTML = html;
+            }
+          }
         });
 
         onChildRemoved(activeChatListenerRef, (snapshot) => {
