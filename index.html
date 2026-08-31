@@ -7,7 +7,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Tiro+Devanagari+Hindi:ital@0;1&family=Mukta:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Mukta:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
@@ -91,7 +91,7 @@
     }
 
     .header-title { font-size: 1.1rem; font-weight: bold; color: #fff; line-height: 1.2; }
-    .header-status { font-size: 0.75rem; color: #bbf7d0; font-family: 'Poppins', sans-serif; text-align: left; }
+    .header-status { font-size: 0.75rem; color: #bbf7d0; font-family: 'Poppins', sans-serif; }
 
     .header-actions { display: flex; gap: 12px; }
     .header-btn { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; }
@@ -121,8 +121,8 @@
     }
 
     .online-indicator {
-      width: 12px;
-      height: 12px;
+      width: 13px;
+      height: 13px;
       background: #22c55e;
       border: 2px solid var(--panel-bg);
       border-radius: 50%;
@@ -420,7 +420,7 @@
           <div class="header-avatar" id="my-avatar">उ</div>
           <div>
             <div class="header-title" id="my-display-name">जमात ऊला अलिफ़</div>
-            <div class="header-status">ऑनलाइन सदस्य</div>
+            <div class="header-status" id="total-online-label">सभी छात्र</div>
           </div>
         </div>
         <div class="header-actions">
@@ -440,7 +440,7 @@
         </div>
 
         <div style="padding: 10px 16px; font-size: 0.85rem; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.05);">
-          ऑनलाइन छात्र और प्राइवेट चैट्स:
+          छात्रों की लिस्ट (ऑनलाइन / ऑफ़लाइन):
         </div>
         <div id="users-dynamic-list"></div>
       </main>
@@ -454,7 +454,7 @@
           <div class="header-avatar" id="chat-room-avatar">१</div>
           <div>
             <div class="header-title" id="chat-room-title">जमात ऊला अलिफ़</div>
-            <div class="header-status" id="chat-room-status">ऑनलाइन...</div>
+            <div class="header-status" id="chat-room-status">चैट रूम</div>
           </div>
         </div>
       </header>
@@ -485,7 +485,7 @@
     const UPLOAD_PRESET = 'd9xe6u2l';
 
     let drone = null;
-    let room = null;
+    let droneRoom = null;
     let currentUser = { name: "", phone: "", displayName: "", role: "student", location: "Unknown" };
     let currentActiveRoomId = "group";
     const ADMIN_PASSKEY = "razavi123";
@@ -497,7 +497,7 @@
     let isRecording = false;
     let currentStream = null;
 
-    // Mobile Push Notification Permission
+    // Push Notification
     function requestNotificationAccess() {
       if ("Notification" in window && Notification.permission === "default") {
         Notification.requestPermission();
@@ -607,7 +607,7 @@
       }
 
       if (window.isPhoneBanned && window.isPhoneBanned(phone)) {
-        alert("आपको एडमिन द्वारा ब्लॉक कर दिया गया है। आप प्रवेश नहीं कर सकते।");
+        alert("आपको एडमिन द्वारा ब्लॉक कर दिया गया है।");
         return;
       }
 
@@ -616,23 +616,23 @@
 
       loginScreen.style.display = "none";
       requestNotificationAccess();
-      connectRealtimeServer();
+      
+      if (window.setUserOnlineFirebase) {
+        window.setUserOnlineFirebase(currentUser);
+      }
+      connectScaleDrone();
     });
 
-    function connectRealtimeServer() {
+    function connectScaleDrone() {
       drone = new ScaleDrone(CHANNEL_ID, {
         data: { name: currentUser.name, phone: currentUser.phone, role: currentUser.role }
       });
 
       drone.on('open', error => {
         if (error) return console.error(error);
-        room = drone.subscribe('observable-ula-alif-room');
+        droneRoom = drone.subscribe('observable-jamia-online-room');
 
-        room.on('members', updateOnlineUsersList);
-        room.on('member_join', () => updateOnlineUsersList(room.members));
-        room.on('member_leave', () => updateOnlineUsersList(room.members));
-
-        room.on('data', (data) => {
+        droneRoom.on('data', (data) => {
           if (data.type === 'notice') {
             document.getElementById('notice-display').textContent = data.text;
           } 
@@ -654,33 +654,56 @@
       });
     }
 
-    function updateOnlineUsersList(members) {
+    // 100% Reliable Render Users List (Online & Offline) from Firebase
+    window.renderOnlineUsersList = function(onlineMap) {
       const container = document.getElementById('users-dynamic-list');
       if (!container) return;
       container.innerHTML = "";
 
-      const seen = new Set();
-      members.forEach(member => {
-        const u = member.clientData || {};
-        if (!u.phone || u.phone === currentUser.phone || seen.has(u.phone)) return;
-        seen.add(u.phone);
+      const keys = Object.keys(onlineMap || {});
+      let count = 0;
+
+      keys.forEach(phone => {
+        if (phone === currentUser.phone) return;
+        const u = onlineMap[phone];
+        if (!u || !u.name) return;
+
+        count++;
+        
+        const isOnline = u.status === "online";
+        const statusColor = isOnline ? "#22c55e" : "#8696a0"; 
+        const statusText = isOnline ? "ऑनलाइन 🟢" : "ऑफ़लाइन ⚪";
+        
+        let timeText = "";
+        if (!isOnline && u.lastSeen) {
+            const dateObj = new Date(u.lastSeen);
+            const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const dateStr = dateObj.toLocaleDateString();
+            timeText = `(Last seen: ${dateStr} ${timeStr})`;
+        }
 
         const item = document.createElement('div');
         item.className = 'chat-item';
-        item.onclick = () => openPrivateChat(u.phone, u.name);
+        item.onclick = () => openPrivateChat(phone, u.name);
         item.innerHTML = `
           <div class="item-avatar">
             ${u.name.charAt(0)}
-            <div class="online-indicator"></div>
+            <div class="online-indicator" style="background: ${statusColor};"></div>
           </div>
           <div class="item-info">
             <div class="item-name"><span>${u.name}</span> <span style="font-size:0.75rem; color:#38bdf8;">प्राइवेट चैट</span></div>
-            <div class="item-subtext">रोल नंबर / फ़ोन: ${u.phone}</div>
+            <div class="item-subtext" style="color: ${isOnline ? '#22c55e' : 'var(--text-muted)'};">
+              ${statusText} <span style="font-size: 0.7rem;">${timeText}</span>
+            </div>
           </div>
         `;
         container.appendChild(item);
       });
-    }
+
+      if (count === 0) {
+        container.innerHTML = `<div style="padding: 16px; color: var(--text-muted); font-size: 0.85rem; text-align: center;">अभी कोई अन्य छात्र लिस्ट में नहीं है।</div>`;
+      }
+    };
 
     window.openChatRoom = function(roomId, title, subtext) {
       currentActiveRoomId = roomId;
@@ -723,7 +746,7 @@
     msgInput.addEventListener('input', () => {
       if (drone) {
         drone.publish({
-          room: 'observable-ula-alif-room',
+          room: 'observable-jamia-online-room',
           message: { type: 'typing', roomId: currentActiveRoomId, sender: currentUser.name, senderPhone: currentUser.phone }
         });
       }
@@ -830,13 +853,13 @@
       if (isAlreadyBanned) {
         if (confirm(`क्या आप ${targetName} (${targetPhone}) को अनब्लॉक (Unban) करना चाहते हैं?`)) {
           if (window.unbanUser) window.unbanUser(targetPhone);
-          if (drone) drone.publish({ room: 'observable-ula-alif-room', message: { type: 'unban', targetPhone: targetPhone } });
+          if (drone) drone.publish({ room: 'observable-jamia-online-room', message: { type: 'unban', targetPhone: targetPhone } });
           alert(`${targetName} को अनब्लॉक कर दिया गया।`);
         }
       } else {
         if (confirm(`क्या आप सच में ${targetName} (${targetPhone}) को ब्लॉक (Ban) करना चाहते हैं?`)) {
           if (window.banUserPermanently) window.banUserPermanently(targetPhone, targetName);
-          if (drone) drone.publish({ room: 'observable-ula-alif-room', message: { type: 'ban', targetPhone: targetPhone } });
+          if (drone) drone.publish({ room: 'observable-jamia-online-room', message: { type: 'ban', targetPhone: targetPhone } });
           alert(`${targetName} को ब्लॉक कर दिया गया।`);
         }
       }
@@ -913,7 +936,7 @@
     document.getElementById('btn-update-notice').addEventListener('click', () => {
       const noticeVal = document.getElementById('new-notice').value.trim();
       if (!noticeVal || !drone) return;
-      drone.publish({ room: 'observable-ula-alif-room', message: { type: 'notice', text: noticeVal } });
+      drone.publish({ room: 'observable-jamia-online-room', message: { type: 'notice', text: noticeVal } });
       document.getElementById('new-notice').value = "";
       adminPanel.classList.remove('open');
     });
@@ -931,7 +954,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, push, set, onValue, onChildAdded, onChildRemoved, remove, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getDatabase, ref, push, set, update, onValue, onDisconnect, onChildAdded, onChildRemoved, remove, off, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDpqKDayo6H0nVyjnT1JBPjpH8RjmwpvV0",
@@ -950,11 +973,38 @@
 
     let bannedPhoneCache = {};
     const bannedUsersRef = ref(db, 'banned_users');
+    const onlinePresenceRef = ref(db, 'online_presence');
 
+    // Realtime Ban Sync
     onValue(bannedUsersRef, (snapshot) => {
       bannedPhoneCache = snapshot.val() || {};
       renderBannedUsersListInAdmin(bannedPhoneCache);
     });
+
+    // Realtime Sync for ALL Registered Contacts (Online & Offline)
+    onValue(onlinePresenceRef, (snapshot) => {
+      const data = snapshot.val() || {};
+      if (window.renderOnlineUsersList) {
+        window.renderOnlineUsersList(data);
+      }
+    });
+
+    window.setUserOnlineFirebase = function(user) {
+      const userRef = ref(db, `online_presence/${user.phone}`);
+      // User connect hone par online status lagayen aur time update karein
+      set(userRef, {
+        name: user.name,
+        phone: user.phone,
+        status: "online",
+        lastSeen: serverTimestamp()
+      });
+      
+      // User disconnect hone par use delete nahi karna hai, sirf status offline karke lastSeen update karna hai
+      onDisconnect(userRef).update({
+        status: "offline",
+        lastSeen: serverTimestamp()
+      });
+    };
 
     function renderBannedUsersListInAdmin(bannedMap) {
       const listDiv = document.getElementById('banned-users-list-container');
@@ -971,19 +1021,19 @@
         const name = bannedMap[phone].name || phone;
         row.innerHTML = `
           <span>${name} (${phone})</span>
-          <button onclick="window.unbanUser('${phone}')" style="background:#22c55e; border:none; color:#fff; border-radius:4px; padding:4px 10px; cursor:pointer; font-size:0.8rem; font-weight:bold;">अनब्लॉक करें</button>
+          <button onclick="window.unbanUser('${phone}')" style="background:#22c55e; border:none; color:#fff; border-radius:4px; padding:4px 10px; cursor:pointer; font-size:0.8rem; font-weight:bold;">अनब्लॉक (Unban)</button>
         `;
         listDiv.appendChild(row);
       });
     }
 
     window.isPhoneBanned = function(phone) {
-      const clean = (phone || "").replace(/[^0-9a-zA-Z]/g, '');
+      const clean = (phone || "").replace(/[^0-9]/g, '');
       return !!bannedPhoneCache[clean];
     };
 
     window.banUserPermanently = function(phone, name) {
-      const cleanPhone = (phone || "").replace(/[^0-9a-zA-Z]/g, '');
+      const cleanPhone = (phone || "").replace(/[^0-9]/g, '');
       if(cleanPhone) {
         set(ref(db, `banned_users/${cleanPhone}`), { 
           name: name || "Student",
@@ -993,7 +1043,7 @@
     };
 
     window.unbanUser = function(phone) {
-      const cleanPhone = (phone || "").replace(/[^0-9a-zA-Z]/g, '');
+      const cleanPhone = (phone || "").replace(/[^0-9]/g, '');
       if(cleanPhone) {
         remove(ref(db, `banned_users/${cleanPhone}`)).then(() => {
           alert(`छात्र (${phone}) को अनब्लॉक कर दिया गया।`);
