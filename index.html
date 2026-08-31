@@ -354,6 +354,15 @@
             <div class="item-subtext">सभी छात्रों का मुख्य क्लासरूम</div>
           </div>
         </div>
+                <!-- AI उस्ताद चैट रूम बटन -->
+        <div class="chat-item" onclick="window.openAiChat()">
+          <div class="item-avatar" style="background: #1e1e2d; color: #38bdf8; border: 1px solid #38bdf8;"><i class="fa-solid fa-robot"></i></div>
+          <div class="item-info">
+            <div class="item-name"><span>🤖 AI उस्ताद (Gemini)</span> <span style="font-size: 0.75rem; color: #facc15;">24/7 Assistant</span></div>
+            <div class="item-subtext" style="color: #38bdf8;">पढ़ाई से जुड़ा कोई भी सवाल पूछें...</div>
+          </div>
+        </div>
+
         <div style="padding: 10px 16px; font-size: 0.85rem; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.05);">
           सभी छात्र (ऑनलाइन 🟢 / ऑफ़लाइन ⚪):
         </div>
@@ -1023,6 +1032,11 @@
         window.sendFirebaseMessage(window.currentActiveRoomId, window.currentUser.name, window.currentUser.phone, window.currentUser.displayName, window.currentUser.role, text, window.currentUser.location);
       }
       msgInput.value = "";
+
+      // --- NAYA AI LOGIC YAHAN HAI ---
+      if (window.currentActiveRoomId.startsWith('ai_ustad_')) {
+        window.fetchGeminiResponse(text, window.currentActiveRoomId);
+      }
     }
 
     sendBtn.addEventListener('click', sendChatMessage);
@@ -1644,6 +1658,54 @@
         if (el) el.remove();
       });
     };
+
+        // --- GEMINI AI INTEGRATION (Phase 1: AI Ustad) ---
+    window.openAiChat = function() {
+      // हर यूज़र का अपना प्राइवेट AI रूम बनेगा
+      const aiRoomId = `ai_ustad_${window.currentUser.phone}`;
+      window.openChatRoom(aiRoomId, '🤖 AI उस्ताद', 'Google Gemini AI Assistant', 'https://cdn-icons-png.flaticon.com/512/8943/8943377.png');
+    };
+
+    window.fetchGeminiResponse = async function(userText, roomId) {
+      const typingDiv = document.getElementById('typing-indicator');
+      typingDiv.textContent = `AI उस्ताद सोच रहा है...`;
+      typingDiv.style.display = 'block';
+
+      // आपकी जनरेट की गई असली Gemini API Key
+      const GEMINI_API_KEY = "AQ.Ab8RN6LQJeG3NGBwv68vdDGmaEAbB3kSpIrNFZzsgSzRxeXsQw"; 
+      
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`;
+
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "x-goog-api-key": GEMINI_API_KEY
+          },
+          body: JSON.stringify({
+            contents: [{
+              role: "user",
+              parts: [{ text: `तुम एक बहुत ही इल्मी, शरीफ़ और मददगार 'AI उस्ताद' हो। उर्दू, हिंदी और इंग्लिश में तालीम (पढ़ाई) से जुड़े सवालों के जवाब दो। सवाल: ${userText}` }]
+            }]
+          })
+        });
+        const data = await response.json();
+        const aiText = data.candidates[0].content.parts[0].text;
+
+        if(window.sendFirebaseMessage) {
+          // AI का जवाब सीधे फायरबेस में चला जाएगा
+          window.sendFirebaseMessage(roomId, "AI उस्ताद", "gemini_bot", "🤖 AI उस्ताद", "admin", aiText, "Google Server");
+        }
+      } catch (error) {
+        if(window.sendFirebaseMessage) {
+          window.sendFirebaseMessage(roomId, "AI उस्ताद", "gemini_bot", "🤖 AI उस्ताद", "admin", "माफ़ी चाहता हूँ, अभी मेरे सर्वर में कोई तकनीकी दिक्कत है।", "Google Server");
+        }
+      } finally {
+        typingDiv.style.display = 'none';
+      }
+    };
+
   </script>
 </body>
 </html>
