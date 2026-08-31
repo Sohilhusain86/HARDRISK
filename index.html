@@ -1677,16 +1677,18 @@
       typingDiv.textContent = `AI उस्ताद सोच रहा है...`;
       typingDiv.style.display = 'block';
 
-      const GEMINI_API_KEY = "AQ.Ab8RN6LQJeG3NGBwv68vdDGmaEAbB3kSpIrNFZzsgSzRxeXsQw";
+      // आपकी बिल्कुल नई जनरेट की गई GCP/Service Account API Key
+      const GEMINI_API_KEY = "AQ.Ab8RN6IUr6MZYDYbHqOme6dI6sEG4UXIgRd5lKsK04w21G3i_g"; 
       
-      // Proxy / Direct endpoint fallback with error tracing
-      const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+      // Google Cloud / GCP प्रोजेक्ट के लिए सही v1 endpoint
+      const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent`;
 
       try {
         const response = await fetch(url, {
           method: "POST",
           headers: { 
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${GEMINI_API_KEY}`
           },
           body: JSON.stringify({
             contents: [{
@@ -1701,18 +1703,17 @@
           const aiText = data.candidates[0].content.parts[0].text;
           window.sendFirebaseMessage(roomId, "AI उस्ताद", "gemini_bot", "🤖 AI उस्ताद", "admin", aiText, "Google Server");
         } else if (data.error) {
-          window.sendFirebaseMessage(roomId, "AI उस्ताद", "gemini_bot", "🤖 AI उस्ताद", "admin", "Google API Error: " + data.error.message, "Google Server");
+          window.sendFirebaseMessage(roomId, "AI उस्ताद", "gemini_bot", "🤖 AI उस्ताद", "admin", "Cloud API Error: " + data.error.message, "Google Server");
         } else {
           window.sendFirebaseMessage(roomId, "AI उस्ताद", "gemini_bot", "🤖 AI उस्ताद", "admin", "माफ़ कीजिए, AI से सही डेटा नहीं मिला।", "Google Server");
         }
 
       } catch (error) {
-        window.sendFirebaseMessage(roomId, "AI उस्ताद", "gemini_bot", "🤖 AI उस्ताद", "admin", "नेटवर्क या फेच एरर: " + error.message, "Google Server");
+        window.sendFirebaseMessage(roomId, "AI उस्ताद", "gemini_bot", "🤖 AI उस्ताद", "admin", "कनेक्शन एरर: " + error.message, "Google Server");
       } finally {
         typingDiv.style.display = 'none';
       }
     };
-    
     
   </script>
 </body>
