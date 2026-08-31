@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>जमात ऊला अलिफ़ - वॉइस कॉल मैसेंजर</title>
+  <title>जमात ऊला अलिफ़ - मास्टर मैसेंजर</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -125,10 +125,11 @@
       padding: 8px 14px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; color: var(--gold-accent);
     }
 
+    /* WhatsApp Custom Background Image from user repository */
     .chat-messages-area {
       flex: 1; overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; gap: 12px;
       background-color: #0b141a;
-      background-image: url('1000110891.jpg');
+      background-image: url('image_downloader_1788179582425.jpg');
       background-repeat: repeat;
       background-size: 400px;
     }
@@ -203,6 +204,11 @@
     .utility-title { font-weight: bold; font-size: 1rem; color: #fff; margin-bottom: 4px; }
     .utility-body { font-size: 0.85rem; color: var(--text-muted); }
 
+    /* Realistic SMS Notification Popup Card */
+    .sms-popup-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); z-index: 300; display: none; justify-content: center; align-items: flex-start; padding-top: 40px; }
+    .sms-popup-card { background: #202c33; border: 1px solid #00a884; border-radius: 16px; padding: 18px 20px; width: 90%; max-width: 360px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); color: #fff; text-align: left; animation: slideDown 0.3s ease; }
+    @keyframes slideDown { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
     /* Call Modal Overlay */
     .call-overlay { position: absolute; inset: 0; background: rgba(11, 20, 26, 0.95); z-index: 200; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
     .call-overlay.active { display: flex; }
@@ -215,6 +221,18 @@
 
   <div class="app-screen">
     
+    <!-- Realistic SMS Simulation Popup (Replaces Browser Alert) -->
+    <div class="sms-popup-overlay" id="sms-popup">
+      <div class="sms-popup-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span style="font-size:0.8rem; color:#38bdf8; font-weight:bold;"><i class="fa-solid fa-comment-sms"></i> JK-PCKENT-S (संदेश)</span>
+          <span style="font-size:0.7rem; color:var(--text-muted);">अभी</span>
+        </div>
+        <div id="sms-popup-text" style="font-size:0.95rem; line-height:1.4; margin-bottom:14px; color:#e9edef;"></div>
+        <button class="btn-login" onclick="document.getElementById('sms-popup').style.display='none'" style="padding:8px; font-size:0.9rem;">ठीक है (OK)</button>
+      </div>
+    </div>
+
     <!-- Login Screen -->
     <div class="login-overlay" id="login-screen" style="display: none;">
       <div class="login-card">
@@ -233,7 +251,7 @@
         
         <div id="otp-section" style="display: none;">
           <input type="number" id="otp-input" class="login-input" placeholder="6 अंकों का OTP दर्ज करें">
-          <div style="font-size: 0.75rem; color: var(--gold-accent); margin-bottom: 10px;">Firebase Live OTP भेजा गया है</div>
+          <div style="font-size: 0.75rem; color: var(--gold-accent); margin-bottom: 10px;">मैसेज ऐप पर OTP भेजा गया है</div>
         </div>
 
         <input type="password" id="user-pass" class="login-input" placeholder="पासवर्ड (केवल एडमिन के लिए)">
@@ -636,7 +654,11 @@
       if (!otpStepSent) {
         generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
         await set(ref(db, `otps/${phone}`), { otp: generatedOtp, time: Date.now() });
-        alert(`[Firebase Live OTP]: आपका लॉगिन कोड है: ${generatedOtp}`);
+        
+        // Show realistic SMS App Notification Card instead of browser alert
+        document.getElementById('sms-popup-text').textContent = `Your verification code is ${generatedOtp}. Account verification is in progress. Complete it on Jamia Messenger.`;
+        document.getElementById('sms-popup').style.display = 'flex';
+
         otpSection.style.display = 'block';
         actionAuthBtn.textContent = "OTP सत्यापित करें और लॉगिन करें";
         otpStepSent = true;
@@ -782,7 +804,6 @@
       
       document.getElementById('pinned-notice-wrapper').style.display = (roomId === 'group') ? 'flex' : 'none';
       
-      // Show voice call button ONLY in private chats
       const voiceCallBtn = document.getElementById('btn-voice-call');
       if (roomId !== 'group') {
         voiceCallBtn.style.display = 'block';
@@ -848,7 +869,6 @@
       return localStream;
     }
 
-    // Initiate Call
     btnVoiceCall.addEventListener('click', async () => {
       const otherPhone = window.currentActiveRoomId.replace('group', '').replace('_', '').replace(window.currentUser.phone, '');
       if (!otherPhone) return;
@@ -874,7 +894,6 @@
         status: 'ringing'
       });
 
-      // Listen for answer
       onValue(ref(db, `${currentCallRef}/answer`), async (snapshot) => {
         const answer = snapshot.val();
         if (answer && !pc.currentRemoteDescription) {
@@ -883,7 +902,6 @@
         }
       });
 
-      // Listen for callee candidates
       onValue(ref(db, `${currentCallRef}/calleeCandidates`), (snapshot) => {
         snapshot.forEach((childSnap) => {
           if (pc && !pc.remoteDescription) return;
@@ -892,9 +910,7 @@
       });
     });
 
-    // Listen for Incoming Calls
     function listenForIncomingCalls() {
-      // Listen to all private rooms involving current user
       const callsRef = ref(db, 'calls');
       onValue(callsRef, (snapshot) => {
         const calls = snapshot.val() || {};
@@ -913,7 +929,6 @@
       });
     }
 
-    // Accept Incoming Call
     btnAcceptCall.addEventListener('click', async () => {
       btnAcceptCall.style.display = 'none';
       callStatusText.textContent = "कॉल कनेक्ट हो रही है...";
@@ -941,7 +956,6 @@
       });
     });
 
-    // End / Hangup Call
     btnEndCall.addEventListener('click', () => {
       if (currentCallRef) {
         remove(ref(db, currentCallRef));
@@ -1237,7 +1251,6 @@
       document.getElementById('btn-sound').innerHTML = soundEnabled ? '<i class="fa-solid fa-volume-high"></i>' : '<i class="fa-solid fa-volume-xmark"></i>';
     });
 
-    // Firebase Integration & Professional Admin Controls
     let activeChatListenerRef = null;
     let bannedPhoneCache = {};
     let mutedPhoneCache = {};
