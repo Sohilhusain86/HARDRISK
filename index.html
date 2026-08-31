@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>जमात ऊला अलिफ़ - लाइव मैसेंजर</title>
+  <title>जमात ऊला अलिफ़ - अल्टीमेट मैसेंजर</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -77,19 +77,10 @@
     .header-user-info { display: flex; align-items: center; gap: 10px; }
 
     .header-avatar, .item-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: #2a3942;
-      color: #00a884;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      position: relative;
-      overflow: hidden;
-      background-size: cover;
-      background-position: center;
+      width: 48px; height: 48px; border-radius: 50%;
+      background: #2a3942; color: #00a884; display: flex;
+      align-items: center; justify-content: center; font-size: 1.2rem;
+      position: relative; overflow: hidden; background-size: cover; background-position: center;
     }
     .header-avatar { width: 42px; height: 42px; }
 
@@ -109,6 +100,14 @@
 
     .header-actions { display: flex; gap: 10px; align-items: center; }
     .header-btn { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; }
+
+    .nav-tabs {
+      display: flex; background: var(--primary-green); border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .nav-tab-btn {
+      flex: 1; padding: 8px 4px; background: none; border: none; color: #bbf7d0; font-size: 0.78rem; font-weight: bold; cursor: pointer; text-align: center; font-family: 'Poppins', sans-serif;
+    }
+    .nav-tab-btn.active { color: #fff; border-bottom: 3px solid var(--gold-accent); }
 
     .chats-list-area { flex: 1; overflow-y: auto; padding: 8px 0; background: var(--panel-bg); }
 
@@ -132,7 +131,7 @@
     }
 
     .msg-bubble {
-      max-width: 85%; padding: 8px 14px 26px 14px; border-radius: 12px; font-size: 0.95rem; line-height: 1.6; word-wrap: break-word; position: relative;
+      max-width: 85%; padding: 8px 14px 28px 14px; border-radius: 12px; font-size: 0.95rem; line-height: 1.6; word-wrap: break-word; position: relative;
     }
     .msg-mine { align-self: flex-end; background: var(--msg-mine); border-top-right-radius: 2px; }
     .msg-other { align-self: flex-start; background: var(--msg-other); border-top-left-radius: 2px; }
@@ -150,16 +149,9 @@
       display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--text-muted); font-family: 'Poppins', sans-serif;
     }
 
-    /* Message Reactions UI */
-    .msg-reactions-container {
-      display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px;
-    }
-    .reaction-pill {
-      background: rgba(255,255,255,0.12); border-radius: 12px; padding: 2px 6px; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 3px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05);
-    }
-    .reaction-picker-bar {
-      position: absolute; bottom: -28px; left: 0; background: #202c33; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 2px 8px; display: none; gap: 6px; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    }
+    .msg-reactions-container { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+    .reaction-pill { background: rgba(255,255,255,0.12); border-radius: 12px; padding: 2px 6px; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 3px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); }
+    .reaction-picker-bar { position: absolute; bottom: -28px; left: 0; background: #202c33; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 2px 8px; display: none; gap: 6px; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
     .msg-bubble:hover .reaction-picker-bar { display: flex; }
     .emoji-opt { cursor: pointer; font-size: 1rem; transition: transform 0.1s; }
     .emoji-opt:hover { transform: scale(1.3); }
@@ -167,62 +159,43 @@
     .msg-img-preview { max-width: 100%; max-height: 240px; border-radius: 8px; margin-top: 5px; display: block; cursor: pointer; }
     .msg-audio-player { width: 210px; margin-top: 6px; height: 36px; }
 
-    .file-attachment-card {
-      background: rgba(0,0,0,0.25); border-radius: 8px; padding: 8px 12px; margin-top: 5px; display: flex; align-items: center; gap: 10px;
-    }
+    .file-attachment-card { background: rgba(0,0,0,0.25); border-radius: 8px; padding: 8px 12px; margin-top: 5px; display: flex; align-items: center; gap: 10px; }
     .file-attachment-card a { color: #38bdf8; text-decoration: none; font-weight: bold; font-family: 'Poppins', sans-serif; font-size: 0.85rem; }
 
     #typing-indicator { display: none; padding: 4px 14px; font-size: 0.8rem; color: #00a884; font-style: italic; background: #202c33; }
 
-    .chat-bottom-dock {
-      background: #202c33; padding: 8px 10px; display: flex; align-items: center; gap: 6px;
-    }
-    .chat-input-box {
-      flex: 1; background: #2a3942; border: none; border-radius: 25px; padding: 10px 16px; color: #fff; font-family: 'Mukta', sans-serif; font-size: 0.95rem; outline: none;
-    }
+    .chat-bottom-dock { background: #202c33; padding: 8px 10px; display: flex; align-items: center; gap: 6px; }
+    .chat-input-box { flex: 1; background: #2a3942; border: none; border-radius: 25px; padding: 10px 16px; color: #fff; font-family: 'Mukta', sans-serif; font-size: 0.95rem; outline: none; }
     .btn-dock-action { background: none; border: none; color: var(--text-muted); font-size: 1.25rem; cursor: pointer; padding: 6px; }
     .btn-dock-action:hover { color: #00a884; }
 
     .btn-mic.recording { color: #ef4444; animation: pulse 1s infinite alternate; }
     @keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.2); } }
 
-    .btn-send {
-      width: 42px; height: 42px; background: var(--deep-green); color: #fff; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer;
-    }
+    .btn-send { width: 42px; height: 42px; background: var(--deep-green); color: #fff; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; }
 
-    .login-overlay {
-      position: absolute; inset: 0; background: #111b21; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; overflow-y: auto;
-    }
-    .login-card {
-      background: #202c33; border-radius: 20px; padding: 24px 20px; width: 100%; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-    }
-    .dp-upload-box {
-      width: 80px; height: 80px; border-radius: 50%; background: #2a3942; border: 2px dashed #00a884; margin: 0 auto 14px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden; background-size: cover; background-position: center; color: var(--text-muted); font-size: 1.5rem;
-    }
-    .login-input {
-      width: 100%; background: #111b21; border: 1px solid #00a884; border-radius: 12px; padding: 11px 14px; color: #fff; font-family: 'Mukta', 'Poppins', sans-serif; font-size: 0.95rem; margin-bottom: 12px; outline: none; text-align: center;
-    }
-    .btn-login {
-      width: 100%; background: #00a884; color: #fff; border: none; border-radius: 30px; padding: 12px; font-size: 1.05rem; font-weight: bold; cursor: pointer;
-    }
+    .login-overlay { position: absolute; inset: 0; background: #111b21; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; overflow-y: auto; }
+    .login-card { background: #202c33; border-radius: 20px; padding: 24px 20px; width: 100%; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
+    .dp-upload-box { width: 80px; height: 80px; border-radius: 50%; background: #2a3942; border: 2px dashed #00a884; margin: 0 auto 14px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden; background-size: cover; background-position: center; color: var(--text-muted); font-size: 1.5rem; }
+    .login-input { width: 100%; background: #111b21; border: 1px solid #00a884; border-radius: 12px; padding: 11px 14px; color: #fff; font-family: 'Mukta', 'Poppins', sans-serif; font-size: 0.95rem; margin-bottom: 12px; outline: none; text-align: center; }
+    .btn-login { width: 100%; background: #00a884; color: #fff; border: none; border-radius: 30px; padding: 12px; font-size: 1.05rem; font-weight: bold; cursor: pointer; }
 
-    .admin-modal {
-      position: absolute; inset: 0; background: #111b21; z-index: 50; display: none; flex-direction: column; padding: 20px; overflow-y: auto;
-    }
+    .admin-modal { position: absolute; inset: 0; background: #111b21; z-index: 50; display: none; flex-direction: column; padding: 20px; overflow-y: auto; }
     .admin-modal.open { display: flex; }
-    .admin-header {
-      display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #202c33; padding-bottom: 12px; margin-bottom: 16px; color: var(--gold-accent);
-    }
-    .banned-chip {
-      display: flex; justify-content: space-between; align-items: center; background: #2a3942; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; font-family: 'Poppins', sans-serif; font-size: 0.85rem;
-    }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #202c33; padding-bottom: 12px; margin-bottom: 16px; color: var(--gold-accent); }
+    .banned-chip { display: flex; justify-content: space-between; align-items: center; background: #2a3942; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; font-family: 'Poppins', sans-serif; font-size: 0.85rem; }
+
+    .section-container { padding: 16px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; flex: 1; }
+    .utility-card { background: var(--card-bg); padding: 12px 14px; border-radius: 10px; border-left: 4px solid var(--gold-accent); margin-bottom: 10px; }
+    .utility-title { font-weight: bold; font-size: 1rem; color: #fff; margin-bottom: 4px; }
+    .utility-body { font-size: 0.85rem; color: var(--text-muted); }
   </style>
 </head>
 <body>
 
   <div class="app-screen">
     
-    <!-- Login & DP & OTP Screen -->
+    <!-- Login Screen -->
     <div class="login-overlay" id="login-screen" style="display: none;">
       <div class="login-card">
         <h2 style="color: #00a884; margin-bottom: 6px; font-size: 1.4rem;">जमात ऊला अलिफ़ मैसेंजर</h2>
@@ -248,26 +221,23 @@
       </div>
     </div>
 
-    <!-- Admin Master Control Panel -->
+    <!-- Admin Panel -->
     <div class="admin-modal" id="admin-panel">
       <div class="admin-header">
         <h3><i class="fa-solid fa-shield-halved"></i> एडमिन कंट्रोल पैनल</h3>
         <button class="header-btn" id="btn-close-admin"><i class="fa-solid fa-xmark"></i></button>
       </div>
-
       <div style="margin-bottom: 16px;">
         <label style="color: #00a884; display: block; margin-bottom: 6px; font-size: 0.9rem;">पिन नोटिस बदलें:</label>
         <input type="text" id="new-notice" class="login-input" placeholder="नया नोटिस या सबक लिखें...">
         <button class="btn-login" id="btn-update-notice">नोटिस लाइव पब्लिश करें</button>
       </div>
-
       <div style="margin-bottom: 16px;">
-        <label style="color: #ef4444; display: block; margin-bottom: 6px; font-size: 0.9rem;">ब्लॉक किए गए छात्र (Banned Students):</label>
+        <label style="color: #ef4444; display: block; margin-bottom: 6px; font-size: 0.9rem;">ब्लॉक किए गए छात्र:</label>
         <div id="banned-users-list-container" style="max-height: 140px; overflow-y: auto; margin-bottom: 8px;">
           <div style="color: var(--text-muted); font-size: 0.8rem;">कोई छात्र ब्लॉक नहीं है।</div>
         </div>
       </div>
-
       <div>
         <button class="btn-login" id="btn-clear-chat" style="background: #475569;"><i class="fa-solid fa-trash"></i> स्क्रीन साफ़ करें</button>
       </div>
@@ -286,11 +256,20 @@
         <div class="header-actions">
           <button class="header-btn" id="btn-admin-crown" title="एडमिन पैनल" style="display: none;"><i class="fa-solid fa-crown" style="color: #facc15;"></i></button>
           <button class="header-btn" id="btn-sound" title="साउंड ऑन/ऑफ"><i class="fa-solid fa-volume-high"></i></button>
-          <button class="header-btn" id="btn-logout" title="लॉगआउट करें" onclick="logoutApp()" style="color: #f87171;"><i class="fa-solid fa-right-from-bracket"></i></button>
+          <button class="header-btn" id="btn-logout" title="लॉगआउट" onclick="logoutApp()" style="color: #f87171;"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
       </header>
 
-      <main class="chats-list-area" id="contacts-list">
+      <!-- Multi Navigation Tabs -->
+      <nav class="nav-tabs">
+        <button class="nav-tab-btn active" id="tab-chats-btn" onclick="switchTab('chats')"><i class="fa-solid fa-comments"></i> चैट्स</button>
+        <button class="nav-tab-btn" id="tab-notes-btn" onclick="switchTab('notes')"><i class="fa-solid fa-book"></i> नोट्स/टास्क</button>
+        <button class="nav-tab-btn" id="tab-anon-btn" onclick="switchTab('anon')"><i class="fa-solid fa-user-secret"></i> गुप्त बोर्ड</button>
+        <button class="nav-tab-btn" id="tab-polls-btn" onclick="switchTab('polls')"><i class="fa-solid fa-square-poll-vertical"></i> पोल्स</button>
+      </nav>
+
+      <!-- Tab 1: Chats Area -->
+      <main class="chats-list-area" id="tab-content-chats">
         <div class="chat-item" onclick="openChatRoom('group', 'जमात ऊला अलिफ़ (ग्रुप)', 'मुख्य क्लासरूम')">
           <div class="item-avatar" style="background: #005c4b; color: #facc15;"><i class="fa-solid fa-users"></i></div>
           <div class="item-info">
@@ -298,11 +277,44 @@
             <div class="item-subtext">सभी छात्रों का मुख्य क्लासरूम</div>
           </div>
         </div>
-
         <div style="padding: 10px 16px; font-size: 0.85rem; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.05);">
           सभी छात्र (ऑनलाइन 🟢 / ऑफ़लाइन ⚪):
         </div>
         <div id="users-dynamic-list"></div>
+      </main>
+
+      <!-- Tab 2: Notes & Tasks Area -->
+      <main class="chats-list-area" id="tab-content-notes" style="display: none;">
+        <div class="section-container">
+          <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+            <input type="text" id="new-note-title" class="login-input" placeholder="शीर्षक (जैसे: कल का सबक)" style="margin-bottom:0; flex:1;">
+            <button class="btn-login" id="btn-add-note" style="width: auto; padding: 0 16px;"><i class="fa-solid fa-plus"></i></button>
+          </div>
+          <textarea id="new-note-desc" class="login-input" placeholder="विवरण या होमवर्क लिखें..." style="height: 70px; resize: none; margin-bottom: 12px; text-align: left; padding: 10px;"></textarea>
+          <div id="rendered-notes-box"></div>
+        </div>
+      </main>
+
+      <!-- Tab 3: Anonymous Secret Confessions Board -->
+      <main class="chats-list-area" id="tab-content-anon" style="display: none;">
+        <div class="section-container">
+          <div style="font-size: 0.85rem; color: var(--gold-accent); margin-bottom: 6px;">गुप्त बोर्ड (यहाँ आपकी पहचान पूरी तरह छिपी रहेगी):</div>
+          <textarea id="new-anon-text" class="login-input" placeholder="गुप्त सवाल या बात यहाँ लिखें..." style="height: 80px; resize: none; margin-bottom: 8px; text-align: left; padding: 10px;"></textarea>
+          <button class="btn-login" id="btn-send-anon" style="margin-bottom: 14px;">गुमनाम रूप से पोस्ट करें</button>
+          <div id="rendered-anon-box"></div>
+        </div>
+      </main>
+
+      <!-- Tab 4: Live Polls Area -->
+      <main class="chats-list-area" id="tab-content-polls" style="display: none;">
+        <div class="section-container">
+          <div style="font-size: 0.85rem; color: #38bdf8; margin-bottom: 6px;">नया पोल बनाएं:</div>
+          <input type="text" id="new-poll-question" class="login-input" placeholder="पोल का सवाल (जैसे: आज कौन सा सबक होगा?)" style="margin-bottom: 8px;">
+          <input type="text" id="poll-opt-1" class="login-input" placeholder="विकल्प 1" style="margin-bottom: 8px;">
+          <input type="text" id="poll-opt-2" class="login-input" placeholder="विकल्प 2" style="margin-bottom: 12px;">
+          <button class="btn-login" id="btn-create-poll" style="margin-bottom: 14px;">पोल लाइव करें</button>
+          <div id="rendered-polls-box"></div>
+        </div>
       </main>
     </div>
 
@@ -326,6 +338,19 @@
 
       <main class="chat-messages-area" id="chat-stream"></main>
       <div id="typing-indicator">कोई टाइप कर रहा है...</div>
+
+      <!-- Voice Changer Selector Bar -->
+      <div style="background: #111b21; padding: 6px 12px; display: flex; align-items: center; gap: 8px; font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05);">
+        <span style="color: var(--text-muted);">🎙️ वॉइस मोड:</span>
+        <select id="voice-effect-select" style="background: #202c33; color: #fff; border: 1px solid #00a884; border-radius: 6px; padding: 2px 6px; outline: none;">
+          <option value="normal">सामान्य (Normal)</option>
+          <option value="robot">रोबोट (Robot Effect)</option>
+          <option value="chipmunk">गिलहरी (Chipmunk High)</option>
+        </select>
+        <label style="margin-left: auto; display: flex; align-items: center; gap: 4px; color: var(--gold-accent); cursor: pointer;">
+          <input type="checkbox" id="anon-chat-toggle"> गुप्त चैट (Anon)
+        </label>
+      </div>
 
       <footer class="chat-bottom-dock">
         <input type="file" id="file-selector" style="display: none;" accept="image/*,.pdf,.doc,.docx,.zip">
@@ -358,6 +383,16 @@
     let selectedDpUrl = "";
     let generatedOtp = "";
     let otpStepSent = false;
+
+    window.switchTab = function(tabName) {
+      const tabs = ['chats', 'notes', 'anon', 'polls'];
+      tabs.forEach(t => {
+        document.getElementById(`tab-${t}-btn`).classList.remove('active');
+        document.getElementById(`tab-content-${t}`).style.display = 'none';
+      });
+      document.getElementById(`tab-${tabName}-btn`).classList.add('active');
+      document.getElementById(`tab-content-${tabName}`).style.display = 'block';
+    };
 
     window.addEventListener('DOMContentLoaded', () => {
       const savedUser = localStorage.getItem('jamia_chat_saved_user');
@@ -427,10 +462,8 @@
     });
 
     function requestNotificationAccess() {
-      if ("Notification" in window) {
-        if (Notification.permission === "default") {
-          Notification.requestPermission();
-        }
+      if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission();
       }
     }
 
@@ -694,8 +727,12 @@
         return;
       }
 
+      const isAnon = document.getElementById('anon-chat-toggle').checked;
+      const senderName = isAnon ? "गुप्त सदस्य (Anonymous)" : currentUser.name;
+      const displayName = isAnon ? "गुप्त सदस्य 👤" : currentUser.displayName;
+
       if(window.sendFirebaseMessage) {
-        window.sendFirebaseMessage(currentActiveRoomId, currentUser.name, currentUser.phone, currentUser.displayName, currentUser.role, text, currentUser.location);
+        window.sendFirebaseMessage(currentActiveRoomId, senderName, currentUser.phone, displayName, currentUser.role, text, currentUser.location);
       }
       msgInput.value = "";
     }
@@ -753,11 +790,13 @@
             const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
             const audioFile = new File([audioBlob], `audio_${Date.now()}.mp3`, { type: 'audio/mp3' });
             
+            const effect = document.getElementById('voice-effect-select').value;
             msgInput.placeholder = "ऑडियो अपलोड हो रही है...";
             try {
               const res = await uploadToCloudinary(audioFile);
               if (res.secure_url && window.sendFirebaseMessage) {
-                window.sendFirebaseMessage(currentActiveRoomId, currentUser.name, currentUser.phone, currentUser.displayName, currentUser.role, `[AUDIO](${res.secure_url})`, currentUser.location);
+                const audioTag = `[AUDIO:${effect}](${res.secure_url})`;
+                window.sendFirebaseMessage(currentActiveRoomId, currentUser.name, currentUser.phone, currentUser.displayName, currentUser.role, audioTag, currentUser.location);
               }
             } catch(e) {
               alert("ऑडियो अपलोड नहीं हो सकी");
@@ -812,9 +851,17 @@
       if (typeof data.text === 'string' && data.text.startsWith('[IMG](')) {
         const match = data.text.match(/\((.*?)\)/);
         if (match) contentHtml = `<img src="${match[1]}" class="msg-img-preview" alt="Image" onclick="window.open('${match[1]}','_blank')"/>`;
-      } else if (typeof data.text === 'string' && data.text.startsWith('[AUDIO](')) {
+      } else if (typeof data.text === 'string' && data.text.startsWith('[AUDIO')) {
         const match = data.text.match(/\((.*?)\)/);
-        if (match) contentHtml = `<audio src="${match[1]}" controls class="msg-audio-player"></audio>`;
+        const effectMatch = data.text.match(/\[AUDIO:(.*?)\]/);
+        const fx = effectMatch ? effectMatch[1] : 'normal';
+        let playbackRate = 1.0;
+        if (fx === 'robot') playbackRate = 0.75;
+        if (fx === 'chipmunk') playbackRate = 1.4;
+
+        if (match) {
+          contentHtml = `<audio src="${match[1]}" controls class="msg-audio-player" onplay="this.playbackRate=${playbackRate}"></audio> <div style="font-size:0.65rem; color:#facc15;">[वॉइस इफेक्ट: ${fx}]</div>`;
+        }
       } else if (typeof data.text === 'string') {
         const fileMatch = data.text.match(/^\[FILE:(.*?)\]\((.*?)\)$/);
         if (fileMatch) {
@@ -827,7 +874,6 @@
         }
       }
 
-      // Render Reactions (Emojis)
       let reactionsHtml = '';
       if (data.reactions) {
         reactionsHtml = `<div class="msg-reactions-container" id="reactions-${msgKey}">`;
@@ -839,7 +885,6 @@
         reactionsHtml = `<div class="msg-reactions-container" id="reactions-${msgKey}"></div>`;
       }
 
-      // Reaction Picker Bar (👍, ❤️, 😂, 😮, 🙏)
       const reactionPickerHtml = `
         <div class="reaction-picker-bar">
           <span class="emoji-opt" onclick="window.reactToMessage('${currentActiveRoomId}', '${msgKey}', '👍')">👍</span>
@@ -910,7 +955,7 @@
     });
   </script>
 
-  <!-- Firebase Integration -->
+  <!-- Firebase Integration & Additional Features (Notes, Anon Board, Polls) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, push, set, update, onValue, onDisconnect, onChildAdded, onChildRemoved, remove, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -933,6 +978,9 @@
       let bannedPhoneCache = {};
       const bannedUsersRef = ref(db, 'banned_users');
       const usersRef = ref(db, 'users');
+      const notesRef = ref(db, 'important_notes');
+      const anonRef = ref(db, 'anonymous_board');
+      const pollsRef = ref(db, 'live_polls');
 
       onValue(bannedUsersRef, (snapshot) => {
         bannedPhoneCache = snapshot.val() || {};
@@ -945,6 +993,126 @@
           window.renderAllUsersList(data);
         }
       });
+
+      // 1. Notes & Tasks
+      const btnAddNote = document.getElementById('btn-add-note');
+      if (btnAddNote) {
+        btnAddNote.addEventListener('click', () => {
+          const title = document.getElementById('new-note-title').value.trim();
+          const desc = document.getElementById('new-note-desc').value.trim();
+          if (!title || !desc) { alert("कृपया शीर्षक और विवरण भरें।"); return; }
+          push(notesRef, { title, description: desc, author: currentUser.name || "Admin", time: new Date().toLocaleDateString() });
+          document.getElementById('new-note-title').value = "";
+          document.getElementById('new-note-desc').value = "";
+        });
+      }
+
+      onValue(notesRef, (snapshot) => {
+        const data = snapshot.val() || {};
+        const container = document.getElementById('rendered-notes-box');
+        if (!container) return;
+        container.innerHTML = "";
+        const keys = Object.keys(data);
+        if (keys.length === 0) { container.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem; text-align:center;">कोई नोट या टास्क उपलब्ध नहीं है।</div>`; return; }
+        keys.forEach(k => {
+          const item = data[k];
+          const div = document.createElement('div');
+          div.className = 'utility-card';
+          div.innerHTML = `<div class="utility-title">${item.title} <span style="font-size:0.7rem; color:var(--text-muted); float:right;">${item.time}</span></div><div class="utility-body">${item.description}</div><div style="font-size:0.65rem; color:#38bdf8; margin-top:6px;">द्वारा: ${item.author}</div>`;
+          container.appendChild(div);
+        });
+      });
+
+      // 2. Anonymous Board
+      const btnSendAnon = document.getElementById('btn-send-anon');
+      if (btnSendAnon) {
+        btnSendAnon.addEventListener('click', () => {
+          const txt = document.getElementById('new-anon-text').value.trim();
+          if (!txt) { alert("गुप्त संदेश खाली न छोड़ें।"); return; }
+          push(anonRef, { text: txt, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+          document.getElementById('new-anon-text').value = "";
+        });
+      }
+
+      onValue(anonRef, (snapshot) => {
+        const data = snapshot.val() || {};
+        const container = document.getElementById('rendered-anon-box');
+        if (!container) return;
+        container.innerHTML = "";
+        const keys = Object.keys(data);
+        if (keys.length === 0) { container.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem; text-align:center;">गुप्त बोर्ड खाली है।</div>`; return; }
+        keys.forEach(k => {
+          const item = data[k];
+          const div = document.createElement('div');
+          div.className = 'utility-card';
+          div.style.borderLeftColor = '#38bdf8';
+          div.innerHTML = `<div class="utility-title">👤 गुप्त सदस्य <span style="font-size:0.7rem; color:var(--text-muted); float:right;">${item.time}</span></div><div class="utility-body">${item.text}</div>`;
+          container.appendChild(div);
+        });
+      });
+
+      // 3. Live Polls
+      const btnCreatePoll = document.getElementById('btn-create-poll');
+      if (btnCreatePoll) {
+        btnCreatePoll.addEventListener('click', () => {
+          const q = document.getElementById('new-poll-question').value.trim();
+          const o1 = document.getElementById('poll-opt-1').value.trim();
+          const o2 = document.getElementById('poll-opt-2').value.trim();
+          if (!q || !o1 || !o2) { alert("कृपया सवाल और दोनों विकल्प भरें।"); return; }
+          push(pollsRef, { question: q, opt1: o1, opt2: o2, votes1: 0, votes2: 0, voters: {} });
+          document.getElementById('new-poll-question').value = "";
+          document.getElementById('poll-opt-1').value = "";
+          document.getElementById('poll-opt-2').value = "";
+        });
+      }
+
+      onValue(pollsRef, (snapshot) => {
+        const data = snapshot.val() || {};
+        const container = document.getElementById('rendered-polls-box');
+        if (!container) return;
+        container.innerHTML = "";
+        const keys = Object.keys(data);
+        if (keys.length === 0) { container.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem; text-align:center;">कोई लाइव पोल उपलब्ध नहीं है।</div>`; return; }
+        keys.forEach(k => {
+          const poll = data[k];
+          const totalVotes = (poll.votes1 || 0) + (poll.votes2 || 0);
+          const div = document.createElement('div');
+          div.className = 'utility-card';
+          div.style.borderLeftColor = '#22c55e';
+          div.innerHTML = `
+            <div class="utility-title">📊 ${poll.question}</div>
+            <div style="margin-top: 8px; display:flex; flex-direction:column; gap:6px;">
+              <button onclick="window.votePoll('${k}', 1)" style="background:#111b21; border:1px solid #00a884; color:#fff; padding:6px 10px; border-radius:6px; cursor:pointer; text-align:left; display:flex; justify-content:space-between;">
+                <span>${poll.opt1}</span> <span><b>${poll.votes1 || 0}</b> वोट</span>
+              </button>
+              <button onclick="window.votePoll('${k}', 2)" style="background:#111b21; border:1px solid #00a884; color:#fff; padding:6px 10px; border-radius:6px; cursor:pointer; text-align:left; display:flex; justify-content:space-between;">
+                <span>${poll.opt2}</span> <span><b>${poll.votes2 || 0}</b> वोट</span>
+              </button>
+            </div>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:6px; text-align:right;">कुल वोट: ${totalVotes}</div>
+          `;
+          container.appendChild(div);
+        });
+      });
+
+      window.votePoll = function(pollKey, optNum) {
+        const userPhoneKey = currentUser.phone.replace(/[.#$\/\[\]]/g, '_');
+        const pollItemRef = ref(db, `live_polls/${pollKey}`);
+        onValue(pollItemRef, (snap) => {
+          const pollData = snap.val();
+          if (!pollData) return;
+          if (!pollData.voters) pollData.voters = {};
+          if (pollData.voters[userPhoneKey]) {
+            alert("आप पहले ही इस पोल में वोट कर चुके हैं!");
+            return;
+          }
+          pollData.voters[userPhoneKey] = optNum;
+          if (optNum === 1) pollData.votes1 = (pollData.votes1 || 0) + 1;
+          else pollData.votes2 = (pollData.votes2 || 0) + 1;
+
+          set(pollItemRef, pollData);
+        }, { onlyOnce: true });
+      };
 
       window.registerUserFirebase = function(user) {
         const userRef = ref(db, `users/${user.phone}`);
@@ -993,19 +1161,14 @@
       window.banUserPermanently = function(phone, name) {
         const cleanPhone = (phone || "").replace(/[^0-9]/g, '');
         if(cleanPhone) {
-          set(ref(db, `banned_users/${cleanPhone}`), { 
-            name: name || "Student",
-            bannedAt: Date.now() 
-          });
+          set(ref(db, `banned_users/${cleanPhone}`), { name: name || "Student", bannedAt: Date.now() });
         }
       };
 
       window.unbanUser = function(phone) {
         const cleanPhone = (phone || "").replace(/[^0-9]/g, '');
         if(cleanPhone) {
-          remove(ref(db, `banned_users/${cleanPhone}`)).then(() => {
-            alert(`यूजर को अनब्लॉक कर दिया गया।`);
-          });
+          remove(ref(db, `banned_users/${cleanPhone}`)).then(() => alert(`यूजर अनब्लॉक हो गया।`));
         }
       };
 
@@ -1028,35 +1191,26 @@
       window.reactToMessage = function(roomId, msgKey, emoji) {
         const nodePath = (roomId === 'group') ? `messages/group/${msgKey}/reactions` : `messages_private/${roomId}/${msgKey}/reactions`;
         const cleanPhoneKey = currentUser.phone.replace(/[.#$\/\[\]]/g, '_');
-        update(ref(db, nodePath), {
-          [cleanPhoneKey]: emoji
-        });
+        update(ref(db, nodePath), { [cleanPhoneKey]: emoji });
       };
 
       window.deleteFirebaseMessage = function(roomId, key) {
-        if (!confirm("क्या आप सच में यह मैसेज डिलीट करना चाहते हैं?")) return;
+        if (!confirm("मैसेज डिलीट करें?")) return;
         const targetEl = document.getElementById(`msg-${key}`);
         if (targetEl) targetEl.style.opacity = '0.3';
-
         const nodePath = (roomId === 'group') ? `messages/group/${key}` : `messages_private/${roomId}/${key}`;
-        remove(ref(db, nodePath)).then(() => {
-          if (targetEl) targetEl.remove();
-        }).catch(err => alert("डिलीट विफल: " + err.message));
+        remove(ref(db, nodePath)).then(() => { if (targetEl) targetEl.remove(); });
       };
 
       window.listenToRoom = function(roomId) {
-        if (activeChatListenerRef) {
-          off(activeChatListenerRef);
-        }
+        if (activeChatListenerRef) off(activeChatListenerRef);
         const nodePath = (roomId === 'group') ? 'messages/group' : `messages_private/${roomId}`;
         activeChatListenerRef = ref(db, nodePath);
 
-        // Listen to Child Added (New Messages)
         onChildAdded(activeChatListenerRef, (snapshot) => {
           if(window.appendMessage) window.appendMessage(snapshot.val(), snapshot.key);
         });
 
-        // Listen to Child Changed (For Realtime Reactions update)
         onValue(activeChatListenerRef, (snapshot) => {
           const allMsgs = snapshot.val() || {};
           for (let key in allMsgs) {
@@ -1079,7 +1233,7 @@
       };
       
     } catch(error) {
-      console.error("Firebase Initialization Error:", error);
+      console.error("Firebase Error:", error);
     }
   </script>
 </body>
