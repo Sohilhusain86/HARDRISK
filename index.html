@@ -107,7 +107,7 @@
     .header-title { font-size: 1.1rem; font-weight: bold; color: #fff; line-height: 1.2; }
     .header-status { font-size: 0.75rem; color: #bbf7d0; font-family: 'Poppins', sans-serif; }
 
-    .header-actions { display: flex; gap: 12px; }
+    .header-actions { display: flex; gap: 10px; align-items: center; }
     .header-btn { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; }
 
     .chats-list-area { flex: 1; overflow-y: auto; padding: 8px 0; background: var(--panel-bg); }
@@ -217,7 +217,7 @@
   <div class="app-screen">
     
     <!-- Login & DP & OTP Screen -->
-    <div class="login-overlay" id="login-screen">
+    <div class="login-overlay" id="login-screen" style="display: none;">
       <div class="login-card">
         <h2 style="color: #00a884; margin-bottom: 6px; font-size: 1.4rem;">जमात ऊला अलिफ़ मैसेंजर</h2>
         <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 14px;">अपनी फोटो (DP) लगाएं और OTP से लॉगिन करें</p>
@@ -230,7 +230,9 @@
         <div style="font-size: 0.75rem; color: #00a884; margin-bottom: 12px;">फोटो बदलने के लिए क्लिक करें</div>
 
         <input type="text" id="user-name" class="login-input" placeholder="आपका नाम (जैसे: ज़ैद)">
-        <input type="number" id="user-phone" class="login-input" placeholder="रोल नंबर या मोबाइल नंबर">
+        <input type="tel" id="user-phone" class="login-input" placeholder="मोबाइल नंबर (10 अंक)">
+        <!-- Roll Number Optional Input -->
+        <input type="text" id="user-roll" class="login-input" placeholder="रोल नंबर (वैकल्पिक / इख्तियारन)">
         
         <!-- OTP Section -->
         <div id="otp-section" style="display: none;">
@@ -281,7 +283,8 @@
         </div>
         <div class="header-actions">
           <button class="header-btn" id="btn-admin-crown" title="एडमिन पैनल" style="display: none;"><i class="fa-solid fa-crown" style="color: #facc15;"></i></button>
-          <button class="header-btn" id="btn-sound"><i class="fa-solid fa-volume-high"></i></button>
+          <button class="header-btn" id="btn-sound" title="साउंड ऑन/ऑफ"><i class="fa-solid fa-volume-high"></i></button>
+          <button class="header-btn" id="btn-logout" title="लॉगआउट करें" onclick="logoutApp()" style="color: #f87171;"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
       </header>
 
@@ -341,7 +344,7 @@
 
     let drone = null;
     let droneRoom = null;
-    let currentUser = { name: "", phone: "", displayName: "", role: "student", location: "Unknown", dpUrl: "" };
+    let currentUser = { name: "", phone: "", roll: "", displayName: "", role: "student", location: "Unknown", dpUrl: "" };
     let currentActiveRoomId = "group";
     const ADMIN_PASSKEY = "razavi123";
     let soundEnabled = true;
@@ -354,6 +357,48 @@
     let selectedDpUrl = "";
     let generatedOtp = "";
     let otpStepSent = false;
+
+    // Check LocalStorage on startup for Auto-Login
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedUser = localStorage.getItem('jamia_chat_saved_user');
+      if (savedUser) {
+        try {
+          currentUser = JSON.parse(savedUser);
+          document.getElementById('login-screen').style.display = "none";
+          
+          const myAvatar = document.getElementById('my-avatar');
+          if (currentUser.dpUrl) {
+            myAvatar.textContent = "";
+            myAvatar.style.backgroundImage = `url('${currentUser.dpUrl}')`;
+          } else {
+            myAvatar.textContent = currentUser.name.charAt(0);
+          }
+          document.getElementById('my-display-name').textContent = currentUser.displayName;
+
+          if (currentUser.role === 'admin') {
+            document.getElementById('btn-admin-crown').style.display = "block";
+          }
+
+          requestNotificationAccess();
+          if (window.registerUserFirebase) {
+            window.registerUserFirebase(currentUser);
+          }
+          connectScaleDrone();
+        } catch(e) {
+          localStorage.removeItem('jamia_chat_saved_user');
+          document.getElementById('login-screen').style.display = "flex";
+        }
+      } else {
+        document.getElementById('login-screen').style.display = "flex";
+      }
+    });
+
+    function logoutApp() {
+      if (confirm("क्या आप वाकई लॉगआउट करना चाहते हैं?")) {
+        localStorage.removeItem('jamia_chat_saved_user');
+        location.reload();
+      }
+    }
 
     // DP Upload Handler
     const dpFileInput = document.getElementById('dp-file-input');
@@ -464,6 +509,7 @@
     const otpSection = document.getElementById('otp-section');
     const userNameInput = document.getElementById('user-name');
     const userPhoneInput = document.getElementById('user-phone');
+    const userRollInput = document.getElementById('user-roll');
     const userPassInput = document.getElementById('user-pass');
     const otpInput = document.getElementById('otp-input');
     const adminCrown = document.getElementById('btn-admin-crown');
@@ -471,13 +517,14 @@
     actionAuthBtn.addEventListener('click', () => {
       const name = userNameInput.value.trim();
       const phone = userPhoneInput.value.trim().replace(/[^0-9]/g, '');
+      const roll = userRollInput.value.trim();
 
       if (!name) {
         alert("कृपया अपना नाम दर्ज करें।");
         return;
       }
-      if (phone.length < 4) {
-        alert("कृपया सही रोल नंबर या मोबाइल नंबर दर्ज करें।");
+      if (phone.length < 10) {
+        alert("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।");
         return;
       }
 
@@ -498,7 +545,9 @@
 
       currentUser.name = name;
       currentUser.phone = phone;
-      currentUser.displayName = `${name} (${phone})`;
+      currentUser.roll = roll;
+      // If roll is provided, display it, otherwise display name with phone last digits
+      currentUser.displayName = roll ? `${name} (रोल: ${roll})` : `${name} (${phone.slice(-4)})`;
       currentUser.dpUrl = selectedDpUrl || "";
 
       const pass = userPassInput.value.trim();
@@ -511,6 +560,9 @@
         alert("आपको एडमिन द्वारा ब्लॉक कर दिया गया है।");
         return;
       }
+
+      // Save user details permanently to localStorage
+      localStorage.setItem('jamia_chat_saved_user', JSON.stringify(currentUser));
 
       const myAvatar = document.getElementById('my-avatar');
       if (currentUser.dpUrl) {
@@ -552,6 +604,7 @@
           }
           else if (data.type === 'ban' && (data.targetPhone === currentUser.phone)) {
             alert("आपको एडमिन ने ब्लॉक कर दिया है।");
+            localStorage.removeItem('jamia_chat_saved_user');
             location.reload();
           }
           else if (data.type === 'unban' && (data.targetPhone === currentUser.phone)) {
@@ -590,7 +643,7 @@
 
         const item = document.createElement('div');
         item.className = 'chat-item';
-        item.onclick = () => openPrivateChat(phone, u.name, u.dpUrl);
+        item.onclick = () => openPrivateChat(phone, u.displayName || u.name, u.dpUrl);
         
         let avatarStyle = "";
         let avatarContent = u.name.charAt(0);
@@ -605,8 +658,8 @@
             <div class="${isOnline ? 'online-indicator' : 'offline-indicator'}"></div>
           </div>
           <div class="item-info">
-            <div class="item-name"><span>${u.name}</span> <span style="font-size:0.75rem; color:#38bdf8;">प्राइवेट चैट</span></div>
-            <div class="item-subtext">रोल/फ़ोन: ${phone} | ${subText}</div>
+            <div class="item-name"><span>${u.displayName || u.name}</span> <span style="font-size:0.75rem; color:#38bdf8;">प्राइवेट चैट</span></div>
+            <div class="item-subtext">${subText}</div>
           </div>
         `;
         container.appendChild(item);
@@ -646,7 +699,7 @@
 
     window.openPrivateChat = function(otherPhone, otherName, otherDp) {
       const roomId = [currentUser.phone, otherPhone].sort().join('_');
-      openChatRoom(roomId, otherName, `प्राइवेट चैट (${otherPhone})`, otherDp);
+      openChatRoom(roomId, otherName, `प्राइवेट चैट`, otherDp);
     };
 
     window.backToHome = function() {
@@ -771,16 +824,16 @@
       const isAlreadyBanned = window.isPhoneBanned && window.isPhoneBanned(targetPhone);
 
       if (isAlreadyBanned) {
-        if (confirm(`क्या आप ${targetName} (${targetPhone}) को अनब्लॉक (Unban) करना चाहते हैं?`)) {
+        if (confirm(`क्या आप ${targetName} को अनब्लॉक (Unban) करना चाहते हैं?`)) {
           if (window.unbanUser) window.unbanUser(targetPhone);
           if (drone) drone.publish({ room: 'observable-jamia-online-room', message: { type: 'unban', targetPhone: targetPhone } });
-          alert(`${targetName} को अनब्लॉक कर दिया गया।`);
+          alert(`यूजर को अनब्लॉक कर दिया गया।`);
         }
       } else {
-        if (confirm(`क्या आप सच में ${targetName} (${targetPhone}) को ब्लॉक (Ban) करना चाहते हैं?`)) {
+        if (confirm(`क्या आप सच में ${targetName} को ब्लॉक (Ban) करना चाहते हैं?`)) {
           if (window.banUserPermanently) window.banUserPermanently(targetPhone, targetName);
           if (drone) drone.publish({ room: 'observable-jamia-online-room', message: { type: 'ban', targetPhone: targetPhone } });
-          alert(`${targetName} को ब्लॉक कर दिया गया।`);
+          alert(`यूजर को ब्लॉक कर दिया गया।`);
         }
       }
     };
@@ -901,7 +954,6 @@
         renderBannedUsersListInAdmin(bannedPhoneCache);
       });
 
-      // Sync all registered users to show online/offline & last seen & DP under group list
       onValue(usersRef, (snapshot) => {
         const data = snapshot.val() || {};
         if (window.renderAllUsersList) {
@@ -914,6 +966,8 @@
         set(userRef, {
           name: user.name,
           phone: user.phone,
+          roll: user.roll || "",
+          displayName: user.displayName || user.name,
           dpUrl: user.dpUrl || "",
           status: "online",
           lastSeen: Date.now()
@@ -940,7 +994,7 @@
           const name = bannedMap[phone].name || phone;
           row.innerHTML = `
             <span>${name} (${phone})</span>
-            <button onclick="window.unbanUser('${phone}')" style="background:#22c55e; border:none; color:#fff; border-radius:4px; padding:4px 10px; cursor:pointer; font-size:0.8rem; font-weight:bold;">अनब्लॉक (Unban)</button>
+            <button onclick="window.unbanUser('${phone}')" style="background:#22c55e; border:none; color:#fff; border-radius:4px; padding:4px 10px; cursor:pointer; font-size:0.8rem; font-weight:bold;">अनब्लॉक</button>
           `;
           listDiv.appendChild(row);
         });
@@ -965,7 +1019,7 @@
         const cleanPhone = (phone || "").replace(/[^0-9]/g, '');
         if(cleanPhone) {
           remove(ref(db, `banned_users/${cleanPhone}`)).then(() => {
-            alert(`छात्र (${phone}) को अनब्लॉक कर दिया गया।`);
+            alert(`यूजर को अनब्लॉक कर दिया गया।`);
           });
         }
       };
