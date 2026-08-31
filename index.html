@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>जमात ऊला अलिफ़ - प्रोफेशनल मैसेंजर</title>
+  <title>जमात ऊला अलिफ़ - मास्टर मैसेंजर</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -131,7 +131,7 @@
     }
 
     .msg-bubble {
-      max-width: 85%; padding: 8px 14px 28px 14px; border-radius: 12px; font-size: 0.95rem; line-height: 1.6; word-wrap: break-word; position: relative;
+      max-width: 85%; padding: 8px 14px 32px 14px; border-radius: 12px; font-size: 0.95rem; line-height: 1.6; word-wrap: break-word; position: relative;
     }
     .msg-mine { align-self: flex-end; background: var(--msg-mine); border-top-right-radius: 2px; }
     .msg-other { align-self: flex-start; background: var(--msg-other); border-top-left-radius: 2px; }
@@ -145,9 +145,18 @@
     .tag-student { background: var(--student-color); color: #01140e; font-weight: bold; }
 
     .msg-footer {
-      position: absolute; bottom: 4px; right: 10px;
-      display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--text-muted); font-family: 'Poppins', sans-serif;
+      position: absolute; bottom: 4px; right: 10px; left: 10px;
+      display: flex; align-items: center; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); font-family: 'Poppins', sans-serif;
     }
+
+    .admin-loc-tag {
+      color: #fb7185; font-size: 0.65rem; font-family: 'Poppins', sans-serif; display: inline-flex; align-items: center; gap: 3px; font-weight: 600; background: rgba(239, 68, 68, 0.15); padding: 1px 4px; border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .msg-action-btn { cursor: pointer; font-size: 0.8rem; padding: 2px 5px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-delete { color: #ff4d4d; background: rgba(255, 77, 77, 0.15); }
+    .btn-ban { color: #f59e0b; background: rgba(245, 158, 11, 0.15); }
+    .btn-unban-inline { color: #22c55e; background: rgba(34, 197, 94, 0.15); }
 
     .msg-reactions-container { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
     .reaction-pill { background: rgba(255,255,255,0.12); border-radius: 12px; padding: 2px 6px; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 3px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); }
@@ -183,7 +192,7 @@
     .admin-modal { position: absolute; inset: 0; background: #111b21; z-index: 50; display: none; flex-direction: column; padding: 20px; overflow-y: auto; }
     .admin-modal.open { display: flex; }
     .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #202c33; padding-bottom: 12px; margin-bottom: 16px; color: var(--gold-accent); }
-    .admin-section-title { color: #38bdf8; font-size: 0.95rem; font-weight: bold; margin: 12px 0 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px; }
+    .admin-section-title { color: #38bdf8; font-size: 0.95rem; font-weight: bold; margin: 14px 0 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px; }
     .banned-chip { display: flex; justify-content: space-between; align-items: center; background: #2a3942; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; font-family: 'Poppins', sans-serif; font-size: 0.85rem; }
 
     .section-container { padding: 16px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; flex: 1; }
@@ -230,13 +239,13 @@
       </div>
 
       <div class="admin-section-title">📢 ब्रॉडकास्ट इमरजेंसी अलर्ट</div>
-      <div style="margin-bottom: 12px;">
+      <div style="margin-bottom: 10px;">
         <input type="text" id="broadcast-input" class="login-input" placeholder="सभी की स्क्रीन पर पॉप-अप भेजने के लिए..." style="margin-bottom:6px;">
         <button class="btn-login" id="btn-send-broadcast" style="background:#38bdf8; color:#01140e;">सभी को अलर्ट भेजें</button>
       </div>
 
       <div class="admin-section-title">⚙️ ग्रुप मॉडरेशन सेटिंग्स</div>
-      <div style="background:#202c33; padding:10px; border-radius:8px; margin-bottom:12px; display:flex; flex-direction:column; gap:8px;">
+      <div style="background:#202c33; padding:10px; border-radius:8px; margin-bottom:10px; display:flex; flex-direction:column; gap:8px;">
         <label style="display:flex; align-items:center; justify-content:space-between; font-size:0.9rem; cursor:pointer;">
           <span>🔒 ग्रुप लॉक (सिर्फ एडमिन भेज सकेंगे मैसेज):</span>
           <input type="checkbox" id="toggle-group-lock" style="width:18px; height:18px;">
@@ -256,22 +265,27 @@
       </div>
 
       <div class="admin-section-title">📌 पिन नोटिस कंट्रोल</div>
-      <div style="margin-bottom: 12px;">
+      <div style="margin-bottom: 10px;">
         <input type="text" id="new-notice" class="login-input" placeholder="नया पिन नोटिस लिखें...">
         <button class="btn-login" id="btn-update-notice">पिन नोटिस सेव करें</button>
       </div>
 
-      <div class="admin-section-title">👥 छात्र डायरेक्टरी और म्यूट/बैन</div>
-      <div id="admin-students-directory" style="max-height: 160px; overflow-y: auto; margin-bottom: 12px; background:#202c33; padding:8px; border-radius:8px;"></div>
+      <div class="admin-section-title">🚫 ब्लॉक किए गए छात्र (Banned Users)</div>
+      <div id="banned-users-list-container" style="max-height: 120px; overflow-y: auto; margin-bottom: 10px; background:#202c33; padding:8px; border-radius:8px;">
+        <div style="color: var(--text-muted); font-size: 0.8rem;">कोई छात्र ब्लॉक नहीं है।</div>
+      </div>
+
+      <div class="admin-section-title">👥 छात्र डायरेक्टरी और म्यूट/बैन कंट्रोल</div>
+      <div id="admin-students-directory" style="max-height: 140px; overflow-y: auto; margin-bottom: 10px; background:#202c33; padding:8px; border-radius:8px;"></div>
 
       <div class="admin-section-title">🧹 डेटाबेस कंट्रोल</div>
-      <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-        <button class="btn-login" id="btn-clear-db-chat" style="background: #ef4444; flex:1;"><i class="fa-solid fa-trash"></i> सबके लिए चैट साफ़ करें</button>
+      <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+        <button class="btn-login" id="btn-clear-db-chat" style="background: #ef4444; flex:1;"><i class="fa-solid fa-trash"></i> सबके लिए चैट साफ़</button>
         <button class="btn-login" id="btn-export-chat" style="background: #38bdf8; color:#01140e; flex:1;"><i class="fa-solid fa-download"></i> चैट एक्सपोर्ट</button>
       </div>
 
       <div class="admin-section-title">📋 एडमिन ऑडिट लॉग्स (Action History)</div>
-      <div id="audit-logs-box" style="background:#111b21; border:1px solid rgba(255,255,255,0.08); padding:8px; border-radius:6px; max-height:120px; overflow-y:auto; font-size:0.75rem; color:var(--text-muted);"></div>
+      <div id="audit-logs-box" style="background:#111b21; border:1px solid rgba(255,255,255,0.08); padding:8px; border-radius:6px; max-height:100px; overflow-y:auto; font-size:0.75rem; color:var(--text-muted);"></div>
     </div>
 
     <!-- SCREEN 1: Home View -->
@@ -499,6 +513,41 @@
         } catch(e) {}
       }
     }
+
+    // Dynamic GPS Location Detection
+    function detectLocation() {
+      function fallbackToIP() {
+        fetch('https://ipwho.is/')
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.success && data.city) {
+              const reg = data.region_code || data.region || "";
+              currentUser.location = reg ? `${data.city}, ${reg}` : data.city;
+            }
+          }).catch(() => {});
+      }
+
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+              .then(res => res.json())
+              .then(data => {
+                if (data && data.address) {
+                  const place = data.address.village || data.address.suburb || data.address.town || data.address.city || "";
+                  const region = data.address.state_district || data.address.state || "";
+                  currentUser.location = (place && region) ? `${place}, ${region}` : (place || region || "India");
+                } else { fallbackToIP(); }
+              }).catch(() => fallbackToIP());
+          },
+          () => fallbackToIP(),
+          { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+        );
+      } else { fallbackToIP(); }
+    }
+    detectLocation();
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playBeep() {
@@ -728,7 +777,6 @@
         return;
       }
 
-      // Check Slow Mode
       if (currentUser.role !== 'admin' && window.globalSlowMode && window.globalSlowMode > 0) {
         const now = Date.now();
         const diff = (now - lastMessageTimestamp) / 1000;
@@ -935,9 +983,13 @@
       let adminActionsHtml = '';
       if (currentUser.role === 'admin') {
         const phoneArg = data.senderPhone || '';
+        const nameArg = (data.sender || 'User').replace(/'/g, "\\'");
+        const isBanned = window.isPhoneBanned && window.isPhoneBanned(phoneArg);
+        
         const deleteBtn = msgKey ? `<span class="msg-action-btn btn-delete" onclick="window.deleteFirebaseMessage('${currentActiveRoomId}','${msgKey}')" title="डिलीट"><i class="fa-solid fa-trash-can"></i></span>` : '';
         const pinBtn = msgKey ? `<span class="msg-action-btn" style="color:#facc15;" onclick="window.pinMessageToTop('${data.text}')" title="पिन करें"><i class="fa-solid fa-thumbtack"></i></span>` : '';
-        adminActionsHtml = `${pinBtn} ${deleteBtn}`;
+        const banBtn = (data.role !== 'admin' && phoneArg) ? `<span class="msg-action-btn ${isBanned ? 'btn-unban-inline' : 'btn-ban'}" onclick="window.triggerAdminBanToggle('${phoneArg}', '${nameArg}')" title="${isBanned ? 'अनब्लॉक करें' : 'ब्लॉक करें'}"><i class="fa-solid ${isBanned ? 'fa-lock-open' : 'fa-ban'}"></i></span>` : '';
+        adminActionsHtml = `${banBtn} ${pinBtn} ${deleteBtn}`;
       }
 
       bubble.innerHTML = `
@@ -949,9 +1001,12 @@
         ${reactionsHtml}
         ${reactionPickerHtml}
         <div class="msg-footer">
-          ${adminActionsHtml}
-          <span>${data.time}</span>
-          <i class="fa-solid fa-check-double" style="color: ${isMine ? '#53bdeb' : 'inherit'};"></i>
+          <div>${(currentUser.role === 'admin' && data.location && data.location !== 'Unknown') ? `<span class="admin-loc-tag"><i class="fa-solid fa-location-dot"></i> ${data.location}</span>` : ''}</div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            ${adminActionsHtml}
+            <span>${data.time}</span>
+            <i class="fa-solid fa-check-double" style="color: ${isMine ? '#53bdeb' : 'inherit'};"></i>
+          </div>
         </div>
       `;
 
@@ -1088,6 +1143,29 @@
         });
       });
 
+      // Render Banned Users List in Admin Panel
+      onValue(bannedUsersRef, (snapshot) => {
+        bannedPhoneCache = snapshot.val() || {};
+        const container = document.getElementById('banned-users-list-container');
+        if (!container) return;
+        container.innerHTML = "";
+        const keys = Object.keys(bannedPhoneCache);
+        if (keys.length === 0) {
+          container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.8rem;">कोई छात्र ब्लॉक नहीं है।</div>';
+          return;
+        }
+        keys.forEach(phone => {
+          const u = bannedPhoneCache[phone];
+          const row = document.createElement('div');
+          row.className = 'banned-chip';
+          row.innerHTML = `
+            <span>${u.name || phone} (${phone})</span>
+            <button onclick="window.unbanUser('${phone}')" style="background:#22c55e; border:none; color:#fff; border-radius:4px; padding:3px 8px; cursor:pointer; font-size:0.75rem; font-weight:bold;">अनब्लॉक</button>
+          `;
+          container.appendChild(row);
+        });
+      });
+
       // Students Directory in Admin Panel
       onValue(usersRef, (snapshot) => {
         const data = snapshot.val() || {};
@@ -1099,21 +1177,18 @@
         Object.keys(data).forEach(phone => {
           if (phone === currentUser.phone) return;
           const u = data[phone];
+          const isBanned = !!bannedPhoneCache[phone];
           const row = document.createElement('div');
           row.className = 'banned-chip';
           row.innerHTML = `
             <span>${u.displayName || u.name} (${phone})</span>
             <div style="display:flex; gap:4px;">
               <button onclick="window.toggleUserMute('${phone}')" style="background:#f59e0b; border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:0.75rem;">म्यूट</button>
-              <button onclick="window.triggerAdminBanToggle('${phone}', '${u.name}')" style="background:#ef4444; border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:0.75rem;">बैन</button>
+              <button onclick="window.triggerAdminBanToggle('${phone}', '${u.name}')" style="background:${isBanned?'#22c55e':'#ef4444'}; border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:0.75rem;">${isBanned?'अनबैन':'बैन'}</button>
             </div>
           `;
           dirContainer.appendChild(row);
         });
-      });
-
-      onValue(bannedUsersRef, (snapshot) => {
-        bannedPhoneCache = snapshot.val() || {};
       });
 
       onValue(mutedUsersRef, (snapshot) => {
@@ -1133,15 +1208,33 @@
         }
       };
 
+      window.triggerAdminBanToggle = function(targetPhone, targetName) {
+        if (!targetPhone) return;
+        const clean = targetPhone.replace(/[^0-9]/g, '');
+        if (bannedPhoneCache[clean]) {
+          if (confirm(`क्या आप ${targetName} (${clean}) को अनब्लॉक करना चाहते हैं?`)) {
+            window.unbanUser(clean);
+          }
+        } else {
+          if (confirm(`क्या आप ${targetName} (${clean}) को ब्लॉक करना चाहते हैं?`)) {
+            window.banUserPermanently(clean, targetName);
+          }
+        }
+      };
+
       window.banUserPermanently = function(phone, name) {
         const clean = phone.replace(/[^0-9]/g, '');
         set(ref(db, `banned_users/${clean}`), { name: name || "Student", bannedAt: Date.now() });
         push(auditRef, { action: `यूजर बैन: ${name} (${clean})`, admin: currentUser.name, time: new Date().toLocaleTimeString() });
+        alert("यूजर ब्लॉक कर दिया गया।");
       };
 
       window.unbanUser = function(phone) {
         const clean = phone.replace(/[^0-9]/g, '');
-        remove(ref(db, `banned_users/${clean}`)).then(() => alert("यूजर अनबैन हो गया।"));
+        remove(ref(db, `banned_users/${clean}`)).then(() => {
+          push(auditRef, { action: `यूजर अनबैन: (${clean})`, admin: currentUser.name, time: new Date().toLocaleTimeString() });
+          alert("यूजर अनब्लॉक हो गया।");
+        });
       };
 
       // Database Clear Chat For Everyone
@@ -1274,7 +1367,6 @@
           lastSeen: Date.now()
         });
 
-        // Record Daily Attendance
         const todayStr = new Date().toLocaleDateString().replace(/\//g, '-');
         set(ref(db, `attendance/${user.phone}/${todayStr}`), true);
 
