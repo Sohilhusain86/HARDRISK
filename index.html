@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>जमात ऊला अलिफ़ - अल्टीमेट मैसेंजर</title>
+  <title>जमात ऊला अलिफ़ - प्रोफेशनल मैसेंजर</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -105,7 +105,7 @@
       display: flex; background: var(--primary-green); border-top: 1px solid rgba(255,255,255,0.1);
     }
     .nav-tab-btn {
-      flex: 1; padding: 8px 4px; background: none; border: none; color: #bbf7d0; font-size: 0.78rem; font-weight: bold; cursor: pointer; text-align: center; font-family: 'Poppins', sans-serif;
+      flex: 1; padding: 10px; background: none; border: none; color: #bbf7d0; font-size: 0.85rem; font-weight: bold; cursor: pointer; text-align: center; font-family: 'Poppins', sans-serif;
     }
     .nav-tab-btn.active { color: #fff; border-bottom: 3px solid var(--gold-accent); }
 
@@ -183,10 +183,11 @@
     .admin-modal { position: absolute; inset: 0; background: #111b21; z-index: 50; display: none; flex-direction: column; padding: 20px; overflow-y: auto; }
     .admin-modal.open { display: flex; }
     .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #202c33; padding-bottom: 12px; margin-bottom: 16px; color: var(--gold-accent); }
+    .admin-section-title { color: #38bdf8; font-size: 0.95rem; font-weight: bold; margin: 12px 0 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px; }
     .banned-chip { display: flex; justify-content: space-between; align-items: center; background: #2a3942; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; font-family: 'Poppins', sans-serif; font-size: 0.85rem; }
 
     .section-container { padding: 16px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; flex: 1; }
-    .utility-card { background: var(--card-bg); padding: 12px 14px; border-radius: 10px; border-left: 4px solid var(--gold-accent); margin-bottom: 10px; }
+    .utility-card { background: var(--card-bg); padding: 12px 14px; border-radius: 10px; border-left: 4px solid var(--gold-accent); margin-bottom: 10px; position: relative; }
     .utility-title { font-weight: bold; font-size: 1rem; color: #fff; margin-bottom: 4px; }
     .utility-body { font-size: 0.85rem; color: var(--text-muted); }
   </style>
@@ -221,26 +222,56 @@
       </div>
     </div>
 
-    <!-- Admin Panel -->
+    <!-- Master Admin Control Center -->
     <div class="admin-modal" id="admin-panel">
       <div class="admin-header">
-        <h3><i class="fa-solid fa-shield-halved"></i> एडमिन कंट्रोल पैनल</h3>
+        <h3><i class="fa-solid fa-shield-halved"></i> मास्टर एडमिन कंट्रोल सेंटर</h3>
         <button class="header-btn" id="btn-close-admin"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div style="margin-bottom: 16px;">
-        <label style="color: #00a884; display: block; margin-bottom: 6px; font-size: 0.9rem;">पिन नोटिस बदलें:</label>
-        <input type="text" id="new-notice" class="login-input" placeholder="नया नोटिस या सबक लिखें...">
-        <button class="btn-login" id="btn-update-notice">नोटिस लाइव पब्लिश करें</button>
+
+      <div class="admin-section-title">📢 ब्रॉडकास्ट इमरजेंसी अलर्ट</div>
+      <div style="margin-bottom: 12px;">
+        <input type="text" id="broadcast-input" class="login-input" placeholder="सभी की स्क्रीन पर पॉप-अप भेजने के लिए..." style="margin-bottom:6px;">
+        <button class="btn-login" id="btn-send-broadcast" style="background:#38bdf8; color:#01140e;">सभी को अलर्ट भेजें</button>
       </div>
-      <div style="margin-bottom: 16px;">
-        <label style="color: #ef4444; display: block; margin-bottom: 6px; font-size: 0.9rem;">ब्लॉक किए गए छात्र:</label>
-        <div id="banned-users-list-container" style="max-height: 140px; overflow-y: auto; margin-bottom: 8px;">
-          <div style="color: var(--text-muted); font-size: 0.8rem;">कोई छात्र ब्लॉक नहीं है।</div>
+
+      <div class="admin-section-title">⚙️ ग्रुप मॉडरेशन सेटिंग्स</div>
+      <div style="background:#202c33; padding:10px; border-radius:8px; margin-bottom:12px; display:flex; flex-direction:column; gap:8px;">
+        <label style="display:flex; align-items:center; justify-content:space-between; font-size:0.9rem; cursor:pointer;">
+          <span>🔒 ग्रुप लॉक (सिर्फ एडमिन भेज सकेंगे मैसेज):</span>
+          <input type="checkbox" id="toggle-group-lock" style="width:18px; height:18px;">
+        </label>
+        <label style="display:flex; align-items:center; justify-content:space-between; font-size:0.9rem; cursor:pointer;">
+          <span>🖼️ मीडिया रोकें (सिर्फ टेक्स्ट की अनुमति):</span>
+          <input type="checkbox" id="toggle-media-lock" style="width:18px; height:18px;">
+        </label>
+        <div>
+          <span style="font-size:0.85rem; color:var(--text-muted);">स्लो मोड (मैसेज भेजने के बीच का गैप):</span>
+          <select id="slow-mode-select" class="login-input" style="margin-top:4px; margin-bottom:0;">
+            <option value="0">बंद (No Delay)</option>
+            <option value="5">5 सेकंड</option>
+            <option value="15">15 सेकंड</option>
+          </select>
         </div>
       </div>
-      <div>
-        <button class="btn-login" id="btn-clear-chat" style="background: #475569;"><i class="fa-solid fa-trash"></i> स्क्रीन साफ़ करें</button>
+
+      <div class="admin-section-title">📌 पिन नोटिस कंट्रोल</div>
+      <div style="margin-bottom: 12px;">
+        <input type="text" id="new-notice" class="login-input" placeholder="नया पिन नोटिस लिखें...">
+        <button class="btn-login" id="btn-update-notice">पिन नोटिस सेव करें</button>
       </div>
+
+      <div class="admin-section-title">👥 छात्र डायरेक्टरी और म्यूट/बैन</div>
+      <div id="admin-students-directory" style="max-height: 160px; overflow-y: auto; margin-bottom: 12px; background:#202c33; padding:8px; border-radius:8px;"></div>
+
+      <div class="admin-section-title">🧹 डेटाबेस कंट्रोल</div>
+      <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+        <button class="btn-login" id="btn-clear-db-chat" style="background: #ef4444; flex:1;"><i class="fa-solid fa-trash"></i> सबके लिए चैट साफ़ करें</button>
+        <button class="btn-login" id="btn-export-chat" style="background: #38bdf8; color:#01140e; flex:1;"><i class="fa-solid fa-download"></i> चैट एक्सपोर्ट</button>
+      </div>
+
+      <div class="admin-section-title">📋 एडमिन ऑडिट लॉग्स (Action History)</div>
+      <div id="audit-logs-box" style="background:#111b21; border:1px solid rgba(255,255,255,0.08); padding:8px; border-radius:6px; max-height:120px; overflow-y:auto; font-size:0.75rem; color:var(--text-muted);"></div>
     </div>
 
     <!-- SCREEN 1: Home View -->
@@ -260,11 +291,9 @@
         </div>
       </header>
 
-      <!-- Multi Navigation Tabs -->
       <nav class="nav-tabs">
         <button class="nav-tab-btn active" id="tab-chats-btn" onclick="switchTab('chats')"><i class="fa-solid fa-comments"></i> चैट्स</button>
         <button class="nav-tab-btn" id="tab-notes-btn" onclick="switchTab('notes')"><i class="fa-solid fa-book"></i> नोट्स/टास्क</button>
-        <button class="nav-tab-btn" id="tab-anon-btn" onclick="switchTab('anon')"><i class="fa-solid fa-user-secret"></i> गुप्त बोर्ड</button>
         <button class="nav-tab-btn" id="tab-polls-btn" onclick="switchTab('polls')"><i class="fa-solid fa-square-poll-vertical"></i> पोल्स</button>
       </nav>
 
@@ -286,6 +315,7 @@
       <!-- Tab 2: Notes & Tasks Area -->
       <main class="chats-list-area" id="tab-content-notes" style="display: none;">
         <div class="section-container">
+          <div style="font-size: 0.85rem; color: var(--gold-accent); margin-bottom: 4px;">नया टास्क या होमवर्क शेयर करें (सभी को दिखेगा):</div>
           <div style="display: flex; gap: 8px; margin-bottom: 8px;">
             <input type="text" id="new-note-title" class="login-input" placeholder="शीर्षक (जैसे: कल का सबक)" style="margin-bottom:0; flex:1;">
             <button class="btn-login" id="btn-add-note" style="width: auto; padding: 0 16px;"><i class="fa-solid fa-plus"></i></button>
@@ -295,24 +325,14 @@
         </div>
       </main>
 
-      <!-- Tab 3: Anonymous Secret Confessions Board -->
-      <main class="chats-list-area" id="tab-content-anon" style="display: none;">
-        <div class="section-container">
-          <div style="font-size: 0.85rem; color: var(--gold-accent); margin-bottom: 6px;">गुप्त बोर्ड (यहाँ आपकी पहचान पूरी तरह छिपी रहेगी):</div>
-          <textarea id="new-anon-text" class="login-input" placeholder="गुप्त सवाल या बात यहाँ लिखें..." style="height: 80px; resize: none; margin-bottom: 8px; text-align: left; padding: 10px;"></textarea>
-          <button class="btn-login" id="btn-send-anon" style="margin-bottom: 14px;">गुमनाम रूप से पोस्ट करें</button>
-          <div id="rendered-anon-box"></div>
-        </div>
-      </main>
-
-      <!-- Tab 4: Live Polls Area -->
+      <!-- Tab 3: Live Polls Area -->
       <main class="chats-list-area" id="tab-content-polls" style="display: none;">
         <div class="section-container">
-          <div style="font-size: 0.85rem; color: #38bdf8; margin-bottom: 6px;">नया पोल बनाएं:</div>
-          <input type="text" id="new-poll-question" class="login-input" placeholder="पोल का सवाल (जैसे: आज कौन सा सबक होगा?)" style="margin-bottom: 8px;">
+          <div style="font-size: 0.85rem; color: #38bdf8; margin-bottom: 4px;">नया पोल बनाएं (सभी के लिए):</div>
+          <input type="text" id="new-poll-question" class="login-input" placeholder="पोल का सवाल..." style="margin-bottom: 8px;">
           <input type="text" id="poll-opt-1" class="login-input" placeholder="विकल्प 1" style="margin-bottom: 8px;">
           <input type="text" id="poll-opt-2" class="login-input" placeholder="विकल्प 2" style="margin-bottom: 12px;">
-          <button class="btn-login" id="btn-create-poll" style="margin-bottom: 14px;">पोल लाइव करें</button>
+          <button class="btn-login" id="btn-create-poll" style="margin-bottom: 14px;">पोल ग्रुप में भेजें</button>
           <div id="rendered-polls-box"></div>
         </div>
       </main>
@@ -339,17 +359,13 @@
       <main class="chat-messages-area" id="chat-stream"></main>
       <div id="typing-indicator">कोई टाइप कर रहा है...</div>
 
-      <!-- Voice Changer Selector Bar -->
       <div style="background: #111b21; padding: 6px 12px; display: flex; align-items: center; gap: 8px; font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05);">
-        <span style="color: var(--text-muted);">🎙️ वॉइस मोड:</span>
+        <span style="color: var(--text-muted);">🎙️ वॉइस इफ़ेक्ट:</span>
         <select id="voice-effect-select" style="background: #202c33; color: #fff; border: 1px solid #00a884; border-radius: 6px; padding: 2px 6px; outline: none;">
-          <option value="normal">सामान्य (Normal)</option>
-          <option value="robot">रोबोट (Robot Effect)</option>
-          <option value="chipmunk">गिलहरी (Chipmunk High)</option>
+          <option value="normal">सामान्य आवाज़ (Normal)</option>
+          <option value="robot">रोबोट आवाज़ (Robot)</option>
+          <option value="chipmunk">गिलहरी आवाज़ (Chipmunk High)</option>
         </select>
-        <label style="margin-left: auto; display: flex; align-items: center; gap: 4px; color: var(--gold-accent); cursor: pointer;">
-          <input type="checkbox" id="anon-chat-toggle"> गुप्त चैट (Anon)
-        </label>
       </div>
 
       <footer class="chat-bottom-dock">
@@ -375,6 +391,7 @@
     const ADMIN_PASSKEY = "razavi123";
     let soundEnabled = true;
     let typingTimer = null;
+    let lastMessageTimestamp = 0;
 
     let mediaRecorder = null;
     let audioChunks = [];
@@ -385,7 +402,7 @@
     let otpStepSent = false;
 
     window.switchTab = function(tabName) {
-      const tabs = ['chats', 'notes', 'anon', 'polls'];
+      const tabs = ['chats', 'notes', 'polls'];
       tabs.forEach(t => {
         document.getElementById(`tab-${t}-btn`).classList.remove('active');
         document.getElementById(`tab-content-${t}`).style.display = 'none';
@@ -515,14 +532,8 @@
       const phone = userPhoneInput.value.trim().replace(/[^0-9]/g, '');
       const roll = userRollInput.value.trim();
 
-      if (!name) {
-        alert("कृपया अपना नाम दर्ज करें।");
-        return;
-      }
-      if (phone.length < 10) {
-        alert("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।");
-        return;
-      }
+      if (!name) { alert("कृपया अपना नाम दर्ज करें।"); return; }
+      if (phone.length < 10) { alert("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।"); return; }
 
       if (!otpStepSent) {
         generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -534,10 +545,7 @@
       }
 
       const enteredOtp = otpInput.value.trim();
-      if (enteredOtp !== generatedOtp) {
-        alert("गलत OTP! कृपया सही OTP दर्ज करें।");
-        return;
-      }
+      if (enteredOtp !== generatedOtp) { alert("गलत OTP!"); return; }
 
       currentUser.name = name;
       currentUser.phone = phone;
@@ -549,11 +557,6 @@
       if (pass === ADMIN_PASSKEY) {
         currentUser.role = "admin";
         adminCrown.style.display = "block";
-      }
-
-      if (window.isPhoneBanned && window.isPhoneBanned(phone)) {
-        alert("आपको एडमिन द्वारा ब्लॉक कर दिया गया है।");
-        return;
       }
 
       localStorage.setItem('jamia_chat_saved_user', JSON.stringify(currentUser));
@@ -586,10 +589,7 @@
         droneRoom = drone.subscribe('observable-jamia-online-room');
 
         droneRoom.on('data', (data) => {
-          if (data.type === 'notice') {
-            document.getElementById('notice-display').textContent = data.text;
-          } 
-          else if (data.type === 'typing' && data.roomId === currentActiveRoomId && data.senderPhone !== currentUser.phone) {
+          if (data.type === 'typing' && data.roomId === currentActiveRoomId && data.senderPhone !== currentUser.phone) {
             const typingDiv = document.getElementById('typing-indicator');
             typingDiv.textContent = `${data.sender} टाइप कर रहे हैं...`;
             typingDiv.style.display = 'block';
@@ -600,9 +600,6 @@
             alert("आपको एडमिन ने ब्लॉक कर दिया है।");
             localStorage.removeItem('jamia_chat_saved_user');
             location.reload();
-          }
-          else if (data.type === 'unban' && (data.targetPhone === currentUser.phone)) {
-            alert("आपको एडमिन ने अनब्लॉक कर दिया है।");
           }
         });
       });
@@ -623,7 +620,6 @@
 
         count++;
         const isOnline = u.status === 'online';
-        
         let subText = "ऑनलाइन 🟢";
         if (!isOnline) {
           if (u.lastSeen) {
@@ -727,12 +723,24 @@
         return;
       }
 
-      const isAnon = document.getElementById('anon-chat-toggle').checked;
-      const senderName = isAnon ? "गुप्त सदस्य (Anonymous)" : currentUser.name;
-      const displayName = isAnon ? "गुप्त सदस्य 👤" : currentUser.displayName;
+      if (window.isUserMuted && window.isUserMuted(currentUser.phone)) {
+        alert("आपको एडमिन द्वारा अस्थायी रूप से म्यूट किया गया है।");
+        return;
+      }
+
+      // Check Slow Mode
+      if (currentUser.role !== 'admin' && window.globalSlowMode && window.globalSlowMode > 0) {
+        const now = Date.now();
+        const diff = (now - lastMessageTimestamp) / 1000;
+        if (diff < window.globalSlowMode) {
+          alert(`स्लो मोड चालू है! कृपया ${Math.ceil(window.globalSlowMode - diff)} सेकंड बाद मैसेज भेजें।`);
+          return;
+        }
+        lastMessageTimestamp = now;
+      }
 
       if(window.sendFirebaseMessage) {
-        window.sendFirebaseMessage(currentActiveRoomId, senderName, currentUser.phone, displayName, currentUser.role, text, currentUser.location);
+        window.sendFirebaseMessage(currentActiveRoomId, currentUser.name, currentUser.phone, currentUser.displayName, currentUser.role, text, currentUser.location);
       }
       msgInput.value = "";
     }
@@ -748,7 +756,14 @@
       return await res.json();
     }
 
-    attachBtn.addEventListener('click', () => fileSelector.click());
+    attachBtn.addEventListener('click', () => {
+      if (currentUser.role !== 'admin' && window.globalMediaLock) {
+        alert("एडमिन ने ग्रुप में मीडिया (फोटो/फाइल) भेजना प्रतिबंधित किया है।");
+        return;
+      }
+      fileSelector.click();
+    });
+
     fileSelector.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -774,6 +789,56 @@
       }
     });
 
+    async function processAudioWithEffect(blob, effectType) {
+      if (effectType === 'normal') return blob;
+      try {
+        const arrayBuffer = await blob.arrayBuffer();
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const decodedBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+        let sampleRate = decodedBuffer.sampleRate;
+        if (effectType === 'chipmunk') sampleRate = sampleRate * 1.4;
+        else if (effectType === 'robot') sampleRate = sampleRate * 0.75;
+
+        const offlineCtx = new OfflineAudioContext(decodedBuffer.numberOfChannels, decodedBuffer.length, sampleRate);
+        const source = offlineCtx.createBufferSource();
+        source.buffer = decodedBuffer;
+        source.connect(offlineCtx.destination);
+        source.start(0);
+
+        const renderedBuffer = await offlineCtx.startRendering();
+        return bufferToWaveBlob(renderedBuffer);
+      } catch(e) { return blob; }
+    }
+
+    function bufferToWaveBlob(abuffer) {
+      let numOfChan = abuffer.numberOfChannels,
+          length = abuffer.length * numOfChan * 2 + 44,
+          buffer = new ArrayBuffer(length),
+          view = new DataView(buffer),
+          channels = [], sampleRate = abuffer.sampleRate, offset = 0, pos = 0;
+
+      function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
+      function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
+
+      setUint32(0x46464952); setUint32(length - 8); setUint32(0x45564157);
+      setUint32(0x20746d66); setUint32(16); setUint16(1); setUint16(numOfChan);
+      setUint32(sampleRate); setUint32(sampleRate * 2 * numOfChan);
+      setUint16(numOfChan * 2); setUint16(16); setUint32(0x61746164); setUint32(length - pos - 4);
+
+      for (let i = 0; i < abuffer.numberOfChannels; i++) channels.push(abuffer.getChannelData(i));
+      while (pos < length) {
+        for (let i = 0; i < numOfChan; i++) {
+          let sample = Math.max(-1, Math.min(1, channels[i][offset]));
+          sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767);
+          view.setInt16(pos, sample, true);
+          pos += 2;
+        }
+        offset++;
+      }
+      return new Blob([buffer], { type: "audio/wav" });
+    }
+
     micBtn.addEventListener('click', async () => {
       if (!isRecording) {
         try {
@@ -787,16 +852,18 @@
 
           mediaRecorder.onstop = async () => {
             if (currentStream) currentStream.getTracks().forEach(track => track.stop());
-            const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-            const audioFile = new File([audioBlob], `audio_${Date.now()}.mp3`, { type: 'audio/mp3' });
-            
+            const rawBlob = new Blob(audioChunks, { type: 'audio/mp3' });
             const effect = document.getElementById('voice-effect-select').value;
+            
+            msgInput.placeholder = "वॉइस इफ़ेक्ट प्रोसेस हो रहा है...";
+            const processedBlob = await processAudioWithEffect(rawBlob, effect);
+            const audioFile = new File([processedBlob], `audio_${Date.now()}.wav`, { type: 'audio/wav' });
+            
             msgInput.placeholder = "ऑडियो अपलोड हो रही है...";
             try {
               const res = await uploadToCloudinary(audioFile);
               if (res.secure_url && window.sendFirebaseMessage) {
-                const audioTag = `[AUDIO:${effect}](${res.secure_url})`;
-                window.sendFirebaseMessage(currentActiveRoomId, currentUser.name, currentUser.phone, currentUser.displayName, currentUser.role, audioTag, currentUser.location);
+                window.sendFirebaseMessage(currentActiveRoomId, currentUser.name, currentUser.phone, currentUser.displayName, currentUser.role, `[AUDIO](${res.secure_url})`, currentUser.location);
               }
             } catch(e) {
               alert("ऑडियो अपलोड नहीं हो सकी");
@@ -808,34 +875,13 @@
           mediaRecorder.start();
           isRecording = true;
           micBtn.classList.add('recording');
-        } catch (err) {
-          alert("माइक की अनुमति दें: " + err.message);
-        }
+        } catch (err) { alert("माइक की अनुमति दें: " + err.message); }
       } else {
         if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
         isRecording = false;
         micBtn.classList.remove('recording');
       }
     });
-
-    window.triggerAdminBanToggle = function(targetPhone, targetName) {
-      if (!targetPhone) return;
-      const isAlreadyBanned = window.isPhoneBanned && window.isPhoneBanned(targetPhone);
-
-      if (isAlreadyBanned) {
-        if (confirm(`क्या आप ${targetName} को अनब्लॉक करना चाहते हैं?`)) {
-          if (window.unbanUser) window.unbanUser(targetPhone);
-          if (drone) drone.publish({ room: 'observable-jamia-online-room', message: { type: 'unban', targetPhone: targetPhone } });
-          alert(`यूजर को अनब्लॉक कर दिया गया।`);
-        }
-      } else {
-        if (confirm(`क्या आप सच में ${targetName} को ब्लॉक करना चाहते हैं?`)) {
-          if (window.banUserPermanently) window.banUserPermanently(targetPhone, targetName);
-          if (drone) drone.publish({ room: 'observable-jamia-online-room', message: { type: 'ban', targetPhone: targetPhone } });
-          alert(`यूजर को ब्लॉक कर दिया गया।`);
-        }
-      }
-    };
 
     window.appendMessage = function(data, msgKey) {
       const isMine = data.senderPhone === currentUser.phone;
@@ -847,21 +893,12 @@
       const roleLabel = data.role === 'admin' ? 'एडमिन' : 'छात्र';
 
       let contentHtml = `<div>${data.text}</div>`;
-      
       if (typeof data.text === 'string' && data.text.startsWith('[IMG](')) {
         const match = data.text.match(/\((.*?)\)/);
         if (match) contentHtml = `<img src="${match[1]}" class="msg-img-preview" alt="Image" onclick="window.open('${match[1]}','_blank')"/>`;
-      } else if (typeof data.text === 'string' && data.text.startsWith('[AUDIO')) {
+      } else if (typeof data.text === 'string' && data.text.startsWith('[AUDIO](')) {
         const match = data.text.match(/\((.*?)\)/);
-        const effectMatch = data.text.match(/\[AUDIO:(.*?)\]/);
-        const fx = effectMatch ? effectMatch[1] : 'normal';
-        let playbackRate = 1.0;
-        if (fx === 'robot') playbackRate = 0.75;
-        if (fx === 'chipmunk') playbackRate = 1.4;
-
-        if (match) {
-          contentHtml = `<audio src="${match[1]}" controls class="msg-audio-player" onplay="this.playbackRate=${playbackRate}"></audio> <div style="font-size:0.65rem; color:#facc15;">[वॉइस इफेक्ट: ${fx}]</div>`;
-        }
+        if (match) contentHtml = `<audio src="${match[1]}" controls class="msg-audio-player"></audio>`;
       } else if (typeof data.text === 'string') {
         const fileMatch = data.text.match(/^\[FILE:(.*?)\]\((.*?)\)$/);
         if (fileMatch) {
@@ -895,19 +932,12 @@
         </div>
       `;
 
-      const locationHtml = (currentUser.role === 'admin' && data.location && data.location !== 'Unknown')
-        ? `<span class="admin-loc-tag"><i class="fa-solid fa-location-dot"></i> ${data.location}</span>`
-        : '';
-
       let adminActionsHtml = '';
       if (currentUser.role === 'admin') {
         const phoneArg = data.senderPhone || '';
-        const nameArg = (data.sender || 'User').replace(/'/g, "\\'");
-        const isBanned = window.isPhoneBanned && window.isPhoneBanned(phoneArg);
-        
         const deleteBtn = msgKey ? `<span class="msg-action-btn btn-delete" onclick="window.deleteFirebaseMessage('${currentActiveRoomId}','${msgKey}')" title="डिलीट"><i class="fa-solid fa-trash-can"></i></span>` : '';
-        const banBtn = (data.role !== 'admin' && phoneArg) ? `<span class="msg-action-btn ${isBanned ? 'btn-unban-inline' : 'btn-ban'}" onclick="window.triggerAdminBanToggle('${phoneArg}', '${nameArg}')" title="${isBanned ? 'अनब्लॉक करें' : 'ब्लॉक करें'}"><i class="fa-solid ${isBanned ? 'fa-lock-open' : 'fa-ban'}"></i></span>` : '';
-        adminActionsHtml = `${banBtn} ${deleteBtn}`;
+        const pinBtn = msgKey ? `<span class="msg-action-btn" style="color:#facc15;" onclick="window.pinMessageToTop('${data.text}')" title="पिन करें"><i class="fa-solid fa-thumbtack"></i></span>` : '';
+        adminActionsHtml = `${pinBtn} ${deleteBtn}`;
       }
 
       bubble.innerHTML = `
@@ -920,7 +950,6 @@
         ${reactionPickerHtml}
         <div class="msg-footer">
           ${adminActionsHtml}
-          ${locationHtml}
           <span>${data.time}</span>
           <i class="fa-solid fa-check-double" style="color: ${isMine ? '#53bdeb' : 'inherit'};"></i>
         </div>
@@ -936,26 +965,13 @@
     adminCrown.addEventListener('click', () => adminPanel.classList.add('open'));
     document.getElementById('btn-close-admin').addEventListener('click', () => adminPanel.classList.remove('open'));
 
-    document.getElementById('btn-update-notice').addEventListener('click', () => {
-      const noticeVal = document.getElementById('new-notice').value.trim();
-      if (!noticeVal || !drone) return;
-      drone.publish({ room: 'observable-jamia-online-room', message: { type: 'notice', text: noticeVal } });
-      document.getElementById('new-notice').value = "";
-      adminPanel.classList.remove('open');
-    });
-
-    document.getElementById('btn-clear-chat').addEventListener('click', () => {
-      chatStream.innerHTML = "";
-      adminPanel.classList.remove('open');
-    });
-
     document.getElementById('btn-sound').addEventListener('click', () => {
       soundEnabled = !soundEnabled;
       document.getElementById('btn-sound').innerHTML = soundEnabled ? '<i class="fa-solid fa-volume-high"></i>' : '<i class="fa-solid fa-volume-xmark"></i>';
     });
   </script>
 
-  <!-- Firebase Integration & Additional Features (Notes, Anon Board, Polls) -->
+  <!-- Firebase Integration & Professional Admin Controls -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, push, set, update, onValue, onDisconnect, onChildAdded, onChildRemoved, remove, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -976,32 +992,189 @@
       let activeChatListenerRef = null;
 
       let bannedPhoneCache = {};
+      let mutedPhoneCache = {};
       const bannedUsersRef = ref(db, 'banned_users');
+      const mutedUsersRef = ref(db, 'mutes');
       const usersRef = ref(db, 'users');
-      const notesRef = ref(db, 'important_notes');
-      const anonRef = ref(db, 'anonymous_board');
-      const pollsRef = ref(db, 'live_polls');
+      const notesRef = ref(db, 'group_shared_notes');
+      const pollsRef = ref(db, 'group_shared_polls');
+      const settingsRef = ref(db, 'settings');
+      const auditRef = ref(db, 'audit_logs');
 
-      onValue(bannedUsersRef, (snapshot) => {
-        bannedPhoneCache = snapshot.val() || {};
-        renderBannedUsersListInAdmin(bannedPhoneCache);
-      });
+      // Global Settings Sync
+      onValue(settingsRef, (snapshot) => {
+        const settings = snapshot.val() || {};
+        window.globalSlowMode = settings.slowMode || 0;
+        window.globalMediaLock = !!settings.mediaLock;
 
-      onValue(usersRef, (snapshot) => {
-        const data = snapshot.val() || {};
-        if (window.renderAllUsersList) {
-          window.renderAllUsersList(data);
+        const isLocked = !!settings.groupLocked;
+        const msgInputBox = document.getElementById('msg-input');
+        if (msgInputBox && currentUser.role !== 'admin') {
+          msgInputBox.disabled = isLocked;
+          msgInputBox.placeholder = isLocked ? "🔒 एडमिन द्वारा ग्रुप लॉक किया गया है..." : "यहाँ मैसेज लिखें...";
+        }
+
+        if (settings.noticeText) {
+          document.getElementById('notice-display').textContent = settings.noticeText;
+        }
+
+        if (settings.broadcastAlert && settings.broadcastTime > (window.lastAlertTime || 0)) {
+          window.lastAlertTime = settings.broadcastTime;
+          alert("📢 एडमिन इमरजेंसी अलर्ट:\n\n" + settings.broadcastAlert);
         }
       });
 
-      // 1. Notes & Tasks
+      // Admin Settings UI Binding
+      const toggleGroupLock = document.getElementById('toggle-group-lock');
+      const toggleMediaLock = document.getElementById('toggle-media-lock');
+      const slowModeSelect = document.getElementById('slow-mode-select');
+
+      if (toggleGroupLock) {
+        toggleGroupLock.addEventListener('change', (e) => {
+          update(settingsRef, { groupLocked: e.target.checked });
+          push(auditRef, { action: `ग्रुप लॉक: ${e.target.checked}`, admin: currentUser.name, time: new Date().toLocaleTimeString() });
+        });
+      }
+
+      if (toggleMediaLock) {
+        toggleMediaLock.addEventListener('change', (e) => {
+          update(settingsRef, { mediaLock: e.target.checked });
+          push(auditRef, { action: `मीडिया लॉक: ${e.target.checked}`, admin: currentUser.name, time: new Date().toLocaleTimeString() });
+        });
+      }
+
+      if (slowModeSelect) {
+        slowModeSelect.addEventListener('change', (e) => {
+          const val = parseInt(e.target.value);
+          update(settingsRef, { slowMode: val });
+          push(auditRef, { action: `स्लो मोड सेट: ${val}s`, admin: currentUser.name, time: new Date().toLocaleTimeString() });
+        });
+      }
+
+      document.getElementById('btn-update-notice').addEventListener('click', () => {
+        const noticeVal = document.getElementById('new-notice').value.trim();
+        if (!noticeVal) return;
+        update(settingsRef, { noticeText: noticeVal });
+        push(auditRef, { action: `पिन नोटिस बदला गया`, admin: currentUser.name, time: new Date().toLocaleTimeString() });
+        document.getElementById('new-notice').value = "";
+        alert("पिन नोटिस सेव हो गया!");
+      });
+
+      document.getElementById('btn-send-broadcast').addEventListener('click', () => {
+        const alertText = document.getElementById('broadcast-input').value.trim();
+        if (!alertText) return;
+        update(settingsRef, { broadcastAlert: alertText, broadcastTime: Date.now() });
+        push(auditRef, { action: `ब्रॉडकास्ट अलर्ट भेजा गया`, admin: currentUser.name, time: new Date().toLocaleTimeString() });
+        document.getElementById('broadcast-input').value = "";
+        alert("अलर्ट सभी छात्रों को भेज दिया गया!");
+      });
+
+      window.pinMessageToTop = function(text) {
+        update(settingsRef, { noticeText: `📌 पिन किया गया: ${text}` });
+        alert("मैसेज पिन कर दिया गया!");
+      };
+
+      // Audit Logs Realtime
+      onValue(auditRef, (snapshot) => {
+        const logs = snapshot.val() || {};
+        const box = document.getElementById('audit-logs-box');
+        if (!box) return;
+        box.innerHTML = "";
+        Object.values(logs).slice(-10).reverse().forEach(log => {
+          const div = document.createElement('div');
+          div.style.marginBottom = "4px";
+          div.textContent = `[${log.time}] ${log.admin}: ${log.action}`;
+          box.appendChild(div);
+        });
+      });
+
+      // Students Directory in Admin Panel
+      onValue(usersRef, (snapshot) => {
+        const data = snapshot.val() || {};
+        if (window.renderAllUsersList) window.renderAllUsersList(data);
+        
+        const dirContainer = document.getElementById('admin-students-directory');
+        if (!dirContainer) return;
+        dirContainer.innerHTML = "";
+        Object.keys(data).forEach(phone => {
+          if (phone === currentUser.phone) return;
+          const u = data[phone];
+          const row = document.createElement('div');
+          row.className = 'banned-chip';
+          row.innerHTML = `
+            <span>${u.displayName || u.name} (${phone})</span>
+            <div style="display:flex; gap:4px;">
+              <button onclick="window.toggleUserMute('${phone}')" style="background:#f59e0b; border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:0.75rem;">म्यूट</button>
+              <button onclick="window.triggerAdminBanToggle('${phone}', '${u.name}')" style="background:#ef4444; border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:0.75rem;">बैन</button>
+            </div>
+          `;
+          dirContainer.appendChild(row);
+        });
+      });
+
+      onValue(bannedUsersRef, (snapshot) => {
+        bannedPhoneCache = snapshot.val() || {};
+      });
+
+      onValue(mutedUsersRef, (snapshot) => {
+        mutedPhoneCache = snapshot.val() || {};
+      });
+
+      window.isPhoneBanned = (phone) => !!bannedPhoneCache[phone.replace(/[^0-9]/g, '')];
+      window.isUserMuted = (phone) => !!mutedPhoneCache[phone.replace(/[^0-9]/g, '')];
+
+      window.toggleUserMute = function(phone) {
+        const clean = phone.replace(/[^0-9]/g, '');
+        if (mutedPhoneCache[clean]) {
+          remove(ref(db, `mutes/${clean}`)).then(() => alert("यूजर अनम्यूट हो गया।"));
+        } else {
+          set(ref(db, `mutes/${clean}`), { mutedAt: Date.now() });
+          alert("यूजर म्यूट कर दिया गया।");
+        }
+      };
+
+      window.banUserPermanently = function(phone, name) {
+        const clean = phone.replace(/[^0-9]/g, '');
+        set(ref(db, `banned_users/${clean}`), { name: name || "Student", bannedAt: Date.now() });
+        push(auditRef, { action: `यूजर बैन: ${name} (${clean})`, admin: currentUser.name, time: new Date().toLocaleTimeString() });
+      };
+
+      window.unbanUser = function(phone) {
+        const clean = phone.replace(/[^0-9]/g, '');
+        remove(ref(db, `banned_users/${clean}`)).then(() => alert("यूजर अनबैन हो गया।"));
+      };
+
+      // Database Clear Chat For Everyone
+      document.getElementById('btn-clear-db-chat').addEventListener('click', () => {
+        if (confirm("चेतावनी: क्या आप ग्रुप की पूरी चैट हमेशा के लिए डिलीट करना चाहते हैं?")) {
+          remove(ref(db, 'messages/group')).then(() => {
+            alert("ग्रुप चैट पूरी तरह साफ कर दी गई है।");
+            document.getElementById('chat-stream').innerHTML = "";
+            push(auditRef, { action: `ग्रुप चैट साफ की गई`, admin: currentUser.name, time: new Date().toLocaleTimeString() });
+          });
+        }
+      });
+
+      // Export Chat Backup
+      document.getElementById('btn-export-chat').addEventListener('click', () => {
+        const stream = document.getElementById('chat-stream');
+        const textContent = stream.innerText;
+        const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Jamia_Chat_Backup_${new Date().toLocaleDateString()}.txt`;
+        a.click();
+      });
+
+      // Shared Notes
       const btnAddNote = document.getElementById('btn-add-note');
       if (btnAddNote) {
         btnAddNote.addEventListener('click', () => {
           const title = document.getElementById('new-note-title').value.trim();
           const desc = document.getElementById('new-note-desc').value.trim();
           if (!title || !desc) { alert("कृपया शीर्षक और विवरण भरें।"); return; }
-          push(notesRef, { title, description: desc, author: currentUser.name || "Admin", time: new Date().toLocaleDateString() });
+          push(notesRef, { title, description: desc, author: currentUser.displayName || currentUser.name, time: new Date().toLocaleDateString() });
           document.getElementById('new-note-title').value = "";
           document.getElementById('new-note-desc').value = "";
         });
@@ -1013,45 +1186,20 @@
         if (!container) return;
         container.innerHTML = "";
         const keys = Object.keys(data);
-        if (keys.length === 0) { container.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem; text-align:center;">कोई नोट या टास्क उपलब्ध नहीं है।</div>`; return; }
+        if (keys.length === 0) { container.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem; text-align:center;">कोई टास्क या नोट उपलब्ध नहीं है।</div>`; return; }
         keys.forEach(k => {
           const item = data[k];
           const div = document.createElement('div');
           div.className = 'utility-card';
-          div.innerHTML = `<div class="utility-title">${item.title} <span style="font-size:0.7rem; color:var(--text-muted); float:right;">${item.time}</span></div><div class="utility-body">${item.description}</div><div style="font-size:0.65rem; color:#38bdf8; margin-top:6px;">द्वारा: ${item.author}</div>`;
+          let adminDel = currentUser.role === 'admin' ? `<button onclick="window.deleteNote('${k}')" style="position:absolute; top:8px; right:8px; background:none; border:none; color:#ef4444; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>` : '';
+          div.innerHTML = `${adminDel}<div class="utility-title">${item.title} <span style="font-size:0.7rem; color:var(--text-muted); margin-left:8px;">${item.time}</span></div><div class="utility-body">${item.description}</div><div style="font-size:0.65rem; color:#38bdf8; margin-top:6px;">शेयर किया: ${item.author}</div>`;
           container.appendChild(div);
         });
       });
 
-      // 2. Anonymous Board
-      const btnSendAnon = document.getElementById('btn-send-anon');
-      if (btnSendAnon) {
-        btnSendAnon.addEventListener('click', () => {
-          const txt = document.getElementById('new-anon-text').value.trim();
-          if (!txt) { alert("गुप्त संदेश खाली न छोड़ें।"); return; }
-          push(anonRef, { text: txt, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
-          document.getElementById('new-anon-text').value = "";
-        });
-      }
+      window.deleteNote = (key) => remove(ref(db, `group_shared_notes/${key}`));
 
-      onValue(anonRef, (snapshot) => {
-        const data = snapshot.val() || {};
-        const container = document.getElementById('rendered-anon-box');
-        if (!container) return;
-        container.innerHTML = "";
-        const keys = Object.keys(data);
-        if (keys.length === 0) { container.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem; text-align:center;">गुप्त बोर्ड खाली है।</div>`; return; }
-        keys.forEach(k => {
-          const item = data[k];
-          const div = document.createElement('div');
-          div.className = 'utility-card';
-          div.style.borderLeftColor = '#38bdf8';
-          div.innerHTML = `<div class="utility-title">👤 गुप्त सदस्य <span style="font-size:0.7rem; color:var(--text-muted); float:right;">${item.time}</span></div><div class="utility-body">${item.text}</div>`;
-          container.appendChild(div);
-        });
-      });
-
-      // 3. Live Polls
+      // Shared Polls
       const btnCreatePoll = document.getElementById('btn-create-poll');
       if (btnCreatePoll) {
         btnCreatePoll.addEventListener('click', () => {
@@ -1059,7 +1207,7 @@
           const o1 = document.getElementById('poll-opt-1').value.trim();
           const o2 = document.getElementById('poll-opt-2').value.trim();
           if (!q || !o1 || !o2) { alert("कृपया सवाल और दोनों विकल्प भरें।"); return; }
-          push(pollsRef, { question: q, opt1: o1, opt2: o2, votes1: 0, votes2: 0, voters: {} });
+          push(pollsRef, { question: q, opt1: o1, opt2: o2, votes1: 0, votes2: 0, voters: {}, author: currentUser.displayName || currentUser.name });
           document.getElementById('new-poll-question').value = "";
           document.getElementById('poll-opt-1').value = "";
           document.getElementById('poll-opt-2').value = "";
@@ -1079,8 +1227,10 @@
           const div = document.createElement('div');
           div.className = 'utility-card';
           div.style.borderLeftColor = '#22c55e';
+          let adminDel = currentUser.role === 'admin' ? `<button onclick="window.deletePoll('${k}')" style="position:absolute; top:8px; right:8px; background:none; border:none; color:#ef4444; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>` : '';
           div.innerHTML = `
-            <div class="utility-title">📊 ${poll.question}</div>
+            ${adminDel}
+            <div class="utility-title">📊 ${poll.question} <span style="font-size:0.65rem; color:#38bdf8; display:block;">द्वारा: ${poll.author}</span></div>
             <div style="margin-top: 8px; display:flex; flex-direction:column; gap:6px;">
               <button onclick="window.votePoll('${k}', 1)" style="background:#111b21; border:1px solid #00a884; color:#fff; padding:6px 10px; border-radius:6px; cursor:pointer; text-align:left; display:flex; justify-content:space-between;">
                 <span>${poll.opt1}</span> <span><b>${poll.votes1 || 0}</b> वोट</span>
@@ -1095,21 +1245,19 @@
         });
       });
 
+      window.deletePoll = (key) => remove(ref(db, `group_shared_polls/${key}`));
+
       window.votePoll = function(pollKey, optNum) {
         const userPhoneKey = currentUser.phone.replace(/[.#$\/\[\]]/g, '_');
-        const pollItemRef = ref(db, `live_polls/${pollKey}`);
+        const pollItemRef = ref(db, `group_shared_polls/${pollKey}`);
         onValue(pollItemRef, (snap) => {
           const pollData = snap.val();
           if (!pollData) return;
           if (!pollData.voters) pollData.voters = {};
-          if (pollData.voters[userPhoneKey]) {
-            alert("आप पहले ही इस पोल में वोट कर चुके हैं!");
-            return;
-          }
+          if (pollData.voters[userPhoneKey]) { alert("आप पहले ही इस पोल में वोट कर चुके हैं!"); return; }
           pollData.voters[userPhoneKey] = optNum;
           if (optNum === 1) pollData.votes1 = (pollData.votes1 || 0) + 1;
           else pollData.votes2 = (pollData.votes2 || 0) + 1;
-
           set(pollItemRef, pollData);
         }, { onlyOnce: true });
       };
@@ -1126,50 +1274,11 @@
           lastSeen: Date.now()
         });
 
-        onDisconnect(userRef).update({
-          status: "offline",
-          lastSeen: Date.now()
-        });
-      };
+        // Record Daily Attendance
+        const todayStr = new Date().toLocaleDateString().replace(/\//g, '-');
+        set(ref(db, `attendance/${user.phone}/${todayStr}`), true);
 
-      function renderBannedUsersListInAdmin(bannedMap) {
-        const listDiv = document.getElementById('banned-users-list-container');
-        if (!listDiv) return;
-        listDiv.innerHTML = "";
-        const keys = Object.keys(bannedMap);
-        if (keys.length === 0) {
-          listDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 0.8rem;">कोई छात्र ब्लॉक नहीं है।</div>';
-          return;
-        }
-        keys.forEach(phone => {
-          const row = document.createElement('div');
-          row.className = 'banned-chip';
-          const name = bannedMap[phone].name || phone;
-          row.innerHTML = `
-            <span>${name} (${phone})</span>
-            <button onclick="window.unbanUser('${phone}')" style="background:#22c55e; border:none; color:#fff; border-radius:4px; padding:4px 10px; cursor:pointer; font-size:0.8rem; font-weight:bold;">अनब्लॉक</button>
-          `;
-          listDiv.appendChild(row);
-        });
-      }
-
-      window.isPhoneBanned = function(phone) {
-        const clean = (phone || "").replace(/[^0-9]/g, '');
-        return !!bannedPhoneCache[clean];
-      };
-
-      window.banUserPermanently = function(phone, name) {
-        const cleanPhone = (phone || "").replace(/[^0-9]/g, '');
-        if(cleanPhone) {
-          set(ref(db, `banned_users/${cleanPhone}`), { name: name || "Student", bannedAt: Date.now() });
-        }
-      };
-
-      window.unbanUser = function(phone) {
-        const cleanPhone = (phone || "").replace(/[^0-9]/g, '');
-        if(cleanPhone) {
-          remove(ref(db, `banned_users/${cleanPhone}`)).then(() => alert(`यूजर अनब्लॉक हो गया।`));
-        }
+        onDisconnect(userRef).update({ status: "offline", lastSeen: Date.now() });
       };
 
       window.sendFirebaseMessage = function(roomId, name, phone, displayName, role, text, userLocation) {
@@ -1195,11 +1304,12 @@
       };
 
       window.deleteFirebaseMessage = function(roomId, key) {
-        if (!confirm("मैसेज डिलीट करें?")) return;
-        const targetEl = document.getElementById(`msg-${key}`);
-        if (targetEl) targetEl.style.opacity = '0.3';
+        if (!confirm("क्या आप सच में यह मैसेज डिलीट करना चाहते हैं?")) return;
         const nodePath = (roomId === 'group') ? `messages/group/${key}` : `messages_private/${roomId}/${key}`;
-        remove(ref(db, nodePath)).then(() => { if (targetEl) targetEl.remove(); });
+        remove(ref(db, nodePath)).then(() => {
+          const el = document.getElementById(`msg-${key}`);
+          if (el) el.remove();
+        });
       };
 
       window.listenToRoom = function(roomId) {
@@ -1232,9 +1342,7 @@
         });
       };
       
-    } catch(error) {
-      console.error("Firebase Error:", error);
-    }
+    } catch(error) { console.error("Firebase Error:", error); }
   </script>
 </body>
 </html>
