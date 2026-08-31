@@ -1173,15 +1173,21 @@
       const roleLabel = data.role === 'admin' ? 'एडमिन' : 'छात्र';
 
       let contentHtml = `<div>${data.text}</div>`;
-      if (typeof data.text === 'string' && data.text.startsWith('[IMG](')) {
-        const match = data.text.match(/\((.*?)\)/);
-        if (match) contentHtml = `<img src="${match[1]}" class="msg-img-preview" alt="Image" onclick="window.open('${match[1]}','_blank')"/>`;
-      } else if (typeof data.text === 'string' && data.text.startsWith('[AUDIO](')) {
-        const match = data.text.match(/\((.*?)\)/);
-        if (match) contentHtml = `<audio src="${match[1]}" controls class="msg-audio-player"></audio>`;
-      } else if (typeof data.text === 'string') {
-        const fileMatch = data.text.match(/^\[FILE:(.*?)\]\((.*?)\)$/);
-        if (fileMatch) {
+      
+      if (typeof data.text === 'string') {
+        const cleanText = data.text.trim();
+        // \s* लगाने से अगर लाइन ब्रेक (Enter) या स्पेस होगा, तो भी ऑडियो/इमेज प्लेयर बन जाएगा
+        const audioMatch = cleanText.match(/\[AUDIO(?::(.*?))?\]\s*\((.*?)\)/);
+        const imgMatch = cleanText.match(/\[IMG\]\s*\((.*?)\)/);
+        const fileMatch = cleanText.match(/\[FILE:(.*?)\]\s*\((.*?)\)/);
+
+        if (imgMatch) {
+          contentHtml = `<img src="${imgMatch[1]}" class="msg-img-preview" alt="Image" onclick="window.open('${imgMatch[1]}','_blank')"/>`;
+        } else if (audioMatch) {
+          const effect = audioMatch[1] || 'normal';
+          const url = audioMatch[2];
+          contentHtml = `<audio src="${url}" controls class="msg-audio-player"></audio> ${effect !== 'normal' ? `<div style="font-size:0.65rem; color:#facc15; margin-top:4px;">[इफेक्ट: ${effect}]</div>` : ''}`;
+        } else if (fileMatch) {
           contentHtml = `
             <div class="file-attachment-card">
               <i class="fa-solid fa-file-arrow-down" style="font-size: 1.3rem; color: #38bdf8;"></i>
