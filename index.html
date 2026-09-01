@@ -199,7 +199,7 @@
     .login-input { width: 100%; background: #111b21; border: 1px solid #00a884; border-radius: 12px; padding: 11px 14px; color: #fff; font-family: 'Mukta', 'Poppins', sans-serif; font-size: 0.95rem; margin-bottom: 12px; outline: none; text-align: center; }
     .btn-login { width: 100%; background: #00a884; color: #fff; border: none; border-radius: 30px; padding: 12px; font-size: 1.05rem; font-weight: bold; cursor: pointer; }
 
-    .admin-modal { position: absolute; inset: 0; background: #111b21; z-index: 50; display: none; flex-direction: column; padding: 20px; overflow-y: auto; }
+    .admin-modal { position: absolute; inset: 0; background: #111b21; z-index: 50; display: none; flex-direction: column; padding: 20px 20px 80px 20px; overflow-y: auto; }
     .admin-modal.open { display: flex; }
     .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #202c33; padding-bottom: 12px; margin-bottom: 16px; color: var(--gold-accent); }
     .admin-section-title { color: #38bdf8; font-size: 0.95rem; font-weight: bold; margin: 14px 0 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px; }
@@ -315,13 +315,13 @@
       </div>
 
       <div class="admin-section-title">🚫 ब्लॉक किए गए छात्र (Banned Users)</div>
-      <div id="banned-users-list-container" style="max-height: 120px; overflow-y: auto; margin-bottom: 10px; background:#202c33; padding:8px; border-radius:8px;">
-        <div style="color: var(--text-muted); font-size: 0.8rem;">कोई छात्र ब्लॉक नहीं है।</div>
-      </div>
+<div id="banned-users-list-container" style="min-height: 50px; max-height: 180px; overflow-y: auto; margin-bottom: 12px; background:#202c33; padding:10px; border-radius:8px; border: 1px solid rgba(255,255,255,0.08);">
+  <div style="color: var(--text-muted); font-size: 0.85rem;">कोई छात्र ब्लॉक नहीं है।</div>
+</div>
 
       <div class="admin-section-title">👥 छात्र डायरेक्टरी और म्यूट/बैन कंट्रोल</div>
-      <div id="admin-students-directory" style="max-height: 140px; overflow-y: auto; margin-bottom: 10px; background:#202c33; padding:8px; border-radius:8px;"></div>
-
+<div id="admin-students-directory" style="min-height: 60px; max-height: 220px; overflow-y: auto; margin-bottom: 12px; background:#202c33; padding:10px; border-radius:8px; border: 1px solid rgba(255,255,255,0.08);"></div>
+      
       <div class="admin-section-title">🧹 डेटाबेस कंट्रोल</div>
       <div style="display: flex; gap: 8px; margin-bottom: 10px;">
         <button class="btn-login" id="btn-clear-db-chat" style="background: #ef4444; flex:1;"><i class="fa-solid fa-trash"></i> सबके लिए चैट साफ़</button>
@@ -329,8 +329,7 @@
       </div>
 
       <div class="admin-section-title">📋 एडमिन ऑडिट लॉग्स (Action History)</div>
-      <div id="audit-logs-box" style="background:#111b21; border:1px solid rgba(255,255,255,0.08); padding:8px; border-radius:6px; max-height:100px; overflow-y:auto; font-size:0.75rem; color:var(--text-muted);"></div>
-    </div>
+<div id="audit-logs-box" style="background:#111b21; border:1px solid rgba(255,255,255,0.12); padding:10px; border-radius:8px; min-height: 60px; max-height:160px; overflow-y:auto; font-size:0.8rem; color:#94a3b8; margin-bottom: 20px;"></div>
 
     <!-- SCREEN 1: Home View -->
     <div class="view-screen view-active" id="screen-home">
