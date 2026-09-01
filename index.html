@@ -1102,42 +1102,6 @@
         lastMessageTimestamp = now;
       }
 
-      // ड्रॉपडाउन और शेड्यूल इनपुट से वैल्यू लें
-      const ghostSelect = document.getElementById('ghost-duration-select');
-      const scheduleInput = document.getElementById('schedule-time-input');
-      
-      const gDuration = ghostSelect ? parseInt(ghostSelect.value) : 30000;
-      const sTime = scheduleInput ? scheduleInput.value : null;
-
-      let sentMsgKey = null;
-      if(window.sendFirebaseMessage) {
-        sentMsgKey = window.sendFirebaseMessage(
-          window.currentActiveRoomId, 
-          window.currentUser.name, 
-          window.currentUser.phone, 
-          window.currentUser.displayName, 
-          window.currentUser.role, 
-          text, 
-          window.currentUser.location,
-          window.isGhostActive || false,
-          gDuration,
-          sTime
-        );
-      }
-      
-      const currentRoom = window.currentActiveRoomId;
-      const senderName = window.currentUser.name;
-      const senderPhone = window.currentUser.phone;
-      const senderRole = window.currentUser.role;
-
-      msgInput.value = "";
-      if (scheduleInput) scheduleInput.value = ""; // रीसेट करें
-
-      if (currentRoom.startsWith('ai_ustad_')) {
-        window.fetchGeminiResponse(text, currentRoom);
-        return;
-      }
-
       // 🧠 बैकग्राउंड AI ऑटो-बाउंसर लॉजिक (जैसा पहले था)
       if (currentRoom === 'group' && senderRole !== 'admin' && sentMsgKey) {
         (async () => {
