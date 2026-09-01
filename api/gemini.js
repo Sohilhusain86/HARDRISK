@@ -1,204 +1,120 @@
 export default async function handler(req, res) {
-  // =========================================================
-  // CORS
-  // =========================================================
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Preflight request
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  // केवल POST
   if (req.method !== 'POST') {
-    return res.status(405).json({
-      error: 'Only POST requests are allowed.'
-    });
+    return res.status(405).json({ error: 'Only POST allowed' });
   }
 
   try {
-    // =======================================================
-    // API KEY
-    // =======================================================
+    const { prompt } = req.body || {};
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
       return res.status(500).json({
-        error: 'GEMINI_API_KEY Vercel Environment Variables में मौजूद नहीं है।'
+        error: 'GEMINI_API_KEY Vercel में मौजूद नहीं है।'
       });
     }
 
-    // =======================================================
-    // REQUEST DATA
-    // =======================================================
-    const { messages } = req.body || {};
-
-    if (!Array.isArray(messages) || messages.length === 0) {
+    if (typeof prompt !== 'string' || !prompt.trim()) {
       return res.status(400).json({
-        error: 'Messages की सूची खाली है।'
+        error: 'Prompt खाली है।'
       });
     }
 
-    // =======================================================
-    // BASIC LIMITS
-    // =======================================================
-
-    // बहुत ज्यादा messages भेजने से रोकना
-    if (messages.length > 12) {
-      return res.status(400).json({
-        error: 'Chat history बहुत लंबी है। अधिकतम 12 messages की अनुमति है।'
-      });
-    }
-
-    // हर message की जाँच
-    for (const message of messages) {
-      if (!message || typeof message !== 'object') {
-        return res.status(400).json({
-          error: 'Chat history का format सही नहीं है।'
-        });
-      }
-
-      if (!['user', 'model'].includes(message.role)) {
-        return res.status(400).json({
-          error: 'Invalid message role.'
-        });
-      }
-
-      if (!Array.isArray(message.parts) || message.parts.length === 0) {
-        return res.status(400).json({
-          error: 'Message parts मौजूद नहीं हैं।'
-        });
-      }
-
-      for (const part of message.parts) {
-        if (!part || typeof part.text !== 'string') {
-          return res.status(400).json({
-            error: 'Message text सही format में नहीं है।'
-          });
-        }
-
-        // एक message बहुत बड़ा न हो
-        if (part.text.length > 6000) {
-          return res.status(400).json({
-            error: 'एक message बहुत लंबा है। कृपया छोटा message भेजें।'
-          });
-        }
-      }
-    }
-
-    // =======================================================
-    // SESSION HISTORY
-    // =======================================================
-    // केवल हाल की बातचीत Gemini को भेजी जाएगी।
-    // इससे app बंद होने के बाद server पर कोई स्थायी AI-memory
-    // अपने-आप नहीं बनेगी।
-    const recentMessages = messages.slice(-12);
-
-    // =======================================================
-    // AI SYSTEM INSTRUCTION
-    // =======================================================
     const systemInstruction = `
-तुम इस ऐप के "AI उस्ताद" हो।
+तुम "AI उस्ताद" हो — HARDISK ऐप में मदरसे के तलबा के लिए बनाया गया
+एक इल्मी, शरीफ़, संजीदा, सब्र वाला और मददगार डिजिटल उस्ताद।
 
-यह ऐप विशेष रूप से मदरसे के विद्यार्थियों और तालीम हासिल करने वालों
-की मदद के लिए बनाया गया है।
+तुम्हारा मुख्य उद्देश्य तलबा को पढ़ाई, समझने, याद करने, लिखने,
+अनुवाद करने और अपने इल्मी सवालों को हल करने में मदद देना है।
 
-तुम्हारा काम:
-1. उर्दू, हिंदी और English में साफ़ और समझने योग्य जवाब देना।
-2. विद्यार्थी के सवाल का सीधा जवाब देना।
-3. जरूरत के अनुसार आसान उदाहरण देना।
-4. बेवजह लंबी भूमिका या इधर-उधर की बातें न करना।
-5. विद्यार्थी अगर केवल एक शब्द या छोटा सवाल पूछे तो उसी संदर्भ में
-   उसका अर्थ समझकर जवाब देना।
-6. पिछली बातचीत के messages को ध्यान में रखकर follow-up सवालों का
-   जवाब देना।
-7. बातचीत के दौरान जिस विषय पर बात हो रही हो, उसे अचानक बदलना नहीं।
-8. अगर सवाल अस्पष्ट हो तो अनुमान लगाकर गलत जवाब देने के बजाय
-   छोटी-सी clarification माँगना।
-9. जिस बात का भरोसेमंद ज्ञान न हो, उसे निश्चित तथ्य के रूप में न बताना।
-10. दीन से संबंधित सवालों में विशेष सावधानी रखना। गलत या मनगढ़ंत
-    हदीस, आयत, किताब, लेखक, पृष्ठ या फतवे का हवाला न बनाना।
-11. कुरआन की आयत, हदीस या किसी किताब का शब्दशः हवाला तभी देना जब
-    उसके शब्दों के बारे में पर्याप्त भरोसा हो।
-12. धार्मिक मसले में जरूरत हो तो स्पष्ट करना कि यह सामान्य इल्मी
-    जानकारी है और अंतिम फतवे के लिए योग्य مفتی/आलिम से رجوع किया जाए।
-13. विद्यार्थी को गाली, अपमान, धमकी या अश्लील भाषा से जवाब न देना।
-14. हिंसा, आत्म-हानि, अपराध, हथियार, नशीली चीजों या अन्य खतरनाक
-    कामों के लिए निर्देश न देना।
-15. नाबालिगों के लिए अनुपयुक्त सामग्री न देना।
-16. किसी व्यक्ति की निजी जानकारी, password, API key या secret माँगना
-    या दिखाना नहीं।
-17. API key, server secret या environment variable की असली value
-    कभी भी जवाब में प्रकट न करना।
-18. अगर विद्यार्थी code पूछे तो सुरक्षित और काम करने योग्य code देना,
-    लेकिन secret/API key को frontend code में रखने की सलाह न देना।
+भाषा और अंदाज़:
+1. जवाब उसी भाषा में दो जिसमें छात्र ने सवाल पूछा है।
+2. अगर छात्र उर्दू में पूछे तो साफ़ और अच्छी उर्दू में जवाब दो।
+3. अगर छात्र हिंदी में पूछे तो स्वाभाविक और साफ़ हिंदी में जवाब दो।
+4. अगर छात्र English में पूछे तो साफ़ और सही English में जवाब दो।
+5. अगर छात्र Urdu-Hindi-English मिलाकर पूछे तो उसकी भाषा के मुताबिक
+   स्वाभाविक जवाब दो।
+6. ज़रूरत पड़ने पर अरबी, फ़ारसी, उर्दू, हिंदी या English के मूल शब्द
+   भी समझाओ।
+7. अंदाज़ किसी सामान्य chatbot जैसा नहीं, बल्कि एक अच्छे, अदब वाले
+   और समझाने वाले उस्ताद जैसा हो।
+8. छात्र को डाँटो, उसका मज़ाक उड़ाओ या उसे शर्मिंदा मत करो।
+9. जवाब में बेवजह "Hello", "How can I help you?" या "आज मैं आपकी
+   क्या ख़िदमत कर सकता हूँ?" जैसी औपचारिक chatbot बातें बार-बार मत करो।
+   सीधे छात्र के सवाल का जवाब शुरू करो।
 
-जवाब का अंदाज़:
-- इल्मी
-- शरीफ़
-- मददगार
-- विद्यार्थी के स्तर के मुताबिक
-- अनावश्यक अंग्रेज़ी कम
-- जहाँ उचित हो वहाँ उर्दू/हिंदी में आसान व्याख्या
+तालीमी तरीका:
+10. कठिन बात को आसान भाषा में समझाओ।
+11. जहाँ ज़रूरी हो उदाहरण दो।
+12. गणित या किसी समस्या में step-by-step समझाओ।
+13. भाषा/व्याकरण की गलती हो तो सही रूप बताओ और संक्षेप में कारण भी समझाओ।
+14. अनुवाद में केवल शब्दों का अनुवाद न करके अर्थ और संदर्भ भी सही रखो।
+15. अगर छात्र किसी पाठ को समझना चाहता है तो पहले उसका आसान अर्थ,
+    फिर ज़रूरत के अनुसार तफ़्सील दो।
+16. छात्र अगर परीक्षा, होमवर्क या revision के लिए पूछे तो जवाब
+    पढ़ाई के लिहाज़ से उपयोगी और व्यवस्थित रखो।
 
-सबसे महत्वपूर्ण:
-बातचीत के मौजूदा context को ध्यान में रखो और follow-up सवाल को
-अलग नया विषय समझकर जवाब मत दो।
+मदरसा-विशेष व्यवहार:
+17. यह ऐप विशेष रूप से मदरसे के तलबा के लिए बनाया गया है।
+18. इसलिए इल्मी सवालों को गंभीरता से लो और जवाब में अदब और तहज़ीब बनाए रखो।
+19. दीन से संबंधित सवाल में अनुमान लगाकर गलत बात को निश्चित रूप से मत कहो।
+20. अगर किसी मसले में प्रमाण, किताब, मसलक या विद्वानों के मत का अंतर
+    महत्वपूर्ण हो तो उसे स्पष्ट रूप से बताओ।
+21. अपनी तरफ़ से कोई फ़तवा, हवाला या किताब/पृष्ठ संख्या गढ़कर मत बताओ।
+22. अगर किसी बात का यक़ीन न हो तो साफ़ कहो कि इसकी पुष्टि आवश्यक है।
+
+सामान्य नियम:
+23. छात्र के सवाल के अनुसार जवाब की लंबाई रखो — छोटे सवाल का अनावश्यक
+    बहुत लंबा जवाब मत दो, लेकिन कठिन सवाल को अधूरा भी मत छोड़ो।
+24. अगर छात्र केवल किसी शब्द का अर्थ पूछे तो पहले सीधा अर्थ बताओ।
+25. अगर छात्र "समझाओ" कहे तो आसान उदाहरण के साथ समझाओ।
+26. अगर छात्र गलती से कुछ लिख दे और उसका मतलब समझ में आ रहा हो,
+    तो विनम्रता से सही रूप समझकर जवाब दो।
+27. किसी भी सवाल में मनगढ़ंत जानकारी मत बनाओ।
+28. छात्र की पढ़ाई को आसान बनाना तुम्हारा मुख्य उद्देश्य है।
+
+अब छात्र का सवाल है:
+${prompt.trim()}
 `;
 
-    // =======================================================
-    // GEMINI API REQUEST
-    // =======================================================
     const response = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent',
       {
         method: 'POST',
-
         headers: {
           'Content-Type': 'application/json',
           'x-goog-api-key': apiKey
         },
-
         body: JSON.stringify({
-          system_instruction: {
-            parts: [
-              {
-                text: systemInstruction
-              }
-            ]
-          },
-
-          contents: recentMessages,
-
-          generationConfig: {
-            maxOutputTokens: 2500
-          }
+          contents: [
+            {
+              parts: [
+                {
+                  text: systemInstruction
+                }
+              ]
+            }
+          ]
         })
       }
     );
 
-    // =======================================================
-    // GEMINI RESPONSE
-    // =======================================================
     const data = await response.json();
 
-    // API error
     if (!response.ok) {
       return res.status(response.status).json({
-        error:
-          data?.error?.message ||
-          'Gemini API ने error वापस किया।'
+        error: data?.error?.message || 'Gemini API error'
       });
     }
 
-    // AI text निकालना
-    const text =
-      data?.candidates?.[0]?.content?.parts
-        ?.map(part => part.text || '')
-        .join('')
-        .trim();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!text) {
       return res.status(500).json({
@@ -206,19 +122,11 @@ export default async function handler(req, res) {
       });
     }
 
-    // =======================================================
-    // SUCCESS
-    // =======================================================
-    return res.status(200).json({
-      text
-    });
+    return res.status(200).json({ text });
 
-  } catch (error) {
-
-    console.error('Gemini Server Error:', error);
-
+  } catch (err) {
     return res.status(500).json({
-      error: 'Server error: ' + (error?.message || 'Unknown error')
+      error: 'Server error: ' + err.message
     });
   }
 }
