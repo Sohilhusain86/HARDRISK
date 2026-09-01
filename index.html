@@ -1071,7 +1071,6 @@
       if (window.currentUser.role !== 'admin') {
         const hasLink = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi.test(text);
         
-        // यहाँ आप और भी सख्त शब्द जोड़ सकते हैं
         const badWords = ["gaali", "madarchod", "bhenchod", "chutiya", "harami", "paagal", "kamina", "spam", "http", "www."]; 
         const lowerText = text.toLowerCase();
         const hasBadWord = badWords.some(word => lowerText.includes(word));
@@ -1081,7 +1080,6 @@
           
           const cleanPhone = window.currentUser.phone.replace(/[^0-9]/g, '');
           
-          // डेटाबेस में बैन लिस्ट में डालें
           set(ref(db, `banned_users/${cleanPhone}`), { 
             name: window.currentUser.name, 
             bannedAt: Date.now(),
@@ -1091,32 +1089,9 @@
           push(auditRef, { action: `ऑटो-बाउंसर बैन (24h): ${window.currentUser.name}`, admin: "AI System", time: new Date().toLocaleTimeString() });
           
           msgInput.value = "";
-          return; // मैसेज को ग्रुप में जाने से रोक देगा!
-        }
-      }
-      
-      // ==========================================
-
-      if (window.currentUser.role !== 'admin' && window.globalSlowMode && window.globalSlowMode > 0) {
-        const now = Date.now();
-        const diff = (now - lastMessageTimestamp) / 1000;
-        if (diff < window.globalSlowMode) {
-          alert(`स्लो मोड चालू है! कृपया ${Math.ceil(window.globalSlowMode - diff)} सेकंड बाद मैसेज भेजें।`);
           return;
         }
-        lastMessageTimestamp = now;
       }
-
-      if(window.sendFirebaseMessage) {
-        window.sendFirebaseMessage(window.currentActiveRoomId, window.currentUser.name, window.currentUser.phone, window.currentUser.displayName, window.currentUser.role, text, window.currentUser.location);
-      }
-      msgInput.value = "";
-
-      if (window.currentActiveRoomId.startsWith('ai_ustad_')) {
-        window.fetchGeminiResponse(text, window.currentActiveRoomId);
-      }
-    }
-    
       // ==========================================
 
       if (window.currentUser.role !== 'admin' && window.globalSlowMode && window.globalSlowMode > 0) {
