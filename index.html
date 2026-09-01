@@ -1620,7 +1620,7 @@
       update(ref(db, nodePath), { [cleanPhoneKey]: emoji });
     };
 
-    window.deleteFirebaseMessage = function(roomId, key) {
+        window.deleteFirebaseMessage = function(roomId, key) {
       if (!confirm("क्या आप सच में यह मैसेज डिलीट करना चाहते हैं?")) {
         return;
       }
@@ -1766,7 +1766,7 @@
         window.openChatRoom(
           aiRoomId,
           '🤖 AI उस्ताद',
-          'Suhail's Learning Desk Ai',
+          "Suhail's Learning Desk Ai", // यहाँ डबल कोट्स लगाकर सिंटैक्स एरर ठीक कर दिया गया है
           'https://cdn-icons-png.flaticon.com/512/8943/8943377.png'
         );
 
@@ -1821,7 +1821,7 @@
 
       if (userText.length > GEMINI_MAX_USER_MESSAGE_LENGTH) {
         if (window.sendFirebaseMessage) {
-          window.sendFirebaseMessage(roomId, "AI उस्ताद", "gemini_bot", "🤖 AI उस्ताद", "admin", "आपका सवाल बहुत लंबा है। कृपया उसे छोटा करके भेजें।", "Vercel Server");
+          window.sendFirebaseMessage(roomId, "AI उस्ताद", "Suhail_Ai", "🤖 AI उस्ताद", "admin", "आपका सवाल बहुत लंबा है। कृपया उसे छोटा करके भेजें।", "Vercel Server");
         }
         return;
       }
