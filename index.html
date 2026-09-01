@@ -1766,7 +1766,7 @@
         window.openChatRoom(
           aiRoomId,
           '🤖 AI उस्ताद',
-          'Google Gemini AI Assistant',
+          'Suhail's Learning Desk Ai',
           'https://cdn-icons-png.flaticon.com/512/8943/8943377.png'
         );
 
@@ -1878,7 +1878,7 @@
           }
 
           if (window.sendFirebaseMessage) {
-             window.sendFirebaseMessage(roomId, "AI उस्ताद", "gemini_bot", "🤖 AI उस्ताद", "admin", aiText, "Vercel Server");
+             window.sendFirebaseMessage(roomId, "AI उस्ताद", "Suhail_Ai", "🤖 AI उस्ताद", "admin", aiText, "Vercel Server");
           }
         } else {
           throw new Error("कोई जवाब नहीं मिला");
@@ -1887,7 +1887,7 @@
         // एरर आने पर फेल हुआ मैसेज हिस्ट्री से निकाल दें
         window.geminiChatHistory.pop();
         if (window.sendFirebaseMessage) {
-           window.sendFirebaseMessage(roomId, "AI उस्ताद", "gemini_bot", "🤖 AI उस्ताद", "admin", "कनेक्शन एरर: " + error.message, "Vercel Server");
+           window.sendFirebaseMessage(roomId, "AI उस्ताद", "Suhail_Ai", "🤖 AI उस्ताद", "admin", "कनेक्शन एरर: " + error.message, "Vercel Server");
         }
       } finally {
         if (typingDiv) {
