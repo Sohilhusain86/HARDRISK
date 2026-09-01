@@ -330,6 +330,17 @@
 
       <div class="admin-section-title">📋 एडमिन ऑडिट लॉग्स (Action History)</div>
       <div id="audit-logs-box" style="background:#111b21; border:1px solid rgba(255,255,255,0.12); padding:10px; border-radius:8px; min-height: 60px; max-height:160px; overflow-y:auto; font-size:0.8rem; color:#94a3b8; margin-bottom: 20px;"></div>
+
+            <!-- 📊 ADVANCED ATTENDANCE & PERFORMANCE ANALYTICS DASHBOARD -->
+      <div class="admin-section-title">📊 लाइव हाज़िरी और परफॉरमेंस एनालिटिक्स</div>
+      <div style="background:#202c33; padding:12px; border-radius:8px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.08);">
+        <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">
+          छात्रों की कुल उपस्थिति (Attendance Records) का लाइव डेटा:
+        </div>
+        <div id="admin-analytics-container" style="max-height: 200px; overflow-y: auto; font-size: 0.85rem;">
+          <div style="color: var(--text-muted); text-align: center; padding: 10px;">डेटा लोड हो रहा है...</div>
+        </div>
+      </div>
     </div> <!-- ✅ Admin Panel Closed Correctly -->
 
     <!-- SCREEN 1: Home View -->
@@ -1981,6 +1992,79 @@
         magicBtn.disabled = false;
       }
     };
+
+        // =========================================================
+    // 📊 ADVANCED ATTENDANCE & PERFORMANCE ANALYTICS ENGINE
+    // =========================================================
+    
+    const attendanceRootRef = ref(db, 'attendance');
+
+    onValue(attendanceRootRef, (snapshot) => {
+      const attendanceData = snapshot.val() || {};
+      const usersDataSnapshot = ref(db, 'users');
+      
+      // छात्रों के नाम और फोन नंबर की जानकारी प्राप्त करें
+      onValue(usersDataSnapshot, (userSnap) => {
+        const usersMap = userSnap.val() || {};
+        const container = document.getElementById('admin-analytics-container');
+        if (!container) return;
+        
+        container.innerHTML = "";
+        const phoneKeys = Object.keys(attendanceData);
+
+        if (phoneKeys.length === 0) {
+          container.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 10px;">अभी तक कोई हाज़िरी दर्ज नहीं हुई है।</div>`;
+          return;
+        }
+
+        // टेबल या लिस्ट बनाने के लिए स्ट्रक्चर तैयार करें
+        let tableHtml = `
+          <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: 'Poppins', sans-serif;">
+            <thead>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.15); color: #38bdf8; font-size: 0.75rem;">
+                <th style="padding: 6px;">छात्र का नाम</th>
+                <th style="padding: 6px; text-align: center;">कुल दिन उपस्थित</th>
+                <th style="padding: 6px; text-align: center;">स्टेटस</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        phoneKeys.forEach(phone => {
+          const userInfo = usersMap[phone] || {};
+          const studentName = userInfo.displayName || userInfo.name || phone;
+          const daysRecord = attendanceData[phone] || {};
+          const totalDaysPresent = Object.keys(daysRecord).length;
+
+          // परफॉरमेंस के हिसाब से कलर बैज (ग्रोथ इंडिकेटर)
+          let badgeColor = "#ef4444"; // लाल (कम उपस्थित)
+          let statusText = "सुधार की जरूरत";
+          if (totalDaysPresent >= 5) {
+            badgeColor = "#22c55e"; // हरा (रेगुलर)
+            statusText = "उत्कृष्ट (Regular)";
+          } else if (totalDaysPresent >= 2) {
+            badgeColor = "#facc15"; // पीला (औसत)
+            statusText = "मध्यम (Average)";
+          }
+
+          tableHtml += `
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem;">
+              <td style="padding: 8px 6px; color: #fff; font-weight: 600;">${studentName}</td>
+              <td style="padding: 8px 6px; text-align: center; color: #facc15; font-weight: bold;">${totalDaysPresent} दिन</td>
+              <td style="padding: 8px 6px; text-align: center;">
+                <span style="background: ${badgeColor}22; color: ${badgeColor}; border: 1px solid ${badgeColor}55; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">
+                  ${statusText}
+                </span>
+              </td>
+            </tr>
+          `;
+        });
+
+        tableHtml += `</tbody></table>`;
+        container.innerHTML = tableHtml;
+
+      }, { onlyOnce: true });
+    });
     
   </script>
 </body>
