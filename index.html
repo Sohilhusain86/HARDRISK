@@ -1457,7 +1457,7 @@
       });
     });
 
-    onValue(usersRef, (snapshot) => {
+        onValue(usersRef, (snapshot) => {
       const data = snapshot.val() || {};
       if (window.renderAllUsersList) window.renderAllUsersList(data);
       
@@ -1475,6 +1475,7 @@
           <div style="display:flex; gap:4px;">
             <button onclick="window.toggleUserMute('${phone}')" style="background:#f59e0b; border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:0.75rem;">म्यूट</button>
             <button onclick="window.triggerAdminBanToggle('${phone}', '${u.name}')" style="background:${isBanned?'#22c55e':'#ef4444'}; border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:0.75rem;">${isBanned?'अनबैन':'बैन'}</button>
+            <button onclick="window.purgeUserPermanently('${phone}', '${u.displayName || u.name || phone}')" style="background:#ef4444; border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:0.75rem;"><i class="fa-solid fa-trash"></i> डिलीट</button>
           </div>
         `;
         dirContainer.appendChild(row);
@@ -1517,6 +1518,30 @@
       set(ref(db, `banned_users/${clean}`), { name: name || "Student", bannedAt: Date.now() });
       push(auditRef, { action: `यूजर बैन: ${name} (${clean})`, admin: window.currentUser.name, time: new Date().toLocaleTimeString() });
       alert("यूजर ब्लॉक कर दिया गया।");
+    };
+
+    window.purgeUserPermanently = async function(phone, userName) {
+      if (window.currentUser.role !== 'admin') {
+        alert("केवल एडमिन ही यूज़र को हमेशा के लिए डिलीट कर सकते हैं।");
+        return;
+      }
+
+      const cleanPhone = phone.replace(/[^0-9]/g, '');
+      const confirmDelete = confirm(`⚠️ क्या आप सच में "${userName}" (${cleanPhone}) को हमेशा के लिए हटाना चाहते हैं?\n\nइसका प्रोफाइल, हाज़िरी और रिकॉर्ड हमेशा के लिए मिट जाएगा।`);
+      
+      if (!confirmDelete) return;
+
+      try {
+        await remove(ref(db, `users/${cleanPhone}`));
+        await remove(ref(db, `attendance/${cleanPhone}`));
+        await remove(ref(db, `otps/${cleanPhone}`));
+        await remove(ref(db, `banned_users/${cleanPhone}`));
+        await remove(ref(db, `mutes/${cleanPhone}`));
+        alert(`"${userName}" को सफलतापूर्वक हमेशा के लिए डिलीट कर दिया गया है।`);
+      } catch (err) {
+        console.error("Purge Error:", err);
+        alert("डिलीट करने में त्रुटि हुई।");
+      }
     };
 
     window.unbanUser = function(phone) {
@@ -2103,6 +2128,36 @@
 
       }, { onlyOnce: true });
     });
+
+        // =========================================================
+    // 🗑️ PERMANENT DELETE / PURGE USER FUNCTION
+    // =========================================================
+    window.purgeUserPermanently = async function(phone, userName) {
+      if (window.currentUser.role !== 'admin') {
+        alert("केवल एडमिन ही यूज़र को हमेशा के लिए डिलीट कर सकते हैं।");
+        return;
+      }
+
+      const confirmDelete = confirm(`⚠️ चेतावनी: क्या आप सच में "${userName}" (${phone}) को हमेशा के लिए डिलीट करना चाहते हैं?\n\nइसका पूरा प्रोफाइल, हाज़िरी और रिकॉर्ड डेटाबेस से मिट जाएगा।`);
+      
+      if (!confirmDelete) return;
+
+      try {
+        // 1. यूज़र प्रोफाइल हटाएं
+        await remove(ref(db, `users/${phone}`));
+        
+        // 2. हाज़िरी रिकॉर्ड हटाएं
+        await remove(ref(db, `attendance/${phone}`));
+
+        // 3. यदि कोई पेंडिंग OTP रिकॉर्ड हो तो उसे भी हटाएं
+        await remove(ref(db, `otps/${phone}`));
+
+        alert(`सफलता: "${userName}" का पूरा रिकॉर्ड स्थायी रूप से डिलीट कर दिया गया है।`);
+      } catch (error) {
+        console.error("Delete Error:", error);
+        alert("डेटा डिलीट करने में समस्या आई।");
+      }
+    };
     
   </script>
 </body>
