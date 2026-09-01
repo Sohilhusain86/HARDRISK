@@ -12,19 +12,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt } = req.body || {};
+    const { messages } = req.body || {};
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      return res.status(500).json({
-        error: 'GEMINI_API_KEY Vercel में मौजूद नहीं है।'
-      });
+      return res.status(500).json({ error: 'GEMINI_API_KEY Vercel में मौजूद नहीं है।' });
     }
 
-    if (typeof prompt !== 'string' || !prompt.trim()) {
-      return res.status(400).json({
-        error: 'Prompt खाली है।'
-      });
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ error: 'Messages की सूची खाली है या गलत फॉर्मेट में है।' });
     }
 
     const systemInstruction = `
@@ -75,38 +71,37 @@ export default async function handler(req, res) {
     बहुत लंबा जवाब मत दो, लेकिन कठिन सवाल को अधूरा भी मत छोड़ो।
 24. अगर छात्र केवल किसी शब्द का अर्थ पूछे तो पहले सीधा अर्थ बताओ।
 25. अगर छात्र "समझाओ" कहे तो आसान उदाहरण के साथ समझाओ।
-26. अगर छात्र गलती से कुछ लिख दे और उसका मतलब समझ में आ रहा हो,
-    तो विनम्रता से सही रूप समझकर जवाब दो।
-27. किसी भी सवाल में मनगढ़ंत जानकारी मत बनाओ।
-28. छात्र की पढ़ाई को आसान बनाना तुम्हारा मुख्य उद्देश्य है।
-
-अब छात्र का सवाल है:
-${prompt.trim()}
+26. छात्र की पढ़ाई को आसान बनाना तुम्हारा मुख्य उद्देश्य है।
 `;
 
-    const response = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': apiKey
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: systemInstruction
-                }
-              ]
-            }
-          ]
-        })
-      }
-    );
+    // आपने जो मॉडल तय किया है (gemini-2.5-flash)
+    const GOOGLE_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
-    const data = await response.json();
+    const response = await fetch(GOOGLE_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey
+      },
+      body: JSON.stringify({
+        system_instruction: {
+          parts: [{ text: systemInstruction }]
+        },
+        contents: messages,
+        generationConfig: { maxOutputTokens: 2500 }
+      })
+    });
+
+    // Crash Protection: सीधे JSON में पार्स करने से पहले Text के रूप में पढ़ें
+    const responseText = await response.text();
+    let data;
+    
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error("Google API HTML Error:", responseText);
+      return res.status(500).json({ error: 'Google API से अमान्य जवाब (HTML) मिला। Vercel Logs चेक करें।' });
+    }
 
     if (!response.ok) {
       return res.status(response.status).json({
@@ -117,16 +112,12 @@ ${prompt.trim()}
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!text) {
-      return res.status(500).json({
-        error: 'AI से कोई जवाब नहीं मिला।'
-      });
+      return res.status(500).json({ error: 'AI से कोई जवाब नहीं मिला।' });
     }
 
     return res.status(200).json({ text });
 
   } catch (err) {
-    return res.status(500).json({
-      error: 'Server error: ' + err.message
-    });
+    return res.status(500).json({ error: 'Server error: ' + err.message });
   }
 }
