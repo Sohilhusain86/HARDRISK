@@ -453,15 +453,19 @@
         </select>
       </div>
 
-      <footer class="chat-bottom-dock">
+     <footer class="chat-bottom-dock">
         <input type="file" id="file-selector" style="display: none;" accept="image/*,.pdf,.doc,.docx,.zip">
         <button class="btn-dock-action" id="btn-attach" title="फ़ाइल या फ़ोटो भेजें"><i class="fa-solid fa-paperclip" style="transform: rotate(45deg);"></i></button>
         <button class="btn-dock-action btn-mic" id="btn-mic" title="ऑडियो रिकॉर्ड करें"><i class="fa-solid fa-microphone"></i></button>
         <input type="text" class="chat-input-box" id="msg-input" placeholder="यहाँ मैसेज लिखें...">
+        
+        <!-- ✨ NEW AI MAGIC BUTTON -->
+        <button class="btn-dock-action" id="btn-ai-magic" onclick="window.enhanceMessageWithAI()" title="AI से मेसेज सुधारें (Grammar/Translation)" style="color: #a78bfa;"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+        
         <button class="btn-send" id="btn-send"><i class="fa-solid fa-paper-plane"></i></button>
       </footer>
     </div> <!-- ✅ Screen Chat Closed Correctly -->
-
+    
     <!-- VOICE CALL MODAL SCREEN -->
     <div class="call-overlay" id="call-screen">
       <div class="call-avatar-large" id="call-target-avatar"><i class="fa-solid fa-user"></i></div>
@@ -1919,6 +1923,62 @@
       } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
+      }
+    };
+
+        // =========================================================
+    // 🌍 SMART TRANSLATOR & GRAMMAR CHECKER (AI MAGIC)
+    // =========================================================
+
+    window.enhanceMessageWithAI = async function() {
+      const inputField = document.getElementById('msg-input');
+      let text = inputField.value.trim();
+      
+      if (!text) {
+        alert("AI से सुधारने के लिए पहले चैट बॉक्स में कुछ लिखें!");
+        return;
+      }
+
+      const magicBtn = document.getElementById('btn-ai-magic');
+      magicBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+      magicBtn.disabled = true;
+
+      // AI को निर्देश कि मेसेज को कैसे सुधारना है
+      const prompt = `आप एक प्रोफेशनल एडिटर और ट्रांसलेटर हैं। इस मेसेज को पढ़ें: "${text}"
+      अगर यह टूटी-फूटी भाषा में है, तो इसकी ग्रामर सही करें। अगर यह बहुत कैज़ुअल है, तो इसे थोड़ा साफ़ और पढ़ने में अच्छा बनाएँ। 
+      आपको सिर्फ सुधरा हुआ (Corrected/Translated) टेक्स्ट आउटपुट देना है। कोई एक्स्ट्रा बात या स्पष्टीकरण न लिखें।`;
+
+      try {
+        const response = await fetch('/api/gemini', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [{ role: "user", parts: [{ text: prompt }] }]
+          })
+        });
+
+        const responseText = await response.text();
+        let data = JSON.parse(responseText);
+
+        if (!response.ok || data.error) {
+          throw new Error(data.error || "सर्वर एरर");
+        }
+
+        if (data.text) {
+          // AI का सुधरा हुआ टेक्स्ट चैट बॉक्स में डाल दें
+          inputField.value = data.text.trim(); 
+          
+          // जादू वाला एनीमेशन इफ़ेक्ट (चैट बॉक्स का रंग हल्का सा बदलेगा)
+          inputField.style.backgroundColor = "#2d1b69";
+          setTimeout(() => { inputField.style.backgroundColor = "#2a3942"; }, 500);
+        } else {
+          throw new Error("AI ने कोई जवाब नहीं दिया।");
+        }
+      } catch (error) {
+        alert("AI Magic में एरर: " + error.message);
+      } finally {
+        magicBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
+        magicBtn.disabled = false;
       }
     };
     
