@@ -1621,47 +1621,131 @@
     };
 
     window.deleteFirebaseMessage = function(roomId, key) {
-      if (!confirm("क्या आप सच में यह मैसेज डिलीट करना चाहते हैं?")) return;
-      const nodePath = (roomId === 'group') ? `messages/group/${key}` : `messages_private/${roomId}/${key}`;
-      remove(ref(db, nodePath)).then(() => {
-        const el = document.getElementById(`msg-${key}`);
-        if (el) el.remove();
-      });
+      if (!confirm("क्या आप सच में यह मैसेज डिलीट करना चाहते हैं?")) {
+        return;
+      }
+
+      const nodePath =
+        (roomId === 'group')
+          ? `messages/group/${key}`
+          : `messages_private/${roomId}/${key}`;
+
+      remove(ref(db, nodePath))
+        .then(() => {
+          const el = document.getElementById(`msg-${key}`);
+          if (el) {
+            el.remove();
+          }
+        })
+        .catch((error) => {
+          console.error("Message delete error:", error);
+        });
     };
+
 
     window.listenToRoom = function(roomId) {
-      if (activeChatListenerRef) off(activeChatListenerRef);
-      const nodePath = (roomId === 'group') ? 'messages/group' : `messages_private/${roomId}`;
+
+      // पुराने listener को बंद करें
+      if (activeChatListenerRef) {
+        off(activeChatListenerRef);
+      }
+
+      const nodePath =
+        (roomId === 'group')
+          ? 'messages/group'
+          : `messages_private/${roomId}`;
+
       activeChatListenerRef = ref(db, nodePath);
 
-      onChildAdded(activeChatListenerRef, (snapshot) => {
-        if(window.appendMessage) window.appendMessage(snapshot.val(), snapshot.key);
-      });
 
-      onValue(activeChatListenerRef, (snapshot) => {
-        const allMsgs = snapshot.val() || {};
-        for (let key in allMsgs) {
-          const msgData = allMsgs[key];
-          const reactionsContainer = document.getElementById(`reactions-${key}`);
-          if (reactionsContainer && msgData.reactions) {
-            let html = "";
-            for (let phone in msgData.reactions) {
-              html += `<span class="reaction-pill">${msgData.reactions[phone]}</span>`;
+      // ---------------------------------------------------------
+      // NEW MESSAGE LISTENER
+      // ---------------------------------------------------------
+
+      onChildAdded(
+        activeChatListenerRef,
+        (snapshot) => {
+
+          if (window.appendMessage) {
+            window.appendMessage(
+              snapshot.val(),
+              snapshot.key
+            );
+          }
+
+        }
+      );
+
+
+      // ---------------------------------------------------------
+      // MESSAGE / REACTION UPDATE LISTENER
+      // ---------------------------------------------------------
+
+      onValue(
+        activeChatListenerRef,
+        (snapshot) => {
+
+          const allMsgs =
+            snapshot.val() || {};
+
+          for (const key in allMsgs) {
+
+            const msgData =
+              allMsgs[key];
+
+            const reactionsContainer =
+              document.getElementById(
+                `reactions-${key}`
+              );
+
+            if (
+              reactionsContainer &&
+              msgData &&
+              msgData.reactions
+            ) {
+
+              let html = "";
+
+              for (
+                const phone in msgData.reactions
+              ) {
+
+                html +=
+                  `<span class="reaction-pill">${msgData.reactions[phone]}</span>`;
+              }
+
+              reactionsContainer.innerHTML =
+                html;
             }
-            reactionsContainer.innerHTML = html;
           }
         }
-      });
+      );
 
-      onChildRemoved(activeChatListenerRef, (snapshot) => {
-        const el = document.getElementById(`msg-${snapshot.key}`);
-        if (el) el.remove();
-      });
+
+      // ---------------------------------------------------------
+      // MESSAGE DELETE LISTENER
+      // ---------------------------------------------------------
+
+      onChildRemoved(
+        activeChatListenerRef,
+        (snapshot) => {
+
+          const el =
+            document.getElementById(
+              `msg-${snapshot.key}`
+            );
+
+          if (el) {
+            el.remove();
+          }
+        }
+      );
     };
 
-        <!-- =========================================================
-         GEMINI AI INTEGRATION — PHASE 1: AI USTAAD
-         ========================================================= -->
+
+    // =========================================================
+    // GEMINI AI — AI USTAAD
+    // =========================================================
 
     window.openAiChat = function() {
 
@@ -1672,27 +1756,42 @@
           ? String(window.currentUser.phone)
           : "guest";
 
-      const aiRoomId = `ai_ustad_${phone}`;
+      const aiRoomId =
+        `ai_ustad_${phone}`;
 
-      window.openChatRoom(
-        aiRoomId,
-        '🤖 AI उस्ताद',
-        'Google Gemini AI Assistant',
-        'https://cdn-icons-png.flaticon.com/512/8943/8943377.png'
-      );
+
+      // AI Ustaad chat room खोलें
+      if (window.openChatRoom) {
+
+        window.openChatRoom(
+          aiRoomId,
+          '🤖 AI उस्ताद',
+          'Google Gemini AI Assistant',
+          'https://cdn-icons-png.flaticon.com/512/8943/8943377.png'
+        );
+
+      } else {
+
+        console.error(
+          "openChatRoom function नहीं मिला।"
+        );
+      }
     };
 
 
     // =========================================================
-    // GEMINI AI — SESSION CHAT MEMORY
+    // GEMINI AI — SESSION MEMORY
     // =========================================================
     //
-    // यह memory केवल वर्तमान खुले हुए page/session तक रहेगी।
+    // यह memory केवल वर्तमान खुले हुए page/session में रहेगी।
     //
-    // localStorage में save नहीं होगी।
-    // Firebase/database में save नहीं होगी।
+    // localStorage में SAVE नहीं होगी।
+    // Firebase में SAVE नहीं होगी।
+    // Database में SAVE नहीं होगी।
     //
-    // Page/app बंद करके दोबारा खोलने पर नई बातचीत शुरू होगी।
+    // App/page बंद करके दोबारा खोलने पर यह फिर से खाली होगी।
+    //
+    // इसलिए यूज़र को अगली बार नई बातचीत मिलेगी।
     // =========================================================
 
     window.geminiChatHistory = [];
@@ -1702,8 +1801,7 @@
     // GEMINI AI LIMITS
     // =========================================================
 
-    // एक session में अधिकतम 12 messages
-    // (user + AI दोनों मिलाकर)
+    // User + AI दोनों को मिलाकर अधिकतम 12 messages
     const GEMINI_MAX_HISTORY = 12;
 
     // एक user message की अधिकतम लंबाई
@@ -1711,34 +1809,43 @@
 
 
     // =========================================================
-    // GEMINI AI RESPONSE FUNCTION
+    // GEMINI AI RESPONSE
     // =========================================================
 
-    window.fetchGeminiResponse = async function(userText, roomId) {
+    window.fetchGeminiResponse = async function(
+      userText,
+      roomId
+    ) {
 
       const typingDiv =
-        document.getElementById('typing-indicator');
+        document.getElementById(
+          'typing-indicator'
+        );
 
 
       // -------------------------------------------------------
-      // INPUT VALIDATION
+      // INPUT CHECK
       // -------------------------------------------------------
 
-      if (typeof userText !== 'string') {
+      if (
+        typeof userText !== "string"
+      ) {
         return;
       }
 
-      userText = userText.trim();
+
+      userText =
+        userText.trim();
 
 
-      // खाली message स्वीकार नहीं होगा
+      // खाली message रोकें
       if (!userText) {
         return;
       }
 
 
       // -------------------------------------------------------
-      // USER MESSAGE LENGTH LIMIT
+      // MESSAGE LENGTH LIMIT
       // -------------------------------------------------------
 
       if (
@@ -1746,7 +1853,9 @@
         GEMINI_MAX_USER_MESSAGE_LENGTH
       ) {
 
-        if (window.sendFirebaseMessage) {
+        if (
+          window.sendFirebaseMessage
+        ) {
 
           window.sendFirebaseMessage(
             roomId,
@@ -1764,7 +1873,7 @@
 
 
       // -------------------------------------------------------
-      // TYPING INDICATOR
+      // TYPING INDICATOR ON
       // -------------------------------------------------------
 
       if (typingDiv) {
@@ -1811,7 +1920,7 @@
 
 
       // =======================================================
-      // SEND CHAT HISTORY TO VERCEL API
+      // SEND HISTORY TO VERCEL
       // =======================================================
 
       try {
@@ -1823,24 +1932,23 @@
               method: "POST",
 
               headers: {
-                "Content-Type": "application/json"
+                "Content-Type":
+                  "application/json"
               },
 
               body: JSON.stringify({
-
                 messages:
                   window.geminiChatHistory
-
               })
             }
           );
 
 
         // -----------------------------------------------------
-        // READ SERVER RESPONSE
+        // READ RESPONSE
         // -----------------------------------------------------
 
-        let data;
+        let data = null;
 
         try {
 
@@ -1848,6 +1956,11 @@
             await response.json();
 
         } catch (jsonError) {
+
+          console.error(
+            "Gemini JSON parse error:",
+            jsonError
+          );
 
           data = {
             error:
@@ -1857,7 +1970,7 @@
 
 
         // =====================================================
-        // GEMINI / SERVER ERROR
+        // API ERROR
         // =====================================================
 
         if (
@@ -1873,12 +1986,13 @@
               : `Gemini API Error (${response.status})`;
 
 
-          // जिस user message का जवाब नहीं मिला,
-          // उसे session history से निकाल दें।
+          // Failed user message को history से निकालें
           window.geminiChatHistory.pop();
 
 
-          if (window.sendFirebaseMessage) {
+          if (
+            window.sendFirebaseMessage
+          ) {
 
             window.sendFirebaseMessage(
               roomId,
@@ -1886,7 +2000,8 @@
               "gemini_bot",
               "🤖 AI उस्ताद",
               "admin",
-              "Gemini Error: " + errorMessage,
+              "Gemini Error: " +
+                errorMessage,
               "Vercel Server"
             );
           }
@@ -1896,23 +2011,29 @@
 
 
         // =====================================================
-        // GET AI TEXT
+        // AI RESPONSE TEXT
         // =====================================================
 
         const aiText =
-          String(data.text).trim();
+          String(
+            data.text
+          ).trim();
 
 
         // =====================================================
-        // EMPTY AI RESPONSE
+        // EMPTY RESPONSE
         // =====================================================
 
         if (!aiText) {
 
+          // Failed response के कारण
+          // user message निकालें
           window.geminiChatHistory.pop();
 
 
-          if (window.sendFirebaseMessage) {
+          if (
+            window.sendFirebaseMessage
+          ) {
 
             window.sendFirebaseMessage(
               roomId,
@@ -1963,10 +2084,12 @@
 
 
         // =====================================================
-        // SEND AI RESPONSE TO FIREBASE CHAT
+        // SHOW AI RESPONSE IN FIREBASE CHAT
         // =====================================================
 
-        if (window.sendFirebaseMessage) {
+        if (
+          window.sendFirebaseMessage
+        ) {
 
           window.sendFirebaseMessage(
             roomId,
@@ -1992,11 +2115,13 @@
         );
 
 
-        // Failed user message को history से निकाल दें
+        // Failed user message को history से निकालें
         window.geminiChatHistory.pop();
 
 
-        if (window.sendFirebaseMessage) {
+        if (
+          window.sendFirebaseMessage
+        ) {
 
           window.sendFirebaseMessage(
             roomId,
@@ -2019,7 +2144,7 @@
       } finally {
 
         // =====================================================
-        // STOP TYPING INDICATOR
+        // TYPING INDICATOR OFF
         // =====================================================
 
         if (typingDiv) {
@@ -2029,6 +2154,7 @@
         }
       }
     };
+
 
 </script>
 </body>
