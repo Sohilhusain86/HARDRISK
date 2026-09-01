@@ -239,33 +239,7 @@
       </div>
     </div>
 
-    <!-- Login Screen -->
-    <div class="login-overlay" id="login-screen" style="display: none;">
-      <div class="login-card">
-        <h2 style="color: #00a884; margin-bottom: 6px; font-size: 1.4rem;">जमात ऊला अलिफ़ मैसेंजर</h2>
-        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 14px;">अपनी फोटो (DP) लगाएं और OTP से लॉगिन करें</p>
-        
-        <input type="file" id="dp-file-input" accept="image/*" style="display: none;">
-        <div class="dp-upload-box" id="dp-preview-box" onclick="document.getElementById('dp-file-input').click()" title="प्रोफाइल फोटो चुनें">
-          <i class="fa-solid fa-camera" id="dp-camera-icon"></i>
-        </div>
-        <div style="font-size: 0.75rem; color: #00a884; margin-bottom: 12px;">फोटो बदलने के लिए क्लिक करें</div>
-
-        <input type="text" id="user-name" class="login-input" placeholder="आपका नाम (जैसे: ज़ैद)">
-        <input type="tel" id="user-phone" class="login-input" placeholder="मोबाइल नंबर (10 अंक)">
-        <input type="text" id="user-roll" class="login-input" placeholder="रोल नंबर (वैकल्पिक / इख्तियारन)">
-        
-        <div id="otp-section" style="display: none;">
-          <input type="number" id="otp-input" class="login-input" placeholder="6 अंकों का OTP दर्ज करें">
-          <div style="font-size: 0.75rem; color: var(--gold-accent); margin-bottom: 10px;">मैसेज ऐप पर OTP भेजा गया है</div>
-        </div>
-
-        <input type="password" id="user-pass" class="login-input" placeholder="पासवर्ड (केवल एडमिन के लिए)">
-        <button class="btn-login" id="btn-action-auth">OTP भेजें (Send OTP)</button>
-      </div>
-    </div>
-
-    <!-- Master Admin Control Center -->
+  <!-- Master Admin Control Center -->
     <div class="admin-modal" id="admin-panel">
       <div class="admin-header">
         <h3><i class="fa-solid fa-shield-halved"></i> मास्टर एडमिन कंट्रोल सेंटर</h3>
@@ -281,7 +255,7 @@
       <div class="admin-section-title">📝 AI क्लास समरी जनरेटर (Suhail Assistant)</div>
       <div style="background:#202c33; padding:10px; border-radius:8px; margin-bottom:10px;">
         <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px; line-height:1.4;">
-          पिछले 24 घंटों में मेन ग्रुप में हुई बातचीत को AI पढ़ेगा और एक साफ़-सुथरी बुलेट-पॉइंट समरी बनाकर सीधे ग्रुप में पोस्ट कर देगा।
+          पिछले 24 घंटों में मेन গ্রুপের हुई बातचीत को AI पढ़ेगा और एक साफ़-सुथरी बुलेट-पॉइंट समरी बनाकर सीधे ग्रुप में पोस्ट कर देगा।
         </div>
         <button class="btn-login" id="btn-generate-summary" onclick="window.generateClassSummary()" style="background:#facc15; color:#01140e; font-weight:bold; display:flex; justify-content:center; align-items:center; gap:8px;">
           <i class="fa-solid fa-wand-magic-sparkles"></i> आज की समरी (Summary) बनाएं
@@ -331,67 +305,7 @@
       <div class="admin-section-title">📋 एडमिन ऑडिट लॉग्स (Action History)</div>
       <div id="audit-logs-box" style="background:#111b21; border:1px solid rgba(255,255,255,0.12); padding:10px; border-radius:8px; min-height: 60px; max-height:160px; overflow-y:auto; font-size:0.8rem; color:#94a3b8; margin-bottom: 20px;"></div>
 
-    </div> <!-- 👈 एडमिन पैनल यहाँ सही से बंद होता है -->
-
-    <!-- SCREEN 1: Home View -->
-    <div class="view-screen view-active" id="screen-home">
-      <header class="top-header">
-        <div class="header-user-info">
-          <div class="header-avatar" id="my-avatar">उ</div>
-          <div>
-            <div class="header-title" id="my-display-name">जमात ऊला अलिफ़</div>
-            <div class="header-status" id="total-online-label">ऑनलाइन सदस्य</div>
-          </div>
-        </div>
-        <div class="header-actions">
-          <button class="header-btn" id="btn-admin-crown" title="एडमिन पैनल" style="display: none;"><i class="fa-solid fa-crown" style="color: #facc15;"></i></button>
-          <button class="header-btn" id="btn-sound" title="साउंड ऑन/ऑफ"><i class="fa-solid fa-volume-high"></i></button>
-          <button class="header-btn" id="btn-logout" title="लॉगआउट" onclick="logoutApp()" style="color: #f87171;"><i class="fa-solid fa-right-from-bracket"></i></button>
-        </div>
-      </header>
-      
-      <div class="admin-section-title">⚙️ ग्रुप मॉडरेशन सेटिंग्स</div>
-      <div style="background:#202c33; padding:10px; border-radius:8px; margin-bottom:10px; display:flex; flex-direction:column; gap:8px;">
-        <label style="display:flex; align-items:center; justify-content:space-between; font-size:0.9rem; cursor:pointer;">
-          <span>🔒 ग्रुप लॉक (सिर्फ एडमिन भेज सकेंगे मैसेज):</span>
-          <input type="checkbox" id="toggle-group-lock" style="width:18px; height:18px;">
-        </label>
-        <label style="display:flex; align-items:center; justify-content:space-between; font-size:0.9rem; cursor:pointer;">
-          <span>🖼️ मीडिया रोकें (सिर्फ टेक्स्ट की अनुमति):</span>
-          <input type="checkbox" id="toggle-media-lock" style="width:18px; height:18px;">
-        </label>
-        <div>
-          <span style="font-size:0.85rem; color:var(--text-muted);">स्लो मोड (मैसेज भेजने के बीच का गैप):</span>
-          <select id="slow-mode-select" class="login-input" style="margin-top:4px; margin-bottom:0;">
-            <option value="0">बंद (No Delay)</option>
-            <option value="5">5 सेकंड</option>
-            <option value="15">15 सेकंड</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="admin-section-title">📌 पिन नोटिस कंट्रोल</div>
-      <div style="margin-bottom: 10px;">
-        <input type="text" id="new-notice" class="login-input" placeholder="नया पिन नोटिस लिखें...">
-        <button class="btn-login" id="btn-update-notice">पिन नोटिस सेव करें</button>
-      </div>
-
-      <div class="admin-section-title">🚫 ब्लॉक किए गए छात्र (Banned Users)</div>
-<div id="banned-users-list-container" style="min-height: 50px; max-height: 180px; overflow-y: auto; margin-bottom: 12px; background:#202c33; padding:10px; border-radius:8px; border: 1px solid rgba(255,255,255,0.08);">
-  <div style="color: var(--text-muted); font-size: 0.85rem;">कोई छात्र ब्लॉक नहीं है।</div>
-</div>
-
-      <div class="admin-section-title">👥 छात्र डायरेक्टरी और म्यूट/बैन कंट्रोल</div>
-<div id="admin-students-directory" style="min-height: 60px; max-height: 220px; overflow-y: auto; margin-bottom: 12px; background:#202c33; padding:10px; border-radius:8px; border: 1px solid rgba(255,255,255,0.08);"></div>
-      
-      <div class="admin-section-title">🧹 डेटाबेस कंट्रोल</div>
-      <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-        <button class="btn-login" id="btn-clear-db-chat" style="background: #ef4444; flex:1;"><i class="fa-solid fa-trash"></i> सबके लिए चैट साफ़</button>
-        <button class="btn-login" id="btn-export-chat" style="background: #38bdf8; color:#01140e; flex:1;"><i class="fa-solid fa-download"></i> चैट एक्सपोर्ट</button>
-      </div>
-
-      <div class="admin-section-title">📋 एडमिन ऑडिट लॉग्स (Action History)</div>
-<div id="audit-logs-box" style="background:#111b21; border:1px solid rgba(255,255,255,0.12); padding:10px; border-radius:8px; min-height: 60px; max-height:160px; overflow-y:auto; font-size:0.8rem; color:#94a3b8; margin-bottom: 20px;"></div>
+    </div> <!-- ✅ एडमिन पैनल यहाँ सही से बंद हो गया -->
 
     <!-- SCREEN 1: Home View -->
     <div class="view-screen view-active" id="screen-home">
@@ -425,7 +339,7 @@
             <div class="item-subtext">सभी छात्रों का मुख्य क्लासरूम</div>
           </div>
         </div>
-                <!-- AI उस्ताद चैट रूम बटन -->
+        <!-- AI उस्ताद चैट रूम बटन -->
         <div class="chat-item" onclick="window.openAiChat()">
           <div class="item-avatar" style="background: #1e1e2d; color: #38bdf8; border: 1px solid #38bdf8;"><i class="fa-solid fa-robot"></i></div>
           <div class="item-info">
