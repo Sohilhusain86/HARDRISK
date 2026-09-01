@@ -457,15 +457,42 @@
         </select>
       </div>
 
-     <footer class="chat-bottom-dock">
+      <footer class="chat-bottom-dock" style="position: relative;">
+        <!-- 👻 Ghost Mode & 🕒 Schedule Controls Panel (पैनल जो घोस्ट बटन क्लिक करने पर खुलेगा) -->
+        <div id="ghost-schedule-controls" style="display: none; background: rgba(30, 41, 59, 0.98); padding: 10px; border-radius: 8px; position: absolute; bottom: 70px; left: 10px; z-index: 100; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 15px rgba(0,0,0,0.4); width: 220px;">
+          <div style="font-size: 0.75rem; color: #a855f7; font-weight: bold; margin-bottom: 6px;"><i class="fa-solid fa-ghost"></i> घोस्ट & शेड्यूल सेटिंग्स</div>
+          
+          <!-- घोस्ट टाइमर ड्रॉपडाउन -->
+          <div style="margin-bottom: 8px;">
+            <label style="font-size: 0.7rem; color: #cbd5e1; display: block; margin-bottom: 2px;">ऑटो-डिलीट टाइम (घोस्ट मोड):</label>
+            <select id="ghost-duration-select" style="background: #0f172a; color: #fff; border: 1px solid #475569; border-radius: 4px; padding: 4px; font-size: 0.75rem; width: 100%;">
+              <option value="10000">10 सेकंड</option>
+              <option value="30000" selected>30 सेकंड</option>
+              <option value="60000">1 मिनट</option>
+              <option value="300000">5 मिनट</option>
+            </select>
+          </div>
+
+          <!-- शेड्यूल्ड मैसेज के लिए डेट/टाइम पिकर -->
+          <div>
+            <label style="font-size: 0.7rem; color: #cbd5e1; display: block; margin-bottom: 2px;">शेड्यूल टाइम (वैकल्पिक):</label>
+            <input type="datetime-local" id="schedule-time-input" style="background: #0f172a; color: #fff; border: 1px solid #475569; border-radius: 4px; padding: 4px; font-size: 0.75rem; width: 100%;">
+          </div>
+        </div>
+
         <input type="file" id="file-selector" style="display: none;" accept="image/*,.pdf,.doc,.docx,.zip">
         <button class="btn-dock-action" id="btn-attach" title="फ़ाइल या फ़ोटो भेजें"><i class="fa-solid fa-paperclip" style="transform: rotate(45deg);"></i></button>
         <button class="btn-dock-action btn-mic" id="btn-mic" title="ऑडियो रिकॉर्ड करें"><i class="fa-solid fa-microphone"></i></button>
         <input type="text" class="chat-input-box" id="msg-input" placeholder="यहाँ मैसेज लिखें...">
         
+        <!-- 👻 Ghost Mode Toggle Button -->
+        <button class="btn-dock-action" id="btn-ghost-mode" type="button" onclick="window.toggleGhostMode()" title="घोस्ट मोड और शेड्यूल सेटिंग्स" style="color: var(--text-muted);">
+          <i class="fa-solid fa-ghost"></i>
+        </button>
+        
         <button class="btn-dock-action" id="btn-ai-magic" onclick="window.enhanceMessageWithAI()" title="AI से मेसेज सुधारें" style="color: #a78bfa;"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
         <button class="btn-send" id="btn-send"><i class="fa-solid fa-paper-plane"></i></button>
-      </footer>
+     </footer>
     </div>
     
     <!-- VOICE CALL MODAL SCREEN -->
@@ -1075,10 +1102,27 @@
         lastMessageTimestamp = now;
       }
 
-      // 1. मैसेज तुरंत ग्रुप/चैट में सेंड कर दें
+      // ड्रॉपडाउन और शेड्यूल इनपुट से वैल्यू लें
+      const ghostSelect = document.getElementById('ghost-duration-select');
+      const scheduleInput = document.getElementById('schedule-time-input');
+      
+      const gDuration = ghostSelect ? parseInt(ghostSelect.value) : 30000;
+      const sTime = scheduleInput ? scheduleInput.value : null;
+
       let sentMsgKey = null;
       if(window.sendFirebaseMessage) {
-        sentMsgKey = window.sendFirebaseMessage(window.currentActiveRoomId, window.currentUser.name, window.currentUser.phone, window.currentUser.displayName, window.currentUser.role, text, window.currentUser.location);
+        sentMsgKey = window.sendFirebaseMessage(
+          window.currentActiveRoomId, 
+          window.currentUser.name, 
+          window.currentUser.phone, 
+          window.currentUser.displayName, 
+          window.currentUser.role, 
+          text, 
+          window.currentUser.location,
+          window.isGhostActive || false,
+          gDuration,
+          sTime
+        );
       }
       
       const currentRoom = window.currentActiveRoomId;
@@ -1087,6 +1131,96 @@
       const senderRole = window.currentUser.role;
 
       msgInput.value = "";
+      if (scheduleInput) scheduleInput.value = ""; // रीसेट करें
+
+      if (currentRoom.startsWith('ai_ustad_')) {
+        window.fetchGeminiResponse(text, currentRoom);
+        return;
+      }
+
+      // 🧠 बैकग्राउंड AI ऑटो-बाउंसर लॉजिक (जैसा पहले था)
+      if (currentRoom === 'group' && senderRole !== 'admin' && sentMsgKey) {
+        (async () => {
+          try {
+            const hasLink = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi.test(text);
+            let isViolation = hasLink;
+
+            if (!isViolation) {
+              const modPrompt = `You are a strict classroom content moderation AI. Analyze this message: "${text}". 
+Is it abusive, vulgar, disrespectful, sexually explicit, containing severe profanity, Hindi/Hinglish/Urdu slurs, or harassment? 
+Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation or explanation.`;
+
+              const modRes = await fetch('/api/gemini', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  messages: [{ role: "user", parts: [{ text: modPrompt }] }]
+                })
+              });
+
+              const modTextRaw = await modRes.text();
+              let modData = JSON.parse(modTextRaw);
+              const verdict = (modData.text || "").trim().toUpperCase();
+              if (verdict.includes("UNSAFE")) isViolation = true;
+            }
+
+            if (isViolation) {
+              remove(ref(db, `messages/group/${sentMsgKey}`));
+              const cleanPhone = senderPhone.replace(/[^0-9]/g, '');
+              const banDurationMs = 5 * 60 * 60 * 1000; 
+              const banExpiry = Date.now() + banDurationMs;
+
+              set(ref(db, `banned_users/${cleanPhone}`), { 
+                name: senderName, 
+                bannedAt: Date.now(),
+                bannedUntil: banExpiry,
+                autoBanned: true 
+              });
+
+              push(auditRef, { 
+                action: `AI ऑटो-डिलीट व 5 घंटे बैन: ${senderName} (मैसेज: "${text}")`, 
+                admin: "Gemini AI Moderator", 
+                time: new Date().toLocaleTimeString() 
+              });
+            }
+          } catch (err) {
+            console.warn("Background AI Moderation error:", err);
+          }
+        })();
+      }
+     }
+    
+      // ड्रॉपडाउन और शेड्यूल इनपुट से वैल्यू लें
+      const ghostSelect = document.getElementById('ghost-duration-select');
+      const scheduleInput = document.getElementById('schedule-time-input');
+      
+      const gDuration = ghostSelect ? parseInt(ghostSelect.value) : 30000;
+      const sTime = scheduleInput ? scheduleInput.value : null;
+
+      // 1. मैसेज तुरंत ग्रुप/चैट में सेंड कर दें
+      let sentMsgKey = null;
+      if(window.sendFirebaseMessage) {
+        sentMsgKey = window.sendFirebaseMessage(
+          window.currentActiveRoomId, 
+          window.currentUser.name, 
+          window.currentUser.phone, 
+          window.currentUser.displayName, 
+          window.currentUser.role, 
+          text, 
+          window.currentUser.location,
+          window.isGhostActive || false,
+          gDuration,
+          sTime
+        );
+      }
+      
+      const currentRoom = window.currentActiveRoomId;
+      const senderName = window.currentUser.name;
+      const senderPhone = window.currentUser.phone;
+      const senderRole = window.currentUser.role;
+
+      msgInput.value = "";
+      if (scheduleInput) scheduleInput.value = ""; // भेजने के बाद शेड्यूल इनपुट रीसेट करें
 
       if (currentRoom.startsWith('ai_ustad_')) {
         window.fetchGeminiResponse(text, currentRoom);
@@ -1299,6 +1433,13 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       const roleLabel = data.role === 'admin' ? 'एडमिन' : 'छात्र';
 
       let contentHtml = `<div>${data.text}</div>`;
+
+      if (data.isGhost && data.expiresAt) {
+        window.handleGhostMessageExpiration(window.currentActiveRoomId, msgKey, data.expiresAt);
+        const secLabel = Math.round(data.ghostDuration / 1000) + 's';
+        const ghostBadge = `<span style="color:#c084fc; font-size:0.7rem; margin-left:4px;"><i class="fa-solid fa-ghost"></i> ${secLabel}</span>`;
+        contentHtml += ghostBadge;
+      }
       
       if (typeof data.text === 'string') {
         const cleanText = data.text.trim();
@@ -1740,11 +1881,12 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       onDisconnect(userRef).update({ status: "offline", lastSeen: Date.now() });
     };
 
-        window.sendFirebaseMessage = function(roomId, name, phone, displayName, role, text, userLocation) {
+            window.sendFirebaseMessage = function(roomId, name, phone, displayName, role, text, userLocation, isGhost = false) {
       if(!text) return null;
       const now = new Date();
       const nodePath = (roomId === 'group') ? 'messages/group' : `messages_private/${roomId}`;
-      const newMsgRef = push(ref(db, nodePath), {
+      
+      const payload = {
         sender: name,
         senderPhone: phone,
         displayName: displayName,
@@ -1753,10 +1895,17 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         location: userLocation || "Unknown",
         time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
-      });
+      };
+
+      if (isGhost) {
+        payload.isGhost = true;
+        payload.expiresAt = Date.now() + (30 * 1000); // 30 सेकंड बाद डिलीट
+      }
+
+      const newMsgRef = push(ref(db, nodePath), payload);
       return newMsgRef.key;
     };
-
+    
     window.reactToMessage = function(roomId, msgKey, emoji) {
       const nodePath = (roomId === 'group') ? `messages/group/${msgKey}/reactions` : `messages_private/${roomId}/${msgKey}/reactions`;
       const cleanPhoneKey = window.currentUser.phone.replace(/[.#$\/\[\]]/g, '_');
@@ -2195,6 +2344,34 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         }
       } catch (error) {
         alert("AI रिपोर्ट बनाने में एरर: " + error.message);
+      }
+    };
+
+    window.isGhostActive = false;
+
+    window.toggleGhostMode = function() {
+      window.isGhostActive = !window.isGhostActive;
+      const btn = document.getElementById('btn-ghost-mode');
+      const panel = document.getElementById('ghost-schedule-controls');
+      
+      if (btn) {
+        btn.style.color = window.isGhostActive ? '#a855f7' : 'var(--text-muted)';
+      }
+      if (panel) {
+        panel.style.display = window.isGhostActive ? 'block' : 'none';
+      }
+    };
+
+    window.handleGhostMessageExpiration = function(roomId, msgKey, expiresAt) {
+      const remainingMs = expiresAt - Date.now();
+      const nodePath = (roomId === 'group') ? `messages/group/${msgKey}` : `messages_private/${roomId}/${msgKey}`;
+      
+      if (remainingMs <= 0) {
+        remove(ref(db, nodePath));
+      } else {
+        setTimeout(() => {
+          remove(ref(db, nodePath));
+        }, remainingMs);
       }
     };
     
