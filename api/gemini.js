@@ -11,11 +11,12 @@ export default async function handler(req, res) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      return res.status(500).json({ error: 'GEMINI_API_KEY Vercel में नहीं मिली।' });
+      return res.status(500).json({ error: 'GEMINI_API_KEY Vercel में मौजूद नहीं है।' });
     }
 
+    // एक्टिव मॉडल gemini-2.5-flash का इस्तेमाल
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -34,7 +35,7 @@ export default async function handler(req, res) {
     } else if (data.error) {
       return res.status(500).json({ error: data.error.message });
     } else {
-      return res.status(500).json({ error: 'AI से जवाब नहीं मिला।' });
+      return res.status(500).json({ error: 'AI से कोई जवाब नहीं मिला।' });
     }
   } catch (err) {
     return res.status(500).json({ error: err.message });
