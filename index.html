@@ -210,12 +210,10 @@
     .utility-title { font-weight: bold; font-size: 1rem; color: #fff; margin-bottom: 4px; }
     .utility-body { font-size: 0.85rem; color: var(--text-muted); }
 
-    /* Realistic SMS Notification Popup Card */
     .sms-popup-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); z-index: 300; display: none; justify-content: center; align-items: flex-start; padding-top: 40px; }
     .sms-popup-card { background: #202c33; border: 1px solid #00a884; border-radius: 16px; padding: 18px 20px; width: 90%; max-width: 360px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); color: #fff; text-align: left; animation: slideDown 0.3s ease; }
     @keyframes slideDown { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-    /* Call Modal Overlay */
     .call-overlay { position: absolute; inset: 0; background: rgba(11, 20, 26, 0.95); z-index: 200; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
     .call-overlay.active { display: flex; }
     .call-avatar-large { width: 100px; height: 100px; border-radius: 50%; background: #2a3942; background-size: cover; background-position: center; margin-bottom: 20px; border: 3px solid #00a884; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #00a884; }
@@ -331,7 +329,6 @@
       <div class="admin-section-title">📋 एडमिन ऑडिट लॉग्स (Action History)</div>
       <div id="audit-logs-box" style="background:#111b21; border:1px solid rgba(255,255,255,0.12); padding:10px; border-radius:8px; min-height: 60px; max-height:160px; overflow-y:auto; font-size:0.8rem; color:#94a3b8; margin-bottom: 20px;"></div>
 
-            <!-- 📊 ADVANCED ATTENDANCE & PERFORMANCE ANALYTICS DASHBOARD -->
       <div class="admin-section-title">📊 लाइव हाज़िरी और परफॉरमेंस एनालिटिक्स</div>
       <div style="background:#202c33; padding:12px; border-radius:8px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.08);">
         <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">
@@ -341,7 +338,7 @@
           <div style="color: var(--text-muted); text-align: center; padding: 10px;">डेटा लोड हो रहा है...</div>
         </div>
       </div>
-    </div> <!-- ✅ Admin Panel Closed Correctly -->
+    </div>
 
     <!-- SCREEN 1: Home View -->
     <div class="view-screen view-active" id="screen-home">
@@ -376,7 +373,6 @@
           </div>
         </div>
         
-        <!-- AI उस्ताद चैट रूम बटन -->
         <div class="chat-item" onclick="window.openAiChat()">
           <div class="item-avatar" style="background: #1e1e2d; color: #38bdf8; border: 1px solid #38bdf8;"><i class="fa-solid fa-robot"></i></div>
           <div class="item-info">
@@ -404,11 +400,9 @@
         </div>
       </main>
 
-            <!-- Tab 3: Live Polls Area -->
+      <!-- Tab 3: Live Polls Area -->
       <main class="chats-list-area" id="tab-content-polls" style="display: none;">
         <div class="section-container">
-          
-          <!-- ✨ NEW AI POLL MAKER ADDED HERE -->
           <div style="background:#1e1e2d; padding:12px; border-radius:10px; margin-bottom:16px; border: 1px solid #8b5cf6;">
             <div style="font-size: 0.85rem; color: #a78bfa; margin-bottom: 8px; font-weight:bold;">
               <i class="fa-solid fa-wand-magic-sparkles"></i> AI ऑटो-क्विज़ (स्मार्ट पोल मेकर)
@@ -418,7 +412,6 @@
               AI से सवाल और विकल्प (Options) बनवाएं
             </button>
           </div>
-          <!-- END AI POLL MAKER -->
 
           <div style="font-size: 0.85rem; color: #38bdf8; margin-bottom: 4px;">नया पोल मैन्युअल बनाएं:</div>
           <input type="text" id="new-poll-question" class="login-input" placeholder="पोल का सवाल..." style="margin-bottom: 8px;">
@@ -429,7 +422,7 @@
           <div id="rendered-polls-box"></div>
         </div>
       </main>
-    </div> <!-- ✅ Screen Home Closed Correctly -->
+    </div>
 
     <!-- SCREEN 2: Chat Room -->
     <div class="view-screen view-hidden" id="screen-chat">
@@ -470,12 +463,10 @@
         <button class="btn-dock-action btn-mic" id="btn-mic" title="ऑडियो रिकॉर्ड करें"><i class="fa-solid fa-microphone"></i></button>
         <input type="text" class="chat-input-box" id="msg-input" placeholder="यहाँ मैसेज लिखें...">
         
-        <!-- ✨ NEW AI MAGIC BUTTON -->
-        <button class="btn-dock-action" id="btn-ai-magic" onclick="window.enhanceMessageWithAI()" title="AI से मेसेज सुधारें (Grammar/Translation)" style="color: #a78bfa;"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
-        
+        <button class="btn-dock-action" id="btn-ai-magic" onclick="window.enhanceMessageWithAI()" title="AI से मेसेज सुधारें" style="color: #a78bfa;"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
         <button class="btn-send" id="btn-send"><i class="fa-solid fa-paper-plane"></i></button>
       </footer>
-    </div> <!-- ✅ Screen Chat Closed Correctly -->
+    </div>
     
     <!-- VOICE CALL MODAL SCREEN -->
     <div class="call-overlay" id="call-screen">
@@ -490,11 +481,11 @@
       <audio id="remote-audio" autoplay></audio>
     </div>
 
-  </div> <!-- ✅ App Screen Closed Correctly -->
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, push, set, update, onValue, onDisconnect, onChildAdded, onChildRemoved, remove, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, get, push, set, update, onValue, onDisconnect, onChildAdded, onChildRemoved, remove, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDpqKDayo6H0nVyjnT1JBPjpH8RjmwpvV0",
@@ -557,9 +548,9 @@
             myAvatar.textContent = "";
             myAvatar.style.backgroundImage = `url('${window.currentUser.dpUrl}')`;
           } else {
-            myAvatar.textContent = window.currentUser.name.charAt(0);
+            myAvatar.textContent = (window.currentUser.name || "उ").charAt(0);
           }
-          document.getElementById('my-display-name').textContent = window.currentUser.displayName;
+          document.getElementById('my-display-name').textContent = window.currentUser.displayName || window.currentUser.name;
 
           if (window.currentUser.role === 'admin') {
             document.getElementById('btn-admin-crown').style.display = "block";
@@ -585,33 +576,35 @@
         localStorage.removeItem('jamia_chat_saved_user');
         location.reload();
       }
-    }
+    };
 
     const dpFileInput = document.getElementById('dp-file-input');
     const dpPreviewBox = document.getElementById('dp-preview-box');
     const dpCameraIcon = document.getElementById('dp-camera-icon');
 
-    dpFileInput.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      dpPreviewBox.style.opacity = "0.5";
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', window.UPLOAD_PRESET);
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${window.CLOUD_NAME}/auto/upload`, { method: 'POST', body: formData });
-        const result = await res.json();
-        if (result.secure_url) {
-          selectedDpUrl = result.secure_url;
-          dpPreviewBox.style.backgroundImage = `url('${selectedDpUrl}')`;
-          dpCameraIcon.style.display = 'none';
+    if (dpFileInput) {
+      dpFileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        dpPreviewBox.style.opacity = "0.5";
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('upload_preset', window.UPLOAD_PRESET);
+          const res = await fetch(`https://api.cloudinary.com/v1_1/${window.CLOUD_NAME}/auto/upload`, { method: 'POST', body: formData });
+          const result = await res.json();
+          if (result.secure_url) {
+            selectedDpUrl = result.secure_url;
+            dpPreviewBox.style.backgroundImage = `url('${selectedDpUrl}')`;
+            if (dpCameraIcon) dpCameraIcon.style.display = 'none';
+          }
+        } catch (err) {
+          alert("DP अपलोड विफल रही।");
+        } finally {
+          dpPreviewBox.style.opacity = "1";
         }
-      } catch (err) {
-        alert("DP अपलोड विफल रही।");
-      } finally {
-        dpPreviewBox.style.opacity = "1";
-      }
-    });
+      });
+    }
 
     function requestNotificationAccess() {
       if ("Notification" in window && Notification.permission === "default") {
@@ -633,7 +626,7 @@
           });
         } catch(e) {}
       }
-    }
+    };
 
     function detectLocation() {
       function fallbackToIP() {
@@ -685,7 +678,7 @@
         osc.start();
         osc.stop(audioCtx.currentTime + 0.06);
       } catch(e) {}
-    }
+    };
 
     const actionAuthBtn = document.getElementById('btn-action-auth');
     const otpSection = document.getElementById('otp-section');
@@ -719,65 +712,63 @@
 
       const enteredOtp = otpInput.value.trim();
       const otpSnapRef = ref(db, `otps/${phone}`);
-      onValue(otpSnapRef, (snap) => {
-        const otpData = snap.val();
-        if (!otpData || otpData.otp !== enteredOtp) {
-          alert("गलत OTP! कृपया सही OTP दर्ज करें।");
-          return;
-        }
+      
+      const snap = await get(otpSnapRef);
+      const otpData = snap.val();
+      if (!otpData || otpData.otp !== enteredOtp) {
+        alert("गलत OTP! कृपया सही OTP दर्ज करें।");
+        return;
+      }
 
-                // 🔒 डुप्लीकेट फोन नंबर और नाम ओवरराइट होने से रोकने की जांच
-        const existingUserSnap = await get(ref(db, `users/${phone}`));
-        let finalName = name;
-        let finalRoll = roll;
+      // 🔒 डुप्लीकेट फोन नंबर और नाम ओवरराइट होने से रोकने की जांच
+      const existingUserSnap = await get(ref(db, `users/${phone}`));
+      let finalName = name;
+      let finalRoll = roll;
 
-        if (existingUserSnap.exists()) {
-          const oldData = existingUserSnap.val();
-          // अगर यह नंबर पहले से रजिस्टर्ड है, तो पुराना असली नाम और रोल ही रहेगा
-          finalName = oldData.name || name;
-          finalRoll = oldData.roll || roll;
-        } else {
-          // पहली बार नया नंबर आने पर डेटाबेस में सुरक्षित सेव करें
-          await set(ref(db, `users/${phone}`), {
-            name: name,
-            phone: phone,
-            roll: roll,
-            createdAt: Date.now()
-          });
-        }
+      if (existingUserSnap.exists()) {
+        const oldData = existingUserSnap.val();
+        finalName = oldData.name || name;
+        finalRoll = oldData.roll || roll;
+      } else {
+        await set(ref(db, `users/${phone}`), {
+          name: name,
+          phone: phone,
+          roll: roll,
+          createdAt: Date.now()
+        });
+      }
 
-        window.currentUser.name = finalName;
-        window.currentUser.phone = phone;
-        window.currentUser.roll = finalRoll;
-        window.currentUser.displayName = finalRoll ? `${finalName} (रोल: ${finalRoll})` : finalName;
-        window.currentUser.dpUrl = selectedDpUrl || "";
-        
-        const pass = userPassInput.value.trim();
-        if (pass === ADMIN_PASSKEY) {
-          window.currentUser.role = "admin";
-          adminCrown.style.display = "block";
-        }
+      window.currentUser.name = finalName;
+      window.currentUser.phone = phone;
+      window.currentUser.roll = finalRoll;
+      window.currentUser.displayName = finalRoll ? `${finalName} (रोल: ${finalRoll})` : finalName;
+      window.currentUser.dpUrl = selectedDpUrl || "";
+      
+      const pass = userPassInput.value.trim();
+      if (pass === ADMIN_PASSKEY) {
+        window.currentUser.role = "admin";
+        if (adminCrown) adminCrown.style.display = "block";
+      }
 
-        localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
+      localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
 
-        const myAvatar = document.getElementById('my-avatar');
-        if (window.currentUser.dpUrl) {
-          myAvatar.textContent = "";
-          myAvatar.style.backgroundImage = `url('${window.currentUser.dpUrl}')`;
-        } else {
-          myAvatar.textContent = name.charAt(0);
-        }
-        document.getElementById('my-display-name').textContent = window.currentUser.displayName;
+      const myAvatar = document.getElementById('my-avatar');
+      if (window.currentUser.dpUrl) {
+        myAvatar.textContent = "";
+        myAvatar.style.backgroundImage = `url('${window.currentUser.dpUrl}')`;
+      } else {
+        myAvatar.textContent = finalName.charAt(0);
+      }
+      document.getElementById('my-display-name').textContent = window.currentUser.displayName;
 
-        document.getElementById('login-screen').style.display = "none";
-        requestNotificationAccess();
-        
-        if (window.registerUserFirebase) {
-          window.registerUserFirebase(window.currentUser);
-        }
-        connectScaleDrone();
-        listenForIncomingCalls();
-      }, { onlyOnce: true });
+      document.getElementById('login-screen').style.display = "none";
+      requestNotificationAccess();
+      
+      if (window.registerUserFirebase) {
+        window.registerUserFirebase(window.currentUser);
+      }
+      connectScaleDrone();
+      listenForIncomingCalls();
     });
 
     function connectScaleDrone() {
@@ -1323,7 +1314,7 @@
     };
 
     const adminPanel = document.getElementById('admin-panel');
-    adminCrown.addEventListener('click', () => adminPanel.classList.add('open'));
+    if (adminCrown) adminCrown.addEventListener('click', () => adminPanel.classList.add('open'));
     document.getElementById('btn-close-admin').addEventListener('click', () => adminPanel.classList.remove('open'));
 
     document.getElementById('btn-sound').addEventListener('click', () => {
@@ -1360,14 +1351,12 @@
         document.getElementById('notice-display').textContent = settings.noticeText;
       }
 
-           if (settings.broadcastAlert && settings.broadcastTime) {
-        // अलर्ट भेजने की तारीख और आज की तारीख निकालें
+      if (settings.broadcastAlert && settings.broadcastTime) {
         const alertDate = new Date(settings.broadcastTime).toLocaleDateString();
         const todayDate = new Date().toLocaleDateString();
 
-        // अगर अलर्ट आज ही भेजा गया है, और इस बार ऐप खुलने पर अभी तक नहीं दिखा है, तभी दिखाएं
         if (alertDate === todayDate && settings.broadcastTime > (window.lastAlertTime || 0)) {
-          window.lastAlertTime = settings.broadcastTime; // चैट करते वक्त बार-बार लूप में आने से रोकेगा
+          window.lastAlertTime = settings.broadcastTime;
           alert("📢 एडमिन इमरजेंसी अलर्ट:\n\n" + settings.broadcastAlert);
         }
       }
@@ -1457,7 +1446,7 @@
       });
     });
 
-        onValue(usersRef, (snapshot) => {
+    onValue(usersRef, (snapshot) => {
       const data = snapshot.val() || {};
       if (window.renderAllUsersList) window.renderAllUsersList(data);
       
@@ -1805,7 +1794,7 @@
         try {
           data = JSON.parse(responseText);
         } catch (parseError) {
-          throw new Error("सर्वर से गलत फॉर्मेट (HTML) मिला। Vercel Logs चेक करें।");
+          throw new Error("सर्वर से गलत फॉर्मेट मिला।");
         }
         
         if (!response.ok || data.error) throw new Error(data.error || `सर्वर एरर (${response.status})`);
@@ -1840,7 +1829,7 @@
 
       const btn = document.getElementById('btn-generate-summary');
       const originalText = btn.innerHTML;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> समरी बन रही है (कृपया रुकें)...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> समरी बन रही है...';
       btn.disabled = true;
 
       try {
@@ -1868,7 +1857,7 @@
             return;
           }
 
-          const summaryPrompt = `कृपया नीचे दी गई मदरसे के क्लास (ग्रुप) की आज की बातचीत को पढ़ें। इसके आधार पर एक बहुत ही साफ़-सुथरी और प्रोफेशनल बुलेट-पॉइंट समरी (Class Summary) बनाएँ। बताएँ कि आज कौन-से मुख्य विषय (Topics) डिस्कस हुए, क्या इल्मी बातें हुईं और क्या होमवर्क या निर्देश दिए गए। समरी का अंदाज़ एक उस्ताद की तरह हो।\n\nआज की बातचीत:\n${chatText}`;
+          const summaryPrompt = `कृपया नीचे दी गई क्लास की बातचीत पढ़कर एक अच्छी बुलेट-पॉइंट समरी बनाएँ:\n\n${chatText}`;
 
           const response = await fetch('/api/gemini', {
             method: "POST",
@@ -1879,18 +1868,12 @@
           });
 
           const responseText = await response.text();
-          let data = null;
-
-          try {
-            data = JSON.parse(responseText);
-          } catch (e) {
-            throw new Error("सर्वर से गलत जवाब मिला (HTML)।");
-          }
+          let data = JSON.parse(responseText);
 
           if (!response.ok || data.error) throw new Error(data.error || "सर्वर एरर");
 
           if (data.text) {
-             const finalSummary = "📝 **आज की क्लास समरी (Class Summary):**\n\n" + data.text.trim();
+             const finalSummary = "📝 **आज की क्लास समरी:**\n\n" + data.text.trim();
              if (window.sendFirebaseMessage) {
                window.sendFirebaseMessage('group', "Suhail Assistant", "Suhail_Ai", "🤖 Suhail Assistant", "admin", finalSummary, "Vercel Server");
              }
@@ -1909,10 +1892,6 @@
       }
     };
 
-        // =========================================================
-    // 📊 AI AUTO-QUIZ MAKER (SMART POLL GENERATOR)
-    // =========================================================
-
     window.generateAIPoll = async function() {
       if (window.currentUser.role !== 'admin') {
         alert("यह सुपर-फीचर केवल एडमिन के लिए है।");
@@ -1921,20 +1900,16 @@
 
       const topicInput = document.getElementById('ai-poll-topic').value.trim();
       if (!topicInput) { 
-        alert("कृपया कोई टॉपिक, सबक या पैराग्राफ लिखें ताकि AI उस पर सवाल बना सके!"); 
+        alert("कृपया कोई टॉपिक या पैराग्राफ लिखें!"); 
         return; 
       }
 
       const btn = document.getElementById('btn-generate-ai-poll');
       const originalText = btn.innerHTML;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> AI पोल तैयार कर रहा है...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> पोल तैयार हो रहा है...';
       btn.disabled = true;
 
-      // Prompt forces Gemini to output STRICT JSON so our code can read it automatically
-      const prompt = `आप एक उस्ताद (टीचर) हैं। नीचे दिए गए टेक्स्ट या पैराग्राफ को पढ़ें और उसमें से एक बहुत अच्छा Multiple Choice Question (MCQ) बनाएँ। प्रश्न हिंदी या उर्दू (देवनागरी लिपि) में होना चाहिए। आपको जवाब सिर्फ और सिर्फ एक JSON फॉर्मेट में देना है। कोई एक्स्ट्रा टेक्स्ट, बैकटिक या स्पष्टीकरण न दें।
-      JSON फॉर्मेट: {"question": "आपका सवाल यहाँ", "opt1": "पहला विकल्प", "opt2": "दूसरा विकल्प"}
-      
-      टेक्स्ट: ${topicInput}`;
+      const prompt = `आप एक उस्ताद हैं। नीचे दिए गए टेक्स्ट से एक Multiple Choice Question बनाएँ। जवाब सिर्फ JSON फॉर्मेट में दें: {"question": "सवाल", "opt1": "विकल्प 1", "opt2": "विकल्प 2"}\n\nटेक्स्ट: ${topicInput}`;
 
       try {
         const response = await fetch('/api/gemini', {
@@ -1948,11 +1923,8 @@
         const responseText = await response.text();
         let data = JSON.parse(responseText);
 
-        if (!response.ok || data.error) {
-          throw new Error(data.error || "सर्वर एरर");
-        }
+        if (!response.ok || data.error) throw new Error(data.error || "सर्वर एरर");
 
-        // Clean up markdown block if Gemini adds it accidentally
         let jsonString = data.text.replace(/```json/g, '').replace(/```/g, '').trim();
         const pollData = JSON.parse(jsonString);
 
@@ -1968,12 +1940,9 @@
             author: window.currentUser.displayName || window.currentUser.name 
           });
           
-          alert("AI ने शानदार पोल बनाकर ग्रुप में लाइव कर दिया है!");
-          document.getElementById('ai-poll-topic').value = ""; // डिब्बा खाली करें
-        } else {
-          throw new Error("AI ने सही फॉर्मेट में जवाब नहीं दिया।");
+          alert("AI ने पोल बनाकर ग्रुप में लाइव कर दिया है!");
+          document.getElementById('ai-poll-topic').value = "";
         }
-
       } catch (error) {
         alert("पोल बनाने में एरर: " + error.message);
       } finally {
@@ -1981,10 +1950,6 @@
         btn.disabled = false;
       }
     };
-
-        // =========================================================
-    // 🌍 SMART TRANSLATOR & GRAMMAR CHECKER (AI MAGIC)
-    // =========================================================
 
     window.enhanceMessageWithAI = async function() {
       const inputField = document.getElementById('msg-input');
@@ -1999,10 +1964,7 @@
       magicBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
       magicBtn.disabled = true;
 
-      // AI को निर्देश कि मेसेज को कैसे सुधारना है
-      const prompt = `आप एक प्रोफेशनल एडिटर और ट्रांसलेटर हैं। इस मेसेज को पढ़ें: "${text}"
-      अगर यह टूटी-फूटी भाषा में है, तो इसकी ग्रामर सही करें। अगर यह बहुत कैज़ुअल है, तो इसे थोड़ा साफ़ और पढ़ने में अच्छा बनाएँ। 
-      आपको सिर्फ सुधरा हुआ (Corrected/Translated) टेक्स्ट आउटपुट देना है। कोई एक्स्ट्रा बात या स्पष्टीकरण न लिखें।`;
+      const prompt = `इस मेसेज की ग्रामर और भाषा सुधारें: "${text}". सिर्फ सुधरा हुआ टेक्स्ट दें।`;
 
       try {
         const response = await fetch('/api/gemini', {
@@ -2016,19 +1978,12 @@
         const responseText = await response.text();
         let data = JSON.parse(responseText);
 
-        if (!response.ok || data.error) {
-          throw new Error(data.error || "सर्वर एरर");
-        }
+        if (!response.ok || data.error) throw new Error(data.error || "सर्वर एरर");
 
         if (data.text) {
-          // AI का सुधरा हुआ टेक्स्ट चैट बॉक्स में डाल दें
           inputField.value = data.text.trim(); 
-          
-          // जादू वाला एनीमेशन इफ़ेक्ट (चैट बॉक्स का रंग हल्का सा बदलेगा)
           inputField.style.backgroundColor = "#2d1b69";
           setTimeout(() => { inputField.style.backgroundColor = "#2a3942"; }, 500);
-        } else {
-          throw new Error("AI ने कोई जवाब नहीं दिया।");
         }
       } catch (error) {
         alert("AI Magic में एरर: " + error.message);
@@ -2038,12 +1993,7 @@
       }
     };
 
-          // =========================================================
-    // 📊 UPDATED ATTENDANCE & PERFORMANCE ANALYTICS (WITH NAME MERGING)
-    // =========================================================
-    
     const attendanceRootRef = ref(db, 'attendance');
-
     onValue(attendanceRootRef, (snapshot) => {
       const attendanceData = snapshot.val() || {};
       const usersDataSnapshot = ref(db, 'users');
@@ -2061,14 +2011,11 @@
           return;
         }
 
-        // नाम के आधार पर डेटा को मर्ज करने के लिए एक ऑब्जेक्ट बनाएँ
         let mergedUsers = {};
 
         phoneKeys.forEach(phone => {
           const userInfo = usersMap[phone] || {};
           let studentName = userInfo.displayName || userInfo.name || phone;
-          
-          // नाम को स्टैंडर्ड फॉर्मेट में लाएं ताकि छोटे/बड़े अक्षर का फर्क खत्म हो जाए
           let cleanNameKey = studentName.trim().toLowerCase();
           
           const daysRecord = attendanceData[phone] || {};
@@ -2080,7 +2027,6 @@
               totalDays: 0
             };
           }
-          // अगर एक ही नाम अलग-अलग जगह है तो दिन जुड़ जाएंगे
           mergedUsers[cleanNameKey].totalDays += totalDaysPresent;
         });
 
@@ -2089,7 +2035,7 @@
             <thead>
               <tr style="border-bottom: 1px solid rgba(255,255,255,0.15); color: #38bdf8; font-size: 0.75rem;">
                 <th style="padding: 6px;">छात्र का नाम</th>
-                <th style="padding: 6, text-align: center;">कुल दिन उपस्थित</th>
+                <th style="padding: 6px; text-align: center;">कुल दिन उपस्थित</th>
                 <th style="padding: 6px; text-align: center;">स्टेटस</th>
               </tr>
             </thead>
@@ -2129,36 +2075,6 @@
       }, { onlyOnce: true });
     });
 
-        // =========================================================
-    // 🗑️ PERMANENT DELETE / PURGE USER FUNCTION
-    // =========================================================
-    window.purgeUserPermanently = async function(phone, userName) {
-      if (window.currentUser.role !== 'admin') {
-        alert("केवल एडमिन ही यूज़र को हमेशा के लिए डिलीट कर सकते हैं।");
-        return;
-      }
-
-      const confirmDelete = confirm(`⚠️ चेतावनी: क्या आप सच में "${userName}" (${phone}) को हमेशा के लिए डिलीट करना चाहते हैं?\n\nइसका पूरा प्रोफाइल, हाज़िरी और रिकॉर्ड डेटाबेस से मिट जाएगा।`);
-      
-      if (!confirmDelete) return;
-
-      try {
-        // 1. यूज़र प्रोफाइल हटाएं
-        await remove(ref(db, `users/${phone}`));
-        
-        // 2. हाज़िरी रिकॉर्ड हटाएं
-        await remove(ref(db, `attendance/${phone}`));
-
-        // 3. यदि कोई पेंडिंग OTP रिकॉर्ड हो तो उसे भी हटाएं
-        await remove(ref(db, `otps/${phone}`));
-
-        alert(`सफलता: "${userName}" का पूरा रिकॉर्ड स्थायी रूप से डिलीट कर दिया गया है।`);
-      } catch (error) {
-        console.error("Delete Error:", error);
-        alert("डेटा डिलीट करने में समस्या आई।");
-      }
-    };
-    
   </script>
 </body>
 </html>
