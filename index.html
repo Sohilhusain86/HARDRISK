@@ -1659,153 +1659,377 @@
       });
     };
 
-        // --- GEMINI AI INTEGRATION (Phase 1: AI Ustad) ---
+        <!-- =========================================================
+         GEMINI AI INTEGRATION — PHASE 1: AI USTAAD
+         ========================================================= -->
+
     window.openAiChat = function() {
-      // हर यूज़र का अपना प्राइवेट AI रूम बनेगा
-      const aiRoomId = `ai_ustad_${window.currentUser.phone}`;
-      window.openChatRoom(aiRoomId, '🤖 AI उस्ताद', 'Google Gemini AI Assistant', 'https://cdn-icons-png.flaticon.com/512/8943/8943377.png');
+
+      // हर यूज़र का अपना निजी AI रूम
+      const phone =
+        window.currentUser &&
+        window.currentUser.phone
+          ? String(window.currentUser.phone)
+          : "guest";
+
+      const aiRoomId = `ai_ustad_${phone}`;
+
+      window.openChatRoom(
+        aiRoomId,
+        '🤖 AI उस्ताद',
+        'Google Gemini AI Assistant',
+        'https://cdn-icons-png.flaticon.com/512/8943/8943377.png'
+      );
     };
 
-     // --- GEMINI AI SESSION HISTORY ---
-// यह memory केवल खुले हुए page/session तक रहेगी।
-window.geminiChatHistory = [];
 
-window.fetchGeminiResponse = async function(userText, roomId) {
-  const typingDiv = document.getElementById('typing-indicator');
+    // =========================================================
+    // GEMINI AI — SESSION CHAT MEMORY
+    // =========================================================
+    //
+    // यह memory केवल वर्तमान खुले हुए page/session तक रहेगी।
+    //
+    // localStorage में save नहीं होगी।
+    // Firebase/database में save नहीं होगी।
+    //
+    // Page/app बंद करके दोबारा खोलने पर नई बातचीत शुरू होगी।
+    // =========================================================
 
-  if (typingDiv) {
-    typingDiv.textContent = 'AI उस्ताद सोच रहा है...';
-    typingDiv.style.display = 'block';
-  }
+    window.geminiChatHistory = [];
 
-  try {
-    const cleanText = String(userText || '').trim();
 
-    if (!cleanText) return;
+    // =========================================================
+    // GEMINI AI LIMITS
+    // =========================================================
 
-    // बहुत लंबा user message रोकें
-    if (cleanText.length > 4000) {
-      window.sendFirebaseMessage(
-        roomId,
-        'AI उस्ताद',
-        'gemini_bot',
-        '🤖 AI उस्ताद',
-        'admin',
-        'मैसेज बहुत लंबा है। कृपया इसे 4000 अक्षरों के अंदर रखें।',
-        'Vercel Server'
-      );
-      return;
-    }
+    // एक session में अधिकतम 12 messages
+    // (user + AI दोनों मिलाकर)
+    const GEMINI_MAX_HISTORY = 12;
 
-    // नया user message history में डालें
-    window.geminiChatHistory.push({
-      role: 'user',
-      parts: [{ text: cleanText }]
-    });
+    // एक user message की अधिकतम लंबाई
+    const GEMINI_MAX_USER_MESSAGE_LENGTH = 4000;
 
-    // अधिकतम 10 messages = लगभग 5 सवाल-जवाब
-    // हमेशा user message से शुरू करने की कोशिश
-    if (window.geminiChatHistory.length > 10) {
-      window.geminiChatHistory =
-        window.geminiChatHistory.slice(-10);
 
-      while (
-        window.geminiChatHistory.length > 0 &&
-        window.geminiChatHistory[0].role !== 'user'
-      ) {
-        window.geminiChatHistory.shift();
+    // =========================================================
+    // GEMINI AI RESPONSE FUNCTION
+    // =========================================================
+
+    window.fetchGeminiResponse = async function(userText, roomId) {
+
+      const typingDiv =
+        document.getElementById('typing-indicator');
+
+
+      // -------------------------------------------------------
+      // INPUT VALIDATION
+      // -------------------------------------------------------
+
+      if (typeof userText !== 'string') {
+        return;
       }
-    }
 
-    const response = await fetch('/api/gemini', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        messages: window.geminiChatHistory
-      })
-    });
+      userText = userText.trim();
 
-    const data = await response.json();
 
-    if (!response.ok || !data.text) {
-      // गलती होने पर आखिरी user message history से हटाएँ
-      window.geminiChatHistory.pop();
-
-      window.sendFirebaseMessage(
-        roomId,
-        'AI उस्ताद',
-        'gemini_bot',
-        '🤖 AI उस्ताद',
-        'admin',
-        'Gemini Error: ' +
-          (data.error || 'AI से कोई जवाब नहीं मिला।'),
-        'Vercel Server'
-      );
-
-      return;
-    }
-
-    // AI का जवाब भी history में रखें
-    window.geminiChatHistory.push({
-      role: 'model',
-      parts: [{ text: data.text }]
-    });
-
-    // History को सीमित रखें
-    if (window.geminiChatHistory.length > 10) {
-      window.geminiChatHistory =
-        window.geminiChatHistory.slice(-10);
-
-      while (
-        window.geminiChatHistory.length > 0 &&
-        window.geminiChatHistory[0].role !== 'user'
-      ) {
-        window.geminiChatHistory.shift();
+      // खाली message स्वीकार नहीं होगा
+      if (!userText) {
+        return;
       }
-    }
 
-    // AI का जवाब Firebase chat में दिखाएँ
-    window.sendFirebaseMessage(
-      roomId,
-      'AI उस्ताद',
-      'gemini_bot',
-      '🤖 AI उस्ताद',
-      'admin',
-      data.text,
-      'Vercel Server'
-    );
 
-  } catch (error) {
+      // -------------------------------------------------------
+      // USER MESSAGE LENGTH LIMIT
+      // -------------------------------------------------------
 
-    // Network error पर आखिरी user message हटाएँ
-    if (
-      window.geminiChatHistory.length > 0 &&
-      window.geminiChatHistory[
-        window.geminiChatHistory.length - 1
-      ].role === 'user'
-    ) {
-      window.geminiChatHistory.pop();
-    }
+      if (
+        userText.length >
+        GEMINI_MAX_USER_MESSAGE_LENGTH
+      ) {
 
-    window.sendFirebaseMessage(
-      roomId,
-      'AI उस्ताद',
-      'gemini_bot',
-      '🤖 AI उस्ताद',
-      'admin',
-      'Connection Error: ' + error.message,
-      'Vercel Server'
-    );
+        if (window.sendFirebaseMessage) {
 
-  } finally {
-    if (typingDiv) {
-      typingDiv.style.display = 'none';
-    }
-  }
-};
-    
-  </script>
+          window.sendFirebaseMessage(
+            roomId,
+            "AI उस्ताद",
+            "gemini_bot",
+            "🤖 AI उस्ताद",
+            "admin",
+            "आपका सवाल बहुत लंबा है। कृपया उसे छोटा करके भेजें।",
+            "Vercel Server"
+          );
+        }
+
+        return;
+      }
+
+
+      // -------------------------------------------------------
+      // TYPING INDICATOR
+      // -------------------------------------------------------
+
+      if (typingDiv) {
+
+        typingDiv.textContent =
+          "AI उस्ताद सोच रहा है...";
+
+        typingDiv.style.display =
+          "block";
+      }
+
+
+      // -------------------------------------------------------
+      // USER MESSAGE → SESSION HISTORY
+      // -------------------------------------------------------
+
+      window.geminiChatHistory.push({
+
+        role: "user",
+
+        parts: [
+          {
+            text: userText
+          }
+        ]
+
+      });
+
+
+      // -------------------------------------------------------
+      // HISTORY LIMIT
+      // -------------------------------------------------------
+
+      if (
+        window.geminiChatHistory.length >
+        GEMINI_MAX_HISTORY
+      ) {
+
+        window.geminiChatHistory =
+          window.geminiChatHistory.slice(
+            -GEMINI_MAX_HISTORY
+          );
+      }
+
+
+      // =======================================================
+      // SEND CHAT HISTORY TO VERCEL API
+      // =======================================================
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/gemini",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type": "application/json"
+              },
+
+              body: JSON.stringify({
+
+                messages:
+                  window.geminiChatHistory
+
+              })
+            }
+          );
+
+
+        // -----------------------------------------------------
+        // READ SERVER RESPONSE
+        // -----------------------------------------------------
+
+        let data;
+
+        try {
+
+          data =
+            await response.json();
+
+        } catch (jsonError) {
+
+          data = {
+            error:
+              "Server से सही response नहीं मिला।"
+          };
+        }
+
+
+        // =====================================================
+        // GEMINI / SERVER ERROR
+        // =====================================================
+
+        if (
+          !response.ok ||
+          !data ||
+          !data.text
+        ) {
+
+          const errorMessage =
+            data &&
+            data.error
+              ? data.error
+              : `Gemini API Error (${response.status})`;
+
+
+          // जिस user message का जवाब नहीं मिला,
+          // उसे session history से निकाल दें।
+          window.geminiChatHistory.pop();
+
+
+          if (window.sendFirebaseMessage) {
+
+            window.sendFirebaseMessage(
+              roomId,
+              "AI उस्ताद",
+              "gemini_bot",
+              "🤖 AI उस्ताद",
+              "admin",
+              "Gemini Error: " + errorMessage,
+              "Vercel Server"
+            );
+          }
+
+          return;
+        }
+
+
+        // =====================================================
+        // GET AI TEXT
+        // =====================================================
+
+        const aiText =
+          String(data.text).trim();
+
+
+        // =====================================================
+        // EMPTY AI RESPONSE
+        // =====================================================
+
+        if (!aiText) {
+
+          window.geminiChatHistory.pop();
+
+
+          if (window.sendFirebaseMessage) {
+
+            window.sendFirebaseMessage(
+              roomId,
+              "AI उस्ताद",
+              "gemini_bot",
+              "🤖 AI उस्ताद",
+              "admin",
+              "AI से कोई जवाब नहीं मिला।",
+              "Vercel Server"
+            );
+          }
+
+          return;
+        }
+
+
+        // =====================================================
+        // AI RESPONSE → SESSION HISTORY
+        // =====================================================
+
+        window.geminiChatHistory.push({
+
+          role: "model",
+
+          parts: [
+            {
+              text: aiText
+            }
+          ]
+
+        });
+
+
+        // -----------------------------------------------------
+        // HISTORY LIMIT AGAIN
+        // -----------------------------------------------------
+
+        if (
+          window.geminiChatHistory.length >
+          GEMINI_MAX_HISTORY
+        ) {
+
+          window.geminiChatHistory =
+            window.geminiChatHistory.slice(
+              -GEMINI_MAX_HISTORY
+            );
+        }
+
+
+        // =====================================================
+        // SEND AI RESPONSE TO FIREBASE CHAT
+        // =====================================================
+
+        if (window.sendFirebaseMessage) {
+
+          window.sendFirebaseMessage(
+            roomId,
+            "AI उस्ताद",
+            "gemini_bot",
+            "🤖 AI उस्ताद",
+            "admin",
+            aiText,
+            "Vercel Server"
+          );
+        }
+
+
+      } catch (error) {
+
+        // =====================================================
+        // CONNECTION ERROR
+        // =====================================================
+
+        console.error(
+          "AI Ustaad connection error:",
+          error
+        );
+
+
+        // Failed user message को history से निकाल दें
+        window.geminiChatHistory.pop();
+
+
+        if (window.sendFirebaseMessage) {
+
+          window.sendFirebaseMessage(
+            roomId,
+            "AI उस्ताद",
+            "gemini_bot",
+            "🤖 AI उस्ताद",
+            "admin",
+            "कनेक्शन एरर: " +
+              (
+                error &&
+                error.message
+                  ? error.message
+                  : "Server से संपर्क नहीं हो सका।"
+              ),
+            "Vercel Server"
+          );
+        }
+
+
+      } finally {
+
+        // =====================================================
+        // STOP TYPING INDICATOR
+        // =====================================================
+
+        if (typingDiv) {
+
+          typingDiv.style.display =
+            "none";
+        }
+      }
+    };
+
+</script>
 </body>
 </html>
