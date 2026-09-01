@@ -277,7 +277,17 @@
         <input type="text" id="broadcast-input" class="login-input" placeholder="सभी की स्क्रीन पर पॉप-अप भेजने के लिए..." style="margin-bottom:6px;">
         <button class="btn-login" id="btn-send-broadcast" style="background:#38bdf8; color:#01140e;">सभी को अलर्ट भेजें</button>
       </div>
-
+      
+<div class="admin-section-title">📝 AI क्लास समरी जनरेटर (Suhail Assistant)</div>
+      <div style="background:#202c33; padding:10px; border-radius:8px; margin-bottom:10px;">
+        <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px; line-height:1.4;">
+          पिछले 24 घंटों में मेन ग्रुप में हुई बातचीत को AI पढ़ेगा और एक साफ़-सुथरी बुलेट-पॉइंट समरी बनाकर सीधे ग्रुप में पोस्ट कर देगा।
+        </div>
+        <button class="btn-login" id="btn-generate-summary" onclick="window.generateClassSummary()" style="background:#facc15; color:#01140e; font-weight:bold; display:flex; justify-content:center; align-items:center; gap:8px;">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> आज की समरी (Summary) बनाएं
+        </button>
+      </div>
+      
       <div class="admin-section-title">⚙️ ग्रुप मॉडरेशन सेटिंग्स</div>
       <div style="background:#202c33; padding:10px; border-radius:8px; margin-bottom:10px; display:flex; flex-direction:column; gap:8px;">
         <label style="display:flex; align-items:center; justify-content:space-between; font-size:0.9rem; cursor:pointer;">
@@ -1896,6 +1906,96 @@
       }
     };
 
+    // =========================================================
+    // AI CLASS SUMMARY GENERATOR
+    // =========================================================
+
+    window.generateClassSummary = async function() {
+      if (window.currentUser.role !== 'admin') {
+        alert("यह फीचर केवल एडमिन के लिए है।");
+        return;
+      }
+
+      const btn = document.getElementById('btn-generate-summary');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> समरी बन रही है (कृपया रुकें)...';
+      btn.disabled = true;
+
+      try {
+        // 1. फायरबेस से पिछले 24 घंटे की चैट निकालें
+        const groupRef = ref(db, 'messages/group');
+        
+        onValue(groupRef, async (snapshot) => {
+          const msgs = snapshot.val() || {};
+          let chatText = "";
+          const now = Date.now();
+          const oneDay = 24 * 60 * 60 * 1000;
+          let messageCount = 0;
+
+          // मैसेजेस को समय के अनुसार फिल्टर करें
+          Object.values(msgs).forEach(m => {
+            if (now - m.timestamp < oneDay) {
+               // फोटो या ऑडियो लिंक को समरी से बाहर रखें
+               if (m.text && !m.text.includes('[IMG]') && !m.text.includes('[AUDIO]') && !m.text.includes('[FILE:')) {
+                 chatText += `${m.displayName || m.sender}: ${m.text}\n`;
+                 messageCount++;
+               }
+            }
+          });
+
+          if (messageCount < 3) {
+            alert("आज की समरी बनाने के लिए ग्रुप में पर्याप्त बातचीत नहीं हुई है।");
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            return;
+          }
+
+          // 2. AI के लिए सीक्रेट प्रॉम्प्ट तैयार करें
+          const summaryPrompt = `कृपया नीचे दी गई मदरसे के क्लास (ग्रुप) की आज की बातचीत को पढ़ें। इसके आधार पर एक बहुत ही साफ़-सुथरी और प्रोफेशनल बुलेट-पॉइंट समरी (Class Summary) बनाएँ। बताएँ कि आज कौन-से मुख्य विषय (Topics) डिस्कस हुए, क्या इल्मी बातें हुईं और क्या होमवर्क या निर्देश दिए गए। समरी का अंदाज़ एक उस्ताद की तरह हो।\n\nआज की बातचीत:\n${chatText}`;
+
+          // 3. Vercel Backend को रिक्वेस्ट भेजें
+          const response = await fetch('/api/gemini', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              messages: [{ role: "user", parts: [{ text: summaryPrompt }] }]
+            })
+          });
+
+          const responseText = await response.text();
+          let data = null;
+
+          try {
+            data = JSON.parse(responseText);
+          } catch (e) {
+            throw new Error("सर्वर से गलत जवाब मिला (HTML)।");
+          }
+
+          if (!response.ok || data.error) {
+            throw new Error(data.error || "सर्वर एरर");
+          }
+
+          if (data.text) {
+             // 4. तैयार समरी को ग्रुप में "Suhail Assistant" के नाम से भेजें
+             const finalSummary = "📝 **आज की क्लास समरी (Class Summary):**\n\n" + data.text.trim();
+             
+             if (window.sendFirebaseMessage) {
+               window.sendFirebaseMessage('group', "Suhail Assistant", "Suhail_Ai", "🤖 Suhail Assistant", "admin", finalSummary, "Vercel Server");
+             }
+             alert("समरी सफलतापूर्वक मेन ग्रुप में भेज दी गई है!");
+          }
+          
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+
+        }, { onlyOnce: true }); // onlyOnce: true का मतलब है कि यह सिर्फ एक बार डेटा लेगा, लूप में नहीं फँसेगा
+
+      } catch (error) {
+        alert("समरी बनाने में एरर: " + error.message);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    };
 
 </script>
 </body>
