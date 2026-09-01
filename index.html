@@ -1992,9 +1992,16 @@
       } catch (error) {
         alert("समरी बनाने में एरर: " + error.message);
         btn.innerHTML = originalText;
+          btn.disabled = false;
+
+        }, { onlyOnce: true }); 
+
+      } catch (error) {
+        alert("समरी बनाने में एरर: " + error.message);
+        btn.innerHTML = originalText;
         btn.disabled = false;
       }
-    };
+    };   // <--- यह वाला ब्रैकेट (}) इस फंक्शन को बंद करने के लिए ज़रूरी है जो मिसिंग था!
 
 </script>
 </body>
