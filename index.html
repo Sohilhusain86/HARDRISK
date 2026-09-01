@@ -726,12 +726,32 @@
           return;
         }
 
-        window.currentUser.name = name;
-        window.currentUser.phone = phone;
-        window.currentUser.roll = roll;
-        window.currentUser.displayName = roll ? `${name} (रोल: ${roll})` : `${name} (${phone.slice(-4)})`;
-        window.currentUser.dpUrl = selectedDpUrl || "";
+                // 🔒 डुप्लीकेट फोन नंबर और नाम ओवरराइट होने से रोकने की जांच
+        const existingUserSnap = await get(ref(db, `users/${phone}`));
+        let finalName = name;
+        let finalRoll = roll;
 
+        if (existingUserSnap.exists()) {
+          const oldData = existingUserSnap.val();
+          // अगर यह नंबर पहले से रजिस्टर्ड है, तो पुराना असली नाम और रोल ही रहेगा
+          finalName = oldData.name || name;
+          finalRoll = oldData.roll || roll;
+        } else {
+          // पहली बार नया नंबर आने पर डेटाबेस में सुरक्षित सेव करें
+          await set(ref(db, `users/${phone}`), {
+            name: name,
+            phone: phone,
+            roll: roll,
+            createdAt: Date.now()
+          });
+        }
+
+        window.currentUser.name = finalName;
+        window.currentUser.phone = phone;
+        window.currentUser.roll = finalRoll;
+        window.currentUser.displayName = finalRoll ? `${finalName} (रोल: ${finalRoll})` : finalName;
+        window.currentUser.dpUrl = selectedDpUrl || "";
+        
         const pass = userPassInput.value.trim();
         if (pass === ADMIN_PASSKEY) {
           window.currentUser.role = "admin";
@@ -1993,8 +2013,8 @@
       }
     };
 
-        // =========================================================
-    // 📊 ADVANCED ATTENDANCE & PERFORMANCE ANALYTICS ENGINE
+          // =========================================================
+    // 📊 UPDATED ATTENDANCE & PERFORMANCE ANALYTICS (WITH NAME MERGING)
     // =========================================================
     
     const attendanceRootRef = ref(db, 'attendance');
@@ -2003,7 +2023,6 @@
       const attendanceData = snapshot.val() || {};
       const usersDataSnapshot = ref(db, 'users');
       
-      // छात्रों के नाम और फोन नंबर की जानकारी प्राप्त करें
       onValue(usersDataSnapshot, (userSnap) => {
         const usersMap = userSnap.val() || {};
         const container = document.getElementById('admin-analytics-container');
@@ -2017,39 +2036,58 @@
           return;
         }
 
-        // टेबल या लिस्ट बनाने के लिए स्ट्रक्चर तैयार करें
+        // नाम के आधार पर डेटा को मर्ज करने के लिए एक ऑब्जेक्ट बनाएँ
+        let mergedUsers = {};
+
+        phoneKeys.forEach(phone => {
+          const userInfo = usersMap[phone] || {};
+          let studentName = userInfo.displayName || userInfo.name || phone;
+          
+          // नाम को स्टैंडर्ड फॉर्मेट में लाएं ताकि छोटे/बड़े अक्षर का फर्क खत्म हो जाए
+          let cleanNameKey = studentName.trim().toLowerCase();
+          
+          const daysRecord = attendanceData[phone] || {};
+          const totalDaysPresent = Object.keys(daysRecord).length;
+
+          if (!mergedUsers[cleanNameKey]) {
+            mergedUsers[cleanNameKey] = {
+              displayName: studentName,
+              totalDays: 0
+            };
+          }
+          // अगर एक ही नाम अलग-अलग जगह है तो दिन जुड़ जाएंगे
+          mergedUsers[cleanNameKey].totalDays += totalDaysPresent;
+        });
+
         let tableHtml = `
           <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: 'Poppins', sans-serif;">
             <thead>
               <tr style="border-bottom: 1px solid rgba(255,255,255,0.15); color: #38bdf8; font-size: 0.75rem;">
                 <th style="padding: 6px;">छात्र का नाम</th>
-                <th style="padding: 6px; text-align: center;">कुल दिन उपस्थित</th>
+                <th style="padding: 6, text-align: center;">कुल दिन उपस्थित</th>
                 <th style="padding: 6px; text-align: center;">स्टेटस</th>
               </tr>
             </thead>
             <tbody>
         `;
 
-        phoneKeys.forEach(phone => {
-          const userInfo = usersMap[phone] || {};
-          const studentName = userInfo.displayName || userInfo.name || phone;
-          const daysRecord = attendanceData[phone] || {};
-          const totalDaysPresent = Object.keys(daysRecord).length;
+        Object.keys(mergedUsers).forEach(key => {
+          const user = mergedUsers[key];
+          const totalDaysPresent = user.totalDays;
 
-          // परफॉरमेंस के हिसाब से कलर बैज (ग्रोथ इंडिकेटर)
-          let badgeColor = "#ef4444"; // लाल (कम उपस्थित)
+          let badgeColor = "#ef4444"; 
           let statusText = "सुधार की जरूरत";
           if (totalDaysPresent >= 5) {
-            badgeColor = "#22c55e"; // हरा (रेगुलर)
+            badgeColor = "#22c55e"; 
             statusText = "उत्कृष्ट (Regular)";
           } else if (totalDaysPresent >= 2) {
-            badgeColor = "#facc15"; // पीला (औसत)
+            badgeColor = "#facc15"; 
             statusText = "मध्यम (Average)";
           }
 
           tableHtml += `
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem;">
-              <td style="padding: 8px 6px; color: #fff; font-weight: 600;">${studentName}</td>
+              <td style="padding: 8px 6px; color: #fff; font-weight: 600;">${user.displayName}</td>
               <td style="padding: 8px 6px; text-align: center; color: #facc15; font-weight: bold;">${totalDaysPresent} दिन</td>
               <td style="padding: 8px 6px; text-align: center;">
                 <span style="background: ${badgeColor}22; color: ${badgeColor}; border: 1px solid ${badgeColor}55; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">
