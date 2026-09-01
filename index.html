@@ -1101,8 +1101,50 @@
         }
         lastMessageTimestamp = now;
       }
+    
+      // ड्रॉपडाउन और शेड्यूल इनपुट से वैल्यू लें
+      const ghostSelect = document.getElementById('ghost-duration-select');
+      const scheduleInput = document.getElementById('schedule-time-input');
+      
+      const gDuration = ghostSelect ? parseInt(ghostSelect.value) : 30000;
+      const sTime = scheduleInput ? scheduleInput.value : null;
 
-      // 🧠 बैकग्राउंड AI ऑटो-बाउंसर लॉजिक (जैसा पहले था)
+      // 1. मैसेज तुरंत ग्रुप/चैट में सेंड कर दें
+      let sentMsgKey = null;
+      if(window.sendFirebaseMessage) {
+        sentMsgKey = window.sendFirebaseMessage(
+          window.currentActiveRoomId, 
+          window.currentUser.name, 
+          window.currentUser.phone, 
+          window.currentUser.displayName, 
+          window.currentUser.role, 
+          text, 
+          window.currentUser.location,
+          window.isGhostActive || false,
+          gDuration,
+          sTime
+        );
+      }
+      
+      // 2. वेरिएबल्स सेट करें
+      const currentRoom = window.currentActiveRoomId;
+      const senderName = window.currentUser.name;
+      const senderPhone = window.currentUser.phone;
+      const senderRole = window.currentUser.role;
+
+      // 3. इनपुट बॉक्स खाली करें
+      msgInput.value = "";
+      if (scheduleInput) scheduleInput.value = ""; // भेजने के बाद शेड्यूल इनपुट रीसेट करें
+
+      // 4. अगर AI उस्ताद से बात हो रही है, तो AI को मैसेज भेजें
+      if (currentRoom.startsWith('ai_ustad_')) {
+        window.fetchGeminiResponse(text, currentRoom);
+        return;
+      }
+
+      // =========================================================
+      // 🧠 5. बैकग्राउंड AI ऑटो-बाउंसर (सिर्फ मुख्य ग्रुप चैट के लिए)
+      // =========================================================
       if (currentRoom === 'group' && senderRole !== 'admin' && sentMsgKey) {
         (async () => {
           try {
@@ -1129,7 +1171,10 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
             }
 
             if (isViolation) {
+              // मैसेज डिलीट करें
               remove(ref(db, `messages/group/${sentMsgKey}`));
+              
+              // यूज़र को 5 घंटे के लिए बैन करें
               const cleanPhone = senderPhone.replace(/[^0-9]/g, '');
               const banDurationMs = 5 * 60 * 60 * 1000; 
               const banExpiry = Date.now() + banDurationMs;
@@ -1141,6 +1186,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
                 autoBanned: true 
               });
 
+              // एडमिन लॉग्स में डालें
               push(auditRef, { 
                 action: `AI ऑटो-डिलीट व 5 घंटे बैन: ${senderName} (मैसेज: "${text}")`, 
                 admin: "Gemini AI Moderator", 
@@ -1152,44 +1198,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
           }
         })();
       }
-     }
-    
-      // ड्रॉपडाउन और शेड्यूल इनपुट से वैल्यू लें
-      const ghostSelect = document.getElementById('ghost-duration-select');
-      const scheduleInput = document.getElementById('schedule-time-input');
-      
-      const gDuration = ghostSelect ? parseInt(ghostSelect.value) : 30000;
-      const sTime = scheduleInput ? scheduleInput.value : null;
-
-      // 1. मैसेज तुरंत ग्रुप/चैट में सेंड कर दें
-      let sentMsgKey = null;
-      if(window.sendFirebaseMessage) {
-        sentMsgKey = window.sendFirebaseMessage(
-          window.currentActiveRoomId, 
-          window.currentUser.name, 
-          window.currentUser.phone, 
-          window.currentUser.displayName, 
-          window.currentUser.role, 
-          text, 
-          window.currentUser.location,
-          window.isGhostActive || false,
-          gDuration,
-          sTime
-        );
-      }
-      
-      const currentRoom = window.currentActiveRoomId;
-      const senderName = window.currentUser.name;
-      const senderPhone = window.currentUser.phone;
-      const senderRole = window.currentUser.role;
-
-      msgInput.value = "";
-      if (scheduleInput) scheduleInput.value = ""; // भेजने के बाद शेड्यूल इनपुट रीसेट करें
-
-      if (currentRoom.startsWith('ai_ustad_')) {
-        window.fetchGeminiResponse(text, currentRoom);
-        return;
-      }
+    }
 
       // =========================================================
       // 🧠 बैकग्राउंड AI ऑटो-बाउंसर (सिर्फ मुख्य ग्रुप चैट के लिए)
