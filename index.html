@@ -1065,6 +1065,39 @@
         return;
       }
 
+      // ==========================================
+      // 🛡️ AI SMART MODERATION (AUTO-BOUNCER)
+      // ==========================================
+      if (window.currentUser.role !== 'admin') {
+        // 1. लिंक चेक (URL Detection)
+        const hasLink = /(https?:\/\/[^\s]+)/g.test(text);
+        
+        // 2. गलत शब्दों की लिस्ट (आप इसमें और शब्द जोड़ सकते हैं)
+        const badWords = ["पागल", "बेवकूफ", "गाली1", "गाली2", "spam", "offer"]; 
+        const lowerText = text.toLowerCase();
+        const hasBadWord = badWords.some(word => lowerText.includes(word));
+
+        if (hasLink || hasBadWord) {
+          alert("⚠️ ऑटो-बाउंसर अलर्ट: आपने अनचाहा लिंक या गलत शब्द भेजा है। सुरक्षा नियमों के तहत आपको 24 घंटे के लिए ऑटो-ब्लॉक किया जा रहा है!");
+          
+          const cleanPhone = window.currentUser.phone.replace(/[^0-9]/g, '');
+          const unbanTime = Date.now() + (24 * 60 * 60 * 1000); // 24 घंटे का टाइमर
+          
+          // यूज़र को डेटाबेस में बैन लिस्ट में डालें
+          set(ref(db, `banned_users/${cleanPhone}`), { 
+            name: window.currentUser.name, 
+            bannedAt: Date.now(),
+            autoBanned: true
+          });
+          
+          push(auditRef, { action: `ऑटो-बाउंसर बैन (24h): ${window.currentUser.name}`, admin: "AI System", time: new Date().toLocaleTimeString() });
+          
+          msgInput.value = "";
+          return; // मैसेज को आगे जाने से रोक दें
+        }
+      }
+      // ==========================================
+
       if (window.currentUser.role !== 'admin' && window.globalSlowMode && window.globalSlowMode > 0) {
         const now = Date.now();
         const diff = (now - lastMessageTimestamp) / 1000;
@@ -1465,6 +1498,7 @@
             <button onclick="window.toggleUserMute('${phone}')" style="background:#f59e0b; border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:0.75rem;">म्यूट</button>
             <button onclick="window.triggerAdminBanToggle('${phone}', '${u.name}')" style="background:${isBanned?'#22c55e':'#ef4444'}; border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:0.75rem;">${isBanned?'अनबैन':'बैन'}</button>
             <button onclick="window.purgeUserPermanently('${phone}', '${u.displayName || u.name || phone}')" style="background:#ef4444; border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:0.75rem;"><i class="fa-solid fa-trash"></i> डिलीट</button>
+            <button onclick="window.generateStudentMentorReport('${phone}', '${u.displayName || u.name}')" style="background:#8b5cf6; border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:0.75rem;"><i class="fa-solid fa-file-signature"></i> AI रिपोर्ट</button>
           </div>
         `;
         dirContainer.appendChild(row);
@@ -2075,6 +2109,61 @@
       }, { onlyOnce: true });
     });
 
+    // =========================================================
+    // 🎓 AI MENTOR (PERSONALIZED STUDENT REPORT)
+    // =========================================================
+    window.generateStudentMentorReport = async function(targetPhone, targetName) {
+      if (window.currentUser.role !== 'admin') {
+        alert("यह फीचर केवल एडमिन के लिए है।");
+        return;
+      }
+
+      alert(`AI मेंटर ${targetName} का डेटा एनालाइज़ कर रहा है। कृपया 10-15 सेकंड इंतज़ार करें...`);
+
+      try {
+        // 1. छात्र की हाज़िरी (Attendance) निकालें
+        const attSnap = await get(ref(db, `attendance/${targetPhone}`));
+        const attData = attSnap.val() || {};
+        const totalDaysPresent = Object.keys(attData).length;
+
+        // 2. AI के लिए प्रॉम्प्ट तैयार करें
+        const prompt = `आप एक बहुत ही हमदर्द और बेहतरीन उस्ताद (मेंटर) हैं। 
+        आपके एक छात्र का नाम '${targetName}' है। 
+        इस छात्र ने अब तक कुल ${totalDaysPresent} दिन क्लास में हाज़िरी लगाई है। 
+        
+        इस डेटा के आधार पर इस छात्र के लिए 3 बुलेट पॉइंट्स की एक छोटी, उत्साहवर्धक (Encouraging) और पर्सनलाइज़्ड प्रोग्रेस रिपोर्ट बनाएँ। 
+        अगर हाज़िरी 3 दिन से कम है, तो उन्हें प्यार से रोज़ाना आने की ताकीद करें। 
+        जवाब सीधे छात्र से बात करने वाले अंदाज़ में दें (जैसे: "अस्सलाम वालेकुम ${targetName}, आपकी इस हफ्ते की रिपोर्ट...")।`;
+
+        // 3. Gemini AI से रिपोर्ट बनवाएं
+        const response = await fetch('/api/gemini', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [{ role: "user", parts: [{ text: prompt }] }]
+          })
+        });
+
+        const responseText = await response.text();
+        let data = JSON.parse(responseText);
+
+        if (!response.ok || data.error) throw new Error(data.error || "सर्वर एरर");
+
+        if (data.text) {
+          const finalReport = "📊 **आपकी वीकली प्रोग्रेस रिपोर्ट:**\n\n" + data.text.trim();
+          
+          // 4. रिपोर्ट को सीधे छात्र के प्राइवेट AI चैट रूम में भेजें
+          const aiRoomId = `ai_ustad_${targetPhone}`;
+          if (window.sendFirebaseMessage) {
+            window.sendFirebaseMessage(aiRoomId, "AI उस्ताद (मेंटर)", "Suhail_Ai", "🎓 AI उस्ताद (मेंटर)", "admin", finalReport, "Vercel Server");
+          }
+          alert(`✅ ${targetName} की प्रोग्रेस रिपोर्ट तैयार होकर उनके प्राइवेट चैट में भेज दी गई है!`);
+        }
+      } catch (error) {
+        alert("AI रिपोर्ट बनाने में एरर: " + error.message);
+      }
+    };
+    
   </script>
 </body>
 </html>
