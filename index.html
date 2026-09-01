@@ -125,7 +125,7 @@
       padding: 8px 14px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; color: var(--gold-accent);
     }
 
-    /* WhatsApp Custom Background Image from user repository */
+    /* WhatsApp Custom Background Image */
     .chat-messages-area {
       flex: 1; 
       overflow-y: auto; 
@@ -227,7 +227,7 @@
 
   <div class="app-screen">
     
-    <!-- Realistic SMS Simulation Popup (Replaces Browser Alert) -->
+    <!-- Realistic SMS Simulation Popup -->
     <div class="sms-popup-overlay" id="sms-popup">
       <div class="sms-popup-card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -239,7 +239,33 @@
       </div>
     </div>
 
-  <!-- Master Admin Control Center -->
+    <!-- Login Screen -->
+    <div class="login-overlay" id="login-screen" style="display: none;">
+      <div class="login-card">
+        <h2 style="color: #00a884; margin-bottom: 6px; font-size: 1.4rem;">जमात ऊला अलिफ़ मैसेंजर</h2>
+        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 14px;">अपनी फोटो (DP) लगाएं और OTP से लॉगिन करें</p>
+        
+        <input type="file" id="dp-file-input" accept="image/*" style="display: none;">
+        <div class="dp-upload-box" id="dp-preview-box" onclick="document.getElementById('dp-file-input').click()" title="प्रोफाइल फोटो चुनें">
+          <i class="fa-solid fa-camera" id="dp-camera-icon"></i>
+        </div>
+        <div style="font-size: 0.75rem; color: #00a884; margin-bottom: 12px;">फोटो बदलने के लिए क्लिक करें</div>
+
+        <input type="text" id="user-name" class="login-input" placeholder="आपका नाम (जैसे: ज़ैद)">
+        <input type="tel" id="user-phone" class="login-input" placeholder="मोबाइल नंबर (10 अंक)">
+        <input type="text" id="user-roll" class="login-input" placeholder="रोल नंबर (वैकल्पिक / इख्तियारन)">
+        
+        <div id="otp-section" style="display: none;">
+          <input type="number" id="otp-input" class="login-input" placeholder="6 अंकों का OTP दर्ज करें">
+          <div style="font-size: 0.75rem; color: var(--gold-accent); margin-bottom: 10px;">मैसेज ऐप पर OTP भेजा गया है</div>
+        </div>
+
+        <input type="password" id="user-pass" class="login-input" placeholder="पासवर्ड (केवल एडमिन के लिए)">
+        <button class="btn-login" id="btn-action-auth">OTP भेजें (Send OTP)</button>
+      </div>
+    </div>
+
+    <!-- Master Admin Control Center -->
     <div class="admin-modal" id="admin-panel">
       <div class="admin-header">
         <h3><i class="fa-solid fa-shield-halved"></i> मास्टर एडमिन कंट्रोल सेंटर</h3>
@@ -255,7 +281,7 @@
       <div class="admin-section-title">📝 AI क्लास समरी जनरेटर (Suhail Assistant)</div>
       <div style="background:#202c33; padding:10px; border-radius:8px; margin-bottom:10px;">
         <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px; line-height:1.4;">
-          पिछले 24 घंटों में मेन গ্রুপের हुई बातचीत को AI पढ़ेगा और एक साफ़-सुथरी बुलेट-पॉइंट समरी बनाकर सीधे ग्रुप में पोस्ट कर देगा।
+          पिछले 24 घंटों में मेन ग्रुप में हुई बातचीत को AI पढ़ेगा और एक साफ़-सुथरी बुलेट-पॉइंट समरी बनाकर सीधे ग्रुप में पोस्ट कर देगा।
         </div>
         <button class="btn-login" id="btn-generate-summary" onclick="window.generateClassSummary()" style="background:#facc15; color:#01140e; font-weight:bold; display:flex; justify-content:center; align-items:center; gap:8px;">
           <i class="fa-solid fa-wand-magic-sparkles"></i> आज की समरी (Summary) बनाएं
@@ -304,8 +330,7 @@
 
       <div class="admin-section-title">📋 एडमिन ऑडिट लॉग्स (Action History)</div>
       <div id="audit-logs-box" style="background:#111b21; border:1px solid rgba(255,255,255,0.12); padding:10px; border-radius:8px; min-height: 60px; max-height:160px; overflow-y:auto; font-size:0.8rem; color:#94a3b8; margin-bottom: 20px;"></div>
-
-    </div> <!-- ✅ एडमिन पैनल यहाँ सही से बंद हो गया -->
+    </div> <!-- ✅ Admin Panel Closed Correctly -->
 
     <!-- SCREEN 1: Home View -->
     <div class="view-screen view-active" id="screen-home">
@@ -339,6 +364,7 @@
             <div class="item-subtext">सभी छात्रों का मुख्य क्लासरूम</div>
           </div>
         </div>
+        
         <!-- AI उस्ताद चैट रूम बटन -->
         <div class="chat-item" onclick="window.openAiChat()">
           <div class="item-avatar" style="background: #1e1e2d; color: #38bdf8; border: 1px solid #38bdf8;"><i class="fa-solid fa-robot"></i></div>
@@ -378,7 +404,7 @@
           <div id="rendered-polls-box"></div>
         </div>
       </main>
-    </div>
+    </div> <!-- ✅ Screen Home Closed Correctly -->
 
     <!-- SCREEN 2: Chat Room -->
     <div class="view-screen view-hidden" id="screen-chat">
@@ -391,7 +417,6 @@
             <div class="header-status" id="chat-room-status">ऑनलाइन...</div>
           </div>
         </div>
-        <!-- Voice Call Button (Only in Private Chat) -->
         <div class="header-actions">
           <button class="header-btn" id="btn-voice-call" title="वॉइस कॉल करें" style="display:none;"><i class="fa-solid fa-phone"></i></button>
         </div>
@@ -421,7 +446,7 @@
         <input type="text" class="chat-input-box" id="msg-input" placeholder="यहाँ मैसेज लिखें...">
         <button class="btn-send" id="btn-send"><i class="fa-solid fa-paper-plane"></i></button>
       </footer>
-    </div>
+    </div> <!-- ✅ Screen Chat Closed Correctly -->
 
     <!-- VOICE CALL MODAL SCREEN -->
     <div class="call-overlay" id="call-screen">
@@ -436,7 +461,7 @@
       <audio id="remote-audio" autoplay></audio>
     </div>
 
-  </div>
+  </div> <!-- ✅ App Screen Closed Correctly -->
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -476,7 +501,6 @@
     let generatedOtp = "";
     let otpStepSent = false;
 
-    // WebRTC Calling Variables
     let peerConnection = null;
     let localStream = null;
     let currentCallRef = null;
@@ -655,7 +679,6 @@
         generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
         await set(ref(db, `otps/${phone}`), { otp: generatedOtp, time: Date.now() });
         
-        // Show realistic SMS App Notification Card instead of browser alert
         document.getElementById('sms-popup-text').textContent = `Your verification code is ${generatedOtp}. Account verification is in progress. Complete it on Jamia Messenger.`;
         document.getElementById('sms-popup').style.display = 'flex';
 
@@ -834,7 +857,6 @@
       document.getElementById('screen-home').classList.add('view-active');
     };
 
-    // --- WebRTC Voice Call Logic ---
     const callScreen = document.getElementById('call-screen');
     const callStatusText = document.getElementById('call-status-text');
     const callTargetName = document.getElementById('call-target-name');
@@ -1018,7 +1040,6 @@
       }
       msgInput.value = "";
 
-      // --- NAYA AI LOGIC YAHAN HAI ---
       if (window.currentActiveRoomId.startsWith('ai_ustad_')) {
         window.fetchGeminiResponse(text, window.currentActiveRoomId);
       }
@@ -1175,7 +1196,6 @@
       
       if (typeof data.text === 'string') {
         const cleanText = data.text.trim();
-        // \s* लगाने से अगर लाइन ब्रेक (Enter) या स्पेस होगा, तो भी ऑडियो/इमेज प्लेयर बन जाएगा
         const audioMatch = cleanText.match(/\[AUDIO(?::(.*?))?\]\s*\((.*?)\)/);
         const imgMatch = cleanText.match(/\[IMG\]\s*\((.*?)\)/);
         const fileMatch = cleanText.match(/\[FILE:(.*?)\]\s*\((.*?)\)/);
@@ -1605,201 +1625,70 @@
       update(ref(db, nodePath), { [cleanPhoneKey]: emoji });
     };
 
-        window.deleteFirebaseMessage = function(roomId, key) {
+    window.deleteFirebaseMessage = function(roomId, key) {
       if (!confirm("क्या आप सच में यह मैसेज डिलीट करना चाहते हैं?")) {
         return;
       }
-
-      const nodePath =
-        (roomId === 'group')
-          ? `messages/group/${key}`
-          : `messages_private/${roomId}/${key}`;
-
-      remove(ref(db, nodePath))
-        .then(() => {
-          const el = document.getElementById(`msg-${key}`);
-          if (el) {
-            el.remove();
-          }
-        })
-        .catch((error) => {
-          console.error("Message delete error:", error);
-        });
+      const nodePath = (roomId === 'group') ? `messages/group/${key}` : `messages_private/${roomId}/${key}`;
+      remove(ref(db, nodePath)).then(() => {
+        const el = document.getElementById(`msg-${key}`);
+        if (el) el.remove();
+      }).catch((error) => console.error("Message delete error:", error));
     };
 
-
     window.listenToRoom = function(roomId) {
-
-      // पुराने listener को बंद करें
       if (activeChatListenerRef) {
         off(activeChatListenerRef);
       }
-
-      const nodePath =
-        (roomId === 'group')
-          ? 'messages/group'
-          : `messages_private/${roomId}`;
-
+      const nodePath = (roomId === 'group') ? 'messages/group' : `messages_private/${roomId}`;
       activeChatListenerRef = ref(db, nodePath);
 
+      onChildAdded(activeChatListenerRef, (snapshot) => {
+        if (window.appendMessage) window.appendMessage(snapshot.val(), snapshot.key);
+      });
 
-      // ---------------------------------------------------------
-      // NEW MESSAGE LISTENER
-      // ---------------------------------------------------------
-
-      onChildAdded(
-        activeChatListenerRef,
-        (snapshot) => {
-
-          if (window.appendMessage) {
-            window.appendMessage(
-              snapshot.val(),
-              snapshot.key
-            );
-          }
-
-        }
-      );
-
-
-      // ---------------------------------------------------------
-      // MESSAGE / REACTION UPDATE LISTENER
-      // ---------------------------------------------------------
-
-      onValue(
-        activeChatListenerRef,
-        (snapshot) => {
-
-          const allMsgs =
-            snapshot.val() || {};
-
-          for (const key in allMsgs) {
-
-            const msgData =
-              allMsgs[key];
-
-            const reactionsContainer =
-              document.getElementById(
-                `reactions-${key}`
-              );
-
-            if (
-              reactionsContainer &&
-              msgData &&
-              msgData.reactions
-            ) {
-
-              let html = "";
-
-              for (
-                const phone in msgData.reactions
-              ) {
-
-                html +=
-                  `<span class="reaction-pill">${msgData.reactions[phone]}</span>`;
-              }
-
-              reactionsContainer.innerHTML =
-                html;
+      onValue(activeChatListenerRef, (snapshot) => {
+        const allMsgs = snapshot.val() || {};
+        for (const key in allMsgs) {
+          const msgData = allMsgs[key];
+          const reactionsContainer = document.getElementById(`reactions-${key}`);
+          if (reactionsContainer && msgData && msgData.reactions) {
+            let html = "";
+            for (const phone in msgData.reactions) {
+              html += `<span class="reaction-pill">${msgData.reactions[phone]}</span>`;
             }
+            reactionsContainer.innerHTML = html;
           }
         }
-      );
+      });
 
-
-      // ---------------------------------------------------------
-      // MESSAGE DELETE LISTENER
-      // ---------------------------------------------------------
-
-      onChildRemoved(
-        activeChatListenerRef,
-        (snapshot) => {
-
-          const el =
-            document.getElementById(
-              `msg-${snapshot.key}`
-            );
-
-          if (el) {
-            el.remove();
-          }
-        }
-      );
+      onChildRemoved(activeChatListenerRef, (snapshot) => {
+        const el = document.getElementById(`msg-${snapshot.key}`);
+        if (el) el.remove();
+      });
     };
 
-
-    // =========================================================
-    // GEMINI AI — AI USTAAD
-    // =========================================================
-
     window.openAiChat = function() {
-
-      // हर यूज़र का अपना निजी AI रूम
-      const phone =
-        window.currentUser &&
-        window.currentUser.phone
-          ? String(window.currentUser.phone)
-          : "guest";
-
-      const aiRoomId =
-        `ai_ustad_${phone}`;
-
-
-      // AI Ustaad chat room खोलें
+      const phone = window.currentUser && window.currentUser.phone ? String(window.currentUser.phone) : "guest";
+      const aiRoomId = `ai_ustad_${phone}`;
       if (window.openChatRoom) {
-
         window.openChatRoom(
           aiRoomId,
           '🤖 AI उस्ताद',
-          "Suhail's Learning Desk Ai", // यहाँ डबल कोट्स लगाकर सिंटैक्स एरर ठीक कर दिया गया है
+          "Suhail's Learning Desk Ai",
           'https://cdn-icons-png.flaticon.com/512/8943/8943377.png'
         );
-
       } else {
-
-        console.error(
-          "openChatRoom function नहीं मिला।"
-        );
+        console.error("openChatRoom function नहीं मिला।");
       }
     };
 
-
-    // =========================================================
-    // GEMINI AI — SESSION MEMORY
-    // =========================================================
-    //
-    // यह memory केवल वर्तमान खुले हुए page/session में रहेगी।
-    //
-    // localStorage में SAVE नहीं होगी।
-    // Firebase में SAVE नहीं होगी।
-    // Database में SAVE नहीं होगी।
-    //
-    // App/page बंद करके दोबारा खोलने पर यह फिर से खाली होगी।
-    //
-    // इसलिए यूज़र को अगली बार नई बातचीत मिलेगी।
-    // =========================================================
-
     window.geminiChatHistory = [];
-
-
-    // =========================================================
-    // GEMINI AI LIMITS
-    // =========================================================
-
-    // User + AI दोनों को मिलाकर अधिकतम 12 messages
     const GEMINI_MAX_HISTORY = 12;
-
-    // एक user message की अधिकतम लंबाई
     const GEMINI_MAX_USER_MESSAGE_LENGTH = 4000;
-
-
-    // =========================================================
-    // GEMINI AI RESPONSE
-    // =========================================================
 
     window.fetchGeminiResponse = async function(userText, roomId) {
       const typingDiv = document.getElementById('typing-indicator');
-      
       if (typeof userText !== "string") return;
       userText = userText.trim();
       if (!userText) return;
@@ -1816,13 +1705,8 @@
         typingDiv.style.display = 'block';
       }
 
-      // 1. यूज़र के सवाल को मेमोरी में सेव करें
-      window.geminiChatHistory.push({
-        role: "user",
-        parts: [{ text: userText }]
-      });
+      window.geminiChatHistory.push({ role: "user", parts: [{ text: userText }] });
 
-      // 2. मेमोरी लिमिट बनाए रखें
       if (window.geminiChatHistory.length > GEMINI_MAX_HISTORY) {
         window.geminiChatHistory = window.geminiChatHistory.slice(-GEMINI_MAX_HISTORY);
       }
@@ -1831,11 +1715,9 @@
         const response = await fetch('/api/gemini', {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          // 3. अब पूरी 'messages' हिस्ट्री भेज रहे हैं
           body: JSON.stringify({ messages: window.geminiChatHistory }) 
         });
 
-        // 4. Crash Protection (JSON Error से बचने के लिए)
         const responseText = await response.text();
         let data = null;
 
@@ -1845,23 +1727,14 @@
           throw new Error("सर्वर से गलत फॉर्मेट (HTML) मिला। Vercel Logs चेक करें।");
         }
         
-        if (!response.ok || data.error) {
-          throw new Error(data.error || `सर्वर एरर (${response.status})`);
-        }
+        if (!response.ok || data.error) throw new Error(data.error || `सर्वर एरर (${response.status})`);
 
         if (data.text) {
           const aiText = String(data.text).trim();
-          
-          // 5. AI के जवाब को भी मेमोरी में सेव करें
-          window.geminiChatHistory.push({
-            role: "model",
-            parts: [{ text: aiText }]
-          });
-
+          window.geminiChatHistory.push({ role: "model", parts: [{ text: aiText }] });
           if (window.geminiChatHistory.length > GEMINI_MAX_HISTORY) {
             window.geminiChatHistory = window.geminiChatHistory.slice(-GEMINI_MAX_HISTORY);
           }
-
           if (window.sendFirebaseMessage) {
              window.sendFirebaseMessage(roomId, "AI उस्ताद", "Suhail_Ai", "🤖 AI उस्ताद", "admin", aiText, "Vercel Server");
           }
@@ -1869,21 +1742,14 @@
           throw new Error("कोई जवाब नहीं मिला");
         }
       } catch (error) {
-        // एरर आने पर फेल हुआ मैसेज हिस्ट्री से निकाल दें
         window.geminiChatHistory.pop();
         if (window.sendFirebaseMessage) {
            window.sendFirebaseMessage(roomId, "AI उस्ताद", "Suhail_Ai", "🤖 AI उस्ताद", "admin", "कनेक्शन एरर: " + error.message, "Vercel Server");
         }
       } finally {
-        if (typingDiv) {
-          typingDiv.style.display = 'none';
-        }
+        if (typingDiv) typingDiv.style.display = 'none';
       }
     };
-
-    // =========================================================
-    // AI CLASS SUMMARY GENERATOR
-    // =========================================================
 
     window.generateClassSummary = async function() {
       if (window.currentUser.role !== 'admin') {
@@ -1898,7 +1764,6 @@
 
       try {
         const groupRef = ref(db, 'messages/group');
-        
         onValue(groupRef, async (snapshot) => {
           const msgs = snapshot.val() || {};
           let chatText = "";
@@ -1941,13 +1806,10 @@
             throw new Error("सर्वर से गलत जवाब मिला (HTML)।");
           }
 
-          if (!response.ok || data.error) {
-            throw new Error(data.error || "सर्वर एरर");
-          }
+          if (!response.ok || data.error) throw new Error(data.error || "सर्वर एरर");
 
           if (data.text) {
              const finalSummary = "📝 **आज की क्लास समरी (Class Summary):**\n\n" + data.text.trim();
-             
              if (window.sendFirebaseMessage) {
                window.sendFirebaseMessage('group', "Suhail Assistant", "Suhail_Ai", "🤖 Suhail Assistant", "admin", finalSummary, "Vercel Server");
              }
@@ -1965,8 +1827,6 @@
         btn.disabled = false;
       }
     };
-
-    
-</script>
+  </script>
 </body>
 </html>
