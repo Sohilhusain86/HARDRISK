@@ -75,7 +75,7 @@ export default async function handler(req, res) {
 `;
 
     // आपने जो मॉडल तय किया है (gemini-2.5-flash)
-    const GOOGLE_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+    const GOOGLE_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent';
 
     const response = await fetch(GOOGLE_API_URL, {
       method: 'POST',
