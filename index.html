@@ -1933,7 +1933,6 @@
       btn.disabled = true;
 
       try {
-        // 1. फायरबेस से पिछले 24 घंटे की चैट निकालें
         const groupRef = ref(db, 'messages/group');
         
         onValue(groupRef, async (snapshot) => {
@@ -1943,10 +1942,8 @@
           const oneDay = 24 * 60 * 60 * 1000;
           let messageCount = 0;
 
-          // मैसेजेस को समय के अनुसार फिल्टर करें
           Object.values(msgs).forEach(m => {
             if (now - m.timestamp < oneDay) {
-               // फोटो या ऑडियो लिंक को समरी से बाहर रखें
                if (m.text && !m.text.includes('[IMG]') && !m.text.includes('[AUDIO]') && !m.text.includes('[FILE:')) {
                  chatText += `${m.displayName || m.sender}: ${m.text}\n`;
                  messageCount++;
@@ -1961,10 +1958,8 @@
             return;
           }
 
-          // 2. AI के लिए सीक्रेट प्रॉम्प्ट तैयार करें
-          const summaryPrompt = `कृपया नीचे दी गई मदरसे के क्लास (ग्रुप) की आज की बातचीत को पढ़ें। इसके आधार पर एक बहुत ही साफ़-सुथरी और प्रोफेशनल बुलेट-पॉइंट समरी (Class Summary) बनाएँ। बताएँ कि आज कौन-से मुख्य विषय (Topics) डिस्कस हुए, क्या इल्मी बातें हुईं और क्या होमवर्क या निर्देश दिए गए। समरी का अंदाज़ एक उस्ताद की तरह हो।\n\nआज की बातचीत:\n${chatText}`;
+          const summaryPrompt = `कृपया नीचे दी गई मदरसे के क्लास (ग्रुप) की आज की बातचीत को पढ़ें। इसके आधार पर एक बहुत ही साफ़-सुथरी और प्रोफेशनल बुलेट-पॉइंट समरी (Class Summary) बनाएँ। बताएँ कि आज कौन-से मुख्य विषय (Topics) डिस्कस हुए, क्या इल्मी बातें हुईं और क्या होमवर्क या निर्देश दिए गए। समरी का अंदाज़ एक उस्ताद की तरह हो。\n\nआज की बातचीत:\n${chatText}`;
 
-          // 3. Vercel Backend को रिक्वेस्ट भेजें
           const response = await fetch('/api/gemini', {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1987,7 +1982,6 @@
           }
 
           if (data.text) {
-             // 4. तैयार समरी को ग्रुप में "Suhail Assistant" के नाम से भेजें
              const finalSummary = "📝 **आज की क्लास समरी (Class Summary):**\n\n" + data.text.trim();
              
              if (window.sendFirebaseMessage) {
@@ -1999,22 +1993,16 @@
           btn.innerHTML = originalText;
           btn.disabled = false;
 
-        }, { onlyOnce: true }); // onlyOnce: true का मतलब है कि यह सिर्फ एक बार डेटा लेगा, लूप में नहीं फँसेगा
-
-      } catch (error) {
-        alert("समरी बनाने में एरर: " + error.message);
-        btn.innerHTML = originalText;
-          btn.disabled = false;
-
-        }, { onlyOnce: true }); 
+        }, { onlyOnce: true });
 
       } catch (error) {
         alert("समरी बनाने में एरर: " + error.message);
         btn.innerHTML = originalText;
         btn.disabled = false;
       }
-    };   // <--- यह वाला ब्रैकेट (}) इस फंक्शन को बंद करने के लिए ज़रूरी है जो मिसिंग था!
+    };
 
+    
 </script>
 </body>
 </html>
