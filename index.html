@@ -393,14 +393,28 @@
         </div>
       </main>
 
-      <!-- Tab 3: Live Polls Area -->
+            <!-- Tab 3: Live Polls Area -->
       <main class="chats-list-area" id="tab-content-polls" style="display: none;">
         <div class="section-container">
-          <div style="font-size: 0.85rem; color: #38bdf8; margin-bottom: 4px;">नया पोल बनाएं (सभी के लिए):</div>
+          
+          <!-- ✨ NEW AI POLL MAKER ADDED HERE -->
+          <div style="background:#1e1e2d; padding:12px; border-radius:10px; margin-bottom:16px; border: 1px solid #8b5cf6;">
+            <div style="font-size: 0.85rem; color: #a78bfa; margin-bottom: 8px; font-weight:bold;">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> AI ऑटो-क्विज़ (स्मार्ट पोल मेकर)
+            </div>
+            <textarea id="ai-poll-topic" class="login-input" placeholder="यहाँ कोई पैराग्राफ या सबक पेस्ट करें..." style="height: 65px; resize: none; margin-bottom: 8px; padding: 10px; font-size:0.85rem;"></textarea>
+            <button class="btn-login" id="btn-generate-ai-poll" onclick="window.generateAIPoll()" style="background:#8b5cf6; color:#fff; font-weight:bold; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);">
+              AI से सवाल और विकल्प (Options) बनवाएं
+            </button>
+          </div>
+          <!-- END AI POLL MAKER -->
+
+          <div style="font-size: 0.85rem; color: #38bdf8; margin-bottom: 4px;">नया पोल मैन्युअल बनाएं:</div>
           <input type="text" id="new-poll-question" class="login-input" placeholder="पोल का सवाल..." style="margin-bottom: 8px;">
           <input type="text" id="poll-opt-1" class="login-input" placeholder="विकल्प 1" style="margin-bottom: 8px;">
           <input type="text" id="poll-opt-2" class="login-input" placeholder="विकल्प 2" style="margin-bottom: 12px;">
           <button class="btn-login" id="btn-create-poll" style="margin-bottom: 14px;">पोल ग्रुप में भेजें</button>
+          
           <div id="rendered-polls-box"></div>
         </div>
       </main>
@@ -1834,6 +1848,80 @@
         btn.disabled = false;
       }
     };
+
+        // =========================================================
+    // 📊 AI AUTO-QUIZ MAKER (SMART POLL GENERATOR)
+    // =========================================================
+
+    window.generateAIPoll = async function() {
+      if (window.currentUser.role !== 'admin') {
+        alert("यह सुपर-फीचर केवल एडमिन के लिए है।");
+        return;
+      }
+
+      const topicInput = document.getElementById('ai-poll-topic').value.trim();
+      if (!topicInput) { 
+        alert("कृपया कोई टॉपिक, सबक या पैराग्राफ लिखें ताकि AI उस पर सवाल बना सके!"); 
+        return; 
+      }
+
+      const btn = document.getElementById('btn-generate-ai-poll');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> AI पोल तैयार कर रहा है...';
+      btn.disabled = true;
+
+      // Prompt forces Gemini to output STRICT JSON so our code can read it automatically
+      const prompt = `आप एक उस्ताद (टीचर) हैं। नीचे दिए गए टेक्स्ट या पैराग्राफ को पढ़ें और उसमें से एक बहुत अच्छा Multiple Choice Question (MCQ) बनाएँ। प्रश्न हिंदी या उर्दू (देवनागरी लिपि) में होना चाहिए। आपको जवाब सिर्फ और सिर्फ एक JSON फॉर्मेट में देना है। कोई एक्स्ट्रा टेक्स्ट, बैकटिक या स्पष्टीकरण न दें।
+      JSON फॉर्मेट: {"question": "आपका सवाल यहाँ", "opt1": "पहला विकल्प", "opt2": "दूसरा विकल्प"}
+      
+      टेक्स्ट: ${topicInput}`;
+
+      try {
+        const response = await fetch('/api/gemini', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [{ role: "user", parts: [{ text: prompt }] }]
+          })
+        });
+
+        const responseText = await response.text();
+        let data = JSON.parse(responseText);
+
+        if (!response.ok || data.error) {
+          throw new Error(data.error || "सर्वर एरर");
+        }
+
+        // Clean up markdown block if Gemini adds it accidentally
+        let jsonString = data.text.replace(/```json/g, '').replace(/```/g, '').trim();
+        const pollData = JSON.parse(jsonString);
+
+        if (pollData && pollData.question && pollData.opt1 && pollData.opt2) {
+          const pollsRef = ref(db, 'group_shared_polls');
+          push(pollsRef, { 
+            question: "🤖 " + pollData.question, 
+            opt1: pollData.opt1, 
+            opt2: pollData.opt2, 
+            votes1: 0, 
+            votes2: 0, 
+            voters: {}, 
+            author: window.currentUser.displayName || window.currentUser.name 
+          });
+          
+          alert("AI ने शानदार पोल बनाकर ग्रुप में लाइव कर दिया है!");
+          document.getElementById('ai-poll-topic').value = ""; // डिब्बा खाली करें
+        } else {
+          throw new Error("AI ने सही फॉर्मेट में जवाब नहीं दिया।");
+        }
+
+      } catch (error) {
+        alert("पोल बनाने में एरर: " + error.message);
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    };
+    
   </script>
 </body>
 </html>
