@@ -1311,9 +1311,16 @@
         document.getElementById('notice-display').textContent = settings.noticeText;
       }
 
-      if (settings.broadcastAlert && settings.broadcastTime > (window.lastAlertTime || 0)) {
-        window.lastAlertTime = settings.broadcastTime;
-        alert("📢 एडमिन इमरजेंसी अलर्ट:\n\n" + settings.broadcastAlert);
+           if (settings.broadcastAlert && settings.broadcastTime) {
+        // अलर्ट भेजने की तारीख और आज की तारीख निकालें
+        const alertDate = new Date(settings.broadcastTime).toLocaleDateString();
+        const todayDate = new Date().toLocaleDateString();
+
+        // अगर अलर्ट आज ही भेजा गया है, और इस बार ऐप खुलने पर अभी तक नहीं दिखा है, तभी दिखाएं
+        if (alertDate === todayDate && settings.broadcastTime > (window.lastAlertTime || 0)) {
+          window.lastAlertTime = settings.broadcastTime; // चैट करते वक्त बार-बार लूप में आने से रोकेगा
+          alert("📢 एडमिन इमरजेंसी अलर्ट:\n\n" + settings.broadcastAlert);
+        }
       }
     });
 
