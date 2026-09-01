@@ -1066,24 +1066,22 @@
       }
 
       // ==========================================
-      // 🛡️ AI SMART MODERATION (AUTO-BOUNCER)
+      // 🛡️ AI SMART MODERATION (AUTO-BOUNCER - 100% WORKING)
       // ==========================================
       if (window.currentUser.role !== 'admin') {
-        // 1. लिंक चेक (URL Detection)
-        const hasLink = /(https?:\/\/[^\s]+)/g.test(text);
+        const hasLink = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi.test(text);
         
-        // 2. गलत शब्दों की लिस्ट (आप इसमें और शब्द जोड़ सकते हैं)
-        const badWords = ["पागल", "बेवकूफ", "गाली1", "गाली2", "spam", "offer"]; 
+        // यहाँ आप और भी सख्त शब्द जोड़ सकते हैं
+        const badWords = ["gaali", "madarchod", "bhenchod", "chutiya", "harami", "paagal", "kamina", "spam", "http", "www."]; 
         const lowerText = text.toLowerCase();
         const hasBadWord = badWords.some(word => lowerText.includes(word));
 
         if (hasLink || hasBadWord) {
-          alert("⚠️ ऑटो-बाउंसर अलर्ट: आपने अनचाहा लिंक या गलत शब्द भेजा है। सुरक्षा नियमों के तहत आपको 24 घंटे के लिए ऑटो-ब्लॉक किया जा रहा है!");
+          alert("⚠️ ऑटो-बाउंसर अलर्ट: आपने ग्रुप नियमों के खिलाफ लिंक या अवांछित शब्द भेजा है। आपको 24 घंटे के लिए ऑटो-ब्लॉक किया जा रहा है!");
           
           const cleanPhone = window.currentUser.phone.replace(/[^0-9]/g, '');
-          const unbanTime = Date.now() + (24 * 60 * 60 * 1000); // 24 घंटे का टाइमर
           
-          // यूज़र को डेटाबेस में बैन लिस्ट में डालें
+          // डेटाबेस में बैन लिस्ट में डालें
           set(ref(db, `banned_users/${cleanPhone}`), { 
             name: window.currentUser.name, 
             bannedAt: Date.now(),
@@ -1093,9 +1091,32 @@
           push(auditRef, { action: `ऑटो-बाउंसर बैन (24h): ${window.currentUser.name}`, admin: "AI System", time: new Date().toLocaleTimeString() });
           
           msgInput.value = "";
-          return; // मैसेज को आगे जाने से रोक दें
+          return; // मैसेज को ग्रुप में जाने से रोक देगा!
         }
       }
+      
+      // ==========================================
+
+      if (window.currentUser.role !== 'admin' && window.globalSlowMode && window.globalSlowMode > 0) {
+        const now = Date.now();
+        const diff = (now - lastMessageTimestamp) / 1000;
+        if (diff < window.globalSlowMode) {
+          alert(`स्लो मोड चालू है! कृपया ${Math.ceil(window.globalSlowMode - diff)} सेकंड बाद मैसेज भेजें।`);
+          return;
+        }
+        lastMessageTimestamp = now;
+      }
+
+      if(window.sendFirebaseMessage) {
+        window.sendFirebaseMessage(window.currentActiveRoomId, window.currentUser.name, window.currentUser.phone, window.currentUser.displayName, window.currentUser.role, text, window.currentUser.location);
+      }
+      msgInput.value = "";
+
+      if (window.currentActiveRoomId.startsWith('ai_ustad_')) {
+        window.fetchGeminiResponse(text, window.currentActiveRoomId);
+      }
+    }
+    
       // ==========================================
 
       if (window.currentUser.role !== 'admin' && window.globalSlowMode && window.globalSlowMode > 0) {
@@ -1494,17 +1515,17 @@
         row.className = 'banned-chip';
         row.innerHTML = `
           <span>${u.displayName || u.name} (${phone})</span>
-          <div style="display:flex; gap:4px;">
+          <div style="display:flex; gap:4px; flex-wrap:wrap;">
             <button onclick="window.toggleUserMute('${phone}')" style="background:#f59e0b; border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:0.75rem;">म्यूट</button>
             <button onclick="window.triggerAdminBanToggle('${phone}', '${u.name}')" style="background:${isBanned?'#22c55e':'#ef4444'}; border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:0.75rem;">${isBanned?'अनबैन':'बैन'}</button>
-            <button onclick="window.purgeUserPermanently('${phone}', '${u.displayName || u.name || phone}')" style="background:#ef4444; border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:0.75rem;"><i class="fa-solid fa-trash"></i> डिलीट</button>
+            <button onclick="window.purgeUserPermanently('${phone}', '${u.displayName || u.name || phone}')" style="background:#ef4444; border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:0.75rem;"><i class="fa-solid fa-trash"></i></button>
             <button onclick="window.generateStudentMentorReport('${phone}', '${u.displayName || u.name}')" style="background:#8b5cf6; border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:0.75rem;"><i class="fa-solid fa-file-signature"></i> AI रिपोर्ट</button>
           </div>
         `;
         dirContainer.appendChild(row);
       });
     });
-
+    
     onValue(mutedUsersRef, (snapshot) => {
       mutedPhoneCache = snapshot.val() || {};
     });
