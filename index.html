@@ -278,15 +278,27 @@
         <button class="btn-login" id="btn-send-broadcast" style="background:#38bdf8; color:#01140e;">सभी को अलर्ट भेजें</button>
       </div>
       
-<div class="admin-section-title">📝 AI क्लास समरी जनरेटर (Suhail Assistant)</div>
-      <div style="background:#202c33; padding:10px; border-radius:8px; margin-bottom:10px;">
-        <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px; line-height:1.4;">
-          पिछले 24 घंटों में मेन ग्रुप में हुई बातचीत को AI पढ़ेगा और एक साफ़-सुथरी बुलेट-पॉइंट समरी बनाकर सीधे ग्रुप में पोस्ट कर देगा।
+<div class="admin-section-title">📋 एडमिन ऑडिट लॉग्स (Action History)</div>
+      <div id="audit-logs-box" style="background:#111b21; border:1px solid rgba(255,255,255,0.12); padding:10px; border-radius:8px; min-height: 60px; max-height:160px; overflow-y:auto; font-size:0.8rem; color:#94a3b8; margin-bottom: 20px;"></div>
+
+    </div> <!-- 👈 यहाँ एडमिन पैनल का मुख्य <div class="admin-modal"> बंद होता है -->
+
+    <!-- SCREEN 1: Home View -->
+    <div class="view-screen view-active" id="screen-home">
+      <header class="top-header">
+        <div class="header-user-info">
+          <div class="header-avatar" id="my-avatar">उ</div>
+          <div>
+            <div class="header-title" id="my-display-name">जमात ऊला अलिफ़</div>
+            <div class="header-status" id="total-online-label">ऑनलाइन सदस्य</div>
+          </div>
         </div>
-        <button class="btn-login" id="btn-generate-summary" onclick="window.generateClassSummary()" style="background:#facc15; color:#01140e; font-weight:bold; display:flex; justify-content:center; align-items:center; gap:8px;">
-          <i class="fa-solid fa-wand-magic-sparkles"></i> आज की समरी (Summary) बनाएं
-        </button>
-      </div>
+        <div class="header-actions">
+          <button class="header-btn" id="btn-admin-crown" title="एडमिन पैनल" style="display: none;"><i class="fa-solid fa-crown" style="color: #facc15;"></i></button>
+          <button class="header-btn" id="btn-sound" title="साउंड ऑन/ऑफ"><i class="fa-solid fa-volume-high"></i></button>
+          <button class="header-btn" id="btn-logout" title="लॉगआउट" onclick="logoutApp()" style="color: #f87171;"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+      </header>
       
       <div class="admin-section-title">⚙️ ग्रुप मॉडरेशन सेटिंग्स</div>
       <div style="background:#202c33; padding:10px; border-radius:8px; margin-bottom:10px; display:flex; flex-direction:column; gap:8px;">
