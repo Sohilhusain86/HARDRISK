@@ -125,7 +125,6 @@
       padding: 8px 14px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; color: var(--gold-accent);
     }
 
-    /* WhatsApp Custom Background Image */
     .chat-messages-area {
       flex: 1; 
       overflow-y: auto; 
@@ -458,11 +457,10 @@
       </div>
 
       <footer class="chat-bottom-dock" style="position: relative;">
-        <!-- 👻 Ghost Mode & 🕒 Schedule Controls Panel (पैनल जो घोस्ट बटन क्लिक करने पर खुलेगा) -->
+        <!-- 👻 Ghost Mode & 🕒 Schedule Controls Panel -->
         <div id="ghost-schedule-controls" style="display: none; background: rgba(30, 41, 59, 0.98); padding: 10px; border-radius: 8px; position: absolute; bottom: 70px; left: 10px; z-index: 100; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 15px rgba(0,0,0,0.4); width: 220px;">
           <div style="font-size: 0.75rem; color: #a855f7; font-weight: bold; margin-bottom: 6px;"><i class="fa-solid fa-ghost"></i> घोस्ट & शेड्यूल सेटिंग्स</div>
           
-          <!-- घोस्ट टाइमर ड्रॉपडाउन -->
           <div style="margin-bottom: 8px;">
             <label style="font-size: 0.7rem; color: #cbd5e1; display: block; margin-bottom: 2px;">ऑटो-डिलीट टाइम (घोस्ट मोड):</label>
             <select id="ghost-duration-select" style="background: #0f172a; color: #fff; border: 1px solid #475569; border-radius: 4px; padding: 4px; font-size: 0.75rem; width: 100%;">
@@ -473,7 +471,6 @@
             </select>
           </div>
 
-          <!-- शेड्यूल्ड मैसेज के लिए डेट/टाइम पिकर -->
           <div>
             <label style="font-size: 0.7rem; color: #cbd5e1; display: block; margin-bottom: 2px;">शेड्यूल टाइम (वैकल्पिक):</label>
             <input type="datetime-local" id="schedule-time-input" style="background: #0f172a; color: #fff; border: 1px solid #475569; border-radius: 4px; padding: 4px; font-size: 0.75rem; width: 100%;">
@@ -485,7 +482,6 @@
         <button class="btn-dock-action btn-mic" id="btn-mic" title="ऑडियो रिकॉर्ड करें"><i class="fa-solid fa-microphone"></i></button>
         <input type="text" class="chat-input-box" id="msg-input" placeholder="यहाँ मैसेज लिखें...">
         
-        <!-- 👻 Ghost Mode Toggle Button -->
         <button class="btn-dock-action" id="btn-ghost-mode" type="button" onclick="window.toggleGhostMode()" title="घोस्ट मोड और शेड्यूल सेटिंग्स" style="color: var(--text-muted);">
           <i class="fa-solid fa-ghost"></i>
         </button>
@@ -747,7 +743,6 @@
         return;
       }
 
-      // 🔒 डुप्लीकेट फोन नंबर और नाम ओवरराइट होने से रोकने की जांच
       const existingUserSnap = await get(ref(db, `users/${phone}`));
       let finalName = name;
       let finalRoll = roll;
@@ -1078,7 +1073,8 @@
       }
     });
 
-        function sendChatMessage() {
+    // 🚀 एकदम सही और फाइनल sendChatMessage फंक्शन
+    function sendChatMessage() {
       const text = msgInput.value.trim();
       if (!text) return;
 
@@ -1102,14 +1098,11 @@
         lastMessageTimestamp = now;
       }
     
-      // ड्रॉपडाउन और शेड्यूल इनपुट से वैल्यू लें
       const ghostSelect = document.getElementById('ghost-duration-select');
       const scheduleInput = document.getElementById('schedule-time-input');
-      
       const gDuration = ghostSelect ? parseInt(ghostSelect.value) : 30000;
       const sTime = scheduleInput ? scheduleInput.value : null;
 
-      // 1. मैसेज तुरंत ग्रुप/चैट में सेंड कर दें
       let sentMsgKey = null;
       if(window.sendFirebaseMessage) {
         sentMsgKey = window.sendFirebaseMessage(
@@ -1126,25 +1119,19 @@
         );
       }
       
-      // 2. वेरिएबल्स सेट करें
       const currentRoom = window.currentActiveRoomId;
       const senderName = window.currentUser.name;
       const senderPhone = window.currentUser.phone;
       const senderRole = window.currentUser.role;
 
-      // 3. इनपुट बॉक्स खाली करें
       msgInput.value = "";
-      if (scheduleInput) scheduleInput.value = ""; // भेजने के बाद शेड्यूल इनपुट रीसेट करें
+      if (scheduleInput) scheduleInput.value = ""; 
 
-      // 4. अगर AI उस्ताद से बात हो रही है, तो AI को मैसेज भेजें
       if (currentRoom.startsWith('ai_ustad_')) {
         window.fetchGeminiResponse(text, currentRoom);
         return;
       }
 
-      // =========================================================
-      // 🧠 5. बैकग्राउंड AI ऑटो-बाउंसर (सिर्फ मुख्य ग्रुप चैट के लिए)
-      // =========================================================
       if (currentRoom === 'group' && senderRole !== 'admin' && sentMsgKey) {
         (async () => {
           try {
@@ -1171,10 +1158,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
             }
 
             if (isViolation) {
-              // मैसेज डिलीट करें
               remove(ref(db, `messages/group/${sentMsgKey}`));
-              
-              // यूज़र को 5 घंटे के लिए बैन करें
               const cleanPhone = senderPhone.replace(/[^0-9]/g, '');
               const banDurationMs = 5 * 60 * 60 * 1000; 
               const banExpiry = Date.now() + banDurationMs;
@@ -1186,7 +1170,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
                 autoBanned: true 
               });
 
-              // एडमिन लॉग्स में डालें
               push(auditRef, { 
                 action: `AI ऑटो-डिलीट व 5 घंटे बैन: ${senderName} (मैसेज: "${text}")`, 
                 admin: "Gemini AI Moderator", 
@@ -1198,64 +1181,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
           }
         })();
       }
-    }
-
-      // =========================================================
-      // 🧠 बैकग्राउंड AI ऑटो-बाउंसर (सिर्फ मुख्य ग्रुप चैट के लिए)
-      // =========================================================
-      if (currentRoom === 'group' && senderRole !== 'admin' && sentMsgKey) {
-        (async () => {
-          try {
-            const hasLink = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi.test(text);
-            let isViolation = hasLink;
-
-            if (!isViolation) {
-              const modPrompt = `You are a strict classroom content moderation AI. Analyze this message: "${text}". 
-Is it abusive, vulgar, disrespectful, sexually explicit, containing severe profanity, Hindi/Hinglish/Urdu slurs, or harassment? 
-Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation or explanation.`;
-
-              const modRes = await fetch('/api/gemini', {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  messages: [{ role: "user", parts: [{ text: modPrompt }] }]
-                })
-              });
-
-              const modTextRaw = await modRes.text();
-              let modData = JSON.parse(modTextRaw);
-              const verdict = (modData.text || "").trim().toUpperCase();
-              if (verdict.includes("UNSAFE")) isViolation = true;
-            }
-
-            if (isViolation) {
-              // 1. ग्रुप से मैसेज तुरंत हमेशा के लिए डिलीट करें
-              remove(ref(db, `messages/group/${sentMsgKey}`));
-
-              // 2. यूज़र को ठीक 5 घंटे के लिए ब्लॉक करें
-              const cleanPhone = senderPhone.replace(/[^0-9]/g, '');
-              const banDurationMs = 5 * 60 * 60 * 1000; // 5 घंटे
-              const banExpiry = Date.now() + banDurationMs;
-
-              set(ref(db, `banned_users/${cleanPhone}`), { 
-                name: senderName, 
-                bannedAt: Date.now(),
-                bannedUntil: banExpiry,
-                autoBanned: true 
-              });
-
-              push(auditRef, { 
-                action: `AI ऑटो-डिलीट व 5 घंटे बैन: ${senderName} (मैसेज: "${text}")`, 
-                admin: "Gemini AI Moderator", 
-                time: new Date().toLocaleTimeString() 
-              });
-            }
-          } catch (err) {
-            console.warn("Background AI Moderation error:", err);
-          }
-        })();
-      }
-      // =========================================================
     }
 
     sendBtn.addEventListener('click', sendChatMessage);
@@ -1854,7 +1779,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       onDisconnect(userRef).update({ status: "offline", lastSeen: Date.now() });
     };
 
-            window.sendFirebaseMessage = function(roomId, name, phone, displayName, role, text, userLocation, isGhost = false) {
+    window.sendFirebaseMessage = function(roomId, name, phone, displayName, role, text, userLocation, isGhost = false, ghostDuration = 30000, scheduleTime = null) {
       if(!text) return null;
       const now = new Date();
       const nodePath = (roomId === 'group') ? 'messages/group' : `messages_private/${roomId}`;
@@ -1870,9 +1795,15 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         timestamp: Date.now()
       };
 
+      if (scheduleTime) {
+        payload.isScheduled = true;
+        payload.scheduledFor = new Date(scheduleTime).getTime();
+      }
+
       if (isGhost) {
         payload.isGhost = true;
-        payload.expiresAt = Date.now() + (30 * 1000); // 30 सेकंड बाद डिलीट
+        payload.ghostDuration = ghostDuration;
+        payload.expiresAt = Date.now() + ghostDuration;
       }
 
       const newMsgRef = push(ref(db, nodePath), payload);
@@ -2277,12 +2208,10 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       alert(`AI मेंटर ${targetName} का डेटा एनालाइज़ कर रहा है। कृपया 10-15 सेकंड इंतज़ार करें...`);
 
       try {
-        // 1. छात्र की हाज़िरी (Attendance) निकालें
         const attSnap = await get(ref(db, `attendance/${targetPhone}`));
         const attData = attSnap.val() || {};
         const totalDaysPresent = Object.keys(attData).length;
 
-        // 2. AI के लिए प्रॉम्प्ट तैयार करें
         const prompt = `आप एक बहुत ही हमदर्द और बेहतरीन उस्ताद (मेंटर) हैं। 
         आपके एक छात्र का नाम '${targetName}' है। 
         इस छात्र ने अब तक कुल ${totalDaysPresent} दिन क्लास में हाज़िरी लगाई है। 
@@ -2291,7 +2220,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         अगर हाज़िरी 3 दिन से कम है, तो उन्हें प्यार से रोज़ाना आने की ताकीद करें। 
         जवाब सीधे छात्र से बात करने वाले अंदाज़ में दें (जैसे: "अस्सलाम वालेकुम ${targetName}, आपकी इस हफ्ते की रिपोर्ट...")।`;
 
-        // 3. Gemini AI से रिपोर्ट बनवाएं
         const response = await fetch('/api/gemini', {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -2308,7 +2236,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         if (data.text) {
           const finalReport = "📊 **आपकी वीकली प्रोग्रेस रिपोर्ट:**\n\n" + data.text.trim();
           
-          // 4. रिपोर्ट को सीधे छात्र के प्राइवेट AI चैट रूम में भेजें
           const aiRoomId = `ai_ustad_${targetPhone}`;
           if (window.sendFirebaseMessage) {
             window.sendFirebaseMessage(aiRoomId, "AI उस्ताद (मेंटर)", "Suhail_Ai", "🎓 AI उस्ताद (मेंटर)", "admin", finalReport, "Vercel Server");
