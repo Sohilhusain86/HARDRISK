@@ -3092,6 +3092,15 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         let avatarStyle = u.dpUrl ? `background-image: url('${u.dpUrl}');` : "";
         let avatarContent = u.dpUrl ? "" : (u.name || "उ").charAt(0);
 
+        let medal = "";
+        const rank = sortedKeys.indexOf(phone) + 1;
+        if (rank === 1) medal = "🥇 ";
+        else if (rank === 2) medal = "🥈 ";
+        else if (rank === 3) medal = "🥉 ";
+
+        const xpCount = u.xp || 0;
+        const streakCount = u.streak || 0;
+
         item.innerHTML = `
           <div class="item-avatar" style="${avatarStyle}">
             ${avatarContent}
@@ -3099,10 +3108,12 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
           </div>
           <div class="item-info">
             <div class="item-name">
-              <span>${u.displayName || u.name} ${isPinned ? '<i class="fa-solid fa-thumbtack wa-pinned-icon"></i>' : ''}</span>
-              <div style="display:flex; gap:6px; align-items:center;">
+              <span>${medal}${u.displayName || u.name} ${isPinned ? '<i class="fa-solid fa-thumbtack wa-pinned-icon"></i>' : ''}</span>
+              <div style="display:flex; gap:5px; align-items:center;">
+                <span class="badge-streak">🔥 ${streakCount}</span>
+                <span class="badge-xp">⚡ ${xpCount} XP</span>
                 ${unreadCount > 0 ? `<span class="wa-badge-unread">${unreadCount}</span>` : ''}
-                <span onclick="window.togglePinChat('${phone}', event)" style="color:#8696a0; cursor:pointer; font-size:0.75rem;"><i class="fa-solid fa-thumbtack"></i></span>
+                <span onclick="window.togglePinChat('${phone}', event)" style="color:#8696a0; cursor:pointer; font-size:0.75rem; margin-left:4px;"><i class="fa-solid fa-thumbtack"></i></span>
               </div>
             </div>
             <div class="item-subtext" style="color:#8696a0;">${u.about || 'طالب علم - जमात ऊला'}</div>
