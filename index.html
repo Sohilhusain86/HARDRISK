@@ -3384,7 +3384,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       }
     };
     
-// =========================================================
+  // =========================================================
     // ⚡ PHASE 3: 24-HR STATUS, BOOK EXCHANGE & PINBOARD
     // =========================================================
 
@@ -3394,43 +3394,62 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
     // 1. Inject Status Tray & Navigation Buttons
     window.setupPhase3UI = function() {
       const usersContainer = document.getElementById('users-dynamic-list');
-      if (!usersContainer || document.getElementById('status-tray')) return;
+      if (!usersContainer) return;
 
+      const filterBar = document.getElementById('wa-filter-bar');
       const headerDock = usersContainer.parentElement;
 
-      // Status Tray
-      const tray = document.createElement('div');
-      tray.id = 'status-tray';
-      tray.className = 'status-tray-wrapper';
-      tray.innerHTML = `
-        <div class="status-circle-item" onclick="window.promptCreateStatus()">
-          <div class="status-ring my-status">
-            <div class="status-avatar"><i class="fa-solid fa-plus"></i></div>
+      // Status Tray (Stories)
+      if (!document.getElementById('status-tray')) {
+        const tray = document.createElement('div');
+        tray.id = 'status-tray';
+        tray.className = 'status-tray-wrapper';
+        tray.innerHTML = `
+          <div class="status-circle-item" onclick="window.promptCreateStatus()">
+            <div class="status-ring my-status">
+              <div class="status-avatar"><i class="fa-solid fa-plus"></i></div>
+            </div>
+            <div class="status-user-label">मेरा स्टेटस</div>
           </div>
-          <div class="status-user-label">मेरा स्टेटस</div>
-        </div>
-        <div id="peer-statuses-dock" style="display:flex; gap:12px;"></div>
-      `;
-      headerDock.insertBefore(tray, document.getElementById('wa-filter-bar') || usersContainer);
+          <div id="peer-statuses-dock" style="display:flex; gap:12px;"></div>
+        `;
+        if (filterBar) {
+          headerDock.insertBefore(tray, filterBar);
+        } else {
+          headerDock.insertBefore(tray, usersContainer);
+        }
+      }
 
-      // Add 'एक्सचेंज' and 'नोटिस बोर्ड' Filter Pills
-      const filterBar = document.getElementById('wa-filter-bar');
-      if (filterBar && !document.getElementById('pill-exchange')) {
-        const exPill = document.createElement('button');
-        exPill.id = 'pill-exchange';
-        exPill.className = 'filter-pill';
-        exPill.innerHTML = `📚 एक्सचेंज`;
-        exPill.onclick = () => window.openBookExchangeModal();
-        filterBar.appendChild(exPill);
-
-        const noticePill = document.createElement('button');
-        noticePill.id = 'pill-notice-board';
-        noticePill.className = 'filter-pill';
-        noticePill.innerHTML = `📌 नोटिस बोर्ड`;
-        noticePill.onclick = () => window.openNoticeBoardModal();
-        filterBar.appendChild(noticePill);
+      // Add 'एक्सचेंज' and 'नोटिस बोर्ड' Filter Pills into Header
+      if (filterBar) {
+        if (!document.getElementById('pill-exchange')) {
+          const exPill = document.createElement('button');
+          exPill.id = 'pill-exchange';
+          exPill.className = 'filter-pill';
+          exPill.innerHTML = `📚 एक्सचेंज`;
+          exPill.onclick = () => window.openBookExchangeModal();
+          filterBar.appendChild(exPill);
+        }
+        if (!document.getElementById('pill-notice-board')) {
+          const noticePill = document.createElement('button');
+          noticePill.id = 'pill-notice-board';
+          noticePill.className = 'filter-pill';
+          noticePill.innerHTML = `📌 नोटिस बोर्ड`;
+          noticePill.onclick = () => window.openNoticeBoardModal();
+          filterBar.appendChild(noticePill);
+        }
       }
     };
+
+    // Auto-hook into RenderUsers so Phase 3 UI renders automatically
+    const prevRenderWithPhase3 = window.renderAllUsersList;
+    window.renderAllUsersList = function(usersMap) {
+      if (prevRenderWithPhase3) prevRenderWithPhase3(usersMap);
+      window.setupPhase3UI();
+    };
+
+    // Run setup immediately on load
+    setTimeout(() => { if (window.setupPhase3UI) window.setupPhase3UI(); }, 300);
 
     // 2. Status Logic (Create, Auto-Delete > 24 Hours, Views, Reply)
     window.promptCreateStatus = function() {
@@ -3541,7 +3560,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         const keys = Object.keys(data).reverse();
 
         if (keys.length === 0) {
-          listContainer.innerHTML = "<p style='color:#8696a0; text-align:center;'>अभी कोई नोटिस नहीं है।</p>";
+          listContainer.innerHTML = "<p style='color:#8696a0; text-align:center; padding:12px;'>अभी कोई नोटिस नहीं है।</p>";
           return;
         }
 
@@ -3603,7 +3622,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         const keys = Object.keys(data).reverse();
 
         if (keys.length === 0) {
-          listContainer.innerHTML = "<p style='color:#8696a0; text-align:center;'>अभी कोई आधिकारिक नोटिस जारी नहीं हुआ है।</p>";
+          listContainer.innerHTML = "<p style='color:#8696a0; text-align:center; padding:12px;'>अभी कोई आधिकारिक नोटिस जारी नहीं हुआ है।</p>";
           return;
         }
 
