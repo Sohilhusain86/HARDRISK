@@ -2275,6 +2275,39 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       }
     };
     
+    // =========================================================
+    // 🕒 ऑटो-शेड्यूल और घोस्ट मैसेज चेकर (मोबाइल के लिए आसान जुगाड़)
+    // =========================================================
+    setInterval(() => {
+      // यह काम सिर्फ एडमिन के फोन से होगा ताकि बार-बार मैसेज रिपीट न हों
+      if (window.currentUser && window.currentUser.role === 'admin') {
+        const now = Date.now();
+        
+        get(ref(db, 'messages/group')).then((snapshot) => {
+          if (snapshot.exists()) {
+            const msgs = snapshot.val();
+            for (const key in msgs) {
+              const msg = msgs[key];
+              
+              // 1. अगर किसी शेड्यूल्ड मैसेज का टाइम हो गया है, तो उसे पब्लिश कर दें
+              if (msg.isScheduled && msg.scheduledFor && now >= msg.scheduledFor) {
+                update(ref(db, `messages/group/${key}`), {
+                  isScheduled: null, // शेड्यूल्ड टैग हटा दें
+                  timestamp: now,
+                  time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                });
+              }
+              
+              // 2. अगर कोई घोस्ट मैसेज डिलीट होने से छूट गया है, तो उसे साफ कर दें
+              if (msg.isGhost && msg.expiresAt && now >= msg.expiresAt) {
+                remove(ref(db, `messages/group/${key}`));
+              }
+            }
+          }
+        }).catch(err => console.error(err));
+      }
+    }, 15000); // यह कोड हर 15 सेकंड में बैकग्राउंड में चेक करेगा
+
   </script>
 </body>
 </html>
