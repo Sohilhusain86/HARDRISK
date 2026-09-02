@@ -233,6 +233,81 @@
     .call-avatar-large { width: 100px; height: 100px; border-radius: 50%; background: #2a3942; background-size: cover; background-position: center; margin-bottom: 20px; border: 3px solid #00a884; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #00a884; }
     .call-btn-danger { background: #ef4444; color: #fff; border: none; border-radius: 50px; padding: 12px 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
     .call-btn-success { background: #22c55e; color: #fff; border: none; border-radius: 50px; padding: 12px 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+
+    /* --- Phase 1 Gamification & Peer Styles --- */
+    .peer-actions-dock {
+      background: #182229;
+      padding: 6px 10px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      white-space: nowrap;
+    }
+    .btn-peer-action {
+      background: #202c33;
+      color: #e9edef;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-peer-action:hover { background: #005c4b; color: #fff; }
+    
+    .badge-xp {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+      font-weight: bold;
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: 10px;
+    }
+    .badge-streak {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      font-weight: bold;
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: 10px;
+    }
+    .rank-medal { font-size: 1rem; margin-right: 4px; }
+
+    /* Custom Event Cards in Chat */
+    .peer-card {
+      background: #182229;
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 4px;
+      border-left: 4px solid #facc15;
+    }
+    .peer-card.quiz { border-left-color: #a855f7; }
+    .peer-card-btn {
+      background: #00a884;
+      border: none;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+    .takraar-timer-banner {
+      background: #f59e0b;
+      color: #000;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
   </style>
 </head>
 <body>
@@ -474,6 +549,19 @@
           <option value="robot">रोबोट आवाज़ (Robot)</option>
           <option value="chipmunk">गिलहरी आवाज़ (Chipmunk High)</option>
         </select>
+      </div>
+
+      <!-- 🚀 Phase 1: Peer Action Bar -->
+      <div class="peer-actions-dock">
+        <button type="button" class="btn-peer-action" onclick="window.requestTodayLesson()">
+          <i class="fa-solid fa-bullhorn" style="color: #facc15;"></i> आज का सबक चाहिए
+        </button>
+        <button type="button" class="btn-peer-action" onclick="window.sendQuizDuelChallenge()">
+          <i class="fa-solid fa-bolt" style="color: #c084fc;"></i> क्विज़ चैलेंज
+        </button>
+        <button type="button" class="btn-peer-action" onclick="window.startTakraarRoom()">
+          <i class="fa-solid fa-hourglass-half" style="color: #38bdf8;"></i> 15m तक़रार रूम
+        </button>
       </div>
 
       <footer class="chat-bottom-dock" style="position: relative;">
@@ -2463,6 +2551,251 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         }).catch(()=>{});
       }
     }, 15000);
+
+    // =========================================================
+    // ⚡ PHASE 1: XP, LEADERBOARD, STREAK, QUIZ & STUDY ROOMS
+    // =========================================================
+
+    // 1. Award XP Logic
+    window.awardXP = async function(phone, amount, reason = "") {
+      if (!phone) return;
+      const cleanPhone = phone.replace(/[^0-9]/g, '');
+      const userRef = ref(db, `users/${cleanPhone}`);
+      try {
+        const snap = await get(userRef);
+        if (snap.exists()) {
+          const curXP = snap.val().xp || 0;
+          await update(userRef, { xp: curXP + amount });
+          if (cleanPhone === window.currentUser.phone) {
+            window.currentUser.xp = curXP + amount;
+            localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
+          }
+        }
+      } catch(e) { console.error("XP error", e); }
+    };
+
+    // 2. Study Streak Logic (Calculated daily on login)
+    window.updateDailyStreak = async function(phone) {
+      if (!phone) return;
+      const cleanPhone = phone.replace(/[^0-9]/g, '');
+      const streakRef = ref(db, `users/${cleanPhone}`);
+      try {
+        const snap = await get(streakRef);
+        if (!snap.exists()) return;
+        const data = snap.val();
+        const now = new Date();
+        const todayStr = now.toISOString().slice(0, 10);
+
+        let streak = data.streak || 0;
+        const lastActive = data.lastActiveDate || "";
+
+        if (lastActive !== todayStr) {
+          const yesterday = new Date(now.setDate(now.getDate() - 1)).toISOString().slice(0, 10);
+          if (lastActive === yesterday) {
+            streak += 1;
+            window.awardXP(cleanPhone, 20, "Daily Streak Bonus");
+          } else if (lastActive === "") {
+            streak = 1;
+          } else {
+            streak = 1; // streak reset
+          }
+          await update(streakRef, { streak: streak, lastActiveDate: todayStr });
+          if (cleanPhone === window.currentUser.phone) {
+            window.currentUser.streak = streak;
+            localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
+          }
+        }
+      } catch(e){}
+    };
+
+    // Auto-update streak on start
+    if (window.currentUser && window.currentUser.phone) {
+      window.updateDailyStreak(window.currentUser.phone);
+    }
+
+    // 3. Overwrite/Enhance renderAllUsersList with Live Leaderboard Ranking (🥇, 🥈, 🥉)
+    const originalRenderUsers = window.renderAllUsersList;
+    window.renderAllUsersList = function(usersMap) {
+      const container = document.getElementById('users-dynamic-list');
+      if (!container) return;
+      container.innerHTML = "";
+
+      // Sort users descending by XP
+      const sortedKeys = Object.keys(usersMap || {}).sort((a, b) => {
+        return (usersMap[b]?.xp || 0) - (usersMap[a]?.xp || 0);
+      });
+
+      let rank = 1;
+      sortedKeys.forEach(phone => {
+        if (window.currentUser && phone === window.currentUser.phone) return;
+        const u = usersMap[phone];
+        if (!u || !u.name) return;
+
+        let medal = "";
+        if (rank === 1) medal = `<span class="rank-medal">🥇</span>`;
+        else if (rank === 2) medal = `<span class="rank-medal">🥈</span>`;
+        else if (rank === 3) medal = `<span class="rank-medal">🥉</span>`;
+        else medal = `<span style="font-size:0.75rem; color:var(--text-muted); margin-right:6px;">#${rank}</span>`;
+        rank++;
+
+        const isOnline = u.status === 'online';
+        const xpCount = u.xp || 0;
+        const streakCount = u.streak || 0;
+
+        const item = document.createElement('div');
+        item.className = 'chat-item';
+        item.onclick = () => window.openPrivateChat(phone, u.displayName || u.name, u.dpUrl);
+        
+        let avatarStyle = u.dpUrl ? `background-image: url('${u.dpUrl}');` : "";
+        let avatarContent = u.dpUrl ? "" : (u.name || "उ").charAt(0);
+
+        item.innerHTML = `
+          <div class="item-avatar" style="${avatarStyle}">
+            ${avatarContent}
+            <div class="${isOnline ? 'online-indicator' : 'offline-indicator'}"></div>
+          </div>
+          <div class="item-info">
+            <div class="item-name">
+              <span>${medal}${u.displayName || u.name}</span>
+              <div style="display:flex; gap:4px; align-items:center;">
+                <span class="badge-streak">🔥 ${streakCount}</span>
+                <span class="badge-xp">⚡ ${xpCount} XP</span>
+              </div>
+            </div>
+            <div class="item-subtext">${isOnline ? 'ऑनलाइन 🟢' : 'ऑफ़लाइन ⚪'} | रैंक और मुताला प्रोफाइल</div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    };
+
+    // 4. "आज का सबक चाहिए" Request
+    window.requestTodayLesson = function() {
+      const subject = prompt("किस किताब या विषय का आज का सबक चाहिए?");
+      if (!subject) return;
+      const text = `[LESSON_REQUEST] साथी छात्र ${window.currentUser.name} को आज का सबक चाहिए: **${subject}**। कोई भी साथी कॉपी की फोटो शेयर करके मदद करे!`;
+      window.sendChatMessageWithText(text);
+      window.awardXP(window.currentUser.phone, 5, "Asked for Lesson");
+    };
+
+    // 5. 1-ऑन-1 क्विज़ चैलेंज (Duel)
+    window.sendQuizDuelChallenge = function() {
+      const q = prompt("क्विज़ का सवाल लिखें:");
+      if (!q) return;
+      const o1 = prompt("पहला विकल्प (Option 1):");
+      const o2 = prompt("दूसरा विकल्प (Option 2):");
+      const ans = prompt("सही विकल्प कौन सा है? (1 या 2 लिखें):");
+      if (!o1 || !o2 || !ans) return;
+
+      const payload = `[QUIZ_DUEL:${q}|${o1}|${o2}|${ans}|${window.currentUser.phone}]`;
+      window.sendChatMessageWithText(payload);
+    };
+
+    // 6. 15-मिनट ऑडियो तक़रार रूम (Timer Call)
+    window.startTakraarRoom = function() {
+      if (window.currentActiveRoomId === 'group') {
+        alert("तक़रार रूम शुरू करने के लिए किसी साथी छात्र की प्राइवेट चैट खोलें!");
+        return;
+      }
+      const callScreen = document.getElementById('call-screen');
+      if (callScreen) {
+        let timerDiv = document.getElementById('takraar-timer-display');
+        if (!timerDiv) {
+          timerDiv = document.createElement('div');
+          timerDiv.id = 'takraar-timer-display';
+          timerDiv.className = 'takraar-timer-banner';
+          callScreen.insertBefore(timerDiv, callScreen.firstChild);
+        }
+
+        let secondsRemaining = 15 * 60; // 15 mins
+        timerDiv.innerHTML = `<i class="fa-solid fa-clock"></i> तक़रार टाइमर: 15:00`;
+
+        const interval = setInterval(() => {
+          secondsRemaining--;
+          const m = Math.floor(secondsRemaining / 60);
+          const s = secondsRemaining % 60;
+          timerDiv.innerHTML = `<i class="fa-solid fa-clock"></i> तक़रार टाइमर: ${m}:${s < 10 ? '0' : ''}${s}`;
+
+          if (secondsRemaining <= 0 || !callScreen.classList.contains('active')) {
+            clearInterval(interval);
+            timerDiv.remove();
+            if (secondsRemaining <= 0) {
+              alert("15 मिनट का तक़रार सेशन पूरा हुआ! +50 XP!");
+              window.awardXP(window.currentUser.phone, 50, "Takraar Completed");
+              document.getElementById('btn-end-call').click();
+            }
+          }
+        }, 1000);
+      }
+      document.getElementById('btn-voice-call').click();
+    };
+
+    // Helper: Send Custom System Chat
+    window.sendChatMessageWithText = function(text) {
+      if (window.sendFirebaseMessage) {
+        window.sendFirebaseMessage(
+          window.currentActiveRoomId, 
+          window.currentUser.name, 
+          window.currentUser.phone, 
+          window.currentUser.displayName, 
+          window.currentUser.role, 
+          text, 
+          window.currentUser.location
+        );
+      }
+    };
+
+    // Intercept peer messages (Lesson request cards, Quiz duel cards, Star voting)
+    const originalAppend = window.appendMessage;
+    window.appendMessage = function(data, msgKey) {
+      if (!data || typeof data.text !== 'string') {
+        if (originalAppend) originalAppend(data, msgKey);
+        return;
+      }
+
+      // Check Lesson Request Card
+      if (data.text.startsWith('[LESSON_REQUEST]')) {
+        const desc = data.text.replace('[LESSON_REQUEST]', '');
+        data.text = `
+          <div class="peer-card">
+            <div style="font-weight:bold; color:#facc15; font-size:0.85rem;"><i class="fa-solid fa-book-open"></i> आज का सबक रिक्वेस्ट</div>
+            <div style="margin:4px 0; font-size:0.85rem;">${desc}</div>
+            <button class="peer-card-btn" onclick="document.getElementById('btn-attach').click()">
+              <i class="fa-solid fa-upload"></i> कॉपी की फोटो भेजें (+25 XP)
+            </button>
+            <button class="peer-card-btn" style="background:#f59e0b; margin-left:4px;" onclick="window.awardXP('${data.senderPhone}', 25); alert('आपने साथी को ⭐ स्टार और +25 XP दिए!');">
+              ⭐ शुक्रिया स्टार
+            </button>
+          </div>
+        `;
+      } 
+      // Check Quiz Duel Card
+      else if (data.text.startsWith('[QUIZ_DUEL:')) {
+        const parts = data.text.replace('[QUIZ_DUEL:', '').replace(']', '').split('|');
+        const [question, opt1, opt2, correctAns, challengerPhone] = parts;
+        data.text = `
+          <div class="peer-card quiz">
+            <div style="font-weight:bold; color:#c084fc; font-size:0.85rem;"><i class="fa-solid fa-bolt"></i> 1-ऑन-1 क्विज़ मुकाबला</div>
+            <div style="margin:6px 0; font-size:0.9rem; font-weight:600;">${question}</div>
+            <div style="display:flex; gap:6px; margin-top:6px;">
+              <button class="peer-card-btn" style="background:#202c33; border:1px solid #c084fc; flex:1;" onclick="window.checkQuizAnswer(1, '${correctAns}', '${challengerPhone}')">1. ${opt1}</button>
+              <button class="peer-card-btn" style="background:#202c33; border:1px solid #c084fc; flex:1;" onclick="window.checkQuizAnswer(2, '${correctAns}', '${challengerPhone}')">2. ${opt2}</button>
+            </div>
+          </div>
+        `;
+      }
+
+      if (originalAppend) originalAppend(data, msgKey);
+    };
+
+    window.checkQuizAnswer = function(chosen, correct, challengerPhone) {
+      if (String(chosen) === String(correct)) {
+        alert("माशाअल्लाह! बिल्कुल सही जवाब! 🎉 आपको +20 XP मिले!");
+        window.awardXP(window.currentUser.phone, 20, "Quiz Won");
+      } else {
+        alert("गलत जवाब! सही विकल्प " + correct + " था। बेहतर तैयारी करें!");
+      }
+    };
     
   </script>
 </body>
