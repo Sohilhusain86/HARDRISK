@@ -456,6 +456,130 @@
       margin: 1%;
       cursor: pointer;
     } 
+
+    /* --- Phase 3: Status, Book Exchange & Digital Pinboard Styles --- */
+    /* Status Stories Tray */
+    .status-tray-wrapper {
+      display: flex;
+      gap: 12px;
+      padding: 10px 14px;
+      overflow-x: auto;
+      background: #111b21;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      white-space: nowrap;
+    }
+    .status-circle-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      width: 56px;
+    }
+    .status-ring {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      padding: 2px;
+      border: 2px solid #00a884;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .status-ring.my-status { border: 2px dashed #8696a0; }
+    .status-avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      background-color: #202c33;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #fff;
+    }
+    .status-user-label {
+      font-size: 0.68rem;
+      color: #8696a0;
+      margin-top: 4px;
+      max-width: 54px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    /* Fullscreen Status Viewer */
+    .status-viewer-modal {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 99999;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px;
+    }
+    .status-viewer-modal.active { display: flex; }
+    .status-progress-bar {
+      height: 3px;
+      background: rgba(255,255,255,0.2);
+      width: 100%;
+      border-radius: 2px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .status-progress-fill {
+      height: 100%;
+      background: #00a884;
+      width: 0%;
+      transition: width 5s linear;
+    }
+
+    /* Exchange & Notice Modals & Cards */
+    .exchange-card {
+      background: #202c33;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      border-left: 4px solid #00a884;
+    }
+    .exchange-card.need { border-left-color: #ef4444; }
+    .exchange-tag {
+      font-size: 0.65rem;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+    .exchange-tag.need { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+    .exchange-tag.available { background: rgba(0, 168, 132, 0.2); color: #00a884; }
+    .exchange-tag.resolved { background: rgba(134, 150, 160, 0.2); color: #8696a0; }
+
+    /* Digital Notice Pinboard */
+    .pinboard-card {
+      background: #202c33;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-left: 4px solid #facc15;
+      position: relative;
+    }
+    .pinboard-badge {
+      background: rgba(250, 204, 21, 0.15);
+      color: #facc15;
+      font-size: 0.68rem;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      }
   </style>
 </head>
 <body>
@@ -3260,6 +3384,329 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       }
     };
     
+// =========================================================
+    // ⚡ PHASE 3: 24-HR STATUS, BOOK EXCHANGE & PINBOARD
+    // =========================================================
+
+    window.currentViewingStatus = null;
+    let statusTimer = null;
+
+    // 1. Inject Status Tray & Navigation Buttons
+    window.setupPhase3UI = function() {
+      const usersContainer = document.getElementById('users-dynamic-list');
+      if (!usersContainer || document.getElementById('status-tray')) return;
+
+      const headerDock = usersContainer.parentElement;
+
+      // Status Tray
+      const tray = document.createElement('div');
+      tray.id = 'status-tray';
+      tray.className = 'status-tray-wrapper';
+      tray.innerHTML = `
+        <div class="status-circle-item" onclick="window.promptCreateStatus()">
+          <div class="status-ring my-status">
+            <div class="status-avatar"><i class="fa-solid fa-plus"></i></div>
+          </div>
+          <div class="status-user-label">मेरा स्टेटस</div>
+        </div>
+        <div id="peer-statuses-dock" style="display:flex; gap:12px;"></div>
+      `;
+      headerDock.insertBefore(tray, document.getElementById('wa-filter-bar') || usersContainer);
+
+      // Add 'एक्सचेंज' and 'नोटिस बोर्ड' Filter Pills
+      const filterBar = document.getElementById('wa-filter-bar');
+      if (filterBar && !document.getElementById('pill-exchange')) {
+        const exPill = document.createElement('button');
+        exPill.id = 'pill-exchange';
+        exPill.className = 'filter-pill';
+        exPill.innerHTML = `📚 एक्सचेंज`;
+        exPill.onclick = () => window.openBookExchangeModal();
+        filterBar.appendChild(exPill);
+
+        const noticePill = document.createElement('button');
+        noticePill.id = 'pill-notice-board';
+        noticePill.className = 'filter-pill';
+        noticePill.innerHTML = `📌 नोटिस बोर्ड`;
+        noticePill.onclick = () => window.openNoticeBoardModal();
+        filterBar.appendChild(noticePill);
+      }
+    };
+
+    // 2. Status Logic (Create, Auto-Delete > 24 Hours, Views, Reply)
+    window.promptCreateStatus = function() {
+      const text = prompt("स्टेटस में क्या लिखना चाहते हैं? (किताब, सबक या पैगाम):");
+      if (!text) return;
+      const cleanPhone = window.currentUser.phone.replace(/[^0-9]/g, '');
+      set(ref(db, `statuses/${cleanPhone}`), {
+        senderPhone: cleanPhone,
+        senderName: window.currentUser.displayName || window.currentUser.name,
+        dpUrl: window.currentUser.dpUrl || '',
+        text: text,
+        timestamp: Date.now(),
+        viewers: {}
+      }).then(() => alert("माशाअल्लाह! आपका स्टेटस 24 घंटे के लिए पोस्ट हो गया।"));
+    };
+
+    onValue(ref(db, 'statuses'), snap => {
+      window.setupPhase3UI();
+      const peerDock = document.getElementById('peer-statuses-dock');
+      if (!peerDock) return;
+      peerDock.innerHTML = "";
+
+      const now = Date.now();
+      const data = snap.val() || {};
+
+      Object.keys(data).forEach(phone => {
+        const item = data[phone];
+        if (now - item.timestamp > 86400000) {
+          remove(ref(db, `statuses/${phone}`));
+          return;
+        }
+        const circle = document.createElement('div');
+        circle.className = 'status-circle-item';
+        circle.onclick = () => window.openStatusViewer(item);
+
+        let bgStyle = item.dpUrl ? `background-image: url('${item.dpUrl}');` : '';
+        let initial = item.dpUrl ? '' : (item.senderName || 'उ').charAt(0);
+
+        circle.innerHTML = `
+          <div class="status-ring">
+            <div class="status-avatar" style="${bgStyle}">${initial}</div>
+          </div>
+          <div class="status-user-label">${item.senderName}</div>
+        `;
+        peerDock.appendChild(circle);
+      });
+    });
+
+    window.openStatusViewer = function(statusData) {
+      window.currentViewingStatus = statusData;
+      const modal = document.getElementById('status-viewer');
+      const prog = document.getElementById('status-progress');
+      
+      document.getElementById('status-view-name').innerText = statusData.senderName;
+      document.getElementById('status-view-time').innerText = new Date(statusData.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      document.getElementById('status-view-body').innerText = statusData.text;
+      
+      const viewersList = Object.keys(statusData.viewers || {});
+      document.getElementById('status-viewers-count').innerHTML = `<i class="fa-solid fa-eye"></i> ${viewersList.length} ने देखा`;
+
+      modal.classList.add('active');
+      prog.style.width = '0%';
+      setTimeout(() => { prog.style.width = '100%'; }, 50);
+
+      const cleanPhone = window.currentUser.phone.replace(/[^0-9]/g, '');
+      if (cleanPhone !== statusData.senderPhone) {
+        update(ref(db, `statuses/${statusData.senderPhone}/viewers`), {
+          [cleanPhone]: window.currentUser.displayName || window.currentUser.name
+        });
+      }
+
+      clearTimeout(statusTimer);
+      statusTimer = setTimeout(() => { window.closeStatusViewer(); }, 5000);
+    };
+
+    window.closeStatusViewer = function() {
+      clearTimeout(statusTimer);
+      document.getElementById('status-viewer').classList.remove('active');
+      document.getElementById('status-progress').style.width = '0%';
+    };
+
+    window.replyToCurrentStatus = function() {
+      if (!window.currentViewingStatus) return;
+      const reply = prompt(`${window.currentViewingStatus.senderName} के स्टेटस का जवाब दें:`);
+      if (!reply) return;
+      window.closeStatusViewer();
+      const privateRoomId = [window.currentUser.phone, window.currentViewingStatus.senderPhone].sort().join('_');
+      window.sendFirebaseMessage(
+        privateRoomId, 
+        window.currentUser.name, 
+        window.currentUser.phone, 
+        window.currentUser.displayName, 
+        window.currentUser.role, 
+        `[STATUS_REPLY] ❝${window.currentViewingStatus.text}❞ ➔ ${reply}`, 
+        window.currentUser.location
+      );
+      alert("जवाब साथी के इनबॉक्स में भेज दिया गया!");
+    };
+
+    // 3. Book Exchange Logic
+    window.openBookExchangeModal = function() {
+      document.getElementById('exchange-modal').classList.add('active');
+      const listContainer = document.getElementById('exchange-cards-list');
+      
+      onValue(ref(db, 'book_exchange'), snap => {
+        listContainer.innerHTML = "";
+        const data = snap.val() || {};
+        const keys = Object.keys(data).reverse();
+
+        if (keys.length === 0) {
+          listContainer.innerHTML = "<p style='color:#8696a0; text-align:center;'>अभी कोई नोटिस नहीं है।</p>";
+          return;
+        }
+
+        keys.forEach(k => {
+          const item = data[k];
+          const isResolved = item.resolved === true;
+          const isOwner = item.senderPhone === window.currentUser.phone;
+
+          const card = document.createElement('div');
+          card.className = `exchange-card ${item.type}`;
+          card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <span class="exchange-tag ${isResolved ? 'resolved' : item.type}">
+                ${isResolved ? '✓ हल हो गया (Solved)' : (item.type === 'need' ? '📢 किताब चाहिए' : '📗 उपलब्ध है')}
+              </span>
+              ${isOwner && !isResolved ? `<button onclick="window.markExchangeResolved('${k}')" style="background:#00a884; border:none; color:#fff; font-size:0.68rem; padding:2px 6px; border-radius:4px; cursor:pointer;">हल हुआ मार्क करें</button>` : ''}
+            </div>
+            <div style="font-size:0.9rem; font-weight:bold; color:#e9edef; margin:4px 0;">${item.bookTitle}</div>
+            <div style="font-size:0.78rem; color:#8696a0; margin-bottom:6px;">${item.description}</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.05); padding-top:6px; font-size:0.72rem; color:#8696a0;">
+              <span>तालिब-ए-इल्म: <b style="color:#e9edef;">${item.senderName}</b></span>
+              <span onclick="window.openPrivateChat('${item.senderPhone}', '${item.senderName}', '')" style="color:#00a884; cursor:pointer; font-weight:bold;"><i class="fa-solid fa-comment-dots"></i> चैट करें</span>
+            </div>
+          `;
+          listContainer.appendChild(card);
+        });
+      });
+    };
+
+    window.postNewExchangePrompt = function() {
+      const type = confirm("क्या आपको किताब चाहिए? ('OK' = किताब चाहिए, 'Cancel' = मेरे पास उपलब्ध है)") ? 'need' : 'available';
+      const bookTitle = prompt("किताब या गाइड का नाम लिखें:");
+      if (!bookTitle) return;
+      const desc = prompt("तफ़सील (कंडीशन या ज़रूरत की वजह):") || "राब्ता करें";
+
+      push(ref(db, 'book_exchange'), {
+        type: type,
+        bookTitle: bookTitle,
+        description: desc,
+        senderName: window.currentUser.displayName || window.currentUser.name,
+        senderPhone: window.currentUser.phone.replace(/[^0-9]/g, ''),
+        timestamp: Date.now(),
+        resolved: false
+      }).then(() => alert("नोटिस बोर्ड पर पोस्ट हो गया!"));
+    };
+
+    window.markExchangeResolved = function(id) {
+      update(ref(db, `book_exchange/${id}`), { resolved: true });
+    };
+
+    // 4. Digital Class Notice Board (Pinboard Logic)
+    window.openNoticeBoardModal = function() {
+      document.getElementById('notice-board-modal').classList.add('active');
+      const listContainer = document.getElementById('notice-board-list');
+
+      onValue(ref(db, 'class_pinboard'), snap => {
+        listContainer.innerHTML = "";
+        const data = snap.val() || {};
+        const keys = Object.keys(data).reverse();
+
+        if (keys.length === 0) {
+          listContainer.innerHTML = "<p style='color:#8696a0; text-align:center;'>अभी कोई आधिकारिक नोटिस जारी नहीं हुआ है।</p>";
+          return;
+        }
+
+        keys.forEach(k => {
+          const n = data[k];
+          const isAdmin = window.currentUser?.role === 'admin';
+          const card = document.createElement('div');
+          card.className = 'pinboard-card';
+          card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span class="pinboard-badge"><i class="fa-solid fa-thumbtack"></i> ${n.category || 'आधिकारिक सूचना'}</span>
+              <small style="color:#8696a0; font-size:0.68rem;">${new Date(n.timestamp).toLocaleDateString()} ${new Date(n.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</small>
+            </div>
+            <div style="font-weight:bold; color:#e9edef; font-size:0.92rem; margin-bottom:4px;">${n.title}</div>
+            <div style="color:#cbd5e1; font-size:0.82rem; line-height:1.4; white-space:pre-wrap;">${n.content}</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; border-top:1px solid rgba(255,255,255,0.06); padding-top:6px;">
+              <small style="color:#8696a0; font-size:0.7rem;">जारीकर्ता: <b style="color:#facc15;">${n.senderName}</b></small>
+              ${isAdmin ? `<button onclick="window.deleteClassNotice('${k}')" style="background:#ef4444; border:none; color:#fff; border-radius:4px; font-size:0.65rem; padding:2px 6px; cursor:pointer;"><i class="fa-solid fa-trash"></i> हटाएँ</button>` : ''}
+            </div>
+          `;
+          listContainer.appendChild(card);
+        });
+      });
+    };
+
+    window.postClassNoticePrompt = function() {
+      const title = prompt("नोटिस का शीर्षक (Title) लिखें (जैसे: इम्तिहान ऐलान, छुट्टी की सूचना):");
+      if (!title) return;
+      const content = prompt("नोटिस का पूरा विवरण लिखें:");
+      if (!content) return;
+      const cat = prompt("कैटिगरी लिखें (जैसे: परीक्षा, छुट्टी, मदरसा ऐलान, ज़रूरी):") || "ज़रूरी";
+
+      push(ref(db, 'class_pinboard'), {
+        title: title,
+        content: content,
+        category: cat,
+        senderName: window.currentUser.displayName || window.currentUser.name,
+        senderPhone: window.currentUser.phone.replace(/[^0-9]/g, ''),
+        timestamp: Date.now()
+      }).then(() => alert("आधिकारिक नोटिस पिनबोर्ड पर चस्पाँ कर दिया गया!"));
+    };
+
+    window.deleteClassNotice = function(id) {
+      if (confirm("क्या आप वाकई इस नोटिस को हटाना चाहते हैं?")) {
+        remove(ref(db, `class_pinboard/${id}`));
+      }
+    };
+
   </script>
+
+<!-- 🟢 Status Viewer Modal -->
+  <div id="status-viewer" class="status-viewer-modal">
+    <div>
+      <div class="status-progress-bar"><div id="status-progress" class="status-progress-fill"></div></div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div id="status-view-avatar" style="width:36px; height:36px; border-radius:50%; background:#202c33; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold;"></div>
+          <div>
+            <div id="status-view-name" style="color:#fff; font-size:0.85rem; font-weight:bold;"></div>
+            <div id="status-view-time" style="color:#8696a0; font-size:0.7rem;"></div>
+          </div>
+        </div>
+        <button onclick="window.closeStatusViewer()" style="background:transparent; border:none; color:#fff; font-size:1.5rem; cursor:pointer;">&times;</button>
+      </div>
+    </div>
+    
+    <div id="status-view-body" style="text-align:center; color:#fff; font-size:1.2rem; padding:20px; word-break:break-word;"></div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span id="status-viewers-count" style="color:#8696a0; font-size:0.75rem;"><i class="fa-solid fa-eye"></i> 0</span>
+      <button id="btn-status-reply" class="peer-card-btn" onclick="window.replyToCurrentStatus()">
+        <i class="fa-solid fa-reply"></i> जवाब दें
+      </button>
+    </div>
+  </div>
+
+  <!-- 📚 Book Exchange Modal -->
+  <div id="exchange-modal" class="wa-modal-overlay">
+    <div class="wa-modal-content" style="max-height:85vh;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+        <h3 style="color:#e9edef; margin:0; font-size:1rem;"><i class="fa-solid fa-book-bookmark" style="color:#00a884;"></i> किताब व कॉपी एक्सचेंज</h3>
+        <button onclick="document.getElementById('exchange-modal').classList.remove('active')" style="background:transparent; border:none; color:#8696a0; font-size:1.4rem; cursor:pointer;">&times;</button>
+      </div>
+      <button class="peer-card-btn" style="width:100%; margin-bottom:12px;" onclick="window.postNewExchangePrompt()">
+        <i class="fa-solid fa-plus"></i> नया नोटिस पोस्ट करें (चाहिए / उपलब्ध है)
+      </button>
+      <div id="exchange-cards-list" style="overflow-y:auto; max-height:55vh;"></div>
+    </div>
+  </div>
+
+  <!-- 📌 Digital Notice Pinboard Modal -->
+  <div id="notice-board-modal" class="wa-modal-overlay">
+    <div class="wa-modal-content" style="max-height:85vh;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+        <h3 style="color:#e9edef; margin:0; font-size:1rem;"><i class="fa-solid fa-thumbtack" style="color:#facc15;"></i> डिजिटल क्लास नोटिस बोर्ड</h3>
+        <button onclick="document.getElementById('notice-board-modal').classList.remove('active')" style="background:transparent; border:none; color:#8696a0; font-size:1.4rem; cursor:pointer;">&times;</button>
+      </div>
+      <button id="btn-create-notice" class="peer-card-btn" style="width:100%; margin-bottom:12px; background:#d97706;" onclick="window.postClassNoticePrompt()">
+        <i class="fa-solid fa-bullhorn"></i> नया आधिकारिक नोटिस जारी करें
+      </button>
+      <div id="notice-board-list" style="overflow-y:auto; max-height:55vh;"></div>
+    </div>
+  </div>
+
 </body>
 </html>
