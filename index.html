@@ -2745,44 +2745,62 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       }
     };
 
-    // Intercept peer messages (Lesson request cards, Quiz duel cards, Star voting)
+    // Intercept peer messages (Safe Rendering without breaking Admin Pin/Edit buttons)
     const originalAppend = window.appendMessage;
     window.appendMessage = function(data, msgKey) {
-      if (!data || typeof data.text !== 'string') {
-        if (originalAppend) originalAppend(data, msgKey);
-        return;
-      }
+      if (!data) return;
 
-      // Check Lesson Request Card
-      if (data.text.startsWith('[LESSON_REQUEST]')) {
-        const desc = data.text.replace('[LESSON_REQUEST]', '');
-        data.text = `
-          <div class="peer-card">
-            <div style="font-weight:bold; color:#facc15; font-size:0.85rem;"><i class="fa-solid fa-book-open"></i> आज का सबक रिक्वेस्ट</div>
-            <div style="margin:4px 0; font-size:0.85rem;">${desc}</div>
-            <button class="peer-card-btn" onclick="document.getElementById('btn-attach').click()">
-              <i class="fa-solid fa-upload"></i> कॉपी की फोटो भेजें (+25 XP)
-            </button>
-            <button class="peer-card-btn" style="background:#f59e0b; margin-left:4px;" onclick="window.awardXP('${data.senderPhone}', 25); alert('आपने साथी को ⭐ स्टार और +25 XP दिए!');">
-              ⭐ शुक्रिया स्टार
-            </button>
-          </div>
-        `;
-      } 
-      // Check Quiz Duel Card
-      else if (data.text.startsWith('[QUIZ_DUEL:')) {
-        const parts = data.text.replace('[QUIZ_DUEL:', '').replace(']', '').split('|');
-        const [question, opt1, opt2, correctAns, challengerPhone] = parts;
-        data.text = `
-          <div class="peer-card quiz">
-            <div style="font-weight:bold; color:#c084fc; font-size:0.85rem;"><i class="fa-solid fa-bolt"></i> 1-ऑन-1 क्विज़ मुकाबला</div>
-            <div style="margin:6px 0; font-size:0.9rem; font-weight:600;">${question}</div>
-            <div style="display:flex; gap:6px; margin-top:6px;">
-              <button class="peer-card-btn" style="background:#202c33; border:1px solid #c084fc; flex:1;" onclick="window.checkQuizAnswer(1, '${correctAns}', '${challengerPhone}')">1. ${opt1}</button>
-              <button class="peer-card-btn" style="background:#202c33; border:1px solid #c084fc; flex:1;" onclick="window.checkQuizAnswer(2, '${correctAns}', '${challengerPhone}')">2. ${opt2}</button>
-            </div>
-          </div>
-        `;
+      const isLessonReq = typeof data.text === 'string' && data.text.startsWith('[LESSON_REQUEST]');
+      const isQuizDuel = typeof data.text === 'string' && data.text.startsWith('[QUIZ_DUEL:');
+
+      if (isLessonReq || isQuizDuel) {
+        // 1. एडमिन बटन्स को टूटने से बचाने के लिए सेफ टेक्स्ट के साथ मैसेज बनाएं
+        const safeData = { 
+          ...data, 
+          text: isLessonReq ? "📖 आज का सबक रिक्वेस्ट" : "⚡ 1-ऑन-1 क्विज़ मुकाबला" 
+        };
+        
+        if (originalAppend) originalAppend(safeData, msgKey);
+
+        // 2. बबल बनने के तुरंत बाद उसके अंदर कार्ड को खूबसूरती से सेट करें
+        const bubble = document.getElementById(`msg-${msgKey}`);
+        if (bubble && bubble.children[1]) {
+          if (isLessonReq) {
+            const desc = data.text.replace('[LESSON_REQUEST]', '').trim();
+            bubble.children[1].innerHTML = `
+              <div class="peer-card" style="width:100%; box-sizing:border-box;">
+                <div style="font-weight:bold; color:#facc15; font-size:0.85rem; margin-bottom:4px;">
+                  <i class="fa-solid fa-book-open"></i> आज का सबक रिक्वेस्ट
+                </div>
+                <div style="margin:4px 0 8px 0; font-size:0.88rem; color:#e9edef; line-height:1.4;">${desc}</div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;">
+                  <button class="peer-card-btn" onclick="document.getElementById('btn-attach').click()">
+                    <i class="fa-solid fa-upload"></i> कॉपी की फोटो भेजें (+25 XP)
+                  </button>
+                  <button class="peer-card-btn" style="background:#f59e0b;" onclick="window.awardXP('${data.senderPhone}', 25); alert('आपने साथी को ⭐ स्टार और +25 XP दिए!');">
+                    ⭐ शुक्रिया स्टार
+                  </button>
+                </div>
+              </div>
+            `;
+          } else if (isQuizDuel) {
+            const parts = data.text.replace('[QUIZ_DUEL:', '').replace(']', '').split('|');
+            const [question, opt1, opt2, correctAns, challengerPhone] = parts;
+            bubble.children[1].innerHTML = `
+              <div class="peer-card quiz" style="width:100%; box-sizing:border-box;">
+                <div style="font-weight:bold; color:#c084fc; font-size:0.85rem; margin-bottom:4px;">
+                  <i class="fa-solid fa-bolt"></i> 1-ऑन-1 क्विज़ मुकाबला
+                </div>
+                <div style="margin:6px 0; font-size:0.9rem; font-weight:600; color:#e9edef;">${question}</div>
+                <div style="display:flex; gap:6px; margin-top:6px;">
+                  <button class="peer-card-btn" style="background:#202c33; border:1px solid #c084fc; flex:1;" onclick="window.checkQuizAnswer(1, '${correctAns}', '${challengerPhone}')">1. ${opt1}</button>
+                  <button class="peer-card-btn" style="background:#202c33; border:1px solid #c084fc; flex:1;" onclick="window.checkQuizAnswer(2, '${correctAns}', '${challengerPhone}')">2. ${opt2}</button>
+                </div>
+              </div>
+            `;
+          }
+        }
+        return;
       }
 
       if (originalAppend) originalAppend(data, msgKey);
