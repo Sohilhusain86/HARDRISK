@@ -77,7 +77,7 @@
     .header-user-info { display: flex; align-items: center; gap: 10px; min-width: 0; }
 
     .header-avatar, .item-avatar {
-      width: 48px; height: 48px; border-radius: 50%;
+      width: 46px; height: 46px; border-radius: 50%;
       background: #2a3942; color: #00a884; display: flex; flex-shrink: 0;
       align-items: center; justify-content: center; font-size: 1.2rem;
       position: relative; overflow: hidden; background-size: cover; background-position: center;
@@ -183,18 +183,18 @@
 
     #typing-indicator { display: none; padding: 4px 14px; font-size: 0.8rem; color: #00a884; font-style: italic; background: #202c33; }
 
-    /* 🚨 FIXED CHAT DOCK FOR MOBILE (FLEXBOX FIX) 🚨 */
+    /* 🚨 FIXED CHAT DOCK FOR ALL MOBILES (NO BUTTONS HIDDEN) 🚨 */
     .chat-bottom-dock { 
       background: #202c33; padding: 8px 10px; display: flex; align-items: center; gap: 6px; 
-      flex-wrap: nowrap; /* Prevent buttons from hiding */
+      flex-wrap: nowrap; 
     }
     .chat-input-box { 
-      flex: 1 1 auto; /* Allow box to shrink */
-      min-width: 0; /* Flexbox trick to prevent overflow */
+      flex: 1 1 auto; 
+      min-width: 0; 
       background: #2a3942; border: none; border-radius: 25px; padding: 10px 16px; color: #fff; font-family: 'Mukta', sans-serif; font-size: 0.95rem; outline: none; 
     }
     .btn-dock-action { 
-      flex: 0 0 auto; /* Stop buttons from shrinking */
+      flex: 0 0 auto; 
       background: none; border: none; color: var(--text-muted); font-size: 1.25rem; cursor: pointer; padding: 6px; 
     }
     .btn-dock-action:hover { color: #00a884; }
@@ -207,7 +207,7 @@
       width: 42px; height: 42px; background: var(--deep-green); color: #fff; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; 
     }
 
-    .login-overlay { position: absolute; inset: 0; background: #111b21; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; overflow-y: auto; }
+    .login-overlay { position: absolute; inset: 0; background: #111b21; z-index: 100; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; overflow-y: auto; }
     .login-card { background: #202c33; border-radius: 20px; padding: 24px 20px; width: 100%; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
     .dp-upload-box { width: 80px; height: 80px; border-radius: 50%; background: #2a3942; border: 2px dashed #00a884; margin: 0 auto 14px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden; background-size: cover; background-position: center; color: var(--text-muted); font-size: 1.5rem; }
     .login-input { width: 100%; background: #111b21; border: 1px solid #00a884; border-radius: 12px; padding: 11px 14px; color: #fff; font-family: 'Mukta', 'Poppins', sans-serif; font-size: 0.95rem; margin-bottom: 12px; outline: none; text-align: center; }
@@ -239,6 +239,7 @@
 
   <div class="app-screen">
     
+    <!-- Realistic SMS Simulation Popup -->
     <div class="sms-popup-overlay" id="sms-popup">
       <div class="sms-popup-card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -251,7 +252,7 @@
     </div>
 
     <!-- Login Screen -->
-    <div class="login-overlay" id="login-screen" style="display: none;">
+    <div class="login-overlay" id="login-screen">
       <div class="login-card">
         <h2 style="color: #00a884; margin-bottom: 6px; font-size: 1.4rem;">जमात ऊला अलिफ़ मैसेंजर</h2>
         <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 14px;">अपनी फोटो (DP) लगाएं और OTP से लॉगिन करें</p>
@@ -510,7 +511,7 @@
      </footer>
     </div>
     
-    <!-- VOICE CALL MODAL SCREEN -->
+    <!-- 📞 REAL-TIME INCOMING & OUTGOING CALL MODAL -->
     <div class="call-overlay" id="call-screen">
       <div class="call-avatar-large" id="call-target-avatar"><i class="fa-solid fa-user"></i></div>
       <h2 id="call-status-text" style="color: #fff; margin-bottom: 6px;">कॉल हो रही है...</h2>
@@ -563,9 +564,11 @@
     let generatedOtp = "";
     let otpStepSent = false;
 
+    // WebRTC Calling Variables
     let peerConnection = null;
     let localStream = null;
     let currentCallRef = null;
+    window.activeCallRoomId = null;
     const rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
     window.switchTab = function(tabName) {
@@ -578,41 +581,40 @@
       document.getElementById(`tab-content-${tabName}`).style.display = 'block';
     };
 
-    // 🚀 NEW FEATURE: Ask Mic Permission Promptly & SAFELY
-    window.askForMicPermission = async function() {
-      try {
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          stream.getTracks().forEach(track => track.stop());
-        }
-      } catch (err) {
-        console.warn("माइक की परमिशन नहीं मिली या ब्राउज़र सपोर्ट नहीं करता।");
+    // 🎤 SAFE NON-BLOCKING MIC PERMISSION
+    window.askForMicPermission = function() {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+          .then(stream => stream.getTracks().forEach(t => t.stop()))
+          .catch(() => {});
       }
     };
 
     function updateUserUI() {
       const myAvatar = document.getElementById('my-avatar');
-      if (window.currentUser.dpUrl) {
+      if (window.currentUser && window.currentUser.dpUrl) {
         myAvatar.textContent = "";
         myAvatar.style.backgroundImage = `url('${window.currentUser.dpUrl}')`;
-      } else {
+      } else if (window.currentUser) {
         myAvatar.textContent = (window.currentUser.name || "उ").charAt(0);
       }
-      document.getElementById('my-display-name').textContent = window.currentUser.displayName || window.currentUser.name;
-      if (window.currentUser.role === 'admin') {
+      document.getElementById('my-display-name').textContent = window.currentUser.displayName || window.currentUser.name || "जमात ऊला अलिफ़";
+      if (window.currentUser && window.currentUser.role === 'admin') {
         document.getElementById('btn-admin-crown').style.display = "block";
       }
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    // 🚀 ULTRA-STABLE APP INITIALIZER (PREVENTS FREEZING)
+    function initApp() {
       const savedUser = localStorage.getItem('jamia_chat_saved_user');
       if (savedUser) {
         try {
           window.currentUser = JSON.parse(savedUser);
-          document.getElementById('login-screen').style.display = "none";
+          const loginScreen = document.getElementById('login-screen');
+          if (loginScreen) loginScreen.style.display = "none";
           updateUserUI();
           requestNotificationAccess();
-          window.askForMicPermission(); 
+          window.askForMicPermission();
           if (window.registerUserFirebase) {
             window.registerUserFirebase(window.currentUser);
           }
@@ -620,12 +622,20 @@
           listenForIncomingCalls();
         } catch(e) {
           localStorage.removeItem('jamia_chat_saved_user');
-          document.getElementById('login-screen').style.display = "flex";
+          const loginScreen = document.getElementById('login-screen');
+          if (loginScreen) loginScreen.style.display = "flex";
         }
       } else {
-        document.getElementById('login-screen').style.display = "flex";
+        const loginScreen = document.getElementById('login-screen');
+        if (loginScreen) loginScreen.style.display = "flex";
       }
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
 
     window.logoutApp = function() {
       if (confirm("क्या आप वाकई लॉगआउट करना चाहते हैं?")) {
@@ -666,7 +676,6 @@
       });
     }
 
-    // 🚀 NEW FEATURE: Change DP Later
     const dpUpdateInput = document.getElementById('dp-update-file');
     if (dpUpdateInput) {
       dpUpdateInput.addEventListener('change', async (e) => {
@@ -833,7 +842,6 @@
       updateUserUI();
       document.getElementById('login-screen').style.display = "none";
       requestNotificationAccess();
-      
       window.askForMicPermission(); 
       
       if (window.registerUserFirebase) {
@@ -844,36 +852,38 @@
     });
 
     function connectScaleDrone() {
-      // 🚀 फिक्स: अगर ScaleDrone लोड नहीं हुआ (खराब नेट की वजह से), तो ऐप क्रैश नहीं होगी।
       if (typeof ScaleDrone === 'undefined') {
-        console.warn("ScaleDrone script failed to load. Typing indicator will not work.");
+        console.warn("ScaleDrone script skipped");
         return;
       }
-      drone = new ScaleDrone(window.CHANNEL_ID, {
-        data: { name: window.currentUser.name, phone: window.currentUser.phone, role: window.currentUser.role }
-      });
-
-      drone.on('open', error => {
-        if (error) return console.error(error);
-        droneRoom = drone.subscribe('observable-jamia-online-room');
-
-        droneRoom.on('data', (data) => {
-          if (data.type === 'typing' && data.roomId === window.currentActiveRoomId && data.senderPhone !== window.currentUser.phone) {
-            const typingDiv = document.getElementById('typing-indicator');
-            typingDiv.textContent = `${data.sender} टाइप कर रहे हैं...`;
-            typingDiv.style.display = 'block';
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(() => { typingDiv.style.display = 'none'; }, 1500);
-          }
-          else if (data.type === 'ban' && (data.targetPhone === window.currentUser.phone)) {
-            alert("आपको एडमिन ने ब्लॉक कर दिया है।");
-            localStorage.removeItem('jamia_chat_saved_user');
-            location.reload();
-          }
+      try {
+        drone = new ScaleDrone(window.CHANNEL_ID, {
+          data: { name: window.currentUser.name, phone: window.currentUser.phone, role: window.currentUser.role }
         });
-      });
+
+        drone.on('open', error => {
+          if (error) return;
+          droneRoom = drone.subscribe('observable-jamia-online-room');
+
+          droneRoom.on('data', (data) => {
+            if (data.type === 'typing' && data.roomId === window.currentActiveRoomId && data.senderPhone !== window.currentUser.phone) {
+              const typingDiv = document.getElementById('typing-indicator');
+              typingDiv.textContent = `${data.sender} टाइप कर रहे हैं...`;
+              typingDiv.style.display = 'block';
+              clearTimeout(typingTimer);
+              typingTimer = setTimeout(() => { typingDiv.style.display = 'none'; }, 1500);
+            }
+            else if (data.type === 'ban' && (data.targetPhone === window.currentUser.phone)) {
+              alert("आपको एडमिन ने ब्लॉक कर दिया है।");
+              localStorage.removeItem('jamia_chat_saved_user');
+              location.reload();
+            }
+          });
+        });
+      } catch(e){}
     }
 
+    // 🚀 SAFE USER DIRECTORY RENDERING
     window.renderAllUsersList = function(usersMap) {
       const container = document.getElementById('users-dynamic-list');
       if (!container) return;
@@ -883,7 +893,7 @@
       let count = 0;
 
       keys.forEach(phone => {
-        if (phone === window.currentUser.phone) return;
+        if (window.currentUser && phone === window.currentUser.phone) return;
         const u = usersMap[phone];
         if (!u || !u.name) return;
 
@@ -904,7 +914,7 @@
         item.onclick = () => window.openPrivateChat(phone, u.displayName || u.name, u.dpUrl);
         
         let avatarStyle = "";
-        let avatarContent = u.name.charAt(0);
+        let avatarContent = (u.name || "उ").charAt(0);
         if (u.dpUrl) {
           avatarStyle = `background-image: url('${u.dpUrl}');`;
           avatarContent = "";
@@ -943,13 +953,7 @@
       }
       
       document.getElementById('pinned-notice-wrapper').style.display = (roomId === 'group') ? 'flex' : 'none';
-      
-      const voiceCallBtn = document.getElementById('btn-voice-call');
-      if (roomId !== 'group') {
-        voiceCallBtn.style.display = 'block';
-      } else {
-        voiceCallBtn.style.display = 'none';
-      }
+      document.getElementById('btn-voice-call').style.display = (roomId !== 'group') ? 'block' : 'none';
 
       document.getElementById('screen-home').classList.remove('view-active');
       document.getElementById('screen-home').classList.add('view-hidden');
@@ -958,7 +962,6 @@
 
       document.getElementById('chat-stream').innerHTML = "";
 
-      // 🚀 NEW FEATURE: Load Offline Chat (Cache)
       if (roomId === 'group') {
         const cached = localStorage.getItem('offline_group_chats');
         if(cached) {
@@ -988,11 +991,12 @@
       document.getElementById('screen-home').classList.add('view-active');
     };
 
-    // 🚀 FIXED FEATURE: Calling System WebRTC 
+    // =========================================================
+    // 📞 100% REAL-TIME BIDIRECTIONAL WEBRTC CALLING SYSTEM
+    // =========================================================
     const callScreen = document.getElementById('call-screen');
     const callStatusText = document.getElementById('call-status-text');
     const callTargetName = document.getElementById('call-target-name');
-    const callTargetAvatar = document.getElementById('call-target-avatar');
     const btnAcceptCall = document.getElementById('btn-accept-call');
     const btnEndCall = document.getElementById('btn-end-call');
     const remoteAudio = document.getElementById('remote-audio');
@@ -1008,8 +1012,8 @@
 
       peerConnection.onicecandidate = (event) => {
         if (event.candidate && currentCallRef) {
-          // 🚀 फिक्स: कॉलिंग कैंडिडेट सही व्यक्ति को भेजने का सटीक तरीका
-          push(ref(db, `${currentCallRef}/${window.callRole}Candidates`), event.candidate.toJSON());
+          const type = (window.callRole === 'caller') ? 'callerCandidates' : 'calleeCandidates';
+          push(ref(db, `${currentCallRef}/${type}`), event.candidate.toJSON());
         }
       };
 
@@ -1019,13 +1023,14 @@
     async function getLocalAudioStream() {
       if (!localStream) {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-           throw new Error("आपका ब्राउज़र कॉलिंग सपोर्ट नहीं करता।");
+           throw new Error("माइक सपोर्ट नहीं करता।");
         }
         localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
       }
       return localStream;
     }
 
+    // CALLER: When user presses voice call button
     btnVoiceCall.addEventListener('click', async () => {
       const otherPhone = window.currentActiveRoomId.replace('group', '').replace('_', '').replace(window.currentUser.phone, '');
       if (!otherPhone) return;
@@ -1036,7 +1041,7 @@
       btnAcceptCall.style.display = 'none';
 
       try {
-        window.callRole = 'caller'; // Set role dynamically
+        window.callRole = 'caller';
         currentCallRef = `calls/${window.currentActiveRoomId}`;
         const callRef = ref(db, currentCallRef);
 
@@ -1049,10 +1054,14 @@
 
         await set(callRef, {
           offer: { type: offer.type, sdp: offer.sdp },
-          caller: window.currentUser.phone,
-          status: 'ringing'
+          callerPhone: window.currentUser.phone,
+          callerName: window.currentUser.displayName || window.currentUser.name,
+          calleePhone: otherPhone,
+          status: 'ringing',
+          createdAt: Date.now()
         });
 
+        // Listen for answer
         onValue(ref(db, `${currentCallRef}/answer`), async (snapshot) => {
           const answer = snapshot.val();
           if (answer && !pc.currentRemoteDescription) {
@@ -1061,84 +1070,128 @@
           }
         });
 
+        // Listen for callee ICE candidates
         onChildAdded(ref(db, `${currentCallRef}/calleeCandidates`), (snapshot) => {
           if (pc.remoteDescription) {
             pc.addIceCandidate(new RTCIceCandidate(snapshot.val())).catch(()=>{});
           }
         });
+
+        // Listen for call ended status
+        onValue(ref(db, `${currentCallRef}/status`), (snap) => {
+          if (snap.val() === 'ended') cleanupCall();
+        });
+
       } catch (err) {
-        alert("कॉल करने में त्रुटि या माइक परमिशन नहीं: " + err.message);
-        callScreen.classList.remove('active');
+        alert("कॉल करने में समस्या: " + err.message);
+        cleanupCall();
       }
     });
 
+    // CALLEE: Listen for incoming calls in real-time
     function listenForIncomingCalls() {
       const callsRef = ref(db, 'calls');
       onValue(callsRef, (snapshot) => {
         const calls = snapshot.val() || {};
-        Object.keys(calls).forEach(roomId => {
-          if (roomId.includes(window.currentUser.phone)) {
-            const callData = calls[roomId];
-            if (callData && callData.status === 'ringing' && callData.caller !== window.currentUser.phone && !currentCallRef) {
-              currentCallRef = `calls/${roomId}`;
-              callScreen.classList.add('active');
-              callStatusText.textContent = "इनकमिंग वॉइस कॉल...";
-              callTargetName.textContent = "कॉल आ रही है...";
-              btnAcceptCall.style.display = 'inline-block';
+        for (const roomId of Object.keys(calls)) {
+          const callData = calls[roomId];
+          if (!callData) continue;
+
+          // Check if this call is meant for ME
+          const isForMe = (callData.calleePhone === window.currentUser.phone) || 
+                          (roomId.includes(window.currentUser.phone) && callData.callerPhone !== window.currentUser.phone);
+
+          if (isForMe) {
+            if (callData.status === 'ringing') {
+              if (!currentCallRef || currentCallRef !== `calls/${roomId}`) {
+                currentCallRef = `calls/${roomId}`;
+                window.incomingCallData = callData;
+
+                callStatusText.textContent = "इनकमिंग वॉइस कॉल...";
+                callTargetName.textContent = callData.callerName || "साथी छात्र";
+                btnAcceptCall.style.display = 'inline-block';
+                callScreen.classList.add('active');
+                playBeep();
+              }
+              return;
+            } else if (callData.status === 'ended') {
+              if (currentCallRef === `calls/${roomId}`) cleanupCall();
             }
           }
-        });
+        }
+
+        if (currentCallRef && !calls[currentCallRef.replace('calls/', '')]) {
+          cleanupCall();
+        }
       });
     }
 
+    // CALLEE ACCEPTS CALL
     btnAcceptCall.addEventListener('click', async () => {
       btnAcceptCall.style.display = 'none';
       callStatusText.textContent = "कॉल कनेक्ट हो रही है...";
       try {
-        window.callRole = 'callee'; // Set role dynamically
+        window.callRole = 'callee';
         const pc = startPeerConnection();
         const stream = await getLocalAudioStream();
         stream.getTracks().forEach(track => pc.addTrack(track, stream));
 
         const callRef = ref(db, currentCallRef);
-        onValue(ref(db, `${currentCallRef}/offer`), async (snapshot) => {
-          const offer = snapshot.val();
-          if (offer && !pc.currentRemoteDescription) {
-            await pc.setRemoteDescription(new RTCSessionDescription(offer));
-            const answer = await pc.createAnswer();
-            await pc.setLocalDescription(answer);
-            await update(callRef, { answer: { type: answer.type, sdp: answer.sdp }, status: 'connected' });
-            callStatusText.textContent = "बातचीत शुरू (Connected)";
-          }
-        }, { onlyOnce: true });
+        const snap = await get(ref(db, `${currentCallRef}/offer`));
+        const offer = snap.val();
 
+        if (offer && !pc.currentRemoteDescription) {
+          await pc.setRemoteDescription(new RTCSessionDescription(offer));
+          const answer = await pc.createAnswer();
+          await pc.setLocalDescription(answer);
+          await update(callRef, { answer: { type: answer.type, sdp: answer.sdp }, status: 'connected' });
+          callStatusText.textContent = "बातचीत शुरू (Connected)";
+        }
+
+        // Listen for caller candidates
         onChildAdded(ref(db, `${currentCallRef}/callerCandidates`), (snapshot) => {
           if (pc.remoteDescription) {
             pc.addIceCandidate(new RTCIceCandidate(snapshot.val())).catch(()=>{});
           }
         });
+
+        // Listen if caller ends call
+        onValue(ref(db, `${currentCallRef}/status`), (snap) => {
+          if (snap.val() === 'ended') cleanupCall();
+        });
+
       } catch (err) { 
-        alert("कॉल एरर: " + err.message); 
-        callScreen.classList.remove('active');
+        alert("कॉल उठाने में समस्या: " + err.message); 
+        cleanupCall();
       }
     });
 
+    // END CALL (BOTH CALLER & CALLEE)
     btnEndCall.addEventListener('click', () => {
       if (currentCallRef) {
-        remove(ref(db, currentCallRef));
+        update(ref(db, currentCallRef), { status: 'ended' }).catch(()=>{});
+        setTimeout(() => {
+          remove(ref(db, currentCallRef)).catch(()=>{});
+        }, 500);
       }
+      cleanupCall();
+    });
+
+    function cleanupCall() {
       if (peerConnection) {
-        peerConnection.close();
+        try { peerConnection.close(); } catch(e){}
         peerConnection = null;
       }
       if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
+        try { localStream.getTracks().forEach(track => track.stop()); } catch(e){}
         localStream = null;
       }
       currentCallRef = null;
+      window.callRole = null;
       callScreen.classList.remove('active');
+      btnAcceptCall.style.display = 'none';
       callStatusText.textContent = "कॉल समाप्त";
-    });
+    }
 
     const chatStream = document.getElementById('chat-stream');
     const msgInput = document.getElementById('msg-input');
@@ -1214,6 +1267,7 @@
         return;
       }
 
+      // AI Content Moderation in Group Chat
       if (currentRoom === 'group' && senderRole !== 'admin' && sentMsgKey) {
         (async () => {
           try {
@@ -1259,7 +1313,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
               });
             }
           } catch (err) {
-            console.warn("Background AI Moderation error:", err);
+            console.warn("Moderation error:", err);
           }
         })();
       }
@@ -1267,14 +1321,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
 
     sendBtn.addEventListener('click', sendChatMessage);
     msgInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendChatMessage(); });
-
-    async function uploadToCloudinary(file) {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', window.UPLOAD_PRESET);
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${window.CLOUD_NAME}/auto/upload`, { method: 'POST', body: formData });
-      return await res.json();
-    }
 
     attachBtn.addEventListener('click', () => {
       if (window.currentUser.role !== 'admin' && window.globalMediaLock) {
@@ -1403,15 +1449,14 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       }
     });
 
-    // 🚀 NEW FEATURE: Edit & Delete User Message Logic
+    // 🚀 EDIT & DELETE USER MESSAGE LOGIC
     window.deleteUserMessage = function(roomId, key) {
       if(confirm("क्या आप यह मैसेज सभी के लिए डिलीट करना चाहते हैं?")) {
         const nodePath = (roomId === 'group') ? `messages/group/${key}` : `messages_private/${roomId}/${key}`;
         update(ref(db, nodePath), { isDeleted: true, text: "🚫 यह मैसेज डिलीट कर दिया गया है।", isGhost: null, isEdited: false });
       }
-    }
+    };
     
-    // 🚀 फिक्स: Quotes या Comma से क्रैश न होने वाला Edit फंक्शन
     window.editUserMessage = function(roomId, key, encodedOldText) {
       const oldText = decodeURIComponent(encodedOldText);
       const newText = prompt("मैसेज सुधारें (Correct Message):", oldText);
@@ -1419,12 +1464,11 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         const nodePath = (roomId === 'group') ? `messages/group/${key}` : `messages_private/${roomId}/${key}`;
         update(ref(db, nodePath), { text: newText.trim(), isEdited: true });
       }
-    }
+    };
 
     window.appendMessage = function(data, msgKey) {
-      if (!data) return; // 🚀 फिक्स: नल डेटा क्रैश प्रोटेक्शन
-      // 🚀 फिक्स: अगर मैसेज शेड्यूल किया गया है और अभी उसका टाइम नहीं आया है, तो उसे स्क्रीन पर न दिखाएं!
-      if (data.isScheduled) return;
+      if (!data) return;
+      if (data.isScheduled && data.scheduledFor && Date.now() < data.scheduledFor) return;
 
       const isMine = data.senderPhone === window.currentUser.phone;
       let bubble = document.getElementById(`msg-${msgKey}`);
@@ -1541,8 +1585,13 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       if(isNew) {
         chatStream.appendChild(bubble);
         chatStream.scrollTop = chatStream.scrollHeight;
-        playBeep();
-        if (!isMine && !data.isDeleted) triggerSystemNotification(data.sender, data.text);
+        
+        // Only beep & notify for real-time recent incoming messages (avoids freezing on load)
+        const isRecent = (Date.now() - (data.timestamp || 0)) < 15000;
+        if (isRecent) {
+          playBeep();
+          if (!isMine && !data.isDeleted) triggerSystemNotification(data.sender, data.text);
+        }
       }
     };
 
@@ -1679,6 +1728,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       });
     });
 
+    // 🚀 STABLE USERS & DIRECTORY LISTENER
     onValue(usersRef, (snapshot) => {
       const data = snapshot.val() || {};
       if (window.renderAllUsersList) window.renderAllUsersList(data);
@@ -1687,8 +1737,10 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       if (!dirContainer) return;
       dirContainer.innerHTML = "";
       Object.keys(data).forEach(phone => {
-        if (phone === window.currentUser.phone) return;
+        if (window.currentUser && phone === window.currentUser.phone) return;
         const u = data[phone];
+        if (!u || !u.name) return; // Prevent crashes
+
         const isBanned = !!bannedPhoneCache[phone];
         const row = document.createElement('div');
         row.className = 'banned-chip';
@@ -1762,7 +1814,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         await remove(ref(db, `mutes/${cleanPhone}`));
         alert(`"${userName}" को सफलतापूर्वक हमेशा के लिए डिलीट कर दिया गया है।`);
       } catch (err) {
-        console.error("Purge Error:", err);
         alert("डिलीट करने में त्रुटि हुई।");
       }
     };
@@ -1889,6 +1940,25 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       }, { onlyOnce: true });
     };
 
+    window.registerUserFirebase = function(user) {
+      if (!user || !user.phone) return;
+      const userRef = ref(db, `users/${user.phone}`);
+      set(userRef, {
+        name: user.name,
+        phone: user.phone,
+        roll: user.roll || "",
+        displayName: user.displayName || user.name,
+        dpUrl: user.dpUrl || "",
+        status: "online",
+        lastSeen: Date.now()
+      });
+
+      const todayStr = new Date().toLocaleDateString().replace(/\//g, '-');
+      set(ref(db, `attendance/${user.phone}/${todayStr}`), true);
+
+      onDisconnect(userRef).update({ status: "offline", lastSeen: Date.now() });
+    };
+
     window.sendFirebaseMessage = function(roomId, name, phone, displayName, role, text, userLocation, isGhost = false, ghostDuration = 30000, scheduleTime = null) {
       if(!text) return null;
       const now = new Date();
@@ -1944,13 +2014,18 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       const nodePath = (roomId === 'group') ? 'messages/group' : `messages_private/${roomId}`;
       activeChatListenerRef = ref(db, nodePath);
 
-      // 🚀 NEW FEATURE: Save Group Chats to LocalStorage (Safe Mode)
+      // Safe caching of recent messages
       onValue(activeChatListenerRef, (snapshot) => {
         const allMsgs = snapshot.val() || {};
         if (roomId === 'group') {
           try {
-            localStorage.setItem('offline_group_chats', JSON.stringify(allMsgs));
-          } catch(e) { console.warn("Storage Full"); }
+            const keys = Object.keys(allMsgs).slice(-50);
+            const compact = {};
+            keys.forEach(k => {
+              if (allMsgs[k] && !allMsgs[k].text?.startsWith('[IMG](')) compact[k] = allMsgs[k];
+            });
+            localStorage.setItem('offline_group_chats', JSON.stringify(compact));
+          } catch(e) {}
         }
         for (const key in allMsgs) {
           const msgData = allMsgs[key];
@@ -1989,8 +2064,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
           "Suhail's Learning Desk Ai",
           'https://cdn-icons-png.flaticon.com/512/8943/8943377.png'
         );
-      } else {
-        console.error("openChatRoom function नहीं मिला।");
       }
     };
 
@@ -2030,27 +2103,16 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         });
 
         const responseText = await response.text();
-        let data = null;
-
-        try {
-          data = JSON.parse(responseText);
-        } catch (parseError) {
-          throw new Error("सर्वर से गलत फॉर्मेट मिला।");
-        }
+        let data = JSON.parse(responseText);
         
-        if (!response.ok || data.error) throw new Error(data.error || `सर्वर एरर (${response.status})`);
+        if (!response.ok || data.error) throw new Error(data.error || `सर्वर एरर`);
 
         if (data.text) {
           const aiText = String(data.text).trim();
           window.geminiChatHistory.push({ role: "model", parts: [{ text: aiText }] });
-          if (window.geminiChatHistory.length > GEMINI_MAX_HISTORY) {
-            window.geminiChatHistory = window.geminiChatHistory.slice(-GEMINI_MAX_HISTORY);
-          }
           if (window.sendFirebaseMessage) {
              window.sendFirebaseMessage(roomId, "AI उस्ताद", "Suhail_Ai", "🤖 AI उस्ताद", "admin", aiText, "Vercel Server");
           }
-        } else {
-          throw new Error("कोई जवाब नहीं मिला");
         }
       } catch (error) {
         window.geminiChatHistory.pop();
@@ -2111,8 +2173,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
           const responseText = await response.text();
           let data = JSON.parse(responseText);
 
-          if (!response.ok || data.error) throw new Error(data.error || "सर्वर एरर");
-
           if (data.text) {
              const finalSummary = "📝 **आज की क्लास समरी:**\n\n" + data.text.trim();
              if (window.sendFirebaseMessage) {
@@ -2163,9 +2223,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
 
         const responseText = await response.text();
         let data = JSON.parse(responseText);
-
-        if (!response.ok || data.error) throw new Error(data.error || "सर्वर एरर");
-
         let jsonString = data.text.replace(/```json/g, '').replace(/```/g, '').trim();
         const pollData = JSON.parse(jsonString);
 
@@ -2218,8 +2275,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
 
         const responseText = await response.text();
         let data = JSON.parse(responseText);
-
-        if (!response.ok || data.error) throw new Error(data.error || "सर्वर एरर");
 
         if (data.text) {
           inputField.value = data.text.trim(); 
@@ -2316,9 +2371,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       }, { onlyOnce: true });
     });
 
-    // =========================================================
-    // 🎓 AI MENTOR (PERSONALIZED STUDENT REPORT)
-    // =========================================================
     window.generateStudentMentorReport = async function(targetPhone, targetName) {
       if (window.currentUser.role !== 'admin') {
         alert("यह फीचर केवल एडमिन के लिए है।");
@@ -2336,9 +2388,9 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         आपके एक छात्र का नाम '${targetName}' है। 
         इस छात्र ने अब तक कुल ${totalDaysPresent} दिन क्लास में हाज़िरी लगाई है। 
         
-        इस डेटा के आधार पर इस छात्र के लिए 3 बुलेट पॉइंट्स की एक छोटी, उत्साहवर्धक (Encouraging) और पर्सनलाइज़्ड प्रोग्रेस रिपोर्ट बनाएँ। 
+        इस डेटा के आधार पर इस छात्र के लिए 3 बुलेट पॉइंट्स की एक छोटी, उत्साहवर्धक और पर्सनलाइज़्ड प्रोग्रेस रिपोर्ट बनाएँ। 
         अगर हाज़िरी 3 दिन से कम है, तो उन्हें प्यार से रोज़ाना आने की ताकीद करें। 
-        जवाब सीधे छात्र से बात करने वाले अंदाज़ में दें (जैसे: "अस्सलाम वालेकुम ${targetName}, आपकी इस हफ्ते की रिपोर्ट...")।`;
+        जवाब सीधे छात्र से बात करने वाले अंदाज़ में दें।`;
 
         const response = await fetch('/api/gemini', {
           method: "POST",
@@ -2351,11 +2403,8 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         const responseText = await response.text();
         let data = JSON.parse(responseText);
 
-        if (!response.ok || data.error) throw new Error(data.error || "सर्वर एरर");
-
         if (data.text) {
           const finalReport = "📊 **आपकी वीकली प्रोग्रेस रिपोर्ट:**\n\n" + data.text.trim();
-          
           const aiRoomId = `ai_ustad_${targetPhone}`;
           if (window.sendFirebaseMessage) {
             window.sendFirebaseMessage(aiRoomId, "AI उस्ताद (मेंटर)", "Suhail_Ai", "🎓 AI उस्ताद (मेंटर)", "admin", finalReport, "Vercel Server");
@@ -2395,7 +2444,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       }
     };
 
-    // 🚀 NEW FEATURE: Auto-Checker for Scheduled & Ghost Messages (Admin only)
+    // Auto-Checker for Scheduled & Ghost Messages (Admin Only)
     setInterval(() => {
       if (window.currentUser && window.currentUser.role === 'admin') {
         const now = Date.now();
