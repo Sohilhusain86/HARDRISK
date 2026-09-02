@@ -74,11 +74,11 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.4);
     }
 
-    .header-user-info { display: flex; align-items: center; gap: 10px; }
+    .header-user-info { display: flex; align-items: center; gap: 10px; min-width: 0; }
 
     .header-avatar, .item-avatar {
       width: 48px; height: 48px; border-radius: 50%;
-      background: #2a3942; color: #00a884; display: flex;
+      background: #2a3942; color: #00a884; display: flex; flex-shrink: 0;
       align-items: center; justify-content: center; font-size: 1.2rem;
       position: relative; overflow: hidden; background-size: cover; background-position: center;
     }
@@ -95,10 +95,10 @@
       position: absolute; bottom: 0; right: 0;
     }
 
-    .header-title { font-size: 1.1rem; font-weight: bold; color: #fff; line-height: 1.2; }
+    .header-title { font-size: 1.1rem; font-weight: bold; color: #fff; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
     .header-status { font-size: 0.75rem; color: #bbf7d0; font-family: 'Poppins', sans-serif; }
 
-    .header-actions { display: flex; gap: 10px; align-items: center; }
+    .header-actions { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
     .header-btn { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; }
 
     .nav-tabs {
@@ -118,7 +118,7 @@
 
     .item-info { flex: 1; min-width: 0; }
     .item-name { font-size: 1rem; font-weight: bold; color: #fff; display: flex; justify-content: space-between; }
-    .item-subtext { font-size: 0.8rem; color: var(--text-muted); font-family: 'Poppins', sans-serif; }
+    .item-subtext { font-size: 0.8rem; color: var(--text-muted); font-family: 'Poppins', sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     .pinned-notice-bar {
       background: #1f2c34; border-bottom: 1px solid rgba(250, 204, 21, 0.3);
@@ -239,7 +239,6 @@
 
   <div class="app-screen">
     
-    <!-- Realistic SMS Simulation Popup -->
     <div class="sms-popup-overlay" id="sms-popup">
       <div class="sms-popup-card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -579,13 +578,15 @@
       document.getElementById(`tab-content-${tabName}`).style.display = 'block';
     };
 
-    // 🚀 NEW FEATURE: Ask Mic Permission Promptly
+    // 🚀 NEW FEATURE: Ask Mic Permission Promptly & SAFELY
     window.askForMicPermission = async function() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(track => track.stop());
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          stream.getTracks().forEach(track => track.stop());
+        }
       } catch (err) {
-        console.warn("माइक की परमिशन नहीं मिली।");
+        console.warn("माइक की परमिशन नहीं मिली या ब्राउज़र सपोर्ट नहीं करता।");
       }
     };
 
@@ -611,7 +612,7 @@
           document.getElementById('login-screen').style.display = "none";
           updateUserUI();
           requestNotificationAccess();
-          window.askForMicPermission(); // Ask permission on entry
+          window.askForMicPermission(); 
           if (window.registerUserFirebase) {
             window.registerUserFirebase(window.currentUser);
           }
@@ -637,7 +638,6 @@
     const dpPreviewBox = document.getElementById('dp-preview-box');
     const dpCameraIcon = document.getElementById('dp-camera-icon');
 
-    // Utility: Upload to Cloudinary
     async function uploadToCloudinary(file) {
       const formData = new FormData();
       formData.append('file', file);
@@ -646,7 +646,6 @@
       return await res.json();
     }
 
-    // Login screen DP upload
     if (dpFileInput) {
       dpFileInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
@@ -801,7 +800,6 @@
         return;
       }
 
-      // 🔒 डुप्लीकेट फोन नंबर और नाम ओवरराइट होने से रोकने की जांच
       const existingUserSnap = await get(ref(db, `users/${phone}`));
       let finalName = name;
       let finalRoll = roll;
@@ -836,7 +834,7 @@
       document.getElementById('login-screen').style.display = "none";
       requestNotificationAccess();
       
-      window.askForMicPermission(); // Ask mic permission
+      window.askForMicPermission(); 
       
       if (window.registerUserFirebase) {
         window.registerUserFirebase(window.currentUser);
@@ -846,6 +844,11 @@
     });
 
     function connectScaleDrone() {
+      // 🚀 फिक्स: अगर ScaleDrone लोड नहीं हुआ (खराब नेट की वजह से), तो ऐप क्रैश नहीं होगी।
+      if (typeof ScaleDrone === 'undefined') {
+        console.warn("ScaleDrone script failed to load. Typing indicator will not work.");
+        return;
+      }
       drone = new ScaleDrone(window.CHANNEL_ID, {
         data: { name: window.currentUser.name, phone: window.currentUser.phone, role: window.currentUser.role }
       });
@@ -959,10 +962,12 @@
       if (roomId === 'group') {
         const cached = localStorage.getItem('offline_group_chats');
         if(cached) {
-           const msgs = JSON.parse(cached);
-           for(let key in msgs) {
-             if (window.appendMessage) window.appendMessage(msgs[key], key);
-           }
+           try {
+             const msgs = JSON.parse(cached);
+             for(let key in msgs) {
+               if (window.appendMessage) window.appendMessage(msgs[key], key);
+             }
+           } catch(e) {}
         }
       }
 
@@ -1003,8 +1008,8 @@
 
       peerConnection.onicecandidate = (event) => {
         if (event.candidate && currentCallRef) {
-          const type = (window.currentUser.phone === currentCallRef.split('_')[1]) ? 'caller' : 'callee';
-          push(ref(db, `${currentCallRef}/${type}Candidates`), event.candidate.toJSON());
+          // 🚀 फिक्स: कॉलिंग कैंडिडेट सही व्यक्ति को भेजने का सटीक तरीका
+          push(ref(db, `${currentCallRef}/${window.callRole}Candidates`), event.candidate.toJSON());
         }
       };
 
@@ -1013,6 +1018,9 @@
 
     async function getLocalAudioStream() {
       if (!localStream) {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+           throw new Error("आपका ब्राउज़र कॉलिंग सपोर्ट नहीं करता।");
+        }
         localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
       }
       return localStream;
@@ -1028,6 +1036,7 @@
       btnAcceptCall.style.display = 'none';
 
       try {
+        window.callRole = 'caller'; // Set role dynamically
         currentCallRef = `calls/${window.currentActiveRoomId}`;
         const callRef = ref(db, currentCallRef);
 
@@ -1058,7 +1067,7 @@
           }
         });
       } catch (err) {
-        alert("कॉल करने में त्रुटि: " + err.message);
+        alert("कॉल करने में त्रुटि या माइक परमिशन नहीं: " + err.message);
         callScreen.classList.remove('active');
       }
     });
@@ -1086,6 +1095,7 @@
       btnAcceptCall.style.display = 'none';
       callStatusText.textContent = "कॉल कनेक्ट हो रही है...";
       try {
+        window.callRole = 'callee'; // Set role dynamically
         const pc = startPeerConnection();
         const stream = await getLocalAudioStream();
         stream.getTracks().forEach(track => pc.addTrack(track, stream));
@@ -1107,7 +1117,10 @@
             pc.addIceCandidate(new RTCIceCandidate(snapshot.val())).catch(()=>{});
           }
         });
-      } catch (err) { alert("कॉल एरर: " + err.message); }
+      } catch (err) { 
+        alert("कॉल एरर: " + err.message); 
+        callScreen.classList.remove('active');
+      }
     });
 
     btnEndCall.addEventListener('click', () => {
@@ -1398,7 +1411,9 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       }
     }
     
-    window.editUserMessage = function(roomId, key, oldText) {
+    // 🚀 फिक्स: Quotes या Comma से क्रैश न होने वाला Edit फंक्शन
+    window.editUserMessage = function(roomId, key, encodedOldText) {
+      const oldText = decodeURIComponent(encodedOldText);
       const newText = prompt("मैसेज सुधारें (Correct Message):", oldText);
       if(newText && newText.trim() !== "" && newText !== oldText) {
         const nodePath = (roomId === 'group') ? `messages/group/${key}` : `messages_private/${roomId}/${key}`;
@@ -1407,6 +1422,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
     }
 
     window.appendMessage = function(data, msgKey) {
+      if (!data) return; // 🚀 फिक्स: नल डेटा क्रैश प्रोटेक्शन
       // 🚀 फिक्स: अगर मैसेज शेड्यूल किया गया है और अभी उसका टाइम नहीं आया है, तो उसे स्क्रीन पर न दिखाएं!
       if (data.isScheduled) return;
 
@@ -1462,7 +1478,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
             const msgTime = data.timestamp || Date.now();
             const ageMins = (Date.now() - msgTime) / 60000;
             if (ageMins < 10) {
-              const safeText = cleanText.replace(/'/g,"\\'");
+              const safeText = encodeURIComponent(cleanText).replace(/'/g, "%27");
               userActionsHtml += `<span class="msg-action-btn" onclick="window.editUserMessage('${window.currentActiveRoomId}', '${msgKey}', '${safeText}')" style="color:#38bdf8;" title="मैसेज सुधारें"><i class="fa-solid fa-pen"></i></span>`;
               userActionsHtml += `<span class="msg-action-btn" onclick="window.deleteUserMessage('${window.currentActiveRoomId}', '${msgKey}')" style="color:#ef4444;" title="डिलीट करें"><i class="fa-solid fa-trash"></i></span>`;
             }
@@ -1928,11 +1944,13 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       const nodePath = (roomId === 'group') ? 'messages/group' : `messages_private/${roomId}`;
       activeChatListenerRef = ref(db, nodePath);
 
-      // 🚀 NEW FEATURE: Save Group Chats to LocalStorage for Offline Viewing
+      // 🚀 NEW FEATURE: Save Group Chats to LocalStorage (Safe Mode)
       onValue(activeChatListenerRef, (snapshot) => {
         const allMsgs = snapshot.val() || {};
         if (roomId === 'group') {
-          localStorage.setItem('offline_group_chats', JSON.stringify(allMsgs));
+          try {
+            localStorage.setItem('offline_group_chats', JSON.stringify(allMsgs));
+          } catch(e) { console.warn("Storage Full"); }
         }
         for (const key in allMsgs) {
           const msgData = allMsgs[key];
@@ -1947,7 +1965,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         }
       });
 
-      // Child Changed handles edits and deletes dynamically
       onChildChanged(activeChatListenerRef, (snapshot) => {
         if (window.appendMessage) window.appendMessage(snapshot.val(), snapshot.key);
       });
