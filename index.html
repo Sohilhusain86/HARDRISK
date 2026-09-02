@@ -144,6 +144,7 @@
     }
     .msg-mine { align-self: flex-end; background: var(--msg-mine); border-top-right-radius: 2px; }
     .msg-other { align-self: flex-start; background: var(--msg-other); border-top-left-radius: 2px; }
+    .msg-deleted-box { color: rgba(255,255,255,0.6); font-style: italic; display: flex; align-items: center; gap: 6px; }
 
     .msg-sender-name {
       font-size: 0.8rem; font-weight: bold; color: var(--gold-accent); display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 2px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 2px;
@@ -162,7 +163,7 @@
       color: #fb7185; font-size: 0.65rem; font-family: 'Poppins', sans-serif; display: inline-flex; align-items: center; gap: 3px; font-weight: 600; background: rgba(239, 68, 68, 0.15); padding: 1px 4px; border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.3);
     }
 
-    .msg-action-btn { cursor: pointer; font-size: 0.8rem; padding: 2px 5px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; }
+    .msg-action-btn { cursor: pointer; font-size: 0.8rem; padding: 2px 5px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px; }
     .btn-delete { color: #ff4d4d; background: rgba(255, 77, 77, 0.15); }
     .btn-ban { color: #f59e0b; background: rgba(245, 158, 11, 0.15); }
     .btn-unban-inline { color: #22c55e; background: rgba(34, 197, 94, 0.15); }
@@ -182,15 +183,29 @@
 
     #typing-indicator { display: none; padding: 4px 14px; font-size: 0.8rem; color: #00a884; font-style: italic; background: #202c33; }
 
-    .chat-bottom-dock { background: #202c33; padding: 8px 10px; display: flex; align-items: center; gap: 6px; }
-    .chat-input-box { flex: 1; background: #2a3942; border: none; border-radius: 25px; padding: 10px 16px; color: #fff; font-family: 'Mukta', sans-serif; font-size: 0.95rem; outline: none; }
-    .btn-dock-action { background: none; border: none; color: var(--text-muted); font-size: 1.25rem; cursor: pointer; padding: 6px; }
+    /* 🚨 FIXED CHAT DOCK FOR MOBILE (FLEXBOX FIX) 🚨 */
+    .chat-bottom-dock { 
+      background: #202c33; padding: 8px 10px; display: flex; align-items: center; gap: 6px; 
+      flex-wrap: nowrap; /* Prevent buttons from hiding */
+    }
+    .chat-input-box { 
+      flex: 1 1 auto; /* Allow box to shrink */
+      min-width: 0; /* Flexbox trick to prevent overflow */
+      background: #2a3942; border: none; border-radius: 25px; padding: 10px 16px; color: #fff; font-family: 'Mukta', sans-serif; font-size: 0.95rem; outline: none; 
+    }
+    .btn-dock-action { 
+      flex: 0 0 auto; /* Stop buttons from shrinking */
+      background: none; border: none; color: var(--text-muted); font-size: 1.25rem; cursor: pointer; padding: 6px; 
+    }
     .btn-dock-action:hover { color: #00a884; }
 
     .btn-mic.recording { color: #ef4444; animation: pulse 1s infinite alternate; }
     @keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.2); } }
 
-    .btn-send { width: 42px; height: 42px; background: var(--deep-green); color: #fff; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; }
+    .btn-send { 
+      flex: 0 0 auto; 
+      width: 42px; height: 42px; background: var(--deep-green); color: #fff; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; 
+    }
 
     .login-overlay { position: absolute; inset: 0; background: #111b21; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; overflow-y: auto; }
     .login-card { background: #202c33; border-radius: 20px; padding: 24px 20px; width: 100%; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
@@ -351,6 +366,11 @@
         </div>
         <div class="header-actions">
           <button class="header-btn" id="btn-admin-crown" title="एडमिन पैनल" style="display: none;"><i class="fa-solid fa-crown" style="color: #facc15;"></i></button>
+          
+          <!-- 🚀 DP Change Feature Added -->
+          <button class="header-btn" id="btn-change-dp" title="प्रोफाइल फोटो बदलें" onclick="document.getElementById('dp-update-file').click()"><i class="fa-solid fa-camera-rotate"></i></button>
+          <input type="file" id="dp-update-file" accept="image/*" style="display:none;">
+
           <button class="header-btn" id="btn-sound" title="साउंड ऑन/ऑफ"><i class="fa-solid fa-volume-high"></i></button>
           <button class="header-btn" id="btn-logout" title="लॉगआउट" onclick="logoutApp()" style="color: #f87171;"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
@@ -508,7 +528,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, get, push, set, update, onValue, onDisconnect, onChildAdded, onChildRemoved, remove, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, get, push, set, update, onValue, onDisconnect, onChildAdded, onChildChanged, onChildRemoved, remove, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDpqKDayo6H0nVyjnT1JBPjpH8RjmwpvV0",
@@ -559,27 +579,39 @@
       document.getElementById(`tab-content-${tabName}`).style.display = 'block';
     };
 
+    // 🚀 NEW FEATURE: Ask Mic Permission Promptly
+    window.askForMicPermission = async function() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(track => track.stop());
+      } catch (err) {
+        console.warn("माइक की परमिशन नहीं मिली।");
+      }
+    };
+
+    function updateUserUI() {
+      const myAvatar = document.getElementById('my-avatar');
+      if (window.currentUser.dpUrl) {
+        myAvatar.textContent = "";
+        myAvatar.style.backgroundImage = `url('${window.currentUser.dpUrl}')`;
+      } else {
+        myAvatar.textContent = (window.currentUser.name || "उ").charAt(0);
+      }
+      document.getElementById('my-display-name').textContent = window.currentUser.displayName || window.currentUser.name;
+      if (window.currentUser.role === 'admin') {
+        document.getElementById('btn-admin-crown').style.display = "block";
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       const savedUser = localStorage.getItem('jamia_chat_saved_user');
       if (savedUser) {
         try {
           window.currentUser = JSON.parse(savedUser);
           document.getElementById('login-screen').style.display = "none";
-          
-          const myAvatar = document.getElementById('my-avatar');
-          if (window.currentUser.dpUrl) {
-            myAvatar.textContent = "";
-            myAvatar.style.backgroundImage = `url('${window.currentUser.dpUrl}')`;
-          } else {
-            myAvatar.textContent = (window.currentUser.name || "उ").charAt(0);
-          }
-          document.getElementById('my-display-name').textContent = window.currentUser.displayName || window.currentUser.name;
-
-          if (window.currentUser.role === 'admin') {
-            document.getElementById('btn-admin-crown').style.display = "block";
-          }
-
+          updateUserUI();
           requestNotificationAccess();
+          window.askForMicPermission(); // Ask permission on entry
           if (window.registerUserFirebase) {
             window.registerUserFirebase(window.currentUser);
           }
@@ -605,17 +637,23 @@
     const dpPreviewBox = document.getElementById('dp-preview-box');
     const dpCameraIcon = document.getElementById('dp-camera-icon');
 
+    // Utility: Upload to Cloudinary
+    async function uploadToCloudinary(file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', window.UPLOAD_PRESET);
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${window.CLOUD_NAME}/auto/upload`, { method: 'POST', body: formData });
+      return await res.json();
+    }
+
+    // Login screen DP upload
     if (dpFileInput) {
       dpFileInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
         dpPreviewBox.style.opacity = "0.5";
         try {
-          const formData = new FormData();
-          formData.append('file', file);
-          formData.append('upload_preset', window.UPLOAD_PRESET);
-          const res = await fetch(`https://api.cloudinary.com/v1_1/${window.CLOUD_NAME}/auto/upload`, { method: 'POST', body: formData });
-          const result = await res.json();
+          const result = await uploadToCloudinary(file);
           if (result.secure_url) {
             selectedDpUrl = result.secure_url;
             dpPreviewBox.style.backgroundImage = `url('${selectedDpUrl}')`;
@@ -626,6 +664,26 @@
         } finally {
           dpPreviewBox.style.opacity = "1";
         }
+      });
+    }
+
+    // 🚀 NEW FEATURE: Change DP Later
+    const dpUpdateInput = document.getElementById('dp-update-file');
+    if (dpUpdateInput) {
+      dpUpdateInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        alert("प्रोफाइल फोटो अपलोड हो रही है, कृपया प्रतीक्षा करें...");
+        try {
+          const res = await uploadToCloudinary(file);
+          if (res.secure_url) {
+            window.currentUser.dpUrl = res.secure_url;
+            localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
+            update(ref(db, `users/${window.currentUser.phone}`), { dpUrl: res.secure_url });
+            updateUserUI();
+            alert("प्रोफाइल फोटो सफलतापूर्वक बदल गई!");
+          }
+        } catch (err) { alert("अपलोड फेल: " + err.message); }
       });
     }
 
@@ -743,6 +801,7 @@
         return;
       }
 
+      // 🔒 डुप्लीकेट फोन नंबर और नाम ओवरराइट होने से रोकने की जांच
       const existingUserSnap = await get(ref(db, `users/${phone}`));
       let finalName = name;
       let finalRoll = roll;
@@ -773,18 +832,11 @@
       }
 
       localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
-
-      const myAvatar = document.getElementById('my-avatar');
-      if (window.currentUser.dpUrl) {
-        myAvatar.textContent = "";
-        myAvatar.style.backgroundImage = `url('${window.currentUser.dpUrl}')`;
-      } else {
-        myAvatar.textContent = finalName.charAt(0);
-      }
-      document.getElementById('my-display-name').textContent = window.currentUser.displayName;
-
+      updateUserUI();
       document.getElementById('login-screen').style.display = "none";
       requestNotificationAccess();
+      
+      window.askForMicPermission(); // Ask mic permission
       
       if (window.registerUserFirebase) {
         window.registerUserFirebase(window.currentUser);
@@ -902,6 +954,18 @@
       document.getElementById('screen-chat').classList.add('view-active');
 
       document.getElementById('chat-stream').innerHTML = "";
+
+      // 🚀 NEW FEATURE: Load Offline Chat (Cache)
+      if (roomId === 'group') {
+        const cached = localStorage.getItem('offline_group_chats');
+        if(cached) {
+           const msgs = JSON.parse(cached);
+           for(let key in msgs) {
+             if (window.appendMessage) window.appendMessage(msgs[key], key);
+           }
+        }
+      }
+
       if (window.listenToRoom) {
         window.listenToRoom(roomId);
       }
@@ -919,6 +983,7 @@
       document.getElementById('screen-home').classList.add('view-active');
     };
 
+    // 🚀 FIXED FEATURE: Calling System WebRTC 
     const callScreen = document.getElementById('call-screen');
     const callStatusText = document.getElementById('call-status-text');
     const callTargetName = document.getElementById('call-target-name');
@@ -938,8 +1003,8 @@
 
       peerConnection.onicecandidate = (event) => {
         if (event.candidate && currentCallRef) {
-          const candidatesRef = ref(db, `${currentCallRef}/${window.currentUser.phone === currentCallRef.split('_')[1] ? 'caller' : 'callee'}Candidates`);
-          push(candidatesRef, event.candidate.toJSON());
+          const type = (window.currentUser.phone === currentCallRef.split('_')[1]) ? 'caller' : 'callee';
+          push(ref(db, `${currentCallRef}/${type}Candidates`), event.candidate.toJSON());
         }
       };
 
@@ -962,36 +1027,40 @@
       callTargetName.textContent = document.getElementById('chat-room-title').textContent;
       btnAcceptCall.style.display = 'none';
 
-      currentCallRef = `calls/${window.currentActiveRoomId}`;
-      const callRef = ref(db, currentCallRef);
+      try {
+        currentCallRef = `calls/${window.currentActiveRoomId}`;
+        const callRef = ref(db, currentCallRef);
 
-      const pc = startPeerConnection();
-      const stream = await getLocalAudioStream();
-      stream.getTracks().forEach(track => pc.addTrack(track, stream));
+        const pc = startPeerConnection();
+        const stream = await getLocalAudioStream();
+        stream.getTracks().forEach(track => pc.addTrack(track, stream));
 
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
 
-      await set(callRef, {
-        offer: { type: offer.type, sdp: offer.sdp },
-        caller: window.currentUser.phone,
-        status: 'ringing'
-      });
-
-      onValue(ref(db, `${currentCallRef}/answer`), async (snapshot) => {
-        const answer = snapshot.val();
-        if (answer && !pc.currentRemoteDescription) {
-          await pc.setRemoteDescription(new RTCSessionDescription(answer));
-          callStatusText.textContent = "बातचीत शुरू (Connected)";
-        }
-      });
-
-      onValue(ref(db, `${currentCallRef}/calleeCandidates`), (snapshot) => {
-        snapshot.forEach((childSnap) => {
-          if (pc && !pc.remoteDescription) return;
-          pc.addIceCandidate(new RTCIceCandidate(childSnap.val())).catch(()=>{});
+        await set(callRef, {
+          offer: { type: offer.type, sdp: offer.sdp },
+          caller: window.currentUser.phone,
+          status: 'ringing'
         });
-      });
+
+        onValue(ref(db, `${currentCallRef}/answer`), async (snapshot) => {
+          const answer = snapshot.val();
+          if (answer && !pc.currentRemoteDescription) {
+            await pc.setRemoteDescription(new RTCSessionDescription(answer));
+            callStatusText.textContent = "बातचीत शुरू (Connected)";
+          }
+        });
+
+        onChildAdded(ref(db, `${currentCallRef}/calleeCandidates`), (snapshot) => {
+          if (pc.remoteDescription) {
+            pc.addIceCandidate(new RTCIceCandidate(snapshot.val())).catch(()=>{});
+          }
+        });
+      } catch (err) {
+        alert("कॉल करने में त्रुटि: " + err.message);
+        callScreen.classList.remove('active');
+      }
     });
 
     function listenForIncomingCalls() {
@@ -1006,7 +1075,7 @@
               callScreen.classList.add('active');
               callStatusText.textContent = "इनकमिंग वॉइस कॉल...";
               callTargetName.textContent = "कॉल आ रही है...";
-              btnAcceptCall.style.display = 'block';
+              btnAcceptCall.style.display = 'inline-block';
             }
           }
         });
@@ -1016,28 +1085,29 @@
     btnAcceptCall.addEventListener('click', async () => {
       btnAcceptCall.style.display = 'none';
       callStatusText.textContent = "कॉल कनेक्ट हो रही है...";
+      try {
+        const pc = startPeerConnection();
+        const stream = await getLocalAudioStream();
+        stream.getTracks().forEach(track => pc.addTrack(track, stream));
 
-      const pc = startPeerConnection();
-      const stream = await getLocalAudioStream();
-      stream.getTracks().forEach(track => pc.addTrack(track, stream));
+        const callRef = ref(db, currentCallRef);
+        onValue(ref(db, `${currentCallRef}/offer`), async (snapshot) => {
+          const offer = snapshot.val();
+          if (offer && !pc.currentRemoteDescription) {
+            await pc.setRemoteDescription(new RTCSessionDescription(offer));
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+            await update(callRef, { answer: { type: answer.type, sdp: answer.sdp }, status: 'connected' });
+            callStatusText.textContent = "बातचीत शुरू (Connected)";
+          }
+        }, { onlyOnce: true });
 
-      const callRef = ref(db, currentCallRef);
-      onValue(ref(db, `${currentCallRef}/offer`), async (snapshot) => {
-        const offer = snapshot.val();
-        if (offer && !pc.currentRemoteDescription) {
-          await pc.setRemoteDescription(new RTCSessionDescription(offer));
-          const answer = await pc.createAnswer();
-          await pc.setLocalDescription(answer);
-          await update(callRef, { answer: { type: answer.type, sdp: answer.sdp }, status: 'connected' });
-          callStatusText.textContent = "बातचीत शुरू (Connected)";
-        }
-      }, { onlyOnce: true });
-
-      onValue(ref(db, `${currentCallRef}/callerCandidates`), (snapshot) => {
-        snapshot.forEach((childSnap) => {
-          pc.addIceCandidate(new RTCIceCandidate(childSnap.val())).catch(()=>{});
+        onChildAdded(ref(db, `${currentCallRef}/callerCandidates`), (snapshot) => {
+          if (pc.remoteDescription) {
+            pc.addIceCandidate(new RTCIceCandidate(snapshot.val())).catch(()=>{});
+          }
         });
-      });
+      } catch (err) { alert("कॉल एरर: " + err.message); }
     });
 
     btnEndCall.addEventListener('click', () => {
@@ -1073,7 +1143,6 @@
       }
     });
 
-    // 🚀 एकदम सही और फाइनल sendChatMessage फंक्शन
     function sendChatMessage() {
       const text = msgInput.value.trim();
       if (!text) return;
@@ -1321,48 +1390,88 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       }
     });
 
+    // 🚀 NEW FEATURE: Edit & Delete User Message Logic
+    window.deleteUserMessage = function(roomId, key) {
+      if(confirm("क्या आप यह मैसेज सभी के लिए डिलीट करना चाहते हैं?")) {
+        const nodePath = (roomId === 'group') ? `messages/group/${key}` : `messages_private/${roomId}/${key}`;
+        update(ref(db, nodePath), { isDeleted: true, text: "🚫 यह मैसेज डिलीट कर दिया गया है।", isGhost: null, isEdited: false });
+      }
+    }
+    
+    window.editUserMessage = function(roomId, key, oldText) {
+      const newText = prompt("मैसेज सुधारें (Correct Message):", oldText);
+      if(newText && newText.trim() !== "" && newText !== oldText) {
+        const nodePath = (roomId === 'group') ? `messages/group/${key}` : `messages_private/${roomId}/${key}`;
+        update(ref(db, nodePath), { text: newText.trim(), isEdited: true });
+      }
+    }
+
     window.appendMessage = function(data, msgKey) {
+      // 🚀 फिक्स: अगर मैसेज शेड्यूल किया गया है और अभी उसका टाइम नहीं आया है, तो उसे स्क्रीन पर न दिखाएं!
+      if (data.isScheduled) return;
+
       const isMine = data.senderPhone === window.currentUser.phone;
-      const bubble = document.createElement('div');
-      bubble.className = `msg-bubble ${isMine ? 'msg-mine' : 'msg-other'}`;
-      if (msgKey) bubble.id = `msg-${msgKey}`;
+      let bubble = document.getElementById(`msg-${msgKey}`);
+      const isNew = !bubble;
+      
+      if(isNew) {
+        bubble = document.createElement('div');
+        bubble.className = `msg-bubble ${isMine ? 'msg-mine' : 'msg-other'}`;
+        if (msgKey) bubble.id = `msg-${msgKey}`;
+      }
 
       const roleClass = data.role === 'admin' ? 'tag-admin' : 'tag-student';
       const roleLabel = data.role === 'admin' ? 'एडमिन' : 'छात्र';
 
-      let contentHtml = `<div>${data.text}</div>`;
+      let contentHtml = '';
+      let userActionsHtml = '';
 
-      if (data.isGhost && data.expiresAt) {
-        window.handleGhostMessageExpiration(window.currentActiveRoomId, msgKey, data.expiresAt);
-        const secLabel = Math.round(data.ghostDuration / 1000) + 's';
-        const ghostBadge = `<span style="color:#c084fc; font-size:0.7rem; margin-left:4px;"><i class="fa-solid fa-ghost"></i> ${secLabel}</span>`;
-        contentHtml += ghostBadge;
-      }
-      
-      if (typeof data.text === 'string') {
-        const cleanText = data.text.trim();
-        const audioMatch = cleanText.match(/\[AUDIO(?::(.*?))?\]\s*\((.*?)\)/);
-        const imgMatch = cleanText.match(/\[IMG\]\s*\((.*?)\)/);
-        const fileMatch = cleanText.match(/\[FILE:(.*?)\]\s*\((.*?)\)/);
+      if (data.isDeleted) {
+        contentHtml = `<div class="msg-deleted-box">${data.text}</div>`;
+      } else {
+        contentHtml = `<div>${data.text} ${data.isEdited ? '<span style="font-size:0.6rem; color:var(--text-muted);">(Edited)</span>' : ''}</div>`;
+        
+        if (data.isGhost && data.expiresAt) {
+          window.handleGhostMessageExpiration(window.currentActiveRoomId, msgKey, data.expiresAt);
+          const secLabel = Math.round(data.ghostDuration / 1000) + 's';
+          contentHtml += `<span style="color:#c084fc; font-size:0.65rem; margin-left:4px;"><i class="fa-solid fa-ghost"></i> ${secLabel}</span>`;
+        }
+        
+        if (typeof data.text === 'string') {
+          const cleanText = data.text.trim();
+          const audioMatch = cleanText.match(/\[AUDIO(?::(.*?))?\]\s*\((.*?)\)/);
+          const imgMatch = cleanText.match(/\[IMG\]\s*\((.*?)\)/);
+          const fileMatch = cleanText.match(/\[FILE:(.*?)\]\s*\((.*?)\)/);
 
-        if (imgMatch) {
-          contentHtml = `<img src="${imgMatch[1]}" class="msg-img-preview" alt="Image" onclick="window.open('${imgMatch[1]}','_blank')"/>`;
-        } else if (audioMatch) {
-          const effect = audioMatch[1] || 'normal';
-          const url = audioMatch[2];
-          contentHtml = `<audio src="${url}" controls class="msg-audio-player"></audio> ${effect !== 'normal' ? `<div style="font-size:0.65rem; color:#facc15; margin-top:4px;">[इफेक्ट: ${effect}]</div>` : ''}`;
-        } else if (fileMatch) {
-          contentHtml = `
-            <div class="file-attachment-card">
-              <i class="fa-solid fa-file-arrow-down" style="font-size: 1.3rem; color: #38bdf8;"></i>
-              <div><a href="${fileMatch[2]}" target="_blank" download>${fileMatch[1]}</a></div>
-            </div>
-          `;
+          if (imgMatch) {
+            contentHtml = `<img src="${imgMatch[1]}" class="msg-img-preview" alt="Image" onclick="window.open('${imgMatch[1]}','_blank')"/>`;
+          } else if (audioMatch) {
+            const effect = audioMatch[1] || 'normal';
+            const url = audioMatch[2];
+            contentHtml = `<audio src="${url}" controls class="msg-audio-player"></audio> ${effect !== 'normal' ? `<div style="font-size:0.65rem; color:#facc15; margin-top:4px;">[इफेक्ट: ${effect}]</div>` : ''}`;
+          } else if (fileMatch) {
+            contentHtml = `
+              <div class="file-attachment-card">
+                <i class="fa-solid fa-file-arrow-down" style="font-size: 1.3rem; color: #38bdf8;"></i>
+                <div><a href="${fileMatch[2]}" target="_blank" download>${fileMatch[1]}</a></div>
+              </div>
+            `;
+          }
+
+          if (isMine) {
+            const msgTime = data.timestamp || Date.now();
+            const ageMins = (Date.now() - msgTime) / 60000;
+            if (ageMins < 10) {
+              const safeText = cleanText.replace(/'/g,"\\'");
+              userActionsHtml += `<span class="msg-action-btn" onclick="window.editUserMessage('${window.currentActiveRoomId}', '${msgKey}', '${safeText}')" style="color:#38bdf8;" title="मैसेज सुधारें"><i class="fa-solid fa-pen"></i></span>`;
+              userActionsHtml += `<span class="msg-action-btn" onclick="window.deleteUserMessage('${window.currentActiveRoomId}', '${msgKey}')" style="color:#ef4444;" title="डिलीट करें"><i class="fa-solid fa-trash"></i></span>`;
+            }
+          }
         }
       }
 
       let reactionsHtml = '';
-      if (data.reactions) {
+      if (data.reactions && !data.isDeleted) {
         reactionsHtml = `<div class="msg-reactions-container" id="reactions-${msgKey}">`;
         for (let userPhone in data.reactions) {
           reactionsHtml += `<span class="reaction-pill">${data.reactions[userPhone]}</span>`;
@@ -1372,7 +1481,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         reactionsHtml = `<div class="msg-reactions-container" id="reactions-${msgKey}"></div>`;
       }
 
-      const reactionPickerHtml = `
+      const reactionPickerHtml = data.isDeleted ? '' : `
         <div class="reaction-picker-bar">
           <span class="emoji-opt" onclick="window.reactToMessage('${window.currentActiveRoomId}', '${msgKey}', '👍')">👍</span>
           <span class="emoji-opt" onclick="window.reactToMessage('${window.currentActiveRoomId}', '${msgKey}', '❤️')">❤️</span>
@@ -1383,7 +1492,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       `;
 
       let adminActionsHtml = '';
-      if (window.currentUser.role === 'admin') {
+      if (window.currentUser.role === 'admin' && !data.isDeleted) {
         const phoneArg = data.senderPhone || '';
         const nameArg = (data.sender || 'User').replace(/'/g, "\\'");
         const isBanned = window.isPhoneBanned && window.isPhoneBanned(phoneArg);
@@ -1403,8 +1512,9 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         ${reactionsHtml}
         ${reactionPickerHtml}
         <div class="msg-footer">
-          <div>${(window.currentUser.role === 'admin' && data.location && data.location !== 'Unknown') ? `<span class="admin-loc-tag"><i class="fa-solid fa-location-dot"></i> ${data.location}</span>` : ''}</div>
+          <div>${(window.currentUser.role === 'admin' && data.location && data.location !== 'Unknown' && !data.isDeleted) ? `<span class="admin-loc-tag"><i class="fa-solid fa-location-dot"></i> ${data.location}</span>` : ''}</div>
           <div style="display:flex; align-items:center; gap:6px;">
+            ${userActionsHtml}
             ${adminActionsHtml}
             <span>${data.time}</span>
             <i class="fa-solid fa-check-double" style="color: ${isMine ? '#53bdeb' : 'inherit'};"></i>
@@ -1412,10 +1522,12 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         </div>
       `;
 
-      chatStream.appendChild(bubble);
-      chatStream.scrollTop = chatStream.scrollHeight;
-      playBeep();
-      if (!isMine) triggerSystemNotification(data.sender, data.text);
+      if(isNew) {
+        chatStream.appendChild(bubble);
+        chatStream.scrollTop = chatStream.scrollHeight;
+        playBeep();
+        if (!isMine && !data.isDeleted) triggerSystemNotification(data.sender, data.text);
+      }
     };
 
     const adminPanel = document.getElementById('admin-panel');
@@ -1761,24 +1873,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       }, { onlyOnce: true });
     };
 
-    window.registerUserFirebase = function(user) {
-      const userRef = ref(db, `users/${user.phone}`);
-      set(userRef, {
-        name: user.name,
-        phone: user.phone,
-        roll: user.roll || "",
-        displayName: user.displayName || user.name,
-        dpUrl: user.dpUrl || "",
-        status: "online",
-        lastSeen: Date.now()
-      });
-
-      const todayStr = new Date().toLocaleDateString().replace(/\//g, '-');
-      set(ref(db, `attendance/${user.phone}/${todayStr}`), true);
-
-      onDisconnect(userRef).update({ status: "offline", lastSeen: Date.now() });
-    };
-
     window.sendFirebaseMessage = function(roomId, name, phone, displayName, role, text, userLocation, isGhost = false, ghostDuration = 30000, scheduleTime = null) {
       if(!text) return null;
       const now = new Date();
@@ -1834,16 +1928,16 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       const nodePath = (roomId === 'group') ? 'messages/group' : `messages_private/${roomId}`;
       activeChatListenerRef = ref(db, nodePath);
 
-      onChildAdded(activeChatListenerRef, (snapshot) => {
-        if (window.appendMessage) window.appendMessage(snapshot.val(), snapshot.key);
-      });
-
+      // 🚀 NEW FEATURE: Save Group Chats to LocalStorage for Offline Viewing
       onValue(activeChatListenerRef, (snapshot) => {
         const allMsgs = snapshot.val() || {};
+        if (roomId === 'group') {
+          localStorage.setItem('offline_group_chats', JSON.stringify(allMsgs));
+        }
         for (const key in allMsgs) {
           const msgData = allMsgs[key];
           const reactionsContainer = document.getElementById(`reactions-${key}`);
-          if (reactionsContainer && msgData && msgData.reactions) {
+          if (reactionsContainer && msgData && msgData.reactions && !msgData.isDeleted) {
             let html = "";
             for (const phone in msgData.reactions) {
               html += `<span class="reaction-pill">${msgData.reactions[phone]}</span>`;
@@ -1851,6 +1945,15 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
             reactionsContainer.innerHTML = html;
           }
         }
+      });
+
+      // Child Changed handles edits and deletes dynamically
+      onChildChanged(activeChatListenerRef, (snapshot) => {
+        if (window.appendMessage) window.appendMessage(snapshot.val(), snapshot.key);
+      });
+
+      onChildAdded(activeChatListenerRef, (snapshot) => {
+        if (window.appendMessage) window.appendMessage(snapshot.val(), snapshot.key);
       });
 
       onChildRemoved(activeChatListenerRef, (snapshot) => {
@@ -2274,40 +2377,27 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         }, remainingMs);
       }
     };
-    
-    // =========================================================
-    // 🕒 ऑटो-शेड्यूल और घोस्ट मैसेज चेकर (मोबाइल के लिए आसान जुगाड़)
-    // =========================================================
+
+    // 🚀 NEW FEATURE: Auto-Checker for Scheduled & Ghost Messages (Admin only)
     setInterval(() => {
-      // यह काम सिर्फ एडमिन के फोन से होगा ताकि बार-बार मैसेज रिपीट न हों
       if (window.currentUser && window.currentUser.role === 'admin') {
         const now = Date.now();
-        
         get(ref(db, 'messages/group')).then((snapshot) => {
-          if (snapshot.exists()) {
-            const msgs = snapshot.val();
-            for (const key in msgs) {
-              const msg = msgs[key];
-              
-              // 1. अगर किसी शेड्यूल्ड मैसेज का टाइम हो गया है, तो उसे पब्लिश कर दें
-              if (msg.isScheduled && msg.scheduledFor && now >= msg.scheduledFor) {
-                update(ref(db, `messages/group/${key}`), {
-                  isScheduled: null, // शेड्यूल्ड टैग हटा दें
-                  timestamp: now,
-                  time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                });
-              }
-              
-              // 2. अगर कोई घोस्ट मैसेज डिलीट होने से छूट गया है, तो उसे साफ कर दें
-              if (msg.isGhost && msg.expiresAt && now >= msg.expiresAt) {
-                remove(ref(db, `messages/group/${key}`));
-              }
+          if (!snapshot.exists()) return;
+          const msgs = snapshot.val();
+          for (const key in msgs) {
+            const msg = msgs[key];
+            if (msg.isScheduled && msg.scheduledFor && now >= msg.scheduledFor) {
+              update(ref(db, `messages/group/${key}`), { isScheduled: null, timestamp: now, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+            }
+            if (msg.isGhost && msg.expiresAt && now >= msg.expiresAt) {
+              remove(ref(db, `messages/group/${key}`));
             }
           }
-        }).catch(err => console.error(err));
+        }).catch(()=>{});
       }
-    }, 15000); // यह कोड हर 15 सेकंड में बैकग्राउंड में चेक करेगा
-
+    }, 15000);
+    
   </script>
 </body>
 </html>
