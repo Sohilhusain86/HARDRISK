@@ -523,63 +523,45 @@
       justify-content: space-between;
       padding: 16px;
     }
+
+      /* Phase 3 Fixed: Status Tray & Clean Modals */
+    .status-tray-wrapper {
+      display: flex; gap: 12px; padding: 10px 14px; overflow-x: auto;
+      background: #111b21; border-bottom: 1px solid rgba(255,255,255,0.08); white-space: nowrap;
+    }
+    .status-circle-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; width: 56px; }
+    .status-ring {
+      width: 50px; height: 50px; border-radius: 50%; padding: 2px;
+      border: 2px solid #00a884; display: flex; align-items: center; justify-content: center;
+    }
+    .status-ring.my-status { border: 2px dashed #8696a0; }
+    .status-avatar {
+      width: 100%; height: 100%; border-radius: 50%; background-size: cover; background-position: center;
+      background-color: #202c33; display: flex; align-items: center; justify-content: center; font-size: 1rem; color: #fff;
+    }
+    .status-user-label { font-size: 0.68rem; color: #8696a0; margin-top: 4px; max-width: 54px; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+
+    /* Modal Form Inputs */
+    .wa-form-input {
+      width: 100%; background: #202c33; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+      padding: 9px 12px; color: #e9edef; font-size: 0.85rem; margin-bottom: 10px; outline: none; box-sizing: border-box;
+    }
+    .wa-form-input:focus { border-color: #00a884; }
+
+    /* Fullscreen Status Viewer */
+    .status-viewer-modal {
+      position: fixed; inset: 0; background: #0b141a; z-index: 99999; display: none;
+      flex-direction: column; justify-content: space-between; padding: 16px; box-sizing: border-box;
+    }
     .status-viewer-modal.active { display: flex; }
-    .status-progress-bar {
-      height: 3px;
-      background: rgba(255,255,255,0.2);
-      width: 100%;
-      border-radius: 2px;
-      margin-bottom: 12px;
-      overflow: hidden;
-    }
-    .status-progress-fill {
-      height: 100%;
-      background: #00a884;
-      width: 0%;
-      transition: width 5s linear;
-    }
+    .status-progress-bar { height: 3px; background: rgba(255,255,255,0.2); width: 100%; border-radius: 2px; margin-bottom: 12px; overflow: hidden; }
+    .status-progress-fill { height: 100%; background: #00a884; width: 0%; transition: width 5s linear; }
 
-    /* Exchange & Notice Modals & Cards */
-    .exchange-card {
-      background: #202c33;
-      border-radius: 8px;
-      padding: 10px 12px;
-      margin-bottom: 10px;
-      border-left: 4px solid #00a884;
-    }
+    /* Cards */
+    .exchange-card { background: #202c33; border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; border-left: 4px solid #00a884; }
     .exchange-card.need { border-left-color: #ef4444; }
-    .exchange-tag {
-      font-size: 0.65rem;
-      font-weight: bold;
-      padding: 2px 6px;
-      border-radius: 4px;
-      display: inline-block;
-      margin-bottom: 4px;
-    }
-    .exchange-tag.need { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-    .exchange-tag.available { background: rgba(0, 168, 132, 0.2); color: #00a884; }
-    .exchange-tag.resolved { background: rgba(134, 150, 160, 0.2); color: #8696a0; }
-
-    /* Digital Notice Pinboard */
-    .pinboard-card {
-      background: #202c33;
-      border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 10px;
-      border-left: 4px solid #facc15;
-      position: relative;
-    }
-    .pinboard-badge {
-      background: rgba(250, 204, 21, 0.15);
-      color: #facc15;
-      font-size: 0.68rem;
-      font-weight: bold;
-      padding: 2px 6px;
-      border-radius: 4px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      }
+    .pinboard-card { background: #202c33; border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #facc15; }
+      
   </style>
 </head>
 <body>
@@ -3385,13 +3367,25 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
     };
     
   // =========================================================
-    // ⚡ PHASE 3: 24-HR STATUS, BOOK EXCHANGE & PINBOARD
+    // ⚡ PHASE 3 BUG-FREE: STATUS (IMAGE/TEXT), EXCHANGE & PINBOARD
     // =========================================================
 
     window.currentViewingStatus = null;
+    window.tempStatusImgBase64 = "";
     let statusTimer = null;
 
-    // 1. Inject Status Tray & Navigation Buttons
+    // Safe DB Listener (handles both onValue or get fallback)
+    function safeListen(pathStr, callback) {
+      if (typeof onValue === 'function') {
+        onValue(ref(db, pathStr), callback);
+      } else {
+        const fetchOnce = () => get(ref(db, pathStr)).then(callback).catch(err => console.error(err));
+        fetchOnce();
+        setInterval(fetchOnce, 8000);
+      }
+    }
+
+    // 1. Inject UI Elements into Chat Screen
     window.setupPhase3UI = function() {
       const usersContainer = document.getElementById('users-dynamic-list');
       if (!usersContainer) return;
@@ -3399,13 +3393,13 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       const filterBar = document.getElementById('wa-filter-bar');
       const headerDock = usersContainer.parentElement;
 
-      // Status Tray (Stories)
+      // Inject Status Tray
       if (!document.getElementById('status-tray')) {
         const tray = document.createElement('div');
         tray.id = 'status-tray';
         tray.className = 'status-tray-wrapper';
         tray.innerHTML = `
-          <div class="status-circle-item" onclick="window.promptCreateStatus()">
+          <div class="status-circle-item" onclick="document.getElementById('create-status-modal').classList.add('active')">
             <div class="status-ring my-status">
               <div class="status-avatar"><i class="fa-solid fa-plus"></i></div>
             </div>
@@ -3413,14 +3407,11 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
           </div>
           <div id="peer-statuses-dock" style="display:flex; gap:12px;"></div>
         `;
-        if (filterBar) {
-          headerDock.insertBefore(tray, filterBar);
-        } else {
-          headerDock.insertBefore(tray, usersContainer);
-        }
+        if (filterBar) headerDock.insertBefore(tray, filterBar);
+        else headerDock.insertBefore(tray, usersContainer);
       }
 
-      // Add 'एक्सचेंज' and 'नोटिस बोर्ड' Filter Pills into Header
+      // Inject Filter Pills
       if (filterBar) {
         if (!document.getElementById('pill-exchange')) {
           const exPill = document.createElement('button');
@@ -3441,32 +3432,85 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       }
     };
 
-    // Auto-hook into RenderUsers so Phase 3 UI renders automatically
-    const prevRenderWithPhase3 = window.renderAllUsersList;
+    // Auto-hook into RenderUsers
+    const hookRenderPhase3 = window.renderAllUsersList;
     window.renderAllUsersList = function(usersMap) {
-      if (prevRenderWithPhase3) prevRenderWithPhase3(usersMap);
+      if (hookRenderPhase3) hookRenderPhase3(usersMap);
       window.setupPhase3UI();
     };
+    setTimeout(() => { if (window.setupPhase3UI) window.setupPhase3UI(); }, 400);
 
-    // Run setup immediately on load
-    setTimeout(() => { if (window.setupPhase3UI) window.setupPhase3UI(); }, 300);
+    // 2. Image Compression & Status Submission
+    window.previewStatusImage = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
 
-    // 2. Status Logic (Create, Auto-Delete > 24 Hours, Views, Reply)
-    window.promptCreateStatus = function() {
-      const text = prompt("स्टेटस में क्या लिखना चाहते हैं? (किताब, सबक या पैगाम):");
-      if (!text) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 600;
+          let w = img.width;
+          let h = img.height;
+          if (w > h && w > maxDim) { h *= maxDim / w; w = maxDim; }
+          else if (h > maxDim) { w *= maxDim / h; h = maxDim; }
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          window.tempStatusImgBase64 = canvas.toDataURL('image/jpeg', 0.65);
+
+          document.getElementById('status-preview-img-tag').src = window.tempStatusImgBase64;
+          document.getElementById('status-img-preview-box').style.display = 'block';
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+
+    window.removeStatusImagePreview = function() {
+      window.tempStatusImgBase64 = "";
+      document.getElementById('status-file-picker').value = "";
+      document.getElementById('status-img-preview-box').style.display = 'none';
+    };
+
+    window.submitNewStatus = function() {
+      const text = document.getElementById('status-input-text').value.trim();
+      const img = window.tempStatusImgBase64;
+
+      if (!text && !img) {
+        alert("कृपया कुछ लिखें या फोटो चुनें!");
+        return;
+      }
+      if (!window.currentUser || !window.currentUser.phone) {
+        alert("यूज़र लोड नहीं हुआ है। कृपया पेज रिफ्रेश करें।");
+        return;
+      }
+
       const cleanPhone = window.currentUser.phone.replace(/[^0-9]/g, '');
-      set(ref(db, `statuses/${cleanPhone}`), {
+      const payload = {
         senderPhone: cleanPhone,
         senderName: window.currentUser.displayName || window.currentUser.name,
         dpUrl: window.currentUser.dpUrl || '',
         text: text,
+        image: img || '',
         timestamp: Date.now(),
         viewers: {}
-      }).then(() => alert("माशाअल्लाह! आपका स्टेटस 24 घंटे के लिए पोस्ट हो गया।"));
+      };
+
+      // Using update to avoid missing set() imports
+      update(ref(db, `statuses/${cleanPhone}`), payload)
+        .then(() => {
+          alert("माशाअल्लाह! आपका स्टेटस 24 घंटे के लिए पोस्ट हो गया।");
+          document.getElementById('create-status-modal').classList.remove('active');
+          document.getElementById('status-input-text').value = "";
+          window.removeStatusImagePreview();
+        })
+        .catch(err => alert("सबमिट नहीं हो सका: " + err.message));
     };
 
-    onValue(ref(db, 'statuses'), snap => {
+    // Listen & Render Status Tray
+    safeListen('statuses', snap => {
       window.setupPhase3UI();
       const peerDock = document.getElementById('peer-statuses-dock');
       if (!peerDock) return;
@@ -3481,6 +3525,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
           remove(ref(db, `statuses/${phone}`));
           return;
         }
+
         const circle = document.createElement('div');
         circle.className = 'status-circle-item';
         circle.onclick = () => window.openStatusViewer(item);
@@ -3498,25 +3543,35 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       });
     });
 
-    window.openStatusViewer = function(statusData) {
-      window.currentViewingStatus = statusData;
+    // 3. Status Viewer
+    window.openStatusViewer = function(item) {
+      window.currentViewingStatus = item;
       const modal = document.getElementById('status-viewer');
-      const prog = document.getElementById('status-progress');
-      
-      document.getElementById('status-view-name').innerText = statusData.senderName;
-      document.getElementById('status-view-time').innerText = new Date(statusData.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      document.getElementById('status-view-body').innerText = statusData.text;
-      
-      const viewersList = Object.keys(statusData.viewers || {});
-      document.getElementById('status-viewers-count').innerHTML = `<i class="fa-solid fa-eye"></i> ${viewersList.length} ने देखा`;
+      const imgTag = document.getElementById('status-view-img');
+      const textTag = document.getElementById('status-view-text');
+
+      document.getElementById('status-view-name').innerText = item.senderName;
+      document.getElementById('status-view-time').innerText = new Date(item.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+      if (item.image) {
+        imgTag.src = item.image;
+        imgTag.style.display = 'block';
+      } else {
+        imgTag.style.display = 'none';
+      }
+      textTag.innerText = item.text || '';
+
+      const viewers = Object.keys(item.viewers || {});
+      document.getElementById('status-viewers-count').innerHTML = `<i class="fa-solid fa-eye"></i> ${viewers.length} ने देखा`;
 
       modal.classList.add('active');
+      const prog = document.getElementById('status-progress');
       prog.style.width = '0%';
       setTimeout(() => { prog.style.width = '100%'; }, 50);
 
-      const cleanPhone = window.currentUser.phone.replace(/[^0-9]/g, '');
-      if (cleanPhone !== statusData.senderPhone) {
-        update(ref(db, `statuses/${statusData.senderPhone}/viewers`), {
+      const cleanPhone = window.currentUser?.phone ? window.currentUser.phone.replace(/[^0-9]/g, '') : '';
+      if (cleanPhone && cleanPhone !== item.senderPhone) {
+        update(ref(db, `statuses/${item.senderPhone}/viewers`), {
           [cleanPhone]: window.currentUser.displayName || window.currentUser.name
         });
       }
@@ -3543,134 +3598,144 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         window.currentUser.phone, 
         window.currentUser.displayName, 
         window.currentUser.role, 
-        `[STATUS_REPLY] ❝${window.currentViewingStatus.text}❞ ➔ ${reply}`, 
+        `[STATUS_REPLY] ➔ ${reply}`, 
         window.currentUser.location
       );
       alert("जवाब साथी के इनबॉक्स में भेज दिया गया!");
     };
 
-    // 3. Book Exchange Logic
+    // 4. Book Exchange Submission & Rendering
     window.openBookExchangeModal = function() {
       document.getElementById('exchange-modal').classList.add('active');
-      const listContainer = document.getElementById('exchange-cards-list');
-      
-      onValue(ref(db, 'book_exchange'), snap => {
-        listContainer.innerHTML = "";
+      const list = document.getElementById('exchange-cards-list');
+
+      safeListen('book_exchange', snap => {
+        list.innerHTML = "";
         const data = snap.val() || {};
         const keys = Object.keys(data).reverse();
 
         if (keys.length === 0) {
-          listContainer.innerHTML = "<p style='color:#8696a0; text-align:center; padding:12px;'>अभी कोई नोटिस नहीं है।</p>";
+          list.innerHTML = "<p style='color:#8696a0; text-align:center; padding:12px;'>अभी कोई नोटिस नहीं है।</p>";
           return;
         }
 
         keys.forEach(k => {
-          const item = data[k];
-          const isResolved = item.resolved === true;
-          const isOwner = item.senderPhone === window.currentUser.phone;
-
+          const it = data[k];
+          const isOwner = it.senderPhone === window.currentUser?.phone?.replace(/[^0-9]/g, '');
           const card = document.createElement('div');
-          card.className = `exchange-card ${item.type}`;
+          card.className = `exchange-card ${it.type}`;
           card.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-              <span class="exchange-tag ${isResolved ? 'resolved' : item.type}">
-                ${isResolved ? '✓ हल हो गया (Solved)' : (item.type === 'need' ? '📢 किताब चाहिए' : '📗 उपलब्ध है')}
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="exchange-tag ${it.resolved ? 'resolved' : it.type}">
+                ${it.resolved ? '✓ हल हो गया (Solved)' : (it.type === 'need' ? '📢 चाहिए' : '📗 उपलब्ध है')}
               </span>
-              ${isOwner && !isResolved ? `<button onclick="window.markExchangeResolved('${k}')" style="background:#00a884; border:none; color:#fff; font-size:0.68rem; padding:2px 6px; border-radius:4px; cursor:pointer;">हल हुआ मार्क करें</button>` : ''}
+              ${isOwner && !it.resolved ? `<button onclick="window.markExchangeResolved('${k}')" style="background:#00a884; border:none; color:#fff; font-size:0.68rem; padding:2px 6px; border-radius:4px; cursor:pointer;">हल हुआ मार्क करें</button>` : ''}
             </div>
-            <div style="font-size:0.9rem; font-weight:bold; color:#e9edef; margin:4px 0;">${item.bookTitle}</div>
-            <div style="font-size:0.78rem; color:#8696a0; margin-bottom:6px;">${item.description}</div>
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.05); padding-top:6px; font-size:0.72rem; color:#8696a0;">
-              <span>तालिब-ए-इल्म: <b style="color:#e9edef;">${item.senderName}</b></span>
-              <span onclick="window.openPrivateChat('${item.senderPhone}', '${item.senderName}', '')" style="color:#00a884; cursor:pointer; font-weight:bold;"><i class="fa-solid fa-comment-dots"></i> चैट करें</span>
+            <div style="font-weight:bold; color:#e9edef; font-size:0.9rem; margin:4px 0;">${it.bookTitle}</div>
+            <div style="font-size:0.78rem; color:#8696a0; margin-bottom:6px;">${it.description}</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.05); padding-top:6px; font-size:0.72rem;">
+              <span style="color:#8696a0;">तालिब-ए-इल्म: <b style="color:#e9edef;">${it.senderName}</b></span>
+              <span onclick="window.openPrivateChat('${it.senderPhone}', '${it.senderName}', '')" style="color:#00a884; cursor:pointer; font-weight:bold;"><i class="fa-solid fa-comment-dots"></i> चैट करें</span>
             </div>
           `;
-          listContainer.appendChild(card);
+          list.appendChild(card);
         });
       });
     };
 
-    window.postNewExchangePrompt = function() {
-      const type = confirm("क्या आपको किताब चाहिए? ('OK' = किताब चाहिए, 'Cancel' = मेरे पास उपलब्ध है)") ? 'need' : 'available';
-      const bookTitle = prompt("किताब या गाइड का नाम लिखें:");
-      if (!bookTitle) return;
-      const desc = prompt("तफ़सील (कंडीशन या ज़रूरत की वजह):") || "राब्ता करें";
+    window.submitExchangePost = function() {
+      const type = document.getElementById('ex-post-type').value;
+      const title = document.getElementById('ex-post-title').value.trim();
+      const desc = document.getElementById('ex-post-desc').value.trim() || "कोई विवरण नहीं";
 
-      push(ref(db, 'book_exchange'), {
+      if (!title) { alert("किताब का नाम लिखें!"); return; }
+
+      const id = Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+      update(ref(db, `book_exchange/${id}`), {
         type: type,
-        bookTitle: bookTitle,
+        bookTitle: title,
         description: desc,
         senderName: window.currentUser.displayName || window.currentUser.name,
         senderPhone: window.currentUser.phone.replace(/[^0-9]/g, ''),
         timestamp: Date.now(),
         resolved: false
-      }).then(() => alert("नोटिस बोर्ड पर पोस्ट हो गया!"));
+      }).then(() => {
+        alert("नोटिस बोर्ड पर पोस्ट हो गया!");
+        document.getElementById('ex-post-title').value = "";
+        document.getElementById('ex-post-desc').value = "";
+      }).catch(err => alert("सबमिट नहीं हो सका: " + err.message));
     };
 
     window.markExchangeResolved = function(id) {
       update(ref(db, `book_exchange/${id}`), { resolved: true });
     };
 
-    // 4. Digital Class Notice Board (Pinboard Logic)
+    // 5. Digital Notice Board (Pinboard)
     window.openNoticeBoardModal = function() {
       document.getElementById('notice-board-modal').classList.add('active');
-      const listContainer = document.getElementById('notice-board-list');
+      const isAdmin = window.currentUser?.role === 'admin';
+      const form = document.getElementById('admin-notice-form');
+      if (form) form.style.display = isAdmin ? 'block' : 'none';
 
-      onValue(ref(db, 'class_pinboard'), snap => {
-        listContainer.innerHTML = "";
+      const list = document.getElementById('notice-board-list');
+      safeListen('class_pinboard', snap => {
+        list.innerHTML = "";
         const data = snap.val() || {};
         const keys = Object.keys(data).reverse();
 
         if (keys.length === 0) {
-          listContainer.innerHTML = "<p style='color:#8696a0; text-align:center; padding:12px;'>अभी कोई आधिकारिक नोटिस जारी नहीं हुआ है।</p>";
+          list.innerHTML = "<p style='color:#8696a0; text-align:center; padding:12px;'>अभी कोई नोटिस नहीं है।</p>";
           return;
         }
 
         keys.forEach(k => {
           const n = data[k];
-          const isAdmin = window.currentUser?.role === 'admin';
           const card = document.createElement('div');
           card.className = 'pinboard-card';
           card.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <span class="pinboard-badge"><i class="fa-solid fa-thumbtack"></i> ${n.category || 'आधिकारिक सूचना'}</span>
-              <small style="color:#8696a0; font-size:0.68rem;">${new Date(n.timestamp).toLocaleDateString()} ${new Date(n.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</small>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="background:rgba(250,204,21,0.15); color:#facc15; font-size:0.68rem; font-weight:bold; padding:2px 6px; border-radius:4px;">📌 ${n.category}</span>
+              <small style="color:#8696a0; font-size:0.68rem;">${new Date(n.timestamp).toLocaleDateString()}</small>
             </div>
             <div style="font-weight:bold; color:#e9edef; font-size:0.92rem; margin-bottom:4px;">${n.title}</div>
             <div style="color:#cbd5e1; font-size:0.82rem; line-height:1.4; white-space:pre-wrap;">${n.content}</div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; border-top:1px solid rgba(255,255,255,0.06); padding-top:6px;">
               <small style="color:#8696a0; font-size:0.7rem;">जारीकर्ता: <b style="color:#facc15;">${n.senderName}</b></small>
-              ${isAdmin ? `<button onclick="window.deleteClassNotice('${k}')" style="background:#ef4444; border:none; color:#fff; border-radius:4px; font-size:0.65rem; padding:2px 6px; cursor:pointer;"><i class="fa-solid fa-trash"></i> हटाएँ</button>` : ''}
+              ${isAdmin ? `<button onclick="window.deleteNotice('${k}')" style="background:#ef4444; border:none; color:#fff; border-radius:4px; font-size:0.65rem; padding:2px 6px; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>` : ''}
             </div>
           `;
-          listContainer.appendChild(card);
+          list.appendChild(card);
         });
       });
     };
 
-    window.postClassNoticePrompt = function() {
-      const title = prompt("नोटिस का शीर्षक (Title) लिखें (जैसे: इम्तिहान ऐलान, छुट्टी की सूचना):");
-      if (!title) return;
-      const content = prompt("नोटिस का पूरा विवरण लिखें:");
-      if (!content) return;
-      const cat = prompt("कैटिगरी लिखें (जैसे: परीक्षा, छुट्टी, मदरसा ऐलान, ज़रूरी):") || "ज़रूरी";
+    window.submitNoticePost = function() {
+      const title = document.getElementById('notice-input-title').value.trim();
+      const content = document.getElementById('notice-input-content').value.trim();
+      const cat = document.getElementById('notice-input-cat').value;
 
-      push(ref(db, 'class_pinboard'), {
+      if (!title || !content) { alert("शीर्षक और विवरण दोनों भरें!"); return; }
+
+      const id = Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+      update(ref(db, `class_pinboard/${id}`), {
         title: title,
         content: content,
         category: cat,
         senderName: window.currentUser.displayName || window.currentUser.name,
-        senderPhone: window.currentUser.phone.replace(/[^0-9]/g, ''),
         timestamp: Date.now()
-      }).then(() => alert("आधिकारिक नोटिस पिनबोर्ड पर चस्पाँ कर दिया गया!"));
+      }).then(() => {
+        alert("आधिकारिक नोटिस जारी कर दिया गया!");
+        document.getElementById('notice-input-title').value = "";
+        document.getElementById('notice-input-content').value = "";
+      }).catch(err => alert("सबमिट नहीं हो सका: " + err.message));
     };
 
-    window.deleteClassNotice = function(id) {
-      if (confirm("क्या आप वाकई इस नोटिस को हटाना चाहते हैं?")) {
+    window.deleteNotice = function(id) {
+      if (confirm("नोटिस हटाना चाहते हैं?")) {
         remove(ref(db, `class_pinboard/${id}`));
       }
     };
-
+    
   </script>
 
 <!-- 🟢 Status Viewer Modal -->
@@ -3689,41 +3754,91 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       </div>
     </div>
     
-    <div id="status-view-body" style="text-align:center; color:#fff; font-size:1.2rem; padding:20px; word-break:break-word;"></div>
+    <div id="status-view-body" style="text-align:center; color:#fff; flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:10px;">
+      <img id="status-view-img" src="" style="max-height:60vh; max-width:100%; border-radius:8px; display:none; object-fit:contain; margin-bottom:10px;" />
+      <div id="status-view-text" style="font-size:1.15rem; line-height:1.4; word-break:break-word;"></div>
+    </div>
 
     <div style="display:flex; justify-content:space-between; align-items:center;">
       <span id="status-viewers-count" style="color:#8696a0; font-size:0.75rem;"><i class="fa-solid fa-eye"></i> 0</span>
-      <button id="btn-status-reply" class="peer-card-btn" onclick="window.replyToCurrentStatus()">
-        <i class="fa-solid fa-reply"></i> जवाब दें
-      </button>
+      <button class="peer-card-btn" onclick="window.replyToCurrentStatus()"><i class="fa-solid fa-reply"></i> जवाब दें</button>
+    </div>
+  </div>
+
+  <!-- 📸 Create Status Modal (Photo + Text) -->
+  <div id="create-status-modal" class="wa-modal-overlay">
+    <div class="wa-modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="color:#e9edef; margin:0; font-size:1rem;"><i class="fa-solid fa-circle-plus" style="color:#00a884;"></i> नया स्टेटस लगाएँ</h3>
+        <button onclick="document.getElementById('create-status-modal').classList.remove('active')" style="background:transparent; border:none; color:#8696a0; font-size:1.4rem; cursor:pointer;">&times;</button>
+      </div>
+      <textarea id="status-input-text" class="wa-form-input" rows="3" placeholder="यहाँ कुछ लिखें (सबक, मसला या पैगाम)..."></textarea>
+      
+      <!-- Image Picker -->
+      <div style="margin-bottom:12px;">
+        <label for="status-file-picker" style="display:inline-flex; align-items:center; gap:6px; background:#202c33; color:#00a884; border:1px dashed #00a884; padding:8px 12px; border-radius:6px; font-size:0.8rem; cursor:pointer; width:100%; justify-content:center; box-sizing:border-box;">
+          <i class="fa-solid fa-camera"></i> किताब / नोट्स की फोटो चुनें
+        </label>
+        <input type="file" id="status-file-picker" accept="image/*" style="display:none;" onchange="window.previewStatusImage(event)">
+        <div id="status-img-preview-box" style="margin-top:8px; display:none; position:relative;">
+          <img id="status-preview-img-tag" style="width:100%; max-height:160px; object-fit:cover; border-radius:6px;">
+          <button onclick="window.removeStatusImagePreview()" style="position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.7); color:#fff; border:none; border-radius:50%; width:24px; height:24px; cursor:pointer;">&times;</button>
+        </div>
+      </div>
+
+      <button class="peer-card-btn" style="width:100%;" onclick="window.submitNewStatus()"><i class="fa-solid fa-paper-plane"></i> 24 घंटे के लिए पोस्ट करें</button>
     </div>
   </div>
 
   <!-- 📚 Book Exchange Modal -->
   <div id="exchange-modal" class="wa-modal-overlay">
-    <div class="wa-modal-content" style="max-height:85vh;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
-        <h3 style="color:#e9edef; margin:0; font-size:1rem;"><i class="fa-solid fa-book-bookmark" style="color:#00a884;"></i> किताब व कॉपी एक्सचेंज</h3>
+    <div class="wa-modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="color:#e9edef; margin:0; font-size:1rem;"><i class="fa-solid fa-book-bookmark" style="color:#00a884;"></i> किताब व स्टेशनरी एक्सचेंज</h3>
         <button onclick="document.getElementById('exchange-modal').classList.remove('active')" style="background:transparent; border:none; color:#8696a0; font-size:1.4rem; cursor:pointer;">&times;</button>
       </div>
-      <button class="peer-card-btn" style="width:100%; margin-bottom:12px;" onclick="window.postNewExchangePrompt()">
-        <i class="fa-solid fa-plus"></i> नया नोटिस पोस्ट करें (चाहिए / उपलब्ध है)
-      </button>
-      <div id="exchange-cards-list" style="overflow-y:auto; max-height:55vh;"></div>
+      
+      <!-- New Post Form Box -->
+      <div style="background:#182229; padding:10px; border-radius:8px; margin-bottom:12px;">
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+          <select id="ex-post-type" class="wa-form-input" style="margin-bottom:0; flex:1;">
+            <option value="need">📢 मुझे किताब चाहिए</option>
+            <option value="available">📗 मेरे पास उपलब्ध है</option>
+          </select>
+          <input type="text" id="ex-post-title" class="wa-form-input" placeholder="किताब का नाम" style="margin-bottom:0; flex:2;">
+        </div>
+        <input type="text" id="ex-post-desc" class="wa-form-input" placeholder="विवरण (जैसे: शरह जामी चाहिए, हाल ठीक हो)">
+        <button class="peer-card-btn" style="width:100%;" onclick="window.submitExchangePost()"><i class="fa-solid fa-plus"></i> नोटिस बोर्ड पर जोड़ें</button>
+      </div>
+
+      <div id="exchange-cards-list" style="overflow-y:auto; max-height:45vh;"></div>
     </div>
   </div>
 
   <!-- 📌 Digital Notice Pinboard Modal -->
   <div id="notice-board-modal" class="wa-modal-overlay">
-    <div class="wa-modal-content" style="max-height:85vh;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+    <div class="wa-modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <h3 style="color:#e9edef; margin:0; font-size:1rem;"><i class="fa-solid fa-thumbtack" style="color:#facc15;"></i> डिजिटल क्लास नोटिस बोर्ड</h3>
         <button onclick="document.getElementById('notice-board-modal').classList.remove('active')" style="background:transparent; border:none; color:#8696a0; font-size:1.4rem; cursor:pointer;">&times;</button>
       </div>
-      <button id="btn-create-notice" class="peer-card-btn" style="width:100%; margin-bottom:12px; background:#d97706;" onclick="window.postClassNoticePrompt()">
-        <i class="fa-solid fa-bullhorn"></i> नया आधिकारिक नोटिस जारी करें
-      </button>
-      <div id="notice-board-list" style="overflow-y:auto; max-height:55vh;"></div>
+
+      <!-- Admin Notice Form -->
+      <div id="admin-notice-form" style="background:#182229; padding:10px; border-radius:8px; margin-bottom:12px; display:none;">
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+          <input type="text" id="notice-input-title" class="wa-form-input" placeholder="शीर्षक (Title)" style="margin-bottom:0; flex:2;">
+          <select id="notice-input-cat" class="wa-form-input" style="margin-bottom:0; flex:1;">
+            <option value="परीक्षा">परीक्षा</option>
+            <option value="छुट्टी">छुट्टी</option>
+            <option value="मदरसा ऐलान">ऐलान</option>
+            <option value="ज़रूरी">ज़रूरी</option>
+          </select>
+        </div>
+        <textarea id="notice-input-content" class="wa-form-input" rows="2" placeholder="पूरा विवरण लिखें..."></textarea>
+        <button class="peer-card-btn" style="width:100%; background:#d97706;" onclick="window.submitNoticePost()"><i class="fa-solid fa-bullhorn"></i> नोटिस जारी करें</button>
+      </div>
+
+      <div id="notice-board-list" style="overflow-y:auto; max-height:45vh;"></div>
     </div>
   </div>
 
