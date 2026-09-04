@@ -524,14 +524,14 @@
       padding: 16px;
     }
 
-      /* Phase 3 Fixed: Status Tray & Clean Modals */
+   /* Enhanced Status Stories System */
     .status-tray-wrapper {
       display: flex; gap: 12px; padding: 10px 14px; overflow-x: auto;
       background: #111b21; border-bottom: 1px solid rgba(255,255,255,0.08); white-space: nowrap;
     }
     .status-circle-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; width: 56px; }
     .status-ring {
-      width: 50px; height: 50px; border-radius: 50%; padding: 2px;
+      width: 52px; height: 52px; border-radius: 50%; padding: 2px;
       border: 2px solid #00a884; display: flex; align-items: center; justify-content: center;
     }
     .status-ring.my-status { border: 2px dashed #8696a0; }
@@ -554,14 +554,27 @@
       flex-direction: column; justify-content: space-between; padding: 16px; box-sizing: border-box;
     }
     .status-viewer-modal.active { display: flex; }
-    .status-progress-bar { height: 3px; background: rgba(255,255,255,0.2); width: 100%; border-radius: 2px; margin-bottom: 12px; overflow: hidden; }
-    .status-progress-fill { height: 100%; background: #00a884; width: 0%; transition: width 5s linear; }
+    .status-progress-bar { height: 3px; background: rgba(255,255,255,0.25); width: 100%; border-radius: 2px; margin-bottom: 12px; overflow: hidden; }
+    .status-progress-fill { height: 100%; background: #00a884; width: 0%; }
+
+    /* Color picker for text status */
+    .status-color-palette { display: flex; gap: 8px; margin-bottom: 10px; }
+    .color-bullet { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+    .color-bullet.active { border-color: #fff; transform: scale(1.1); }
+
+    /* Viewers details popup */
+    .viewers-drawer {
+      position: fixed; bottom: 0; left: 0; right: 0; background: #1f2c34;
+      border-top-left-radius: 16px; border-top-right-radius: 16px; padding: 16px;
+      z-index: 100000; display: none; max-height: 50vh; overflow-y: auto;
+    }
+    .viewers-drawer.active { display: block; }
 
     /* Cards */
     .exchange-card { background: #202c33; border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; border-left: 4px solid #00a884; }
     .exchange-card.need { border-left-color: #ef4444; }
     .pinboard-card { background: #202c33; border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #facc15; }
-      
+    
   </style>
 </head>
 <body>
@@ -3367,14 +3380,16 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
     };
     
   // =========================================================
-    // ⚡ PHASE 3 BUG-FREE: STATUS (IMAGE/TEXT), EXCHANGE & PINBOARD
+    // ⚡ PHASE 3 COMPLETE: VIDEO/PHOTO/TEXT STATUS, EXCHANGE & PINBOARD
     // =========================================================
 
     window.currentViewingStatus = null;
-    window.tempStatusImgBase64 = "";
+    window.tempStatusMedia = { type: null, base64: null };
+    window.tempStatusBgColor = "#0b141a";
     let statusTimer = null;
+    let videoTimeUpdateListener = null;
 
-    // Safe DB Listener (handles both onValue or get fallback)
+    // Safe DB Listener
     function safeListen(pathStr, callback) {
       if (typeof onValue === 'function') {
         onValue(ref(db, pathStr), callback);
@@ -3385,7 +3400,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       }
     }
 
-    // 1. Inject UI Elements into Chat Screen
+    // 1. Inject Status Tray & Navigation Buttons
     window.setupPhase3UI = function() {
       const usersContainer = document.getElementById('users-dynamic-list');
       if (!usersContainer) return;
@@ -3393,7 +3408,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       const filterBar = document.getElementById('wa-filter-bar');
       const headerDock = usersContainer.parentElement;
 
-      // Inject Status Tray
+      // Status Tray
       if (!document.getElementById('status-tray')) {
         const tray = document.createElement('div');
         tray.id = 'status-tray';
@@ -3411,7 +3426,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         else headerDock.insertBefore(tray, usersContainer);
       }
 
-      // Inject Filter Pills
+      // Add 'एक्सचेंज' and 'नोटिस बोर्ड' Filter Pills
       if (filterBar) {
         if (!document.getElementById('pill-exchange')) {
           const exPill = document.createElement('button');
@@ -3440,8 +3455,15 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
     };
     setTimeout(() => { if (window.setupPhase3UI) window.setupPhase3UI(); }, 400);
 
-    // 2. Image Compression & Status Submission
-    window.previewStatusImage = function(e) {
+    // 2. Status Background Color Selector
+    window.setStatusBgColor = function(colorHex, elem) {
+      window.tempStatusBgColor = colorHex;
+      document.querySelectorAll('.color-bullet').forEach(b => b.classList.remove('active'));
+      if (elem) elem.classList.add('active');
+    };
+
+    // 3. Photo & Video Pickers
+    window.previewStatusImg = function(e) {
       const file = e.target.files[0];
       if (!file) return;
 
@@ -3451,41 +3473,72 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         img.onload = function() {
           const canvas = document.createElement('canvas');
           const maxDim = 600;
-          let w = img.width;
-          let h = img.height;
+          let w = img.width, h = img.height;
           if (w > h && w > maxDim) { h *= maxDim / w; w = maxDim; }
           else if (h > maxDim) { w *= maxDim / h; h = maxDim; }
-          canvas.width = w;
-          canvas.height = h;
+          canvas.width = w; canvas.height = h;
           canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          window.tempStatusImgBase64 = canvas.toDataURL('image/jpeg', 0.65);
 
-          document.getElementById('status-preview-img-tag').src = window.tempStatusImgBase64;
-          document.getElementById('status-img-preview-box').style.display = 'block';
+          window.tempStatusMedia = { type: 'image', base64: canvas.toDataURL('image/jpeg', 0.65) };
+          document.getElementById('status-preview-video-tag').style.display = 'none';
+          const prevImg = document.getElementById('status-preview-img-tag');
+          prevImg.src = window.tempStatusMedia.base64;
+          prevImg.style.display = 'block';
+          document.getElementById('status-media-preview-box').style.display = 'block';
         };
         img.src = evt.target.result;
       };
       reader.readAsDataURL(file);
     };
 
-    window.removeStatusImagePreview = function() {
-      window.tempStatusImgBase64 = "";
-      document.getElementById('status-file-picker').value = "";
-      document.getElementById('status-img-preview-box').style.display = 'none';
-    };
+    window.previewStatusVideo = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
 
-    window.submitNewStatus = function() {
-      const text = document.getElementById('status-input-text').value.trim();
-      const img = window.tempStatusImgBase64;
-
-      if (!text && !img) {
-        alert("कृपया कुछ लिखें या फोटो चुनें!");
+      if (file.size > 4.5 * 1024 * 1024) {
+        alert("वीडियो साइज 4MB से कम रखें ताकि स्टेटस फौरन लोड हो सके।");
+        e.target.value = "";
         return;
       }
-      if (!window.currentUser || !window.currentUser.phone) {
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        window.tempStatusMedia = { type: 'video', base64: evt.target.result };
+        document.getElementById('status-preview-img-tag').style.display = 'none';
+        const prevVid = document.getElementById('status-preview-video-tag');
+        prevVid.src = evt.target.result;
+        prevVid.style.display = 'block';
+        document.getElementById('status-media-preview-box').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    };
+
+    window.clearStatusMediaPreview = function() {
+      window.tempStatusMedia = { type: null, base64: null };
+      document.getElementById('status-file-img').value = "";
+      document.getElementById('status-file-video').value = "";
+      document.getElementById('status-preview-img-tag').style.display = 'none';
+      document.getElementById('status-preview-video-tag').style.display = 'none';
+      document.getElementById('status-media-preview-box').style.display = 'none';
+    };
+
+    // 4. Submit Status to Firebase
+    window.submitEnhancedStatus = function() {
+      const text = document.getElementById('status-input-text').value.trim();
+      const media = window.tempStatusMedia;
+
+      if (!text && !media.base64) {
+        alert("कृपया कुछ लिखें या फोटो/वीडियो चुनें!");
+        return;
+      }
+      if (!window.currentUser?.phone) {
         alert("यूज़र लोड नहीं हुआ है। कृपया पेज रिफ्रेश करें।");
         return;
       }
+
+      const postBtn = document.getElementById('btn-post-status-submit');
+      postBtn.disabled = true;
+      postBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> अपलोड हो रहा है...`;
 
       const cleanPhone = window.currentUser.phone.replace(/[^0-9]/g, '');
       const payload = {
@@ -3493,23 +3546,28 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         senderName: window.currentUser.displayName || window.currentUser.name,
         dpUrl: window.currentUser.dpUrl || '',
         text: text,
-        image: img || '',
+        mediaType: media.type || 'text',
+        mediaData: media.base64 || '',
+        bgColor: window.tempStatusBgColor || '#0b141a',
         timestamp: Date.now(),
         viewers: {}
       };
 
-      // Using update to avoid missing set() imports
       update(ref(db, `statuses/${cleanPhone}`), payload)
         .then(() => {
           alert("माशाअल्लाह! आपका स्टेटस 24 घंटे के लिए पोस्ट हो गया।");
           document.getElementById('create-status-modal').classList.remove('active');
           document.getElementById('status-input-text').value = "";
-          window.removeStatusImagePreview();
+          window.clearStatusMediaPreview();
         })
-        .catch(err => alert("सबमिट नहीं हो सका: " + err.message));
+        .catch(err => alert("अपलोड नहीं हुआ: " + err.message))
+        .finally(() => {
+          postBtn.disabled = false;
+          postBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> 24 घंटे के लिए पोस्ट करें`;
+        });
     };
 
-    // Listen & Render Status Tray
+    // 5. Render Statuses Real-time (Auto-Delete > 24 hrs)
     safeListen('statuses', snap => {
       window.setupPhase3UI();
       const peerDock = document.getElementById('peer-statuses-dock');
@@ -3543,47 +3601,120 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       });
     });
 
-    // 3. Status Viewer
+    // 6. Fullscreen Viewer Logic (Video Sync, Photo, Text)
     window.openStatusViewer = function(item) {
       window.currentViewingStatus = item;
       const modal = document.getElementById('status-viewer');
       const imgTag = document.getElementById('status-view-img');
+      const vidTag = document.getElementById('status-view-video');
       const textTag = document.getElementById('status-view-text');
+      const prog = document.getElementById('status-progress');
+      const delBtn = document.getElementById('btn-status-delete');
+
+      clearTimeout(statusTimer);
+      if (videoTimeUpdateListener) vidTag.removeEventListener('timeupdate', videoTimeUpdateListener);
+
+      prog.style.transition = 'none';
+      prog.style.width = '0%';
+      vidTag.pause();
+      vidTag.style.display = 'none';
+      imgTag.style.display = 'none';
 
       document.getElementById('status-view-name').innerText = item.senderName;
       document.getElementById('status-view-time').innerText = new Date(item.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
-      if (item.image) {
-        imgTag.src = item.image;
-        imgTag.style.display = 'block';
-      } else {
-        imgTag.style.display = 'none';
-      }
+      const cleanPhone = window.currentUser?.phone?.replace(/[^0-9]/g, '');
+      delBtn.style.display = (cleanPhone === item.senderPhone) ? 'block' : 'none';
+
       textTag.innerText = item.text || '';
+      textTag.style.background = item.bgColor || 'transparent';
+
+      if (item.mediaType === 'video' && item.mediaData) {
+        vidTag.src = item.mediaData;
+        vidTag.style.display = 'block';
+        vidTag.currentTime = 0;
+        vidTag.play().catch(e => console.log('Auto-play prevent:', e));
+
+        videoTimeUpdateListener = () => {
+          if (vidTag.duration) {
+            const pct = (vidTag.currentTime / vidTag.duration) * 100;
+            prog.style.width = pct + '%';
+          }
+        };
+        vidTag.addEventListener('timeupdate', videoTimeUpdateListener);
+        vidTag.onended = () => window.closeStatusViewer();
+      } else if (item.mediaType === 'image' && item.mediaData) {
+        imgTag.src = item.mediaData;
+        imgTag.style.display = 'block';
+        setTimeout(() => {
+          prog.style.transition = 'width 6s linear';
+          prog.style.width = '100%';
+        }, 50);
+        statusTimer = setTimeout(() => window.closeStatusViewer(), 6000);
+      } else {
+        setTimeout(() => {
+          prog.style.transition = 'width 5s linear';
+          prog.style.width = '100%';
+        }, 50);
+        statusTimer = setTimeout(() => window.closeStatusViewer(), 5000);
+      }
 
       const viewers = Object.keys(item.viewers || {});
       document.getElementById('status-viewers-count').innerHTML = `<i class="fa-solid fa-eye"></i> ${viewers.length} ने देखा`;
 
       modal.classList.add('active');
-      const prog = document.getElementById('status-progress');
-      prog.style.width = '0%';
-      setTimeout(() => { prog.style.width = '100%'; }, 50);
 
-      const cleanPhone = window.currentUser?.phone ? window.currentUser.phone.replace(/[^0-9]/g, '') : '';
       if (cleanPhone && cleanPhone !== item.senderPhone) {
         update(ref(db, `statuses/${item.senderPhone}/viewers`), {
-          [cleanPhone]: window.currentUser.displayName || window.currentUser.name
+          [cleanPhone]: {
+            name: window.currentUser.displayName || window.currentUser.name,
+            time: Date.now()
+          }
         });
       }
-
-      clearTimeout(statusTimer);
-      statusTimer = setTimeout(() => { window.closeStatusViewer(); }, 5000);
     };
 
     window.closeStatusViewer = function() {
       clearTimeout(statusTimer);
+      const vidTag = document.getElementById('status-view-video');
+      vidTag.pause();
+      vidTag.src = "";
       document.getElementById('status-viewer').classList.remove('active');
+      document.getElementById('status-viewers-drawer').classList.remove('active');
       document.getElementById('status-progress').style.width = '0%';
+    };
+
+    window.deleteMyActiveStatus = function() {
+      if (!window.currentViewingStatus) return;
+      if (confirm("क्या आप अपना यह स्टेटस अभी हटाना चाहते हैं?")) {
+        remove(ref(db, `statuses/${window.currentViewingStatus.senderPhone}`)).then(() => {
+          window.closeStatusViewer();
+          alert("स्टेटस हटा दिया गया।");
+        });
+      }
+    };
+
+    window.showViewersDrawer = function() {
+      if (!window.currentViewingStatus?.viewers) return;
+      const drawer = document.getElementById('status-viewers-drawer');
+      const listDiv = document.getElementById('viewers-name-list');
+      const vData = window.currentViewingStatus.viewers;
+      const keys = Object.keys(vData);
+
+      if (keys.length === 0) {
+        listDiv.innerHTML = "<p style='margin:6px 0;'>अभी किसी ने नहीं देखा।</p>";
+      } else {
+        listDiv.innerHTML = keys.map(k => {
+          const entry = vData[k];
+          const name = typeof entry === 'object' ? entry.name : entry;
+          const time = typeof entry === 'object' ? new Date(entry.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
+          return `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05); color:#e9edef;">
+            <span><i class="fa-solid fa-user-check" style="color:#00a884; margin-right:6px;"></i> ${name}</span>
+            <small style="color:#8696a0;">${time}</small>
+          </div>`;
+        }).join('');
+      }
+      drawer.classList.add('active');
     };
 
     window.replyToCurrentStatus = function() {
@@ -3604,7 +3735,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       alert("जवाब साथी के इनबॉक्स में भेज दिया गया!");
     };
 
-    // 4. Book Exchange Submission & Rendering
+    // 7. Book & Stationery Exchange Logic
     window.openBookExchangeModal = function() {
       document.getElementById('exchange-modal').classList.add('active');
       const list = document.getElementById('exchange-cards-list');
@@ -3670,7 +3801,7 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       update(ref(db, `book_exchange/${id}`), { resolved: true });
     };
 
-    // 5. Digital Notice Board (Pinboard)
+    // 8. Digital Class Notice Board (Pinboard)
     window.openNoticeBoardModal = function() {
       document.getElementById('notice-board-modal').classList.add('active');
       const isAdmin = window.currentUser?.role === 'admin';
@@ -3738,55 +3869,95 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
     
   </script>
 
-<!-- 🟢 Status Viewer Modal -->
+  <!-- 🟢 Enhanced Fullscreen Status Viewer (Video + Photo + Text) -->
   <div id="status-viewer" class="status-viewer-modal">
     <div>
       <div class="status-progress-bar"><div id="status-progress" class="status-progress-fill"></div></div>
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <div style="display:flex; align-items:center; gap:8px;">
-          <div id="status-view-avatar" style="width:36px; height:36px; border-radius:50%; background:#202c33; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold;"></div>
+          <div id="status-view-avatar" style="width:38px; height:38px; border-radius:50%; background:#202c33; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold;"></div>
           <div>
             <div id="status-view-name" style="color:#fff; font-size:0.85rem; font-weight:bold;"></div>
             <div id="status-view-time" style="color:#8696a0; font-size:0.7rem;"></div>
           </div>
         </div>
-        <button onclick="window.closeStatusViewer()" style="background:transparent; border:none; color:#fff; font-size:1.5rem; cursor:pointer;">&times;</button>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button id="btn-status-delete" onclick="window.deleteMyActiveStatus()" style="background:transparent; border:none; color:#ef4444; font-size:1.1rem; cursor:pointer; display:none;">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+          <button onclick="window.closeStatusViewer()" style="background:transparent; border:none; color:#fff; font-size:1.6rem; cursor:pointer;">&times;</button>
+        </div>
       </div>
     </div>
     
-    <div id="status-view-body" style="text-align:center; color:#fff; flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:10px;">
-      <img id="status-view-img" src="" style="max-height:60vh; max-width:100%; border-radius:8px; display:none; object-fit:contain; margin-bottom:10px;" />
-      <div id="status-view-text" style="font-size:1.15rem; line-height:1.4; word-break:break-word;"></div>
+    <!-- Media & Text Area -->
+    <div id="status-view-body" style="text-align:center; color:#fff; flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:10px; width:100%; box-sizing:border-box;">
+      <video id="status-view-video" playsinline webkit-playsinline style="max-height:65vh; max-width:100%; border-radius:8px; display:none; outline:none;"></video>
+      <img id="status-view-img" src="" style="max-height:65vh; max-width:100%; border-radius:8px; display:none; object-fit:contain; margin-bottom:8px;" />
+      <div id="status-view-text" style="font-size:1.25rem; line-height:1.4; word-break:break-word; max-width:90%; padding:15px; border-radius:8px;"></div>
     </div>
 
+    <!-- Bottom Actions & Viewers Counter -->
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <span id="status-viewers-count" style="color:#8696a0; font-size:0.75rem;"><i class="fa-solid fa-eye"></i> 0</span>
+      <span id="status-viewers-count" onclick="window.showViewersDrawer()" style="color:#cbd5e1; font-size:0.8rem; cursor:pointer; background:rgba(255,255,255,0.1); padding:4px 10px; border-radius:12px;">
+        <i class="fa-solid fa-eye"></i> 0
+      </span>
       <button class="peer-card-btn" onclick="window.replyToCurrentStatus()"><i class="fa-solid fa-reply"></i> जवाब दें</button>
     </div>
   </div>
 
-  <!-- 📸 Create Status Modal (Photo + Text) -->
+  <!-- 👁️ Viewers List Bottom Sheet -->
+  <div id="status-viewers-drawer" class="viewers-drawer">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:6px;">
+      <h4 style="margin:0; color:#e9edef; font-size:0.9rem;"><i class="fa-solid fa-users-viewfinder"></i> स्टेटस देखने वाले</h4>
+      <button onclick="document.getElementById('status-viewers-drawer').classList.remove('active')" style="background:transparent; border:none; color:#8696a0; font-size:1.2rem; cursor:pointer;">&times;</button>
+    </div>
+    <div id="viewers-name-list" style="font-size:0.82rem; color:#8696a0;"></div>
+  </div>
+
+  <!-- 📸 Create Status Modal (Video + Photo + Text + Background Color) -->
   <div id="create-status-modal" class="wa-modal-overlay">
     <div class="wa-modal-content">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <h3 style="color:#e9edef; margin:0; font-size:1rem;"><i class="fa-solid fa-circle-plus" style="color:#00a884;"></i> नया स्टेटस लगाएँ</h3>
         <button onclick="document.getElementById('create-status-modal').classList.remove('active')" style="background:transparent; border:none; color:#8696a0; font-size:1.4rem; cursor:pointer;">&times;</button>
       </div>
-      <textarea id="status-input-text" class="wa-form-input" rows="3" placeholder="यहाँ कुछ लिखें (सबक, मसला या पैगाम)..."></textarea>
-      
-      <!-- Image Picker -->
-      <div style="margin-bottom:12px;">
-        <label for="status-file-picker" style="display:inline-flex; align-items:center; gap:6px; background:#202c33; color:#00a884; border:1px dashed #00a884; padding:8px 12px; border-radius:6px; font-size:0.8rem; cursor:pointer; width:100%; justify-content:center; box-sizing:border-box;">
-          <i class="fa-solid fa-camera"></i> किताब / नोट्स की फोटो चुनें
-        </label>
-        <input type="file" id="status-file-picker" accept="image/*" style="display:none;" onchange="window.previewStatusImage(event)">
-        <div id="status-img-preview-box" style="margin-top:8px; display:none; position:relative;">
-          <img id="status-preview-img-tag" style="width:100%; max-height:160px; object-fit:cover; border-radius:6px;">
-          <button onclick="window.removeStatusImagePreview()" style="position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.7); color:#fff; border:none; border-radius:50%; width:24px; height:24px; cursor:pointer;">&times;</button>
-        </div>
+
+      <!-- Color bullets for text status -->
+      <div class="status-color-palette">
+        <span style="font-size:0.75rem; color:#8696a0; align-self:center;">रंग चुनें:</span>
+        <div class="color-bullet active" style="background:#0b141a;" onclick="window.setStatusBgColor('#0b141a', this)"></div>
+        <div class="color-bullet" style="background:#075e54;" onclick="window.setStatusBgColor('#075e54', this)"></div>
+        <div class="color-bullet" style="background:#3b82f6;" onclick="window.setStatusBgColor('#3b82f6', this)"></div>
+        <div class="color-bullet" style="background:#8b5cf6;" onclick="window.setStatusBgColor('#8b5cf6', this)"></div>
+        <div class="color-bullet" style="background:#b91c1c;" onclick="window.setStatusBgColor('#b91c1c', this)"></div>
       </div>
 
-      <button class="peer-card-btn" style="width:100%;" onclick="window.submitNewStatus()"><i class="fa-solid fa-paper-plane"></i> 24 घंटे के लिए पोस्ट करें</button>
+      <textarea id="status-input-text" class="wa-form-input" rows="3" placeholder="यहाँ सबक, हदीस या इबारत लिखें..."></textarea>
+      
+      <!-- Video / Photo Media Picker -->
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <label for="status-file-img" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; background:#202c33; color:#00a884; border:1px dashed #00a884; padding:8px; border-radius:6px; font-size:0.78rem; cursor:pointer;">
+          <i class="fa-solid fa-image"></i> फोटो जोड़ें
+        </label>
+        <input type="file" id="status-file-img" accept="image/*" style="display:none;" onchange="window.previewStatusImg(event)">
+
+        <label for="status-file-video" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; background:#202c33; color:#3b82f6; border:1px dashed #3b82f6; padding:8px; border-radius:6px; font-size:0.78rem; cursor:pointer;">
+          <i class="fa-solid fa-video"></i> वीडियो (Max 15-30s)
+        </label>
+        <input type="file" id="status-file-video" accept="video/mp4,video/webm" style="display:none;" onchange="window.previewStatusVideo(event)">
+      </div>
+
+      <!-- Preview container -->
+      <div id="status-media-preview-box" style="margin-bottom:10px; display:none; position:relative;">
+        <img id="status-preview-img-tag" style="width:100%; max-height:160px; object-fit:cover; border-radius:6px; display:none;">
+        <video id="status-preview-video-tag" controls style="width:100%; max-height:160px; border-radius:6px; display:none;"></video>
+        <button onclick="window.clearStatusMediaPreview()" style="position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.7); color:#fff; border:none; border-radius:50%; width:24px; height:24px; cursor:pointer;">&times;</button>
+      </div>
+
+      <button id="btn-post-status-submit" class="peer-card-btn" style="width:100%;" onclick="window.submitEnhancedStatus()">
+        <i class="fa-solid fa-paper-plane"></i> 24 घंटे के लिए पोस्ट करें
+      </button>
     </div>
   </div>
 
