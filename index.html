@@ -4565,10 +4565,8 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
     };
 
     // =========================================================================
-    // ⚡ VERCEL BACKEND ROUTE & 12-LEVEL QUIZ ENGINE
+    // ⚡ VERCEL BACKEND ROUTE (AI CALL)
     // =========================================================================
-
-    // 1. Vercel Backend Call (No CORS Block, No Browser Errors)
     window.callSmartAI = async function(prompt, systemInstruction = "You are an expert Islamic and academic teacher helper. Reply concisely in simple Urdu/Hindi.") {
       try {
         const response = await fetch("/api/chat", {
@@ -4576,164 +4574,209 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt, systemInstruction })
         });
-        
         if (response.ok) {
           const data = await response.json();
           return data.reply;
         }
       } catch (err) {
-        console.warn("Backend API Error, falling back to local guidance:", err);
+        console.warn("Backend API Error:", err);
       }
       return "माफ़ कीजिएगा, AI नेटवर्क अभी व्यस्त है। कृपया थोड़ी देर बाद प्रयास करें।";
     };
 
-    // 2. 12-Level Engine & Bank
-    let currentQuizLevel = 1;
-    let currentQuizLevelTitle = "निहायत आसान";
+     // =========================================================================
+    // ⚡ PRO QUIZ & STATUS ENGINE (FAIL-SAFE: NEVER FREEZES)
+    // =========================================================================
 
-    const FULL_12_LEVEL_BANK = {
-      1: { q: "5 में 4 जोड़ने पर क्या आएगा?", o: ["8", "9", "10", "7"], a: 1, s: "गणित" },
-      2: { q: "सूरज किस दिशा से निकलता है?", o: ["पूरब (East)", "पश्चिम", "उत्तर", "दक्षिण"], a: 0, s: "सामान्य ज्ञान" },
-      3: { q: "इस्म (Noun) किसे कहते हैं?", o: ["काम को", "किसी नाम/जगह को", "ज़माने को", "हरफ़ को"], a: 1, s: "उर्दू व्याकरण" },
-      4: { q: "Choose the correct past tense of 'Eat':", o: ["Eated", "Ate", "Eating", "Eaten"], a: 1, s: "English" },
-      5: { q: "12 किताबों की कीमत ₹240 है, तो 1 किताब कितने की होगी?", o: ["₹18", "₹20", "₹24", "₹22"], a: 1, s: "गणित" },
-      6: { q: "जिस इस्म पर पेश (ज़म्मा) आता है उसे क्या कहते हैं?", o: ["मर्फ़ूअ", "मंसूब", "मजरूर", "मबनी"], a: 0, s: "नह्व" },
-      7: { q: "'सूर्योदय' में कौन सी संधि है?", o: ["दीर्घ", "गुण", "वृद्धि", "यण"], a: 1, s: "हिंदी व्याकरण" },
-      8: { q: "The plural of 'Criterion' is:", o: ["Criterions", "Criteria", "Criterias", "Criteries"], a: 1, s: "English" },
-      9: { q: "मफ़ऊल (Object) पर आमतौर पर कौन सा ए'राब आता है?", o: ["रफ़अ (पेश)", "नसब (ज़बर)", "जर (ज़ेर)", "जज़्म"], a: 1, s: "नह्व" },
-      10: { q: "यदि x + y = 10 और x - y = 4 हो, तो x का मान क्या होगा?", o: ["6", "7", "8", "5"], a: 1, s: "बीजगणित" },
-      11: { q: "अरबी में 'मुज़ाफ़' पर इनमें से क्या कभी दाखिल नहीं हो सकता?", o: ["ज़ेर", "अलिफ़-लाम और तनवीन", "पेश", "ज़बर"], a: 1, s: "नह्व उच्च" },
-      12: { q: "सलासी मुजर्रद के कुल कितने अबवाब (Gates) होते हैं?", o: ["4", "5", "6", "8"], a: 2, s: "इल्मुस सर्फ़" }
+    const LEVEL_TITLES = {
+      1: "निहायत आसान", 2: "बहुत आसान", 3: "बुनियादी", 4: "साधारण",
+      5: "मध्यम", 6: "कठिन 1", 7: "कठिन 2", 8: "सख्त",
+      9: "आला", 10: "एक्सट्रीम", 11: "सुपर एक्सट्रीम", 12: "आला तरीन"
     };
 
-    window.openQuizArena = function() {
-      document.getElementById('quiz-arena-modal').classList.add('active');
-      window.resetQuizToLevels();
+    // ऑफलाइन इमरजेंसी बैंक (ताकि AI धीमा होने पर भी स्क्रीन 1 सेकंड भी न अटके)
+    const FAILSAFE_QUIZ_BANK = {
+      1: { q: "5 में 4 जोड़ने पर क्या आएगा?", o: ["8", "9", "10", "7"], a: 1 },
+      2: { q: "सूरज किस दिशा से निकलता है?", o: ["पूरब (East)", "पश्चिम", "उत्तर", "दक्षिण"], a: 0 },
+      3: { q: "कलिमे की कितनी किस्में होती हैं?", o: ["दो", "तीन (इस्म, फेल, हरफ़)", "चार", "पाँच"], a: 1 },
+      4: { q: "Choose the correct past tense of 'Eat':", o: ["Eated", "Ate", "Eating", "Eaten"], a: 1 },
+      5: { q: "12 किताबों की कीमत ₹240 है, तो 1 किताब कितने की होगी?", o: ["₹18", "₹20", "₹24", "₹22"], a: 1 },
+      6: { q: "जिस इस्म पर पेश (ज़म्मा) आता है उसे क्या कहते हैं?", o: ["मर्फ़ूअ", "मंसूब", "मजरूर", "मबनी"], a: 0 },
+      7: { q: "'सूर्योदय' में कौन सी संधि है?", o: ["दीर्घ", "गुण", "वृद्धि", "यण"], a: 1 },
+      8: { q: "The plural of 'Criterion' is:", o: ["Criterions", "Criteria", "Criterias", "Criteries"], a: 1 },
+      9: { q: "मफ़ऊल (Object) पर आमतौर पर कौन सा ए'राब आता है?", o: ["रफ़अ (पेश)", "नसब (ज़बर)", "जर (ज़ेर)", "जज़्म"], a: 1 },
+      10: { q: "यदि x + y = 10 और x - y = 4 हो, तो x का मान क्या होगा?", o: ["6", "7", "8", "5"], a: 1 },
+      11: { q: "अरबी में 'मुज़ाफ़' पर इनमें से क्या कभी दाखिल नहीं हो सकता?", o: ["ज़ेर", "अलिफ़-लाम और तनवीन", "पेश", "ज़बर"], a: 1 },
+      12: { q: "सलासी मुजर्रद के कुल कितने अबवाब होते हैं?", o: ["4", "5", "6", "8"], a: 2 }
     };
 
-    window.resetQuizToLevels = function() {
-      clearInterval(quizCountdownTimer);
-      document.getElementById('quiz-level-picker-view').style.display = 'block';
-      document.getElementById('quiz-mode-select-view').style.display = 'none';
-      document.getElementById('quiz-card-picker-view').style.display = 'none';
-      document.getElementById('quiz-battle-play-view').style.display = 'none';
-      document.getElementById('quiz-result-banner').innerText = "";
+    let quizGame = {
+      level: 1,
+      mode: "bot",
+      currentQIndex: 0,
+      totalQuestions: 5,
+      score: 0,
+      timerLeft: 60,
+      timerId: null,
+      activeQuestion: null
     };
 
     window.selectQuizLevel = function(lvl, title) {
-      currentQuizLevel = lvl;
-      currentQuizLevelTitle = title;
+      quizGame.level = lvl;
       document.getElementById('quiz-level-picker-view').style.display = 'none';
-      document.getElementById('selected-level-badge').innerText = `चुना गया: Level ${lvl} (${title})`;
+      document.getElementById('selected-level-badge').innerText = `चुना गया: Level ${lvl} (${LEVEL_TITLES[lvl]})`;
       document.getElementById('quiz-mode-select-view').style.display = 'block';
-    };
-
-    window.resetQuizToModes = function() {
-      document.getElementById('quiz-card-picker-view').style.display = 'none';
-      document.getElementById('quiz-mode-select-view').style.display = 'block';
-    };
-
-    window.openPeerDuelCardPicker = function() {
-      document.getElementById('quiz-mode-select-view').style.display = 'none';
-      const container = document.getElementById('generated-quiz-cards-box');
-      container.innerHTML = "";
-
-      // 3 कार्ड जनरेट करें (चुने गए लेवल और उसके आस-पास से)
-      const levelsToPick = [currentQuizLevel, Math.max(1, currentQuizLevel - 1), Math.min(12, currentQuizLevel + 1)];
-      levelsToPick.forEach((lvl, idx) => {
-        const q = FULL_12_LEVEL_BANK[lvl];
-        const card = document.createElement('div');
-        card.className = 'quiz-card-pick';
-        card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <span style="color:#facc15; font-size:0.78rem; font-weight:bold;">कार्ड ${idx+1}: Level ${lvl} (${q.s})</span>
-            <span style="background:rgba(0,168,132,0.2); color:#00a884; font-size:0.7rem; padding:2px 8px; border-radius:10px;">+${lvl * 5} XP</span>
-          </div>
-          <div style="color:#e9edef; font-size:0.86rem; font-weight:500;">${q.q}</div>
-          <button class="peer-card-btn" style="width:100%; margin-top:8px; padding:6px;" onclick="window.sendDuelChallenge(${JSON.stringify(q).replace(/"/g, '&quot;')}, ${lvl})">
-            🎯 यह सवाल चैलेंज भेजें
-          </button>
-        `;
-        container.appendChild(card);
-      });
-      document.getElementById('quiz-card-picker-view').style.display = 'block';
-    };
-
-    window.sendDuelChallenge = function(questionObj, level) {
-      const challengeId = 'duel_' + Date.now();
-      const myName = window.currentUser?.displayName || window.currentUser?.name || "साथी छात्र";
-      update(ref(db, `quiz_duels/${challengeId}`), {
-        question: questionObj,
-        level: level,
-        senderName: myName,
-        senderPhone: window.currentUser?.phone?.replace(/[^0-9]/g, '') || '',
-        timestamp: Date.now(),
-        status: 'open'
-      }).then(() => {
-        alert(`लेवल ${level} का चैलेंज भेज दिया गया है!`);
-        window.resetQuizToLevels();
-      });
     };
 
     window.startSoloQuizMode = function(mode = 'bot') {
+      quizGame.mode = mode;
+      quizGame.score = 0;
+      quizGame.currentQIndex = 0;
+      clearInterval(quizGame.timerId);
+
       document.getElementById('quiz-mode-select-view').style.display = 'none';
-      const playView = document.getElementById('quiz-battle-play-view');
-      playView.style.display = 'block';
+      document.getElementById('quiz-battle-play-view').style.display = 'block';
+      document.getElementById('quiz-result-banner').innerHTML = "";
 
-      const qData = FULL_12_LEVEL_BANK[currentQuizLevel];
-      document.getElementById('quiz-player-tag').innerText = `Level ${currentQuizLevel}: ${currentQuizLevelTitle} ${mode === 'speed' ? '(स्पीड ट्रायल)' : '(बनाम AI बॉट)'}`;
-      document.getElementById('quiz-active-question').innerText = qData.q;
+      if (mode === 'speed') {
+        quizGame.timerLeft = 60;
+        const badge = document.getElementById('quiz-timer-badge');
+        badge.innerText = `⏱️ ${quizGame.timerLeft}s`;
+        quizGame.timerId = setInterval(() => {
+          quizGame.timerLeft--;
+          badge.innerText = `⏱️ ${quizGame.timerLeft}s`;
+          if (quizGame.timerLeft <= 0) {
+            clearInterval(quizGame.timerId);
+            window.finishQuizRound("समय समाप्त!");
+          }
+        }, 1000);
+      } else {
+        document.getElementById('quiz-timer-badge').innerText = `सवाल: 1/${quizGame.totalQuestions}`;
+      }
 
-      window.speakText(qData.q);
+      window.loadNextQuizQuestion();
+    };
 
+    window.loadNextQuizQuestion = async function() {
+      const qTextElem = document.getElementById('quiz-active-question');
       const optBox = document.getElementById('quiz-options-container');
+      
+      const currentTitle = LEVEL_TITLES[quizGame.level] || "मुकाबला";
+      document.getElementById('quiz-player-tag').innerText = `Level ${quizGame.level}: ${currentTitle}`;
+
+      let questionData = null;
+
+      // ⏱️ 2.5 सेकंड का सख्त टाइमआउट (अगर AI रुका तो तुरंत बैकअप सवाल लोड होगा)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ isQuiz: true, level: quizGame.level }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const jsonRes = await res.json();
+          const clean = jsonRes.reply.replace(/```json|```/g, '').trim();
+          questionData = JSON.parse(clean);
+        }
+      } catch (err) {
+        clearTimeout(timeoutId);
+      }
+
+      // अगर AI से JSON नहीं आया, तो 0ms में बिना अटके बैकअप बैंक से सवाल लें
+      if (!questionData || !questionData.q || !Array.isArray(questionData.o)) {
+        questionData = FAILSAFE_QUIZ_BANK[quizGame.level] || FAILSAFE_QUIZ_BANK[1];
+      }
+
+      quizGame.activeQuestion = questionData;
+      qTextElem.innerText = questionData.q;
+      window.speakText(questionData.q);
+
       optBox.innerHTML = "";
-      qData.o.forEach((opt, idx) => {
+      questionData.o.forEach((opt, idx) => {
         const btn = document.createElement('button');
         btn.className = 'quiz-opt-btn';
         btn.innerText = `${String.fromCharCode(65 + idx)}. ${opt}`;
-        btn.onclick = () => window.handleQuizAnswer(btn, idx === qData.a, currentQuizLevel);
+        btn.onclick = () => window.submitAnswer(btn, idx);
         optBox.appendChild(btn);
       });
-
-      let timeLeft = mode === 'speed' ? 45 : 15;
-      const timerBadge = document.getElementById('quiz-timer-badge');
-      timerBadge.innerText = `⏱️ ${timeLeft}s`;
-      clearInterval(quizCountdownTimer);
-      quizCountdownTimer = setInterval(() => {
-        timeLeft--;
-        timerBadge.innerText = `⏱️ ${timeLeft}s`;
-        if (timeLeft <= 0) {
-          clearInterval(quizCountdownTimer);
-          document.getElementById('quiz-result-banner').innerHTML = `<span style="color:#ef4444;">समय समाप्त!</span>`;
-        }
-      }, 1000);
     };
 
-    window.handleQuizAnswer = function(buttonElem, isCorrect, level) {
-      clearInterval(quizCountdownTimer);
+    window.submitAnswer = function(btnElem, selectedIdx) {
+      document.querySelectorAll('.quiz-opt-btn').forEach(b => b.style.pointerEvents = 'none');
+      const isCorrect = (selectedIdx === quizGame.activeQuestion.a);
       const resBanner = document.getElementById('quiz-result-banner');
-      
-      // बार-बार क्लिक रोकने के लिए सभी बटन्स डिसेबल करें
-      document.querySelectorAll('.quiz-opt-btn').forEach(btn => btn.style.pointerEvents = 'none');
 
       if (isCorrect) {
-        buttonElem.classList.add('correct');
-        const xpEarned = level * 5;
-        resBanner.innerHTML = `<span style="color:#00a884;">माशाअल्लाह! बिल्कुल सही जवाब (+${xpEarned} XP)</span>`;
-        window.speakText("बिल्कुल सही जवाब!");
-        window.awardSmartXP(xpEarned, 'quiz_win');
+        btnElem.classList.add('correct');
+        quizGame.score++;
+        resBanner.innerHTML = `<span style="color:#00a884;">माशाअल्लाह! बिल्कुल सही जवाब (+10 XP)</span>`;
+        window.speakText("बिल्कुल सही");
       } else {
-        buttonElem.classList.add('wrong');
-        resBanner.innerHTML = `<span style="color:#ef4444;">गलत जवाब! अगला सवाल आ रहा है...</span>`;
-        window.speakText("गलत जवाब!");
+        btnElem.classList.add('wrong');
+        resBanner.innerHTML = `<span style="color:#ef4444;">गलत जवाब!</span>`;
+        window.speakText("गलत जवाब");
       }
 
-      // ⏳ 1.2 सेकंड बाद अपने-आप अगला सवाल लोड होगा
       setTimeout(() => {
-        currentQuizLevel = (currentQuizLevel % 12) + 1;
-        window.startSoloQuizMode('speed');
-      }, 1200);
+        quizGame.currentQIndex++;
+        resBanner.innerHTML = "";
+
+        if (quizGame.mode === 'speed') {
+          if (quizGame.timerLeft > 0) {
+            quizGame.level = (quizGame.level % 12) + 1; // स्पीड रन में लेवल आगे बढ़ेगा
+            window.loadNextQuizQuestion();
+          }
+        } else {
+          if (quizGame.currentQIndex < quizGame.totalQuestions) {
+            document.getElementById('quiz-timer-badge').innerText = `सवाल: ${quizGame.currentQIndex + 1}/${quizGame.totalQuestions}`;
+            window.loadNextQuizQuestion();
+          } else {
+            window.finishQuizRound("मुकाबला मुकम्मल!");
+          }
+        }
+      }, 1100);
+    };
+
+    window.finishQuizRound = function(titleMsg) {
+      clearInterval(quizGame.timerId);
+      const totalEarnedXP = quizGame.score * 10;
+      window.awardSmartXP(totalEarnedXP, 'quiz_round');
+
+      const playView = document.getElementById('quiz-battle-play-view');
+      playView.innerHTML = `
+        <div style="text-align:center; padding:20px 10px;">
+          <h2 style="color:#facc15; margin:0 0 8px 0;">🏆 ${titleMsg}</h2>
+          <p style="color:#8696a0; font-size:0.9rem;">लेवल ${quizGame.level}: ${LEVEL_TITLES[quizGame.level]}</p>
+          <div style="background:#111b21; padding:15px; border-radius:10px; margin:15px 0;">
+            <div style="font-size:1.4rem; color:#fff; font-weight:bold;">कुल सही जवाब: ${quizGame.score}</div>
+            <div style="color:#00a884; font-size:1rem; margin-top:5px;">+${totalEarnedXP} XP हासिल किए!</div>
+          </div>
+          <button class="peer-card-btn" style="width:100%; padding:10px;" onclick="window.resetQuizToLevels()">
+            🔄 दूसरा मुकाबला खेलें
+          </button>
+        </div>
+      `;
+    };
+
+    // ❤️ सेफ स्टेटस लाइक (No Crash)
+    window.likeCurrentStatus = function(statusId) {
+      const activeId = statusId || window.activeStatusId;
+      if (!activeId) return;
+
+      const sRef = ref(db, `status_stories/${activeId}`);
+      get(sRef).then(snap => {
+        const val = snap.val() || {};
+        const newLikes = (val.likes || 0) + 1;
+        update(sRef, { likes: newLikes }).then(() => {
+          const countSpan = document.getElementById('status-like-count');
+          if (countSpan) countSpan.innerText = newLikes;
+        });
+      }).catch(() => {});
     };
 
     // 3. मुताला पार्टनर: ऑफलाइन पैगाम ट्रिगर (OneSignal Notification)
@@ -4832,9 +4875,11 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         <i class="fa-solid fa-eye"></i> 0
       </span>
       <button class="peer-card-btn" onclick="window.replyToCurrentStatus()"><i class="fa-solid fa-reply"></i> जवाब दें</button>
+      
       <button onclick="window.likeCurrentStatus(window.activeStatusId)" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#ef4444; border-radius:20px; padding:6px 12px; font-size:0.85rem; cursor:pointer;">
   ❤️ <span id="status-like-count" style="color:#fff; font-size:0.8rem;">0</span>
       </button>
+      
     </div>
   </div>
 
