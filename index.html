@@ -4288,187 +4288,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       });
     };
 
-    // =========================================================================
-    // ⚡ PRO QUIZ ENGINE (FIXED ROUNDS, NO INFINITE LOOP) + STATUS LIKE
-    // =========================================================================
-
-    let quizGame = {
-      level: 1,
-      levelTitle: "निहायत आसान",
-      mode: "bot",
-      currentQIndex: 0,
-      totalQuestions: 5,
-      score: 0,
-      timerLeft: 60,
-      timerId: null,
-      activeQuestion: null
-    };
-
-    const LEVEL_TITLES = {
-      1: "निहायत आसान", 2: "बहुत आसान", 3: "बुनियादी", 4: "साधारण",
-      5: "मध्यम", 6: "कठिन 1", 7: "कठिन 2", 8: "सख्त",
-      9: "आला", 10: "एक्सट्रीम", 11: "सुपर एक्सट्रीम", 12: "आला तरीन"
-    };
-
-    // लेवल चुनने पर
-    window.selectQuizLevel = function(lvl, title) {
-      quizGame.level = lvl;
-      quizGame.levelTitle = title || LEVEL_TITLES[lvl];
-      document.getElementById('quiz-level-picker-view').style.display = 'none';
-      document.getElementById('selected-level-badge').innerText = `चुना गया: Level ${lvl} (${quizGame.levelTitle})`;
-      document.getElementById('quiz-mode-select-view').style.display = 'block';
-    };
-
-    // क्विज़ शुरू
-    window.startSoloQuizMode = function(mode = 'bot') {
-      quizGame.mode = mode;
-      quizGame.score = 0;
-      quizGame.currentQIndex = 0;
-      clearInterval(quizGame.timerId);
-
-      document.getElementById('quiz-mode-select-view').style.display = 'none';
-      document.getElementById('quiz-battle-play-view').style.display = 'block';
-      document.getElementById('quiz-result-banner').innerHTML = "";
-
-      if (mode === 'speed') {
-        quizGame.timerLeft = 60; // 60 सेकंड का मुकम्मल टाइमर
-        const badge = document.getElementById('quiz-timer-badge');
-        badge.innerText = `⏱️ ${quizGame.timerLeft}s`;
-        quizGame.timerId = setInterval(() => {
-          quizGame.timerLeft--;
-          badge.innerText = `⏱️ ${quizGame.timerLeft}s`;
-          if (quizGame.timerLeft <= 0) {
-            clearInterval(quizGame.timerId);
-            window.finishQuizRound("समय समाप्त!");
-          }
-        }, 1000);
-      } else {
-        document.getElementById('quiz-timer-badge').innerText = `सवाल: 1/${quizGame.totalQuestions}`;
-      }
-
-      window.loadNextQuizQuestion();
-    };
-
-    // सवाल लोड करना (AI या फॉलबैक)
-    window.loadNextQuizQuestion = async function() {
-      const qTextElem = document.getElementById('quiz-active-question');
-      const optBox = document.getElementById('quiz-options-container');
-      qTextElem.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> लेवल ${quizGame.level} का नया सवाल तैयार हो रहा है...`;
-      optBox.innerHTML = "";
-
-      document.getElementById('quiz-player-tag').innerText = `Level ${quizGame.level}: ${quizGame.levelTitle}`;
-
-      let questionData = null;
-
-      // Vercel API से सवाल लाने की कोशिश
-      try {
-        const res = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ isQuiz: true, level: quizGame.level })
-        });
-        if (res.ok) {
-          const jsonRes = await res.json();
-          const clean = jsonRes.reply.replace(/```json|```/g, '').trim();
-          questionData = JSON.parse(clean);
-        }
-      } catch (err) {}
-
-      // अगर नेटवर्क की वजह से AI न चले तो लेवल के मुताबिक तुरंत सवाल
-      if (!questionData || !questionData.q) {
-        if (quizGame.level <= 3) {
-          questionData = { q: "कलिमे की कितनी किस्में होती हैं?", o: ["दो", "तीन (इस्म, फेल, हरफ़)", "चार", "पाँच"], a: 1 };
-        } else if (quizGame.level <= 7) {
-          questionData = { q: "जिस इस्म पर काम का असर पड़े उसे क्या कहते हैं?", o: ["फ़ाइल", "मफ़ऊल", "मुब्तदा", "ख़बर"], a: 1 };
-        } else {
-          questionData = { q: "सलासी मुजर्रद के कितने अबवाब कयासी हैं?", o: ["3", "4", "5", "6"], a: 0 };
-        }
-      }
-
-      quizGame.activeQuestion = questionData;
-      qTextElem.innerText = questionData.q;
-      window.speakText(questionData.q);
-
-      optBox.innerHTML = "";
-      questionData.o.forEach((opt, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'quiz-opt-btn';
-        btn.innerText = `${String.fromCharCode(65 + idx)}. ${opt}`;
-        btn.onclick = () => window.submitAnswer(btn, idx);
-        optBox.appendChild(btn);
-      });
-    };
-
-    // जवाब सबमिट करना
-    window.submitAnswer = function(btnElem, selectedIdx) {
-      document.querySelectorAll('.quiz-opt-btn').forEach(b => b.style.pointerEvents = 'none');
-      const isCorrect = (selectedIdx === quizGame.activeQuestion.a);
-      const resBanner = document.getElementById('quiz-result-banner');
-
-      if (isCorrect) {
-        btnElem.classList.add('correct');
-        quizGame.score++;
-        resBanner.innerHTML = `<span style="color:#00a884;">माशाअल्लाह! बिल्कुल सही जवाब (+10 XP)</span>`;
-        window.speakText("बिल्कुल सही");
-      } else {
-        btnElem.classList.add('wrong');
-        resBanner.innerHTML = `<span style="color:#ef4444;">गलत जवाब!</span>`;
-        window.speakText("गलत जवाब");
-      }
-
-      setTimeout(() => {
-        quizGame.currentQIndex++;
-        resBanner.innerHTML = "";
-
-        if (quizGame.mode === 'speed') {
-          if (quizGame.timerLeft > 0) window.loadNextQuizQuestion();
-        } else {
-          if (quizGame.currentQIndex < quizGame.totalQuestions) {
-            document.getElementById('quiz-timer-badge').innerText = `सवाल: ${quizGame.currentQIndex + 1}/${quizGame.totalQuestions}`;
-            window.loadNextQuizQuestion();
-          } else {
-            window.finishQuizRound("मुकाबला मुकम्मल!");
-          }
-        }
-      }, 1200);
-    };
-
-    // क्विज़ का अंत (स्कोर कार्ड स्क्रीन)
-    window.finishQuizRound = function(titleMsg) {
-      clearInterval(quizGame.timerId);
-      const totalEarnedXP = quizGame.score * 10;
-      window.awardSmartXP(totalEarnedXP, 'quiz_round');
-
-      const playView = document.getElementById('quiz-battle-play-view');
-      playView.innerHTML = `
-        <div style="text-align:center; padding:20px 10px;">
-          <h2 style="color:#facc15; margin:0 0 8px 0;">🏆 ${titleMsg}</h2>
-          <p style="color:#8696a0; font-size:0.9rem;">लेवल ${quizGame.level}: ${quizGame.levelTitle}</p>
-          <div style="background:#111b21; padding:15px; border-radius:10px; margin:15px 0;">
-            <div style="font-size:1.4rem; color:#fff; font-weight:bold;">कुल सही जवाब: ${quizGame.score}</div>
-            <div style="color:#00a884; font-size:1rem; margin-top:5px;">+${totalEarnedXP} XP हासिल किए!</div>
-          </div>
-          <button class="peer-card-btn" style="width:100%; padding:10px;" onclick="window.resetQuizToLevels()">
-            🔄 दूसरा लेवल या मुकाबला खेलें
-          </button>
-        </div>
-      `;
-    };
-
-    // =========================================================================
-    // ❤️ स्टेटस लाइक फीचर
-    // =========================================================================
-    window.likeCurrentStatus = function(statusId) {
-      if (!statusId) return;
-      const statusRef = ref(db, `status_stories/${statusId}/likes`);
-      runTransaction(statusRef, (currentLikes) => {
-        return (currentLikes || 0) + 1;
-      }).then(() => {
-        const countSpan = document.getElementById('status-like-count');
-        if (countSpan) countSpan.innerText = (parseInt(countSpan.innerText) || 0) + 1;
-      });
-    };
-
     // 11. Quick Solver & Instant AI Doubt Solver
     const SOLVER_DATA = {
       math: `<b>📐 महत्वपूर्ण बीजगणित सूत्र:</b><br>• (a + b)² = a² + 2ab + b²<br>• (a - b)² = a² - 2ab + b²<br>• a² - b² = (a - b)(a + b)<br><br><b>प्रतिशत (Percentage) शॉर्टकट:</b><br>किसी भी संख्या का 10% निकालने के लिए दाईं तरफ से एक अंक बाद दशमलव (.) लगा दें।`,
@@ -4784,7 +4603,120 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         });
       }).catch(() => {});
     };
-    
+
+    // =========================================================================
+    // 🛠️ ALL RUNTIME FIXES (AUTO-OVERRIDE)
+    // =========================================================================
+
+    // 1. स्टेटस व्यूअर में एक्टिव आईडी और लाइक काउंट सेट करना
+    const _origOpenStatus = window.openStatusViewer;
+    window.openStatusViewer = function(item) {
+      window.activeStatusId = item.senderPhone;
+      if (_origOpenStatus) _origOpenStatus(item);
+      const countElem = document.getElementById('status-like-count');
+      if (countElem) countElem.innerText = item.likes || 0;
+    };
+
+    // 2. सही पाथ पर स्टेटस लाइक (+1)
+    window.likeCurrentStatus = function(statusId) {
+      const activeId = statusId || window.activeStatusId;
+      if (!activeId || typeof db === 'undefined') return;
+
+      const sRef = ref(db, `statuses/${activeId}`);
+      get(sRef).then(snap => {
+        const val = snap.val() || {};
+        const newLikes = (val.likes || 0) + 1;
+        update(sRef, { likes: newLikes }).then(() => {
+          const countElem = document.getElementById('status-like-count');
+          if (countElem) countElem.innerText = newLikes;
+        });
+      }).catch(() => {});
+    };
+
+    // 3. मिसिंग बटन्स (वापस और पार्टनर चैट) फिक्स
+    window.resetQuizToModes = function() {
+      document.getElementById('quiz-card-picker-view').style.display = 'none';
+      document.getElementById('quiz-mode-select-view').style.display = 'block';
+    };
+
+    window.startPeerChat = function(phone) {
+      document.getElementById('study-partner-modal').classList.remove('active');
+      window.openPrivateChat(phone, "इल्मी साथी", "");
+    };
+
+    // 4. पुराने धीमे Gemini की जगह नया 0.2s फास्ट AI उस्ताद
+    window.fetchGeminiResponse = async function(userText, roomId) {
+      const typingDiv = document.getElementById('typing-indicator');
+      if (typingDiv) {
+        typingDiv.textContent = 'AI उस्ताद लिख रहे हैं...';
+        typingDiv.style.display = 'block';
+      }
+      const reply = await window.requestSuhailAI(userText, 'assistant');
+      if (typingDiv) typingDiv.style.display = 'none';
+      
+      if (reply && window.sendFirebaseMessage) {
+        window.sendFirebaseMessage(roomId, "AI उस्ताद", "Suhail_Ai", "🤖 AI उस्ताद", "admin", reply, "Vercel Server");
+      }
+    };
+
+    // =========================================================================
+    // 🛠️ FIXES FOR MISTAKES 3, 4, 5, 6 & 7 (AUTO-OVERRIDE)
+    // =========================================================================
+
+    // ✅ गलती 3 व 4 फिक्स: स्टेटस लाइक, आईडी और सही डेटाबेस पाथ
+    const _baseOpenStatusViewer = window.openStatusViewer;
+    window.openStatusViewer = function(item) {
+      window.activeStatusId = item.senderPhone;
+      if (_baseOpenStatusViewer) _baseOpenStatusViewer(item);
+      
+      // स्टेटस खोलते ही उसके पहले से मौजूद लाइक्स स्क्रीन पर दिखाएं
+      const countSpan = document.getElementById('status-like-count');
+      if (countSpan) countSpan.innerText = item.likes || 0;
+    };
+
+    window.likeCurrentStatus = function(statusId) {
+      const activeId = statusId || window.activeStatusId;
+      if (!activeId || typeof db === 'undefined') return;
+
+      const sRef = ref(db, `statuses/${activeId}`);
+      get(sRef).then(snap => {
+        const val = snap.val() || {};
+        const newLikes = (val.likes || 0) + 1;
+        update(sRef, { likes: newLikes }).then(() => {
+          const countSpan = document.getElementById('status-like-count');
+          if (countSpan) countSpan.innerText = newLikes;
+        });
+      }).catch(err => console.warn("Like Error:", err));
+    };
+
+    // ✅ गलती 5 फिक्स: क्विज़ कार्ड से वापस जाने वाला बटन
+    window.resetQuizToModes = function() {
+      document.getElementById('quiz-card-picker-view').style.display = 'none';
+      document.getElementById('quiz-mode-select-view').style.display = 'block';
+    };
+
+    // ✅ गलती 6 फिक्स: पार्टनर के साथ प्राइवेट चैट खोलने वाला बटन
+    window.startPeerChat = function(partnerPhone) {
+      document.getElementById('study-partner-modal').classList.remove('active');
+      window.openPrivateChat(partnerPhone, "इल्मी साथी", "");
+    };
+
+    // ✅ गलती 7 फिक्स: AI उस्ताद चैट में पुराने धीमे Gemini की जगह सुपरफास्ट 0.2s AI
+    window.fetchGeminiResponse = async function(userText, roomId) {
+      const typingDiv = document.getElementById('typing-indicator');
+      if (typingDiv) {
+        typingDiv.textContent = 'AI उस्ताद लिख रहे हैं...';
+        typingDiv.style.display = 'block';
+      }
+
+      // सीधे नए 0.2s वाले Groq/Cerebras बैकएंड से जवाब मंगाना
+      const reply = await window.requestSuhailAI(userText, 'assistant');
+      if (typingDiv) typingDiv.style.display = 'none';
+
+      if (reply && window.sendFirebaseMessage) {
+        window.sendFirebaseMessage(roomId, "AI उस्ताद", "Suhail_Ai", "🤖 AI उस्ताद", "admin", reply, "Vercel Server");
+      }
+    };
     
   </script>
 
