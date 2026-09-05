@@ -1,18 +1,57 @@
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
 
-  const { prompt, systemInstruction } = req.body || {};
-  const sysPrompt = systemInstruction || "You are an expert Islamic and academic teacher helper. Reply concisely in simple Urdu/Hindi.";
+  // बॉडी पार्सिंग (सुरक्षित तरीका)
+  let body = req.body;
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch (e) {}
+  }
+  const { prompt, isQuiz, level } = body || {};
 
-  // 1. Cerebras (1800+ tok/s Ultra-fast)
+  // 📜 सख्त कानूनी हिदायतें (System Instruction)
+  const systemRules = `आप एक बेहद मोतबर, संजीदा और तजुर्बेकार इस्लामी व अकादमिक उस्ताद (Suhail AI) हैं।
+कानून व कवाइद:
+1. आपका जवाब अहले सुन्नत वल जमात, दरसे निज़ामी और स्कूली निसाब (नह्व, सर्फ़, फ़िक़्ह, गणित, अंग्रेज़ी, उर्दू) के मुताबिक होना चाहिए।
+2. किसी भी फिर्कावाराना बहस या विवादित मसले में उलझे बिना सीधा, सटीक और आसान अल्फ़ाज़ में जवाब दें।
+3. जवाब लंबा-चौड़ा और उबाऊ न हो, 2 से 4 जुमलों में मुकम्मल बात कहें।
+4. कोई भी जानदार की तस्वीर या ग़ैर-शरई बात की तरफ रहनुमाई न करें।`;
+
+  // 🎮 अगर क्विज़ का सवाल जनरेट करना हो
+  let finalPrompt = prompt;
+  if (isQuiz) {
+    finalPrompt = `दरजा (Level) ${level || 1} (1 निहायत आसान से 12 आला तरीन) के तालिब-ए-इल्म के लिए निसाब (नह्व, सर्फ़, गणित, या इंग्लिश) से 1 नया बहुविकल्पीय सवाल बनाएँ। 
+जवाब में सिर्फ और सिर्फ यह वैध JSON दें, कोई और बात न लिखें:
+{"q": "सवाल यहाँ", "o": ["विकल्प 1", "विकल्प 2", "विकल्प 3", "विकल्प 4"], "a": 0, "s": "विषय"}`;
+  }
+
+  // 1. सबसे पहले Groq Llama 3.3 (सुपर-फास्ट और सटीक)
+  try {
+    const gRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.GROQ_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [{ role: "system", content: systemRules }, { role: "user", content: finalPrompt }],
+        temperature: 0.4
+      })
+    });
+    if (gRes.ok) {
+      const data = await gRes.json();
+      return res.status(200).json({ reply: data.choices[0].message.content });
+    }
+  } catch (e) {}
+
+  // 2. दूसरा बैकअप: Cerebras (अल्ट्रा स्पीड)
   try {
     const cRes = await fetch("https://api.cerebras.ai/v1/chat/completions", {
       method: "POST",
@@ -22,39 +61,16 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "llama3.1-8b",
-        messages: [{ role: "system", content: sysPrompt }, { role: "user", content: prompt }]
+        messages: [{ role: "system", content: systemRules }, { role: "user", content: finalPrompt }]
       })
     });
     if (cRes.ok) {
       const data = await cRes.json();
       return res.status(200).json({ reply: data.choices[0].message.content });
     }
-  } catch (e) {
-    console.log("Cerebras busy, switching to Groq...");
-  }
+  } catch (e) {}
 
-  // 2. Groq Cloud (Low Latency)
-  try {
-    const gRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.GROQ_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
-        messages: [{ role: "system", content: sysPrompt }, { role: "user", content: prompt }]
-      })
-    });
-    if (gRes.ok) {
-      const data = await gRes.json();
-      return res.status(200).json({ reply: data.choices[0].message.content });
-    }
-  } catch (e) {
-    console.log("Groq busy, switching to SambaNova...");
-  }
-
-  // 3. SambaNova (Heavy 70B Reasoning)
+  // 3. तीसरा बैकअप: SambaNova
   try {
     const sRes = await fetch("https://api.sambanova.ai/v1/chat/completions", {
       method: "POST",
@@ -64,58 +80,14 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "Meta-Llama-3.1-70B-Instruct",
-        messages: [{ role: "system", content: sysPrompt }, { role: "user", content: prompt }]
+        messages: [{ role: "system", content: systemRules }, { role: "user", content: finalPrompt }]
       })
     });
     if (sRes.ok) {
       const data = await sRes.json();
       return res.status(200).json({ reply: data.choices[0].message.content });
     }
-  } catch (e) {
-    console.log("SambaNova busy, switching to Mistral...");
-  }
+  } catch (e) {}
 
-  // 4. Mistral AI (Multilingual)
-  try {
-    const mRes = await fetch("https://api.mistral.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.MISTRAL_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "mistral-small-latest",
-        messages: [{ role: "system", content: sysPrompt }, { role: "user", content: prompt }]
-      })
-    });
-    if (mRes.ok) {
-      const data = await mRes.json();
-      return res.status(200).json({ reply: data.choices[0].message.content });
-    }
-  } catch (e) {
-    console.log("Mistral busy, switching to OpenRouter...");
-  }
-
-  // 5. OpenRouter (Final Hub Fallback)
-  try {
-    const oRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.OPENROUTER_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "meta-llama/llama-3.1-8b-instruct:free",
-        messages: [{ role: "system", content: sysPrompt }, { role: "user", content: prompt }]
-      })
-    });
-    if (oRes.ok) {
-      const data = await oRes.json();
-      return res.status(200).json({ reply: data.choices[0].message.content });
-    }
-  } catch (e) {
-    console.log("All gateways exhausted");
-  }
-
-  return res.status(500).json({ error: "सभी AI सर्वर व्यस्त हैं।" });
-}
+  return res.status(500).json({ error: "सभी गेटवे व्यस्त हैं।" });
+};
