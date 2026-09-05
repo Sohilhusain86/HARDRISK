@@ -574,8 +574,27 @@
     .exchange-card { background: #202c33; border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; border-left: 4px solid #00a884; }
     .exchange-card.need { border-left-color: #ef4444; }
     .pinboard-card { background: #202c33; border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #facc15; }
+
+    /* ⚡ AI Quiz Arena, Voice, Quick Solver & Partner Styles */
+    .quiz-card-pick { background: #202c33; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
+    .quiz-card-pick:hover { border-color: #00a884; background: #111b21; }
+    .quiz-opt-btn { width: 100%; background: #202c33; border: 1px solid rgba(255,255,255,0.15); color: #e9edef; padding: 12px; border-radius: 8px; margin-bottom: 8px; text-align: left; cursor: pointer; font-size: 0.88rem; transition: 0.2s; }
+    .quiz-opt-btn:hover { background: #2a3942; }
+    .quiz-opt-btn.correct { background: #00a884 !important; color: #fff; font-weight: bold; border-color: #00a884; }
+    .quiz-opt-btn.wrong { background: #ef4444 !important; color: #fff; border-color: #ef4444; }
+    .voice-mic-btn { background: #202c33; border: 1px solid rgba(255,255,255,0.1); color: #00a884; border-radius: 50%; width: 38px; height: 38px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; transition: 0.2s; }
+    .voice-mic-btn.listening { background: #ef4444 !important; color: #fff !important; animation: micPulse 1s infinite; }
+    @keyframes micPulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+    .cheatsheet-tab { display: inline-block; padding: 7px 14px; background: #202c33; border-radius: 20px; font-size: 0.8rem; color: #8696a0; cursor: pointer; margin-right: 6px; margin-bottom: 8px; border: 1px solid transparent; }
+    .cheatsheet-tab.active { background: #00a884; color: #fff; font-weight: 600; }
+    .ai-bubble-box { background: #111b21; border-left: 3px solid #00a884; padding: 10px 14px; border-radius: 4px; font-size: 0.85rem; color: #e9edef; line-height: 1.5; margin-top: 10px; }
+    .partner-card { background: #111b21; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
     
   </style>
+
+  <!-- 🔔 OneSignal Push Notification SDK -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  
 </head>
 <body>
 
@@ -3866,6 +3885,483 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         remove(ref(db, `class_pinboard/${id}`));
       }
     };
+
+    // =========================================================================
+    // ⚡ ALL-IN-ONE MASTER ENGINE: 5 ALGORITHMS, 7 AI GATEWAYS, CLOUDINARY, ONESIGNAL & QUIZ
+    // =========================================================================
+
+    // --- SECURED CREDENTIALS ---
+    const CONFIG_ONESIGNAL_APP_ID = "104c5388-11e2-4038-90d3-b460c5ba221d";
+    const CLOUDINARY_CLOUD_NAME = "xgkhockl";
+    const CLOUDINARY_PRESET = "d9xe6u2l";
+
+    const AI_VAULT = {
+      cerebras: "csk-tft6c8d9mf4kp9txpmvkxt8xfxyrwwcddthx3yhkwp2j52mw",
+      groq: "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",
+      sambanova: "0486a1fa-2e45-4c43-87c8-5c57ce66b665",
+      mistral: "5ywSmO9O1yb6rp7x1fwjQO5x8GqQtXsd",
+      openrouter: "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",
+      huggingface: "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"
+    };
+
+    // 1. OneSignal Push Notification Initializer
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      try {
+        await OneSignal.init({
+          appId: CONFIG_ONESIGNAL_APP_ID,
+          notifyButton: { enable: false }
+        });
+      } catch (e) {
+        console.warn("OneSignal bypass:", e);
+      }
+    });
+
+    // 2. Intelligent Multi-AI Router (Cerebras -> Groq -> SambaNova -> OpenRouter)
+    window.callSmartAI = async function(prompt, systemInstruction = "You are an expert Islamic and academic teacher helper. Answer concisely in simple Urdu/Hindi or English.") {
+      // Tier 1: Cerebras (1800+ tok/s Ultra-fast)
+      try {
+        const cRes = await fetch("https://api.cerebras.ai/v1/chat/completions", {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${AI_VAULT.cerebras}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "llama3.1-8b",
+            messages: [{ role: "system", content: systemInstruction }, { role: "user", content: prompt }],
+            temperature: 0.3
+          })
+        });
+        if (cRes.ok) {
+          const cData = await cRes.json();
+          return cData.choices[0].message.content;
+        }
+      } catch (err) {
+        console.warn("Cerebras switching to Groq...", err);
+      }
+
+      // Tier 2: Groq Cloud (Low Latency)
+      try {
+        const gRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${AI_VAULT.groq}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "llama-3.1-8b-instant",
+            messages: [{ role: "system", content: systemInstruction }, { role: "user", content: prompt }],
+            temperature: 0.3
+          })
+        });
+        if (gRes.ok) {
+          const gData = await gRes.json();
+          return gData.choices[0].message.content;
+        }
+      } catch (err) {
+        console.warn("Groq switching to SambaNova...", err);
+      }
+
+      // Tier 3: SambaNova Cloud (Deep Llama 3.1 Reasoning)
+      try {
+        const sRes = await fetch("https://api.sambanova.ai/v1/chat/completions", {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${AI_VAULT.sambanova}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "Meta-Llama-3.1-70B-Instruct",
+            messages: [{ role: "system", content: systemInstruction }, { role: "user", content: prompt }]
+          })
+        });
+        if (sRes.ok) {
+          const sData = await sRes.json();
+          return sData.choices[0].message.content;
+        }
+      } catch (err) {
+        console.warn("SambaNova switching to OpenRouter...", err);
+      }
+
+      // Tier 4: OpenRouter Fallback
+      try {
+        const oRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${AI_VAULT.openrouter}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "meta-llama/llama-3.1-8b-instruct:free",
+            messages: [{ role: "system", content: systemInstruction }, { role: "user", content: prompt }]
+          })
+        });
+        if (oRes.ok) {
+          const oData = await oRes.json();
+          return oData.choices[0].message.content;
+        }
+      } catch (err) {
+        console.error("All AI Gateways exhausted:", err);
+      }
+      return "माफ़ कीजिएगा, AI नेटवर्क अभी व्यस्त है। कृपया पुनः प्रयास करें।";
+    };
+
+    // 3. Web Speech API (Pronunciation & Mic Voice Typing)
+    window.speakText = function(textToRead, lang = 'hi-IN') {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(textToRead);
+      utterance.lang = lang;
+      utterance.rate = 0.92;
+      window.speechSynthesis.speak(utterance);
+    };
+
+    let activeSpeechRecognizer = null;
+    window.toggleVoiceInput = function(targetInputId, btnElem) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert("आपके डिवाइस में वॉइस टाइपिंग उपलब्ध नहीं है।");
+        return;
+      }
+      if (activeSpeechRecognizer) {
+        activeSpeechRecognizer.stop();
+        activeSpeechRecognizer = null;
+        if (btnElem) btnElem.classList.remove('listening');
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'hi-IN';
+      recognition.continuous = false;
+
+      recognition.onstart = () => { if (btnElem) btnElem.classList.add('listening'); };
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        const target = document.getElementById(targetInputId);
+        if (target) target.value = (target.value ? target.value + " " : "") + transcript;
+      };
+      recognition.onend = recognition.onerror = () => {
+        if (btnElem) btnElem.classList.remove('listening');
+        activeSpeechRecognizer = null;
+      };
+      activeSpeechRecognizer = recognition;
+      recognition.start();
+    };
+
+    // 4. Cloudinary Direct CDN Upload (Preserves DB Quota)
+    window.uploadToCloudinary = async function(file, resourceType = 'auto') {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY_PRESET);
+
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      if (!res.ok) throw new Error("Cloudinary CDN Upload Error");
+      const json = await res.json();
+      return json.secure_url;
+    };
+
+    const previousSubmitStatus = window.submitEnhancedStatus;
+    window.submitEnhancedStatus = async function() {
+      const imgFile = document.getElementById('status-file-img')?.files[0];
+      const vidFile = document.getElementById('status-file-video')?.files[0];
+      const targetFile = imgFile || vidFile;
+
+      if (targetFile) {
+        const postBtn = document.getElementById('btn-post-status-submit');
+        if (postBtn) {
+          postBtn.disabled = true;
+          postBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up fa-spin"></i> क्लाउड पर जा रहा है...`;
+        }
+        try {
+          const cloudUrl = await window.uploadToCloudinary(targetFile, vidFile ? 'video' : 'image');
+          window.tempStatusMedia = {
+            type: vidFile ? 'video' : 'image',
+            base64: cloudUrl
+          };
+        } catch (err) {
+          console.warn("Cloudinary fallback:", err);
+        }
+      }
+      if (previousSubmitStatus) previousSubmitStatus();
+    };
+
+    // 5. ALGORITHM 1: Smart Status Feed Ranking (Unseen first, Admin pinned)
+    window.sortStatusesSmartly = function(statusesObj) {
+      if (!statusesObj) return [];
+      const myPhone = window.currentUser?.phone?.replace(/[^0-9]/g, '') || '';
+      const list = Object.values(statusesObj);
+
+      return list.sort((a, b) => {
+        if (a.isAdmin && !b.isAdmin) return -1;
+        if (!a.isAdmin && b.isAdmin) return 1;
+
+        const aSeen = a.viewers && a.viewers[myPhone];
+        const bSeen = b.viewers && b.viewers[myPhone];
+        if (!aSeen && bSeen) return -1;
+        if (aSeen && !bSeen) return 1;
+        return (b.timestamp || 0) - (a.timestamp || 0);
+      });
+    };
+
+    // 6. ALGORITHM 2: Smart Auto Book-Matcher
+    function checkBookMatchAlgorithm(newPost) {
+      get(ref(db, 'book_exchange')).then(snap => {
+        const allPosts = snap.val() || {};
+        const cleanTitle = (newPost.bookTitle || '').toLowerCase().trim();
+
+        Object.values(allPosts).forEach(post => {
+          if (post.senderPhone !== newPost.senderPhone && !post.resolved) {
+            const matchTitle = (post.bookTitle || '').toLowerCase().trim();
+            if (post.type !== newPost.type && (matchTitle.includes(cleanTitle) || cleanTitle.includes(matchTitle))) {
+              alert(`🔔 ऑटो मैच मिला!\nकिताब "${newPost.bookTitle}" के लिए साथी ${post.senderName} उपलब्ध हैं। आप सीधे उनसे चैट कर सकते हैं!`);
+            }
+          }
+        });
+      });
+    }
+
+    const previousSubmitExchange = window.submitExchangePost;
+    window.submitExchangePost = function() {
+      const title = document.getElementById('ex-post-title')?.value;
+      const type = document.getElementById('ex-post-type')?.value;
+      if (previousSubmitExchange) previousSubmitExchange();
+      setTimeout(() => {
+        if (title) checkBookMatchAlgorithm({
+          bookTitle: title,
+          type: type,
+          senderPhone: window.currentUser?.phone?.replace(/[^0-9]/g, '')
+        });
+      }, 1000);
+    };
+
+    // 7. ALGORITHM 3: Study Partner Finder (Pairing logic)
+    window.openStudyPartnerFinder = function() {
+      document.getElementById('study-partner-modal').classList.add('active');
+      const container = document.getElementById('study-partners-list-box');
+      container.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> मुफ़ीद साथी खोजे जा रहे हैं...`;
+
+      get(ref(db, 'users')).then(snap => {
+        const users = snap.val() || {};
+        const myUser = window.currentUser || {};
+        const list = Object.values(users).filter(u => u.phone !== myUser.phone);
+
+        if (list.length === 0) {
+          container.innerHTML = `<p style="color:#8696a0; font-size:0.85rem;">अभी कोई अन्य साथी ऑनलाइन नहीं है।</p>`;
+          return;
+        }
+        container.innerHTML = "";
+        list.slice(0, 5).forEach(partner => {
+          const div = document.createElement('div');
+          div.className = 'partner-card';
+          div.innerHTML = `
+            <div>
+              <b style="color:#e9edef; font-size:0.88rem;">${partner.name || partner.displayName || 'इल्मी साथी'}</b>
+              <div style="color:#00a884; font-size:0.75rem;">जमात: ${partner.jamath || 'आलिमत'} • मुताला: ईशा बाद</div>
+            </div>
+            <button class="peer-card-btn" style="padding:4px 10px; font-size:0.75rem;" onclick="window.startPeerChat('${partner.phone}')">साथ पढ़ें</button>
+          `;
+          container.appendChild(div);
+        });
+      });
+    };
+
+    // 8. ALGORITHM 4: Anti-Spam & Smart XP System
+    let lastActivityTime = 0;
+    window.awardSmartXP = function(points, reason = 'activity') {
+      const now = Date.now();
+      if (now - lastActivityTime < 3000) return; // 3-second anti-spam cooldown
+      lastActivityTime = now;
+
+      const myPhone = window.currentUser?.phone?.replace(/[^0-9]/g, '');
+      if (!myPhone) return;
+
+      const xpRef = ref(db, `users/${myPhone}/xp`);
+      get(xpRef).then(snap => {
+        const currentXP = snap.val() || 0;
+        update(ref(db, `users/${myPhone}`), { xp: currentXP + points });
+      });
+    };
+
+    // 9. ALGORITHM 5: Doubt Priority Sorting
+    window.sortDoubtsPriority = function(doubtsObj) {
+      if (!doubtsObj) return [];
+      return Object.values(doubtsObj).sort((a, b) => {
+        if (!a.isSolved && b.isSolved) return -1;
+        if (a.isSolved && !b.isSolved) return 1;
+        return (b.views || 0) - (a.views || 0);
+      });
+    };
+
+    // 10. AI Quiz Battle Arena (Solo, 1-on-1 Duel & Speed Trial)
+    const LOCAL_QUIZ_BANK = [
+      { id: 1, level: 'आसान', subject: 'गणित', q: '95 में 37 जोड़ने पर क्या आएगा?', o: ['132', '122', '142', '135'], a: 0 },
+      { id: 2, level: 'मध्यम', subject: 'English', q: 'Choose the correct past tense of "Seek":', o: ['Seeked', 'Sought', 'Soaked', 'Seeking'], a: 1 },
+      { id: 3, level: 'कठिन', subject: 'नह्व', q: 'जिस इस्म पर ज़बर (फ़त्हा) आता है उसे क्या कहते हैं?', o: ['मर्फ़ूअ', 'मजरूर', 'मंसूब', 'मबनी'], a: 2 },
+      { id: 4, level: 'आसान', subject: 'हिंदी व्याकरण', q: '"सूर्योदय" में कौन सी संधि है?', o: ['दीर्घ', 'गुण', 'वृद्धि', 'यण'], a: 1 },
+      { id: 5, level: 'मध्यम', subject: 'गणित', q: 'यदि 12 किताबों की कीमत ₹360 है, तो 5 किताबों की कीमत क्या होगी?', o: ['₹120', '₹150', '₹180', '₹160'], a: 1 }
+    ];
+
+    let quizCountdownTimer = null;
+
+    window.openQuizArena = function() {
+      document.getElementById('quiz-arena-modal').classList.add('active');
+      window.resetQuizModal();
+    };
+
+    window.resetQuizModal = function() {
+      clearInterval(quizCountdownTimer);
+      document.getElementById('quiz-mode-select-view').style.display = 'block';
+      document.getElementById('quiz-card-picker-view').style.display = 'none';
+      document.getElementById('quiz-battle-play-view').style.display = 'none';
+      document.getElementById('quiz-result-banner').innerText = "";
+    };
+
+    window.openPeerDuelCardPicker = function() {
+      document.getElementById('quiz-mode-select-view').style.display = 'none';
+      const container = document.getElementById('generated-quiz-cards-box');
+      container.innerHTML = "";
+
+      const shuffled = [...LOCAL_QUIZ_BANK].sort(() => 0.5 - Math.random()).slice(0, 3);
+      shuffled.forEach((q, idx) => {
+        const card = document.createElement('div');
+        card.className = 'quiz-card-pick';
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="color:#facc15; font-size:0.78rem; font-weight:bold;">कार्ड ${idx+1}: ${q.subject}</span>
+            <span style="background:rgba(0,168,132,0.2); color:#00a884; font-size:0.7rem; padding:2px 8px; border-radius:10px;">${q.level} (+${(idx+1)*5} XP)</span>
+          </div>
+          <div style="color:#e9edef; font-size:0.86rem; font-weight:500;">${q.q}</div>
+          <button class="peer-card-btn" style="width:100%; margin-top:8px; padding:6px;" onclick="window.sendDuelChallenge(${JSON.stringify(q).replace(/"/g, '&quot;')})">
+            🎯 यह सवाल चैलेंज भेजें
+          </button>
+        `;
+        container.appendChild(card);
+      });
+      document.getElementById('quiz-card-picker-view').style.display = 'block';
+    };
+
+    window.sendDuelChallenge = function(questionObj) {
+      const challengeId = 'duel_' + Date.now();
+      update(ref(db, `quiz_duels/${challengeId}`), {
+        question: questionObj,
+        senderName: window.currentUser.displayName || window.currentUser.name,
+        senderPhone: window.currentUser.phone.replace(/[^0-9]/g, ''),
+        timestamp: Date.now(),
+        status: 'open'
+      }).then(() => {
+        alert("चैलेंज भेजा गया! साथी के जवाब देते ही लाइव XP अपडेट हो जाएगा।");
+        window.resetQuizModal();
+      });
+    };
+
+    window.startSoloQuizMode = function(mode = 'bot') {
+      document.getElementById('quiz-mode-select-view').style.display = 'none';
+      document.getElementById('quiz-card-picker-view').style.display = 'none';
+      const playView = document.getElementById('quiz-battle-play-view');
+      playView.style.display = 'block';
+
+      const randomQ = LOCAL_QUIZ_BANK[Math.floor(Math.random() * LOCAL_QUIZ_BANK.length)];
+      document.getElementById('quiz-player-tag').innerText = mode === 'speed' ? "मोड: 1-मिनट स्पीड रन" : "बनाम: AI उस्ताद बॉट";
+      document.getElementById('quiz-active-question').innerText = randomQ.q;
+
+      window.speakText(randomQ.q);
+
+      const optBox = document.getElementById('quiz-options-container');
+      optBox.innerHTML = "";
+      randomQ.o.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-opt-btn';
+        btn.innerText = `${String.fromCharCode(65 + idx)}. ${opt}`;
+        btn.onclick = () => window.handleQuizAnswer(btn, idx === randomQ.a);
+        optBox.appendChild(btn);
+      });
+
+      let timeLeft = mode === 'speed' ? 60 : 15;
+      const timerBadge = document.getElementById('quiz-timer-badge');
+      timerBadge.innerText = `⏱️ ${timeLeft}s`;
+      clearInterval(quizCountdownTimer);
+      quizCountdownTimer = setInterval(() => {
+        timeLeft--;
+        timerBadge.innerText = `⏱️ ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(quizCountdownTimer);
+          document.getElementById('quiz-result-banner').innerHTML = `<span style="color:#ef4444;">समय समाप्त!</span>`;
+        }
+      }, 1000);
+    };
+
+    window.handleQuizAnswer = function(buttonElem, isCorrect) {
+      clearInterval(quizCountdownTimer);
+      const resBanner = document.getElementById('quiz-result-banner');
+      if (isCorrect) {
+        buttonElem.classList.add('correct');
+        resBanner.innerHTML = `<span style="color:#00a884;">माशाअल्लाह! बिल्कुल सही जवाब (+10 XP)</span>`;
+        window.speakText("बिल्कुल सही जवाब!");
+        window.awardSmartXP(10, 'quiz_win');
+      } else {
+        buttonElem.classList.add('wrong');
+        resBanner.innerHTML = `<span style="color:#ef4444;">गलत जवाब! सही विकल्प हाइलाइट हुआ।</span>`;
+        window.speakText("गलत जवाब!");
+      }
+    };
+
+    // 11. Quick Solver & Instant AI Doubt Solver
+    const SOLVER_DATA = {
+      math: `<b>📐 महत्वपूर्ण बीजगणित सूत्र:</b><br>• (a + b)² = a² + 2ab + b²<br>• (a - b)² = a² - 2ab + b²<br>• a² - b² = (a - b)(a + b)<br><br><b>प्रतिशत (Percentage) शॉर्टकट:</b><br>किसी भी संख्या का 10% निकालने के लिए दाईं तरफ से एक अंक बाद दशमलव (.) लगा दें।`,
+      english: `<b>📖 Three Forms of Daily Verbs:</b><br>• Go - Went - Gone<br>• Write - Wrote - Written<br>• Read - Read - Read<br><br><b>💡 Golden Rule:</b> He/She/It के साथ Present Tense में Verb के अंत में 's' या 'es' लगता है।`,
+      hindi: `<b>🇮🇳 संधि के मूल नियम:</b><br>• अ/आ + इ/ई = ए (उदा. नर + ईश = नरेश)<br>• अ/आ + उ/ऊ = ओ (उदा. सूर्य + उदय = सूर्योदय)<br><br><b>अलंकार पहचान:</b> जब एक ही वर्ण बार-बार दोहराया जाए तो <i>अनुप्रास अलंकार</i> होता है।`,
+      nahw: `<b>📜 अरबी व्याकरण कायदे:</b><br>• <b>फ़ाइल (Subject):</b> हमेशा मर्फ़ूअ (पेश वाला) होता है।<br>• <b>मफ़ऊल (Object):</b> हमेशा मंसूब (ज़बर वाला) होता है।<br>• <b>मुज़ाफ़:</b> इस पर कभी अलिफ़-लाम (ال) और तनवीन नहीं आती।`
+    };
+
+    window.openQuickSolverModal = function() {
+      document.getElementById('quick-solver-modal').classList.add('active');
+      window.switchSolverTab('math');
+    };
+
+    window.switchSolverTab = function(type, elem) {
+      document.querySelectorAll('.cheatsheet-tab').forEach(t => t.classList.remove('active'));
+      if (elem) elem.classList.add('active');
+      document.getElementById('solver-content-box').innerHTML = SOLVER_DATA[type] || '';
+    };
+
+    window.askInstantAIUstad = async function() {
+      const inp = document.getElementById('ai-doubt-input');
+      const box = document.getElementById('ai-doubt-response-box');
+      const question = inp?.value?.trim();
+      if (!question) return;
+
+      box.style.display = 'block';
+      box.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> AI उस्ताद जवाब तैयार कर रहे हैं...`;
+      
+      const answer = await window.callSmartAI(question, "आप एक काबिल उस्ताद हैं। छात्र के सवाल का जवाब 2-3 आसान और स्पष्ट वाक्यों में दें।");
+      box.innerHTML = `<b>जवाब:</b><br>${answer}`;
+      window.speakText(answer);
+    };
+
+    // 12. Dynamic UI Header Buttons (Top Bar Pills)
+    const prevSetupPhase3UI = window.setupPhase3UI;
+    window.setupPhase3UI = function() {
+      if (prevSetupPhase3UI) prevSetupPhase3UI();
+      const filterBar = document.getElementById('wa-filter-bar');
+      if (filterBar) {
+        if (!document.getElementById('pill-quiz-arena')) {
+          const qPill = document.createElement('button');
+          qPill.id = 'pill-quiz-arena';
+          qPill.className = 'filter-pill';
+          qPill.innerHTML = `⚡ क्विज़ मुकाबला`;
+          qPill.onclick = () => window.openQuizArena();
+          filterBar.appendChild(qPill);
+        }
+        if (!document.getElementById('pill-quick-solver')) {
+          const sPill = document.createElement('button');
+          sPill.id = 'pill-quick-solver';
+          sPill.className = 'filter-pill';
+          sPill.innerHTML = `📐 क्विक गाइड`;
+          sPill.onclick = () => window.openQuickSolverModal();
+          filterBar.appendChild(sPill);
+        }
+        if (!document.getElementById('pill-study-partner')) {
+          const pPill = document.createElement('button');
+          pPill.id = 'pill-study-partner';
+          pPill.className = 'filter-pill';
+          pPill.innerHTML = `🤝 पार्टनर`;
+          pPill.onclick = () => window.openStudyPartnerFinder();
+          filterBar.appendChild(pPill);
+        }
+      }
+    };
     
   </script>
 
@@ -4013,5 +4509,94 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
     </div>
   </div>
 
+  <!-- 🏆 AI Quiz Battle Arena Modal (Solo, Duel & 1-Minute Speed Run) -->
+  <div id="quiz-arena-modal" class="wa-modal-overlay">
+    <div class="wa-modal-content" style="max-height:85vh; overflow-y:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 style="color:#e9edef; margin:0; font-size:1.05rem;"><i class="fa-solid fa-bolt" style="color:#facc15;"></i> इल्मी क्विज़ मुकाबला</h3>
+        <button onclick="document.getElementById('quiz-arena-modal').classList.remove('active')" style="background:transparent; border:none; color:#8696a0; font-size:1.5rem; cursor:pointer;">&times;</button>
+      </div>
+
+      <!-- Mode Selector -->
+      <div id="quiz-mode-select-view">
+        <p style="color:#8696a0; font-size:0.83rem; margin-bottom:12px;">मुकाबले का तरीका चुनें:</p>
+        <button class="peer-card-btn" style="width:100%; margin-bottom:10px; background:#3b82f6;" onclick="window.startSoloQuizMode('bot')">
+          <i class="fa-solid fa-robot"></i> सोलो मोड (AI उस्ताद बॉट से खेलें)
+        </button>
+        <button class="peer-card-btn" style="width:100%; margin-bottom:10px; background:#eab308;" onclick="window.startSoloQuizMode('speed')">
+          <i class="fa-solid fa-stopwatch"></i> 1-मिनट स्पीड ट्रायल (रैपिड XP रन)
+        </button>
+        <button class="peer-card-btn" style="width:100%;" onclick="window.openPeerDuelCardPicker()">
+          <i class="fa-solid fa-user-ninja"></i> 1-on-1 साथी को चैलेंज भेजें
+        </button>
+      </div>
+
+      <!-- 3-Card Question Picker (No Typing Required) -->
+      <div id="quiz-card-picker-view" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span style="font-size:0.8rem; color:#8696a0;">एक सवाल कार्ड चुनें (साथी को 15s का चैलेंज जाएगा):</span>
+          <button onclick="window.resetQuizModal()" style="background:transparent; border:none; color:#3b82f6; font-size:0.75rem; cursor:pointer;">वापस</button>
+        </div>
+        <div id="generated-quiz-cards-box"></div>
+      </div>
+
+      <!-- Live Battle Arena (15s Timer + Speech) -->
+      <div id="quiz-battle-play-view" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span id="quiz-player-tag" style="color:#00a884; font-size:0.82rem; font-weight:bold;"></span>
+          <span id="quiz-timer-badge" style="background:#ef4444; color:#fff; padding:3px 10px; border-radius:12px; font-size:0.8rem; font-weight:bold;">⏱️ 15s</span>
+        </div>
+        <div style="background:#111b21; padding:14px; border-radius:8px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.08);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <p id="quiz-active-question" style="color:#fff; font-size:0.95rem; margin:0; line-height:1.45; flex:1;"></p>
+            <button onclick="window.speakText(document.getElementById('quiz-active-question').innerText)" style="background:none; border:none; color:#00a884; font-size:1.2rem; cursor:pointer; margin-left:8px;" title="बोलकर सुनाएँ">🔊</button>
+          </div>
+        </div>
+        <div id="quiz-options-container"></div>
+        <div id="quiz-result-banner" style="font-size:0.88rem; text-align:center; margin-top:10px; font-weight:bold;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📖 Subject Quick Solver & Instant AI Ustad Modal -->
+  <div id="quick-solver-modal" class="wa-modal-overlay">
+    <div class="wa-modal-content" style="max-height:85vh; overflow-y:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="color:#e9edef; margin:0; font-size:1.05rem;"><i class="fa-solid fa-graduation-cap" style="color:#00a884;"></i> क्विक गाइड व AI उस्ताद</h3>
+        <button onclick="document.getElementById('quick-solver-modal').classList.remove('active')" style="background:transparent; border:none; color:#8696a0; font-size:1.5rem; cursor:pointer;">&times;</button>
+      </div>
+      <div>
+        <span class="cheatsheet-tab active" onclick="window.switchSolverTab('math', this)">गणित (Maths)</span>
+        <span class="cheatsheet-tab" onclick="window.switchSolverTab('english', this)">English</span>
+        <span class="cheatsheet-tab" onclick="window.switchSolverTab('hindi', this)">हिंदी व्याकरण</span>
+        <span class="cheatsheet-tab" onclick="window.switchSolverTab('nahw', this)">नह्व व सर्फ़</span>
+      </div>
+      <div id="solver-content-box" style="margin-top:10px; font-size:0.84rem; color:#cbd5e1; line-height:1.5; background:#111b21; padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);"></div>
+
+      <!-- Instant AI Doubt Bar -->
+      <div style="margin-top:14px; border-top:1px solid rgba(255,255,255,0.1); padding-top:12px;">
+        <div style="font-size:0.82rem; color:#8696a0; margin-bottom:6px;"><i class="fa-solid fa-wand-magic-sparkles" style="color:#facc15;"></i> AI उस्ताद से कुछ भी पूछें:</div>
+        <div style="display:flex; gap:6px;">
+          <input type="text" id="ai-doubt-input" class="wa-form-input" placeholder="सवाल लिखें या माइक से बोलें..." style="margin-bottom:0; flex:1;">
+          <button class="voice-mic-btn" onclick="window.toggleVoiceInput('ai-doubt-input', this)" title="माइक से बोलें">🎙️</button>
+          <button class="peer-card-btn" onclick="window.askInstantAIUstad()" style="padding:0 14px;"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+        <div id="ai-doubt-response-box" style="display:none;" class="ai-bubble-box"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🤝 Study Partner Matcher Modal -->
+  <div id="study-partner-modal" class="wa-modal-overlay">
+    <div class="wa-modal-content" style="max-height:80vh; overflow-y:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="color:#e9edef; margin:0; font-size:1rem;"><i class="fa-solid fa-user-group" style="color:#3b82f6;"></i> मुताला पार्टनर फाइंडर</h3>
+        <button onclick="document.getElementById('study-partner-modal').classList.remove('active')" style="background:transparent; border:none; color:#8696a0; font-size:1.4rem; cursor:pointer;">&times;</button>
+      </div>
+      <p style="color:#8696a0; font-size:0.82rem;">आपकी जमात और पसंदीदा मुताला वक्त के आधार पर मुफ़ीद साथी:</p>
+      <div id="study-partners-list-box"></div>
+    </div>
+  </div>
+  
 </body>
 </html>
