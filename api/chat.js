@@ -10,47 +10,41 @@ module.exports = async (req, res) => {
   if (typeof body === 'string') {
     try { body = JSON.parse(body); } catch (e) {}
   }
-  const { prompt, type, level } = body || {};
+
+  // हर तरह के पैरामीटर को एक साथ पकड़ना
+  const prompt = body?.prompt || body?.messages?.[body.messages.length - 1]?.parts?.[0]?.text || body?.text || "";
+  const isQuiz = body?.isQuiz || body?.type === 'quiz';
+  const taskType = body?.type || (isQuiz ? 'quiz' : 'assistant');
+  const level = parseInt(body?.level) || 1;
 
   const GROQ_KEY = process.env.GROQ_KEY || "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";
   const CEREBRAS_KEY = process.env.CEREBRAS_KEY || "csk-tft6c8d9mf4kp9txpmvkxt8xfxyrwwcddthx3yhkwp2j52mw";
 
-  // 📜 सख्त शरई व अकादमिक कानून
-  const baseSystemPrompt = `आप दरसे निज़ामी और स्कूली निसाब के मोतबर व तेज़-रफ़्तार AI उस्ताद (Suhail AI) हैं।
+  // 📜 शरई व अकादमिक कानून
+  let systemPrompt = `आप दरसे निज़ामी और स्कूली निसाब के मोतबर AI उस्ताद (Suhail AI) हैं।
 कानून:
 1. हमेशा अहले सुन्नत वल जमात अल मारूफ मसलक-ए-आला हजरत, फ़िक़्ह-ए-हनफ़ी, नह्व, सर्फ़, अदब, रियाज़ी और अंग्रेज़ी के उसूलों पर रहें।
-2. किसी भी विवादित मसले में न पड़ें।
-3. जवाब बिल्कुल साफ़, सटीक और 2-3 जुमलों में दें ताकि तालिब-ए-इल्म का वक्त बर्बाद न हो।
-4. किसी जानदार की तस्वीर का ज़िक्र न करें।`;
+2. जवाब बिल्कुल साफ़, सटीक और 2-3 जुमलों में दें।
+3. किसी जानदार की तस्वीर का ज़िक्र न करें।`;
 
-  // 🎯 टास्क के मुताबिक सिस्टम हिदायत
-  let currentSystem = baseSystemPrompt;
-  let finalPrompt = prompt || "";
+  let userPrompt = prompt || "अस्सलामू अलैकुम";
 
-  if (type === 'corrector') {
-    currentSystem = `${baseSystemPrompt}
-काम: तालिब-ए-इल्म के लिखे जुमले में उर्दू/अरबी/हिंदी/इंग्लिश की इमला (spelling) और ग्रामर की गलती पकड़ें। 
-सीधे 1-2 लाइन में बताएं: "दुरुस्त जुमला यह है: [सही जुमला]" और गलती की वजह बता दें।`;
-  } else if (type === 'summary') {
-    currentSystem = `${baseSystemPrompt}
-काम: दिए गए सबक या इबारत का खुलासा (Summary) सिर्फ 3 अहम बुलेट पॉइंट्स में निकालें।`;
-  } else if (type === 'quiz') {
-    const lvl = parseInt(level) || 1;
-    currentSystem = `आप एक सख्त इम्तिहानी परीक्षक हैं। दरजा (Level) ${lvl}/12 के लिए सिर्फ 1 बहुविकल्पीय सवाल बनाएँ।
-बिना किसी अतिरिक्त बात के केवल यह JSON दें:
+  if (isQuiz) {
+    systemPrompt = `आप एक सख्त इम्तिहानी परीक्षक हैं। दरजा (Level) ${level}/12 के लिए सिर्फ 1 बिल्कुल नया बहुविकल्पीय सवाल बनाएँ।
+बिना किसी अतिरिक्त बात या मार्कडाउन के सिर्फ यह JSON दें:
 {"q": "सवाल", "o": ["विकल्प1", "विकल्प2", "विकल्प3", "विकल्प4"], "a": 0, "s": "विषय"}`;
-    finalPrompt = `Level ${lvl} का नया सवाल तैयार करें।`;
+    userPrompt = `Level ${level} का नया सवाल बनाएँ।`;
   }
 
   const payload = {
     messages: [
-      { role: "system", content: currentSystem },
-      { role: "user", content: finalPrompt }
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt }
     ],
-    temperature: type === 'quiz' ? 0.6 : 0.2
+    temperature: isQuiz ? 0.7 : 0.2
   };
 
-  // ⚡ 1. प्राइमरी इंजन: Groq Instant (0.2s स्पीड)
+  // ⚡ Groq Llama 3.1 Instant (0.2s)
   try {
     const gRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -59,11 +53,13 @@ module.exports = async (req, res) => {
     });
     if (gRes.ok) {
       const data = await gRes.json();
-      return res.status(200).json({ reply: data.choices[0].message.content });
+      const content = data.choices[0].message.content;
+      // दोनों कीज़ (reply और text) वापस भेजना ताकि फ्रंटएंड कभी खाली न रहे
+      return res.status(200).json({ reply: content, text: content });
     }
   } catch (err) {}
 
-  // 🛡️ 2. वाहिद (Single) बैकअप: Cerebras (0.3s स्पीड)
+  // 🛡️ Cerebras Fallback (0.3s)
   try {
     const cRes = await fetch("https://api.cerebras.ai/v1/chat/completions", {
       method: "POST",
@@ -72,9 +68,10 @@ module.exports = async (req, res) => {
     });
     if (cRes.ok) {
       const data = await cRes.json();
-      return res.status(200).json({ reply: data.choices[0].message.content });
+      const content = data.choices[0].message.content;
+      return res.status(200).json({ reply: content, text: content });
     }
   } catch (err) {}
 
-  return res.status(500).json({ error: "AI सर्वर अनुपलब्ध है।" });
+  return res.status(500).json({ error: "AI सर्वर व्यस्त है।" });
 };
