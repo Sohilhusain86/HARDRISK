@@ -4469,35 +4469,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       });
     };
 
-      let timeLeft = mode === 'speed' ? 60 : 15;
-      const timerBadge = document.getElementById('quiz-timer-badge');
-      timerBadge.innerText = `⏱️ ${timeLeft}s`;
-      clearInterval(quizCountdownTimer);
-      quizCountdownTimer = setInterval(() => {
-        timeLeft--;
-        timerBadge.innerText = `⏱️ ${timeLeft}s`;
-        if (timeLeft <= 0) {
-          clearInterval(quizCountdownTimer);
-          document.getElementById('quiz-result-banner').innerHTML = `<span style="color:#ef4444;">समय समाप्त!</span>`;
-        }
-      }, 1000);
-    };
-
-    window.handleQuizAnswer = function(buttonElem, isCorrect) {
-      clearInterval(quizCountdownTimer);
-      const resBanner = document.getElementById('quiz-result-banner');
-      if (isCorrect) {
-        buttonElem.classList.add('correct');
-        resBanner.innerHTML = `<span style="color:#00a884;">माशाअल्लाह! बिल्कुल सही जवाब (+10 XP)</span>`;
-        window.speakText("बिल्कुल सही जवाब!");
-        window.awardSmartXP(10, 'quiz_win');
-      } else {
-        buttonElem.classList.add('wrong');
-        resBanner.innerHTML = `<span style="color:#ef4444;">गलत जवाब! सही विकल्प हाइलाइट हुआ।</span>`;
-        window.speakText("गलत जवाब!");
-      }
-    };
-
     // 11. Quick Solver & Instant AI Doubt Solver
     const SOLVER_DATA = {
       math: `<b>📐 महत्वपूर्ण बीजगणित सूत्र:</b><br>• (a + b)² = a² + 2ab + b²<br>• (a - b)² = a² - 2ab + b²<br>• a² - b² = (a - b)(a + b)<br><br><b>प्रतिशत (Percentage) शॉर्टकट:</b><br>किसी भी संख्या का 10% निकालने के लिए दाईं तरफ से एक अंक बाद दशमलव (.) लगा दें।`,
