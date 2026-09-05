@@ -4717,6 +4717,31 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         window.sendFirebaseMessage(roomId, "AI उस्ताद", "Suhail_Ai", "🤖 AI उस्ताद", "admin", reply, "Vercel Server");
       }
     };
+
+    // 🔗 क्विक गाइड को सीधे Vercel API से जोड़ना (CORS ब्लॉक खत्म)
+    window.askInstantAIUstad = async function() {
+      const inp = document.getElementById('ai-doubt-input');
+      const box = document.getElementById('ai-doubt-response-box');
+      const question = inp?.value?.trim();
+      if (!question) return;
+
+      box.style.display = 'block';
+      box.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> AI उस्ताद जवाब लिख रहे हैं...`;
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: question })
+        });
+        const data = await res.json();
+        const answer = data.reply || data.text;
+        box.innerHTML = `<b>जवाब:</b><br>${answer}`;
+        if (typeof window.speakText === 'function') window.speakText(answer);
+      } catch (e) {
+        box.innerHTML = "माफ़ कीजिएगा, सर्वर से संपर्क नहीं हो सका।";
+      }
+    };
     
   </script>
 
