@@ -4554,6 +4554,10 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
     window.handleQuizAnswer = function(buttonElem, isCorrect, level) {
       clearInterval(quizCountdownTimer);
       const resBanner = document.getElementById('quiz-result-banner');
+      
+      // बार-बार क्लिक रोकने के लिए सभी बटन्स डिसेबल करें
+      document.querySelectorAll('.quiz-opt-btn').forEach(btn => btn.style.pointerEvents = 'none');
+
       if (isCorrect) {
         buttonElem.classList.add('correct');
         const xpEarned = level * 5;
@@ -4562,9 +4566,15 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         window.awardSmartXP(xpEarned, 'quiz_win');
       } else {
         buttonElem.classList.add('wrong');
-        resBanner.innerHTML = `<span style="color:#ef4444;">गलत जवाब! सही विकल्प देखें।</span>`;
+        resBanner.innerHTML = `<span style="color:#ef4444;">गलत जवाब! अगला सवाल आ रहा है...</span>`;
         window.speakText("गलत जवाब!");
       }
+
+      // ⏳ 1.2 सेकंड बाद अपने-आप अगला सवाल लोड होगा
+      setTimeout(() => {
+        currentQuizLevel = (currentQuizLevel % 12) + 1;
+        window.startSoloQuizMode('speed');
+      }, 1200);
     };
 
     // 3. मुताला पार्टनर: ऑफलाइन पैगाम ट्रिगर (OneSignal Notification)
