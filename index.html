@@ -589,6 +589,48 @@
     .cheatsheet-tab.active { background: #00a884; color: #fff; font-weight: 600; }
     .ai-bubble-box { background: #111b21; border-left: 3px solid #00a884; padding: 10px 14px; border-radius: 4px; font-size: 0.85rem; color: #e9edef; line-height: 1.5; margin-top: 10px; }
     .partner-card { background: #111b21; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+
+    /* 📱 हॉरिजॉन्टल स्क्रोल बार फिक्स (बटन स्क्रीन से बाहर नहीं जाएँगे) */
+    #wa-filter-bar, .filter-bar-container {
+      display: flex !important;
+      overflow-x: auto !important;
+      white-space: nowrap !important;
+      scrollbar-width: none !important;
+      -webkit-overflow-scrolling: touch !important;
+      padding: 6px 10px !important;
+      gap: 8px !important;
+    }
+    #wa-filter-bar::-webkit-scrollbar { display: none !important; }
+
+    /* 🎮 12-लेवल क्विज़ ग्रिड व कार्ड्स */
+    .level-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .level-btn {
+      background: #202c33;
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #e9edef;
+      padding: 10px 6px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .level-btn:hover, .level-btn.active {
+      background: #00a884;
+      color: #fff;
+      font-weight: bold;
+      border-color: #00a884;
+    }
+    .level-btn span { display: block; font-size: 0.65rem; color: #8696a0; margin-top: 2px; }
+    .level-btn:hover span, .level-btn.active span { color: #d1fae5; }
+
+    /* 🚫 नीचे अटका हुआ Loading बैनर छुपाने के लिए */
+    .chat-bottom-loading, .app-global-loader { display: none !important; }
     
   </style>
 
@@ -4362,6 +4404,228 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         }
       }
     };
+
+    // =========================================================================
+    // ⚡ VERCEL BACKEND ROUTE & 12-LEVEL QUIZ ENGINE
+    // =========================================================================
+
+    // 1. Vercel Backend Call (No CORS Block, No Browser Errors)
+    window.callSmartAI = async function(prompt, systemInstruction = "You are an expert Islamic and academic teacher helper. Reply concisely in simple Urdu/Hindi.") {
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt, systemInstruction })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          return data.reply;
+        }
+      } catch (err) {
+        console.warn("Backend API Error, falling back to local guidance:", err);
+      }
+      return "माफ़ कीजिएगा, AI नेटवर्क अभी व्यस्त है। कृपया थोड़ी देर बाद प्रयास करें।";
+    };
+
+    // 2. 12-Level Engine & Bank
+    let currentQuizLevel = 1;
+    let currentQuizLevelTitle = "निहायत आसान";
+
+    const FULL_12_LEVEL_BANK = {
+      1: { q: "5 में 4 जोड़ने पर क्या आएगा?", o: ["8", "9", "10", "7"], a: 1, s: "गणित" },
+      2: { q: "सूरज किस दिशा से निकलता है?", o: ["पूरब (East)", "पश्चिम", "उत्तर", "दक्षिण"], a: 0, s: "सामान्य ज्ञान" },
+      3: { q: "इस्म (Noun) किसे कहते हैं?", o: ["काम को", "किसी नाम/जगह को", "ज़माने को", "हरफ़ को"], a: 1, s: "उर्दू व्याकरण" },
+      4: { q: "Choose the correct past tense of 'Eat':", o: ["Eated", "Ate", "Eating", "Eaten"], a: 1, s: "English" },
+      5: { q: "12 किताबों की कीमत ₹240 है, तो 1 किताब कितने की होगी?", o: ["₹18", "₹20", "₹24", "₹22"], a: 1, s: "गणित" },
+      6: { q: "जिस इस्म पर पेश (ज़म्मा) आता है उसे क्या कहते हैं?", o: ["मर्फ़ूअ", "मंसूब", "मजरूर", "मबनी"], a: 0, s: "नह्व" },
+      7: { q: "'सूर्योदय' में कौन सी संधि है?", o: ["दीर्घ", "गुण", "वृद्धि", "यण"], a: 1, s: "हिंदी व्याकरण" },
+      8: { q: "The plural of 'Criterion' is:", o: ["Criterions", "Criteria", "Criterias", "Criteries"], a: 1, s: "English" },
+      9: { q: "मफ़ऊल (Object) पर आमतौर पर कौन सा ए'राब आता है?", o: ["रफ़अ (पेश)", "नसब (ज़बर)", "जर (ज़ेर)", "जज़्म"], a: 1, s: "नह्व" },
+      10: { q: "यदि x + y = 10 और x - y = 4 हो, तो x का मान क्या होगा?", o: ["6", "7", "8", "5"], a: 1, s: "बीजगणित" },
+      11: { q: "अरबी में 'मुज़ाफ़' पर इनमें से क्या कभी दाखिल नहीं हो सकता?", o: ["ज़ेर", "अलिफ़-लाम और तनवीन", "पेश", "ज़बर"], a: 1, s: "नह्व उच्च" },
+      12: { q: "सलासी मुजर्रद के कुल कितने अबवाब (Gates) होते हैं?", o: ["4", "5", "6", "8"], a: 2, s: "इल्मुस सर्फ़" }
+    };
+
+    window.openQuizArena = function() {
+      document.getElementById('quiz-arena-modal').classList.add('active');
+      window.resetQuizToLevels();
+    };
+
+    window.resetQuizToLevels = function() {
+      clearInterval(quizCountdownTimer);
+      document.getElementById('quiz-level-picker-view').style.display = 'block';
+      document.getElementById('quiz-mode-select-view').style.display = 'none';
+      document.getElementById('quiz-card-picker-view').style.display = 'none';
+      document.getElementById('quiz-battle-play-view').style.display = 'none';
+      document.getElementById('quiz-result-banner').innerText = "";
+    };
+
+    window.selectQuizLevel = function(lvl, title) {
+      currentQuizLevel = lvl;
+      currentQuizLevelTitle = title;
+      document.getElementById('quiz-level-picker-view').style.display = 'none';
+      document.getElementById('selected-level-badge').innerText = `चुना गया: Level ${lvl} (${title})`;
+      document.getElementById('quiz-mode-select-view').style.display = 'block';
+    };
+
+    window.resetQuizToModes = function() {
+      document.getElementById('quiz-card-picker-view').style.display = 'none';
+      document.getElementById('quiz-mode-select-view').style.display = 'block';
+    };
+
+    window.openPeerDuelCardPicker = function() {
+      document.getElementById('quiz-mode-select-view').style.display = 'none';
+      const container = document.getElementById('generated-quiz-cards-box');
+      container.innerHTML = "";
+
+      // 3 कार्ड जनरेट करें (चुने गए लेवल और उसके आस-पास से)
+      const levelsToPick = [currentQuizLevel, Math.max(1, currentQuizLevel - 1), Math.min(12, currentQuizLevel + 1)];
+      levelsToPick.forEach((lvl, idx) => {
+        const q = FULL_12_LEVEL_BANK[lvl];
+        const card = document.createElement('div');
+        card.className = 'quiz-card-pick';
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="color:#facc15; font-size:0.78rem; font-weight:bold;">कार्ड ${idx+1}: Level ${lvl} (${q.s})</span>
+            <span style="background:rgba(0,168,132,0.2); color:#00a884; font-size:0.7rem; padding:2px 8px; border-radius:10px;">+${lvl * 5} XP</span>
+          </div>
+          <div style="color:#e9edef; font-size:0.86rem; font-weight:500;">${q.q}</div>
+          <button class="peer-card-btn" style="width:100%; margin-top:8px; padding:6px;" onclick="window.sendDuelChallenge(${JSON.stringify(q).replace(/"/g, '&quot;')}, ${lvl})">
+            🎯 यह सवाल चैलेंज भेजें
+          </button>
+        `;
+        container.appendChild(card);
+      });
+      document.getElementById('quiz-card-picker-view').style.display = 'block';
+    };
+
+    window.sendDuelChallenge = function(questionObj, level) {
+      const challengeId = 'duel_' + Date.now();
+      const myName = window.currentUser?.displayName || window.currentUser?.name || "साथी छात्र";
+      update(ref(db, `quiz_duels/${challengeId}`), {
+        question: questionObj,
+        level: level,
+        senderName: myName,
+        senderPhone: window.currentUser?.phone?.replace(/[^0-9]/g, '') || '',
+        timestamp: Date.now(),
+        status: 'open'
+      }).then(() => {
+        alert(`लेवल ${level} का चैलेंज भेज दिया गया है!`);
+        window.resetQuizToLevels();
+      });
+    };
+
+    window.startSoloQuizMode = function(mode = 'bot') {
+      document.getElementById('quiz-mode-select-view').style.display = 'none';
+      const playView = document.getElementById('quiz-battle-play-view');
+      playView.style.display = 'block';
+
+      const qData = FULL_12_LEVEL_BANK[currentQuizLevel];
+      document.getElementById('quiz-player-tag').innerText = `Level ${currentQuizLevel}: ${currentQuizLevelTitle} ${mode === 'speed' ? '(स्पीड ट्रायल)' : '(बनाम AI बॉट)'}`;
+      document.getElementById('quiz-active-question').innerText = qData.q;
+
+      window.speakText(qData.q);
+
+      const optBox = document.getElementById('quiz-options-container');
+      optBox.innerHTML = "";
+      qData.o.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-opt-btn';
+        btn.innerText = `${String.fromCharCode(65 + idx)}. ${opt}`;
+        btn.onclick = () => window.handleQuizAnswer(btn, idx === qData.a, currentQuizLevel);
+        optBox.appendChild(btn);
+      });
+
+      let timeLeft = mode === 'speed' ? 45 : 15;
+      const timerBadge = document.getElementById('quiz-timer-badge');
+      timerBadge.innerText = `⏱️ ${timeLeft}s`;
+      clearInterval(quizCountdownTimer);
+      quizCountdownTimer = setInterval(() => {
+        timeLeft--;
+        timerBadge.innerText = `⏱️ ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(quizCountdownTimer);
+          document.getElementById('quiz-result-banner').innerHTML = `<span style="color:#ef4444;">समय समाप्त!</span>`;
+        }
+      }, 1000);
+    };
+
+    window.handleQuizAnswer = function(buttonElem, isCorrect, level) {
+      clearInterval(quizCountdownTimer);
+      const resBanner = document.getElementById('quiz-result-banner');
+      if (isCorrect) {
+        buttonElem.classList.add('correct');
+        const xpEarned = level * 5;
+        resBanner.innerHTML = `<span style="color:#00a884;">माशाअल्लाह! बिल्कुल सही जवाब (+${xpEarned} XP)</span>`;
+        window.speakText("बिल्कुल सही जवाब!");
+        window.awardSmartXP(xpEarned, 'quiz_win');
+      } else {
+        buttonElem.classList.add('wrong');
+        resBanner.innerHTML = `<span style="color:#ef4444;">गलत जवाब! सही विकल्प देखें।</span>`;
+        window.speakText("गलत जवाब!");
+      }
+    };
+
+    // 3. मुताला पार्टनर: ऑफलाइन पैगाम ट्रिगर (OneSignal Notification)
+    window.sendOfflineStudyNudge = function(partnerName, partnerPhone) {
+      const myName = window.currentUser?.displayName || window.currentUser?.name || "साथी छात्र";
+      
+      // डेटाबेस में नोटिस अलर्ट दर्ज करना
+      const nudgeId = 'nudge_' + Date.now();
+      update(ref(db, `study_nudges/${nudgeId}`), {
+        toPhone: partnerPhone,
+        fromName: myName,
+        timestamp: Date.now()
+      }).then(() => {
+        alert(`🔔 ${partnerName} को ऑफलाइन पैगाम भेज दिया गया है! जैसे ही वे इंटरनेट चालू करेंगे, उन्हें आपकी मुताला रिक्वेस्ट मिल जाएगी।`);
+      });
+    };
+
+    window.openStudyPartnerFinder = function() {
+      document.getElementById('study-partner-modal').classList.add('active');
+      const container = document.getElementById('study-partners-list-box');
+      container.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> मुफ़ीद साथी खोजे जा रहे हैं...`;
+
+      get(ref(db, 'users')).then(snap => {
+        const users = snap.val() || {};
+        const myPhone = window.currentUser?.phone?.replace(/[^0-9]/g, '') || '';
+        const list = Object.values(users).filter(u => (u.phone || '').replace(/[^0-9]/g, '') !== myPhone);
+
+        if (list.length === 0) {
+          container.innerHTML = `<p style="color:#8696a0; font-size:0.85rem;">अभी कोई अन्य साथी पंजीकृत नहीं है।</p>`;
+          return;
+        }
+        container.innerHTML = "";
+        list.slice(0, 6).forEach(partner => {
+          const pName = partner.name || partner.displayName || 'इल्मी साथी';
+          const pPhone = (partner.phone || '').replace(/[^0-9]/g, '');
+          const div = document.createElement('div');
+          div.className = 'partner-card';
+          div.innerHTML = `
+            <div>
+              <b style="color:#e9edef; font-size:0.88rem;">${pName}</b>
+              <div style="color:#8696a0; font-size:0.75rem;">जमात: ${partner.jamath || 'आलिमत'} • रोल: ${partner.roll || '786'}</div>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="peer-card-btn" style="padding:4px 8px; font-size:0.75rem; background:#22c55e;" onclick="window.startPeerChat('${partner.phone}')">चैट</button>
+              <button class="peer-card-btn" style="padding:4px 8px; font-size:0.75rem; background:#3b82f6;" onclick="window.sendOfflineStudyNudge('${pName}', '${pPhone}')" title="ऑफलाइन पुश पैगाम">🔔 बुलाएँ</button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      });
+    };
+
+    // 4. Loading इंडिकेटर हटाना
+    window.addEventListener('DOMContentLoaded', () => {
+      const loaders = document.querySelectorAll('.chat-bottom-loading, [id*="loading"]');
+      loaders.forEach(el => {
+        if (el && el.innerText && el.innerText.toLowerCase().includes('loading')) {
+          el.style.display = 'none';
+        }
+      });
+    });
     
   </script>
 
@@ -4509,38 +4773,55 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
     </div>
   </div>
 
-  <!-- 🏆 AI Quiz Battle Arena Modal (Solo, Duel & 1-Minute Speed Run) -->
-  <div id="quiz-arena-modal" class="wa-modal-overlay">
+ <div id="quiz-arena-modal" class="wa-modal-overlay">
     <div class="wa-modal-content" style="max-height:85vh; overflow-y:auto;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <h3 style="color:#e9edef; margin:0; font-size:1.05rem;"><i class="fa-solid fa-bolt" style="color:#facc15;"></i> इल्मी क्विज़ मुकाबला</h3>
         <button onclick="document.getElementById('quiz-arena-modal').classList.remove('active')" style="background:transparent; border:none; color:#8696a0; font-size:1.5rem; cursor:pointer;">&times;</button>
       </div>
 
-      <!-- Mode Selector -->
-      <div id="quiz-mode-select-view">
-        <p style="color:#8696a0; font-size:0.83rem; margin-bottom:12px;">मुकाबले का तरीका चुनें:</p>
+      <div id="quiz-level-picker-view">
+        <p style="color:#8696a0; font-size:0.82rem; margin-bottom:6px;">अपना दरजा (Level 1 आसान से Level 12 कठिन) चुनें:</p>
+        <div class="level-grid">
+          <div class="level-btn" onclick="window.selectQuizLevel(1, 'निहायत आसान')">L-1<span>इब्तिदाई</span></div>
+          <div class="level-btn" onclick="window.selectQuizLevel(2, 'बहुत आसान')">L-2<span>आसान</span></div>
+          <div class="level-btn" onclick="window.selectQuizLevel(3, 'आसान')">L-3<span>बुनियादी</span></div>
+          <div class="level-btn" onclick="window.selectQuizLevel(4, 'साधारण')">L-4<span>मध्यम 1</span></div>
+          <div class="level-btn" onclick="window.selectQuizLevel(5, 'मध्यम')">L-5<span>मध्यम 2</span></div>
+          <div class="level-btn" onclick="window.selectQuizLevel(6, 'कठिन 1')">L-6<span>ऊँचा</span></div>
+          <div class="level-btn" onclick="window.selectQuizLevel(7, 'कठिन 2')">L-7<span>मज़बूत</span></div>
+          <div class="level-btn" onclick="window.selectQuizLevel(8, 'सख्त')">L-8<span>मुश्किल</span></div>
+          <div class="level-btn" onclick="window.selectQuizLevel(9, 'आला')">L-9<span>गंभीर</span></div>
+          <div class="level-btn" onclick="window.selectQuizLevel(10, 'एक्सट्रीम')">L-10<span>एक्सपर्ट</span></div>
+          <div class="level-btn" onclick="window.selectQuizLevel(11, 'सुपर एक्सट्रीम')">L-11<span>उस्ताद</span></div>
+          <div class="level-btn" onclick="window.selectQuizLevel(12, 'आला तरीन')">L-12<span>इम्तिहान</span></div>
+        </div>
+      </div>
+
+      <div id="quiz-mode-select-view" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span id="selected-level-badge" style="color:#00a884; font-size:0.82rem; font-weight:bold;"></span>
+          <button onclick="window.resetQuizToLevels()" style="background:transparent; border:none; color:#3b82f6; font-size:0.75rem; cursor:pointer;">लेवल बदलें</button>
+        </div>
         <button class="peer-card-btn" style="width:100%; margin-bottom:10px; background:#3b82f6;" onclick="window.startSoloQuizMode('bot')">
-          <i class="fa-solid fa-robot"></i> सोलो मोड (AI उस्ताद बॉट से खेलें)
+          <i class="fa-solid fa-robot"></i> सोलो AI उस्ताद बॉट से खेलें
         </button>
         <button class="peer-card-btn" style="width:100%; margin-bottom:10px; background:#eab308;" onclick="window.startSoloQuizMode('speed')">
-          <i class="fa-solid fa-stopwatch"></i> 1-मिनट स्पीड ट्रायल (रैपिड XP रन)
+          <i class="fa-solid fa-stopwatch"></i> 1-मिनट स्पीड ट्रायल
         </button>
         <button class="peer-card-btn" style="width:100%;" onclick="window.openPeerDuelCardPicker()">
           <i class="fa-solid fa-user-ninja"></i> 1-on-1 साथी को चैलेंज भेजें
         </button>
       </div>
 
-      <!-- 3-Card Question Picker (No Typing Required) -->
       <div id="quiz-card-picker-view" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-          <span style="font-size:0.8rem; color:#8696a0;">एक सवाल कार्ड चुनें (साथी को 15s का चैलेंज जाएगा):</span>
-          <button onclick="window.resetQuizModal()" style="background:transparent; border:none; color:#3b82f6; font-size:0.75rem; cursor:pointer;">वापस</button>
+          <span style="font-size:0.8rem; color:#8696a0;">एक सवाल कार्ड चुनें:</span>
+          <button onclick="window.resetQuizToModes()" style="background:transparent; border:none; color:#3b82f6; font-size:0.75rem; cursor:pointer;">वापस</button>
         </div>
         <div id="generated-quiz-cards-box"></div>
       </div>
 
-      <!-- Live Battle Arena (15s Timer + Speech) -->
       <div id="quiz-battle-play-view" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
           <span id="quiz-player-tag" style="color:#00a884; font-size:0.82rem; font-weight:bold;"></span>
@@ -4558,7 +4839,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
     </div>
   </div>
 
-  <!-- 📖 Subject Quick Solver & Instant AI Ustad Modal -->
   <div id="quick-solver-modal" class="wa-modal-overlay">
     <div class="wa-modal-content" style="max-height:85vh; overflow-y:auto;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -4573,7 +4853,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       </div>
       <div id="solver-content-box" style="margin-top:10px; font-size:0.84rem; color:#cbd5e1; line-height:1.5; background:#111b21; padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);"></div>
 
-      <!-- Instant AI Doubt Bar -->
       <div style="margin-top:14px; border-top:1px solid rgba(255,255,255,0.1); padding-top:12px;">
         <div style="font-size:0.82rem; color:#8696a0; margin-bottom:6px;"><i class="fa-solid fa-wand-magic-sparkles" style="color:#facc15;"></i> AI उस्ताद से कुछ भी पूछें:</div>
         <div style="display:flex; gap:6px;">
@@ -4586,17 +4865,16 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
     </div>
   </div>
 
-  <!-- 🤝 Study Partner Matcher Modal -->
   <div id="study-partner-modal" class="wa-modal-overlay">
     <div class="wa-modal-content" style="max-height:80vh; overflow-y:auto;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <h3 style="color:#e9edef; margin:0; font-size:1rem;"><i class="fa-solid fa-user-group" style="color:#3b82f6;"></i> मुताला पार्टनर फाइंडर</h3>
         <button onclick="document.getElementById('study-partner-modal').classList.remove('active')" style="background:transparent; border:none; color:#8696a0; font-size:1.4rem; cursor:pointer;">&times;</button>
       </div>
-      <p style="color:#8696a0; font-size:0.82rem;">आपकी जमात और पसंदीदा मुताला वक्त के आधार पर मुफ़ीद साथी:</p>
+      <p style="color:#8696a0; font-size:0.82rem;">साथी अगर ऐप पर नहीं हैं तो आप उन्हें ऑफलाइन नोटिफिकेशन भेज सकते हैं:</p>
       <div id="study-partners-list-box"></div>
     </div>
   </div>
-  
+
 </body>
 </html>
