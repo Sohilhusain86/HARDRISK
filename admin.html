@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛡️ मास्टर एडमिन कंट्रोल रूम - जामिया ऊला अलिफ़</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #0b141a; color: #e9edef; padding: 15px; }
+    .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
+    .header h2 { color: #00a884; font-size: 1.25rem; }
+    .back-btn { background: #202c33; color: #00a884; border: 1px solid #00a884; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: bold; }
+    .card { background: #111b21; border-radius: 8px; padding: 14px; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.06); }
+    .card h3 { color: #facc15; font-size: 0.95rem; margin-bottom: 10px; }
+    input, textarea { width: 100%; padding: 10px; background: #202c33; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 6px; margin-bottom: 8px; font-size: 0.9rem; }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    button { padding: 9px 14px; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: #fff; }
+    .btn-green { background: #00a884; }
+    .btn-blue { background: #3b82f6; }
+    .btn-yellow { background: #eab308; color: #000; }
+    .btn-red { background: #ef4444; }
+    .btn-gray { background: #374151; }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+
+  <div class="header">
+    <h2>🛡️ मास्टर एडमिन कंट्रोल रूम (7 टूल्स)</h2>
+    <a href="/" class="back-btn">⬅️ वापस चैट में जाएँ</a>
+  </div>
+
+  <!-- 1. वन-क्लिक पुश ब्रॉडकास्टर -->
+  <div class="card">
+    <h3>📢 1. वन-क्लिक पुश नोटिफिकेशन ब्रॉडकास्टर</h3>
+    <input type="text" id="push-title" placeholder="ऐलान का शीर्षक (उदा: जरूरी सूचना)">
+    <textarea id="push-body" rows="2" placeholder="छात्रों के मोबाइल पर जाने वाला पैगाम लिखें..."></textarea>
+    <div class="btn-row">
+      <button class="btn-green" onclick="sendQuickPush('⚡ क्विज़ अलर्ट', 'आज का नया क्विज़ मुकाबला शुरू हो चुका है, अभी खेलें!')">🎯 क्विज़ अलर्ट</button>
+      <button class="btn-green" onclick="sendQuickPush('📖 सबक याद करो', 'आज का सबक मुकम्मल करें और साथियों से मुताला करें!')">📖 सबक याद करो</button>
+      <button class="btn-blue" onclick="sendCustomPush()">🚀 कस्टम नोटिफिकेशन भेजें</button>
+    </div>
+  </div>
+
+  <!-- 2. छात्र XP व बैज रिवॉर्ड -->
+  <div class="card">
+    <h3>⚡ 2. छात्र XP व बैज इनाम</h3>
+    <div style="display:flex; gap:8px;">
+      <input type="text" id="reward-roll" placeholder="छात्र का रोल नंबर दर्ज करें">
+      <button class="btn-yellow" onclick="rewardXP(50)">+50 XP</button>
+      <button class="btn-yellow" onclick="rewardXP(100)">+100 XP</button>
+    </div>
+  </div>
+
+  <!-- 3. छात्र वेरिफिकेशन व रोल नंबर कंट्रोल -->
+  <div class="card">
+    <h3>👥 3. छात्र वेरिफिकेशन व बैन कंट्रोल</h3>
+    <div style="display:flex; gap:8px;">
+      <input type="text" id="verify-roll" placeholder="छात्र का रोल नंबर दर्ज करें">
+      <button class="btn-green" onclick="verifyStudent()">वेरिफाई करें ✔️</button>
+      <button class="btn-red" onclick="banStudent()">बैन करें 🚫</button>
+    </div>
+  </div>
+
+  <!-- 4. ग्रुप चैट लॉक व स्लो-मोड -->
+  <div class="card">
+    <h3>🔒 4. ग्रुप चैट लॉक व एंटी-स्पैम स्लो मोड</h3>
+    <div class="btn-row">
+      <button class="btn-green" onclick="toggleLock()">ग्रुप लॉक / अनलॉक</button>
+      <button class="btn-gray" onclick="setSlowMode(30)">स्लो मोड (30s)</button>
+      <button class="btn-gray" onclick="setSlowMode(0)">स्लो मोड बंद (0s)</button>
+    </div>
+  </div>
+
+  <!-- 5. तक़रार रूम (वॉइस डिस्कशन) कंट्रोल -->
+  <div class="card">
+    <h3>🎙️ 5. तक़रार रूम (Audio Rooms) कंट्रोल</h3>
+    <button class="btn-red" onclick="resetTakrar()">सभी एक्टिव तक़रार रूम बंद करें 🛑</button>
+  </div>
+
+  <!-- 6. नोटिस बोर्ड व बुक एक्सचेंज -->
+  <div class="card">
+    <h3>📚 6. नोटिस बोर्ड व बुक एक्सचेंज</h3>
+    <button class="btn-red" onclick="clearNotices()">पुराने नोटिस साफ़ करें 🗑️</button>
+  </div>
+
+  <!-- 7. 24h स्टेटस मॉडरेटर -->
+  <div class="card">
+    <h3>👁️ 7. 24h स्टेटस मॉडरेटर</h3>
+    <button class="btn-red" onclick="clearAllStatuses()">सभी पुराने स्टेटस साफ़ करें 🗑️</button>
+  </div>
+
+  <script>
+    // Firebase Config (ऑटो-कनेक्ट)
+    const firebaseConfig = {
+      databaseURL: "https://hardrisk-default-rtdb.firebaseio.com"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // 1. पुश नोटिफिकेशन
+    async function sendQuickPush(title, message) {
+      try {
+        const res = await fetch('/api/notify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, message })
+        });
+        if (res.ok) alert("✅ नोटिफिकेशन भेज दिया गया!");
+        else alert("❌ विफलता आई।");
+      } catch(e) { alert("एरर: " + e.message); }
+    }
+
+    function sendCustomPush() {
+      const title = document.getElementById('push-title').value.trim();
+      const message = document.getElementById('push-body').value.trim();
+      if (!title || !message) return alert("शीर्षक और पैगाम दोनों भरें!");
+      sendQuickPush(title, message);
+    }
+
+    // 2. XP रिवॉर्ड
+    function rewardXP(pts) {
+      const roll = document.getElementById('reward-roll').value.trim();
+      if (!roll) return alert("रोल नंबर दर्ज करें!");
+      db.ref('users/' + roll + '/xp').transaction(cur => (cur || 0) + pts, (err) => {
+        if (!err) alert(`✅ रोल ${roll} को +${pts} XP मिले!`);
+      });
+    }
+
+    // 3. वेरिफिकेशन व बैन
+    function verifyStudent() {
+      const roll = document.getElementById('verify-roll').value.trim();
+      if (!roll) return alert("रोल नंबर दर्ज करें!");
+      db.ref('users/' + roll).update({ verified: true, role: 'verified_talib' })
+        .then(() => alert(`✔️ रोल ${roll} वेरिफाई हो गया!`));
+    }
+
+    function banStudent() {
+      const roll = document.getElementById('verify-roll').value.trim();
+      if (!roll) return alert("रोल नंबर दर्ज करें!");
+      if (confirm(`रोल ${roll} को बैन करना चाहते हैं?`)) {
+        db.ref('users/' + roll).update({ banned: true })
+          .then(() => alert(`🚫 रोल ${roll} बैन कर दिया गया!`));
+      }
+    }
+
+    // 4. ग्रुप सेटिंग्स
+    function toggleLock() {
+      db.ref('settings/groupLocked').once('value', snap => {
+        const next = !snap.val();
+        db.ref('settings/groupLocked').set(next)
+          .then(() => alert(`ग्रुप लॉक: ${next ? 'चालू' : 'बंद'}`));
+      });
+    }
+
+    function setSlowMode(sec) {
+      db.ref('settings/slowMode').set(sec)
+        .then(() => alert(`स्लो मोड ${sec}s सेट किया गया!`));
+    }
+
+    // 5. तक़रार रूम रीसेट
+    function resetTakrar() {
+      if (confirm("सभी रूम बंद करें?")) {
+        db.ref('takrar_rooms').remove()
+          .then(() => alert("🛑 रूम्स बंद कर दिए गए!"));
+      }
+    }
+
+    // 6. नोटिस साफ़
+    function clearNotices() {
+      if (confirm("नोटिस बोर्ड साफ़ करें?")) {
+        db.ref('class_pinboard').remove()
+          .then(() => alert("🗑️ नोटिस साफ़ कर दिए गए!"));
+      }
+    }
+
+    // 7. स्टेटस साफ़
+    function clearAllStatuses() {
+      if (confirm("क्या सभी 24h स्टेटस हटाना चाहते हैं?")) {
+        db.ref('statuses').remove()
+          .then(() => alert("🗑️ स्टेटस साफ़ कर दिए गए!"));
+      }
+    }
+  </script>
+</body>
+</html>
