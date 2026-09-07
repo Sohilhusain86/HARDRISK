@@ -4668,7 +4668,124 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
         reader.onerror = err => reject(err);
       });
     };
-    
+
+// --- 🛡️ एडमिन कार्यप्रणाली (JavaScript) ---
+window.sendAdminPush = async function(title, message) {
+  try {
+    const res = await fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, message })
+    });
+    if (res.ok) alert("✅ पुश नोटिफिकेशन सफलतापूर्वक भेज दिया गया!");
+    else alert("❌ नोटिफिकेशन भेजने में विफलता आई।");
+  } catch(e) { alert("एरर: " + e.message); }
+};
+
+window.sendCustomAdminPush = function() {
+  const msg = document.getElementById('admin-broadcast-msg').value.trim();
+  if (!msg) return alert("कृपया पैगाम लिखें!");
+  window.sendAdminPush("जमात ऊला अलिफ़ (ऐलान)", msg);
+  document.getElementById('admin-broadcast-msg').value = "";
+};
+
+window.rewardStudentXP = function(points) {
+  const roll = document.getElementById('admin-reward-roll').value.trim();
+  if (!roll) return alert("छात्र का रोल नंबर दर्ज करें!");
+  const userRef = firebase.database().ref('users/' + roll);
+  userRef.child('xp').transaction((cur) => (cur || 0) + points, (err) => {
+    if (!err) alert(`✅ रोल नंबर ${roll} को +${points} XP दिए गए!`);
+  });
+};
+
+window.verifyStudentAdmin = function() {
+  const roll = document.getElementById('admin-verify-roll').value.trim();
+  if (!roll) return alert("रोल नंबर दर्ज करें!");
+  firebase.database().ref('users/' + roll).update({ verified: true, role: 'verified_talib' }, () => {
+    alert(`✔️ रोल नंबर ${roll} वेरिफाई हो गया!`);
+  });
+};
+
+window.banStudentAdmin = function() {
+  const roll = document.getElementById('admin-verify-roll').value.trim();
+  if (!roll) return alert("रोल नंबर दर्ज करें!");
+  if (confirm(`क्या आप वाकई रोल नंबर ${roll} को बैन करना चाहते हैं?`)) {
+    firebase.database().ref('users/' + roll).update({ banned: true }, () => {
+      alert(`🚫 रोल नंबर ${roll} को बैन कर दिया गया!`);
+    });
+  }
+};
+
+window.resetTakrarRooms = function() {
+  if (confirm("क्या आप सभी एक्टिव तक़रार रूम्स रीसेट करना चाहते हैं?")) {
+    firebase.database().ref('takrar_rooms').remove();
+    alert("🛑 सभी तक़रार रूम्स बंद कर दिए गए!");
+  }
+};
+
+// --- ⚡ क्विज़ रीस्टार्ट फिक्स (DOM Preservation) ---
+window.startSoloQuizMode = function(mode = 'bot') {
+  liveQuizState.mode = mode;
+  liveQuizState.score = 0;
+  liveQuizState.currentStep = 0;
+  clearInterval(liveQuizState.timerHandle);
+
+  document.getElementById('quiz-mode-select-view').style.display = 'none';
+  const playView = document.getElementById('quiz-battle-play-view');
+  playView.style.display = 'block';
+
+  // ढाँचा रीस्टोर करना ताकि बार-बार खेलने पर एरर न आए
+  playView.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <span id="quiz-player-tag" style="color:#00a884; font-size:0.82rem; font-weight:bold;"></span>
+      <span id="quiz-timer-badge" style="background:#ef4444; color:#fff; padding:3px 10px; border-radius:12px; font-size:0.8rem; font-weight:bold;">⏱️ 15s</span>
+    </div>
+    <div style="background:#111b21; padding:14px; border-radius:8px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.08);">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <p id="quiz-active-question" style="color:#fff; font-size:0.95rem; margin:0; line-height:1.45; flex:1;"></p>
+        <button onclick="window.speakText(document.getElementById('quiz-active-question').innerText)" style="background:none; border:none; color:#00a884; font-size:1.2rem; cursor:pointer; margin-left:8px;">🔊</button>
+      </div>
+    </div>
+    <div id="quiz-options-container"></div>
+    <div id="quiz-result-banner" style="font-size:0.88rem; text-align:center; margin-top:10px; font-weight:bold;"></div>
+  `;
+
+  if (mode === 'speed') {
+    liveQuizState.timeLeft = 60;
+    const timerBadge = document.getElementById('quiz-timer-badge');
+    timerBadge.innerText = `⏱️ 60s`;
+    liveQuizState.timerHandle = setInterval(() => {
+      liveQuizState.timeLeft--;
+      timerBadge.innerText = `⏱️ ${liveQuizState.timeLeft}s`;
+      if (liveQuizState.timeLeft <= 0) {
+        clearInterval(liveQuizState.timerHandle);
+        window.finishQuizRound("वक्त मुकम्मल हुआ!");
+      }
+    }, 1000);
+  } else {
+    document.getElementById('quiz-timer-badge').innerText = `सवाल: 1/${liveQuizState.maxSteps}`;
+  }
+
+  window.fetchFastQuizQuestion();
+};
+
+window.finishQuizRound = function(msg) {
+  clearInterval(liveQuizState.timerHandle);
+  const totalXP = liveQuizState.score * (liveQuizState.level * 5);
+  const playView = document.getElementById('quiz-battle-play-view');
+  playView.innerHTML = `
+    <div style="text-align:center; padding:20px 10px;">
+      <h2 style="color:#facc15; margin:0 0 8px 0;">🏆 ${msg}</h2>
+      <div style="background:#111b21; padding:16px; border-radius:10px; margin:15px 0; border:1px solid rgba(255,255,255,0.08);">
+        <div style="font-size:1.35rem; color:#fff; font-weight:bold;">सही जवाब: ${liveQuizState.score} / ${liveQuizState.mode === 'speed' ? liveQuizState.currentStep : liveQuizState.maxSteps}</div>
+        <div style="color:#00a884; font-size:1rem; margin-top:6px;">+${totalXP} XP हासिल किए!</div>
+      </div>
+      <button class="peer-card-btn" style="width:100%; padding:12px; background:#00a884; font-size:0.95rem;" onclick="window.resetQuizToLevels()">
+        🔄 दूसरा मुकाबला खेलें
+      </button>
+    </div>
+  `;
+}; 
   </script>
 
   <!-- 🟢 Enhanced Fullscreen Status Viewer (Video + Photo + Text) -->
@@ -4923,5 +5040,77 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
     </div>
   </div>
 
+  <!-- 🛡️ मुकम्मल 7-फीचर एडमिन पैनल मोडल -->
+<div id="admin-master-modal" class="modal-backdrop" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; overflow-y:auto; padding:15px;">
+  <div style="background:#1f2c34; max-width:550px; margin:20px auto; border-radius:12px; padding:20px; border:1px solid rgba(255,255,255,0.1); color:#e9edef;">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; margin-bottom:15px;">
+      <h3 style="margin:0; color:#00a884;">🛡️ एडमिन कंट्रोल रूम (7 टूल्स)</h3>
+      <button onclick="document.getElementById('admin-master-modal').style.display='none'" style="background:none; border:none; color:#8696a0; font-size:1.5rem; cursor:pointer;">✕</button>
+    </div>
+
+    <!-- 1. वन-क्लिक पुश ब्रॉडकास्ट हब -->
+    <div style="background:#111b21; padding:12px; border-radius:8px; margin-bottom:12px;">
+      <h4 style="margin:0 0 8px 0; color:#facc15; font-size:0.95rem;">📢 1. पुश नोटिफिकेशन ब्रॉडकास्टर</h4>
+      <input type="text" id="admin-broadcast-msg" placeholder="सभी छात्रों को भेजने वाला पैगाम लिखें..." style="width:100%; padding:8px; background:#2a3942; border:none; color:#fff; border-radius:5px; margin-bottom:8px; box-sizing:border-box;">
+      <div style="display:flex; gap:6px; flex-wrap:wrap;">
+        <button onclick="window.sendAdminPush('⚡ क्विज़ अलर्ट', 'आज का 12-लेवल क्विज़ मुकाबला शुरू हो चुका है, अभी खेलें!')" style="padding:6px 10px; background:#00a884; border:none; border-radius:4px; color:#fff; font-size:0.75rem; cursor:pointer;">🎯 क्विज़ अलर्ट</button>
+        <button onclick="window.sendAdminPush('📖 सबक याद करो', 'असाइनमेंट और सबक का मुताला मुकम्मल करें!')" style="padding:6px 10px; background:#00a884; border:none; border-radius:4px; color:#fff; font-size:0.75rem; cursor:pointer;">📖 सबक याद करो</button>
+        <button onclick="window.sendCustomAdminPush()" style="padding:6px 10px; background:#3b82f6; border:none; border-radius:4px; color:#fff; font-size:0.75rem; cursor:pointer;">🚀 कस्टम भेजें</button>
+      </div>
+    </div>
+
+    <!-- 2. 24h स्टेटस मॉडरेटर -->
+    <div style="background:#111b21; padding:12px; border-radius:8px; margin-bottom:12px;">
+      <h4 style="margin:0 0 8px 0; color:#facc15; font-size:0.95rem;">👁️ 2. ऑल स्टेटस मॉडरेटर</h4>
+      <div id="admin-status-list" style="max-height:120px; overflow-y:auto; font-size:0.85rem; color:#8696a0;">
+        कोई नया स्टेटस लोड नहीं हुआ।
+      </div>
+    </div>
+
+    <!-- 3. छात्र XP व रैंक मैनेजर -->
+    <div style="background:#111b21; padding:12px; border-radius:8px; margin-bottom:12px;">
+      <h4 style="margin:0 0 8px 0; color:#facc15; font-size:0.95rem;">⚡ 3. छात्र XP व बैज इनाम</h4>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="admin-reward-roll" placeholder="छात्र रोल नंबर" style="flex:1; padding:8px; background:#2a3942; border:none; color:#fff; border-radius:5px;">
+        <button onclick="window.rewardStudentXP(50)" style="padding:8px 12px; background:#eab308; border:none; border-radius:5px; color:#000; font-weight:bold; cursor:pointer;">+50 XP</button>
+        <button onclick="window.rewardStudentXP(100)" style="padding:8px 12px; background:#eab308; border:none; border-radius:5px; color:#000; font-weight:bold; cursor:pointer;">+100 XP</button>
+      </div>
+    </div>
+
+    <!-- 4. किताब एक्सचेंज व नोटिस बोर्ड -->
+    <div style="background:#111b21; padding:12px; border-radius:8px; margin-bottom:12px;">
+      <h4 style="margin:0 0 8px 0; color:#facc15; font-size:0.95rem;">📚 4. नोटिस व बुक एक्सचेंज अप्रूवल</h4>
+      <button onclick="window.clearNoticeBoard()" style="padding:6px 12px; background:#ef4444; border:none; border-radius:4px; color:#fff; font-size:0.8rem; cursor:pointer;">पुराने नोटिस साफ़ करें 🗑️</button>
+    </div>
+
+    <!-- 5. तक़रार रूम (वॉइस डिस्कशन) कंट्रोल -->
+    <div style="background:#111b21; padding:12px; border-radius:8px; margin-bottom:12px;">
+      <h4 style="margin:0 0 8px 0; color:#facc15; font-size:0.95rem;">🎙️ 5. तक़रार रूम (Audio Room) कंट्रोल</h4>
+      <div style="display:flex; gap:10px;">
+        <button onclick="window.resetTakrarRooms()" style="padding:6px 12px; background:#ef4444; border:none; border-radius:4px; color:#fff; font-size:0.8rem; cursor:pointer;">सभी एक्टिव रूम बंद करें 🛑</button>
+      </div>
+    </div>
+
+    <!-- 6. चैट लॉक व स्लो-मोड (Anti-Spam) -->
+    <div style="background:#111b21; padding:12px; border-radius:8px; margin-bottom:12px;">
+      <h4 style="margin:0 0 8px 0; color:#facc15; font-size:0.95rem;">🔒 6. ग्रुप चैट लॉक व स्लो-मोड</h4>
+      <div style="display:flex; gap:10px;">
+        <button id="admin-toggle-lock-btn" onclick="window.toggleGroupLockState()" style="padding:6px 12px; background:#00a884; border:none; border-radius:4px; color:#fff; font-size:0.8rem; cursor:pointer;">ग्रुप लॉक टॉगल</button>
+        <button onclick="window.setChatSlowMode(30)" style="padding:6px 12px; background:#2a3942; border:none; border-radius:4px; color:#fff; font-size:0.8rem; cursor:pointer;">स्लो मोड (30s)</button>
+      </div>
+    </div>
+
+    <!-- 7. रोल नंबर वेरिफिकेशन व छात्र मैनेजमेंट -->
+    <div style="background:#111b21; padding:12px; border-radius:8px;">
+      <h4 style="margin:0 0 8px 0; color:#facc15; font-size:0.95rem;">👥 7. छात्र वेरिफिकेशन व रोल नंबर</h4>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="admin-verify-roll" placeholder="छात्र रोल नंबर" style="flex:1; padding:8px; background:#2a3942; border:none; color:#fff; border-radius:5px;">
+        <button onclick="window.verifyStudentAdmin()" style="padding:8px 12px; background:#00a884; border:none; border-radius:5px; color:#fff; cursor:pointer;">वेरिफाई करें ✔️</button>
+        <button onclick="window.banStudentAdmin()" style="padding:8px 12px; background:#ef4444; border:none; border-radius:5px; color:#fff; cursor:pointer;">बैन करें 🚫</button>
+      </div>
+    </div>
+  </div>
+</div>
+  
 </body>
 </html>
