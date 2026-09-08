@@ -1,36 +1,65 @@
 // ==========================================================
-// 🚀 सोहेल एआई: मुकम्मल 5-बटन डॉक + शाही नोटिस + सनद बोर्ड
+// 🚀 सोहेल एआई: 5-बटन डॉक + शाही नोटिस + सनद बोर्ड (Zero Screen Break)
 // ==========================================================
 
 (function () {
   "use strict";
 
-  // 1. पुरानी किसी भी साइडबार/टूटे हुए लेआउट को स्क्रीन से तुरंत हटाना
-  var oldBoard = document.getElementById('suhail-awards-board');
-  if (oldBoard && oldBoard.parentElement === document.body) {
-    oldBoard.remove();
-  }
-
-  // 2. स्टाइलिंग (स्क्रीन कभी दो फाड़ नहीं होगी)
+  // 1. स्टाइलिंग (स्क्रीन कभी दो फाड़ नहीं होगी)
   var style = document.createElement('style');
-  style.id = 'suhail-perfect-style';
+  style.id = 'suhail-clean-system-style';
   style.innerHTML = `
-    /* स्क्रीन को हमेशा 100% चौड़ा और सीधा रखना */
-    html, body {
-      width: 100% !important;
-      max-width: 100vw !important;
-      overflow-x: hidden !important;
+    /* 📜 अब्दुल गफ़्फ़ार के ठीक नीचे सनद बोर्ड (चैट लिस्ट के अंदर) */
+    #suhail-awards-board {
+      width: calc(100% - 16px) !important;
+      margin: 14px 8px 85px !important;
+      background: #111b21 !important;
+      border: 1px solid rgba(234, 179, 8, 0.35) !important;
+      border-radius: 12px !important;
+      padding: 14px 12px !important;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5) !important;
+      box-sizing: border-box !important;
+      display: block !important;
+      clear: both !important;
+    }
+    .awards-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 7px;
+      margin-bottom: 10px;
+    }
+    .awards-title {
+      color: #eab308;
+      font-size: 0.88rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .award-student-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #182229;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 9px 11px;
+      margin-bottom: 7px;
+    }
+    .award-tag {
+      background: rgba(234, 179, 8, 0.15);
+      border: 1px solid #eab308;
+      color: #fef08a;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      white-space: nowrap;
     }
 
-    /* कोने वाले पुराने दोनों बटनों को हमेशा के लिए छिपाना */
-    body > div:has(> a[href*="admin"]),
-    body > div:has(> button[onclick*="admin"]),
-    button:has(.fa-book):not(.suhail-mini-btn),
-    a:has(.fa-book):not(.suhail-mini-btn) {
-      display: none !important;
-    }
-
-    /* 🎮 पहला वाला: 5-बटन ड्रैगेबल विजेट (सुरक्षित व चालू) */
+    /* 🎮 पहला वाला: 5-बटन ड्रैगेबल विजेट */
     #suhail-5btn-dock {
       position: fixed !important;
       bottom: 20px !important;
@@ -70,43 +99,10 @@
     .btn-m-edu   { background: #182229; color: #3b82f6; border: 1px solid rgba(59,130,246,0.4); }
     .btn-m-info  { background: rgba(234, 179, 8, 0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.35); }
     .btn-m-admin { background: #202c33; color: #eab308; border: 1px solid #eab308; display: none; }
-
-    /* 📜 तीसरा: अब्दुल गफ़्फ़ार के नीचे सनद बोर्ड (सीधी लिस्ट में) */
-    #suhail-awards-board {
-      width: calc(100% - 20px) !important;
-      max-width: 100% !important;
-      margin: 15px auto 95px !important;
-      background: #111b21 !important;
-      border: 1px solid rgba(234, 179, 8, 0.35) !important;
-      border-radius: 14px !important;
-      padding: 16px 14px !important;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.5) !important;
-      box-sizing: border-box !important;
-      display: block !important;
-      clear: both !important;
-    }
-    .awards-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding-bottom: 8px;
-      margin-bottom: 12px;
-    }
-    .award-student-card {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #182229;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-    }
   `;
   document.head.appendChild(style);
 
-  // 3. पहला वाला: 5-बटन ड्रैगेबल विजेट बनाना
+  // 2. पहला वाला: 5-बटन ड्रैगेबल विजेट
   function buildDock() {
     if (document.getElementById('suhail-5btn-dock')) return;
 
@@ -129,7 +125,7 @@
       if (aBtn) aBtn.style.display = 'flex';
     }
 
-    // टच ड्रैग लॉजिक (उंगली से जहाँ चाहें खिसकाएँ)
+    // टच ड्रैग
     var isDragging = false, startX, startY, initLeft, initTop;
     dock.addEventListener('touchstart', function(e) {
       if (e.target.closest('button') || e.target.closest('a')) return;
@@ -154,10 +150,10 @@
     document.addEventListener('touchend', function() { isDragging = false; });
   }
 
-  // 4. दूसरा: 24 घंटे का शाही नोटिस पॉपअप
-  var noticeDone = false;
+  // 3. दूसरा: 24 घंटे का शाही नोटिस पॉपअप
+  var noticeOpened = false;
   function showAwardNotice() {
-    if (noticeDone || document.getElementById('suhail-notice-modal')) return;
+    if (noticeOpened || document.getElementById('suhail-notice-modal')) return;
 
     var modal = document.createElement('div');
     modal.id = 'suhail-notice-modal';
@@ -180,16 +176,16 @@
     document.getElementById('btn-close-notice').onclick = function() {
       modal.remove();
     };
-    noticeDone = true;
+    noticeOpened = true;
   }
 
-  // 5. तीसरा: तफ़सीली सनद बोर्ड (सीधे अब्दुल गफ़्फ़ार के नीचे, कोई साइडबार नहीं)
+  // 4. तीसरा: तफ़सीली सनद बोर्ड (अब्दुल गफ़्फ़ार के नीचे ही सुरक्षित लगाना)
   function insertAwardsBoard() {
     if (document.getElementById('suhail-awards-board')) return;
 
-    // अब्दुल गफ़्फ़ार (रोल 6989) का कार्ड तलाशें
-    var all = document.querySelectorAll('div, li, a');
+    // अब्दुल गफ़्फ़ार (रोल 6989) का कार्ड ढूँढकर सीधे उसी की लिस्ट में जोड़ना
     var abdulGaffarCard = null;
+    var all = document.querySelectorAll('*');
     for (var i = 0; i < all.length; i++) {
       var t = all[i].textContent || '';
       if (t.indexOf('6989') !== -1 && t.indexOf('abdul gaffar') !== -1) {
@@ -199,11 +195,13 @@
       }
     }
 
+    if (!abdulGaffarCard || !abdulGaffarCard.parentElement) return;
+
     var board = document.createElement('div');
     board.id = 'suhail-awards-board';
     board.innerHTML = `
       <div class="awards-header">
-        <div style="color:#eab308; font-size:0.88rem; font-weight:800;"><i class="fa-solid fa-award"></i> तालीमी एज़ाज़ात व सनद बोर्ड</div>
+        <div class="awards-title"><i class="fa-solid fa-award"></i> तालीमी एज़ाज़ात व सनद बोर्ड</div>
         <span style="font-size:0.68rem; color:#8696a0;">उस्ताद की सनद</span>
       </div>
       <div style="font-size:0.72rem; color:#8696a0; margin-bottom:10px; text-align:left;">
@@ -215,60 +213,56 @@
             <h4 style="font-size:0.84rem; font-weight:700; color:#e9edef; margin:0 0 3px 0;">Kaif raza qadri (रोल: 6975)</h4>
             <span style="font-size:0.7rem; color:#8696a0;">कुल इल्मी तरक़्क़ी: ⚡ <strong style="color:#eab308;">350 XP</strong></span>
           </div>
-          <div style="background:rgba(234,179,8,0.15); border:1px solid #eab308; color:#fef08a; padding:3px 8px; border-radius:6px; font-size:0.72rem; font-weight:bold; white-space:nowrap;">⭐ मुमताज़ तालिब-ए-इल्म 🌟</div>
+          <div class="award-tag">⭐ मुमताज़ तालिब-ए-इल्म 🌟</div>
         </div>
         <div class="award-student-card">
           <div style="text-align:left;">
             <h4 style="font-size:0.84rem; font-weight:700; color:#e9edef; margin:0 0 3px 0;">Suhail Husain (रोल: 7877)</h4>
             <span style="font-size:0.7rem; color:#8696a0;">कुल इल्मी तरक़्क़ी: ⚡ <strong style="color:#eab308;">480 XP</strong></span>
           </div>
-          <div style="background:rgba(59,130,246,0.15); border:1px solid #3b82f6; color:#93c5fd; padding:3px 8px; border-radius:6px; font-size:0.72rem; font-weight:bold; white-space:nowrap;">👑 मोहतमिम व उस्ताद</div>
+          <div class="award-tag" style="border-color:#3b82f6; color:#93c5fd; background:rgba(59,130,246,0.15);">👑 मोहतमिम व उस्ताद</div>
         </div>
       </div>
     `;
 
-    // इसे सीधे अब्दुल गफ़्फ़ार के ठीक बाद उसी लिस्ट के अंदर जोड़ें
-    if (abdulGaffarCard && abdulGaffarCard.parentNode) {
-      abdulGaffarCard.parentNode.appendChild(board);
-    } else {
-      var c = document.querySelector('#chats') || document.querySelector('.chat-list');
-      if (c) c.appendChild(board);
-    }
+    abdulGaffarCard.parentElement.appendChild(board);
   }
 
-  // 6. पुराने कोने वाले बटनों को छिपाना
-  function hideOldButtons() {
-    var all = document.querySelectorAll('button, a');
+  // 5. कैफ़ रज़ा के आगे बैज लगाना
+  function updateKaifBadge() {
+    var all = document.querySelectorAll('*');
     for (var i = 0; i < all.length; i++) {
       var el = all[i];
-      if (el.closest && el.closest('#suhail-5btn-dock')) continue;
+      if (el.children.length > 2) continue;
+      if (el.closest && (el.closest('#suhail-5btn-dock') || el.closest('#suhail-awards-board') || el.closest('#suhail-notice-modal'))) continue;
+
       var t = (el.innerText || el.textContent || '').trim();
-      if (t === '📚 30 AI खिदमात' || t === '30 AI खिदमात' || t === '🛡️ सुपर एडमिन' || t === 'सुपर एडमिन') {
-        var p = el.parentElement;
-        if (p && p !== document.body && window.getComputedStyle(p).position === 'fixed') {
-          p.style.display = 'none';
+      if (t.indexOf('6975') !== -1 && t.indexOf('Kaif') !== -1) {
+        if (!el.getAttribute('data-badge-applied')) {
+          el.setAttribute('data-badge-applied', 'true');
+          el.innerHTML = '<span style="color:#eab308; font-size:1rem; margin-right:4px;">⭐</span><span style="background:rgba(234,179,8,0.22); color:#fef08a; border:1px solid #eab308; padding:1px 6px; border-radius:5px; font-size:0.7rem; font-weight:bold; margin-right:5px;">मुमताज़ तालिब-ए-इल्म 🌟</span>' + el.innerHTML.replace(/🥈/g, '').trim();
         }
-        el.style.display = 'none';
+        break;
       }
     }
   }
 
-  // 7. सब कुछ शुरू करना
-  function start() {
-    hideOldButtons();
+  // रन
+  function boot() {
     buildDock();
     insertAwardsBoard();
-    showAwardNotice();
+    updateKaifBadge();
+    setTimeout(showAwardNotice, 800);
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', start);
+    document.addEventListener('DOMContentLoaded', boot);
   } else {
-    start();
+    boot();
   }
 
   setInterval(function () {
-    hideOldButtons();
-    if (!document.getElementById('suhail-awards-board')) insertAwardsBoard();
-  }, 1200);
+    insertAwardsBoard();
+    updateKaifBadge();
+  }, 1000);
 })();
