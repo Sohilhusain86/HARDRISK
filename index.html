@@ -5299,22 +5299,74 @@ window.finishQuizRound = function(msg) {
   }
 </script>
 
+<!-- ========================================================== -->
+<!-- 🚀 सोहेल एआई: नो-स्प्लिट लेआउट + 5-बटन डॉक + बैज + सनद बोर्ड -->
+<!-- ========================================================== -->
 <script>
 (function () {
   "use strict";
 
-  // 1. स्टाइलिंग (पूरी तरह सुरक्षित व जाँची हुई)
+  // 1. स्टाइलिंग (स्क्रीन कभी दो हिस्सों में नहीं टूटेगी)
   var style = document.createElement('style');
   style.innerHTML = `
-    /* 🎮 5-बटन ड्रैगेबल विजेट */
+    /* 📜 नीचे खाली स्पेस में: तफ़सीली सनद बोर्ड (चैट लिस्ट के अंदर) */
+    #suhail-awards-board {
+      width: calc(100% - 20px) !important;
+      max-width: 100% !important;
+      margin: 15px auto 90px !important;
+      background: #111b21 !important;
+      border: 1px solid rgba(234, 179, 8, 0.35) !important;
+      border-radius: 14px !important;
+      padding: 16px 14px !important;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5) !important;
+      box-sizing: border-box !important;
+      display: block !important;
+      clear: both !important;
+    }
+    .awards-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+    .awards-title {
+      color: #eab308;
+      font-size: 0.9rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .award-student-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #182229;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+    .award-tag {
+      background: rgba(234, 179, 8, 0.15);
+      border: 1px solid #eab308;
+      color: #fef08a;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    /* 🎮 5-बटन ड्रैगेबल स्लिम विजेट */
     #suhail-5btn-dock {
       position: fixed !important;
       bottom: 20px !important;
       right: 10px !important;
       z-index: 2147483640 !important;
       display: flex !important;
-      visibility: visible !important;
-      opacity: 1 !important;
       align-items: center;
       gap: 4px;
       background: rgba(17, 27, 33, 0.96) !important;
@@ -5348,70 +5400,20 @@ window.finishQuizRound = function(msg) {
     .btn-m-edu   { background: #182229; color: #3b82f6; border: 1px solid rgba(59,130,246,0.4); }
     .btn-m-info  { background: rgba(234, 179, 8, 0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.35); }
     .btn-m-admin { background: #202c33; color: #eab308; border: 1px solid #eab308; display: none; }
-
-    /* 📜 नीचे खाली स्पेस में: तफ़सीली सनद बोर्ड */
-    #suhail-awards-board {
-      width: calc(100% - 24px);
-      box-sizing: border-box;
-      margin: 20px 12px 90px;
-      background: #111b21;
-      border: 1px solid rgba(234, 179, 8, 0.35);
-      border-radius: 14px;
-      padding: 16px 14px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-    }
-    .awards-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding-bottom: 8px;
-      margin-bottom: 12px;
-    }
-    .award-student-card {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #182229;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-    }
-    .award-tag {
-      background: rgba(234, 179, 8, 0.15);
-      border: 1px solid #eab308;
-      color: #fef08a;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 0.72rem;
-      font-weight: bold;
-      white-space: nowrap;
-    }
   `;
   document.head.appendChild(style);
 
-  // 2. पुराने दोनों बटनों को सटीक नाम से छिपाना (ताकि कोई और चीज़ न छिपे)
+  // 2. पुराने दोनों बटनों को छिपाना
   function hideOldButtons() {
-    var all = document.querySelectorAll('button, a, div, span');
+    var all = document.querySelectorAll('button, a');
     for (var i = 0; i < all.length; i++) {
       var el = all[i];
       if (el.closest && el.closest('#suhail-5btn-dock')) continue;
-
       var t = (el.innerText || el.textContent || '').trim();
-      // बाएँ कोने वाला हरा बटन
-      if (t === '📚 30 AI खिदमात' || t === '30 AI खिदमात') {
+      if (t === '📚 30 AI खिदमात' || t === '30 AI खिदमात' || t === '🛡️ सुपर एडमिन' || t === 'सुपर एडमिन') {
         var p = el.parentElement;
         if (p && p !== document.body && window.getComputedStyle(p).position === 'fixed') {
           p.style.display = 'none';
-        }
-        el.style.display = 'none';
-      }
-      // दाएँ कोने वाला एडमिन बटन
-      if (t === '🛡️ सुपर एडमिन' || t === 'सुपर एडमिन') {
-        var pAdmin = el.parentElement;
-        if (pAdmin && pAdmin !== document.body && window.getComputedStyle(pAdmin).position === 'fixed') {
-          pAdmin.style.display = 'none';
         }
         el.style.display = 'none';
       }
@@ -5428,7 +5430,7 @@ window.finishQuizRound = function(msg) {
       <div class="suhail-drag-handle" id="dock-grip"><i class="fa-solid fa-grip-vertical"></i></div>
       <a href="/awam.html" class="suhail-mini-btn btn-m-old30"><i class="fa-solid fa-book"></i> 30 AI</a>
       <a href="/awam.html" class="suhail-mini-btn btn-m-awam"><i class="fa-solid fa-layer-group"></i> 40 आवामी</a>
-      <button class="suhail-mini-btn btn-m-edu" onclick="alert('30 इल्मी टूल्स: नह्व, सर्फ़ व तश्कील टूल्स सक्रिय हैं!')"><i class="fa-solid fa-graduation-cap"></i> 30 इल्मी</button>
+      <button class="suhail-mini-btn btn-m-edu" onclick="alert('30 इल्मी टूल्स सक्रिय हैं!')"><i class="fa-solid fa-graduation-cap"></i> 30 इल्मी</button>
       <button class="suhail-mini-btn btn-m-info" onclick="alert('📖 जमात ऊला: क्विज़ से XP कमाएँ। 3 स्ट्राइक पर आईडी ब्लॉक होगी।')"><i class="fa-solid fa-circle-info"></i> गाइड</button>
       <a href="/admin.html" class="suhail-mini-btn btn-m-admin" id="dock-admin-link"><i class="fa-solid fa-shield-halved"></i> एडमिन</a>
     `;
@@ -5441,7 +5443,7 @@ window.finishQuizRound = function(msg) {
       if (aBtn) aBtn.style.display = 'flex';
     }
 
-    // टच ड्रैग लॉजिक
+    // टच ड्रैग
     var isDragging = false, startX, startY, initLeft, initTop;
     dock.addEventListener('touchstart', function(e) {
       if (e.target.closest('button') || e.target.closest('a')) return;
@@ -5466,26 +5468,26 @@ window.finishQuizRound = function(msg) {
     document.addEventListener('touchend', function() { isDragging = false; });
   }
 
-  // 4. कैफ़ रज़ा (6975) के आगे स्टार और बैज लगाना
+  // 4. कैफ़ रज़ा (6975) के नाम के आगे सटीक बैज (सिर्फ़ एक जगह)
   function updateKaifBadge() {
-    var all = document.querySelectorAll('*');
+    var all = document.querySelectorAll('h4, span, div');
     for (var i = 0; i < all.length; i++) {
       var el = all[i];
-      if (el.children.length > 2) continue;
+      if (el.querySelector('div, h4')) continue; // बाहर के कंटेनर को छोड़ें
       if (el.closest && (el.closest('#suhail-5btn-dock') || el.closest('#suhail-awards-board') || el.closest('#suhail-notice-modal'))) continue;
 
-      var t = el.textContent || '';
+      var t = (el.innerText || el.textContent || '').trim();
       if (t.indexOf('6975') !== -1 && t.indexOf('Kaif') !== -1) {
-        if (!el.getAttribute('data-badge-fixed')) {
-          el.setAttribute('data-badge-fixed', 'true');
-          var html = el.innerHTML.replace(/🥈/g, '');
-          el.innerHTML = '<span style="color:#eab308; font-size:1rem; margin-right:4px;">⭐</span><span style="background:rgba(234,179,8,0.2); color:#fef08a; border:1px solid #eab308; padding:1px 6px; border-radius:5px; font-size:0.7rem; font-weight:bold; margin-right:5px;">मुमताज़ तालिब-ए-इल्म 🌟</span>' + html.trim();
+        if (!el.getAttribute('data-badge-applied')) {
+          el.setAttribute('data-badge-applied', 'true');
+          el.innerHTML = '<span style="color:#eab308; font-size:1rem; margin-right:4px;">⭐</span><span style="background:rgba(234,179,8,0.22); color:#fef08a; border:1px solid #eab308; padding:1px 6px; border-radius:5px; font-size:0.7rem; font-weight:bold; margin-right:5px;">मुमताज़ तालिब-ए-इल्म 🌟</span>' + el.innerHTML.replace(/🥈/g, '').trim();
         }
+        break;
       }
     }
   }
 
-  // 5. खोलते ही 24 घंटे का शाही नोटिस पॉपअप
+  // 5. 24 घंटे का शाही नोटिस पॉपअप
   var noticeAlreadyShown = false;
   function showAwardNotice() {
     if (noticeAlreadyShown || document.getElementById('suhail-notice-modal')) return;
@@ -5510,7 +5512,7 @@ window.finishQuizRound = function(msg) {
     noticeAlreadyShown = true;
   }
 
-  // 6. नीचे खाली जगह में: तफ़सीली सनद बोर्ड
+  // 6. तफ़सीली बोर्ड (अब्दुल गफ़्फ़ार के नीचे ही चिपकाना, कोई साइडबार नहीं)
   function insertAwardsBoard() {
     if (document.getElementById('suhail-awards-board')) return;
 
@@ -5518,7 +5520,7 @@ window.finishQuizRound = function(msg) {
     board.id = 'suhail-awards-board';
     board.innerHTML = `
       <div class="awards-header">
-        <div style="color:#eab308; font-size:0.88rem; font-weight:800;"><i class="fa-solid fa-award"></i> तालीमी एज़ाज़ात व सनद बोर्ड</div>
+        <div class="awards-title"><i class="fa-solid fa-award"></i> तालीमी एज़ाज़ात व सनद बोर्ड</div>
         <span style="font-size:0.68rem; color:#8696a0;">उस्ताद की सनद</span>
       </div>
       <div style="font-size:0.72rem; color:#8696a0; margin-bottom:10px; text-align:left;">
@@ -5542,11 +5544,26 @@ window.finishQuizRound = function(msg) {
       </div>
     `;
 
-    var target = document.querySelector('#chats') || document.querySelector('.chat-list') || document.body;
-    target.appendChild(board);
+    // अब्दुल गफ़्फ़ार वाले कार्ड का कंटेनर ढूँढकर सीधे उसी के नीचे जोड़ें
+    var targetContainer = null;
+    var all = document.querySelectorAll('div, li');
+    for (var i = 0; i < all.length; i++) {
+      var txt = (all[i].innerText || all[i].textContent || '');
+      if (txt.indexOf('6989') !== -1 && all[i].children.length < 6) {
+        targetContainer = all[i].parentElement;
+        break;
+      }
+    }
+
+    if (targetContainer) {
+      targetContainer.appendChild(board);
+    } else {
+      var c = document.querySelector('#chats') || document.querySelector('.chat-list');
+      if (c) c.appendChild(board);
+    }
   }
 
-  // 7. रन व टाइमर
+  // 7. रन
   function init() {
     hideOldButtons();
     buildDock();
@@ -5561,13 +5578,13 @@ window.finishQuizRound = function(msg) {
     init();
   }
 
-  // लगातार सुरक्षा जाँच ताकि कोई पुराना बटन वापस न आए और बैज टिका रहे
   setInterval(function() {
     hideOldButtons();
     updateKaifBadge();
+    insertAwardsBoard();
   }, 1000);
 })();
-        </script>
+</script>
   
 </body>
 </html>
