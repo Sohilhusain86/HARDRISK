@@ -4786,6 +4786,21 @@ window.finishQuizRound = function(msg) {
     </div>
   `;
 }; 
+
+    window.requestSuhailTask = async function(taskName, promptText, level = 1) {
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ task: taskName, prompt: promptText, level: level })
+    });
+    const data = await res.json();
+    return data.reply || data.text || "कोई जवाब नहीं मिला";
+  } catch(e) {
+    return "एरर: " + e.message;
+  }
+};
+    
   </script>
 
   <!-- 🟢 Enhanced Fullscreen Status Viewer (Video + Photo + Text) -->
