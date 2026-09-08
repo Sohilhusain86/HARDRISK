@@ -1,399 +1,1326 @@
 // ==========================================================
-// 🚀 सोहेल एआई - इमरजेंसी नोटिस, चैट लिस्ट कार्ड्स व खंभों वाला चार्ट
+// 🚀 SUHAIL ASSISTANT UI ENHANCEMENT
+// 40 आवामी खिदमात + सुपर एडमिन
+// 24 घंटे Star Emergency Notice
+// 4-Pillar Growth Chart
 // ==========================================================
 
-(function() {
-  // 1. स्टाइलिंग
-  const style = document.createElement('style');
-  style.innerHTML = `
-    /* नीचे के पुराने फिक्स्ड बटनों को स्क्रीन से हटाना (चैट में कार्ड के रूप में बदलेंगे) */
-    body > div > a[href*="admin"], 
-    body > div > button:has-text("सुपर एडमिन"),
-    div[style*="position: fixed"][style*="bottom"] {
-      /* पुराना क्लटर साफ़ */
+(function () {
+  "use strict";
+
+  // ----------------------------------------------------------
+  // 1. CSS
+  // ----------------------------------------------------------
+
+  const style = document.createElement("style");
+
+  style.id = "suhail-ui-enhancement-style";
+
+  style.textContent = `
+    /* ======================================================
+       CHAT-LIST CARDS
+       ====================================================== */
+
+    .suhail-service-cards {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 4px 12px 8px;
     }
 
-    /* 📢 24 घंटे का इमरजेंसी स्टार नोटिस बैनर */
-    #suhail-emergency-banner {
-      background: linear-gradient(90deg, #1c1917 0%, #292524 50%, #1c1917 100%);
-      border: 1px solid #eab308;
-      border-left: 5px solid #eab308;
-      border-radius: 8px;
-      padding: 10px 14px;
-      margin: 10px 12px 14px;
-      color: #fef08a;
-      font-size: 0.82rem;
-      display: none;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 4px 18px rgba(234, 179, 8, 0.2);
-      animation: pulseGlow 2s infinite ease-in-out;
-    }
-    @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 10px rgba(234, 179, 8, 0.2); }
-      50% { box-shadow: 0 0 20px rgba(234, 179, 8, 0.45); }
-    }
-
-    /* 💬 चैट लिस्ट के अंदर लगने वाले दो नए कार्ड्स */
-    .suhail-chat-card {
+    .suhail-service-card {
+      width: 100%;
+      box-sizing: border-box;
       display: flex;
       align-items: center;
-      padding: 12px 14px;
-      margin: 8px 12px;
+      gap: 12px;
+      padding: 12px 13px;
+      margin: 7px 0;
+
       background: #111b21;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 13px;
+
       color: #e9edef;
+      text-decoration: none;
       cursor: pointer;
-      transition: background 0.2s;
+
+      box-shadow: 0 3px 12px rgba(0,0,0,0.20);
+
+      transition:
+        transform 0.15s ease,
+        background 0.15s ease,
+        border-color 0.15s ease;
     }
-    .suhail-chat-card:hover { background: #182229; }
-    .card-icon-box {
-      width: 44px;
-      height: 44px;
+
+    .suhail-service-card:active {
+      transform: scale(0.985);
+    }
+
+    .suhail-service-card:hover {
+      background: #182229;
+      border-color: rgba(255,255,255,0.14);
+    }
+
+    .suhail-service-icon {
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+
       border-radius: 50%;
+
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.3rem;
-      margin-right: 12px;
-      flex-shrink: 0;
-    }
-    .card-details h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 3px; display: flex; align-items: center; gap: 6px; }
-    .card-details p { font-size: 0.75rem; color: #8696a0; }
 
-    /* 📊 4 खंभों वाला लीडरबोर्ड (Image 3 स्टाइल) */
-    .suhail-pillar-card {
-      background: radial-gradient(circle at 50% 120%, #1c272e 0%, #0b141a 100%);
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      border-radius: 14px;
-      padding: 18px 12px 14px;
-      margin: 20px 12px 90px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      font-size: 22px;
     }
-    .pillar-head {
+
+    .suhail-service-icon.awam {
+      background: rgba(0,168,132,0.16);
+      color: #00a884;
+      border: 1px solid rgba(0,168,132,0.18);
+    }
+
+    .suhail-service-icon.admin {
+      background: rgba(234,179,8,0.13);
+      color: #eab308;
+      border: 1px solid rgba(234,179,8,0.18);
+    }
+
+    .suhail-service-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .suhail-service-title {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      font-size: 0.85rem;
+      gap: 6px;
+
+      font-size: 0.93rem;
       font-weight: 700;
+      line-height: 1.35;
+
+      margin-bottom: 4px;
+    }
+
+    .suhail-service-description {
+      color: #8696a0;
+      font-size: 0.73rem;
+      line-height: 1.45;
+    }
+
+    .suhail-service-badge {
+      flex-shrink: 0;
+      padding: 3px 7px;
+      border-radius: 10px;
+
+      font-size: 0.62rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .suhail-service-badge.awam {
+      background: #00a884;
+      color: #fff;
+    }
+
+    .suhail-service-badge.admin {
+      background: #eab308;
+      color: #111;
+    }
+
+
+    /* ======================================================
+       24 HOURS STAR EMERGENCY NOTICE
+       ====================================================== */
+
+    #suhail-star-emergency {
+      width: calc(100% - 24px);
+      box-sizing: border-box;
+
+      margin: 9px 12px 8px;
+      padding: 11px 12px;
+
+      display: none;
+      align-items: flex-start;
+      gap: 10px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #211d0c 0%,
+          #29230c 50%,
+          #17140a 100%
+        );
+
+      border: 1px solid rgba(234,179,8,0.55);
+      border-left: 4px solid #eab308;
+
+      border-radius: 12px;
+
+      color: #fef3c7;
+
+      box-shadow:
+        0 4px 18px rgba(234,179,8,0.14);
+
+      animation: suhailStarPulse 2.8s ease-in-out infinite;
+    }
+
+    @keyframes suhailStarPulse {
+      0%, 100% {
+        box-shadow: 0 4px 18px rgba(234,179,8,0.10);
+      }
+
+      50% {
+        box-shadow: 0 4px 24px rgba(234,179,8,0.28);
+      }
+    }
+
+    .suhail-star-emergency-icon {
+      width: 35px;
+      height: 35px;
+      min-width: 35px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 50%;
+
+      background: rgba(234,179,8,0.14);
+      border: 1px solid rgba(234,179,8,0.30);
+
+      font-size: 19px;
+    }
+
+    .suhail-star-emergency-content {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .suhail-star-emergency-heading {
+      color: #fde68a;
+      font-size: 0.79rem;
+      font-weight: 800;
+      margin-bottom: 3px;
+    }
+
+    .suhail-star-emergency-message {
+      color: #fef3c7;
+      font-size: 0.72rem;
+      line-height: 1.5;
+    }
+
+    .suhail-star-emergency-time {
+      display: inline-block;
+      margin-top: 5px;
+
+      color: #a8a29e;
+      font-size: 0.62rem;
+    }
+
+
+    /* ======================================================
+       4 PILLAR GROWTH CHART
+       ====================================================== */
+
+    #suhail-pillar-leaderboard {
+      width: calc(100% - 24px);
+      box-sizing: border-box;
+
+      margin: 10px 12px 18px;
+      padding: 14px 12px 12px;
+
+      background:
+        radial-gradient(
+          circle at 50% 120%,
+          #1d2930 0%,
+          #0b141a 70%
+        );
+
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 14px;
+
+      overflow: hidden;
+
+      box-shadow:
+        0 7px 22px rgba(0,0,0,0.35);
+    }
+
+    .suhail-pillar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      margin-bottom: 5px;
+    }
+
+    .suhail-pillar-title {
       color: #e9edef;
-      margin-bottom: 35px;
+      font-size: 0.82rem;
+      font-weight: 800;
     }
-    .pillar-head span { color: #8696a0; font-size: 0.72rem; font-weight: normal; }
 
-    /* सफ़ेद ग्रोथ कर्व (तीर) */
-    .pillar-svg-curve {
+    .suhail-pillar-title-icon {
+      color: #eab308;
+      margin-right: 5px;
+    }
+
+    .suhail-pillar-live {
+      color: #8696a0;
+      font-size: 0.62rem;
+    }
+
+    .suhail-pillar-chart {
+      position: relative;
+      height: 190px;
+      margin-top: 4px;
+    }
+
+    /* Growth arrow */
+    .suhail-growth-svg {
       position: absolute;
-      top: 55px;
-      left: 15px;
-      width: calc(100% - 30px);
-      height: 110px;
-      pointer-events: none;
+
+      left: 2%;
+      top: 8px;
+
+      width: 96%;
+      height: 105px;
+
       z-index: 1;
-      opacity: 0.9;
+      pointer-events: none;
+
+      opacity: 0.72;
     }
 
-    .pillar-stage {
+    .suhail-pillar-stage {
+      position: absolute;
+
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+      height: 158px;
+
       display: flex;
       align-items: flex-end;
       justify-content: space-around;
-      height: 165px;
-      position: relative;
+
+      border-bottom: 1px solid rgba(255,255,255,0.13);
+
       z-index: 2;
-      border-bottom: 2px solid rgba(255, 255, 255, 0.12);
-      padding-bottom: 2px;
     }
-    .pillar-column {
+
+    .suhail-pillar-column {
+      width: 23%;
+      max-width: 70px;
+      height: 100%;
+
       display: flex;
       flex-direction: column;
-      align-items: center;
-      flex: 1;
-      max-width: 65px;
       justify-content: flex-end;
-      height: 100%;
+      align-items: center;
+
+      position: relative;
     }
-    .pillar-details {
+
+    .suhail-pillar-details {
+      width: 100%;
+
       text-align: center;
-      font-size: 0.65rem;
-      color: #e9edef;
-      margin-bottom: 6px;
+
+      margin-bottom: 5px;
+
       line-height: 1.2;
     }
-    .pillar-details .stu-name { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60px; }
-    .pillar-details .stu-roll { color: #8696a0; font-size: 0.58rem; }
-    .pillar-details .stu-xp { color: #eab308; font-weight: 800; font-size: 0.72rem; }
 
-    .pillar-bar-shape {
-      width: 78%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.06) 100%);
-      border-top: 2px solid #ffffff;
-      border-radius: 5px 5px 0 0;
-      box-shadow: 0 0 16px rgba(255, 255, 255, 0.15);
-      transition: height 0.8s ease;
+    .suhail-pillar-xp {
+      color: #eab308;
+      font-size: 0.69rem;
+      font-weight: 900;
+
+      margin-bottom: 2px;
     }
 
-    /* ड्रैगेबल फ्लोटिंग डॉक */
-    .suhail-draggable-dock {
-      position: fixed;
-      bottom: 25px;
-      right: 15px;
-      z-index: 9999;
-      display: flex;
-      gap: 6px;
-      touch-action: none;
-      user-select: none;
-      background: rgba(32, 44, 51, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 30px;
-      padding: 6px 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-      backdrop-filter: blur(8px);
-    }
-    .suhail-dock-btn {
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.76rem;
+    .suhail-pillar-name {
+      color: #e9edef;
+      font-size: 0.65rem;
       font-weight: 700;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      text-decoration: none;
+
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      padding: 0 2px;
     }
-    .btn-dock-awam { background: #00a884; color: #fff; }
-    .btn-dock-admin { background: #202c33; color: #eab308; border: 1px solid #eab308; }
-    .btn-dock-edu { background: #111b21; color: #3b82f6; border: 1px solid #3b82f6; }
-    .drag-grip { color: #8696a0; font-size: 0.8rem; cursor: grab; align-self: center; padding: 0 4px; }
+
+    .suhail-pillar-roll {
+      color: #8696a0;
+      font-size: 0.56rem;
+
+      margin-top: 2px;
+    }
+
+    .suhail-pillar-bar {
+      width: 72%;
+      min-height: 12px;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255,255,255,0.48) 0%,
+          rgba(255,255,255,0.15) 48%,
+          rgba(255,255,255,0.045) 100%
+        );
+
+      border-top: 2px solid #fff;
+
+      border-radius: 5px 5px 0 0;
+
+      box-shadow:
+        0 0 14px rgba(255,255,255,0.12);
+
+      transition: height 0.7s ease;
+    }
+
+    .suhail-pillar-rank {
+      color: #8696a0;
+      font-size: 0.55rem;
+      margin-top: 4px;
+    }
+
+
+    /* ======================================================
+       MOBILE FIX
+       ====================================================== */
+
+    @media (max-width: 420px) {
+
+      .suhail-service-card {
+        padding: 10px 11px;
+        gap: 10px;
+      }
+
+      .suhail-service-icon {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        font-size: 20px;
+      }
+
+      .suhail-service-title {
+        font-size: 0.84rem;
+      }
+
+      .suhail-service-description {
+        font-size: 0.68rem;
+      }
+
+      .suhail-service-badge {
+        font-size: 0.56rem;
+      }
+
+      #suhail-pillar-leaderboard {
+        margin-left: 10px;
+        margin-right: 10px;
+        width: calc(100% - 20px);
+      }
+    }
   `;
+
   document.head.appendChild(style);
 
-  // 2. नीचे के पुराने फिक्स्ड बटनों को छिपाना
-  function hideOldFixedButtons() {
-    document.querySelectorAll('*').forEach(el => {
-      if (el.children.length === 0 && (el.innerText === '30 AI खिदमात' || el.innerText === 'सुपर एडमिन')) {
-        const p = el.closest('div') || el.closest('button') || el;
-        if (p && (window.getComputedStyle(p).position === 'fixed' || p.style.position === 'fixed')) {
-          p.style.display = 'none';
-        }
+
+  // ----------------------------------------------------------
+  // 2. Helper: text से original button ढूँढना
+  // ----------------------------------------------------------
+
+  function findActionByText(text) {
+
+    const elements = document.querySelectorAll(
+      "a, button, [role='button']"
+    );
+
+    for (const el of elements) {
+
+      const value = (el.innerText || el.textContent || "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      if (value.includes(text)) {
+        return el;
       }
-    });
+    }
+
+    return null;
   }
 
-  // 3. चैट लिस्ट में दोनों बटनों को चैट कार्ड बनाकर लगाना
-  function insertChatCards() {
-    if (document.getElementById('card-awam-chat')) return;
 
-    // AI उस्ताद वाले कार्ड के नीचे या स्टेटस के नीचे जगह तलाशें
-    const searchBar = document.querySelector('input[placeholder*="चैट या सबक"]') || document.querySelector('.search-bar');
-    const filterRow = document.querySelector('.filter-chips') || document.querySelector('.chat-filters');
-    const target = filterRow ? filterRow.nextElementSibling : (searchBar ? searchBar.nextElementSibling : null);
+  // ----------------------------------------------------------
+  // 3. Chat-list में नए cards
+  //    पुराने buttons को छूना नहीं है
+  // ----------------------------------------------------------
 
-    const cardContainer = document.createElement('div');
-    cardContainer.id = 'card-awam-chat';
-    cardContainer.innerHTML = `
-      <!-- कार्ड 1: 40 आवामी खिदमात -->
-      <a href="/awam.html" class="suhail-chat-card">
-        <div class="card-icon-box" style="background:rgba(0,168,132,0.15); color:#00a884;">
-          <i class="fa-solid fa-layer-group"></i>
-        </div>
-        <div class="card-details">
-          <h4>🏛️ 40 आवामी व सामाजिक खिदमात <span style="font-size:0.68rem; background:#00a884; color:#fff; padding:1px 6px; border-radius:10px;">पोर्टल</span></h4>
-          <p>सरकारी योजनाएँ, दुकानदारी खाता-बही, प्राथमिक उपचार व टेक हेल्प</p>
-        </div>
-      </a>
+  function insertServiceCards() {
 
-      <!-- कार्ड 2: सुपर एडमिन हब -->
-      <a href="/admin.html" class="suhail-chat-card">
-        <div class="card-icon-box" style="background:rgba(234,179,8,0.15); color:#eab308;">
-          <i class="fa-solid fa-shield-halved"></i>
+    if (document.getElementById("suhail-service-cards")) {
+      return;
+    }
+
+    /*
+      सबसे पहले chat-list ढूँढें।
+      आपके वर्तमान interface में .chat-list / #chats
+      में से जो मिले, उसे इस्तेमाल करेंगे।
+    */
+
+    const chatList =
+      document.querySelector("#chats") ||
+      document.querySelector(".chat-list") ||
+      document.querySelector("#chat-list");
+
+    if (!chatList) {
+      return;
+    }
+
+
+    const wrapper = document.createElement("div");
+
+    wrapper.id = "suhail-service-cards";
+    wrapper.className = "suhail-service-cards";
+
+
+    // ------------------------------------------------------
+    // Card 1
+    // ------------------------------------------------------
+
+    const awamCard = document.createElement("div");
+
+    awamCard.className = "suhail-service-card";
+
+    awamCard.innerHTML = `
+      <div class="suhail-service-icon awam">
+        <i class="fa-solid fa-layer-group"></i>
+      </div>
+
+      <div class="suhail-service-info">
+
+        <div class="suhail-service-title">
+          <span>🏛️ 40 आवामी व सामाजिक खिदमात</span>
+
+          <span class="suhail-service-badge awam">
+            पोर्टल
+          </span>
         </div>
-        <div class="card-details">
-          <h4>🛡️ सुपर एडमिन कंट्रोल पैनल <span style="font-size:0.68rem; background:#eab308; color:#000; padding:1px 6px; border-radius:10px;">एडमिन</span></h4>
-          <p>तलबा हाज़िरी, स्टार व बैज, स्ट्राइक, क्लास चैट व AI इम्तिहान</p>
+
+        <div class="suhail-service-description">
+          सरकारी योजनाएँ, दुकानदारी खाता-बही,
+          प्राथमिक उपचार व टेक हेल्प
         </div>
-      </a>
+
+      </div>
     `;
 
-    if (target && target.parentNode) {
-      target.parentNode.insertBefore(cardContainer, target);
-    } else {
-      const chatArea = document.querySelector('#chats') || document.querySelector('.chat-list') || document.body;
-      chatArea.prepend(cardContainer);
-    }
-  }
 
-  // 4. 24 घंटे का इमरजेंसी स्टार नोटिस बैनर
-  function setupEmergencyBanner(users) {
-    let banner = document.getElementById('suhail-emergency-banner');
-    if (!banner) {
-      banner = document.createElement('div');
-      banner.id = 'suhail-emergency-banner';
-      const topPlacement = document.querySelector('.top-header') || document.querySelector('nav') || document.body;
-      topPlacement.parentNode.insertBefore(banner, topPlacement.nextSibling);
-    }
+    // ------------------------------------------------------
+    // Card 2
+    // ------------------------------------------------------
 
-    // ऐसा छात्र ढूँढें जिसके पास हाल ही में स्टार या बैज लगा हो
-    let latestStarUser = null;
-    const now = Date.now();
-    const ONE_DAY = 24 * 60 * 60 * 1000; // 24 घंटे
+    const adminCard = document.createElement("div");
 
-    Object.values(users || {}).forEach(u => {
-      if (u.star || u.badge) {
-        // यदि 24 घंटे के अंदर अपडेट हुआ हो (या सीधा स्टार हो)
-        if (!u.updatedAt || (now - u.updatedAt < ONE_DAY)) {
-          latestStarUser = u;
-        }
+    adminCard.className = "suhail-service-card";
+
+    adminCard.innerHTML = `
+      <div class="suhail-service-icon admin">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+
+      <div class="suhail-service-info">
+
+        <div class="suhail-service-title">
+          <span>🛡️ सुपर एडमिन कंट्रोल पैनल</span>
+
+          <span class="suhail-service-badge admin">
+            एडमिन
+          </span>
+        </div>
+
+        <div class="suhail-service-description">
+          तलबा हाज़िरी, स्टार व बैज, स्ट्राइक,
+          क्लास चैट व AI इम्तिहान
+        </div>
+
+      </div>
+    `;
+
+
+    // ------------------------------------------------------
+    // IMPORTANT:
+    // Original buttons remain untouched.
+    // New cards only trigger the original buttons.
+    // ------------------------------------------------------
+
+    awamCard.addEventListener("click", function () {
+
+      const original =
+        findActionByText("30 AI खिदमात") ||
+        findActionByText("आवामी");
+
+      if (original) {
+        original.click();
+      } else {
+        window.location.href = "/awam.html";
       }
+
     });
 
-    if (latestStarUser) {
-      const roll = latestStarUser.roll || latestStarUser.rollNumber || '';
-      const name = latestStarUser.name || 'तालिब';
-      const badge = latestStarUser.badge || 'मुमताज़ तालिब-ए-इल्म 🌟';
-      banner.innerHTML = `
-        <span style="font-size:1.3rem;">📢</span>
-        <div>
-          <strong>शाही इल्मी एज़ाज़ (24 घंटे का शाही नोटिस):</strong><br>
-          मुबारकबाद! रोल <strong>${roll}</strong> (${name}) को उस्ताद की तरफ़ से <strong>⭐ ${badge}</strong> से नवाज़ा गया है!
-        </div>
-      `;
-      banner.style.display = 'flex';
-    } else {
-      banner.style.display = 'none';
+
+    adminCard.addEventListener("click", function () {
+
+      const original =
+        findActionByText("सुपर एडमिन") ||
+        findActionByText("एडमिन");
+
+      if (original) {
+        original.click();
+      } else {
+        window.location.href = "/admin.html";
+      }
+
+    });
+
+
+    wrapper.appendChild(awamCard);
+    wrapper.appendChild(adminCard);
+
+
+    // ------------------------------------------------------
+    // कहाँ insert करना है?
+    // Search/filter के बाद और students से पहले
+    // ------------------------------------------------------
+
+    const filter =
+      document.querySelector(".filter-chips") ||
+      document.querySelector(".chat-filters");
+
+    if (filter && filter.parentNode) {
+
+      filter.parentNode.insertBefore(
+        wrapper,
+        filter.nextSibling
+      );
+
+      return;
     }
+
+
+    // Search bar के बाद
+    const search =
+      document.querySelector(
+        'input[placeholder*="चैट या सबक"]'
+      ) ||
+      document.querySelector(".search-bar");
+
+    if (search) {
+
+      const parent = search.parentNode;
+
+      if (parent) {
+
+        parent.parentNode.insertBefore(
+          wrapper,
+          parent.nextSibling
+        );
+
+        return;
+      }
+    }
+
+
+    // Last fallback
+    chatList.prepend(wrapper);
   }
 
-  // 5. 4 खंभों वाला लीडरबोर्ड (Image 3 हू-ब-हू)
-  function renderPillars(users) {
-    let container = document.getElementById('suhail-pillar-leaderboard');
-    if (!container) {
-      container = document.createElement('div');
-      container.id = 'suhail-pillar-leaderboard';
-      container.className = 'suhail-pillar-card';
-      container.innerHTML = `
-        <div class="pillar-head">
-          <div><i class="fa-solid fa-chart-simple" style="color:#eab308; margin-right:6px;"></i> तालीमी तरक़्क़ी व इल्मी मुक़ाबला</div>
-          <span>Live Rank ⚡</span>
+
+  // ----------------------------------------------------------
+  // 4. Emergency Star Notice
+  // ----------------------------------------------------------
+
+  function setupStarEmergencyNotice(users) {
+
+    let notice =
+      document.getElementById("suhail-star-emergency");
+
+
+    // पहले से नहीं है तो बनायें
+    if (!notice) {
+
+      notice = document.createElement("div");
+
+      notice.id = "suhail-star-emergency";
+
+      notice.innerHTML = `
+        <div class="suhail-star-emergency-icon">
+          ⭐
         </div>
-        <svg class="pillar-svg-curve" viewBox="0 0 300 110" preserveAspectRatio="none">
-          <path d="M 20,100 Q 150,75 280,12" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-          <polyline points="268,12 280,12 280,24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-        </svg>
-        <div class="pillar-stage" id="pillar-stage-box"></div>
-      `;
-      const chatArea = document.querySelector('#chats') || document.querySelector('.chat-list') || document.body;
-      chatArea.appendChild(container);
-    }
 
-    const sorted = Object.values(users || {}).sort((a, b) => (parseInt(b.xp) || 0) - (parseInt(a.xp) || 0));
-    // 4 खंभे चढ़ते क्रम में (Rank 4 -> Rank 3 -> Rank 2 -> Rank 1)
-    const displayList = [sorted[3], sorted[2], sorted[1], sorted[0]];
-    const heights = ['38px', '70px', '108px', '148px'];
+        <div class="suhail-star-emergency-content">
 
-    const box = document.getElementById('pillar-stage-box');
-    if (!box) return;
-    box.innerHTML = '';
-
-    displayList.forEach((stu, i) => {
-      const name = stu ? (stu.name || 'तालिब') : '-';
-      const roll = stu ? (stu.roll || stu.rollNumber || '') : '';
-      const xp = stu ? (stu.xp || 0) : 0;
-      box.innerHTML += `
-        <div class="pillar-column">
-          <div class="pillar-details">
-            <div class="stu-xp">⚡ ${xp}</div>
-            <div class="stu-name">${name}</div>
-            <div class="stu-roll">${roll ? 'रोल: ' + roll : ''}</div>
+          <div class="suhail-star-emergency-heading">
+            📢 इल्मी एज़ाज़ — 24 घंटे का नोटिस
           </div>
-          <div class="pillar-bar-shape" style="height:${stu ? heights[i] : '15px'};"></div>
+
+          <div
+            class="suhail-star-emergency-message"
+            id="suhail-star-message"
+          ></div>
+
+          <span
+            class="suhail-star-emergency-time"
+            id="suhail-star-time"
+          ></span>
+
         </div>
       `;
-    });
-  }
 
-  // 6. ड्रैगेबल फ्लोटिंग कैप्सूल
-  function createDraggableDock() {
-    if (document.getElementById('suhail-drag-dock')) return;
 
-    const dock = document.createElement('div');
-    dock.id = 'suhail-drag-dock';
-    dock.className = 'suhail-draggable-dock';
-    dock.innerHTML = `
-      <span class="drag-grip" id="dock-grip"><i class="fa-solid fa-grip-vertical"></i></span>
-      <button class="suhail-dock-btn btn-dock-edu" onclick="openEduSheet()"><i class="fa-solid fa-graduation-cap"></i> 30 टूल्स</button>
-      <a href="/awam.html" class="suhail-dock-btn btn-dock-awam">🏛️ आवामी</a>
-      <a href="/admin.html" class="suhail-dock-btn btn-dock-admin">🛡️ एडमिन</a>
-    `;
-    document.body.appendChild(dock);
+      /*
+        Home screen में notice लगाना है।
+        Chat list के ऊपर।
+      */
 
-    let isDragging = false, startX, startY, initLeft, initTop;
-    const grip = document.getElementById('dock-grip');
+      const chatList =
+        document.querySelector("#chats") ||
+        document.querySelector(".chat-list") ||
+        document.querySelector("#chat-list");
 
-    dock.addEventListener('touchstart', (e) => {
-      if (e.target.closest('a') || e.target.closest('button')) return;
-      isDragging = true;
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-      const rect = dock.getBoundingClientRect();
-      initLeft = rect.left;
-      initTop = rect.top;
-      dock.style.bottom = 'auto'; dock.style.right = 'auto';
-      dock.style.left = initLeft + 'px'; dock.style.top = initTop + 'px';
-    }, { passive: true });
 
-    document.addEventListener('touchmove', (e) => {
-      if (!isDragging) return;
-      const dx = e.touches[0].clientX - startX;
-      const dy = e.touches[0].clientY - startY;
-      dock.style.left = Math.max(10, Math.min(window.innerWidth - dock.offsetWidth - 10, initLeft + dx)) + 'px';
-      dock.style.top = Math.max(10, Math.min(window.innerHeight - dock.offsetHeight - 10, initTop + dy)) + 'px';
-    }, { passive: true });
+      if (chatList && chatList.parentNode) {
 
-    document.addEventListener('touchend', () => isDragging = false);
-  }
+        chatList.parentNode.insertBefore(
+          notice,
+          chatList
+        );
 
-  // 7. डेटाबेस सिंक
-  function initSync() {
-    hideOldFixedButtons();
-    insertChatCards();
-    createDraggableDock();
+      } else {
 
-    const db = window.db || (typeof firebase !== 'undefined' && firebase.apps.length ? firebase.database() : null);
-    if (!db) return;
+        const home =
+          document.getElementById("screen-home");
 
-    db.ref('users').on('value', snap => {
-      const users = snap.val() || {};
-      setupEmergencyBanner(users);
-      renderPillars(users);
-
-      // अगर किसी छात्र को स्टार मिला है तो उसके नाम के आगे ⭐ और बैज लाइव लगाना
-      snap.forEach(child => {
-        const u = child.val() || {};
-        const roll = String(u.roll || u.rollNumber || child.key).trim();
-        if (u.star || u.badge) {
-          document.querySelectorAll('div, p, span, h4').forEach(el => {
-            if (el.children.length <= 1 && el.innerText && el.innerText.includes(`रोल: ${roll}`)) {
-              if (!el.getAttribute('data-badge-done')) {
-                el.setAttribute('data-badge-done', 'true');
-                let html = el.innerHTML.replace(/[🥇🥈🥉]/g, '');
-                const star = u.star ? '<span style="color:#eab308; margin-right:3px;">⭐</span>' : '';
-                const badge = u.badge ? `<span style="background:rgba(234,179,8,0.2); color:#eab308; border:1px solid #eab308; padding:1px 5px; border-radius:4px; font-size:0.7rem; margin-right:4px; font-weight:bold;">${u.badge}</span>` : '';
-                el.innerHTML = `${star}${badge} ${html.trim()}`;
-              }
-            }
-          });
+        if (home) {
+          home.appendChild(notice);
         }
-      });
-    });
+      }
+    }
+
+
+    // ------------------------------------------------------
+    // Latest star खोजें
+    // ------------------------------------------------------
+
+    const now = Date.now();
+
+    const ONE_DAY =
+      24 * 60 * 60 * 1000;
+
+
+    let latest = null;
+
+
+    Object.entries(users || {}).forEach(
+      ([key, user]) => {
+
+        if (!user) return;
+
+        /*
+          अलग-अलग पुराने data structures को support
+          करने के लिए कई timestamp names।
+        */
+
+        const timestamp =
+          Number(
+            user.starAwardedAt ||
+            user.starUpdatedAt ||
+            user.lastStarAt ||
+            user.starTime ||
+            user.updatedAt ||
+            0
+          );
+
+
+        if (!user.star) {
+          return;
+        }
+
+
+        /*
+          अगर timestamp मौजूद है तो 24 घंटे की सीमा लागू।
+          timestamp नहीं है तो fake 24h claim नहीं करेंगे।
+        */
+
+        if (
+          timestamp &&
+          now - timestamp > ONE_DAY
+        ) {
+          return;
+        }
+
+
+        if (
+          !latest ||
+          timestamp > latest.timestamp
+        ) {
+
+          latest = {
+            key,
+            user,
+            timestamp
+          };
+        }
+
+      }
+    );
+
+
+    // ------------------------------------------------------
+    // कोई valid star नहीं
+    // ------------------------------------------------------
+
+    if (!latest) {
+
+      notice.style.display = "none";
+
+      return;
+    }
+
+
+    const user = latest.user;
+
+
+    const name =
+      user.name ||
+      user.displayName ||
+      "तालिब-ए-इल्म";
+
+
+    const roll =
+      user.roll ||
+      user.rollNumber ||
+      latest.key ||
+      "";
+
+
+    const badge =
+      user.badge ||
+      "इल्मी स्टार ⭐";
+
+
+    const message =
+      document.getElementById(
+        "suhail-star-message"
+      );
+
+
+    const time =
+      document.getElementById(
+        "suhail-star-time"
+      );
+
+
+    if (message) {
+
+      message.textContent =
+        `मुबारकबाद! रोल ${roll} (${name}) को `
+        + `उस्ताद की तरफ़ से ${badge} से नवाज़ा गया है।`;
+    }
+
+
+    if (time) {
+
+      if (latest.timestamp) {
+
+        const expiresAt =
+          latest.timestamp + ONE_DAY;
+
+        const remaining =
+          Math.max(
+            0,
+            expiresAt - now
+          );
+
+
+        const hours =
+          Math.floor(
+            remaining / (60 * 60 * 1000)
+          );
+
+
+        const minutes =
+          Math.floor(
+            (remaining % (60 * 60 * 1000))
+            / (60 * 1000)
+          );
+
+
+        const date =
+          new Date(latest.timestamp);
+
+
+        const hh =
+          String(date.getHours()).padStart(2, "0");
+
+
+        const mm =
+          String(date.getMinutes()).padStart(2, "0");
+
+
+        time.textContent =
+          `जारी: ${hh}:${mm} • `
+          + `बाक़ी समय: ${hours} घंटे ${minutes} मिनट`;
+      }
+
+      else {
+
+        time.textContent =
+          "24 घंटे का इल्मी एज़ाज़ नोटिस";
+      }
+    }
+
+
+    notice.style.display = "flex";
   }
 
-  window.addEventListener('DOMContentLoaded', initSync);
-  setTimeout(initSync, 1000);
-  setInterval(hideOldFixedButtons, 2000);
+
+  // ----------------------------------------------------------
+  // 5. 4 Pillar Growth Chart
+  // ----------------------------------------------------------
+
+  function renderPillars(users) {
+
+    let container =
+      document.getElementById(
+        "suhail-pillar-leaderboard"
+      );
+
+
+    // ------------------------------------------------------
+    // Container एक ही बार बने
+    // ------------------------------------------------------
+
+    if (!container) {
+
+      container =
+        document.createElement("div");
+
+      container.id =
+        "suhail-pillar-leaderboard";
+
+
+      container.innerHTML = `
+        <div class="suhail-pillar-header">
+
+          <div class="suhail-pillar-title">
+            <i
+              class="fa-solid fa-chart-simple suhail-pillar-title-icon"
+            ></i>
+
+            तालीमी तरक़्क़ी व इल्मी मुक़ाबला
+          </div>
+
+          <div class="suhail-pillar-live">
+            LIVE RANK ⚡
+          </div>
+
+        </div>
+
+
+        <div class="suhail-pillar-chart">
+
+          <svg
+            class="suhail-growth-svg"
+            viewBox="0 0 300 110"
+            preserveAspectRatio="none"
+          >
+
+            <path
+              d="
+                M 15,98
+                Q 100,88
+                155,60
+                Q 215,34
+                278,10
+              "
+              fill="none"
+              stroke="#ffffff"
+              stroke-width="2.5"
+              stroke-linecap="round"
+            />
+
+            <polyline
+              points="266,10 278,10 278,23"
+              fill="none"
+              stroke="#ffffff"
+              stroke-width="2.5"
+              stroke-linecap="round"
+            />
+
+          </svg>
+
+
+          <div
+            class="suhail-pillar-stage"
+            id="suhail-pillar-stage"
+          ></div>
+
+        </div>
+      `;
+
+
+      /*
+        Chart students list के नीचे रहेगा।
+      */
+
+      const chatList =
+        document.querySelector("#chats") ||
+        document.querySelector(".chat-list") ||
+        document.querySelector("#chat-list");
+
+
+      if (chatList) {
+
+        chatList.appendChild(container);
+
+      } else {
+
+        const home =
+          document.getElementById("screen-home");
+
+        if (home) {
+          home.appendChild(container);
+        }
+      }
+    }
+
+
+    // ------------------------------------------------------
+    // Users sort by XP
+    // ------------------------------------------------------
+
+    const list =
+      Object.values(users || {})
+        .filter(Boolean)
+        .sort(
+          (a, b) =>
+            (Number(b.xp) || 0) -
+            (Number(a.xp) || 0)
+        );
+
+
+    /*
+      Top 4 students.
+      Reference image की तरह:
+      Rank 4 → Rank 3 → Rank 2 → Rank 1
+    */
+
+    const topFour =
+      list.slice(0, 4).reverse();
+
+
+    const heights = [
+      45,
+      76,
+      108,
+      140
+    ];
+
+
+    const stage =
+      document.getElementById(
+        "suhail-pillar-stage"
+      );
+
+
+    if (!stage) return;
+
+
+    stage.innerHTML = "";
+
+
+    topFour.forEach(
+      (student, index) => {
+
+        const column =
+          document.createElement("div");
+
+        column.className =
+          "suhail-pillar-column";
+
+
+        const details =
+          document.createElement("div");
+
+        details.className =
+          "suhail-pillar-details";
+
+
+        const xp =
+          document.createElement("div");
+
+        xp.className =
+          "suhail-pillar-xp";
+
+        xp.textContent =
+          `⚡ ${Number(student.xp) || 0}`;
+
+
+        const name =
+          document.createElement("div");
+
+        name.className =
+          "suhail-pillar-name";
+
+        name.textContent =
+          student.name ||
+          student.displayName ||
+          "तालिब";
+
+
+        const roll =
+          document.createElement("div");
+
+        roll.className =
+          "suhail-pillar-roll";
+
+        const rollValue =
+          student.roll ||
+          student.rollNumber ||
+          "";
+
+
+        roll.textContent =
+          rollValue
+            ? `रोल: ${rollValue}`
+            : "";
+
+
+        details.appendChild(xp);
+        details.appendChild(name);
+        details.appendChild(roll);
+
+
+        const bar =
+          document.createElement("div");
+
+        bar.className =
+          "suhail-pillar-bar";
+
+
+        bar.style.height =
+          `${heights[index] || 45}px`;
+
+
+        const rank =
+          document.createElement("div");
+
+        rank.className =
+          "suhail-pillar-rank";
+
+        /*
+          क्योंकि topFour reverse है:
+          index 0 = Rank 4
+          index 3 = Rank 1
+        */
+
+        rank.textContent =
+          `Rank ${4 - index}`;
+
+
+        column.appendChild(details);
+        column.appendChild(bar);
+        column.appendChild(rank);
+
+
+        stage.appendChild(column);
+      }
+    );
+
+
+    // अगर 4 से कम students हैं
+    // तो खाली छोटे pillars
+    for (
+      let i = topFour.length;
+      i < 4;
+      i++
+    ) {
+
+      const column =
+        document.createElement("div");
+
+      column.className =
+        "suhail-pillar-column";
+
+
+      const bar =
+        document.createElement("div");
+
+      bar.className =
+        "suhail-pillar-bar";
+
+      bar.style.height =
+        "15px";
+
+
+      const rank =
+        document.createElement("div");
+
+      rank.className =
+        "suhail-pillar-rank";
+
+      rank.textContent =
+        `Rank ${4 - i}`;
+
+
+      column.appendChild(bar);
+      column.appendChild(rank);
+
+
+      stage.appendChild(column);
+    }
+  }
+
+
+  // ----------------------------------------------------------
+  // 6. Firebase sync
+  // ----------------------------------------------------------
+
+  function initFirebaseSync() {
+
+    const db =
+      window.db ||
+      (
+        typeof firebase !== "undefined" &&
+        firebase.apps &&
+        firebase.apps.length
+          ? firebase.database()
+          : null
+      );
+
+
+    if (!db) {
+      return;
+    }
+
+
+    /*
+      केवल एक listener
+    */
+
+    if (window.__suhailStarPillarListenerAttached) {
+      return;
+    }
+
+    window.__suhailStarPillarListenerAttached = true;
+
+
+    db.ref("users").on(
+      "value",
+      function (snapshot) {
+
+        const users =
+          snapshot.val() || {};
+
+
+        setupStarEmergencyNotice(users);
+
+        renderPillars(users);
+
+      },
+      function (error) {
+
+        console.error(
+          "Suhail users sync error:",
+          error
+        );
+
+      }
+    );
+  }
+
+
+  // ----------------------------------------------------------
+  // 7. UI initialization
+  // ----------------------------------------------------------
+
+  function initSuhailUI() {
+
+    /*
+      Existing DOM को थोड़ा समय मिलने दें।
+    */
+
+    insertServiceCards();
+
+    initFirebaseSync();
+  }
+
+
+  // ----------------------------------------------------------
+  // 8. DOM Ready
+  // ----------------------------------------------------------
+
+  if (
+    document.readyState === "loading"
+  ) {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      initSuhailUI,
+      { once: true }
+    );
+
+  } else {
+
+    initSuhailUI();
+  }
+
+
+  // ----------------------------------------------------------
+  // 9. Dynamic DOM protection
+  // ----------------------------------------------------------
+
+  /*
+    अगर आपकी app chat-list को बाद में Firebase/render
+    के दौरान दोबारा बनाती है, तो cards फिर लगाए जा सकें।
+  */
+
+  let observerTimer = null;
+
+
+  const observer =
+    new MutationObserver(
+      function () {
+
+        clearTimeout(observerTimer);
+
+
+        observerTimer =
+          setTimeout(
+            function () {
+
+              insertServiceCards();
+
+            },
+            400
+          );
+      }
+    );
+
+
+  observer.observe(
+    document.body,
+    {
+      childList: true,
+      subtree: true
+    }
+  );
+
 })();
