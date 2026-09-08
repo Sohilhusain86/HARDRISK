@@ -5299,51 +5299,164 @@ window.finishQuizRound = function(msg) {
   }
 </script>
 
-<!-- ========================================== -->
+  <!-- ========================================== -->
 <!-- 🚀 सोहेल एआई: मुकम्मल 5-बटन डॉक, खंभे व 24h नोटिस -->
 <!-- ========================================== -->
+  
 <script>
-(function() {
-  // 1. पुराने दोनों कोने वाले बटनों को जबरन DOM से उखाड़ना
-  function purgeOldButtons() {
+(function () {
+  "use strict";
+
+  // 1. कोने वाले दोनों पुराने बटनों को जड़ से डिलीट करना
+  function killOldCornerButtons() {
     var all = document.querySelectorAll('button, a, div');
     for (var i = 0; i < all.length; i++) {
       var el = all[i];
       if (el.closest && el.closest('#suhail-5btn-dock')) continue;
       var txt = (el.innerText || el.textContent || '').trim();
-      if (txt === '30 AI खिदमात' || txt === 'सुपर एडमिन') {
+      if (txt === '30 AI खिदमात' || (txt.indexOf('सुपर एडमिन') !== -1 && txt.indexOf('कंट्रोल') === -1)) {
         var parent = el.parentElement;
-        if (parent && parent.tagName === 'DIV' && (parent.style.position === 'fixed' || window.getComputedStyle(parent).position === 'fixed')) {
-          parent.style.setProperty('display', 'none', 'important');
+        if (parent && parent.children.length === 1 && parent !== document.body) {
+          parent.remove();
+        } else {
+          el.remove();
         }
-        el.style.setProperty('display', 'none', 'important');
       }
     }
   }
 
-  // 2. स्टाइलिंग (अल्ट्रा कॉम्पैक्ट 5-बटन विजेट व चार्ट)
-  var css = document.createElement('style');
-  css.innerHTML = `
-    #suhail-5btn-dock {
+  // 2. स्टाइलिंग (पॉपअप नोटिस व तफ़सीली सनद बोर्ड)
+  var style = document.createElement('style');
+  style.innerHTML = `
+    /* 📢 शाही नोटिस पॉपअप */
+    #suhail-notice-modal {
+      display: none;
       position: fixed;
-      bottom: 16px;
-      right: 8px;
-      z-index: 9999999;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 10000005;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .suhail-notice-box {
+      background: linear-gradient(145deg, #1c1917 0%, #261f0d 60%, #111b21 100%);
+      border: 2px solid #eab308;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 420px;
+      padding: 20px 18px;
+      color: #fef08a;
+      box-shadow: 0 10px 30px rgba(234, 179, 8, 0.3);
+      text-align: center;
+      animation: noticePop 0.3s ease-out;
+    }
+    @keyframes noticePop {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .notice-badge-pill {
+      display: inline-block;
+      background: rgba(234, 179, 8, 0.2);
+      border: 1px solid #eab308;
+      color: #fef08a;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      margin: 10px 0;
+    }
+    .btn-notice-close {
+      background: #eab308;
+      color: #000;
+      border: none;
+      padding: 8px 22px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    /* 📜 नीचे खाली स्पेस में: तफ़सीली इल्मी एज़ाज़ात बोर्ड */
+    #suhail-awards-board {
+      width: calc(100% - 24px);
+      box-sizing: border-box;
+      margin: 20px 12px 90px;
+      background: #111b21;
+      border: 1px solid rgba(234, 179, 8, 0.35);
+      border-radius: 14px;
+      padding: 16px 14px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    }
+    .awards-header {
       display: flex;
       align-items: center;
-      gap: 3px;
-      background: rgba(17, 27, 33, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.16);
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+    .awards-title {
+      color: #eab308;
+      font-size: 0.88rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .award-student-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #182229;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+    .award-stu-info h4 {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #e9edef;
+      margin-bottom: 3px;
+    }
+    .award-stu-info span {
+      font-size: 0.7rem;
+      color: #8696a0;
+    }
+    .award-tag {
+      background: rgba(234, 179, 8, 0.15);
+      border: 1px solid #eab308;
+      color: #fef08a;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    /* 🎮 5-बटन ड्रैगेबल स्लिम विजेट */
+    #suhail-5btn-dock {
+      position: fixed;
+      bottom: 20px;
+      right: 10px;
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(17, 27, 33, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.14);
       border-radius: 25px;
       padding: 3px 6px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
       backdrop-filter: blur(8px);
       touch-action: none;
       user-select: none;
-      max-width: 96vw;
+      max-width: 95vw;
     }
-    .suhail-drag-handle { color: #8696a0; font-size: 0.75rem; cursor: grab; padding: 0 3px; }
-    .suhail-btn {
+    .suhail-drag-handle { color: #8696a0; font-size: 0.8rem; cursor: grab; padding: 0 4px; }
+    .suhail-mini-btn {
       padding: 4px 7px;
       border-radius: 12px;
       font-size: 0.65rem;
@@ -5355,121 +5468,39 @@ window.finishQuizRound = function(msg) {
       gap: 3px;
       text-decoration: none;
       white-space: nowrap;
-      line-height: 1;
     }
-    .sbtn-old30 { background: #00a884; color: #fff; }
-    .sbtn-awam  { background: rgba(0,168,132,0.2); color: #00a884; border: 1px solid rgba(0,168,132,0.4); }
-    .sbtn-edu   { background: #182229; color: #3b82f6; border: 1px solid rgba(59,130,246,0.4); }
-    .sbtn-info  { background: rgba(234,179,8,0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.35); }
-    .sbtn-admin { background: #202c33; color: #eab308; border: 1px solid #eab308; display: none; }
-
-    /* 📢 24 घंटे का स्टार नोटिस */
-    #suhail-star-emergency {
-      width: calc(100% - 24px);
-      margin: 8px 12px;
-      padding: 9px 12px;
-      display: none;
-      align-items: flex-start;
-      gap: 8px;
-      background: linear-gradient(135deg, #211d0c 0%, #29230c 50%, #17140a 100%);
-      border: 1px solid rgba(234,179,8,0.55);
-      border-left: 4px solid #eab308;
-      border-radius: 9px;
-      color: #fef3c7;
-      box-sizing: border-box;
-    }
-
-    /* 📊 4 खंभों वाला लीडरबोर्ड */
-    #suhail-pillar-leaderboard {
-      width: calc(100% - 24px);
-      box-sizing: border-box;
-      margin: 15px 12px 80px;
-      padding: 14px 12px 10px;
-      background: radial-gradient(circle at 50% 120%, #1d2930 0%, #0b141a 70%);
-      border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
-    }
-    .suhail-pillar-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: #e9edef;
-    }
-    .suhail-pillar-chart { position: relative; height: 160px; }
-    .suhail-growth-svg { position: absolute; left: 3%; top: 8px; width: 94%; height: 100px; z-index: 1; pointer-events: none; opacity: 0.8; }
-    .suhail-pillar-stage { position: absolute; left: 0; right: 0; bottom: 0; height: 145px; display: flex; align-items: flex-end; justify-content: space-around; border-bottom: 1px solid rgba(255,255,255,0.15); z-index: 2; }
-    .suhail-pillar-column { width: 22%; max-width: 60px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
-    .suhail-pillar-details { width: 100%; text-align: center; margin-bottom: 4px; line-height: 1.15; }
-    .suhail-pillar-xp { color: #eab308; font-size: 0.68rem; font-weight: 900; }
-    .suhail-pillar-name { color: #e9edef; font-size: 0.62rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .suhail-pillar-roll { color: #8696a0; font-size: 0.55rem; }
-    .suhail-pillar-bar {
-      width: 74%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.06) 100%);
-      border-top: 2px solid #fff;
-      border-radius: 4px 4px 0 0;
-      box-shadow: 0 0 12px rgba(255,255,255,0.12);
-      transition: height 0.7s ease;
-    }
-    #suhail-guide-modal {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000000; align-items: center; justify-content: center; padding: 14px;
-    }
-    .suhail-modal-box {
-      background: #111b21; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; width: 100%; max-width: 450px; color: #e9edef; padding: 16px;
-    }
+    .btn-m-old30 { background: #00a884; color: #fff; }
+    .btn-m-awam  { background: rgba(0, 168, 132, 0.2); color: #00a884; border: 1px solid rgba(0,168,132,0.4); }
+    .btn-m-edu   { background: #182229; color: #3b82f6; border: 1px solid rgba(59,130,246,0.4); }
+    .btn-m-info  { background: rgba(234, 179, 8, 0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.35); }
+    .btn-m-admin { background: #202c33; color: #eab308; border: 1px solid #eab308; display: none; }
   `;
-  document.head.appendChild(css);
+  document.head.appendChild(style);
 
-  // 3. रहनुमाई मॉडल बनाना
-  function buildGuide() {
-    if (document.getElementById('suhail-guide-modal')) return;
-    var g = document.createElement('div');
-    g.id = 'suhail-guide-modal';
-    g.innerHTML = `
-      <div class="suhail-modal-box">
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; margin-bottom:10px;">
-          <h3 style="color:#eab308; font-size:0.95rem;">📖 जमात ऊला - इल्मी रहनुमाई</h3>
-          <button onclick="document.getElementById('suhail-guide-modal').style.display='none'" style="background:none; border:none; color:#8696a0; font-size:1.2rem; cursor:pointer;">✕</button>
-        </div>
-        <p style="font-size:0.75rem; color:#8696a0; line-height:1.5; margin-bottom:8px;">
-          <strong>⚡ XP कैसे कमाएँ:</strong> क्विज़ मुकाबला जीतें (+50 XP), रोज़ाना क्लास हाज़िरी (+20 XP)। उस्ताद की तरफ़ से उम्दा मुताला पर सीधे ⭐ स्टार व लक़ब मिलता है।
-        </p>
-        <p style="font-size:0.75rem; color:#ef4444; line-height:1.5;">
-          <strong>⚠️ नियम:</strong> ग़ैर-दरसी बात पर स्ट्राइक लगेगी। 3 स्ट्राइक पर अकाउंट ब्लॉक हो जाएगा।
-        </p>
-      </div>
-    `;
-    document.body.appendChild(g);
-  }
-
-  // 4. 5-बटन ड्रैगेबल विजेट
+  // 3. 5-बटन ड्रैगेबल डॉक बनाना
   function buildDock() {
     if (document.getElementById('suhail-5btn-dock')) return;
+
     var dock = document.createElement('div');
     dock.id = 'suhail-5btn-dock';
     dock.innerHTML = `
       <div class="suhail-drag-handle" id="dock-grip"><i class="fa-solid fa-grip-vertical"></i></div>
-      <button class="suhail-btn sbtn-old30" id="dock-btn-30"><i class="fa-solid fa-book"></i> 30 AI</button>
-      <a href="/awam.html" class="suhail-btn sbtn-awam"><i class="fa-solid fa-layer-group"></i> 40 आवामी</a>
-      <button class="suhail-btn sbtn-edu" onclick="alert('30 इल्मी टूल्स सक्रिय हैं!')"><i class="fa-solid fa-graduation-cap"></i> 30 इल्मी</button>
-      <button class="suhail-btn sbtn-info" onclick="document.getElementById('suhail-guide-modal').style.display='flex'"><i class="fa-solid fa-circle-info"></i> गाइड</button>
-      <a href="/admin.html" class="suhail-btn sbtn-admin" id="dock-admin-link"><i class="fa-solid fa-shield-halved"></i> एडमिन</a>
+      <a href="/awam.html" class="suhail-mini-btn btn-m-old30"><i class="fa-solid fa-book"></i> 30 AI</a>
+      <a href="/awam.html" class="suhail-mini-btn btn-m-awam"><i class="fa-solid fa-layer-group"></i> 40 आवामी</a>
+      <button class="suhail-mini-btn btn-m-edu" onclick="alert('30 इल्मी टूल्स सक्रिय हैं!')"><i class="fa-solid fa-graduation-cap"></i> 30 इल्मी</button>
+      <button class="suhail-mini-btn btn-m-info" onclick="alert('📖 जमात ऊला: क्विज़ से XP कमाएँ। 3 स्ट्राइक पर आईडी ब्लॉक होगी।')"><i class="fa-solid fa-circle-info"></i> गाइड</button>
+      <a href="/admin.html" class="suhail-mini-btn btn-m-admin" id="dock-admin-link"><i class="fa-solid fa-shield-halved"></i> एडमिन</a>
     `;
     document.body.appendChild(dock);
 
     // एडमिन बटन सिर्फ़ रोल 7877 के लिए
-    var bodyText = document.body.innerText || '';
-    if (bodyText.indexOf('7877') !== -1 || localStorage.getItem('roll') === '7877') {
-      var ab = document.getElementById('dock-admin-link');
-      if (ab) ab.style.display = 'flex';
+    var isOwner = (document.body.innerText || '').indexOf('7877') !== -1 || localStorage.getItem('roll') === '7877';
+    if (isOwner) {
+      var aBtn = document.getElementById('dock-admin-link');
+      if (aBtn) aBtn.style.display = 'flex';
     }
 
-    // टच ड्रैग
+    // टच ड्रैग लॉजिक
     var isDragging = false, startX, startY, initLeft, initTop;
     dock.addEventListener('touchstart', function(e) {
       if (e.target.closest('button') || e.target.closest('a')) return;
@@ -5494,114 +5525,120 @@ window.finishQuizRound = function(msg) {
     document.addEventListener('touchend', function() { isDragging = false; });
   }
 
-  // 5. 24 घंटे का स्टार नोटिस
-  function syncNotice(users) {
-    var notice = document.getElementById('suhail-star-emergency');
-    if (!notice) {
-      notice = document.createElement('div');
-      notice.id = 'suhail-star-emergency';
-      notice.innerHTML = `
-        <div style="font-size:1.2rem;">⭐</div>
-        <div style="flex:1;">
-          <div style="color:#fde68a; font-size:0.75rem; font-weight:800; margin-bottom:2px;">📢 इल्मी एज़ाज़ — 24 घंटे का नोटिस</div>
-          <div id="suhail-star-msg" style="font-size:0.7rem; line-height:1.35;"></div>
-        </div>
-      `;
-      var chatArea = document.querySelector('#chats') || document.querySelector('.chat-list') || document.body;
-      chatArea.prepend(notice);
-    }
+  // 4. खोलते ही शाही इल्मी नोटिस का पॉपअप
+  function showAwardNotice(users) {
+    if (document.getElementById('suhail-notice-modal')) return;
 
     var starUser = null;
     var list = Object.values(users || {});
     for (var i = 0; i < list.length; i++) {
-      if (list[i] && list[i].star) { starUser = list[i]; break; }
+      if (list[i] && (list[i].star || list[i].badge)) {
+        starUser = list[i];
+        break;
+      }
     }
 
-    if (starUser) {
-      var roll = starUser.roll || starUser.rollNumber || '';
-      var name = starUser.name || 'तालिब';
-      var badge = starUser.badge || 'मुमताज़ तालिब-ए-इल्म 🌟';
-      document.getElementById('suhail-star-msg').innerHTML = 'मुबारकबाद! रोल <strong>' + roll + '</strong> (' + name + ') को उस्ताद की तरफ़ से <strong>⭐ ' + badge + '</strong> अता किया गया है।';
-      notice.style.display = 'flex';
-    } else {
-      notice.style.display = 'none';
-    }
+    if (!starUser) return;
+
+    var roll = starUser.roll || starUser.rollNumber || '';
+    var name = starUser.name || 'तालिब-ए-इल्म';
+    var badge = starUser.badge || 'मुमताज़ तालिब-ए-इल्म 🌟';
+
+    var modal = document.createElement('div');
+    modal.id = 'suhail-notice-modal';
+    modal.innerHTML = `
+      <div class="suhail-notice-box">
+        <div style="font-size:2.2rem; margin-bottom:6px;">🌟</div>
+        <h3 style="color:#fde68a; font-size:1.05rem; margin-bottom:8px;">📢 उस्ताद की जानिब से शाही इल्मी नोटिस</h3>
+        <p style="font-size:0.8rem; color:#e9edef; line-height:1.5;">
+          मुबारकबाद! मोहतमिम व उस्ताद (Suhail Husain) की तरफ़ से:<br>
+          <strong>${name}</strong> (रोल नंबर: <strong>${roll}</strong>)
+        </p>
+        <div class="notice-badge-pill">⭐ ${badge}</div>
+        <p style="font-size:0.75rem; color:#8696a0;">उम्दा पढ़ाई और बेहतरीन तालीमी लगन पर यह एज़ाज़ अता किया गया है।</p>
+        <button class="btn-notice-close" onclick="document.getElementById('suhail-notice-modal').style.display='none'">माशाअल्लाह (क़बूल करें)</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.style.display = 'flex';
   }
 
-  // 6. 4 खंभों वाला लीडरबोर्ड
-  function renderPillars(users) {
-    var board = document.getElementById('suhail-pillar-leaderboard');
+  // 5. नीचे खाली स्पेस में: तफ़सीली एज़ाज़ात बोर्ड (विस्तार से सूची)
+  function renderDetailedAwardsBoard(users) {
+    var board = document.getElementById('suhail-awards-board');
     if (!board) {
       board = document.createElement('div');
-      board.id = 'suhail-pillar-leaderboard';
-      board.innerHTML = `
-        <div class="suhail-pillar-header">
-          <div><i class="fa-solid fa-chart-simple" style="color:#eab308; margin-right:5px;"></i> तालीमी तरक़्क़ी व इल्मी मुक़ाबला</div>
-          <div style="color:#8696a0; font-size:0.6rem;">LIVE XP ⚡</div>
-        </div>
-        <div class="suhail-pillar-chart">
-          <svg class="suhail-growth-svg" viewBox="0 0 300 110" preserveAspectRatio="none">
-            <path d="M 15,98 Q 100,88 155,60 Q 215,34 278,10" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-            <polyline points="266,10 278,10 278,23" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-          </svg>
-          <div class="suhail-pillar-stage" id="suhail-pillar-stage"></div>
-        </div>
-      `;
+      board.id = 'suhail-awards-board';
       var chatArea = document.querySelector('#chats') || document.querySelector('.chat-list') || document.body;
       chatArea.appendChild(board);
     }
 
-    var sorted = Object.values(users || {}).sort(function(a, b) {
-      return (Number(b.xp) || 0) - (Number(a.xp) || 0);
+    var list = Object.values(users || {});
+    var awarded = list.filter(function(u) {
+      return u && (u.star || u.badge || (parseInt(u.xp) > 0));
     });
-    var topFour = sorted.slice(0, 4).reverse();
-    var heights = [40, 70, 100, 132];
 
-    var stage = document.getElementById('suhail-pillar-stage');
-    if (!stage) return;
-    stage.innerHTML = '';
+    awarded.sort(function(a, b) {
+      return (parseInt(b.xp) || 0) - (parseInt(a.xp) || 0);
+    });
 
-    for (var i = 0; i < topFour.length; i++) {
-      var st = topFour[i];
-      var col = document.createElement('div');
-      col.className = 'suhail-pillar-column';
-      col.innerHTML = `
-        <div class="suhail-pillar-details">
-          <div class="suhail-pillar-xp">⚡ ` + (Number(st.xp) || 0) + `</div>
-          <div class="suhail-pillar-name">` + (st.name || 'तालिब') + `</div>
-          <div class="suhail-pillar-roll">` + (st.roll ? 'रोल: ' + st.roll : '') + `</div>
+    var rowsHtml = '';
+    awarded.forEach(function(st) {
+      var roll = st.roll || st.rollNumber || '';
+      var name = st.name || 'तालिब';
+      var badge = st.badge || (st.star ? 'इल्मी स्टार ⭐' : 'उम्दा मुताला');
+      var xp = st.xp || 0;
+
+      rowsHtml += `
+        <div class="award-student-card">
+          <div class="award-stu-info">
+            <h4>${name} (रोल: ${roll})</h4>
+            <span>कुल इल्मी तरक़्क़ी: ⚡ <strong>${xp} XP</strong></span>
+          </div>
+          <div class="award-tag">⭐ ${badge}</div>
         </div>
-        <div class="suhail-pillar-bar" style="height:` + (heights[i] || 40) + `px;"></div>
-        <div style="color:#8696a0; font-size:0.55rem; margin-top:3px;">Rank ` + (4 - i) + `</div>
       `;
-      stage.appendChild(col);
-    }
+    });
+
+    board.innerHTML = `
+      <div class="awards-header">
+        <div class="awards-title">
+          <i class="fa-solid fa-award"></i> तालीमी एज़ाज़ात व सनद बोर्ड
+        </div>
+        <span style="font-size:0.68rem; color:#8696a0;">उस्ताद की सनद</span>
+      </div>
+      <div style="font-size:0.72rem; color:#8696a0; margin-bottom:10px;">
+        उस्ताद (Suhail Husain) की जानिब से नवाज़े गए मुमताज़ तलबा की मुकम्मल तफ़सील:
+      </div>
+      <div>${rowsHtml || '<p style="font-size:0.75rem; color:#8696a0; text-align:center;">अभी कोई नया एज़ाज़ जारी नहीं हुआ है।</p>'}</div>
+    `;
   }
 
-  // रन
-  function boot() {
-    purgeOldButtons();
-    buildGuide();
+  // 6. इंजन चालू करना
+  function startEngine() {
+    killOldCornerButtons();
     buildDock();
 
     var db = window.db || (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length ? firebase.database() : null);
     if (db) {
       db.ref('users').on('value', function(snap) {
         var users = snap.val() || {};
-        syncNotice(users);
-        renderPillars(users);
+        showAwardNotice(users);
+        renderDetailedAwardsBoard(users);
       });
     }
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
+    document.addEventListener('DOMContentLoaded', startEngine);
   } else {
-    boot();
+    startEngine();
   }
-  setInterval(purgeOldButtons, 1200);
+
+  // 1 सेकंड बाद पुराने बटनों को पक्का साफ़ करना
+  setInterval(killOldCornerButtons, 1000);
 })();
-</script>
+  </script>
   
 </body>
 </html>
