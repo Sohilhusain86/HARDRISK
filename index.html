@@ -5563,6 +5563,319 @@ window.finishQuizRound = function(msg) {
 </script>
 
   <script src="/suhail-ai.js"></script>
+
+  <!-- ========================================== -->
+<!-- 🚀 सोहेल एआई: 5-बटन स्लिम डॉक + 24h नोटिस + खंभे -->
+<!-- ========================================== -->
+<script>
+(function () {
+  "use strict";
+
+  // 1. स्टाइलिंग (सुपर स्लिम कॉम्पैक्ट डॉक)
+  const style = document.createElement("style");
+  style.textContent = `
+    /* कोने वाले दोनों पुराने बटनों को ज़बरदस्ती छिपाना */
+    body > div:has(> a[href*="admin"]),
+    body > div:has(> button[onclick*="admin"]),
+    div[style*="position: fixed"][style*="bottom:"] {
+      display: none !important;
+    }
+
+    /* 🎮 5-बटन ड्रैगेबल स्लिम विजेट (स्क्रीन नहीं घेरेगा) */
+    #suhail-5btn-dock {
+      position: fixed;
+      bottom: 20px;
+      right: 10px;
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(17, 27, 33, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 25px;
+      padding: 3px 6px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      touch-action: none;
+      user-select: none;
+      max-width: 95vw;
+    }
+    .suhail-drag-handle {
+      color: #8696a0;
+      font-size: 0.8rem;
+      cursor: grab;
+      padding: 0 4px;
+      display: flex;
+      align-items: center;
+    }
+    .suhail-mini-btn {
+      padding: 4px 7px;
+      border-radius: 12px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      text-decoration: none;
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .suhail-mini-btn:active { transform: scale(0.92); }
+    .btn-m-old30  { background: #00a884; color: #fff; }
+    .btn-m-awam   { background: rgba(0, 168, 132, 0.2); color: #00a884; border: 1px solid rgba(0,168,132,0.4); }
+    .btn-m-edu    { background: #182229; color: #3b82f6; border: 1px solid rgba(59,130,246,0.4); }
+    .btn-m-info   { background: rgba(234, 179, 8, 0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.35); }
+    .btn-m-admin  { background: #202c33; color: #eab308; border: 1px solid #eab308; display: none; }
+
+    /* 📢 24 घंटे का स्टार इमरजेंसी नोटिस */
+    #suhail-star-emergency {
+      width: calc(100% - 24px);
+      margin: 8px 12px;
+      padding: 9px 12px;
+      display: none;
+      align-items: flex-start;
+      gap: 8px;
+      background: linear-gradient(135deg, #211d0c 0%, #29230c 50%, #17140a 100%);
+      border: 1px solid rgba(234,179,8,0.55);
+      border-left: 4px solid #eab308;
+      border-radius: 9px;
+      color: #fef3c7;
+      box-sizing: border-box;
+    }
+
+    /* 📊 4 खंभों वाला लीडरबोर्ड */
+    #suhail-pillar-leaderboard {
+      width: calc(100% - 24px);
+      box-sizing: border-box;
+      margin: 15px 12px 80px;
+      padding: 14px 12px 10px;
+      background: radial-gradient(circle at 50% 120%, #1d2930 0%, #0b141a 70%);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    }
+    .suhail-pillar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #e9edef;
+    }
+    .suhail-pillar-chart { position: relative; height: 160px; }
+    .suhail-growth-svg { position: absolute; left: 3%; top: 8px; width: 94%; height: 100px; z-index: 1; pointer-events: none; opacity: 0.8; }
+    .suhail-pillar-stage { position: absolute; left: 0; right: 0; bottom: 0; height: 145px; display: flex; align-items: flex-end; justify-content: space-around; border-bottom: 1px solid rgba(255,255,255,0.15); z-index: 2; }
+    .suhail-pillar-column { width: 22%; max-width: 60px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+    .suhail-pillar-details { width: 100%; text-align: center; margin-bottom: 4px; line-height: 1.15; }
+    .suhail-pillar-xp { color: #eab308; font-size: 0.68rem; font-weight: 900; }
+    .suhail-pillar-name { color: #e9edef; font-size: 0.62rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .suhail-pillar-roll { color: #8696a0; font-size: 0.55rem; }
+    .suhail-pillar-bar {
+      width: 74%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.06) 100%);
+      border-top: 2px solid #fff;
+      border-radius: 4px 4px 0 0;
+      box-shadow: 0 0 12px rgba(255,255,255,0.12);
+      transition: height 0.7s ease;
+    }
+    #suhail-guide-modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000000; align-items: center; justify-content: center; padding: 14px;
+    }
+    .suhail-modal-box {
+      background: #111b21; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; width: 100%; max-width: 450px; color: #e9edef; padding: 16px;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // 2. कोने के पुराने बटनों को छिपाना
+  function hideOldButtons() {
+    document.querySelectorAll("button, a, div").forEach(el => {
+      if (el.closest("#suhail-5btn-dock")) return;
+      const t = (el.innerText || "").trim();
+      if (t === "30 AI खिदमात" || t === "सुपर एडमिन") {
+        const p = el.closest('div[style*="fixed"]') || el;
+        p.style.setProperty("display", "none", "important");
+      }
+    });
+  }
+
+  // 3. रहनुमाई मॉडल
+  function makeGuideModal() {
+    if (document.getElementById("suhail-guide-modal")) return;
+    const g = document.createElement("div");
+    g.id = "suhail-guide-modal";
+    g.innerHTML = `
+      <div class="suhail-modal-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; margin-bottom:10px;">
+          <h3 style="color:#eab308; font-size:0.95rem;">📖 जमात ऊला - इल्मी रहनुमाई</h3>
+          <button onclick="document.getElementById('suhail-guide-modal').style.display='none'" style="background:none; border:none; color:#8696a0; font-size:1.2rem; cursor:pointer;">✕</button>
+        </div>
+        <p style="font-size:0.75rem; color:#8696a0; line-height:1.5; margin-bottom:8px;">
+          <strong>⚡ XP कैसे कमाएँ:</strong> क्विज़ मुकाबला जीतें (+50 XP), रोज़ाना क्लास हाज़िरी (+20 XP)। उस्ताद की तरफ़ से उम्दा मुताला पर सीधे ⭐ स्टार व लक़ब मिलता है।
+        </p>
+        <p style="font-size:0.75rem; color:#ef4444; line-height:1.5;">
+          <strong>⚠️ नियम:</strong> ग़ैर-दरसी बात पर स्ट्राइक लगेगी। 3 स्ट्राइक पर अकाउंट ब्लॉक हो जाएगा।
+        </p>
+      </div>
+    `;
+    document.body.appendChild(g);
+  }
+
+  // 4. 5-बटन ड्रैगेबल विजेट
+  function createDock() {
+    if (document.getElementById("suhail-5btn-dock")) return;
+
+    const dock = document.createElement("div");
+    dock.id = "suhail-5btn-dock";
+    dock.innerHTML = `
+      <div class="suhail-drag-handle" id="dock-grip"><i class="fa-solid fa-grip-vertical"></i></div>
+      <button class="suhail-mini-btn btn-m-old30" id="dock-btn-30"><i class="fa-solid fa-book"></i> 30 AI</button>
+      <a href="/awam.html" class="suhail-mini-btn btn-m-awam"><i class="fa-solid fa-layer-group"></i> 40 आवामी</a>
+      <button class="suhail-mini-btn btn-m-edu" onclick="alert('30 इल्मी टूल्स: नह्व, सर्फ़, गर्दान व तश्कील टूल्स सक्रिय हैं!')"><i class="fa-solid fa-graduation-cap"></i> 30 इल्मी</button>
+      <button class="suhail-mini-btn btn-m-info" onclick="document.getElementById('suhail-guide-modal').style.display='flex'"><i class="fa-solid fa-circle-info"></i> गाइड</button>
+      <a href="/admin.html" class="suhail-mini-btn btn-m-admin" id="dock-admin-link"><i class="fa-solid fa-shield-halved"></i> एडमिन</a>
+    `;
+    document.body.appendChild(dock);
+
+    // सिर्फ़ एडमिन (रोल 7877 / आपके लिए) एडमिन बटन दिखाना
+    const isOwner = document.body.innerText.includes("7877") || localStorage.getItem("roll") === "7877";
+    if (isOwner) {
+      const aBtn = document.getElementById("dock-admin-link");
+      if (aBtn) aBtn.style.display = "flex";
+    }
+
+    // टच ड्रैग लॉजिक
+    let isDragging = false, startX, startY, initLeft, initTop;
+    dock.addEventListener("touchstart", (e) => {
+      if (e.target.closest("button") || e.target.closest("a")) return;
+      isDragging = true;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      const rect = dock.getBoundingClientRect();
+      initLeft = rect.left;
+      initTop = rect.top;
+      dock.style.bottom = "auto"; dock.style.right = "auto";
+      dock.style.left = initLeft + "px"; dock.style.top = initTop + "px";
+    }, { passive: true });
+
+    document.addEventListener("touchmove", (e) => {
+      if (!isDragging) return;
+      const dx = e.touches[0].clientX - startX;
+      const dy = e.touches[0].clientY - startY;
+      dock.style.left = Math.max(5, Math.min(window.innerWidth - dock.offsetWidth - 5, initLeft + dx)) + "px";
+      dock.style.top = Math.max(5, Math.min(window.innerHeight - dock.offsetHeight - 5, initTop + dy)) + "px";
+    }, { passive: true });
+
+    document.addEventListener("touchend", () => isDragging = false);
+  }
+
+  // 5. 24 घंटे का स्टार नोटिस
+  function syncNotice(users) {
+    let notice = document.getElementById("suhail-star-emergency");
+    if (!notice) {
+      notice = document.createElement("div");
+      notice.id = "suhail-star-emergency";
+      notice.innerHTML = `
+        <div style="font-size:1.2rem;">⭐</div>
+        <div style="flex:1;">
+          <div style="color:#fde68a; font-size:0.75rem; font-weight:800; margin-bottom:2px;">📢 इल्मी एज़ाज़ — 24 घंटे का नोटिस</div>
+          <div id="suhail-star-msg" style="font-size:0.7rem; line-height:1.35;"></div>
+        </div>
+      `;
+      const chatArea = document.querySelector("#chats") || document.querySelector(".chat-list") || document.body;
+      chatArea.prepend(notice);
+    }
+
+    let starUser = null;
+    Object.values(users || {}).forEach(u => {
+      if (u && u.star) starUser = u;
+    });
+
+    if (starUser) {
+      const roll = starUser.roll || starUser.rollNumber || "";
+      const name = starUser.name || "तालिब";
+      const badge = starUser.badge || "मुमताज़ तालिब-ए-इल्म 🌟";
+      document.getElementById("suhail-star-msg").innerHTML = `मुबारकबाद! रोल <strong>${roll}</strong> (${name}) को उस्ताद की तरफ़ से <strong>⭐ ${badge}</strong> अता किया गया है।`;
+      notice.style.display = "flex";
+    } else {
+      notice.style.display = "none";
+    }
+  }
+
+  // 6. 4 खंभों वाला लीडरबोर्ड
+  function renderPillars(users) {
+    let board = document.getElementById("suhail-pillar-leaderboard");
+    if (!board) {
+      board = document.createElement("div");
+      board.id = "suhail-pillar-leaderboard";
+      board.innerHTML = `
+        <div class="suhail-pillar-header">
+          <div><i class="fa-solid fa-chart-simple" style="color:#eab308; margin-right:5px;"></i> तालीमी तरक़्क़ी व इल्मी मुक़ाबला</div>
+          <div style="color:#8696a0; font-size:0.6rem;">LIVE XP ⚡</div>
+        </div>
+        <div class="suhail-pillar-chart">
+          <svg class="suhail-growth-svg" viewBox="0 0 300 110" preserveAspectRatio="none">
+            <path d="M 15,98 Q 100,88 155,60 Q 215,34 278,10" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+            <polyline points="266,10 278,10 278,23" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+          <div class="suhail-pillar-stage" id="suhail-pillar-stage"></div>
+        </div>
+      `;
+      const chatArea = document.querySelector("#chats") || document.querySelector(".chat-list") || document.body;
+      chatArea.appendChild(board);
+    }
+
+    const sorted = Object.values(users || {}).sort((a, b) => (Number(b.xp) || 0) - (Number(a.xp) || 0));
+    const topFour = sorted.slice(0, 4).reverse();
+    const heights = [40, 70, 100, 132];
+
+    const stage = document.getElementById("suhail-pillar-stage");
+    if (!stage) return;
+    stage.innerHTML = "";
+
+    topFour.forEach((st, idx) => {
+      const col = document.createElement("div");
+      col.className = "suhail-pillar-column";
+      col.innerHTML = `
+        <div class="suhail-pillar-details">
+          <div class="suhail-pillar-xp">⚡ ${Number(st.xp) || 0}</div>
+          <div class="suhail-pillar-name">${st.name || "तालिब"}</div>
+          <div class="suhail-pillar-roll">${st.roll ? "रोल: " + st.roll : ""}</div>
+        </div>
+        <div class="suhail-pillar-bar" style="height:${heights[idx] || 40}px;"></div>
+        <div style="color:#8696a0; font-size:0.55rem; margin-top:3px;">Rank ${4 - idx}</div>
+      `;
+      stage.appendChild(col);
+    });
+  }
+
+  function start() {
+    hideOldButtons();
+    makeGuideModal();
+    createDock();
+
+    const db = window.db || (typeof firebase !== "undefined" && firebase.apps?.length ? firebase.database() : null);
+    if (db) {
+      db.ref("users").on("value", (snap) => {
+        const users = snap.val() || {};
+        syncNotice(users);
+        renderPillars(users);
+      });
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start);
+  } else {
+    start();
+  }
+  setInterval(hideOldButtons, 1500);
+})();
+</script>
   
 </body>
 </html>
