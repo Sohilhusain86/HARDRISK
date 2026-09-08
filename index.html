@@ -5298,6 +5298,270 @@ window.finishQuizRound = function(msg) {
     }
   }
 </script>
+
+  <!-- ========================================== -->
+<!-- 🚀 ऑल-इन-वन अपग्रेड: बैज, खंभों वाला लीडरबोर्ड व रहनुमाई -->
+<!-- ========================================== -->
+
+<!-- 1. रहनुमाई (About) पॉपअप मॉडल -->
+<div id="about-guide-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; align-items:center; justify-content:center; padding:15px;">
+  <div style="background:#111b21; border:1px solid rgba(255,255,255,0.12); border-radius:12px; width:100%; max-width:480px; max-height:85vh; overflow-y:auto; color:#e9edef; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.8);">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; margin-bottom:15px;">
+      <h3 style="color:#eab308; font-size:1.05rem; display:flex; align-items:center; gap:8px;">
+        <i class="fa-solid fa-circle-info"></i> जमात ऊला - इल्मी रहनुमाई
+      </h3>
+      <button onclick="document.getElementById('about-guide-modal').style.display='none'" style="background:none; border:none; color:#8696a0; font-size:1.3rem; cursor:pointer;">✕</button>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <h4 style="color:#00a884; font-size:0.9rem; margin-bottom:4px;">📖 हमारे बारे में</h4>
+      <p style="font-size:0.8rem; color:#8696a0; line-height:1.5;">
+        यह प्लेटफ़ॉर्म जमात ऊला के तलबा के लिए तैयार किया गया डिजिटल क्लासरूम है, जहाँ नह्व, सर्फ़ और दरसी किताबों को आसान बनाने के लिए 70 सुपर-फास्ट AI टूल्स और लाइव मुकाबला मौजूद है।
+      </p>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <h4 style="color:#eab308; font-size:0.9rem; margin-bottom:4px;">⚡ XP कैसे कमाएँ और रैंक कैसे बढ़ाएँ?</h4>
+      <ul style="font-size:0.8rem; color:#8696a0; padding-left:18px; line-height:1.6;">
+        <li><strong>क्विज़ मुकाबला:</strong> सही जवाब पर <strong>+10 से +50 XP</strong> मिलते हैं।</li>
+        <li><strong>हाज़िरी व मुताला:</strong> रोज़ाना क्लासरूम में सक्रिय रहने पर <strong>+20 XP</strong>।</li>
+        <li><strong>उस्ताद का इनाम:</strong> उम्दा कारकर्दगी पर एडमिन सीधे <strong>⭐ स्टार व इल्मी लक़ब</strong> अता करते हैं।</li>
+      </ul>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <h4 style="color:#3b82f6; font-size:0.9rem; margin-bottom:4px;">🎖️ रैंक व ख़ास फीचर्स (Unlocked Perks)</h4>
+      <ul style="font-size:0.8rem; color:#8696a0; padding-left:18px; line-height:1.6;">
+        <li><strong>तालिब-ए-मुब्तदी (0-99 XP):</strong> बुनियादी चैट व 15-सेकंड रैपिड क्विज़।</li>
+        <li><strong>तालिब-ए-मुस्तइद (100-299 XP):</strong> AI Magic (इमला सुधारक) अनलॉक।</li>
+        <li><strong>माहिर-ए-नह्व (300-599 XP):</strong> Cerebras 12-लेवल इम्तिहान व वॉइस नोट्स अनलॉक।</li>
+        <li><strong>सद्र-ए-फ़ज़ीलत (600+ XP):</strong> वीआईपी गोल्ड प्रोफाइल + सभी टूल्स की प्रायोरिटी स्पीड।</li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 style="color:#ef4444; font-size:0.9rem; margin-bottom:4px;">⚠️ उसूल व स्ट्राइक</h4>
+      <p style="font-size:0.8rem; color:#8696a0; line-height:1.5;">
+        ग़ैर-दरसी बातचीत या स्पैम पर <strong>स्ट्राइक</strong> दी जाएगी। <strong>3 स्ट्राइक</strong> पर आईडी खुद-ब-खुद म्यूट व ब्लॉक हो जाएगी।
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- 2. स्टाइलिंग (खंभों वाला लीडरबोर्ड और फ्लोटिंग बटन) -->
+<style>
+  /* फ्लोटिंग अबाउट बटन */
+  .btn-about-floating {
+    position: fixed;
+    top: 14px;
+    right: 75px;
+    background: #202c33;
+    color: #eab308;
+    border: 1px solid rgba(234, 179, 8, 0.4);
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* खंभों वाला लीडरबोर्ड कार्ड (तीसरी इमेज जैसा) */
+  .pillar-chart-card {
+    background: radial-gradient(circle at 50% 100%, #1a2730 0%, #0b141a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 20px 14px 15px;
+    margin: 25px 12px 90px;
+    position: relative;
+    overflow: hidden;
+  }
+  .pillar-chart-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #e9edef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+  }
+  .pillar-chart-title span { color: #8696a0; font-size: 0.72rem; font-weight: normal; }
+
+  /* बैकग्राउंड ग्रोथ एरो कर्व (Image 3 जैसा तीर) */
+  .growth-curve-svg {
+    position: absolute;
+    top: 50px;
+    left: 20px;
+    right: 20px;
+    height: 120px;
+    width: calc(100% - 40px);
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.85;
+  }
+
+  .pillars-stage {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 180px;
+    position: relative;
+    z-index: 2;
+    padding: 0 10px 4px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+  }
+  .pillar-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    max-width: 75px;
+  }
+  .pillar-info {
+    text-align: center;
+    font-size: 0.68rem;
+    color: #e9edef;
+    margin-bottom: 8px;
+    width: 100%;
+    line-height: 1.25;
+  }
+  .pillar-info .p-name { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pillar-info .p-roll { color: #8696a0; font-size: 0.62rem; }
+  .pillar-info .p-xp { color: #eab308; font-weight: 800; font-size: 0.75rem; margin-bottom: 2px; }
+
+  .pillar-bar {
+    width: 82%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.08) 100%);
+    border-top: 2px solid #ffffff;
+    border-radius: 6px 6px 0 0;
+    box-shadow: 0 -2px 14px rgba(255, 255, 255, 0.12);
+    transition: height 0.8s ease-in-out;
+  }
+</style>
+
+<!-- 3. रनटाइम ऑटो-इंजेक्टर स्क्रिप्ट -->
+<script>
+(function() {
+  // 1. हेडर में 'रहनुमाई' बटन ऑटो-इन्जेक्ट करें
+  if (!document.getElementById('btn-about-trigger')) {
+    const btn = document.createElement('button');
+    btn.id = 'btn-about-trigger';
+    btn.className = 'btn-about-floating';
+    btn.innerHTML = 'ℹ️ रहनुमाई';
+    btn.onclick = () => { document.getElementById('about-guide-modal').style.display = 'flex'; };
+    document.body.appendChild(btn);
+  }
+
+  // 2. खंभों वाले लीडरबोर्ड का स्ट्रक्चर स्क्रीन के नीचे जोड़ें
+  function ensurePillarsContainer() {
+    if (document.getElementById('pillar-leaderboard-section')) return;
+    const card = document.createElement('div');
+    card.id = 'pillar-leaderboard-section';
+    card.className = 'pillar-chart-card';
+    card.innerHTML = `
+      <div class="pillar-chart-title">
+        <div><i class="fa-solid fa-chart-line" style="color:#00a884; margin-right:6px;"></i> तालीमी तरक़्क़ी (Top Ranks)</div>
+        <span>Live Growth ⚡</span>
+      </div>
+      <!-- तीर कर्व (SVG) -->
+      <svg class="growth-curve-svg" viewBox="0 0 300 120" preserveAspectRatio="none">
+        <path d="M 20,110 Q 150,85 280,15" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+        <polyline points="270,15 280,15 280,25" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <div class="pillars-stage" id="live-pillars-box">
+        <!-- 4 खंभे डायनामिक भरेंगे -->
+      </div>
+    `;
+
+    // इसे चैट लिस्ट या मुख्य कंटेंट के नीचे जोड़ें
+    const target = document.querySelector('.chat-list') || document.querySelector('#chats') || document.body;
+    target.parentNode.insertBefore(card, target.nextSibling);
+  }
+
+  // 3. डेटाबेस लिस्टनर (डेटाबेस से स्टार/बैज और खंभे ऑटो-रेंडर)
+  function attachDatabaseSync() {
+    const db = window.db || (typeof firebase !== 'undefined' && firebase.apps.length ? firebase.database() : null);
+    if (!db) {
+      setTimeout(attachDatabaseSync, 1000);
+      return;
+    }
+
+    db.ref('users').on('value', snap => {
+      const usersData = snap.val() || {};
+      const usersArray = [];
+
+      ensurePillarsContainer();
+
+      // (A) स्क्रीन पर मौजूद छात्रों के नाम में स्टार और बैज ऑटो-इन्जेक्ट करें
+      snap.forEach(child => {
+        const u = child.val() || {};
+        const roll = String(u.roll || u.rollNumber || child.key).trim();
+        usersArray.push({ ...u, rollKey: roll });
+
+        if (u.star || u.badge) {
+          // स्क्रीन पर इस रोल नंबर वाले सभी एलिमेंट्स को ढूँढें
+          document.querySelectorAll('*').forEach(el => {
+            if (el.children.length === 0 && el.innerText && el.innerText.includes(`रोल: ${roll}`)) {
+              const parent = el.closest('div') || el;
+              if (!parent.getAttribute('data-badge-applied')) {
+                parent.setAttribute('data-badge-applied', 'true');
+                const starHtml = u.star ? '<span style="color:#eab308; margin-right:4px;">⭐</span>' : '';
+                const badgeHtml = u.badge ? `<span style="background:rgba(234,179,8,0.18); color:#eab308; border:1px solid #eab308; padding:1px 6px; border-radius:8px; font-size:0.72rem; margin-right:4px; font-weight:bold;">${u.badge}</span>` : '';
+                el.innerHTML = `${starHtml}${badgeHtml}${el.innerHTML}`;
+              }
+            }
+          });
+        }
+      });
+
+      // (B) खंभों का निर्माण (तीसरी इमेज के अनुसार चढ़ते क्रम में: 4 -> 3 -> 2 -> 1)
+      const sorted = usersArray.sort((a, b) => (parseInt(b.xp) || 0) - (parseInt(a.xp) || 0));
+      const top4 = [sorted[3], sorted[2], sorted[1], sorted[0]];
+      const heights = ['42px', '75px', '112px', '152px']; // 4 चढ़ते खंभे
+
+      const stage = document.getElementById('live-pillars-box');
+      if (stage) {
+        stage.innerHTML = '';
+        top4.forEach((stu, idx) => {
+          const name = stu ? (stu.name || 'तालिब') : '-';
+          const roll = stu ? stu.rollKey : '';
+          const xp = stu ? (stu.xp || 0) : 0;
+          stage.innerHTML += `
+            <div class="pillar-col">
+              <div class="pillar-info">
+                <div class="p-xp">⚡ ${xp}</div>
+                <div class="p-name">${name}</div>
+                <div class="p-roll">${roll ? 'रोल: ' + roll : ''}</div>
+              </div>
+              <div class="pillar-bar" style="height:${stu ? heights[idx] : '15px'};"></div>
+            </div>
+          `;
+        });
+      }
+    });
+  }
+
+  // 4. रैंक के अनुसार फ़ीचर लॉक गेटकीपर
+  window.verifyRankAccess = function(toolName, minXP) {
+    const myXP = window.currentUserXP || 0; // वर्तमान छात्र की XP
+    if (myXP < minXP) {
+      alert(`🔒 यह फ़ीचर लॉक है!\nइसे इस्तेमाल करने के लिए न्यूनतम ${minXP} XP की ज़रूरत है। (आपकी मौजूदा XP: ${myXP})`);
+      return false;
+    }
+    return true;
+  };
+
+  // स्टार्ट
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachDatabaseSync);
+  } else {
+    attachDatabaseSync();
+  }
+})();
+</script>
   
 </body>
 </html>
