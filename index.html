@@ -5299,25 +5299,25 @@ window.finishQuizRound = function(msg) {
   }
 </script>
 
-  <!-- ========================================== -->
-<!-- 🚀 सोहेल एआई: मुकम्मल 5-बटन डॉक, खंभे व 24h नोटिस -->
-<!-- ========================================== -->
-  
 <script>
 (function () {
   "use strict";
 
-  // 1. कोने वाले दोनों पुराने बटनों को जड़ से डिलीट करना
-  function killOldCornerButtons() {
-    var all = document.querySelectorAll('button, a, div');
+  // 1. बाएँ कोने वाले हरे बटन (30 AI) और पुराने एडमिन बटन को जड़ से डिलीट करना
+  function deleteOldCornerButtons() {
+    var dock = document.getElementById('suhail-5btn-dock');
+    var all = document.querySelectorAll('button, a, div, span');
     for (var i = 0; i < all.length; i++) {
       var el = all[i];
-      if (el.closest && el.closest('#suhail-5btn-dock')) continue;
+      if (dock && dock.contains(el)) continue;
+      if (el.id && el.id.indexOf('suhail-') === 0) continue;
+
       var txt = (el.innerText || el.textContent || '').trim();
-      if (txt === '30 AI खिदमात' || (txt.indexOf('सुपर एडमिन') !== -1 && txt.indexOf('कंट्रोल') === -1)) {
-        var parent = el.parentElement;
-        if (parent && parent.children.length === 1 && parent !== document.body) {
-          parent.remove();
+      // बाएँ कोने वाला '30 AI खिदमात' या दाएँ कोने वाला 'सुपर एडमिन'
+      if (txt.indexOf('30 AI') !== -1 || txt.indexOf('खिदमात') !== -1 || (txt.indexOf('सुपर एडमिन') !== -1 && txt.indexOf('कंट्रोल') === -1)) {
+        var p = el.parentElement;
+        if (p && p !== document.body && (p.style.position === 'fixed' || window.getComputedStyle(p).position === 'fixed')) {
+          p.remove();
         } else {
           el.remove();
         }
@@ -5325,15 +5325,24 @@ window.finishQuizRound = function(msg) {
     }
   }
 
-  // 2. स्टाइलिंग (पॉपअप नोटिस व तफ़सीली सनद बोर्ड)
+  // 2. स्टाइलिंग
   var style = document.createElement('style');
   style.innerHTML = `
-    /* 📢 शाही नोटिस पॉपअप */
+    /* CSS लेवल पर भी बाएँ कोने के बटन को ब्लॉक करना */
+    body > div:has(> a[href*="admin"]),
+    body > div:has(> button[onclick*="admin"]),
+    div[style*="position: fixed"][style*="bottom:"][style*="left:"] {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    /* 📢 24 घंटे का शाही नोटिस पॉपअप */
     #suhail-notice-modal {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 0, 0, 0.88);
       z-index: 10000005;
       align-items: center;
       justify-content: center;
@@ -5345,13 +5354,14 @@ window.finishQuizRound = function(msg) {
       border-radius: 16px;
       width: 100%;
       max-width: 420px;
-      padding: 20px 18px;
+      padding: 22px 18px;
       color: #fef08a;
-      box-shadow: 0 10px 30px rgba(234, 179, 8, 0.3);
+      box-shadow: 0 10px 30px rgba(234, 179, 8, 0.35);
       text-align: center;
-      animation: noticePop 0.3s ease-out;
+      box-sizing: border-box;
+      animation: suhailPop 0.3s ease-out;
     }
-    @keyframes noticePop {
+    @keyframes suhailPop {
       0% { transform: scale(0.85); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
@@ -5360,29 +5370,29 @@ window.finishQuizRound = function(msg) {
       background: rgba(234, 179, 8, 0.2);
       border: 1px solid #eab308;
       color: #fef08a;
-      padding: 4px 12px;
+      padding: 5px 14px;
       border-radius: 20px;
-      font-size: 0.82rem;
+      font-size: 0.86rem;
       font-weight: 800;
-      margin: 10px 0;
+      margin: 12px 0;
     }
     .btn-notice-close {
       background: #eab308;
       color: #000;
       border: none;
-      padding: 8px 22px;
+      padding: 9px 24px;
       border-radius: 20px;
       font-weight: 800;
       font-size: 0.85rem;
       cursor: pointer;
-      margin-top: 12px;
+      margin-top: 10px;
     }
 
     /* 📜 नीचे खाली स्पेस में: तफ़सीली इल्मी एज़ाज़ात बोर्ड */
     #suhail-awards-board {
       width: calc(100% - 24px);
       box-sizing: border-box;
-      margin: 20px 12px 90px;
+      margin: 20px 12px 100px;
       background: #111b21;
       border: 1px solid rgba(234, 179, 8, 0.35);
       border-radius: 14px;
@@ -5399,7 +5409,7 @@ window.finishQuizRound = function(msg) {
     }
     .awards-title {
       color: #eab308;
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       font-weight: 800;
       display: flex;
       align-items: center;
@@ -5436,7 +5446,7 @@ window.finishQuizRound = function(msg) {
       white-space: nowrap;
     }
 
-    /* 🎮 5-बटन ड्रैगेबल स्लिम विजेट */
+    /* 🎮 5-बटन ड्रैगेबल स्लिम डॉक */
     #suhail-5btn-dock {
       position: fixed;
       bottom: 20px;
@@ -5477,7 +5487,7 @@ window.finishQuizRound = function(msg) {
   `;
   document.head.appendChild(style);
 
-  // 3. 5-बटन ड्रैगेबल डॉक बनाना
+  // 3. 5-बटन ड्रैगेबल विजेट बनाना
   function buildDock() {
     if (document.getElementById('suhail-5btn-dock')) return;
 
@@ -5493,14 +5503,14 @@ window.finishQuizRound = function(msg) {
     `;
     document.body.appendChild(dock);
 
-    // एडमिन बटन सिर्फ़ रोल 7877 के लिए
+    // एडमिन बटन सिर्फ़ आपके लिए (रोल 7877)
     var isOwner = (document.body.innerText || '').indexOf('7877') !== -1 || localStorage.getItem('roll') === '7877';
     if (isOwner) {
       var aBtn = document.getElementById('dock-admin-link');
       if (aBtn) aBtn.style.display = 'flex';
     }
 
-    // टच ड्रैग लॉजिक
+    // टच ड्रैग
     var isDragging = false, startX, startY, initLeft, initTop;
     dock.addEventListener('touchstart', function(e) {
       if (e.target.closest('button') || e.target.closest('a')) return;
@@ -5525,9 +5535,41 @@ window.finishQuizRound = function(msg) {
     document.addEventListener('touchend', function() { isDragging = false; });
   }
 
-  // 4. खोलते ही शाही इल्मी नोटिस का पॉपअप
+  // 4. छात्र सूची में सीधे स्टार और बैज लगाना (कैफ़ रज़ा के 🥈 को बदलना)
+  function liveUpdateStudentBadges(users) {
+    if (!users) return;
+    Object.keys(users).forEach(function (k) {
+      var u = users[k];
+      if (!u) return;
+      var roll = String(u.roll || u.rollNumber || k).trim();
+      if (!roll) return;
+
+      if (u.star || u.badge) {
+        var allEls = document.querySelectorAll('h4, div, p, span');
+        for (var i = 0; i < allEls.length; i++) {
+          var el = allEls[i];
+          if (el.children.length > 2) continue;
+          if (el.closest('#suhail-5btn-dock') || el.closest('#suhail-awards-board') || el.closest('#suhail-notice-modal')) continue;
+
+          var txt = el.textContent || el.innerText || '';
+          if (txt.indexOf('रोल: ' + roll) !== -1 || txt.indexOf('रोल:' + roll) !== -1) {
+            if (!el.getAttribute('data-badge-done')) {
+              el.setAttribute('data-badge-done', 'true');
+              var html = el.innerHTML.replace(/[🥇🥈🥉]/g, '');
+              var star = u.star ? '<span style="color:#eab308; font-size:0.95rem; margin-right:4px;">⭐</span>' : '';
+              var badge = u.badge ? '<span style="background:rgba(234,179,8,0.22); color:#fef08a; border:1px solid #eab308; padding:1px 6px; border-radius:5px; font-size:0.7rem; font-weight:bold; margin-right:5px;">' + u.badge + '</span>' : '';
+              el.innerHTML = star + badge + html.trim();
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // 5. खोलते ही 24 घंटे का शाही नोटिस पॉपअप
+  var noticeShown = false;
   function showAwardNotice(users) {
-    if (document.getElementById('suhail-notice-modal')) return;
+    if (noticeShown || document.getElementById('suhail-notice-modal')) return;
 
     var starUser = null;
     var list = Object.values(users || {});
@@ -5537,7 +5579,6 @@ window.finishQuizRound = function(msg) {
         break;
       }
     }
-
     if (!starUser) return;
 
     var roll = starUser.roll || starUser.rollNumber || '';
@@ -5548,52 +5589,57 @@ window.finishQuizRound = function(msg) {
     modal.id = 'suhail-notice-modal';
     modal.innerHTML = `
       <div class="suhail-notice-box">
-        <div style="font-size:2.2rem; margin-bottom:6px;">🌟</div>
-        <h3 style="color:#fde68a; font-size:1.05rem; margin-bottom:8px;">📢 उस्ताद की जानिब से शाही इल्मी नोटिस</h3>
-        <p style="font-size:0.8rem; color:#e9edef; line-height:1.5;">
-          मुबारकबाद! मोहतमिम व उस्ताद (Suhail Husain) की तरफ़ से:<br>
+        <div style="font-size:2.4rem; margin-bottom:6px;">🌟</div>
+        <h3 style="color:#fde68a; font-size:1.05rem; margin-bottom:8px; font-weight:800;">📢 उस्ताद की जानिब से शाही इल्मी नोटिस</h3>
+        <p style="font-size:0.82rem; color:#e9edef; line-height:1.6;">
+          मुबारकबाद! मोहतमिम व उस्ताद <strong>(Suhail Husain)</strong> की तरफ़ से:<br>
           <strong>${name}</strong> (रोल नंबर: <strong>${roll}</strong>)
         </p>
         <div class="notice-badge-pill">⭐ ${badge}</div>
-        <p style="font-size:0.75rem; color:#8696a0;">उम्दा पढ़ाई और बेहतरीन तालीमी लगन पर यह एज़ाज़ अता किया गया है।</p>
-        <button class="btn-notice-close" onclick="document.getElementById('suhail-notice-modal').style.display='none'">माशाअल्लाह (क़बूल करें)</button>
+        <p style="font-size:0.75rem; color:#8696a0;">उम्दा पढ़ाई और बेहतरीन तालीमी लगन पर यह एज़ाज़ अता किया गया है। (24 घंटे का नोटिस)</p>
+        <button class="btn-notice-close" onclick="document.getElementById('suhail-notice-modal').remove();">माशाअल्लाह (क़बूल करें)</button>
       </div>
     `;
     document.body.appendChild(modal);
     modal.style.display = 'flex';
+    noticeShown = true;
   }
 
-  // 5. नीचे खाली स्पेस में: तफ़सीली एज़ाज़ात बोर्ड (विस्तार से सूची)
+  // 6. नीचे खाली जगह में: तफ़सीली एज़ाज़ात व सनद बोर्ड
   function renderDetailedAwardsBoard(users) {
     var board = document.getElementById('suhail-awards-board');
     if (!board) {
       board = document.createElement('div');
       board.id = 'suhail-awards-board';
-      var chatArea = document.querySelector('#chats') || document.querySelector('.chat-list') || document.body;
-      chatArea.appendChild(board);
+      
+      var allEls = document.querySelectorAll('*');
+      var target = null;
+      for (var i = 0; i < allEls.length; i++) {
+        var t = allEls[i].textContent || '';
+        if (t.indexOf('abdul gaffar') !== -1 || t.indexOf('6989') !== -1) {
+          target = allEls[i].closest('.chat-list') || allEls[i].closest('#chats') || allEls[i].parentElement?.parentElement;
+          break;
+        }
+      }
+      if (!target) target = document.querySelector('#chats') || document.querySelector('.chat-list') || document.body;
+      target.appendChild(board);
     }
 
     var list = Object.values(users || {});
-    var awarded = list.filter(function(u) {
-      return u && (u.star || u.badge || (parseInt(u.xp) > 0));
-    });
-
-    awarded.sort(function(a, b) {
-      return (parseInt(b.xp) || 0) - (parseInt(a.xp) || 0);
-    });
+    var awarded = list.filter(function(u) { return u && (u.star || u.badge || (parseInt(u.xp) > 0)); });
+    awarded.sort(function(a, b) { return (parseInt(b.xp) || 0) - (parseInt(a.xp) || 0); });
 
     var rowsHtml = '';
     awarded.forEach(function(st) {
       var roll = st.roll || st.rollNumber || '';
       var name = st.name || 'तालिब';
-      var badge = st.badge || (st.star ? 'इल्मी स्टार ⭐' : 'उम्दा मुताला');
+      var badge = st.badge || (st.star ? 'मुमताज़ तालिब-ए-इल्म 🌟' : 'इल्मी मुताला');
       var xp = st.xp || 0;
-
       rowsHtml += `
         <div class="award-student-card">
-          <div class="award-stu-info">
-            <h4>${name} (रोल: ${roll})</h4>
-            <span>कुल इल्मी तरक़्क़ी: ⚡ <strong>${xp} XP</strong></span>
+          <div style="text-align:left;">
+            <h4 style="font-size:0.84rem; font-weight:700; color:#e9edef; margin-bottom:3px;">${name} (रोल: ${roll})</h4>
+            <span style="font-size:0.7rem; color:#8696a0;">कुल इल्मी तरक़्क़ी: ⚡ <strong>${xp} XP</strong></span>
           </div>
           <div class="award-tag">⭐ ${badge}</div>
         </div>
@@ -5602,43 +5648,54 @@ window.finishQuizRound = function(msg) {
 
     board.innerHTML = `
       <div class="awards-header">
-        <div class="awards-title">
-          <i class="fa-solid fa-award"></i> तालीमी एज़ाज़ात व सनद बोर्ड
-        </div>
+        <div class="awards-title"><i class="fa-solid fa-award"></i> तालीमी एज़ाज़ात व सनद बोर्ड</div>
         <span style="font-size:0.68rem; color:#8696a0;">उस्ताद की सनद</span>
       </div>
-      <div style="font-size:0.72rem; color:#8696a0; margin-bottom:10px;">
+      <div style="font-size:0.72rem; color:#8696a0; margin-bottom:10px; text-align:left;">
         उस्ताद (Suhail Husain) की जानिब से नवाज़े गए मुमताज़ तलबा की मुकम्मल तफ़सील:
       </div>
       <div>${rowsHtml || '<p style="font-size:0.75rem; color:#8696a0; text-align:center;">अभी कोई नया एज़ाज़ जारी नहीं हुआ है।</p>'}</div>
     `;
   }
 
-  // 6. इंजन चालू करना
-  function startEngine() {
-    killOldCornerButtons();
-    buildDock();
+  // 7. डेटाबेस ऑटो-कनेक्टर
+  var dbConnected = false;
+  function connectFirebase() {
+    if (dbConnected) return;
+    var rdb = (window.db && typeof window.db.ref === 'function') ? window.db : null;
+    if (!rdb && typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) {
+      try { rdb = firebase.database(); } catch(e) {}
+    }
 
-    var db = window.db || (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length ? firebase.database() : null);
-    if (db) {
-      db.ref('users').on('value', function(snap) {
+    if (rdb) {
+      dbConnected = true;
+      rdb.ref('users').on('value', function(snap) {
         var users = snap.val() || {};
+        liveUpdateStudentBadges(users);
         showAwardNotice(users);
         renderDetailedAwardsBoard(users);
       });
+    } else {
+      setTimeout(connectFirebase, 400);
     }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', startEngine);
-  } else {
-    startEngine();
+  function start() {
+    deleteOldCornerButtons();
+    buildDock();
+    connectFirebase();
   }
 
-  // 1 सेकंड बाद पुराने बटनों को पक्का साफ़ करना
-  setInterval(killOldCornerButtons, 1000);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    start();
+  }
+
+  // लगातार चेक ताकि बायाँ कोना हमेशा साफ़ रहे
+  setInterval(deleteOldCornerButtons, 400);
 })();
-  </script>
+        </script>
   
 </body>
 </html>
