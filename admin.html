@@ -219,45 +219,56 @@
       setTimeout(() => { t.style.display = 'none'; }, 3500);
     }
 
-    // ऑटो-कनेक्ट इंजन: मुख्य ऐप के खुले इंस्टेंस या लोकल स्टोरेज से जोड़ता है
-    window.addEventListener('DOMContentLoaded', async () => {
+    // ⚡ ऑटो-कनेक्टर: सीधे index.html से असली Firebase Keys खींचता है
+    async function initDatabase() {
+      try {
+        // 1. अगर पहले से लोड हो
+        if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+          db = firebase.database();
+          initAdminListeners();
+          return;
+        }
+
+        // 2. index.html से लाइव कॉन्फ़िग ऑटो-रीड करें
+        const res = await fetch('/index.html');
+        if (res.ok) {
+          const html = await res.text();
+          const match = html.match(/(?:const|var|let)?\s*firebaseConfig\s*=\s*(\{[\s\S]*?\});|firebase\.initializeApp\((\{[\s\S]*?\})\)/);
+          
+          if (match) {
+            const configStr = match[1] || match[2];
+            const config = new Function("return " + configStr)();
+            
+            if (!firebase.apps.length) {
+              firebase.initializeApp(config);
+            }
+            db = firebase.database();
+            showToast("⚡ डेटाबेस लाइव कनेक्ट हो गया!");
+            initAdminListeners();
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn("Auto-connect fetch failed:", err);
+      }
+
+      // 3. फ़ॉलबैक: मुख्य विंडो से
       try {
         if (window.opener && window.opener.firebase && window.opener.firebase.apps.length > 0) {
           db = window.opener.firebase.database();
-        } else if (window.parent && window.parent.firebase && window.parent.firebase.apps.length > 0) {
-          db = window.parent.firebase.database();
-        } else if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-          db = firebase.database();
-        }
-
-        // यदि डायरेक्ट खुला हो, तो इंडेक्स की स्टोरेज से ऑटो-सिंक करे
-        if (!db) {
-          const cachedConfig = localStorage.getItem('firebase_config_cache');
-          if (cachedConfig) {
-            const parsed = JSON.parse(cachedConfig);
-            if (!firebase.apps.length) firebase.initializeApp(parsed);
-            db = firebase.database();
-          }
-        }
-
-        if (db) {
           initAdminListeners();
-          showToast("⚡ डेटाबेस सफलतापूर्वक कनेक्ट हुआ!");
-        } else {
-          // फ़ॉलबैक: छात्र लिस्ट को सर्वरलेस डायरेक्टरी से जोड़े
-          document.getElementById('students-tbody').innerHTML = `
-            <tr><td colspan="7" style="text-align:center; padding:15px; color:var(--accent-gold);">
-              ⚠️ सीधा एक्सेस मोड: लाइव डेटा लोड करने के लिए कृपया मुख्य ऐप (index.html) के अंदर 'Super Admin' शील्ड बटन से इस पेज को खोलें।
-            </td></tr>`;
+          return;
         }
-      } catch (err) {
-        console.error(err);
-        showToast("कनेक्शन एरर: " + err.message);
-      }
-    });
+      } catch (e) {}
 
+      showToast("⚠️ डेटाबेस कनेक्ट नहीं हुआ। पेज रिफ्रेश करें।");
+    }
+
+    window.addEventListener('DOMContentLoaded', initDatabase);
+
+    // 🔍 छात्र सर्च व ऑटो-क्रिएटर
     async function findUserRef(rollInput) {
-      if (!db) throw new Error("डेटाबेस कनेक्ट नहीं है! मुख्य ऐप से खोलें।");
+      if (!db) throw new Error("डेटाबेस अभी लोड हो रहा है, 2 सेकंड रुक कर दोबारा दबाएँ।");
       const clean = String(rollInput).trim();
       const snap = await db.ref('users').once('value');
       let targetRef = null;
@@ -286,7 +297,7 @@
       try {
         const { ref } = await findUserRef(roll);
         await ref.update({ badge: badge, star: true, updatedAt: Date.now() });
-        showToast(`✅ रोल ${roll} को '${badge}' व स्टार दिया गया!`);
+        showToast(`✅ रोल ${roll} को '${badge}' व स्टार दे दिया गया!`);
         document.getElementById('badge-roll').value = '';
       } catch (e) { showToast("एरर: " + e.message); }
     }
@@ -297,7 +308,7 @@
       try {
         const { ref } = await findUserRef(roll);
         await ref.update({ badge: null, star: false });
-        showToast(`✅ रोल ${roll} से बैज व स्टार हटाया गया!`);
+        showToast(`✅ रोल ${roll} से बैज व स्टार हटा दिया गया!`);
       } catch (e) { showToast("एरर: " + e.message); }
     }
 
@@ -484,6 +495,6 @@
         r.style.display = txt.includes(q) ? '' : 'none';
       });
     }
-  </script>
+        </script>
 </body>
 </html>
