@@ -1,501 +1,526 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="ur" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🛡️ सुपर एडमिन मास्टर कंट्रोल हब - जामिया ऊला अलिफ़</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: #0b141a; color: #e9edef; padding: 15px; }
-    .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-    .header h2 { color: #00a884; font-size: 1.2rem; }
-    .back-btn { background: #202c33; color: #00a884; border: 1px solid #00a884; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: bold; }
-    
-    .nav-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-    .tab-btn { background: #111b21; color: #8696a0; border: 1px solid rgba(255,255,255,0.1); padding: 8px 14px; border-radius: 6px; cursor: pointer; white-space: nowrap; font-size: 0.85rem; }
-    .tab-btn.active { background: #00a884; color: #fff; border-color: #00a884; font-weight: bold; }
-    
-    .section-view { display: none; }
-    .section-view.active { display: block; }
-    
-    .card { background: #111b21; border-radius: 8px; padding: 14px; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.08); }
-    .card h3 { color: #facc15; font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-    
-    input, textarea, select { width: 100%; padding: 10px; background: #202c33; border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px; margin-bottom: 8px; font-size: 0.9rem; }
-    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
-    button { padding: 9px 14px; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: #fff; }
-    
-    .btn-green { background: #00a884; }
-    .btn-blue { background: #3b82f6; }
-    .btn-yellow { background: #eab308; color: #000; }
-    .btn-red { background: #ef4444; }
-    .btn-gray { background: #374151; }
-    
-    .output-box { background: #0b141a; border: 1px dashed rgba(255,255,255,0.2); border-radius: 6px; padding: 10px; font-size: 0.85rem; color: #aebac1; white-space: pre-wrap; margin-top: 8px; max-height: 250px; overflow-y: auto; }
-  </style>
+  <title>🛡️ सुपर एडमिन हब - जमात ऊला</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+  <style>
+    :root {
+      --bg-main: #0b141a;
+      --bg-card: #111b21;
+      --bg-input: #202c33;
+      --accent-green: #00a884;
+      --accent-gold: #eab308;
+      --accent-red: #ef4444;
+      --accent-blue: #3b82f6;
+      --text-main: #e9edef;
+      --text-muted: #8696a0;
+      --border-color: rgba(255, 255, 255, 0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg-main); color: var(--text-main); padding-bottom: 50px; }
+
+    /* Top Bar */
+    .top-header { background: #1f2c34; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
+    .top-header h1 { font-size: 1.15rem; color: var(--accent-gold); display: flex; align-items: center; gap: 8px; }
+    .btn-back { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; }
+
+    /* Layout */
+    .container { max-width: 900px; margin: 20px auto; padding: 0 14px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px; }
+
+    /* Status Bar */
+    .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+    .stat-card { background: var(--bg-card); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid var(--border-color); }
+    .stat-val { font-size: 1.4rem; font-weight: bold; color: var(--accent-green); }
+    .stat-lbl { font-size: 0.75rem; color: var(--text-muted); }
+
+    /* Action Cards */
+    .admin-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .admin-card h2 { font-size: 0.95rem; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; color: var(--text-main); }
+    .admin-card label { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* Form Controls */
+    input, select, textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px; border-radius: 6px; font-size: 0.88rem; outline: none; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent-green); }
+    .btn-row { display: flex; gap: 8px; }
+    button { cursor: pointer; border: none; border-radius: 6px; padding: 10px; font-weight: 600; font-size: 0.85rem; transition: opacity 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+    button:active { opacity: 0.8; }
+    .btn-green { background: var(--accent-green); color: #fff; flex: 1; }
+    .btn-red { background: var(--accent-red); color: #fff; flex: 1; }
+    .btn-gold { background: var(--accent-gold); color: #000; flex: 1; }
+    .btn-blue { background: var(--accent-blue); color: #fff; flex: 1; }
+    .btn-muted { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color); }
+
+    /* Students List Table */
+    .table-container { background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; margin-top: 20px; }
+    .table-header { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border-color); }
+    th { color: var(--text-muted); font-weight: 600; background: rgba(255,255,255,0.02); }
+    .badge-pill { padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: bold; }
+    .badge-star { background: rgba(234, 179, 8, 0.15); color: var(--accent-gold); border: 1px solid var(--accent-gold); }
+    .badge-ban { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); border: 1px solid var(--accent-red); }
+
+    /* Toast Notification */
+    #toast { position: fixed; bottom: 20px; right: 20px; background: #202c33; color: #fff; border-left: 4px solid var(--accent-green); padding: 12px 18px; border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.6); display: none; z-index: 1000; font-size: 0.88rem; }
+  </style>
 </head>
 <body>
 
-  <div class="header">
-    <h2>🛡️ सुपर एडमिन मास्टर हब (20 टूल्स)</h2>
-    <a href="/" class="back-btn">⬅️ वापस चैट में जाएँ</a>
+  <!-- Top Header -->
+  <div class="top-header">
+    <h1><i class="fa-solid fa-shield-halved"></i> सुपर एडमिन हब</h1>
+    <a href="/index.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> मुख्य क्लासरूम</a>
   </div>
 
-  <!-- नेविगेशन टैब्स -->
-  <div class="nav-tabs">
-    <button class="tab-btn active" onclick="openTab('sec-ai')">🎓 AI तालीमी टूल्स (1-6)</button>
-    <button class="tab-btn" onclick="openTab('sec-push')">📢 एडवांस्ड पुश हब (7-10)</button>
-    <button class="tab-btn" onclick="openTab('sec-students')">🎖️ तलबा बैज व स्ट्राइक (11-15)</button>
-    <button class="tab-btn" onclick="openTab('sec-system')">⚙️ क्लास मोड व टूल्स (16-20)</button>
-  </div>
+  <div class="container">
 
-  <!-- ================= SECTION 1: AI तालीमी टूल्स (1-6) ================= -->
-  <div id="sec-ai" class="section-view active">
-    
-    <!-- 1. AI इम्तिहान पर्चा मेकर -->
-    <div class="card">
-      <h3>📝 1. AI इम्तिहान पर्चा मेकर (Exam Generator)</h3>
-      <input type="text" id="ai-paper-subject" placeholder="विषय व किताब का नाम (उदा: नह्वमीर / तरीक़तुन असरिया)">
-      <select id="ai-paper-level">
-        <option value="1">दरजा 1-3 (शुरुआती)</option>
-        <option value="6">दरजा 4-8 (दरमियाना)</option>
-        <option value="12">दरजा 9-12 (आला)</option>
-      </select>
-      <button class="btn-green" onclick="generateExamPaper()">पर्चा जनरेट करें 🚀</button>
-      <div id="out-exam-paper" class="output-box" style="display:none;"></div>
-    </div>
-
-    <!-- 2. AI हफ़्तेवार निसाब प्लानर -->
-    <div class="card">
-      <h3>📅 2. AI हफ़्तेवार निसाब प्लानर (Syllabus Planner)</h3>
-      <input type="text" id="ai-plan-book" placeholder="किताब का नाम और सफ़हा रेंज (उदा: कुदूरी सफ़हा 10 से 35)">
-      <button class="btn-green" onclick="generateWeeklyPlan()">7 दिन का मुताला शेड्यूल बनाएँ 🗓️</button>
-      <div id="out-weekly-plan" class="output-box" style="display:none;"></div>
-    </div>
-
-    <!-- 3. AI तलबा कमज़ोरी डायग्नोस्टिक -->
-    <div class="card">
-      <h3>🔍 3. AI तलबा कमज़ोरी डायग्नोस्टिक (Weak Area Diagnostic)</h3>
-      <input type="text" id="ai-diag-roll" placeholder="छात्र का रोल नंबर दर्ज करें">
-      <input type="text" id="ai-diag-issue" placeholder="कमज़ोरी का क्षेत्र (उदा: अरबी तर्जुमा या याददाश्त)">
-      <button class="btn-blue" onclick="analyzeWeakArea()">कमज़ोरी का विश्लेषण करें 💡</button>
-      <div id="out-student-diag" class="output-box" style="display:none;"></div>
-    </div>
-
-    <!-- 4. AI तक़रीर व मज़मून ड्राफ्टर -->
-    <div class="card">
-      <h3>🎙️ 4. AI तक़रीर व मज़मून ड्राफ्टर (Speech & Essay)</h3>
-      <input type="text" id="ai-speech-topic" placeholder="उनवान / विषय (उदा: इल्म की अहमियत / सीरत-ए-मुस्तफ़ा ﷺ)">
-      <div class="btn-row">
-        <button class="btn-yellow" onclick="generateSpeech('Urdu')">उर्दू तक़रीर</button>
-        <button class="btn-yellow" onclick="generateSpeech('Hindi')">हिंदी तक़रीर</button>
-        <button class="btn-yellow" onclick="generateSpeech('Arabic')">अरबी खुतबा</button>
+    <!-- 1. Real-time Status Bar -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-val" id="st-total">0</div>
+        <div class="stat-lbl">कुल तलबा</div>
       </div>
-      <div id="out-speech-box" class="output-box" style="display:none;"></div>
-    </div>
-
-    <!-- 5. AI अरबी इबारत ए'राब चेकर -->
-    <div class="card">
-      <h3>📖 5. AI अरबी इबारत ए'राब व तरकीब चेकर</h3>
-      <textarea id="ai-arabic-input" rows="2" placeholder="अरबी इबारत पेस्ट करें..."></textarea>
-      <button class="btn-green" onclick="checkArabicText()">ए'राब (Tashkeel) लगाएँ व तरकीब समझें ✏️</button>
-      <div id="out-arabic-box" class="output-box" style="display:none;"></div>
-    </div>
-
-    <!-- 6. AI असाइनमेंट चेकर व ग्रेडर -->
-    <div class="card">
-      <h3>📑 6. AI असाइनमेंट चेकर व ग्रेडर</h3>
-      <textarea id="ai-assign-input" rows="2" placeholder="छात्र का लिखा जवाब यहाँ पेस्ट करें..."></textarea>
-      <button class="btn-blue" onclick="gradeAssignment()">जवाब चेक करें व नंबर दें 💯</button>
-      <div id="out-grade-box" class="output-box" style="display:none;"></div>
-    </div>
-
-  </div>
-
-  <!-- ================= SECTION 2: एडवांस्ड पुश हब (7-10) ================= -->
-  <div id="sec-push" class="section-view">
-    
-    <!-- 7. टारगेटेड रोल-नंबर पुश अलर्ट -->
-    <div class="card">
-      <h3>🎯 7. टारगेटेड रोल-नंबर पुश अलर्ट (निजी नोटिस)</h3>
-      <input type="text" id="push-single-roll" placeholder="छात्र का रोल नंबर दर्ज करें">
-      <input type="text" id="push-single-msg" placeholder="निजी संदेश लिखें...">
-      <button class="btn-blue" onclick="sendTargetedRollPush()">छात्र को डायरेक्ट पुश भेजें 🚀</button>
-    </div>
-
-    <!-- 8. नमाज़ व मुताला अलार्म ब्रॉडकास्ट -->
-    <div class="card">
-      <h3>⏰ 8. शेड्यूल्ड नमाज़ व मुताला पुश अलर्ट</h3>
-      <div class="btn-row">
-        <button class="btn-green" onclick="sendQuickNotify('फ़ज्र बाद मुताला 📖', 'सवेरे के ताज़ा ज़हन के साथ आज का पहला सबक दोहराएँ!')">फ़ज्र अलर्ट</button>
-        <button class="btn-green" onclick="sendQuickNotify('अस्र बाद तफ़रीह व ज़िक्र 🌿', 'अस्र का वक्त है, बा-जमात नमाज़ का एहतिमाम करें!')">अस्र अलर्ट</button>
-        <button class="btn-green" onclick="sendQuickNotify('ईशा बाद तक़रार रूम 🤝', 'ईशा बाद मुताले का वक्त शुरू, साथी से तक़रार करें!')">ईशा अलर्ट</button>
+      <div class="stat-card">
+        <div class="stat-val" id="st-active" style="color:var(--accent-gold);">0</div>
+        <div class="stat-lbl">स्टार प्राप्त</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="st-strikes" style="color:var(--accent-red);">0</div>
+        <div class="stat-lbl">म्यूट / ब्लॉक</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="st-chat-state" style="color:var(--accent-blue);">खुला</div>
+        <div class="stat-lbl">क्लास चैट</div>
       </div>
     </div>
 
-    <!-- 9. 2x XP क्विज़ फ्लैश अलर्ट -->
-    <div class="card">
-      <h3>⚡ 9. क्विज़ चैलेंज 2x XP फ्लैश अलर्ट</h3>
-      <button class="btn-yellow" onclick="sendQuickNotify('⚡ डबल XP घंटा शुरू!', 'अगले 1 घंटे के लिए हर क्विज़ पर 2x XP मिलेगा, अभी मुकाबला खेलें!')">📢 2x XP फ्लैश अलर्ट भेजें</button>
-    </div>
+    <!-- 2. Action Controls Grid -->
+    <div class="grid-2">
 
-    <!-- 10. ऑडियो नोटिस ब्रॉडकास्टर -->
-    <div class="card">
-      <h3>🎙️ 10. ऑडियो ऐलान ब्रॉडकास्टर (Cloudinary + Push)</h3>
-      <input type="file" id="audio-announcement-file" accept="audio/*">
-      <input type="text" id="audio-push-title" placeholder="ऑडियो का शीर्षक (उदा: उस्ताद का ज़रूरी पैगाम)">
-      <button class="btn-green" onclick="uploadAudioAndBroadcast()">ऑडियो अपलोड कर पुश भेजें 📢</button>
-    </div>
-
-  </div>
-
-  <!-- ================= SECTION 3: तलबा बैज व अनुशासन (11-15) ================= -->
-  <div id="sec-students" class="section-view">
-    
-    <!-- 11. सीज़न XP रीसेट -->
-    <div class="card">
-      <h3>🔄 11. सीज़न/महीना XP रीसेट व आर्काइव</h3>
-      <p style="font-size:0.8rem; color:#8696a0; margin-bottom:8px;">सभी तलबा के XP को शून्य करके नए महीने का मुकाबला शुरू करें।</p>
-      <button class="btn-red" onclick="resetAcademicSeasonXP()">⚠️ सभी तलबा के XP रीसेट करें</button>
-    </div>
-
-    <!-- 12. विशिष्ट लक़ब व बैज मैनेजर -->
-    <div class="card">
-      <h3>🎖️ 12. विशिष्ट लक़ब व बैज असाइनर</h3>
-      <input type="text" id="badge-roll" placeholder="छात्र रोल नंबर">
-      <select id="badge-title">
-        <option value="मुमताज़ तालिब-ए-इल्म 🌟">मुमताज़ तालिब-ए-इल्म 🌟</option>
-        <option value="नाज़िम-ए-क्लास (Monitor) 🎓">नाज़िम-ए-क्लास (Monitor) 🎓</option>
-        <option value="सुपर क्विज़ चैंपियन ⚡">सुपर क्विज़ चैंपियन ⚡</option>
-        <option value="सुलतानुल मुताला 📚">सुलतानुल मुताला 📚</option>
-      </select>
-      <button class="btn-yellow" onclick="assignBadge()">बैज प्रदान करें 🏅</button>
-    </div>
-
-    <!-- 13. 3-स्ट्राइक अनुशासन प्रणाली -->
-    <div class="card">
-      <h3>⚠️ 13. 3-स्ट्राइक अनुशासन प्रणाली</h3>
-      <input type="text" id="strike-roll" placeholder="छात्र रोल नंबर">
-      <div class="btn-row">
-        <button class="btn-yellow" onclick="addStrike(1)">+1 चेतावनी स्ट्राइक ⚠️</button>
-        <button class="btn-red" onclick="clearStrikes()">स्ट्राइक माफ़ करें (0) ✔️</button>
+      <!-- कार्ड 1: स्टार, लक़ब व बैज असाइनर -->
+      <div class="admin-card">
+        <h2><i class="fa-solid fa-award" style="color:var(--accent-gold);"></i> 1. स्टार व इल्मी लक़ब</h2>
+        <label>छात्र का रोल नंबर दर्ज करें:</label>
+        <input type="text" id="badge-roll" placeholder="उदा. 7877">
+        <label>इल्मी लक़ब / बैज चुनें:</label>
+        <select id="badge-title">
+          <option value="मुमताज़ तालिब-ए-इल्म 🌟">मुमताज़ तालिब-ए-इल्म 🌟</option>
+          <option value="माहिर-ए-नह्व व सर्फ़ 📜">माहिर-ए-नह्व व सर्फ़ 📜</option>
+          <option value="सदर-ए-अंजुमन 🎙️">सदर-ए-अंजुमन 🎙️</option>
+          <option value="शहंशाह-ए-क्विज़ ⚡">शहंशाह-ए-क्विज़ ⚡</option>
+          <option value="हाफ़िज़-ए-सबक़ 🏆">हाफ़िज़-ए-सबक़ 🏆</option>
+        </select>
+        <div class="btn-row">
+          <button class="btn-gold" onclick="assignBadge()"><i class="fa-solid fa-star"></i> स्टार व बैज दें</button>
+          <button class="btn-muted" onclick="removeBadge()"><i class="fa-solid fa-xmark"></i> हटाएँ</button>
+        </div>
       </div>
-    </div>
 
-    <!-- 14. तलबा तस्दीक़ क्यू -->
-    <div class="card">
-      <h3>✔️ 14. तलबा तस्दीक़ (Verification) अप्रूवल क्यू</h3>
-      <input type="text" id="verify-queue-roll" placeholder="वेरिफाई करने वाला रोल नंबर">
-      <div class="btn-row">
-        <button class="btn-green" onclick="approveTalib(true)">वेरिफाई करें ✔️</button>
-        <button class="btn-red" onclick="approveTalib(false)">रिजेक्ट / बैन 🚫</button>
+      <!-- कार्ड 2: स्ट्राइक व मर्यादा नियमन -->
+      <div class="admin-card">
+        <h2><i class="fa-solid fa-triangle-exclamation" style="color:var(--accent-red);"></i> 2. स्ट्राइक व म्यूट सिस्टम</h2>
+        <label>छात्र का रोल नंबर:</label>
+        <input type="text" id="strike-roll" placeholder="उदा. 6989">
+        <label>कार्यवाही चुनें (3 स्ट्राइक = ऑटो-बैन):</label>
+        <div class="btn-row">
+          <button class="btn-red" onclick="applyStrike(1)"><i class="fa-solid fa-plus"></i> +1 स्ट्राइक</button>
+          <button class="btn-muted" onclick="resetStrikes()"><i class="fa-solid fa-rotate-left"></i> ज़ीरो करें</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn-red" style="background:#7f1d1d;" onclick="toggleDirectBan(true)"><i class="fa-solid fa-ban"></i> सीधा बैन करें</button>
+          <button class="btn-green" onclick="toggleDirectBan(false)"><i class="fa-solid fa-check"></i> अनबैन करें</button>
+        </div>
       </div>
-    </div>
 
-    <!-- 15. निष्क्रिय छात्र खोजक -->
-    <div class="card">
-      <h3>💤 15. निष्क्रिय छात्र खोजक (Inactive Talib Audit)</h3>
-      <button class="btn-gray" onclick="findInactiveStudents()">15 दिन से शांत तलबा की सूची देखें 🔍</button>
-      <div id="out-inactive-list" class="output-box" style="display:none;"></div>
-    </div>
-
-  </div>
-
-  <!-- ================= SECTION 4: क्लास मोड व सिस्टम टूल्स (16-20) ================= -->
-  <div id="sec-system" class="section-view">
-    
-    <!-- 16. इम्तिहान हॉल मोड -->
-    <div class="card">
-      <h3>🔒 16. इम्तिहान हॉल मोड (Exam Lockdown Mode)</h3>
-      <p style="font-size:0.8rem; color:#8696a0; margin-bottom:8px;">इस मोड में चैट व तक़रार बंद हो जाएगी, सिर्फ किताबें व नोट्स खुलेंगे।</p>
-      <div class="btn-row">
-        <button class="btn-red" onclick="toggleExamLockdown(true)">🔒 एग्जाम मोड ऑन करें</button>
-        <button class="btn-green" onclick="toggleExamLockdown(false)">🔓 नॉर्मल मोड रीस्टोर करें</button>
+      <!-- कार्ड 3: XP व अंक नियंत्रण -->
+      <div class="admin-card">
+        <h2><i class="fa-solid fa-bolt" style="color:var(--accent-blue);"></i> 3. XP व अंक नियंत्रण</h2>
+        <label>छात्र का रोल नंबर:</label>
+        <input type="text" id="xp-roll" placeholder="उदा. 7877">
+        <div class="btn-row">
+          <button class="btn-blue" onclick="adjustXP(50)"><i class="fa-solid fa-plus"></i> +50 XP</button>
+          <button class="btn-blue" onclick="adjustXP(100)"><i class="fa-solid fa-plus"></i> +100 XP</button>
+          <button class="btn-muted" onclick="adjustXP(-50)"><i class="fa-solid fa-minus"></i> -50 XP</button>
+        </div>
       </div>
+
+      <!-- कार्ड 4: क्लासरूम व चैट नियंत्रण -->
+      <div class="admin-card">
+        <h2><i class="fa-solid fa-comments"></i> 4. क्लासरूम व चैट नियंत्रण</h2>
+        <label>क्लास चैट की स्थिति बदलें:</label>
+        <div class="btn-row">
+          <button class="btn-red" onclick="setChatLock(true)"><i class="fa-solid fa-lock"></i> चैट बंद (Mute All)</button>
+          <button class="btn-green" onclick="setChatLock(false)"><i class="fa-solid fa-lock-open"></i> चैट खोलें</button>
+        </div>
+        <label style="margin-top:6px;">चैट का कचरा साफ़ करें:</label>
+        <button class="btn-muted" style="color:var(--accent-red); border-color:var(--accent-red);" onclick="clearAllChatMessages()">
+          <i class="fa-solid fa-trash-can"></i> संपूर्ण क्लास चैट साफ़ करें (Wipe)
+        </button>
+      </div>
+
+      <!-- कार्ड 5: सार्वजनिक नोटिस व ऐलान -->
+      <div class="admin-card">
+        <h2><i class="fa-solid fa-bullhorn" style="color:var(--accent-green);"></i> 5. नोटिस बोर्ड प्रसारण</h2>
+        <label>नोटिस / ऐलान का विषय लिखें:</label>
+        <textarea id="notice-text" rows="2" placeholder="उदा. कल सुबह नह्वमीर का इम्तिहान 8 बजे होगा..."></textarea>
+        <div class="btn-row">
+          <button class="btn-green" onclick="broadcastNotice()"><i class="fa-solid fa-paper-plane"></i> नोटिस जारी करें</button>
+          <button class="btn-muted" onclick="clearNotice()"><i class="fa-solid fa-trash"></i> हटाएं</button>
+        </div>
+      </div>
+
+      <!-- कार्ड 6: AI इम्तिहान व ऑटोमेशन इंजन -->
+      <div class="admin-card">
+        <h2><i class="fa-solid fa-robot" style="color:var(--accent-gold);"></i> 6. AI ऑटोमेशन व टूल्स</h2>
+        <label>त्वरित AI टास्क चलाएँ:</label>
+        <select id="sel-admin-ai">
+          <option value="sambanova_class_summary">दिनभर की चैट की 3-लाइन समरी बनाएँ</option>
+          <option value="cerebras_quiz_architect">दरजा 12 के लिए नया नह्व पर्चा बनाएँ</option>
+          <option value="mistral_formal_letter">मदरसा नोटिस का औपचारिक ड्राफ्ट</option>
+        </select>
+        <button class="btn-gold" onclick="runAdminAI()" id="btn-admin-ai"><i class="fa-solid fa-wand-magic-sparkles"></i> AI प्रोसेस शुरू करें</button>
+        <div id="admin-ai-output" style="display:none; background:var(--bg-input); padding:10px; border-radius:6px; font-size:0.8rem; max-height:120px; overflow-y:auto; white-space:pre-wrap;"></div>
+      </div>
+
     </div>
 
-    <!-- 17. तक़रार रूम्स क्लोज़र -->
-    <div class="card">
-      <h3>🎙️ 17. तक़रार रूम्स (Audio Discussions) लाइव क्लोज़र</h3>
-      <button class="btn-red" onclick="flushTakrarRooms()">🛑 सभी एक्टिव मुताला कमरों को बंद करें</button>
-    </div>
-
-    <!-- 18. लाइव क्लास पोल क्रिएटर -->
-    <div class="card">
-      <h3>📊 18. लाइव क्लास पोल / रायशुमारी क्रिएटर</h3>
-      <input type="text" id="poll-q" placeholder="सवाल (उदा: कल की छुट्टी पर क्या राय है?)">
-      <input type="text" id="poll-opt1" placeholder="विकल्प 1">
-      <input type="text" id="poll-opt2" placeholder="विकल्प 2">
-      <button class="btn-blue" onclick="createClassPoll()">ग्रुप में नया पोल जारी करें 🗳️</button>
-    </div>
-
-    <!-- 19. डिजिटल सनद/प्रमाणपत्र जनरेटर -->
-    <div class="card">
-      <h3>📜 19. डिजिटल सनद/प्रमाणपत्र टेक्स्ट जनरेटर</h3>
-      <input type="text" id="cert-name" placeholder="छात्र का नाम">
-      <input type="text" id="cert-roll" placeholder="रोल नंबर">
-      <input type="text" id="cert-achieve" placeholder="उपलब्धि (उदा: दर्जा अव्वल में प्रथम स्थान)">
-      <button class="btn-yellow" onclick="generateSanadText()">सनद ड्राफ्ट तैयार करें 🖨️</button>
-      <div id="out-cert-box" class="output-box" style="display:none;"></div>
-    </div>
-
-    <!-- 20. सिस्टम मेंटेनेंस मोड -->
-    <div class="card">
-      <h3>🛠️ 20. सिस्टम मेंटेनेंस मोड (Emergency Maintenance)</h3>
-      <p style="font-size:0.8rem; color:#8696a0; margin-bottom:8px;">ऐप पर 'रखरखाव जारी है' का संदेश लगाकर छात्रों का लॉगिन रोकें।</p>
-      <div class="btn-row">
-        <button class="btn-red" onclick="setMaintenance(true)">🛑 मेंटेनेंस मोड चालू</button>
-        <button class="btn-green" onclick="setMaintenance(false)">🟢 मेंटेनेंस समाप्त</button>
+    <!-- 3. Live Students List Directory -->
+    <div class="table-container">
+      <div class="table-header">
+        <h3 style="font-size:0.95rem;"><i class="fa-solid fa-users"></i> तलबा डायरेक्टरी (Live Database)</h3>
+        <input type="text" id="table-search" placeholder="रोल या नाम से खोजें..." onkeyup="filterStudentTable()" style="width:200px; padding:6px 10px;">
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="students-table">
+          <thead>
+            <tr>
+              <th>रोल</th>
+              <th>नाम</th>
+              <th>XP</th>
+              <th>लक़ब / बैज</th>
+              <th>स्ट्राइक</th>
+              <th>स्थिति</th>
+              <th>त्वरित एक्शन</th>
+            </tr>
+          </thead>
+          <tbody id="students-tbody">
+            <tr><td colspan="7" style="text-align:center; color:var(--text-muted);">डेटा लोड हो रहा है...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
   </div>
 
-  <!-- जावास्क्रिप्ट लॉजिक इंजन -->
+  <div id="toast">सूचना</div>
+
   <script>
-    // 1. Firebase इनिशियलाइज़ेशन
-    const firebaseConfig = {
-      databaseURL: "https://hardrisk-default-rtdb.firebaseio.com"
-    };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    // ==========================================
+    // Firebase Auto-Configuration
+    // ==========================================
+    let db = null;
+    let studentsCache = [];
 
-    // टैब स्विचिंग
-    function openTab(tabId) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.section-view').forEach(v => v.classList.remove('active'));
-      event.target.classList.add('active');
-      document.getElementById(tabId).classList.add('active');
-    }
-
-    // AI कॉलर यूटिलिटी (/api/chat)
-    async function callSuhailAI(prompt, type = 'assistant') {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, type })
-      });
-      const data = await res.json();
-      return data.reply || data.text || "AI से कोई जवाब नहीं मिला।";
-    }
-
-    // --- AI टूल्स फंक्शन्स (1-6) ---
-    async function generateExamPaper() {
-      const sub = document.getElementById('ai-paper-subject').value.trim();
-      const lvl = document.getElementById('ai-paper-level').value;
-      if (!sub) return alert("विषय दर्ज करें!");
-      const out = document.getElementById('out-exam-paper');
-      out.style.display = 'block';
-      out.innerText = "⏳ पर्चा तैयार हो रहा है...";
-      const prompt = `दरसे निज़ामी/स्कूली निसाब के तहत किताब "${sub}" (दरजा ${lvl}) के लिए 10 सवालों का मुकम्मल इम्तिहान पर्चा (सवालात और उनके सही जवाबात के साथ) तैयार करें।`;
-      out.innerText = await callSuhailAI(prompt);
-    }
-
-    async function generateWeeklyPlan() {
-      const book = document.getElementById('ai-plan-book').value.trim();
-      if (!book) return alert("किताब व सफ़हा भरें!");
-      const out = document.getElementById('out-weekly-plan');
-      out.style.display = 'block';
-      out.innerText = "⏳ मुताला प्लान बन रहा है...";
-      const prompt = `किताब "${book}" के लिए तलबा का पीर (सोमवार) से सनीचर (शनिवार) तक का 7 दिन का मुताला और सबक याद करने का टाइम-टेबल बनाएँ।`;
-      out.innerText = await callSuhailAI(prompt);
-    }
-
-    async function analyzeWeakArea() {
-      const roll = document.getElementById('ai-diag-roll').value.trim();
-      const issue = document.getElementById('ai-diag-issue').value.trim();
-      if (!roll || !issue) return alert("रोल और कमज़ोरी भरें!");
-      const out = document.getElementById('out-student-diag');
-      out.style.display = 'block';
-      out.innerText = "⏳ विश्लेषण चल रहा है...";
-      const prompt = `रोल नंबर ${roll} का तालिब-ए-इल्म "${issue}" में कमज़ोर है। उस्ताद के तौर पर उसे इस विषय में मज़बूत करने के 3 व्यावहारिक और आसान तरीक़े बताएं।`;
-      out.innerText = await callSuhailAI(prompt);
-    }
-
-    async function generateSpeech(lang) {
-      const topic = document.getElementById('ai-speech-topic').value.trim();
-      if (!topic) return alert("उनवान दर्ज करें!");
-      const out = document.getElementById('out-speech-box');
-      out.style.display = 'block';
-      out.innerText = `⏳ ${lang} में तक़रीर तैयार हो रही है...`;
-      const prompt = `उनवान "${topic}" पर तलबा की अंजुमन के लिए 2 मिनट की पुरअसर तक़रीर (${lang} ज़बान में) तैयार करें।`;
-      out.innerText = await callSuhailAI(prompt);
-    }
-
-    async function checkArabicText() {
-      const txt = document.getElementById('ai-arabic-input').value.trim();
-      if (!txt) return alert("अरबी इबारत लिखें!");
-      const out = document.getElementById('out-arabic-box');
-      out.style.display = 'block';
-      out.innerText = "⏳ ए'राब और तरकीब जाँची जा रही है...";
-      const prompt = `इस अरबी इबारत पर मुकम्मल ए'राब (ज़ेर-ज़बर-पेश) लगाएँ और अहम कलिमात की नह्वी तरकीब समझाएँ:\n${txt}`;
-      out.innerText = await callSuhailAI(prompt);
-    }
-
-    async function gradeAssignment() {
-      const txt = document.getElementById('ai-assign-input').value.trim();
-      if (!txt) return alert("जवाब लिखें!");
-      const out = document.getElementById('out-grade-box');
-      out.style.display = 'block';
-      out.innerText = "⏳ असाइनमेंट जाँचा जा रहा है...";
-      const prompt = `एक मुंसिफ़ परीक्षक के तौर पर इस छात्र के जवाब का जायज़ा लें। 10 में से नंबर दें और 2 सुधार बताएं:\n${txt}`;
-      out.innerText = await callSuhailAI(prompt);
-    }
-
-    // --- पुश नोटिफिकेशन हब (7-10) ---
-    async function sendQuickNotify(title, message) {
+    window.addEventListener('DOMContentLoaded', () => {
       try {
-        const res = await fetch('/api/notify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, message })
-        });
-        if (res.ok) alert("✅ पुश नोटिफिकेशन प्रसारित कर दिया गया!");
-      } catch (e) { alert("एरर: " + e.message); }
-    }
-
-    function sendTargetedRollPush() {
-      const roll = document.getElementById('push-single-roll').value.trim();
-      const msg = document.getElementById('push-single-msg').value.trim();
-      if (!roll || !msg) return alert("रोल और पैगाम दोनों भरें!");
-      sendQuickNotify(`निजी पैगाम (रोल: ${roll})`, msg);
-    }
-
-    async function uploadAudioAndBroadcast() {
-      const file = document.getElementById('audio-announcement-file').files[0];
-      const title = document.getElementById('audio-push-title').value.trim();
-      if (!file) return alert("ऑडियो फ़ाइल चुनें!");
-      alert("⏳ ऑडियो अपलोड हो रहा है...");
-      
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = async () => {
-        try {
-          const res = await fetch('/api/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ file: reader.result, resourceType: 'video' })
-          });
-          const data = await res.json();
-          if (data.secure_url) {
-            sendQuickNotify(title || "नया ऑडियो ऐलान", `उस्ताद का ऑडियो संदेश सुनने के लिए यहाँ टैप करें: ${data.secure_url}`);
-          }
-        } catch(e) { alert("अपलोड एरर: " + e.message); }
-      };
-    }
-
-    // --- तलबा बैज व अनुशासन (11-15) ---
-    function resetAcademicSeasonXP() {
-      if (confirm("क्या आप वाकई सभी तलबा के XP शून्य करके नया सीज़न शुरू करना चाहते हैं?")) {
-        db.ref('users').once('value', snap => {
-          snap.forEach(child => {
-            child.ref.update({ xp: 0 });
-          });
-          alert("✅ सभी तलबा के XP रीसेट कर दिए गए!");
-        });
-      }
-    }
-
-    function assignBadge() {
-      const roll = document.getElementById('badge-roll').value.trim();
-      const badge = document.getElementById('badge-title').value;
-      if (!roll) return alert("रोल नंबर दर्ज करें!");
-      db.ref(`users/${roll}`).update({ badge: badge }, () => {
-        alert(`🎖️ रोल ${roll} को '${badge}' बैज दिया गया!`);
-      });
-    }
-
-    function addStrike(count) {
-      const roll = document.getElementById('strike-roll').value.trim();
-      if (!roll) return alert("रोल नंबर दर्ज करें!");
-      db.ref(`users/${roll}/strikes`).transaction(cur => (cur || 0) + count, (err, committed, snap) => {
-        const total = snap.val();
-        if (total >= 3) {
-          db.ref(`users/${roll}`).update({ banned: true });
-          alert(`⚠️ रोल ${roll} की 3 स्ट्राइक पूरी हुईं। छात्र ऑटो-म्यूट/बैन हो गया!`);
+        if (firebase.apps.length > 0) {
+          db = firebase.database();
         } else {
-          alert(`⚠️ रोल ${roll} को स्ट्राइक दी गई। कुल स्ट्राइक: ${total}/3`);
+          // अगर आपके पास पहले से config है तो वह उठाएगा अन्यथा window.db
+          db = window.opener?.db || window.parent?.db;
+        }
+
+        if (!db) {
+          showToast("⚠️ Firebase इनिशियलाइज़ नहीं हुआ। कृपया मुख्य पेज से आएँ।");
+        } else {
+          initAdminListeners();
+        }
+      } catch (err) {
+        console.error("Firebase Init Error:", err);
+      }
+    });
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 3500);
+    }
+
+    // ==========================================
+    // यूनिवर्सल छात्र सर्चर (Roll / UID दोनों को ढूँढता है)
+    // ==========================================
+    async function findUserRef(rollInput) {
+      if (!db) throw new Error("डेटाबेस कनेक्ट नहीं है!");
+      const clean = String(rollInput).trim();
+      const snap = await db.ref('users').once('value');
+      let targetRef = null;
+      let targetData = null;
+
+      snap.forEach(child => {
+        const u = child.val() || {};
+        if (child.key === clean || String(u.roll) === clean || String(u.rollNumber) === clean) {
+          targetRef = child.ref;
+          targetData = u;
         }
       });
+
+      if (!targetRef) {
+        // अगर मौजूद नहीं तो रोल नंबर नाम का नया नोड बना दें
+        targetRef = db.ref('users/' + clean);
+        targetData = { roll: clean, name: "तालिब " + clean, xp: 0, strikes: 0 };
+      }
+      return { ref: targetRef, data: targetData };
     }
 
-    function clearStrikes() {
-      const roll = document.getElementById('strike-roll').value.trim();
-      if (!roll) return alert("रोल नंबर दर्ज करें!");
-      db.ref(`users/${roll}`).update({ strikes: 0, banned: false }, () => {
-        alert(`✔️ रोल ${roll} की सभी स्ट्राइक माफ़ कर दी गईं!`);
-      });
-    }
+    // ==========================================
+    // 1. बैज व स्टार हैंडलर
+    // ==========================================
+    async function assignBadge() {
+      const roll = document.getElementById('badge-roll').value.trim();
+      const badge = document.getElementById('badge-title').value;
+      if (!roll) return showToast("कृपया रोल नंबर दर्ज करें!");
 
-    function approveTalib(status) {
-      const roll = document.getElementById('verify-queue-roll').value.trim();
-      if (!roll) return alert("रोल नंबर दर्ज करें!");
-      db.ref(`users/${roll}`).update({ verified: status, banned: !status }, () => {
-        alert(status ? `✔️ रोल ${roll} वेरिफाई हो गया!` : `🚫 रोल ${roll} रिजेक्ट व ब्लॉक हुआ!`);
-      });
-    }
-
-    function findInactiveStudents() {
-      const out = document.getElementById('out-inactive-list');
-      out.style.display = 'block';
-      out.innerText = "⏳ डेटाबेस जाँचा जा रहा है...";
-      db.ref('users').once('value', snap => {
-        let list = "💤 निष्क्रिय तलबा सूची (No recent activity):\n";
-        let count = 0;
-        snap.forEach(child => {
-          const u = child.val();
-          if (!u.lastActive || (Date.now() - u.lastActive > 15 * 86400000)) {
-            list += `• रोल: ${child.key} (${u.name || 'नाम दर्ज नहीं'})\n`;
-            count++;
-          }
-        });
-        out.innerText = count > 0 ? list : "सब छात्र सक्रिय हैं!";
-      });
-    }
-
-    // --- क्लास मोड व टूल्स (16-20) ---
-    function toggleExamLockdown(state) {
-      db.ref('settings/examLockdown').set(state, () => {
-        alert(state ? "🔒 इम्तिहान हॉल लॉकडाउन सक्रिय हुआ!" : "🟢 नॉर्मल मोड रीस्टोर हुआ!");
-      });
-    }
-
-    function flushTakrarRooms() {
-      if (confirm("सभी तक़रार रूम्स बंद करें?")) {
-        db.ref('takrar_rooms').remove(() => alert("🛑 सभी रूम्स बंद हो गए!"));
+      try {
+        const { ref, data } = await findUserRef(roll);
+        await ref.update({ badge: badge, star: true, updatedAt: Date.now() });
+        showToast(`✅ रोल ${roll} को '${badge}' व स्टार दे दिया गया!`);
+        document.getElementById('badge-roll').value = '';
+      } catch (e) {
+        showToast("एरर: " + e.message);
       }
     }
 
-    function createClassPoll() {
-      const q = document.getElementById('poll-q').value.trim();
-      const o1 = document.getElementById('poll-opt1').value.trim();
-      const o2 = document.getElementById('poll-opt2').value.trim();
-      if (!q || !o1 || !o2) return alert("सवाल और दोनों विकल्प भरें!");
-      db.ref('class_polls').push({
-        question: q,
-        options: [o1, o2],
-        votes: { opt0: 0, opt1: 0 },
-        timestamp: Date.now()
-      }, () => alert("🗳️ नया पोल लाइव जारी कर दिया गया!"));
+    async function removeBadge() {
+      const roll = document.getElementById('badge-roll').value.trim();
+      if (!roll) return showToast("कृपया रोल नंबर दर्ज करें!");
+      try {
+        const { ref } = await findUserRef(roll);
+        await ref.update({ badge: null, star: false });
+        showToast(`✅ रोल ${roll} से बैज व स्टार हटा दिया गया!`);
+      } catch (e) {
+        showToast("एरर: " + e.message);
+      }
     }
 
-    async function generateSanadText() {
-      const name = document.getElementById('cert-name').value.trim();
-      const roll = document.getElementById('cert-roll').value.trim();
-      const ach = document.getElementById('cert-achieve').value.trim();
-      if (!name || !roll) return alert("नाम और रोल नंबर भरें!");
-      const out = document.getElementById('out-cert-box');
-      out.style.display = 'block';
-      out.innerText = "⏳ सनद तैयार हो रही है...";
-      const prompt = `जामिया ऊला अलिफ़ की तरफ से तालिब-ए-इल्म "${name}" (रोल: ${roll}) की उपलब्धि "${ach}" के लिए एक औपचारिक, अदबी और सुंदर प्रमाण पत्र (सनद) का टेक्स्ट ड्राफ्ट तैयार करें।`;
-      out.innerText = await callSuhailAI(prompt);
+    // ==========================================
+    // 2. स्ट्राइक व बैन हैंडलर
+    // ==========================================
+    async function applyStrike(val) {
+      const roll = document.getElementById('strike-roll').value.trim();
+      if (!roll) return showToast("रोल नंबर दर्ज करें!");
+
+      try {
+        const { ref, data } = await findUserRef(roll);
+        const current = (data.strikes || 0) + val;
+        const updates = { strikes: current };
+        if (current >= 3) {
+          updates.banned = true;
+        }
+        await ref.update(updates);
+        showToast(`⚠️ रोल ${roll}: स्ट्राइक = ${current}/3 ${current >= 3 ? '(म्यूट/ब्लॉक हुआ)' : ''}`);
+      } catch (e) {
+        showToast("एरर: " + e.message);
+      }
     }
 
-    function setMaintenance(state) {
-      db.ref('settings/maintenanceMode').set(state, () => {
-        alert(state ? "🛑 मेंटेनेंस मोड चालू हुआ!" : "🟢 मेंटेनेंस समाप्त, ऐप चालू है!");
+    async function resetStrikes() {
+      const roll = document.getElementById('strike-roll').value.trim();
+      if (!roll) return showToast("रोल नंबर दर्ज करें!");
+      try {
+        const { ref } = await findUserRef(roll);
+        await ref.update({ strikes: 0, banned: false });
+        showToast(`✅ रोल ${roll} की सभी स्ट्राइक रद्द की गईं!`);
+      } catch (e) {
+        showToast("एरर: " + e.message);
+      }
+    }
+
+    async function toggleDirectBan(isBan) {
+      const roll = document.getElementById('strike-roll').value.trim();
+      if (!roll) return showToast("रोल नंबर दर्ज करें!");
+      try {
+        const { ref } = await findUserRef(roll);
+        await ref.update({ banned: isBan });
+        showToast(isBan ? `🚫 रोल ${roll} को बैन कर दिया गया!` : `✅ रोल ${roll} को अनबैन कर दिया गया!`);
+      } catch (e) {
+        showToast("एरर: " + e.message);
+      }
+    }
+
+    // ==========================================
+    // 3. XP नियंत्रण
+    // ==========================================
+    async function adjustXP(delta) {
+      const roll = document.getElementById('xp-roll').value.trim();
+      if (!roll) return showToast("रोल नंबर दर्ज करें!");
+      try {
+        const { ref, data } = await findUserRef(roll);
+        const currentXP = Math.max(0, (parseInt(data.xp) || 0) + delta);
+        await ref.update({ xp: currentXP });
+        showToast(`⚡ रोल ${roll}: कुल XP = ${currentXP}`);
+      } catch (e) {
+        showToast("एरर: " + e.message);
+      }
+    }
+
+    // ==========================================
+    // 4. चैट रूम व संदेश नियंत्रण
+    // ==========================================
+    async function setChatLock(lockState) {
+      if (!db) return;
+      try {
+        await db.ref('settings/chatLocked').set(lockState);
+        showToast(lockState ? "🔒 क्लास चैट बंद (Mute All) कर दी गई।" : "🔓 क्लास चैट सभी के लिए खोल दी गई।");
+      } catch (e) {
+        showToast("एरर: " + e.message);
+      }
+    }
+
+    async function clearAllChatMessages() {
+      if (!confirm("⚠️ क्या आप सच में क्लासरूम के सभी संदेश साफ़ (Wipe) करना चाहते हैं?")) return;
+      try {
+        await db.ref('chats').remove();
+        await db.ref('messages').remove();
+        showToast("🧹 संपूर्ण चैट इतिहास सफलतापूर्वक साफ़ किया गया!");
+      } catch (e) {
+        showToast("एरर: " + e.message);
+      }
+    }
+
+    // ==========================================
+    // 5. नोटिस बोर्ड प्रसारण
+    // ==========================================
+    async function broadcastNotice() {
+      const text = document.getElementById('notice-text').value.trim();
+      if (!text) return showToast("नोटिस का विवरण दर्ज करें!");
+      try {
+        await db.ref('notices/latest').set({
+          content: text,
+          date: new Date().toLocaleDateString('hi-IN'),
+          timestamp: Date.now()
+        });
+        showToast("📢 नया नोटिस जारी कर दिया गया!");
+        document.getElementById('notice-text').value = '';
+      } catch (e) {
+        showToast("एरर: " + e.message);
+      }
+    }
+
+    async function clearNotice() {
+      try {
+        await db.ref('notices/latest').remove();
+        showToast("🗑️ नोटिस हटा दिया गया!");
+      } catch (e) {
+        showToast("एरर: " + e.message);
+      }
+    }
+
+    // ==========================================
+    // 6. AI ऑटोमेशन कॉलर
+    // ==========================================
+    async function runAdminAI() {
+      const task = document.getElementById('sel-admin-ai').value;
+      const btn = document.getElementById('btn-admin-ai');
+      const box = document.getElementById('admin-ai-output');
+
+      btn.disabled = true;
+      btn.innerText = "AI प्रोसेस हो रहा है...";
+      box.style.display = "block";
+      box.innerText = "लोड हो रहा है...";
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ task: task, prompt: "प्रशासनिक रिपोर्ट तैयार करें" })
+        });
+        const data = await res.json();
+        box.innerText = data.reply || data.text || "जवाब नहीं मिला।";
+      } catch (err) {
+        box.innerText = "एरर: " + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "AI प्रोसेस शुरू करें";
+      }
+    }
+
+    // ==========================================
+    // 7. लाइव रियल-टाइम टेबल व स्टेटस लिस्टनर
+    // ==========================================
+    function initAdminListeners() {
+      // 1. चैट लॉक स्थिति
+      db.ref('settings/chatLocked').on('value', snap => {
+        const locked = snap.val() === true;
+        const el = document.getElementById('st-chat-state');
+        el.innerText = locked ? "बंद" : "खुला";
+        el.style.color = locked ? "var(--accent-red)" : "var(--accent-green)";
+      });
+
+      // 2. लाइव छात्र लिस्ट व आँकड़े
+      db.ref('users').on('value', snap => {
+        studentsCache = [];
+        let starsCount = 0;
+        let strikesCount = 0;
+        const tbody = document.getElementById('students-tbody');
+        tbody.innerHTML = '';
+
+        snap.forEach(child => {
+          const u = child.val() || {};
+          const roll = u.roll || u.rollNumber || child.key;
+          const name = u.name || "छात्र";
+          const xp = u.xp || 0;
+          const badge = u.badge || "-";
+          const strikes = u.strikes || 0;
+          const isBanned = u.banned === true || strikes >= 3;
+
+          if (u.star || u.badge) starsCount++;
+          if (isBanned) strikesCount++;
+
+          studentsCache.push({ roll, name, xp, badge, strikes, isBanned });
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td><strong>${roll}</strong></td>
+            <td>${name}</td>
+            <td><span style="color:var(--accent-gold); font-weight:bold;">${xp}</span></td>
+            <td>${badge !== '-' ? `<span class="badge-pill badge-star">${badge}</span>` : '-'}</td>
+            <td><span style="color:${strikes > 0 ? 'var(--accent-red)' : 'var(--text-muted)'}; font-weight:bold;">${strikes}/3</span></td>
+            <td><span class="badge-pill ${isBanned ? 'badge-ban' : 'badge-star'}" style="${!isBanned ? 'color:var(--accent-green); border-color:var(--accent-green);' : ''}">${isBanned ? 'ब्लॉक' : 'सक्रिय'}</span></td>
+            <td>
+              <button class="btn-muted" style="padding:4px 8px; font-size:0.75rem;" onclick="quickSelectRoll('${roll}')">चुनें</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+
+        document.getElementById('st-total').innerText = studentsCache.length;
+        document.getElementById('st-active').innerText = starsCount;
+        document.getElementById('st-strikes').innerText = strikesCount;
+      });
+    }
+
+    function quickSelectRoll(roll) {
+      document.getElementById('badge-roll').value = roll;
+      document.getElementById('strike-roll').value = roll;
+      document.getElementById('xp-roll').value = roll;
+      showToast(`रोल ${roll} को फ़ील्ड्स में चुन लिया गया!`);
+    }
+
+    function filterStudentTable() {
+      const q = document.getElementById('table-search').value.toLowerCase();
+      const rows = document.querySelectorAll('#students-tbody tr');
+      rows.forEach(r => {
+        const txt = r.innerText.toLowerCase();
+        r.style.display = txt.includes(q) ? '' : 'none';
       });
     }
   </script>
