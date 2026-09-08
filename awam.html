@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ur" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏛️ सोहेल एआई - आवामी व सामाजिक खिदमात</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-main: #0b141a;
+      --bg-card: #111b21;
+      --bg-input: #202c33;
+      --accent-green: #00a884;
+      --accent-gold: #eab308;
+      --text-main: #e9edef;
+      --text-muted: #8696a0;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg-main); color: var(--text-main); padding-bottom: 60px; }
+
+    .header { background: #1f2c34; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .header h1 { font-size: 1.1rem; color: var(--accent-gold); display: flex; align-items: center; gap: 8px; }
+    .btn-back { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; }
+
+    .container { max-width: 800px; margin: 15px auto; padding: 0 12px; }
+
+    /* Category Buttons */
+    .cat-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: none; }
+    .cat-tabs::-webkit-scrollbar { display: none; }
+    .tab-btn { background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border); padding: 8px 14px; border-radius: 20px; font-size: 0.8rem; white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    .tab-btn.active { background: var(--accent-green); color: #fff; border-color: var(--accent-green); font-weight: 600; }
+
+    /* Work Area */
+    .workspace-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+    .workspace-card label { display: block; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 6px; }
+    select, textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); padding: 12px; border-radius: 8px; font-size: 0.9rem; outline: none; margin-bottom: 12px; }
+    select:focus, textarea:focus { border-color: var(--accent-green); }
+
+    .btn-run { width: 100%; background: var(--accent-green); color: #fff; border: none; padding: 12px; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-run:active { opacity: 0.85; }
+
+    /* Output */
+    .result-box { margin-top: 15px; background: var(--bg-input); border-radius: 8px; padding: 15px; border-left: 4px solid var(--accent-gold); display: none; }
+    .result-head { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--accent-gold); font-weight: 600; margin-bottom: 8px; }
+    .result-body { font-size: 0.88rem; line-height: 1.6; color: var(--text-main); white-space: pre-wrap; }
+    .btn-copy { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; }
+
+    /* Grid */
+    .service-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+    .grid-item { background: var(--bg-card); border: 1px solid var(--border); padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+    .grid-item:hover { border-color: var(--accent-gold); background: #182229; }
+    .grid-item h3 { font-size: 0.85rem; color: var(--text-main); display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .grid-item p { font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1><i class="fa-solid fa-layer-group"></i> सोहेल एआई आवामी मरकज़</h1>
+    <a href="/index.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> क्लासरूम</a>
+  </div>
+
+  <div class="container">
+    <div class="cat-tabs">
+      <button class="tab-btn active" onclick="switchCategory('all')">🌐 सभी 40 सेवाएँ</button>
+      <button class="tab-btn" onclick="switchCategory('govt')">🏛️ क़ानूनी व सरकारी (10)</button>
+      <button class="tab-btn" onclick="switchCategory('biz')">💼 दुकान व हिसाब (10)</button>
+      <button class="tab-btn" onclick="switchCategory('health')">🩺 सेहत व यूनानी (10)</button>
+      <button class="tab-btn" onclick="switchCategory('tech')">🔧 डिजिटल व टेक (10)</button>
+    </div>
+
+    <div class="workspace-card">
+      <label for="sel-task"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent-gold);"></i> सोहेल एआई खिदमत चुनें:</label>
+      <select id="sel-task" onchange="updatePlaceholder()">
+        <!-- 1. क़ानूनी व सरकारी -->
+        <optgroup label="🏛️ सोहेल एआई — क़ानूनी व सरकारी रहनुमाई" class="grp-govt">
+          <option value="nv_govt_scheme" data-p="योजना का नाम लिखें या अपनी उम्र व काम बताकर पात्रता पूछें...">1. सरकारी योजना पात्रता चेकर</option>
+          <option value="nv_complaint_letter" data-p="विभाग का नाम और अपनी शिकायत की पूरी बात लिखें...">2. शिकायती दरख़्वास्त पत्र ड्राफ्टर</option>
+          <option value="nv_rti_draft" data-p="किस विभाग या काम की जानकारी चाहिए, स्पष्ट लिखें...">3. आरटीआई (RTI) आवेदन पत्र ड्राफ्टर</option>
+          <option value="nv_land_docs" data-p="खतौनी, बैनामा या ज़मीनी काग़ज़ात का जो शब्द समझना हो लिखें...">4. ज़मीनी खतौनी व बैनामा शब्दावली गाइड</option>
+          <option value="nv_govt_form_guide" data-p="आधार, पैन या वोटर आईडी में क्या सुधार या नया बनवाना है?">5. आधार/पैन/वोटर आईडी सुधार गाइड</option>
+          <option value="nv_utility_bill_calc" data-p="बिजली बिल में कितने यूनिट या क्या गड़बड़ी आई है?">6. बिजली बिल गड़बड़ी आपत्ति पत्र</option>
+          <option value="nv_pension_scholarship" data-p="पेंशन या छात्रवृत्ति के बारे में अपनी स्थिति लिखें...">7. पेंशन व छात्रवृत्ति स्टेटस गाइड</option>
+          <option value="nv_consumer_court" data-p="ख़राब सामान, कंपनी का नाम और समस्या लिखें...">8. उपभोक्ता फ़ोरम शिकायत ड्राफ्टर</option>
+          <option value="nv_police_complaint" data-p="थाने में देने के लिए घटना का विवरण और तारीख़ लिखें...">9. थाना लिखित तहरीर प्रारूप</option>
+          <option value="nv_tenant_legal" data-p="किरायेदारी, एग्रीमेंट या कमरे को लेकर जो मसला हो लिखें...">10. रेंट एग्रीमेंट मुख्य शर्तें गाइड</option>
+        </optgroup>
+
+        <!-- 2. दुकान व रोज़गार -->
+        <optgroup label="💼 सोहेल एआई — हिसाब-किताब व दुकानदारी" class="grp-biz">
+          <option value="cf_ledger_khata" data-p="ग्राहक का नाम, पिछला बाक़ी और नया लेनदेन लिखें...">11. दैनिक खाता-बही (उधारी-जमा) समरी</option>
+          <option value="cf_profit_loss" data-p="ख़रीद रेट, भाड़ा और बिक्री रेट दर्ज करें...">12. नफ़ा-नुक़सान (Profit Margin) कैलकुलेटर</option>
+          <option value="cf_digital_invoice" data-p="सामान का नाम, मात्रा और रेट लिखें...">13. व्हाट्सएप डिजिटल बिल व रसीद</option>
+          <option value="cf_inventory_alert" data-p="दुकान के सामान और बची हुई मात्रा लिखें...">14. स्टॉक ख़त्म अलर्ट (Re-order Estimator)</option>
+          <option value="cf_retail_margin" data-p="थोक रेट और अपना ख़र्च लिखें...">15. थोक बनाम फुटकर क़ीमत विश्लेषक</option>
+          <option value="cf_local_ad_maker" data-p="दुकान का नाम, ऑफ़र या सामान का नाम लिखें...">16. स्थानीय व्यापार व्हाट्सएप विज्ञापन</option>
+          <option value="cf_small_biz_plan" data-p="कितने बजट में किस चीज़ की दुकान शुरू करनी है?">17. छोटा बिज़नेस लागत अनुमानक</option>
+          <option value="cf_gst_guide" data-p="अपनी सालाना बिक्री और व्यापार का प्रकार लिखें...">18. कम्पोज़ीशन व जीएसटी सामान्य गाइड</option>
+          <option value="cf_refund_dispute" data-p="ग्राहक किस बात पर नाराज़ है, संक्षेप में लिखें...">19. ग्राहक विवाद समाधान संदेश</option>
+          <option value="cf_monthly_budget" data-p="मासिक आमदनी और मुख्य ख़र्चों की रकम लिखें...">20. घरेलू मासिक राशन व बचत बजट</option>
+        </optgroup>
+
+        <!-- 3. सेहत व यूनानी -->
+        <optgroup label="🩺 सोहेल एआई — यूनानी व तिब्बी मुशीर" class="grp-health">
+          <option value="gem_first_aid" data-p="चोट, जलने या तकलीफ़ का विवरण लिखें...">21. आपातकालीन प्राथमिक उपचार (First Aid)</option>
+          <option value="gem_unani_remedy" data-p="सर्दी, खाँसी, बदहज़मी या परेशानी का विवरण दें...">22. घरेलू व यूनानी नुस्खा सलाहकार</option>
+          <option value="gem_rx_terms" data-p="पर्चे पर लिखी डॉक्टर की शब्दावली लिखें...">23. डॉक्टर के पर्चे के संकेत (OD/BD/SOS)</option>
+          <option value="gem_lab_report_terms" data-p="टेस्ट रिपोर्ट का नाम और वैल्यू यहाँ लिखें...">24. ब्लड टेस्ट (CBC, Sugar) रिपोर्ट गाइड</option>
+          <option value="gem_seasonal_diet" data-p="मौसम और अपनी सेहत/उम्र की जानकारी दें...">25. मौसमी गिज़ा व परहेज़ चार्ट</option>
+          <option value="gem_bp_sugar_routine" data-p="बीपी या शुगर की रीडिंग और उम्र लिखें...">26. बीपी व शुगर जीवनशैली गाइड</option>
+          <option value="gem_elder_child_care" data-p="बच्चे या बुज़ुर्ग की उम्र और मौसम की तकलीफ़ लिखें...">27. बुज़ुर्गों व बच्चों की मौसमी देखरेख</option>
+          <option value="gem_symptom_guide" data-p="जो शारीरिक तकलीफ़ हो रही है, साफ़ लिखें...">28. लक्षण अनुसार सही डॉक्टर गाइड</option>
+          <option value="gem_mental_calm" data-p="तनाव, घबराहट या अनिद्रा का अनुभव लिखें...">29. मानसिक तनाव व सुकून भरी साँस गाइड</option>
+          <option value="gem_hospital_emergency" data-p="इमरजेंसी की स्थिति लिखें...">30. अस्पताल इमरजेंसी तैयारी चेकलिस्ट</option>
+        </optgroup>
+
+        <!-- 4. टेक व डिजिटल -->
+        <optgroup label="🔧 सोहेल एआई — रोज़मर्रा डिजिटल मुआविन" class="grp-tech">
+          <option value="co_mobile_troubleshoot" data-p="मोबाइल का मॉडल और समस्या (हैंग, स्टोरेज) लिखें...">31. मोबाइल मेमोरी व हैंग ट्रबलशूटर</option>
+          <option value="co_travel_ticket_guide" data-p="कहाँ से कहाँ जाना है, ट्रेन या बस के नियम पूछें...">32. ट्रेन (IRCTC) व तत्काल टिकट गाइड</option>
+          <option value="co_upi_fraud_safety" data-p="संदिग्ध मैसेज, कॉल या लिंक का विवरण लिखें...">33. यूपीआई व ऑनलाइन फ्रॉड सुरक्षा</option>
+          <option value="co_lost_phone_ceir" data-p="फ़ोन गुम होने पर ब्लॉक करने की प्रक्रिया पूछें...">34. गुम/चोरी मोबाइल ब्लॉक (CEIR गाइड)</option>
+          <option value="co_appliance_repair" data-p="पंखा, कूलर, इन्वर्टर या घरेलू उपकरण की तकलीफ़ लिखें...">35. घरेलू उपकरणों की बुनियादी देखभाल</option>
+          <option value="co_daily_translator" data-p="जिस जुमले का अंग्रेज़ी/उर्दू/हिंदी में अनुवाद चाहिए लिखें...">36. रोज़मर्रा बहुभाषी अनुवादक</option>
+          <option value="co_online_bill_pay" data-p="गैस बुकिंग या बिल भरने में कहाँ समस्या आ रही है?">37. ऑनलाइन बिजली/सिलेंडर बुकिंग गाइड</option>
+          <option value="co_resume_builder" data-p="नाम, पढ़ाई और जिस काम के लिए बायो-डेटा चाहिए लिखें...">38. बायो-डेटा / रेज़्यूमे टेक्स्ट मेकर</option>
+          <option value="co_social_media_helper" data-p="वीडियो, पोस्ट या प्रोफ़ाइल का विषय लिखें...">39. सोशल मीडिया पोस्ट व वीडियो आउटलाइनर</option>
+          <option value="co_market_price_check" data-p="सामान का नाम और ऑनलाइन दिखने वाला दाम लिखें...">40. ऑनलाइन सामान सही क़ीमत चेकर</option>
+        </optgroup>
+      </select>
+
+      <label for="user-prompt"><i class="fa-solid fa-pen"></i> अपनी ज़रूरत या सवाल लिखें:</label>
+      <textarea id="user-prompt" rows="3" placeholder="योजना का नाम लिखें या अपनी उम्र व काम बताकर पात्रता पूछें..."></textarea>
+
+      <button class="btn-run" onclick="executeSuhailAI()" id="btn-run">
+        <i class="fa-solid fa-bolt"></i> सोहेल एआई से हल प्राप्त करें
+      </button>
+
+      <div class="result-box" id="result-box">
+        <div class="result-head">
+          <span><i class="fa-solid fa-robot"></i> सोहेल एआई का आधिकारिक समाधान</span>
+          <button class="btn-copy" onclick="copyResult()"><i class="fa-solid fa-copy"></i> कॉपी करें</button>
+        </div>
+        <div class="result-body" id="result-body"></div>
+      </div>
+    </div>
+
+    <h3 style="font-size:0.9rem; color:var(--text-muted); margin-bottom:10px;"><i class="fa-solid fa-table-cells"></i> त्वरित चयन (Quick Access)</h3>
+    <div class="service-grid" id="service-grid"></div>
+  </div>
+
+  <script>
+    function updatePlaceholder() {
+      const sel = document.getElementById('sel-task');
+      const opt = sel.options[sel.selectedIndex];
+      const p = opt.getAttribute('data-p') || "यहाँ अपना सवाल लिखें...";
+      document.getElementById('user-prompt').placeholder = p;
+    }
+
+    function switchCategory(cat) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const grpGovt = document.querySelector('.grp-govt');
+      const grpBiz = document.querySelector('.grp-biz');
+      const grpHealth = document.querySelector('.grp-health');
+      const grpTech = document.querySelector('.grp-tech');
+
+      if (cat === 'all') {
+        grpGovt.style.display = grpBiz.style.display = grpHealth.style.display = grpTech.style.display = '';
+      } else if (cat === 'govt') {
+        grpGovt.style.display = ''; grpBiz.style.display = grpHealth.style.display = grpTech.style.display = 'none';
+        document.getElementById('sel-task').value = "nv_govt_scheme";
+      } else if (cat === 'biz') {
+        grpBiz.style.display = ''; grpGovt.style.display = grpHealth.style.display = grpTech.style.display = 'none';
+        document.getElementById('sel-task').value = "cf_ledger_khata";
+      } else if (cat === 'health') {
+        grpHealth.style.display = ''; grpGovt.style.display = grpBiz.style.display = grpTech.style.display = 'none';
+        document.getElementById('sel-task').value = "gem_first_aid";
+      } else if (cat === 'tech') {
+        grpTech.style.display = ''; grpGovt.style.display = grpBiz.style.display = grpHealth.style.display = 'none';
+        document.getElementById('sel-task').value = "co_mobile_troubleshoot";
+      }
+      updatePlaceholder();
+    }
+
+    async function executeSuhailAI() {
+      const task = document.getElementById('sel-task').value;
+      const prompt = document.getElementById('user-prompt').value.trim();
+      const btn = document.getElementById('btn-run');
+      const resBox = document.getElementById('result-box');
+      const resBody = document.getElementById('result-body');
+
+      if (!prompt) return alert("कृपया अपनी ज़रूरत या सवाल लिखें!");
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> सोहेल एआई सोच रहा है...`;
+      resBox.style.display = "block";
+      resBody.innerText = "सोहेल एआई जवाब तैयार कर रहा है, कृपया प्रतीक्षा करें...";
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ task: task, prompt: prompt })
+        });
+        const data = await res.json();
+        resBody.innerText = data.reply || data.text || "जवाब प्राप्त नहीं हो सका।";
+      } catch (err) {
+        resBody.innerText = "तकनीकी समस्या: " + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-bolt"></i> सोहेल एआई से हल प्राप्त करें`;
+      }
+    }
+
+    function copyResult() {
+      const txt = document.getElementById('result-body').innerText;
+      navigator.clipboard.writeText(txt).then(() => alert("जवाब कॉपी हो गया!"));
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const sel = document.getElementById('sel-task');
+      const grid = document.getElementById('service-grid');
+      Array.from(sel.options).slice(0, 16).forEach(opt => {
+        const div = document.createElement('div');
+        div.className = 'grid-item';
+        div.innerHTML = `<h3>${opt.innerText}</h3><p>${opt.getAttribute('data-p') || ''}</p>`;
+        div.onclick = () => {
+          sel.value = opt.value;
+          updatePlaceholder();
+          window.scrollTo({ top: 100, behavior: 'smooth' });
+        };
+        grid.appendChild(div);
+      });
+    });
+  </script>
+</body>
+</html>
