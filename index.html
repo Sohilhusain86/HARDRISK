@@ -5151,39 +5151,109 @@ window.finishQuizRound = function(msg) {
     <div style="padding:15px; overflow-y:auto; flex:1;">
       <label style="color:#8696a0; font-size:0.8rem; display:block; margin-bottom:6px;">इल्मी सर्विस चुनें:</label>
       <select id="sel-ai-task" style="width:100%; padding:10px; background:#202c33; border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:6px; margin-bottom:12px; font-size:0.88rem;">
-        <optgroup label="⚡ Groq (सुपर-फास्ट टूल्स)">
-          <option value="groq_nahw_sarf_quick">1. कलिमा पहचान (इस्म, फे़'ल, हर्फ़)</option>
-          <option value="groq_rapid_quiz">2. 15-सेकंड रैपिड सेग़ा क्विज़</option>
-          <option value="groq_autocomplete">3. नह्वी जुमला ऑटो-कम्प्लीट</option>
-          <option value="groq_voice_keywords">4. अहम व्याकरण कीवर्ड्स</option>
-        </optgroup>
-        <optgroup label="🧠 Cerebras (आला दर्जात व तहलील)">
-          <option value="cerebras_tarkib">5. अरबी इबारत की नह्वी तरकीब</option>
-          <option value="cerebras_haft_aqsam">6. हफ़्त अक़्साम व तालील (सर्फ़)</option>
-          <option value="cerebras_quiz_explain">7. क्विज़ सवाल की तफ़सीली वजह</option>
-          <option value="cerebras_student_audit">8. छात्र नह्व-सर्फ़ कमज़ोरी रिपोर्ट</option>
-        </optgroup>
-        <optgroup label="📊 SambaNova (समरी व नोट्स)">
-          <option value="sambanova_class_summary">9. आज के दरस व क्लास का खुलासा</option>
-          <option value="sambanova_vocab_notes">10. पाठ्यपुस्तक मुफ़्रदात (शब्दकोश)</option>
-          <option value="sambanova_syllabus_plan">11. हफ़्तेवार मुताला टाइम-टेबल</option>
-          <option value="sambanova_speech_draft">12. अंजुमन तक़रीर व मक़ाला</option>
-        </optgroup>
-        <optgroup label="✏️ Mistral AI (भाषा व इमला)">
-          <option value="mistral_magic_correct">13. इमला व स्पेलिंग सुधार</option>
-          <option value="mistral_tashkeel">14. अरबी इबारत पर ए'राब (Tashkeel)</option>
-          <option value="mistral_dictionary">15. अरबी लुग़त, माद्दा व बाब</option>
-          <option value="mistral_formal_letter">16. मदरसे की औपचारिक अर्ज़ी/दरख़्वास्त</option>
-          <option value="mistral_grammar_feedback">17. व्याकरण त्रुटि विश्लेषण</option>
-        </optgroup>
-        <optgroup label="🌐 OpenRouter (रिसर्च व अनुवाद)">
-          <option value="openrouter_translation">18. शुद्ध तालीमी अरबी-उर्दू तर्जुमा</option>
-          <option value="openrouter_cross_verify">19. नह्वी क़वायद क्रॉस-वेरिफ़ायर</option>
-          <option value="openrouter_school_solver">20. स्कूली गणित व साइंस सॉल्वर</option>
-          <option value="openrouter_author_history">21. नह्व-सर्फ़ मुसन्निफ़ीन संदर्भ</option>
-        </optgroup>
-      </select>
+  <!-- तालीमी विंग (30) -->
+  <optgroup label="⚡ Groq (रैपिड तालीमी)">
+    <option value="groq_nahw_sarf_quick">1. कलिमा पहचान (इस्म, फे़'ल, हर्फ़)</option>
+    <option value="groq_rapid_quiz">2. 15s रैपिड सेग़ा क्विज़</option>
+    <option value="groq_autocomplete">3. नह्वी जुमला ऑटो-कम्प्लीट</option>
+    <option value="groq_voice_keywords">4. अहम व्याकरण कीवर्ड्स</option>
+    <option value="groq_profile_summary">5. तालीमी प्रोफ़ाइल स्नैपशॉट</option>
+  </optgroup>
 
+  <optgroup label="🧠 Cerebras (आला इम्तिहान व तरकीब)">
+    <option value="cerebras_tarkib">6. अरबी इबारत की नह्वी तरकीब</option>
+    <option value="cerebras_haft_aqsam">7. हफ़्त अक़्साम व तालील (सर्फ़)</option>
+    <option value="cerebras_quiz_explain">8. क्विज़ सही जवाब की वजह</option>
+    <option value="cerebras_student_audit">9. छात्र नह्व-सर्फ़ कमज़ोरी रिपोर्ट</option>
+    <option value="cerebras_quiz_architect">10. 12-लेवल कस्टमाइज़्ड क्विज़</option>
+  </optgroup>
+
+  <optgroup label="📊 SambaNova (समरी व नोट्स)">
+    <option value="sambanova_class_summary">11. आज के दरस व क्लास का खुलासा</option>
+    <option value="sambanova_vocab_notes">12. पाठ्यपुस्तक मुफ़्रदात (शब्दकोश)</option>
+    <option value="sambanova_syllabus_plan">13. हफ़्तेवार मुताला टाइम-टेबल</option>
+    <option value="sambanova_speech_draft">14. अंजुमन तक़रीर व मक़ाला</option>
+    <option value="sambanova_assignment_grade">15. असाइनमेंट मूल्यांकन व अंक</option>
+  </optgroup>
+
+  <optgroup label="✏️ Mistral AI (इमला व दरख़्वास्त)">
+    <option value="mistral_magic_correct">16. इमला व स्पेलिंग सुधार</option>
+    <option value="mistral_tashkeel">17. अरबी इबारत पर ए'राब (Tashkeel)</option>
+    <option value="mistral_dictionary">18. अरबी लुग़त, माद्दा व बाब</option>
+    <option value="mistral_formal_letter">19. मदरसे की औपचारिक दरख़्वास्त</option>
+    <option value="mistral_grammar_feedback">20. व्याकरण त्रुटि विश्लेषण</option>
+  </optgroup>
+
+  <optgroup label="🌐 OpenRouter (रिसर्च व अनुवाद)">
+    <option value="openrouter_translation">21. शुद्ध अरबी-उर्दू-हिंदी तर्जुमा</option>
+    <option value="openrouter_cross_verify">22. नह्वी क़वायद क्रॉस-वेरिफ़ायर</option>
+    <option value="openrouter_school_solver">23. स्कूली गणित व साइंस सॉल्वर</option>
+    <option value="openrouter_author_history">24. मुसन्निफ़ीन व किताबों का संदर्भ</option>
+    <option value="openrouter_universal_fallback">25. यूनिवर्सल तालीमी फ़ॉलबैक</option>
+  </optgroup>
+
+  <optgroup label="🛡️ HuggingFace (मर्यादा व क्लासिफ़ायर)">
+    <option value="hf_content_filter">26. अमर्यादित भाषा व स्पैम फ़िल्टर</option>
+    <option value="hf_auto_tagging">27. सवाल विषय ऑटो-टैगिंग</option>
+    <option value="hf_book_matcher">28. किताब एक्सचेंज मैचिंग</option>
+    <option value="hf_inactive_audit">29. निष्क्रिय छात्र वेक-अप संदेश</option>
+    <option value="hf_speech_transcribe">30. वॉयस नोट भाषाई ड्राफ्ट</option>
+  </optgroup>
+
+  <!-- आवामी विंग (40) -->
+  <optgroup label="🏛️ NVIDIA NIM (सरकारी, कानूनी व काग़ज़ात)">
+    <option value="nv_govt_scheme">31. सरकारी योजना पात्रता चेकर</option>
+    <option value="nv_complaint_letter">32. शिकायती दरख़्वास्त पत्र ड्राफ्टर</option>
+    <option value="nv_rti_draft">33. आरटीआई (RTI) आवेदन लेखक</option>
+    <option value="nv_land_docs">34. ज़मीनी दस्तावेज़ व खतौनी सरलीकरण</option>
+    <option value="nv_govt_form_guide">35. आधार, पैन व वोटर आईडी गाइड</option>
+    <option value="nv_utility_bill_calc">36. बिजली-पानी बिल गड़बड़ी आपत्ति</option>
+    <option value="nv_pension_scholarship">37. पेंशन व छात्रवृत्ति स्टेटस गाइड</option>
+    <option value="nv_consumer_court">38. उपभोक्ता अधिकार व फ़ोरम शिकायत</option>
+    <option value="nv_police_complaint">39. थाना तहरीर (FIR/Complaint) ड्राफ्ट</option>
+    <option value="nv_tenant_legal">40. रेंट एग्रीमेंट व कानूनी नियम</option>
+  </optgroup>
+
+  <optgroup label="💼 Cloudflare Workers AI (दुकानदारी व रोज़गार)">
+    <option value="cf_ledger_khata">41. दैनिक खाता-बही व उधारी हिसाब</option>
+    <option value="cf_profit_loss">42. मुनाफ़ा व मार्जिन (Profit-Loss) गणक</option>
+    <option value="cf_digital_invoice">43. व्हाट्सएप डिजिटल बिल व रसीद</option>
+    <option value="cf_inventory_alert">44. दुकान स्टॉक व इन्वेंट्री अलर्ट</option>
+    <option value="cf_local_ad_maker">45. स्थानीय बाज़ार विज्ञापन व ऑफ़र</option>
+    <option value="cf_monthly_budget">46. घरेलू मासिक बचत बजट प्लानर</option>
+    <option value="cf_small_biz_plan">47. छोटा बिज़नेस शुरू करने का खाका</option>
+    <option value="cf_gst_guide">48. जीएसटी व कम्पोज़ीशन नियम गाइड</option>
+    <option value="cf_refund_dispute">49. ग्राहक असंतोष व विवाद समाधान</option>
+    <option value="cf_loan_emi_calc">50. ईएमआई, लोन व बचत कैलकुलेटर</option>
+  </optgroup>
+
+  <optgroup label="🩺 Google Gemini (सेहत, यूनानी व तिब्बी)">
+    <option value="gem_first_aid">51. आपातकालीन प्राथमिक उपचार (First Aid)</option>
+    <option value="gem_seasonal_diet">52. मौसमी परहेज़ व गिज़ा चार्ट</option>
+    <option value="gem_unani_remedy">53. घरेलू व यूनानी नुस्खे सलाहकार</option>
+    <option value="gem_rx_terms">54. डॉक्टर के पर्चे (Prescription) शब्दावली</option>
+    <option value="gem_symptom_guide">55. लक्षण विश्लेषण व सही डॉक्टर गाइड</option>
+    <option value="gem_elder_child_care">56. बुज़ुर्गों व बच्चों की देखभाल</option>
+    <option value="gem_lab_report_terms">57. लैब टेस्ट रिपोर्ट शब्दावली गाइड</option>
+    <option value="gem_bp_sugar_routine">58. बीपी व शुगर जीवनशैली चार्ट</option>
+    <option value="gem_mental_calm">59. मानसिक तनाव व सुकून मार्गदर्शक</option>
+    <option value="gem_hospital_emergency">60. अस्पताल इमरजेंसी प्रोटोकॉल</option>
+  </optgroup>
+
+  <optgroup label="🔧 Cohere (टेक, यात्रा व घरेलू मदद)">
+    <option value="co_mobile_troubleshoot">61. मोबाइल व स्टोरेज ट्रबलशूटर</option>
+    <option value="co_travel_ticket_guide">62. ट्रेन (IRCTC) व यात्रा गाइड</option>
+    <option value="co_upi_fraud_safety">63. यूपीआई व ऑनलाइन फ्रॉड सुरक्षा</option>
+    <option value="co_recharge_wifi_plan">64. मोबाइल रिचार्ज व प्लान तुलना</option>
+    <option value="co_appliance_repair">65. घरेलू उपकरणों की बुनियादी मरम्मत</option>
+    <option value="co_daily_translator">66. सफ़र व आम बोलचाल अनुवादक</option>
+    <option value="co_social_media_helper">67. सोशल मीडिया विवरण व बायो</option>
+    <option value="co_lost_phone_ceir">68. गुम फ़ोन व सिम ब्लॉक (CEIR)</option>
+    <option value="co_online_bill_pay">69. ऑनलाइन बिल पेमेंट व सिलेंडर बुकिंग</option>
+    <option value="co_market_price_check">70. ऑनलाइन बाज़ार व सही क़ीमत गाइड</option>
+  </optgroup>
+      </select>
+      
       <label style="color:#8696a0; font-size:0.8rem; display:block; margin-bottom:6px;">अपनी इबारत या सवाल लिखें:</label>
       <textarea id="ai-task-input" rows="3" placeholder="यहाँ लफ़्ज़, इबारत या सवाल दर्ज करें..." style="width:100%; padding:10px; background:#202c33; border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:6px; margin-bottom:12px; font-size:0.9rem; box-sizing:border-box;"></textarea>
 
