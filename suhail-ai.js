@@ -1,107 +1,173 @@
 // ==========================================================
-// 🚀 सोहेल एआई (Suhail AI) - ऑटोमैटिक क्लासरूम इंजन
-// यह स्क्रिप्ट खुद चैट बॉक्स, क्विज़ और नोट्स टैब से जुड़ती है
+// 🚀 सोहेल एआई - टच-ड्रैगेबल विजेट व लेआउट प्रोटेक्टर
 // ==========================================================
 
 (function() {
-  console.log("⚡ सोहेल एआई क्लासरूम इंजन सक्रिय हुआ...");
+  // 1. क्राउन (👑) को आज़ाद करना और ख़राब फिक्स बटनों को हटाना
+  const oldRogueBtn = document.getElementById('btn-about-trigger');
+  if (oldRogueBtn) oldRogueBtn.remove();
 
-  // 1. चैट बॉक्स: लिखते ही अगला लफ़्ज़ व माद्दा सुझाव (Auto-Hook)
-  function attachChatSmartBar() {
-    const input = document.getElementById('chat-input') || document.querySelector('textarea') || document.querySelector('input[type="text"]');
-    if (!input || document.getElementById('suhail-smart-bar')) return;
+  // 2. ड्रैगेबल डॉक स्टाइल
+  const style = document.createElement('style');
+  style.innerHTML = `
+    /* हेडर और क्राउन को ओवरलैप से बचाना */
+    #btn-about-trigger { display: none !important; }
+    
+    /* ड्रैगेबल कंट्रोलर बॉक्स */
+    .suhail-draggable-dock {
+      position: fixed;
+      bottom: 25px;
+      right: 15px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      touch-action: none;
+      user-select: none;
+    }
+    .suhail-drag-handle {
+      background: rgba(32, 44, 51, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 30px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+    }
+    .suhail-dock-btn {
+      padding: 7px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn-dock-awam { background: #00a884; color: #fff; }
+    .btn-dock-admin { background: #202c33; color: #eab308; border: 1px solid #eab308; }
+    .btn-dock-about { background: #111b21; color: #3b82f6; border: 1px solid #3b82f6; }
+    .drag-grip { color: #8696a0; font-size: 0.8rem; cursor: grab; padding: 0 2px; }
 
-    const bar = document.createElement('div');
-    bar.id = 'suhail-smart-bar';
-    bar.style.cssText = 'display:none; padding:5px 12px; font-size:0.75rem; background:#182229; color:#00a884; border:1px solid rgba(0,168,132,0.3); border-radius:15px; margin-bottom:6px; cursor:pointer; width:fit-content;';
-    input.parentNode.insertBefore(bar, input);
+    /* कीबोर्ड खुलते ही या टाइप करते ही डॉक को पारदर्शी/किनारे करना */
+    .dock-minimized {
+      opacity: 0.25;
+      transform: scale(0.85);
+    }
+  `;
+  document.head.appendChild(style);
 
-    let timer;
-    input.addEventListener('input', () => {
-      clearTimeout(timer);
-      const val = input.value.trim();
-      if (val.length < 3) { bar.style.display = 'none'; return; }
+  // 3. ड्रैगेबल डॉक बनाना (स्क्रीन पर कहीं भी ले जाने योग्य)
+  function createDraggableDock() {
+    if (document.getElementById('suhail-drag-dock')) return;
 
-      timer = setTimeout(async () => {
-        try {
-          const res = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ task: 'groq_autocomplete', prompt: val })
+    // पुराने स्थिर बटनों को छिपाना ताकि चैट इनपुट साफ़ हो जाए
+    document.querySelectorAll('*').forEach(el => {
+      if (el.children.length === 0 && (el.innerText.includes('30 AI खिदमात') || el.innerText.includes('सुपर एडमिन'))) {
+        const p = el.closest('div') || el.closest('button') || el;
+        if (p && p.style.position === 'fixed') p.style.display = 'none';
+      }
+    });
+
+    const dock = document.createElement('div');
+    dock.id = 'suhail-drag-dock';
+    dock.className = 'suhail-draggable-dock';
+    dock.innerHTML = `
+      <div class="suhail-drag-handle" id="dock-handle">
+        <span class="drag-grip"><i class="fa-solid fa-grip-vertical"></i></span>
+        <a href="/awam.html" class="suhail-dock-btn btn-dock-awam">🏛️ 40 खिदमात</a>
+        <a href="/admin.html" class="suhail-dock-btn btn-dock-admin">🛡️ एडमिन</a>
+        <button class="suhail-dock-btn btn-dock-about" onclick="document.getElementById('about-guide-modal').style.display='flex'">ℹ️ गाइड</button>
+      </div>
+    `;
+    document.body.appendChild(dock);
+
+    // 4. टच ड्रैग लॉजिक (मोबाइल पर उंगली से सरकाना)
+    let isDragging = false;
+    let startX, startY, initLeft, initTop;
+
+    const handle = document.getElementById('dock-handle');
+
+    function onTouchStart(e) {
+      if (e.target.closest('a') || e.target.closest('button')) return; // बटनों पर क्लिक काम करे
+      isDragging = true;
+      const touch = e.touches[0];
+      startX = touch.clientX;
+      startY = touch.clientY;
+      const rect = dock.getBoundingClientRect();
+      initLeft = rect.left;
+      initTop = rect.top;
+      dock.style.bottom = 'auto';
+      dock.style.right = 'auto';
+      dock.style.left = initLeft + 'px';
+      dock.style.top = initTop + 'px';
+    }
+
+    function onTouchMove(e) {
+      if (!isDragging) return;
+      const touch = e.touches[0];
+      const dx = touch.clientX - startX;
+      const dy = touch.clientY - startY;
+
+      let newLeft = Math.max(10, Math.min(window.innerWidth - dock.offsetWidth - 10, initLeft + dx));
+      let newTop = Math.max(10, Math.min(window.innerHeight - dock.offsetHeight - 10, initTop + dy));
+
+      dock.style.left = newLeft + 'px';
+      dock.style.top = newTop + 'px';
+    }
+
+    function onTouchEnd() {
+      isDragging = false;
+    }
+
+    handle.addEventListener('touchstart', onTouchStart, { passive: true });
+    document.addEventListener('touchmove', onTouchMove, { passive: true });
+    document.addEventListener('touchend', onTouchEnd);
+
+    // 5. टाइपिंग के समय इनपुट बॉक्स को साफ़ रखना
+    const inputs = document.querySelectorAll('input, textarea');
+    inputs.forEach(inp => {
+      inp.addEventListener('focus', () => dock.classList.add('dock-minimized'));
+      inp.addEventListener('blur', () => dock.classList.remove('dock-minimized'));
+    });
+  }
+
+  // 6. लाइव स्टार और बैज को सही रेंडर करना
+  function syncLiveBadges() {
+    const db = window.db || (typeof firebase !== 'undefined' && firebase.apps.length ? firebase.database() : null);
+    if (!db) return;
+
+    db.ref('users').on('value', snap => {
+      snap.forEach(child => {
+        const u = child.val() || {};
+        const roll = String(u.roll || u.rollNumber || child.key).trim();
+        if (u.star || u.badge) {
+          document.querySelectorAll('div, p, span, h4').forEach(el => {
+            if (el.children.length <= 1 && el.innerText && el.innerText.includes(`रोल: ${roll}`)) {
+              if (!el.getAttribute('data-badge-synced')) {
+                el.setAttribute('data-badge-synced', 'true');
+                const star = u.star ? '<span style="color:#eab308; margin-right:3px;">⭐</span>' : '';
+                const badge = u.badge ? `<span style="background:rgba(234,179,8,0.18); color:#eab308; border:1px solid #eab308; padding:1px 5px; border-radius:4px; font-size:0.7rem; margin-right:4px; font-weight:bold;">${u.badge}</span>` : '';
+                el.innerHTML = `${star}${badge} ${el.innerHTML}`;
+              }
+            }
           });
-          const d = await res.json();
-          if (d.reply) {
-            bar.innerHTML = `✨ <b>सोहेल एआई सुझाव:</b> ${d.reply} <i>(टैप करें)</i>`;
-            bar.style.display = 'inline-block';
-            bar.onclick = () => { input.value = val + " " + d.reply; bar.style.display = 'none'; input.focus(); };
-          }
-        } catch(e) { bar.style.display = 'none'; }
-      }, 700);
-    });
-  }
-
-  // 2. क्विज़ स्क्रीन: ग़लत जवाब पर खुद नह्वी वजह समझाना
-  function attachQuizAutoExplainer() {
-    document.addEventListener('click', (e) => {
-      const opt = e.target.closest('.quiz-option') || e.target.closest('[onclick*="checkAnswer"]');
-      if (!opt) return;
-
-      setTimeout(() => {
-        const modal = document.querySelector('.quiz-card') || document.querySelector('#quiz-modal') || opt.closest('div');
-        if (modal && !modal.querySelector('#suhail-quiz-why')) {
-          const whyBox = document.createElement('div');
-          whyBox.id = 'suhail-quiz-why';
-          whyBox.style.cssText = 'background:#182229; border-left:3px solid #eab308; padding:8px; font-size:0.78rem; color:#e9edef; margin-top:10px; border-radius:4px;';
-          whyBox.innerHTML = '📖 <i>सोहेल एआई नह्वी नियम लोड कर रहा है...</i>';
-          modal.appendChild(whyBox);
-
-          fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ task: 'cerebras_quiz_explain', prompt: "इस नह्वी क्विज़ सवाल के सही नियम की तशरीह करें" })
-          }).then(r => r.json()).then(d => {
-            whyBox.innerHTML = `<b>📖 सोहेल एआई नह्वी तशरीह:</b> ${d.reply || 'सबक याद रखें।'}`;
-          }).catch(() => whyBox.remove());
         }
-      }, 300);
+      });
     });
   }
 
-  // 3. नोट्स टैब: खुलते ही ऑटोमैटिक क्लास समरी रेंडर करना
-  function attachNotesAutoSummary() {
-    const notesTab = document.querySelector('[data-tab="notes"]') || document.getElementById('tab-notes') || document.querySelector('a[href="#notes"]');
-    if (!notesTab) return;
-
-    notesTab.addEventListener('click', () => {
-      const container = document.getElementById('notes') || document.getElementById('notes-content') || document.querySelector('.notes-container');
-      if (!container || container.getAttribute('data-summary-loaded')) return;
-
-      const summaryCard = document.createElement('div');
-      summaryCard.style.cssText = 'background:#111b21; border:1px solid rgba(234,179,8,0.3); border-radius:8px; padding:12px; margin-bottom:12px; font-size:0.82rem; color:#e9edef;';
-      summaryCard.innerHTML = `<h4 style="color:#eab308; margin-bottom:4px;">📌 आज का इल्मी खुलासा (सोहेल एआई)</h4><p>लोड हो रहा है...</p>`;
-      container.prepend(summaryCard);
-
-      fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ task: 'sambanova_class_summary', prompt: "दिनभर के असबाक़ का खुलासा बनाएँ" })
-      }).then(r => r.json()).then(d => {
-        summaryCard.querySelector('p').innerText = d.reply || "आज का सबक मुकम्मल हुआ।";
-        container.setAttribute('data-summary-loaded', 'true');
-      }).catch(() => summaryCard.remove());
-    });
-  }
-
-  // DOM लोड होते ही खुद ब खुद कनेक्ट हो जाए
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      attachChatSmartBar();
-      attachQuizAutoExplainer();
-      attachNotesAutoSummary();
-    });
-  } else {
-    attachChatSmartBar();
-    attachQuizAutoExplainer();
-    attachNotesAutoSummary();
-  }
+  window.addEventListener('DOMContentLoaded', () => {
+    createDraggableDock();
+    syncLiveBadges();
+  });
+  setTimeout(() => {
+    createDraggableDock();
+    syncLiveBadges();
+  }, 1000);
 })();
