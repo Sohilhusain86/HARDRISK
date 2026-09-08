@@ -5132,6 +5132,102 @@ window.finishQuizRound = function(msg) {
   🛡️ सुपर एडमिन
 </a>
   
+  <!-- 🎓 30 AI इल्मी खिदमात: Floating Toolkit Button & Modal -->
+<div id="ai-tools-fab" onclick="document.getElementById('ai-toolkit-modal').style.display='flex'" style="position:fixed; bottom:25px; left:16px; z-index:9999; background:#00a884; color:#fff; padding:10px 16px; border-radius:24px; font-size:0.85rem; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.4); display:flex; align-items:center; gap:6px;">
+  📚 30 AI खिदमात
+</div>
+
+<!-- AI टूल्स का इंटरैक्टिव पॉपअप -->
+<div id="ai-toolkit-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:10000; align-items:center; justify-content:center; padding:15px;">
+  <div style="background:#111b21; border:1px solid rgba(255,255,255,0.1); border-radius:12px; width:100%; max-width:480px; max-height:85vh; display:flex; flex-direction:column; overflow:hidden;">
+    
+    <!-- हेडर -->
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid rgba(255,255,255,0.1);">
+      <h3 style="color:#00a884; font-size:1.05rem; margin:0;">📚 30 AI इल्मी खिदमात (Suhail AI)</h3>
+      <button onclick="document.getElementById('ai-toolkit-modal').style.display='none'" style="background:none; border:none; color:#8696a0; font-size:1.3rem; cursor:pointer;">✕</button>
+    </div>
+
+    <!-- बॉडी -->
+    <div style="padding:15px; overflow-y:auto; flex:1;">
+      <label style="color:#8696a0; font-size:0.8rem; display:block; margin-bottom:6px;">इल्मी सर्विस चुनें:</label>
+      <select id="sel-ai-task" style="width:100%; padding:10px; background:#202c33; border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:6px; margin-bottom:12px; font-size:0.88rem;">
+        <optgroup label="⚡ Groq (सुपर-फास्ट टूल्स)">
+          <option value="groq_nahw_sarf_quick">1. कलिमा पहचान (इस्म, फे़'ल, हर्फ़)</option>
+          <option value="groq_rapid_quiz">2. 15-सेकंड रैपिड सेग़ा क्विज़</option>
+          <option value="groq_autocomplete">3. नह्वी जुमला ऑटो-कम्प्लीट</option>
+          <option value="groq_voice_keywords">4. अहम व्याकरण कीवर्ड्स</option>
+        </optgroup>
+        <optgroup label="🧠 Cerebras (आला दर्जात व तहलील)">
+          <option value="cerebras_tarkib">5. अरबी इबारत की नह्वी तरकीब</option>
+          <option value="cerebras_haft_aqsam">6. हफ़्त अक़्साम व तालील (सर्फ़)</option>
+          <option value="cerebras_quiz_explain">7. क्विज़ सवाल की तफ़सीली वजह</option>
+          <option value="cerebras_student_audit">8. छात्र नह्व-सर्फ़ कमज़ोरी रिपोर्ट</option>
+        </optgroup>
+        <optgroup label="📊 SambaNova (समरी व नोट्स)">
+          <option value="sambanova_class_summary">9. आज के दरस व क्लास का खुलासा</option>
+          <option value="sambanova_vocab_notes">10. पाठ्यपुस्तक मुफ़्रदात (शब्दकोश)</option>
+          <option value="sambanova_syllabus_plan">11. हफ़्तेवार मुताला टाइम-टेबल</option>
+          <option value="sambanova_speech_draft">12. अंजुमन तक़रीर व मक़ाला</option>
+        </optgroup>
+        <optgroup label="✏️ Mistral AI (भाषा व इमला)">
+          <option value="mistral_magic_correct">13. इमला व स्पेलिंग सुधार</option>
+          <option value="mistral_tashkeel">14. अरबी इबारत पर ए'राब (Tashkeel)</option>
+          <option value="mistral_dictionary">15. अरबी लुग़त, माद्दा व बाब</option>
+          <option value="mistral_formal_letter">16. मदरसे की औपचारिक अर्ज़ी/दरख़्वास्त</option>
+          <option value="mistral_grammar_feedback">17. व्याकरण त्रुटि विश्लेषण</option>
+        </optgroup>
+        <optgroup label="🌐 OpenRouter (रिसर्च व अनुवाद)">
+          <option value="openrouter_translation">18. शुद्ध तालीमी अरबी-उर्दू तर्जुमा</option>
+          <option value="openrouter_cross_verify">19. नह्वी क़वायद क्रॉस-वेरिफ़ायर</option>
+          <option value="openrouter_school_solver">20. स्कूली गणित व साइंस सॉल्वर</option>
+          <option value="openrouter_author_history">21. नह्व-सर्फ़ मुसन्निफ़ीन संदर्भ</option>
+        </optgroup>
+      </select>
+
+      <label style="color:#8696a0; font-size:0.8rem; display:block; margin-bottom:6px;">अपनी इबारत या सवाल लिखें:</label>
+      <textarea id="ai-task-input" rows="3" placeholder="यहाँ लफ़्ज़, इबारत या सवाल दर्ज करें..." style="width:100%; padding:10px; background:#202c33; border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:6px; margin-bottom:12px; font-size:0.9rem; box-sizing:border-box;"></textarea>
+
+      <button onclick="runSelectedAITask()" id="btn-run-task" style="width:100%; padding:11px; background:#00a884; border:none; border-radius:6px; color:#fff; font-weight:bold; cursor:pointer; font-size:0.9rem;">
+        🚀 जवाब हासिल करें
+      </button>
+
+      <!-- नतीजा बॉक्स -->
+      <div id="ai-task-result" style="display:none; background:#0b141a; border:1px dashed rgba(255,255,255,0.2); border-radius:6px; padding:12px; font-size:0.88rem; color:#e9edef; white-space:pre-wrap; margin-top:14px; max-height:220px; overflow-y:auto; line-height:1.45;"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  async function runSelectedAITask() {
+    const task = document.getElementById('sel-ai-task').value;
+    const input = document.getElementById('ai-task-input').value.trim();
+    const resultBox = document.getElementById('ai-task-result');
+    const btn = document.getElementById('btn-run-task');
+
+    if (!input) return alert("कृपया इबारत या सवाल दर्ज करें!");
+
+    btn.disabled = true;
+    btn.innerText = "⏳ AI सोच रहा है...";
+    resultBox.style.display = "block";
+    resultBox.innerText = "तैयार किया जा रहा है...";
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task: task, prompt: input })
+      });
+      const data = await res.json();
+      resultBox.innerText = data.reply || data.text || "जवाब प्राप्त नहीं हो सका।";
+    } catch(err) {
+      resultBox.innerText = "एरर: " + err.message;
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "🚀 जवाब हासिल करें";
+    }
+  }
+</script>
   
 </body>
 </html>
