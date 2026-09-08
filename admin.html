@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html lang="ur" dir="ltr">
 <head>
+
+<script>
+  // एडमिन पैनल का सीक्रेट पिन लॉक (उदाहरण: 7877)
+  const ADMIN_PIN = "7877"; 
+  let savedAuth = sessionStorage.getItem("admin_authenticated");
+
+  if (savedAuth !== "true") {
+    let enteredPin = prompt("🔒 सुपर एडमिन सीक्रेट पिन दर्ज करें:");
+    if (enteredPin === ADMIN_PIN) {
+      sessionStorage.setItem("admin_authenticated", "true");
+    } else {
+      alert("❌ ग़लत पिन! आपको क्लासरूम भेजा जा रहा है।");
+      window.location.href = "/index.html";
+    }
+  }
+</script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🛡️ सुपर एडमिन हब - जमात ऊला</title>
