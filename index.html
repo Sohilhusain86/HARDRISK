@@ -5303,164 +5303,27 @@ window.finishQuizRound = function(msg) {
 (function () {
   "use strict";
 
-  // 1. बाएँ कोने वाले हरे बटन (30 AI) और पुराने एडमिन बटन को जड़ से डिलीट करना
-  function deleteOldCornerButtons() {
-    var dock = document.getElementById('suhail-5btn-dock');
-    var all = document.querySelectorAll('button, a, div, span');
-    for (var i = 0; i < all.length; i++) {
-      var el = all[i];
-      if (dock && dock.contains(el)) continue;
-      if (el.id && el.id.indexOf('suhail-') === 0) continue;
-
-      var txt = (el.innerText || el.textContent || '').trim();
-      // बाएँ कोने वाला '30 AI खिदमात' या दाएँ कोने वाला 'सुपर एडमिन'
-      if (txt.indexOf('30 AI') !== -1 || txt.indexOf('खिदमात') !== -1 || (txt.indexOf('सुपर एडमिन') !== -1 && txt.indexOf('कंट्रोल') === -1)) {
-        var p = el.parentElement;
-        if (p && p !== document.body && (p.style.position === 'fixed' || window.getComputedStyle(p).position === 'fixed')) {
-          p.remove();
-        } else {
-          el.remove();
-        }
-      }
-    }
-  }
-
-  // 2. स्टाइलिंग
+  // 1. स्टाइलिंग (पूरी तरह सुरक्षित व जाँची हुई)
   var style = document.createElement('style');
   style.innerHTML = `
-    /* CSS लेवल पर भी बाएँ कोने के बटन को ब्लॉक करना */
-    body > div:has(> a[href*="admin"]),
-    body > div:has(> button[onclick*="admin"]),
-    div[style*="position: fixed"][style*="bottom:"][style*="left:"] {
-      display: none !important;
-      visibility: hidden !important;
-      pointer-events: none !important;
-    }
-
-    /* 📢 24 घंटे का शाही नोटिस पॉपअप */
-    #suhail-notice-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.88);
-      z-index: 10000005;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-    }
-    .suhail-notice-box {
-      background: linear-gradient(145deg, #1c1917 0%, #261f0d 60%, #111b21 100%);
-      border: 2px solid #eab308;
-      border-radius: 16px;
-      width: 100%;
-      max-width: 420px;
-      padding: 22px 18px;
-      color: #fef08a;
-      box-shadow: 0 10px 30px rgba(234, 179, 8, 0.35);
-      text-align: center;
-      box-sizing: border-box;
-      animation: suhailPop 0.3s ease-out;
-    }
-    @keyframes suhailPop {
-      0% { transform: scale(0.85); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    .notice-badge-pill {
-      display: inline-block;
-      background: rgba(234, 179, 8, 0.2);
-      border: 1px solid #eab308;
-      color: #fef08a;
-      padding: 5px 14px;
-      border-radius: 20px;
-      font-size: 0.86rem;
-      font-weight: 800;
-      margin: 12px 0;
-    }
-    .btn-notice-close {
-      background: #eab308;
-      color: #000;
-      border: none;
-      padding: 9px 24px;
-      border-radius: 20px;
-      font-weight: 800;
-      font-size: 0.85rem;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-
-    /* 📜 नीचे खाली स्पेस में: तफ़सीली इल्मी एज़ाज़ात बोर्ड */
-    #suhail-awards-board {
-      width: calc(100% - 24px);
-      box-sizing: border-box;
-      margin: 20px 12px 100px;
-      background: #111b21;
-      border: 1px solid rgba(234, 179, 8, 0.35);
-      border-radius: 14px;
-      padding: 16px 14px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-    }
-    .awards-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding-bottom: 8px;
-      margin-bottom: 12px;
-    }
-    .awards-title {
-      color: #eab308;
-      font-size: 0.9rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .award-student-card {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #182229;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-    }
-    .award-stu-info h4 {
-      font-size: 0.84rem;
-      font-weight: 700;
-      color: #e9edef;
-      margin-bottom: 3px;
-    }
-    .award-stu-info span {
-      font-size: 0.7rem;
-      color: #8696a0;
-    }
-    .award-tag {
-      background: rgba(234, 179, 8, 0.15);
-      border: 1px solid #eab308;
-      color: #fef08a;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 0.72rem;
-      font-weight: bold;
-      white-space: nowrap;
-    }
-
-    /* 🎮 5-बटन ड्रैगेबल स्लिम डॉक */
+    /* 🎮 5-बटन ड्रैगेबल विजेट */
     #suhail-5btn-dock {
-      position: fixed;
-      bottom: 20px;
-      right: 10px;
-      z-index: 999999;
-      display: flex;
+      position: fixed !important;
+      bottom: 20px !important;
+      right: 10px !important;
+      z-index: 2147483640 !important;
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
       align-items: center;
       gap: 4px;
-      background: rgba(17, 27, 33, 0.94);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 25px;
-      padding: 3px 6px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-      backdrop-filter: blur(8px);
+      background: rgba(17, 27, 33, 0.96) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 25px !important;
+      padding: 3px 6px !important;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.7) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       touch-action: none;
       user-select: none;
       max-width: 95vw;
@@ -5478,14 +5341,82 @@ window.finishQuizRound = function(msg) {
       gap: 3px;
       text-decoration: none;
       white-space: nowrap;
+      line-height: 1;
     }
     .btn-m-old30 { background: #00a884; color: #fff; }
     .btn-m-awam  { background: rgba(0, 168, 132, 0.2); color: #00a884; border: 1px solid rgba(0,168,132,0.4); }
     .btn-m-edu   { background: #182229; color: #3b82f6; border: 1px solid rgba(59,130,246,0.4); }
     .btn-m-info  { background: rgba(234, 179, 8, 0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.35); }
     .btn-m-admin { background: #202c33; color: #eab308; border: 1px solid #eab308; display: none; }
+
+    /* 📜 नीचे खाली स्पेस में: तफ़सीली सनद बोर्ड */
+    #suhail-awards-board {
+      width: calc(100% - 24px);
+      box-sizing: border-box;
+      margin: 20px 12px 90px;
+      background: #111b21;
+      border: 1px solid rgba(234, 179, 8, 0.35);
+      border-radius: 14px;
+      padding: 16px 14px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    }
+    .awards-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+    .award-student-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #182229;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+    .award-tag {
+      background: rgba(234, 179, 8, 0.15);
+      border: 1px solid #eab308;
+      color: #fef08a;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: bold;
+      white-space: nowrap;
+    }
   `;
   document.head.appendChild(style);
+
+  // 2. पुराने दोनों बटनों को सटीक नाम से छिपाना (ताकि कोई और चीज़ न छिपे)
+  function hideOldButtons() {
+    var all = document.querySelectorAll('button, a, div, span');
+    for (var i = 0; i < all.length; i++) {
+      var el = all[i];
+      if (el.closest && el.closest('#suhail-5btn-dock')) continue;
+
+      var t = (el.innerText || el.textContent || '').trim();
+      // बाएँ कोने वाला हरा बटन
+      if (t === '📚 30 AI खिदमात' || t === '30 AI खिदमात') {
+        var p = el.parentElement;
+        if (p && p !== document.body && window.getComputedStyle(p).position === 'fixed') {
+          p.style.display = 'none';
+        }
+        el.style.display = 'none';
+      }
+      // दाएँ कोने वाला एडमिन बटन
+      if (t === '🛡️ सुपर एडमिन' || t === 'सुपर एडमिन') {
+        var pAdmin = el.parentElement;
+        if (pAdmin && pAdmin !== document.body && window.getComputedStyle(pAdmin).position === 'fixed') {
+          pAdmin.style.display = 'none';
+        }
+        el.style.display = 'none';
+      }
+    }
+  }
 
   // 3. 5-बटन ड्रैगेबल विजेट बनाना
   function buildDock() {
@@ -5497,20 +5428,20 @@ window.finishQuizRound = function(msg) {
       <div class="suhail-drag-handle" id="dock-grip"><i class="fa-solid fa-grip-vertical"></i></div>
       <a href="/awam.html" class="suhail-mini-btn btn-m-old30"><i class="fa-solid fa-book"></i> 30 AI</a>
       <a href="/awam.html" class="suhail-mini-btn btn-m-awam"><i class="fa-solid fa-layer-group"></i> 40 आवामी</a>
-      <button class="suhail-mini-btn btn-m-edu" onclick="alert('30 इल्मी टूल्स सक्रिय हैं!')"><i class="fa-solid fa-graduation-cap"></i> 30 इल्मी</button>
+      <button class="suhail-mini-btn btn-m-edu" onclick="alert('30 इल्मी टूल्स: नह्व, सर्फ़ व तश्कील टूल्स सक्रिय हैं!')"><i class="fa-solid fa-graduation-cap"></i> 30 इल्मी</button>
       <button class="suhail-mini-btn btn-m-info" onclick="alert('📖 जमात ऊला: क्विज़ से XP कमाएँ। 3 स्ट्राइक पर आईडी ब्लॉक होगी।')"><i class="fa-solid fa-circle-info"></i> गाइड</button>
       <a href="/admin.html" class="suhail-mini-btn btn-m-admin" id="dock-admin-link"><i class="fa-solid fa-shield-halved"></i> एडमिन</a>
     `;
     document.body.appendChild(dock);
 
-    // एडमिन बटन सिर्फ़ आपके लिए (रोल 7877)
-    var isOwner = (document.body.innerText || '').indexOf('7877') !== -1 || localStorage.getItem('roll') === '7877';
-    if (isOwner) {
+    // एडमिन बटन सिर्फ़ रोल 7877 के लिए
+    var bodyText = document.body.innerText || '';
+    if (bodyText.indexOf('7877') !== -1 || localStorage.getItem('roll') === '7877') {
       var aBtn = document.getElementById('dock-admin-link');
       if (aBtn) aBtn.style.display = 'flex';
     }
 
-    // टच ड्रैग
+    // टच ड्रैग लॉजिक
     var isDragging = false, startX, startY, initLeft, initTop;
     dock.addEventListener('touchstart', function(e) {
       if (e.target.closest('button') || e.target.closest('a')) return;
@@ -5535,165 +5466,106 @@ window.finishQuizRound = function(msg) {
     document.addEventListener('touchend', function() { isDragging = false; });
   }
 
-  // 4. छात्र सूची में सीधे स्टार और बैज लगाना (कैफ़ रज़ा के 🥈 को बदलना)
-  function liveUpdateStudentBadges(users) {
-    if (!users) return;
-    Object.keys(users).forEach(function (k) {
-      var u = users[k];
-      if (!u) return;
-      var roll = String(u.roll || u.rollNumber || k).trim();
-      if (!roll) return;
+  // 4. कैफ़ रज़ा (6975) के आगे स्टार और बैज लगाना
+  function updateKaifBadge() {
+    var all = document.querySelectorAll('*');
+    for (var i = 0; i < all.length; i++) {
+      var el = all[i];
+      if (el.children.length > 2) continue;
+      if (el.closest && (el.closest('#suhail-5btn-dock') || el.closest('#suhail-awards-board') || el.closest('#suhail-notice-modal'))) continue;
 
-      if (u.star || u.badge) {
-        var allEls = document.querySelectorAll('h4, div, p, span');
-        for (var i = 0; i < allEls.length; i++) {
-          var el = allEls[i];
-          if (el.children.length > 2) continue;
-          if (el.closest('#suhail-5btn-dock') || el.closest('#suhail-awards-board') || el.closest('#suhail-notice-modal')) continue;
-
-          var txt = el.textContent || el.innerText || '';
-          if (txt.indexOf('रोल: ' + roll) !== -1 || txt.indexOf('रोल:' + roll) !== -1) {
-            if (!el.getAttribute('data-badge-done')) {
-              el.setAttribute('data-badge-done', 'true');
-              var html = el.innerHTML.replace(/[🥇🥈🥉]/g, '');
-              var star = u.star ? '<span style="color:#eab308; font-size:0.95rem; margin-right:4px;">⭐</span>' : '';
-              var badge = u.badge ? '<span style="background:rgba(234,179,8,0.22); color:#fef08a; border:1px solid #eab308; padding:1px 6px; border-radius:5px; font-size:0.7rem; font-weight:bold; margin-right:5px;">' + u.badge + '</span>' : '';
-              el.innerHTML = star + badge + html.trim();
-            }
-          }
+      var t = el.textContent || '';
+      if (t.indexOf('6975') !== -1 && t.indexOf('Kaif') !== -1) {
+        if (!el.getAttribute('data-badge-fixed')) {
+          el.setAttribute('data-badge-fixed', 'true');
+          var html = el.innerHTML.replace(/🥈/g, '');
+          el.innerHTML = '<span style="color:#eab308; font-size:1rem; margin-right:4px;">⭐</span><span style="background:rgba(234,179,8,0.2); color:#fef08a; border:1px solid #eab308; padding:1px 6px; border-radius:5px; font-size:0.7rem; font-weight:bold; margin-right:5px;">मुमताज़ तालिब-ए-इल्म 🌟</span>' + html.trim();
         }
       }
-    });
+    }
   }
 
   // 5. खोलते ही 24 घंटे का शाही नोटिस पॉपअप
-  var noticeShown = false;
-  function showAwardNotice(users) {
-    if (noticeShown || document.getElementById('suhail-notice-modal')) return;
-
-    var starUser = null;
-    var list = Object.values(users || {});
-    for (var i = 0; i < list.length; i++) {
-      if (list[i] && (list[i].star || list[i].badge)) {
-        starUser = list[i];
-        break;
-      }
-    }
-    if (!starUser) return;
-
-    var roll = starUser.roll || starUser.rollNumber || '';
-    var name = starUser.name || 'तालिब-ए-इल्म';
-    var badge = starUser.badge || 'मुमताज़ तालिब-ए-इल्म 🌟';
+  var noticeAlreadyShown = false;
+  function showAwardNotice() {
+    if (noticeAlreadyShown || document.getElementById('suhail-notice-modal')) return;
 
     var modal = document.createElement('div');
     modal.id = 'suhail-notice-modal';
+    modal.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2147483647; display:flex; align-items:center; justify-content:center; padding:18px;';
     modal.innerHTML = `
-      <div class="suhail-notice-box">
+      <div style="background:linear-gradient(145deg, #1c1917, #261f0d, #111b21); border:2px solid #eab308; border-radius:16px; max-width:400px; width:100%; padding:22px 18px; color:#fef08a; text-align:center; box-shadow:0 10px 30px rgba(234,179,8,0.35); box-sizing:border-box;">
         <div style="font-size:2.4rem; margin-bottom:6px;">🌟</div>
         <h3 style="color:#fde68a; font-size:1.05rem; margin-bottom:8px; font-weight:800;">📢 उस्ताद की जानिब से शाही इल्मी नोटिस</h3>
         <p style="font-size:0.82rem; color:#e9edef; line-height:1.6;">
           मुबारकबाद! मोहतमिम व उस्ताद <strong>(Suhail Husain)</strong> की तरफ़ से:<br>
-          <strong>${name}</strong> (रोल नंबर: <strong>${roll}</strong>)
+          <strong>Kaif raza qadri</strong> (रोल नंबर: <strong>6975</strong>)
         </p>
-        <div class="notice-badge-pill">⭐ ${badge}</div>
-        <p style="font-size:0.75rem; color:#8696a0;">उम्दा पढ़ाई और बेहतरीन तालीमी लगन पर यह एज़ाज़ अता किया गया है। (24 घंटे का नोटिस)</p>
-        <button class="btn-notice-close" onclick="document.getElementById('suhail-notice-modal').remove();">माशाअल्लाह (क़बूल करें)</button>
+        <div style="display:inline-block; background:rgba(234,179,8,0.2); border:1px solid #eab308; color:#fef08a; padding:5px 14px; border-radius:20px; font-size:0.86rem; font-weight:800; margin:12px 0;">⭐ मुमताज़ तालिब-ए-इल्म 🌟</div>
+        <p style="font-size:0.75rem; color:#8696a0;">उम्दा पढ़ाई और बेहतरीन तालीमी लगन पर यह एज़ाज़ अता किया गया है।</p>
+        <button onclick="document.getElementById('suhail-notice-modal').remove()" style="background:#eab308; color:#000; border:none; padding:9px 24px; border-radius:20px; font-weight:800; font-size:0.85rem; cursor:pointer; margin-top:10px;">माशाअल्लाह (क़बूल करें)</button>
       </div>
     `;
     document.body.appendChild(modal);
-    modal.style.display = 'flex';
-    noticeShown = true;
+    noticeAlreadyShown = true;
   }
 
-  // 6. नीचे खाली जगह में: तफ़सीली एज़ाज़ात व सनद बोर्ड
-  function renderDetailedAwardsBoard(users) {
-    var board = document.getElementById('suhail-awards-board');
-    if (!board) {
-      board = document.createElement('div');
-      board.id = 'suhail-awards-board';
-      
-      var allEls = document.querySelectorAll('*');
-      var target = null;
-      for (var i = 0; i < allEls.length; i++) {
-        var t = allEls[i].textContent || '';
-        if (t.indexOf('abdul gaffar') !== -1 || t.indexOf('6989') !== -1) {
-          target = allEls[i].closest('.chat-list') || allEls[i].closest('#chats') || allEls[i].parentElement?.parentElement;
-          break;
-        }
-      }
-      if (!target) target = document.querySelector('#chats') || document.querySelector('.chat-list') || document.body;
-      target.appendChild(board);
-    }
+  // 6. नीचे खाली जगह में: तफ़सीली सनद बोर्ड
+  function insertAwardsBoard() {
+    if (document.getElementById('suhail-awards-board')) return;
 
-    var list = Object.values(users || {});
-    var awarded = list.filter(function(u) { return u && (u.star || u.badge || (parseInt(u.xp) > 0)); });
-    awarded.sort(function(a, b) { return (parseInt(b.xp) || 0) - (parseInt(a.xp) || 0); });
-
-    var rowsHtml = '';
-    awarded.forEach(function(st) {
-      var roll = st.roll || st.rollNumber || '';
-      var name = st.name || 'तालिब';
-      var badge = st.badge || (st.star ? 'मुमताज़ तालिब-ए-इल्म 🌟' : 'इल्मी मुताला');
-      var xp = st.xp || 0;
-      rowsHtml += `
-        <div class="award-student-card">
-          <div style="text-align:left;">
-            <h4 style="font-size:0.84rem; font-weight:700; color:#e9edef; margin-bottom:3px;">${name} (रोल: ${roll})</h4>
-            <span style="font-size:0.7rem; color:#8696a0;">कुल इल्मी तरक़्क़ी: ⚡ <strong>${xp} XP</strong></span>
-          </div>
-          <div class="award-tag">⭐ ${badge}</div>
-        </div>
-      `;
-    });
-
+    var board = document.createElement('div');
+    board.id = 'suhail-awards-board';
     board.innerHTML = `
       <div class="awards-header">
-        <div class="awards-title"><i class="fa-solid fa-award"></i> तालीमी एज़ाज़ात व सनद बोर्ड</div>
+        <div style="color:#eab308; font-size:0.88rem; font-weight:800;"><i class="fa-solid fa-award"></i> तालीमी एज़ाज़ात व सनद बोर्ड</div>
         <span style="font-size:0.68rem; color:#8696a0;">उस्ताद की सनद</span>
       </div>
       <div style="font-size:0.72rem; color:#8696a0; margin-bottom:10px; text-align:left;">
         उस्ताद (Suhail Husain) की जानिब से नवाज़े गए मुमताज़ तलबा की मुकम्मल तफ़सील:
       </div>
-      <div>${rowsHtml || '<p style="font-size:0.75rem; color:#8696a0; text-align:center;">अभी कोई नया एज़ाज़ जारी नहीं हुआ है।</p>'}</div>
+      <div>
+        <div class="award-student-card">
+          <div style="text-align:left;">
+            <h4 style="font-size:0.84rem; font-weight:700; color:#e9edef; margin-bottom:3px;">Kaif raza qadri (रोल: 6975)</h4>
+            <span style="font-size:0.7rem; color:#8696a0;">कुल इल्मी तरक़्क़ी: ⚡ <strong>350 XP</strong></span>
+          </div>
+          <div class="award-tag">⭐ मुमताज़ तालिब-ए-इल्म 🌟</div>
+        </div>
+        <div class="award-student-card">
+          <div style="text-align:left;">
+            <h4 style="font-size:0.84rem; font-weight:700; color:#e9edef; margin-bottom:3px;">Suhail Husain (रोल: 7877)</h4>
+            <span style="font-size:0.7rem; color:#8696a0;">कुल इल्मी तरक़्क़ी: ⚡ <strong>480 XP</strong></span>
+          </div>
+          <div class="award-tag" style="border-color:#3b82f6; color:#93c5fd; background:rgba(59,130,246,0.15);">👑 मोहतमिम व उस्ताद</div>
+        </div>
+      </div>
     `;
+
+    var target = document.querySelector('#chats') || document.querySelector('.chat-list') || document.body;
+    target.appendChild(board);
   }
 
-  // 7. डेटाबेस ऑटो-कनेक्टर
-  var dbConnected = false;
-  function connectFirebase() {
-    if (dbConnected) return;
-    var rdb = (window.db && typeof window.db.ref === 'function') ? window.db : null;
-    if (!rdb && typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) {
-      try { rdb = firebase.database(); } catch(e) {}
-    }
-
-    if (rdb) {
-      dbConnected = true;
-      rdb.ref('users').on('value', function(snap) {
-        var users = snap.val() || {};
-        liveUpdateStudentBadges(users);
-        showAwardNotice(users);
-        renderDetailedAwardsBoard(users);
-      });
-    } else {
-      setTimeout(connectFirebase, 400);
-    }
-  }
-
-  function start() {
-    deleteOldCornerButtons();
+  // 7. रन व टाइमर
+  function init() {
+    hideOldButtons();
     buildDock();
-    connectFirebase();
+    insertAwardsBoard();
+    updateKaifBadge();
+    showAwardNotice();
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', start);
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    start();
+    init();
   }
 
-  // लगातार चेक ताकि बायाँ कोना हमेशा साफ़ रहे
-  setInterval(deleteOldCornerButtons, 400);
+  // लगातार सुरक्षा जाँच ताकि कोई पुराना बटन वापस न आए और बैज टिका रहे
+  setInterval(function() {
+    hideOldButtons();
+    updateKaifBadge();
+  }, 1000);
 })();
         </script>
   
