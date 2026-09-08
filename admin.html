@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🛡️ सुपर एडमिन हब - जमात ऊला</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -23,30 +22,25 @@
       --text-muted: #8696a0;
       --border-color: rgba(255, 255, 255, 0.08);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: var(--bg-main); color: var(--text-main); padding-bottom: 50px; }
 
-    /* Top Bar */
     .top-header { background: #1f2c34; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
     .top-header h1 { font-size: 1.15rem; color: var(--accent-gold); display: flex; align-items: center; gap: 8px; }
     .btn-back { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; }
 
-    /* Layout */
     .container { max-width: 900px; margin: 20px auto; padding: 0 14px; }
     .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px; }
 
-    /* Status Bar */
     .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
     .stat-card { background: var(--bg-card); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid var(--border-color); }
     .stat-val { font-size: 1.4rem; font-weight: bold; color: var(--accent-green); }
     .stat-lbl { font-size: 0.75rem; color: var(--text-muted); }
 
-    /* Action Cards */
     .admin-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
     .admin-card h2 { font-size: 0.95rem; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; color: var(--text-main); }
     .admin-card label { font-size: 0.8rem; color: var(--text-muted); }
 
-    /* Form Controls */
     input, select, textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px; border-radius: 6px; font-size: 0.88rem; outline: none; }
     input:focus, select:focus, textarea:focus { border-color: var(--accent-green); }
     .btn-row { display: flex; gap: 8px; }
@@ -58,7 +52,6 @@
     .btn-blue { background: var(--accent-blue); color: #fff; flex: 1; }
     .btn-muted { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color); }
 
-    /* Students List Table */
     .table-container { background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; margin-top: 20px; }
     .table-header { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
     table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
@@ -68,21 +61,18 @@
     .badge-star { background: rgba(234, 179, 8, 0.15); color: var(--accent-gold); border: 1px solid var(--accent-gold); }
     .badge-ban { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); border: 1px solid var(--accent-red); }
 
-    /* Toast Notification */
     #toast { position: fixed; bottom: 20px; right: 20px; background: #202c33; color: #fff; border-left: 4px solid var(--accent-green); padding: 12px 18px; border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.6); display: none; z-index: 1000; font-size: 0.88rem; }
   </style>
 </head>
 <body>
 
-  <!-- Top Header -->
   <div class="top-header">
     <h1><i class="fa-solid fa-shield-halved"></i> सुपर एडमिन हब</h1>
     <a href="/index.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> मुख्य क्लासरूम</a>
   </div>
 
   <div class="container">
-
-    <!-- 1. Real-time Status Bar -->
+    <!-- Status Bar -->
     <div class="stats-bar">
       <div class="stat-card">
         <div class="stat-val" id="st-total">0</div>
@@ -102,10 +92,8 @@
       </div>
     </div>
 
-    <!-- 2. Action Controls Grid -->
     <div class="grid-2">
-
-      <!-- कार्ड 1: स्टार, लक़ब व बैज असाइनर -->
+      <!-- 1. स्टार व इल्मी लक़ब -->
       <div class="admin-card">
         <h2><i class="fa-solid fa-award" style="color:var(--accent-gold);"></i> 1. स्टार व इल्मी लक़ब</h2>
         <label>छात्र का रोल नंबर दर्ज करें:</label>
@@ -124,7 +112,7 @@
         </div>
       </div>
 
-      <!-- कार्ड 2: स्ट्राइक व मर्यादा नियमन -->
+      <!-- 2. स्ट्राइक व म्यूट सिस्टम -->
       <div class="admin-card">
         <h2><i class="fa-solid fa-triangle-exclamation" style="color:var(--accent-red);"></i> 2. स्ट्राइक व म्यूट सिस्टम</h2>
         <label>छात्र का रोल नंबर:</label>
@@ -140,7 +128,7 @@
         </div>
       </div>
 
-      <!-- कार्ड 3: XP व अंक नियंत्रण -->
+      <!-- 3. XP व अंक नियंत्रण -->
       <div class="admin-card">
         <h2><i class="fa-solid fa-bolt" style="color:var(--accent-blue);"></i> 3. XP व अंक नियंत्रण</h2>
         <label>छात्र का रोल नंबर:</label>
@@ -152,7 +140,7 @@
         </div>
       </div>
 
-      <!-- कार्ड 4: क्लासरूम व चैट नियंत्रण -->
+      <!-- 4. क्लासरूम व चैट नियंत्रण -->
       <div class="admin-card">
         <h2><i class="fa-solid fa-comments"></i> 4. क्लासरूम व चैट नियंत्रण</h2>
         <label>क्लास चैट की स्थिति बदलें:</label>
@@ -166,7 +154,7 @@
         </button>
       </div>
 
-      <!-- कार्ड 5: सार्वजनिक नोटिस व ऐलान -->
+      <!-- 5. नोटिस बोर्ड प्रसारण -->
       <div class="admin-card">
         <h2><i class="fa-solid fa-bullhorn" style="color:var(--accent-green);"></i> 5. नोटिस बोर्ड प्रसारण</h2>
         <label>नोटिस / ऐलान का विषय लिखें:</label>
@@ -177,10 +165,10 @@
         </div>
       </div>
 
-      <!-- कार्ड 6: AI इम्तिहान व ऑटोमेशन इंजन -->
+      <!-- 6. AI ऑटोमेशन कॉलर -->
       <div class="admin-card">
         <h2><i class="fa-solid fa-robot" style="color:var(--accent-gold);"></i> 6. AI ऑटोमेशन व टूल्स</h2>
-        <label>त्वरित AI टास्क चलाएँ:</label>
+        <label>प्रशासनिक AI टास्क चुनें:</label>
         <select id="sel-admin-ai">
           <option value="sambanova_class_summary">दिनभर की चैट की 3-लाइन समरी बनाएँ</option>
           <option value="cerebras_quiz_architect">दरजा 12 के लिए नया नह्व पर्चा बनाएँ</option>
@@ -189,10 +177,9 @@
         <button class="btn-gold" onclick="runAdminAI()" id="btn-admin-ai"><i class="fa-solid fa-wand-magic-sparkles"></i> AI प्रोसेस शुरू करें</button>
         <div id="admin-ai-output" style="display:none; background:var(--bg-input); padding:10px; border-radius:6px; font-size:0.8rem; max-height:120px; overflow-y:auto; white-space:pre-wrap;"></div>
       </div>
-
     </div>
 
-    <!-- 3. Live Students List Directory -->
+    <!-- 7. लाइव तलबा डायरेक्टरी -->
     <div class="table-container">
       <div class="table-header">
         <h3 style="font-size:0.95rem;"><i class="fa-solid fa-users"></i> तलबा डायरेक्टरी (Live Database)</h3>
@@ -212,41 +199,18 @@
             </tr>
           </thead>
           <tbody id="students-tbody">
-            <tr><td colspan="7" style="text-align:center; color:var(--text-muted);">डेटा लोड हो रहा है...</td></tr>
+            <tr><td colspan="7" style="text-align:center; color:var(--text-muted);">डेटाबेस से कनेक्ट हो रहा है...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
-
   </div>
 
   <div id="toast">सूचना</div>
 
   <script>
-    // ==========================================
-    // Firebase Auto-Configuration
-    // ==========================================
     let db = null;
     let studentsCache = [];
-
-    window.addEventListener('DOMContentLoaded', () => {
-      try {
-        if (firebase.apps.length > 0) {
-          db = firebase.database();
-        } else {
-          // अगर आपके पास पहले से config है तो वह उठाएगा अन्यथा window.db
-          db = window.opener?.db || window.parent?.db;
-        }
-
-        if (!db) {
-          showToast("⚠️ Firebase इनिशियलाइज़ नहीं हुआ। कृपया मुख्य पेज से आएँ।");
-        } else {
-          initAdminListeners();
-        }
-      } catch (err) {
-        console.error("Firebase Init Error:", err);
-      }
-    });
 
     function showToast(msg) {
       const t = document.getElementById('toast');
@@ -255,11 +219,45 @@
       setTimeout(() => { t.style.display = 'none'; }, 3500);
     }
 
-    // ==========================================
-    // यूनिवर्सल छात्र सर्चर (Roll / UID दोनों को ढूँढता है)
-    // ==========================================
+    // ऑटो-कनेक्ट इंजन: मुख्य ऐप के खुले इंस्टेंस या लोकल स्टोरेज से जोड़ता है
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        if (window.opener && window.opener.firebase && window.opener.firebase.apps.length > 0) {
+          db = window.opener.firebase.database();
+        } else if (window.parent && window.parent.firebase && window.parent.firebase.apps.length > 0) {
+          db = window.parent.firebase.database();
+        } else if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+          db = firebase.database();
+        }
+
+        // यदि डायरेक्ट खुला हो, तो इंडेक्स की स्टोरेज से ऑटो-सिंक करे
+        if (!db) {
+          const cachedConfig = localStorage.getItem('firebase_config_cache');
+          if (cachedConfig) {
+            const parsed = JSON.parse(cachedConfig);
+            if (!firebase.apps.length) firebase.initializeApp(parsed);
+            db = firebase.database();
+          }
+        }
+
+        if (db) {
+          initAdminListeners();
+          showToast("⚡ डेटाबेस सफलतापूर्वक कनेक्ट हुआ!");
+        } else {
+          // फ़ॉलबैक: छात्र लिस्ट को सर्वरलेस डायरेक्टरी से जोड़े
+          document.getElementById('students-tbody').innerHTML = `
+            <tr><td colspan="7" style="text-align:center; padding:15px; color:var(--accent-gold);">
+              ⚠️ सीधा एक्सेस मोड: लाइव डेटा लोड करने के लिए कृपया मुख्य ऐप (index.html) के अंदर 'Super Admin' शील्ड बटन से इस पेज को खोलें।
+            </td></tr>`;
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("कनेक्शन एरर: " + err.message);
+      }
+    });
+
     async function findUserRef(rollInput) {
-      if (!db) throw new Error("डेटाबेस कनेक्ट नहीं है!");
+      if (!db) throw new Error("डेटाबेस कनेक्ट नहीं है! मुख्य ऐप से खोलें।");
       const clean = String(rollInput).trim();
       const snap = await db.ref('users').once('value');
       let targetRef = null;
@@ -274,29 +272,23 @@
       });
 
       if (!targetRef) {
-        // अगर मौजूद नहीं तो रोल नंबर नाम का नया नोड बना दें
         targetRef = db.ref('users/' + clean);
         targetData = { roll: clean, name: "तालिब " + clean, xp: 0, strikes: 0 };
       }
       return { ref: targetRef, data: targetData };
     }
 
-    // ==========================================
-    // 1. बैज व स्टार हैंडलर
-    // ==========================================
+    // 1. स्टार व बैज
     async function assignBadge() {
       const roll = document.getElementById('badge-roll').value.trim();
       const badge = document.getElementById('badge-title').value;
       if (!roll) return showToast("कृपया रोल नंबर दर्ज करें!");
-
       try {
-        const { ref, data } = await findUserRef(roll);
+        const { ref } = await findUserRef(roll);
         await ref.update({ badge: badge, star: true, updatedAt: Date.now() });
-        showToast(`✅ रोल ${roll} को '${badge}' व स्टार दे दिया गया!`);
+        showToast(`✅ रोल ${roll} को '${badge}' व स्टार दिया गया!`);
         document.getElementById('badge-roll').value = '';
-      } catch (e) {
-        showToast("एरर: " + e.message);
-      }
+      } catch (e) { showToast("एरर: " + e.message); }
     }
 
     async function removeBadge() {
@@ -305,31 +297,22 @@
       try {
         const { ref } = await findUserRef(roll);
         await ref.update({ badge: null, star: false });
-        showToast(`✅ रोल ${roll} से बैज व स्टार हटा दिया गया!`);
-      } catch (e) {
-        showToast("एरर: " + e.message);
-      }
+        showToast(`✅ रोल ${roll} से बैज व स्टार हटाया गया!`);
+      } catch (e) { showToast("एरर: " + e.message); }
     }
 
-    // ==========================================
-    // 2. स्ट्राइक व बैन हैंडलर
-    // ==========================================
+    // 2. स्ट्राइक व बैन
     async function applyStrike(val) {
       const roll = document.getElementById('strike-roll').value.trim();
       if (!roll) return showToast("रोल नंबर दर्ज करें!");
-
       try {
         const { ref, data } = await findUserRef(roll);
         const current = (data.strikes || 0) + val;
         const updates = { strikes: current };
-        if (current >= 3) {
-          updates.banned = true;
-        }
+        if (current >= 3) updates.banned = true;
         await ref.update(updates);
         showToast(`⚠️ रोल ${roll}: स्ट्राइक = ${current}/3 ${current >= 3 ? '(म्यूट/ब्लॉक हुआ)' : ''}`);
-      } catch (e) {
-        showToast("एरर: " + e.message);
-      }
+      } catch (e) { showToast("एरर: " + e.message); }
     }
 
     async function resetStrikes() {
@@ -338,10 +321,8 @@
       try {
         const { ref } = await findUserRef(roll);
         await ref.update({ strikes: 0, banned: false });
-        showToast(`✅ रोल ${roll} की सभी स्ट्राइक रद्द की गईं!`);
-      } catch (e) {
-        showToast("एरर: " + e.message);
-      }
+        showToast(`✅ रोल ${roll} की स्ट्राइक रद्द की गईं!`);
+      } catch (e) { showToast("एरर: " + e.message); }
     }
 
     async function toggleDirectBan(isBan) {
@@ -350,15 +331,11 @@
       try {
         const { ref } = await findUserRef(roll);
         await ref.update({ banned: isBan });
-        showToast(isBan ? `🚫 रोल ${roll} को बैन कर दिया गया!` : `✅ रोल ${roll} को अनबैन कर दिया गया!`);
-      } catch (e) {
-        showToast("एरर: " + e.message);
-      }
+        showToast(isBan ? `🚫 रोल ${roll} को बैन किया गया!` : `✅ रोल ${roll} को अनबैन किया गया!`);
+      } catch (e) { showToast("एरर: " + e.message); }
     }
 
-    // ==========================================
-    // 3. XP नियंत्रण
-    // ==========================================
+    // 3. XP
     async function adjustXP(delta) {
       const roll = document.getElementById('xp-roll').value.trim();
       if (!roll) return showToast("रोल नंबर दर्ज करें!");
@@ -367,73 +344,57 @@
         const currentXP = Math.max(0, (parseInt(data.xp) || 0) + delta);
         await ref.update({ xp: currentXP });
         showToast(`⚡ रोल ${roll}: कुल XP = ${currentXP}`);
-      } catch (e) {
-        showToast("एरर: " + e.message);
-      }
+      } catch (e) { showToast("एरर: " + e.message); }
     }
 
-    // ==========================================
-    // 4. चैट रूम व संदेश नियंत्रण
-    // ==========================================
+    // 4. चैट लॉक व वाइप
     async function setChatLock(lockState) {
-      if (!db) return;
+      if (!db) return showToast("डेटाबेस कनेक्ट नहीं है!");
       try {
         await db.ref('settings/chatLocked').set(lockState);
-        showToast(lockState ? "🔒 क्लास चैट बंद (Mute All) कर दी गई।" : "🔓 क्लास चैट सभी के लिए खोल दी गई।");
-      } catch (e) {
-        showToast("एरर: " + e.message);
-      }
+        showToast(lockState ? "🔒 चैट बंद (Mute All) की गई।" : "🔓 चैट खोल दी गई।");
+      } catch (e) { showToast("एरर: " + e.message); }
     }
 
     async function clearAllChatMessages() {
-      if (!confirm("⚠️ क्या आप सच में क्लासरूम के सभी संदेश साफ़ (Wipe) करना चाहते हैं?")) return;
+      if (!confirm("⚠️ क्या आप सच में संपूर्ण चैट इतिहास साफ़ करना चाहते हैं?")) return;
       try {
         await db.ref('chats').remove();
         await db.ref('messages').remove();
-        showToast("🧹 संपूर्ण चैट इतिहास सफलतापूर्वक साफ़ किया गया!");
-      } catch (e) {
-        showToast("एरर: " + e.message);
-      }
+        showToast("🧹 संपूर्ण चैट इतिहास साफ़ किया गया!");
+      } catch (e) { showToast("एरर: " + e.message); }
     }
 
-    // ==========================================
-    // 5. नोटिस बोर्ड प्रसारण
-    // ==========================================
+    // 5. नोटिस बोर्ड
     async function broadcastNotice() {
       const text = document.getElementById('notice-text').value.trim();
-      if (!text) return showToast("नोटिस का विवरण दर्ज करें!");
+      if (!text) return showToast("नोटिस दर्ज करें!");
       try {
         await db.ref('notices/latest').set({
           content: text,
           date: new Date().toLocaleDateString('hi-IN'),
           timestamp: Date.now()
         });
-        showToast("📢 नया नोटिस जारी कर दिया गया!");
+        showToast("📢 नोटिस जारी कर दिया गया!");
         document.getElementById('notice-text').value = '';
-      } catch (e) {
-        showToast("एरर: " + e.message);
-      }
+      } catch (e) { showToast("एरर: " + e.message); }
     }
 
     async function clearNotice() {
       try {
         await db.ref('notices/latest').remove();
-        showToast("🗑️ नोटिस हटा दिया गया!");
-      } catch (e) {
-        showToast("एरर: " + e.message);
-      }
+        showToast("🗑️ नोटिस हटाया गया!");
+      } catch (e) { showToast("एरर: " + e.message); }
     }
 
-    // ==========================================
-    // 6. AI ऑटोमेशन कॉलर
-    // ==========================================
+    // 6. AI ऑटोमेशन
     async function runAdminAI() {
       const task = document.getElementById('sel-admin-ai').value;
       const btn = document.getElementById('btn-admin-ai');
       const box = document.getElementById('admin-ai-output');
 
       btn.disabled = true;
-      btn.innerText = "AI प्रोसेस हो रहा है...";
+      btn.innerText = "AI सोच रहा है...";
       box.style.display = "block";
       box.innerText = "लोड हो रहा है...";
 
@@ -444,7 +405,7 @@
           body: JSON.stringify({ task: task, prompt: "प्रशासनिक रिपोर्ट तैयार करें" })
         });
         const data = await res.json();
-        box.innerText = data.reply || data.text || "जवाब नहीं मिला।";
+        box.innerText = data.reply || data.text || "जवाब प्राप्त नहीं हो सका।";
       } catch (err) {
         box.innerText = "एरर: " + err.message;
       } finally {
@@ -453,19 +414,19 @@
       }
     }
 
-    // ==========================================
-    // 7. लाइव रियल-टाइम टेबल व स्टेटस लिस्टनर
-    // ==========================================
+    // 7. रियल-टाइम लिस्टनर
     function initAdminListeners() {
-      // 1. चैट लॉक स्थिति
+      if (!db) return;
+
       db.ref('settings/chatLocked').on('value', snap => {
         const locked = snap.val() === true;
         const el = document.getElementById('st-chat-state');
-        el.innerText = locked ? "बंद" : "खुला";
-        el.style.color = locked ? "var(--accent-red)" : "var(--accent-green)";
+        if (el) {
+          el.innerText = locked ? "बंद" : "खुला";
+          el.style.color = locked ? "var(--accent-red)" : "var(--accent-green)";
+        }
       });
 
-      // 2. लाइव छात्र लिस्ट व आँकड़े
       db.ref('users').on('value', snap => {
         studentsCache = [];
         let starsCount = 0;
