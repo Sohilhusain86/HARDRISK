@@ -1,58 +1,129 @@
-const https = require('https');
+// api/msg91/send.js
 
-module.exports = function (req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'POST method required' });
+module.exports = async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({
+      success: false,
+      error: "POST method required"
+    });
   }
 
   try {
-    const phone = req.body && req.body.phone ? String(req.body.phone).replace(/[^0-9]/g, '') : '';
-    const mobile10 = phone.slice(-10);
+    // Vercel JSON body
+    const body =
+      typeof req.body === "string"
+        ? JSON.parse(req.body)
+        : (req.body || {});
 
-    if (mobile10.length !== 10) {
-      return res.status(400).json({ success: false, error: 'अमान्य मोबाइल नंबर' });
+    const rawPhone = String(body.phone || "");
+    const mobile10 = rawPhone.replace(/\D/g, "").slice(-10);
+
+    if (!/^[6-9]\d{9}$/.test(mobile10)) {
+      return res.status(400).json({
+        success: false,
+        error: "अमान्य भारतीय मोबाइल नंबर"
+      });
     }
 
-    const payload = JSON.stringify({
-      widgetId: '3669696b7335343532303131',
-      tokenAuth: '569375TMznDInf4QV6aa1417fP1',
-      identifier: '91' + mobile10
-    });
+    // IMPORTANT:
+    // These must exist in Vercel Environment Variables.
+    const authKey = process.env.MSG91_AUTHKEY;
+    const widgetId = process.env.MSG91_WIDGET_ID;
+    const tokenAuth = process.env.MSG91_WIDGET_TOKEN;
 
-    const options = {
-      hostname: 'control.msg91.com',
-      port: 443,
-      path: '/api/v5/widget/sendOtp',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'authkey': '569375AVYtiXmers66aa144b3P1',
-        'Content-Length': Buffer.byteLength(payload)
-      }
+    if (!authKey || !widgetId || !tokenAuth) {
+      console.error("[MSG91] Missing environment variables");
+
+      return res.status(500).json({
+        success: false,
+        error: "MSG91 configuration missing on server"
+      });
+    }
+
+    const payload = {
+      widgetId,
+      tokenAuth,
+      identifier: "91" + mobile10
     };
 
-    const request = https.request(options, (response) => {
-      let body = '';
-      response.on('data', (chunk) => body += chunk);
-      response.on('end', () => {
-        try {
-          const data = JSON.parse(body);
-          if (data.type === 'error') {
-            res.status(400).json({ success: false, error: data.message || 'MSG91 API Error' });
-          } else {
-            res.status(200).json({ success: true, message: 'OTP Sent' });
-          }
-        } catch (e) {
-          res.status(500).json({ success: false, error: 'MSG91 Parse Error' });
-        }
+    const msg91Response = await fetch(
+      "https://control.msg91.com/api/v5/widget/sendOtp",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authkey: authKey
+        },
+        body: JSON.stringify(payload)
+      }
+    );
+
+    // Read as text first.
+    // This prevents "Unexpected token A" if MSG91/Vercel sends
+    // a non-JSON response.
+    const rawResponse = await msg91Response.text();
+
+    let data;
+
+    try {
+      data = rawResponse ? JSON.parse(rawResponse) : {};
+    } catch (parseError) {
+      console.error(
+        "[MSG91] Non-JSON response:",
+        rawResponse.slice(0, 500)
+      );
+
+      return res.status(502).json({
+        success: false,
+        error: "MSG91 ने वैध JSON response नहीं दिया।",
+        providerStatus: msg91Response.status
       });
+    }
+
+    // Log only safe metadata, never credentials.
+    console.log("[MSG91] Send OTP status:", msg91Response.status);
+
+    if (!msg91Response.ok || data.type === "error") {
+      return res.status(502).json({
+        success: false,
+        error:
+          data.message ||
+          data.error ||
+          "MSG91 OTP भेजने में विफल रहा।",
+        providerStatus: msg91Response.status
+      });
+    }
+
+    // MSG91 may expose the request ID under slightly different names.
+    const reqId =
+      data.reqId ||
+      data.request_id ||
+      data.req_id ||
+      data.data?.reqId ||
+      data.data?.request_id ||
+      null;
+
+    if (!reqId) {
+      console.error("[MSG91] OTP sent but reqId missing");
+
+      return res.status(502).json({
+        success: false,
+        error: "MSG91 ने OTP request ID नहीं लौटाई।"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: data.message || "OTP भेज दिया गया है।",
+      reqId
     });
 
-    request.on('error', (e) => res.status(500).json({ success: false, error: e.message }));
-    request.write(payload);
-    request.end();
+  } catch (error) {
+    console.error("[MSG91] Send function error:", error);
 
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    return res.status(500).json({
+      success: false,
+      error: "OTP भेजने में सर्वर त्रुटि हुई।"
+    });
   }
 };
