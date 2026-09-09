@@ -306,3 +306,52 @@
     boot();
   }
 })();
+
+// ==========================================================
+// 🛠️ स्टेटस वीडियो ब्लैक स्क्रीन फिक्स (Status Video Fix)
+// ==========================================================
+(function() {
+  "use strict";
+
+  // 1. वीडियो को ज़बरदस्ती सामने लाना और टेक्स्ट के बैकग्राउंड को पारदर्शी (Transparent) करना
+  var statusFixStyle = document.createElement('style');
+  statusFixStyle.innerHTML = `
+    /* वीडियो को स्क्रीन पर पूरा फिट करना और सामने लाना */
+    video {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100vw !important;
+      max-height: 100vh !important;
+      object-fit: contain !important; /* वीडियो कटेगी नहीं, पूरी दिखेगी */
+      background: #000 !important;
+      z-index: 10 !important;
+    }
+    
+    /* स्टेटस के टेक्स्ट वाले बैकग्राउंड को पारदर्शी (Transparent) बनाना ताकि पीछे की वीडियो दिखे */
+    .status-text, [id*="status"] div, .text-overlay {
+      background-color: transparent !important;
+      z-index: 20 !important; /* टेक्स्ट को वीडियो के ऊपर रखना */
+      text-shadow: 1px 1px 4px rgba(0,0,0,0.9) !important;
+    }
+  `;
+  document.head.appendChild(statusFixStyle);
+
+  // 2. वीडियो को ब्लॉक होने से बचाना (Browser Autoplay Fix)
+  // जैसे ही यूज़र स्क्रीन पर कहीं भी क्लिक करेगा, रुकी हुई वीडियो अपने आप चल पड़ेगी
+  document.addEventListener('click', function() {
+    var vids = document.querySelectorAll('video');
+    for (var i = 0; i < vids.length; i++) {
+      if (vids[i].paused) {
+        var playPromise = vids[i].play();
+        if (playPromise !== undefined) {
+          playPromise.catch(function(error) {
+            console.log("वीडियो प्ले करने में ब्राउज़र ने रोका: ", error);
+          });
+        }
+      }
+    }
+  });
+})();
