@@ -1,5 +1,5 @@
 /**
- * 🔐 MSG91 DIRECT OTP VERIFY & FIREBASE CUSTOM TOKEN MINT
+ * 🔐 REAL PRODUCTION MSG91 OTP VERIFIER & FIREBASE MINT
  * File: api/msg91/verify.js
  */
 
@@ -13,7 +13,7 @@ if (!admin.apps.length) {
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
         privateKey: (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, "\n")
       }),
-      databaseURL: `https://${process.env.FIREBASE_PROJECT_ID || "ula-alif"}-default-rtdb.firebaseio.com`
+      databaseURL: "https://ula-alif-default-rtdb.firebaseio.com"
     });
   } catch (err) {
     console.error("[FirebaseAdmin] Init error:", err.message);
@@ -22,55 +22,66 @@ if (!admin.apps.length) {
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ success: false, error: "Method not allowed. Use POST." });
+    return res.status(405).json({ success: false, error: "Method not allowed" });
   }
 
   const { phone, otp } = req.body || {};
-  const cleanPhone = String(phone || "").replace(/[^0-9]/g, "");
+  const cleanDigits = String(phone || "").replace(/[^0-9]/g, "");
+  const mobile10 = cleanDigits.slice(-10);
+  const fullPhone = "91" + mobile10;
 
-  if (!cleanPhone || !otp) {
-    return res.status(400).json({ success: false, error: "मोबाइल नंबर और OTP आवश्यक हैं।" });
+  if (!mobile10 || !otp) {
+    return res.status(400).json({ success: false, error: "नंबर और OTP आवश्यक हैं।" });
   }
 
-  const authKey = process.env.MSG91_AUTHKEY || process.env.MSG91_AUTH_KEY || "569375AVYtiXmers66aa144b3P1";
+  const authKey = "569375AVYtiXmers66aa144b3P1";
+  const widgetId = "3669696b7335343532303131";
 
   try {
-    // MSG91 REST API Verify Endpoint
-    const verifyUrl = `https://control.msg91.com/api/v5/otp/verify?otp=${encodeURIComponent(otp.trim())}&mobile=${encodeURIComponent(cleanPhone)}`;
-    const response = await fetch(verifyUrl, {
-      method: "GET",
-      headers: { "authkey": authKey }
+    // 1. पहले Widget Verify एंडपॉइंट चेक करें
+    let verifyRes = await fetch("https://control.msg91.com/api/v5/widget/verifyOtp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "authkey": authKey
+      },
+      body: JSON.stringify({
+        widgetId: widgetId,
+        identifier: fullPhone,
+        otp: String(otp).trim()
+      })
     });
 
-    const data = await response.json();
+    let verifyData = await verifyRes.json();
 
-    if (data.type === "success" || response.ok) {
-      const pure10Digits = cleanPhone.slice(-10);
-      const firebaseUid = `msg91_${pure10Digits}`;
+    // 2. यदि विजेट एंडपॉइंट उपलब्ध न हो तो डायरेक्ट v5 Verify
+    if (!verifyRes.ok || verifyData.type !== "success") {
+      verifyRes = await fetch(`https://control.msg91.com/api/v5/otp/verify?authkey=${authKey}&mobile=${fullPhone}&otp=${encodeURIComponent(otp.trim())}`, {
+        method: "GET"
+      });
+      verifyData = await verifyRes.json();
+    }
 
-      // Claims
-      const adminPhones = (process.env.ADMIN_PHONE_NUMBERS || "").split(",").map(p => p.trim());
-      const customClaims = {
-        phone_number: `+91${pure10Digits}`,
-        provider: "msg91",
-        admin: adminPhones.includes(pure10Digits)
-      };
-
-      const customToken = await admin.auth().createCustomToken(firebaseUid, customClaims);
+    if (verifyData.type === "success" || verifyRes.ok) {
+      const firebaseUid = `msg91_${mobile10}`;
+      const customToken = await admin.auth().createCustomToken(firebaseUid, {
+        phone_number: `+91${mobile10}`,
+        provider: "msg91"
+      });
 
       return res.status(200).json({
         success: true,
-        phone: pure10Digits,
+        phone: mobile10,
         customToken: customToken
       });
-    } else {
-      return res.status(400).json({
-        success: false,
-        error: data.message || "गलत या समाप्त हुआ OTP दर्ज किया गया।"
-      });
     }
+
+    return res.status(400).json({
+      success: false,
+      error: verifyData.message || "गलत OTP दर्ज किया गया।"
+    });
+
   } catch (err) {
-    console.error("[MSG91 Verify Error]:", err);
-    return res.status(500).json({ success: false, error: "सर्वर सत्यापन विफल रहा।" });
+    return res.status(500).json({ success: false, error: "सत्यापन विफल: " + err.message });
   }
 }
