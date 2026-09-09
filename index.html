@@ -5314,49 +5314,11 @@ window.finishQuizRound = function(msg) {
 <!-- 🚀 सोहेल एआई: नो-स्प्लिट लेआउट + 5-बटन डॉक + बैज + सनद बोर्ड -->
 <!-- ========================================================== -->
 
- <!-- ⚙️ MSG91 Official SDK & Configuration Loader -->
-<script>
-  window.MSG91_CONFIG = {
-    widgetId: "3669696b7335343532303131",
-    tokenAuth: "569375TMznDInf4QV6aa1417fP1"
-  };
+<script src="./suhail-live-system.js" defer></script>
+<script src="./SohelCoreSystem.js" defer></script>
+<script type="module" src="./SohelMsg91AuthSystem.js"></script>
+<script type="module" src="./SohelSecuritySystem.js"></script>
 
-  // MSG91 Official Dynamic Loader (Dashboard Verified)
-  (function(urls) {
-    let i = 0;
-    function attempt() {
-      const s = document.createElement('script');
-      s.src = urls[i];
-      s.async = true;
-      s.onload = () => {
-        if (typeof window.initSendOTP === 'function') {
-          window.initSendOTP({
-            widgetId: window.MSG91_CONFIG.widgetId,
-            tokenAuth: window.MSG91_CONFIG.tokenAuth,
-            exposeMethods: true,
-            success: (data) => {
-              if (window.handleMsg91VerificationSuccess) {
-                window.handleMsg91VerificationSuccess(data);
-              }
-            },
-            failure: (error) => {
-              console.error("[MSG91 Error]:", error);
-            }
-          });
-        }
-      };
-      s.onerror = () => {
-        i++;
-        if (i < urls.length) attempt();
-      };
-      document.head.appendChild(s);
-    }
-    attempt();
-  })([
-    'https://verify.msg91.com/otp-provider.js',
-    'https://verify.phone91.com/otp-provider.js'
-  ]);
-</script>
   
 </body>
 </html>
