@@ -1,15 +1,7 @@
 (function () {
   "use strict";
 
-  // 💥 1. FORCE CLEAN: पुराने डमी अलर्ट वाले बटन और बोर्ड को ज़बरदस्ती डिलीट करना 
-  // (ताकि index.html का पुराना कोड तुम्हें परेशान न करे)
-  var garbageIds = ['suhail-5btn-dock', 'suhail-awards-board', 'suhail-notice-modal', 'suhail-guide-modal', 'suhail-core-style'];
-  for (var i = 0; i < garbageIds.length; i++) {
-    var el = document.getElementById(garbageIds[i]);
-    if (el) el.remove();
-  }
-
-  // 2. स्टाइलिंग (प्रीमियम थीम)
+  // 1. स्टाइलिंग (प्रीमियम थीम और नो-स्प्लिट लेआउट)
   var style = document.createElement('style');
   style.id = 'suhail-core-style';
   style.innerHTML = `
@@ -59,6 +51,7 @@
       border: 1px solid rgba(234, 179, 8, 0.35) !important;
       border-radius: 14px !important;
       padding: 16px 14px !important;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5) !important;
       box-sizing: border-box !important;
       display: block !important;
       clear: both !important;
@@ -66,18 +59,18 @@
   `;
   document.head.appendChild(style);
 
-  // 🎯 3. असली 30 टूल्स का मोडल खोलना (कोई डमी अलर्ट नहीं)
+  // 2. असली 30 टूल्स का मोडल खोलना (No Dummy Alert)
   window.openRealToolkit = function () {
     var modal = document.getElementById('ai-toolkit-modal');
     if (modal) {
       modal.style.display = 'flex';
-      modal.style.zIndex = '2147483646';
+      modal.style.zIndex = '2147483647';
     } else {
       window.location.href = '/awam.html'; 
     }
   };
 
-  // 📖 4. खूबसूरत इन-ऐप गाइड विंडो (कोई अलर्ट नहीं)
+  // 3. खूबसूरत इन-ऐप गाइड विंडो (तुम्हारा पुराना प्रीमियम डिज़ाइन)
   window.openGuideDialog = function () {
     var old = document.getElementById('suhail-guide-modal');
     if (old) old.remove();
@@ -102,8 +95,10 @@
     document.body.appendChild(div);
   };
 
-  // 🎮 5. डॉक तैयार करना
+  // 4. डॉक तैयार करना
   function setupDock() {
+    if (document.getElementById('suhail-5btn-dock')) return;
+
     var dock = document.createElement('div');
     dock.id = 'suhail-5btn-dock';
     dock.innerHTML = `
@@ -116,6 +111,7 @@
     `;
     document.body.appendChild(dock);
 
+    // एडमिन बटन सिर्फ़ रोल 7877 के लिए
     if ((document.body.innerText || '').indexOf('7877') !== -1 || localStorage.getItem('roll') === '7877') {
       var a = document.getElementById('dock-admin-link');
       if (a) a.style.display = 'flex';
@@ -146,14 +142,26 @@
     document.addEventListener('touchend', function() { isDragging = false; });
   }
 
-  // 🏆 6. लाइव फ़ायरबेस से सनद बोर्ड
+  // 5. फ़ायरबेस से असली लाइव सनद बोर्ड बनाना
   function updateAwardsFromFirebase(usersData) {
     var board = document.getElementById('suhail-awards-board');
     if (!board) {
       board = document.createElement('div');
       board.id = 'suhail-awards-board';
-      var container = document.querySelector('.chat-list') || document.querySelector('#chats') || document.body;
-      container.appendChild(board);
+      
+      // अब्दुल गफ़्फ़ार वाले कार्ड को ढूँढकर उसके नीचे जोड़ना
+      var targetList = document.querySelector('.chat-list') || document.querySelector('#chats') || document.body;
+      var all = document.querySelectorAll('*');
+      for (var i = 0; i < all.length; i++) {
+        var t = all[i].textContent || '';
+        if (t.indexOf('6989') !== -1 && t.toLowerCase().indexOf('abdul gaffar') !== -1) {
+          if (all[i].children.length < 8) {
+            targetList = all[i].closest('li')?.parentElement || all[i].parentElement?.parentElement || targetList;
+            break;
+          }
+        }
+      }
+      targetList.appendChild(board);
     }
 
     var list = [];
@@ -165,6 +173,7 @@
       }
     });
 
+    // XP के हिसाब से रैंकिंग
     list.sort(function(a, b) { return (parseInt(b.xp) || 0) - (parseInt(a.xp) || 0); });
 
     var itemsHtml = '';
@@ -197,7 +206,7 @@
     `;
   }
 
-  // ⭐ 7. लाइव बैज अपडेट (चैट लिस्ट में)
+  // 6. चैट लिस्ट में छात्रों के बैज लाइव अपडेट करना
   function updateLiveBadgesInChat(usersData) {
     Object.keys(usersData || {}).forEach(function(k) {
       var u = usersData[k];
@@ -208,39 +217,84 @@
       for (var i = 0; i < allEls.length; i++) {
         var el = allEls[i];
         if (el.children.length > 2) continue;
-        if (el.closest && (el.closest('#suhail-5btn-dock') || el.closest('#suhail-awards-board') || el.closest('#suhail-guide-modal'))) continue;
+        if (el.closest && (el.closest('#suhail-5btn-dock') || el.closest('#suhail-awards-board') || el.closest('#suhail-guide-modal') || el.closest('#suhail-notice-modal'))) continue;
 
         var t = (el.innerText || el.textContent || '').trim();
+        // अगर चैट लिस्ट में उस छात्र का रोल नंबर मिल जाए
         if (t.indexOf(roll) !== -1 || t.indexOf('रोल: ' + roll) !== -1) {
           
-          var cleanHtml = el.innerHTML.replace(/[🥇🥈🥉⭐👑]/g, '').replace(/मुमताज़ तालिब-ए-इल्म 🌟/g, '').replace(/मोहतमिम व उस्ताद/g, '');
-          
-          var badgeText = u.badge || 'मुमताज़ तालिब-ए-इल्म 🌟';
-          var isMaster = (roll === '7877');
-          var bColor = isMaster ? '#3b82f6' : '#eab308';
-          var bgTag = isMaster ? 'rgba(59,130,246,0.22)' : 'rgba(234,179,8,0.22)';
-          var icon = isMaster ? '👑' : '⭐';
+          if (!el.getAttribute('data-live-badge-set')) {
+             el.setAttribute('data-live-badge-set', 'true');
+             var cleanHtml = el.innerHTML.replace(/[🥇🥈🥉⭐👑]/g, '').replace(/मुमताज़ तालिब-ए-इल्म 🌟/g, '').replace(/मोहतमिम व उस्ताद/g, '');
+             
+             var badgeText = u.badge || 'मुमताज़ तालिब-ए-इल्म 🌟';
+             var isMaster = (roll === '7877');
+             var bColor = isMaster ? '#3b82f6' : '#eab308';
+             var bgTag = isMaster ? 'rgba(59,130,246,0.22)' : 'rgba(234,179,8,0.22)';
+             var icon = isMaster ? '👑' : '⭐';
 
-          el.innerHTML = '<span style="color:' + bColor + '; font-size:0.95rem; margin-right:4px;">' + icon + '</span><span style="background:' + bgTag + '; color:' + (isMaster?'#93c5fd':'#fef08a') + '; border:1px solid ' + bColor + '; padding:1px 6px; border-radius:5px; font-size:0.7rem; font-weight:bold; margin-right:5px;">' + badgeText + '</span>' + cleanHtml.trim();
+             el.innerHTML = '<span style="color:' + bColor + '; font-size:0.95rem; margin-right:4px;">' + icon + '</span><span style="background:' + bgTag + '; color:' + (isMaster?'#93c5fd':'#fef08a') + '; border:1px solid ' + bColor + '; padding:1px 6px; border-radius:5px; font-size:0.7rem; font-weight:bold; margin-right:5px;">' + badgeText + '</span>' + cleanHtml.trim();
+          }
         }
       }
     });
   }
 
-  // 📡 8. लाइव फ़ायरबेस कनेक्शन
+  // 7. लाइव शाही नोटिस (डेटाबेस से टॉप स्टूडेंट के लिए)
+  var noticeShown = false;
+  function showLiveNotice(student) {
+    if (noticeShown || document.getElementById('suhail-notice-modal')) return;
+    
+    var modal = document.createElement('div');
+    modal.id = 'suhail-notice-modal';
+    modal.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2147483647; display:flex; align-items:center; justify-content:center; padding:18px;';
+    modal.innerHTML = `
+      <div style="background:linear-gradient(145deg, #1c1917, #261f0d, #111b21); border:2px solid #eab308; border-radius:16px; max-width:390px; width:100%; padding:22px 18px; color:#fef08a; text-align:center; box-shadow:0 10px 30px rgba(234,179,8,0.35); box-sizing:border-box;">
+        <div style="font-size:2.4rem; margin-bottom:6px;">🌟</div>
+        <h3 style="color:#fde68a; font-size:1.05rem; margin-bottom:8px; font-weight:800;">📢 उस्ताद की जानिब से शाही इल्मी नोटिस</h3>
+        <p style="font-size:0.82rem; color:#e9edef; line-height:1.6; margin-bottom:10px;">
+          मुबारकबाद! मोहतमिम व उस्ताद <strong>(Suhail Husain)</strong> की तरफ़ से:<br>
+          <strong>${student.name || 'तालिब-ए-इल्म'}</strong> (रोल नंबर: <strong>${student.roll}</strong>)
+        </p>
+        <div style="display:inline-block; background:rgba(234,179,8,0.2); border:1px solid #eab308; color:#fef08a; padding:5px 14px; border-radius:20px; font-size:0.86rem; font-weight:800; margin-bottom:12px;">
+          ⭐ ${student.badge || 'मुमताज़ तालिब-ए-इल्म 🌟'}
+        </div>
+        <p style="font-size:0.75rem; color:#8696a0; margin-bottom:14px;">उम्दा पढ़ाई और बेहतरीन तालीमी लगन पर यह एज़ाज़ अता किया गया है।</p>
+        <button onclick="document.getElementById('suhail-notice-modal').remove()" style="background:#eab308; color:#000; border:none; padding:9px 24px; border-radius:20px; font-weight:800; font-size:0.85rem; cursor:pointer;">माशाअल्लाह (क़बूल करें)</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    noticeShown = true;
+  }
+
+  // 8. असली लाइव फ़ायरबेस कनेक्शन
   function listenToFirebase() {
     var db = window.db || (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length ? firebase.database() : null);
     if (db) {
       db.ref('users').on('value', function(snap) {
         var users = snap.val() || {};
+        
+        // डेटाबेस बदलते ही दोनों चीज़ें तुरंत अपडेट होंगी
         updateAwardsFromFirebase(users);
         updateLiveBadgesInChat(users);
+        
+        // नोटिस के लिए सबसे अच्छे स्टूडेंट को खोजना
+        var bestStudent = null;
+        Object.keys(users).forEach(function(k) {
+           var u = users[k];
+           if (u && (u.star || u.badge) && String(u.roll) !== '7877') {
+               bestStudent = u;
+               bestStudent.roll = u.roll || u.rollNumber || k;
+           }
+        });
+        if (bestStudent) showLiveNotice(bestStudent);
       });
     } else {
-      setTimeout(listenToFirebase, 600);
+      setTimeout(listenToFirebase, 600); // अगर फ़ायरबेस लोड नहीं हुआ है, तो 600ms बाद दोबारा चेक करेगा
     }
   }
 
+  // 9. कोड स्टार्ट
   function boot() {
     setupDock();
     listenToFirebase();
