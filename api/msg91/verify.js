@@ -2,16 +2,13 @@
 
 const admin = require("firebase-admin");
 
-// Firebase Admin initialization
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: (process.env.FIREBASE_PRIVATE_KEY || "").replace(
-        /\\n/g,
-        "\n"
-      )
+      privateKey: (process.env.FIREBASE_PRIVATE_KEY || "")
+        .replace(/\\n/g, "\n")
     }),
     databaseURL:
       process.env.FIREBASE_DATABASE_URL ||
@@ -42,7 +39,7 @@ module.exports = async function handler(req, res) {
     if (!/^[6-9]\d{9}$/.test(mobile10)) {
       return res.status(400).json({
         success: false,
-        error: "अमान्य मोबाइल नंबर"
+        error: "अमान्य भारतीय मोबाइल नंबर"
       });
     }
 
@@ -64,8 +61,6 @@ module.exports = async function handler(req, res) {
     const widgetId = process.env.MSG91_WIDGET_ID;
 
     if (!authKey || !widgetId) {
-      console.error("[MSG91] Verification configuration missing");
-
       return res.status(500).json({
         success: false,
         error: "MSG91 verification configuration missing"
@@ -73,12 +68,12 @@ module.exports = async function handler(req, res) {
     }
 
     const verifyResponse = await fetch(
-      "https://control.msg91.com/api/v5/widget/verifyOtp",
+      "https://api.msg91.com/api/v5/widget/verifyOtp",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          authkey: authKey
+          "authkey": authKey
         },
         body: JSON.stringify({
           widgetId,
@@ -94,13 +89,10 @@ module.exports = async function handler(req, res) {
     let verifyData;
 
     try {
-      verifyData = rawResponse ? JSON.parse(rawResponse) : {};
-    } catch (parseError) {
-      console.error(
-        "[MSG91] Verify returned non-JSON:",
-        rawResponse.slice(0, 500)
-      );
-
+      verifyData = rawResponse
+        ? JSON.parse(rawResponse)
+        : {};
+    } catch {
       return res.status(502).json({
         success: false,
         error: "MSG91 ने वैध verification response नहीं दिया।"
@@ -109,7 +101,6 @@ module.exports = async function handler(req, res) {
 
     if (
       !verifyResponse.ok ||
-      verifyData.type === "error" ||
       verifyData.type !== "success"
     ) {
       return res.status(401).json({
@@ -121,17 +112,16 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // Only after MSG91 confirms success:
-    // create Firebase custom token.
     const firebaseUid = `msg91_${mobile10}`;
 
-    const customToken = await admin.auth().createCustomToken(
-      firebaseUid,
-      {
-        phone_number: `+91${mobile10}`,
-        provider: "msg91"
-      }
-    );
+    const customToken =
+      await admin.auth().createCustomToken(
+        firebaseUid,
+        {
+          phone_number: `+91${mobile10}`,
+          provider: "msg91"
+        }
+      );
 
     return res.status(200).json({
       success: true,
@@ -140,7 +130,7 @@ module.exports = async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error("[MSG91] Verify function error:", error);
+    console.error("[MSG91] Verify error:", error);
 
     return res.status(500).json({
       success: false,
