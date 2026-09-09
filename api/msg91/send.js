@@ -1,4 +1,4 @@
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
@@ -41,7 +41,7 @@ module.exports = async function handler(req, res) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "authkey": authKey
+          authkey: authKey
         },
         body: JSON.stringify({
           widgetId,
@@ -57,8 +57,8 @@ module.exports = async function handler(req, res) {
 
     try {
       data = raw ? JSON.parse(raw) : {};
-    } catch (parseError) {
-      console.error("[MSG91] Invalid JSON:", raw);
+    } catch (error) {
+      console.error("[MSG91] Invalid JSON response:", raw);
 
       return res.status(502).json({
         success: false,
@@ -110,4 +110,4 @@ module.exports = async function handler(req, res) {
       error: "OTP भेजने में server error हुआ।"
     });
   }
-};
+}
