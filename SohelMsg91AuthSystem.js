@@ -324,6 +324,7 @@ window.compressAndUploadImage = async function (file) {
       if (typeof window.updateUserUI === "function") window.updateUserUI();
       const loginScreen = document.getElementById("login-screen");
       if (loginScreen) loginScreen.style.display = "none";
+document.body.classList.add("logged-in");
 
       if (typeof window.connectScaleDrone === "function") window.connectScaleDrone();
       if (typeof window.listenForIncomingCalls === "function") window.listenForIncomingCalls();
@@ -492,6 +493,8 @@ window.compressAndUploadImage = async function (file) {
           onDisconnect(userRef).update({ status: "offline", lastSeen: Date.now() });
 
           if (loginScreen) loginScreen.style.display = "none";
+document.body.classList.add("logged-in");
+
           if (typeof window.updateUserUI === "function") window.updateUserUI();
           if (typeof window.connectScaleDrone === "function") window.connectScaleDrone();
           if (typeof window.listenForIncomingCalls === "function") window.listenForIncomingCalls();
