@@ -58,63 +58,66 @@ import {
   window.selectedDpUrl = "";
 
   // 3. IMAGE COMPRESSION & NATIVE CLOUDINARY UPLOAD
-  window.compressAndUploadImage = async function (file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const img = new Image();
-        img.onload = async function () {
-          const canvas = document.createElement("canvas");
-          const maxDim = 800;
-          let w = img.width, h = img.height;
+window.compressAndUploadImage = async function (file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = new Image();
+      img.onload = async function () {
+        const canvas = document.createElement("canvas");
+        const maxDim = 800;
+        let w = img.width, h = img.height;
 
-          if (w > h && w > maxDim) {
-            h = Math.round((h * maxDim) / w);
-            w = maxDim;
-          } else if (h > maxDim) {
-            w = Math.round((w * maxDim) / h);
-            h = maxDim;
-          }
+        if (w > h && w > maxDim) {
+          h = Math.round((h * maxDim) / w);
+          w = maxDim;
+        } else if (h > maxDim) {
+          w = Math.round((w * maxDim) / h);
+          h = maxDim;
+        }
 
-          canvas.width = w;
-          canvas.height = h;
-          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
 
-          canvas.toBlob(async (blob) => {
-            if (!blob) return reject(new Error("इमेज कंप्रेशन विफल रहा।"));
-            const compressedFile = new File([blob], `dp_${Date.now()}.jpg`, { type: "image/jpeg" });
+        canvas.toBlob(async (blob) => {
+          if (!blob) return reject(new Error("इमेज कंप्रेशन विफल रहा।"));
+          const compressedFile = new File([blob], `dp_${Date.now()}.jpg`, { type: "image/jpeg" });
 
-            try {
-              // प्रोजेक्ट के मौजूदा असली Cloudinary फ़ंक्शन का उपयोग
-              if (typeof window.uploadToCloudinary === "function") {
-                const cdnUrl = await window.uploadToCloudinary(compressedFile, "image");
-                if (cdnUrl) return resolve(cdnUrl);
-              }
-              
-              // फ़ॉलबैक अगर सीधा फ़ेच चाहिए (Cloudinary Unsigned Preset)
-              const preset = window.CLOUDINARY_PRESET || "ml_default";
-              const formData = new FormData();
-              formData.append("file", compressedFile);
-              formData.append("upload_preset", preset);
-
-              const res = await fetch("https://api.cloudinary.com/v1_1/xgkhockl/image/upload", {
-                method: "POST",
-                body: formData
-              });
-              const json = await res.json();
-              if (json.secure_url) resolve(json.secure_url);
-              else reject(new Error(json.error?.message || "क्लाउडिनरी अपलोड अस्वीकृत"));
-            } catch (err) {
-              reject(err);
+          try {
+            // 1. प्रोजेक्ट के मौजूदा असली Cloudinary फ़ंक्शन का प्राथमिक उपयोग
+            if (typeof window.uploadToCloudinary === "function") {
+              const cdnUrl = await window.uploadToCloudinary(compressedFile, "image");
+              if (cdnUrl) return resolve(cdnUrl);
             }
-          }, "image/jpeg", 0.75);
-        };
-        img.src = e.target.result;
+            
+            // 2. फ़ॉलबैक: आपके बनाए हुए Unsigned Preset 'jamia_dp' के साथ सीधा अपलोड
+            const preset = window.CLOUDINARY_PRESET || "jamia_dp";
+            const formData = new FormData();
+            formData.append("file", compressedFile);
+            formData.append("upload_preset", preset);
+
+            const res = await fetch("https://api.cloudinary.com/v1_1/xgkhockl/image/upload", {
+              method: "POST",
+              body: formData
+            });
+            const json = await res.json();
+            if (json.secure_url) {
+              resolve(json.secure_url);
+            } else {
+              reject(new Error(json.error?.message || "क्लाउडिनरी अपलोड अस्वीकृत"));
+            }
+          } catch (err) {
+            reject(err);
+          }
+        }, "image/jpeg", 0.75);
       };
-      reader.onerror = (err) => reject(err);
-      reader.readAsDataURL(file);
-    });
-  };
+      img.src = e.target.result;
+    };
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(file);
+  });
+};
 
   // 4. BIND DP UPLOAD INPUTS
   function setupDpHandlers() {
