@@ -1,7 +1,15 @@
 (function () {
   "use strict";
 
-  // 1. स्टाइलिंग (प्रीमियम थीम और नो-स्प्लिट लेआउट)
+  // 💥 1. FORCE CLEAN: पुराने डमी अलर्ट वाले बटन और बोर्ड को ज़बरदस्ती डिलीट करना 
+  // (ताकि index.html का पुराना कोड तुम्हें परेशान न करे)
+  var garbageIds = ['suhail-5btn-dock', 'suhail-awards-board', 'suhail-notice-modal', 'suhail-guide-modal', 'suhail-core-style'];
+  for (var i = 0; i < garbageIds.length; i++) {
+    var el = document.getElementById(garbageIds[i]);
+    if (el) el.remove();
+  }
+
+  // 2. स्टाइलिंग (प्रीमियम थीम)
   var style = document.createElement('style');
   style.id = 'suhail-core-style';
   style.innerHTML = `
@@ -51,7 +59,6 @@
       border: 1px solid rgba(234, 179, 8, 0.35) !important;
       border-radius: 14px !important;
       padding: 16px 14px !important;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.5) !important;
       box-sizing: border-box !important;
       display: block !important;
       clear: both !important;
@@ -59,18 +66,18 @@
   `;
   document.head.appendChild(style);
 
-  // 2. असली 30 टूल्स का मोडल खोलना (No Dummy Alert)
+  // 🎯 3. असली 30 टूल्स का मोडल खोलना (कोई डमी अलर्ट नहीं)
   window.openRealToolkit = function () {
     var modal = document.getElementById('ai-toolkit-modal');
     if (modal) {
       modal.style.display = 'flex';
       modal.style.zIndex = '2147483646';
     } else {
-      window.location.href = '/awam.html'; // अगर मोडल पेज पर न हो, तो आवामी पेज पर भेजे
+      window.location.href = '/awam.html'; 
     }
   };
 
-  // 3. खूबसूरत इन-ऐप गाइड विंडो (तुम्हारा पुराना प्रीमियम डिज़ाइन)
+  // 📖 4. खूबसूरत इन-ऐप गाइड विंडो (कोई अलर्ट नहीं)
   window.openGuideDialog = function () {
     var old = document.getElementById('suhail-guide-modal');
     if (old) old.remove();
@@ -95,10 +102,8 @@
     document.body.appendChild(div);
   };
 
-  // 4. डॉक तैयार करना
+  // 🎮 5. डॉक तैयार करना
   function setupDock() {
-    if (document.getElementById('suhail-5btn-dock')) return;
-
     var dock = document.createElement('div');
     dock.id = 'suhail-5btn-dock';
     dock.innerHTML = `
@@ -111,7 +116,6 @@
     `;
     document.body.appendChild(dock);
 
-    // एडमिन बटन सिर्फ़ रोल 7877 के लिए
     if ((document.body.innerText || '').indexOf('7877') !== -1 || localStorage.getItem('roll') === '7877') {
       var a = document.getElementById('dock-admin-link');
       if (a) a.style.display = 'flex';
@@ -142,7 +146,7 @@
     document.addEventListener('touchend', function() { isDragging = false; });
   }
 
-  // 5. फ़ायरबेस से असली लाइव सनद बोर्ड बनाना
+  // 🏆 6. लाइव फ़ायरबेस से सनद बोर्ड
   function updateAwardsFromFirebase(usersData) {
     var board = document.getElementById('suhail-awards-board');
     if (!board) {
@@ -161,7 +165,6 @@
       }
     });
 
-    // XP के हिसाब से रैंकिंग
     list.sort(function(a, b) { return (parseInt(b.xp) || 0) - (parseInt(a.xp) || 0); });
 
     var itemsHtml = '';
@@ -194,7 +197,7 @@
     `;
   }
 
-  // 6. चैट लिस्ट में छात्रों के बैज लाइव अपडेट करना (पुराने मेडल हटाकर नए लगाना)
+  // ⭐ 7. लाइव बैज अपडेट (चैट लिस्ट में)
   function updateLiveBadgesInChat(usersData) {
     Object.keys(usersData || {}).forEach(function(k) {
       var u = usersData[k];
@@ -208,10 +211,9 @@
         if (el.closest && (el.closest('#suhail-5btn-dock') || el.closest('#suhail-awards-board') || el.closest('#suhail-guide-modal'))) continue;
 
         var t = (el.innerText || el.textContent || '').trim();
-        // अगर चैट लिस्ट में उस छात्र का रोल नंबर मिल जाए
         if (t.indexOf(roll) !== -1 || t.indexOf('रोल: ' + roll) !== -1) {
-          // पुराना मेडल हटाएँ
-          var cleanHtml = el.innerHTML.replace(/[🥇🥈🥉⭐👑]/g, '').replace(/मुमताज़ तालिब-ए-इल्म 🌟/g, '');
+          
+          var cleanHtml = el.innerHTML.replace(/[🥇🥈🥉⭐👑]/g, '').replace(/मुमताज़ तालिब-ए-इल्म 🌟/g, '').replace(/मोहतमिम व उस्ताद/g, '');
           
           var badgeText = u.badge || 'मुमताज़ तालिब-ए-इल्म 🌟';
           var isMaster = (roll === '7877');
@@ -225,22 +227,20 @@
     });
   }
 
-  // 7. असली लाइव फ़ायरबेस कनेक्शन
+  // 📡 8. लाइव फ़ायरबेस कनेक्शन
   function listenToFirebase() {
     var db = window.db || (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length ? firebase.database() : null);
     if (db) {
       db.ref('users').on('value', function(snap) {
         var users = snap.val() || {};
-        // डेटाबेस बदलते ही दोनों चीज़ें तुरंत अपडेट होंगी
         updateAwardsFromFirebase(users);
         updateLiveBadgesInChat(users);
       });
     } else {
-      setTimeout(listenToFirebase, 600); // अगर फ़ायरबेस लोड नहीं हुआ है, तो 600ms बाद दोबारा चेक करेगा
+      setTimeout(listenToFirebase, 600);
     }
   }
 
-  // 8. कोड स्टार्ट
   function boot() {
     setupDock();
     listenToFirebase();
