@@ -57,18 +57,16 @@ import {
   let activeMobileNumber = "";
   window.selectedDpUrl = "";
 
-  // 3. IMAGE COMPRESSION & INSTANT LOCAL PREVIEW (Fix for DP Issue)
+  // 3. IMAGE COMPRESSION & NATIVE CLOUDINARY UPLOAD
   window.compressAndUploadImage = async function (file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = function (e) {
         const img = new Image();
         img.onload = async function () {
-          // 800px अधिकतम सीमा पर रिसाइज करें
           const canvas = document.createElement("canvas");
           const maxDim = 800;
-          let w = img.width;
-          let h = img.height;
+          let w = img.width, h = img.height;
 
           if (w > h && w > maxDim) {
             h = Math.round((h * maxDim) / w);
@@ -80,30 +78,34 @@ import {
 
           canvas.width = w;
           canvas.height = h;
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, w, h);
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
 
-          // 75% क्वालिटी JPEG में बदलें (फ़ाइल केवल 70-90 KB की रह जाती है)
           canvas.toBlob(async (blob) => {
             if (!blob) return reject(new Error("इमेज कंप्रेशन विफल रहा।"));
-
-            const formData = new FormData();
-            formData.append("file", blob, `dp_${Date.now()}.jpg`);
-            formData.append("upload_preset", "d9xe6u2l");
+            const compressedFile = new File([blob], `dp_${Date.now()}.jpg`, { type: "image/jpeg" });
 
             try {
+              // प्रोजेक्ट के मौजूदा असली Cloudinary फ़ंक्शन का उपयोग
+              if (typeof window.uploadToCloudinary === "function") {
+                const cdnUrl = await window.uploadToCloudinary(compressedFile, "image");
+                if (cdnUrl) return resolve(cdnUrl);
+              }
+              
+              // फ़ॉलबैक अगर सीधा फ़ेच चाहिए (Cloudinary Unsigned Preset)
+              const preset = window.CLOUDINARY_PRESET || "ml_default";
+              const formData = new FormData();
+              formData.append("file", compressedFile);
+              formData.append("upload_preset", preset);
+
               const res = await fetch("https://api.cloudinary.com/v1_1/xgkhockl/image/upload", {
                 method: "POST",
                 body: formData
               });
               const json = await res.json();
-              if (json.secure_url) {
-                resolve(json.secure_url);
-              } else {
-                reject(new Error(json.error?.message || "क्लाउडिनरी अपलोड अस्वीकृत"));
-              }
-            } catch (netErr) {
-              reject(netErr);
+              if (json.secure_url) resolve(json.secure_url);
+              else reject(new Error(json.error?.message || "क्लाउडिनरी अपलोड अस्वीकृत"));
+            } catch (err) {
+              reject(err);
             }
           }, "image/jpeg", 0.75);
         };
