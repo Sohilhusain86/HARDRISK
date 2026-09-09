@@ -1,77 +1,150 @@
+// api/msg91/verify.js
+
 const admin = require("firebase-admin");
 
+// Firebase Admin initialization
 if (!admin.apps.length) {
-  try {
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID || "ula-alif",
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, "\n")
-      }),
-      databaseURL: "https://ula-alif-default-rtdb.firebaseio.com"
-    });
-  } catch (err) {
-    console.error("[FirebaseAdmin] Init error:", err.message);
-  }
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: (process.env.FIREBASE_PRIVATE_KEY || "").replace(
+        /\\n/g,
+        "\n"
+      )
+    }),
+    databaseURL:
+      process.env.FIREBASE_DATABASE_URL ||
+      "https://ula-alif-default-rtdb.firebaseio.com"
+  });
 }
 
-module.exports = async function (req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ success: false, error: "Method not allowed" });
+    return res.status(405).json({
+      success: false,
+      error: "POST method required"
+    });
   }
-
-  const { phone, otp } = req.body || {};
-  const cleanDigits = String(phone || "").replace(/[^0-9]/g, "");
-  const mobile10 = cleanDigits.slice(-10);
-  const fullPhone = "91" + mobile10;
-
-  if (!mobile10 || !otp) {
-    return res.status(400).json({ success: false, error: "नंबर और OTP आवश्यक हैं।" });
-  }
-
-  const authKey = "569375AVYtiXmers66aa144b3P1";
-  const widgetId = "3669696b7335343532303131";
 
   try {
-    let verifyRes = await fetch("https://control.msg91.com/api/v5/widget/verifyOtp", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "authkey": authKey
-      },
-      body: JSON.stringify({
-        widgetId: widgetId,
-        identifier: fullPhone,
-        otp: String(otp).trim()
-      })
-    });
+    const body =
+      typeof req.body === "string"
+        ? JSON.parse(req.body)
+        : (req.body || {});
 
-    let verifyData = await verifyRes.json();
+    const rawPhone = String(body.phone || "");
+    const mobile10 = rawPhone.replace(/\D/g, "").slice(-10);
 
-    if (!verifyRes.ok || verifyData.type !== "success") {
-      verifyRes = await fetch(`https://control.msg91.com/api/v5/otp/verify?authkey=${authKey}&mobile=${fullPhone}&otp=${encodeURIComponent(otp.trim())}`, {
-        method: "GET"
+    const otp = String(body.otp || "").trim();
+    const reqId = String(body.reqId || "").trim();
+
+    if (!/^[6-9]\d{9}$/.test(mobile10)) {
+      return res.status(400).json({
+        success: false,
+        error: "अमान्य मोबाइल नंबर"
       });
-      verifyData = await verifyRes.json();
     }
 
-    if (verifyData.type === "success" || verifyRes.ok) {
-      const firebaseUid = `msg91_${mobile10}`;
-      const customToken = await admin.auth().createCustomToken(firebaseUid, {
+    if (!/^\d{4,8}$/.test(otp)) {
+      return res.status(400).json({
+        success: false,
+        error: "अमान्य OTP"
+      });
+    }
+
+    if (!reqId) {
+      return res.status(400).json({
+        success: false,
+        error: "OTP request ID missing"
+      });
+    }
+
+    const authKey = process.env.MSG91_AUTHKEY;
+    const widgetId = process.env.MSG91_WIDGET_ID;
+
+    if (!authKey || !widgetId) {
+      console.error("[MSG91] Verification configuration missing");
+
+      return res.status(500).json({
+        success: false,
+        error: "MSG91 verification configuration missing"
+      });
+    }
+
+    const verifyResponse = await fetch(
+      "https://control.msg91.com/api/v5/widget/verifyOtp",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authkey: authKey
+        },
+        body: JSON.stringify({
+          widgetId,
+          identifier: "91" + mobile10,
+          otp,
+          reqId
+        })
+      }
+    );
+
+    const rawResponse = await verifyResponse.text();
+
+    let verifyData;
+
+    try {
+      verifyData = rawResponse ? JSON.parse(rawResponse) : {};
+    } catch (parseError) {
+      console.error(
+        "[MSG91] Verify returned non-JSON:",
+        rawResponse.slice(0, 500)
+      );
+
+      return res.status(502).json({
+        success: false,
+        error: "MSG91 ने वैध verification response नहीं दिया।"
+      });
+    }
+
+    if (
+      !verifyResponse.ok ||
+      verifyData.type === "error" ||
+      verifyData.type !== "success"
+    ) {
+      return res.status(401).json({
+        success: false,
+        error:
+          verifyData.message ||
+          verifyData.error ||
+          "गलत या expired OTP।"
+      });
+    }
+
+    // Only after MSG91 confirms success:
+    // create Firebase custom token.
+    const firebaseUid = `msg91_${mobile10}`;
+
+    const customToken = await admin.auth().createCustomToken(
+      firebaseUid,
+      {
         phone_number: `+91${mobile10}`,
         provider: "msg91"
-      });
+      }
+    );
 
-      return res.status(200).json({
-        success: true,
-        phone: mobile10,
-        customToken: customToken
-      });
-    }
+    return res.status(200).json({
+      success: true,
+      phone: mobile10,
+      customToken
+    });
 
-    return res.status(400).json({ success: false, error: verifyData.message || "गलत OTP दर्ज किया गया।" });
+  } catch (error) {
+    console.error("[MSG91] Verify function error:", error);
 
-  } catch (err) {
-    return res.status(500).json({ success: false, error: "सत्यापन विफल: " + err.message });
+    return res.status(500).json({
+      success: false,
+      error: "OTP verification server error"
+    });
   }
 };
