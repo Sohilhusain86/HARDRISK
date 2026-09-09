@@ -1,9 +1,4 @@
-/**
- * 📲 REAL PRODUCTION MSG91 OTP SENDER
- * File: api/msg91/send.js
- */
-
-export default async function handler(req, res) {
+module.exports = async function (req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ success: false, error: "Method not allowed" });
   }
@@ -22,7 +17,6 @@ export default async function handler(req, res) {
   const tokenAuth = "569375TMznDInf4QV6aa1417fP1";
 
   try {
-    // MSG91 Widget Native Send API (यह बिना DLT रिजेक्शन के सीधे SMS रूट करता है)
     const response = await fetch("https://control.msg91.com/api/v5/widget/sendOtp", {
       method: "POST",
       headers: {
@@ -38,16 +32,11 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // यदि विजेट एंडपॉइंट 200 देता है
     if (response.ok && (data.type === "success" || data.status === "success" || !data.type)) {
-      return res.status(200).json({ 
-        success: true, 
-        message: "SMS भेजा गया",
-        reqId: data.message || data.requestId 
-      });
+      return res.status(200).json({ success: true, message: "SMS भेजा गया" });
     }
 
-    // फ़ॉलबैक: स्टैंडर्ड v5 OTP API (डिफ़ॉल्ट रूट)
+    // फ़ॉलबैक
     const fallbackRes = await fetch(`https://control.msg91.com/api/v5/otp?authkey=${authKey}&mobile=${fullPhone}&otp_length=4`, {
       method: "POST"
     });
@@ -57,12 +46,9 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: "SMS भेजा गया" });
     }
 
-    return res.status(400).json({ 
-      success: false, 
-      error: data.message || fallbackData.message || "टेलीकॉम गेटवे अस्वीकृत" 
-    });
+    return res.status(400).json({ success: false, error: data.message || fallbackData.message || "टेलीकॉम गेटवे अस्वीकृत" });
 
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
-}
+};
