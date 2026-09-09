@@ -1,9 +1,4 @@
-/**
- * 🔐 REAL PRODUCTION MSG91 OTP VERIFIER & FIREBASE MINT
- * File: api/msg91/verify.js
- */
-
-import admin from "firebase-admin";
+const admin = require("firebase-admin");
 
 if (!admin.apps.length) {
   try {
@@ -20,7 +15,7 @@ if (!admin.apps.length) {
   }
 }
 
-export default async function handler(req, res) {
+module.exports = async function (req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ success: false, error: "Method not allowed" });
   }
@@ -38,7 +33,6 @@ export default async function handler(req, res) {
   const widgetId = "3669696b7335343532303131";
 
   try {
-    // 1. पहले Widget Verify एंडपॉइंट चेक करें
     let verifyRes = await fetch("https://control.msg91.com/api/v5/widget/verifyOtp", {
       method: "POST",
       headers: {
@@ -54,7 +48,6 @@ export default async function handler(req, res) {
 
     let verifyData = await verifyRes.json();
 
-    // 2. यदि विजेट एंडपॉइंट उपलब्ध न हो तो डायरेक्ट v5 Verify
     if (!verifyRes.ok || verifyData.type !== "success") {
       verifyRes = await fetch(`https://control.msg91.com/api/v5/otp/verify?authkey=${authKey}&mobile=${fullPhone}&otp=${encodeURIComponent(otp.trim())}`, {
         method: "GET"
@@ -76,12 +69,9 @@ export default async function handler(req, res) {
       });
     }
 
-    return res.status(400).json({
-      success: false,
-      error: verifyData.message || "गलत OTP दर्ज किया गया।"
-    });
+    return res.status(400).json({ success: false, error: verifyData.message || "गलत OTP दर्ज किया गया।" });
 
   } catch (err) {
     return res.status(500).json({ success: false, error: "सत्यापन विफल: " + err.message });
   }
-}
+};
