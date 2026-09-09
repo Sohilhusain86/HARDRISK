@@ -1,5 +1,3 @@
-// api/msg91/send.js
-
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -29,13 +27,15 @@ module.exports = async function handler(req, res) {
     const tokenAuth = process.env.MSG91_WIDGET_TOKEN;
 
     if (!authKey || !widgetId || !tokenAuth) {
+      console.error("[MSG91] Environment variables missing");
+
       return res.status(500).json({
         success: false,
         error: "MSG91 configuration missing on server"
       });
     }
 
-    const msg91Response = await fetch(
+    const response = await fetch(
       "https://control.msg91.com/api/v5/widget/sendOtp",
       {
         method: "POST",
@@ -51,31 +51,31 @@ module.exports = async function handler(req, res) {
       }
     );
 
-    const rawResponse = await msg91Response.text();
+    const raw = await response.text();
 
-    let data;
+    let data = {};
 
     try {
-      data = rawResponse ? JSON.parse(rawResponse) : {};
-    } catch {
+      data = raw ? JSON.parse(raw) : {};
+    } catch (parseError) {
+      console.error("[MSG91] Invalid JSON:", raw);
+
       return res.status(502).json({
         success: false,
-        error: "MSG91 ने वैध response नहीं दिया।",
-        providerStatus: msg91Response.status
+        error: "MSG91 ने वैध JSON response नहीं दिया।"
       });
     }
 
-    if (
-      !msg91Response.ok ||
-      data.type === "error"
-    ) {
+    console.log("[MSG91] Status:", response.status);
+    console.log("[MSG91] Response:", data);
+
+    if (!response.ok || data.type === "error") {
       return res.status(502).json({
         success: false,
         error:
           data.message ||
           data.error ||
-          "MSG91 OTP भेजने में विफल रहा।",
-        providerStatus: msg91Response.status
+          "MSG91 OTP भेजने में विफल रहा।"
       });
     }
 
@@ -88,6 +88,8 @@ module.exports = async function handler(req, res) {
       null;
 
     if (!reqId) {
+      console.error("[MSG91] reqId missing:", data);
+
       return res.status(502).json({
         success: false,
         error: "MSG91 ने OTP request ID नहीं लौटाई।"
@@ -101,7 +103,7 @@ module.exports = async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error("[MSG91] Send error:", error);
+    console.error("[MSG91] SEND CRASH:", error);
 
     return res.status(500).json({
       success: false,
