@@ -27,6 +27,27 @@
       --student-color: #38bdf8;
     }
 
+    /* लॉगिन स्क्रीन के पीछे नीचे वाले बटन न दिखें */
+#login-screen {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 999999 !important;
+  background-color: #0b141a !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* लॉगिन से पहले डॉक/बटन बार पूरी तरह छुपा रहे */
+body:not(.logged-in) .bottom-dock,
+body:not(.logged-in) [class*="dock"],
+body:not(.logged-in) footer {
+  display: none !important;
+}
+    
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     body {
