@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * 📲 SOHEL MSG91 AUTH & DP SYSTEM — PRODUCTION ENGINE (STABLE V2)
+ * 📲 JAMIA MESSENGER — PURE SERVER-TO-SERVER DIRECT AUTH ENGINE
  * File: SohelMsg91AuthSystem.js
  * ============================================================================
  */
@@ -24,10 +24,9 @@ import {
 (function () {
   "use strict";
 
-  if (window.__SOHEL_MSG91_AUTH_INITIALIZED__) return;
-  window.__SOHEL_MSG91_AUTH_INITIALIZED__ = true;
+  if (window.__DIRECT_MSG91_ENGINE__) return;
+  window.__DIRECT_MSG91_ENGINE__ = true;
 
-  // 1. FIREBASE CONFIG
   const firebaseConfig = {
     apiKey: "AIzaSyDpqKDayo6H0nVyjnT1JBPjpH8RjmwpvV0",
     authDomain: "ula-alif.firebaseapp.com",
@@ -42,32 +41,20 @@ import {
   const auth = getAuth(app);
   const db = getDatabase(app);
 
-  // 2. MSG91 WIDGET CONFIG RESOLVER
-  function getMsg91Config() {
-    const cfg = window.MSG91_CONFIG || {};
-    return {
-      widgetId: (cfg.widgetId || window.MSG91_WIDGET_ID || "").trim(),
-      tokenAuth: (cfg.tokenAuth || window.MSG91_WIDGET_TOKEN || "").trim(),
-      exposeMethods: true
-    };
-  }
-
-  let msg91WidgetReady = false;
   let isOtpStepActive = false;
-  let activeMobileNumber = "";
+  let activePhone10 = "";
   window.selectedDpUrl = "";
 
-  // 3. IMAGE COMPRESSION & NATIVE CLOUDINARY UPLOAD
+  // 1. Cloudinary Upload
   window.compressAndUploadImage = async function (file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = function (e) {
+      reader.onload = (e) => {
         const img = new Image();
-        img.onload = async function () {
+        img.onload = () => {
           const canvas = document.createElement("canvas");
           const maxDim = 800;
           let w = img.width, h = img.height;
-
           if (w > h && w > maxDim) {
             h = Math.round((h * maxDim) / w);
             w = maxDim;
@@ -75,36 +62,25 @@ import {
             w = Math.round((w * maxDim) / h);
             h = maxDim;
           }
-
           canvas.width = w;
           canvas.height = h;
           canvas.getContext("2d").drawImage(img, 0, 0, w, h);
 
           canvas.toBlob(async (blob) => {
-            if (!blob) return reject(new Error("इमेज कंप्रेशन विफल रहा।"));
+            if (!blob) return reject(new Error("इमेज प्रोसेस विफल"));
             const compressedFile = new File([blob], `dp_${Date.now()}.jpg`, { type: "image/jpeg" });
+            const formData = new FormData();
+            formData.append("file", compressedFile);
+            formData.append("upload_preset", "jamia_dp");
 
             try {
-              if (typeof window.uploadToCloudinary === "function") {
-                const cdnUrl = await window.uploadToCloudinary(compressedFile, "image");
-                if (cdnUrl) return resolve(cdnUrl);
-              }
-              
-              const preset = window.CLOUDINARY_PRESET || "jamia_dp";
-              const formData = new FormData();
-              formData.append("file", compressedFile);
-              formData.append("upload_preset", preset);
-
               const res = await fetch("https://api.cloudinary.com/v1_1/xgkhockl/image/upload", {
                 method: "POST",
                 body: formData
               });
-              const json = await res.json();
-              if (json.secure_url) {
-                resolve(json.secure_url);
-              } else {
-                reject(new Error(json.error?.message || "क्लाउडिनरी अपलोड अस्वीकृत"));
-              }
+              const data = await res.json();
+              if (data.secure_url) resolve(data.secure_url);
+              else reject(new Error(data.error?.message || "क्लाउडिनरी अस्वीकृत"));
             } catch (err) {
               reject(err);
             }
@@ -112,425 +88,185 @@ import {
         };
         img.src = e.target.result;
       };
-      reader.onerror = (err) => reject(err);
+      reader.onerror = reject;
       reader.readAsDataURL(file);
     });
   };
 
-  // 4. BIND DP UPLOAD INPUTS
-  function setupDpHandlers() {
-    const dpFileInput = document.getElementById("dp-file-input");
-    const dpPreviewBox = document.getElementById("dp-preview-box");
-    const dpCameraIcon = document.getElementById("dp-camera-icon");
+  // 2. DP Binding
+  function initDp() {
+    const fileInput = document.getElementById("dp-file-input");
+    const preview = document.getElementById("dp-preview-box");
+    const icon = document.getElementById("dp-camera-icon");
 
-    if (dpFileInput && !dpFileInput.getAttribute("data-bound")) {
-      dpFileInput.setAttribute("data-bound", "true");
-      dpFileInput.addEventListener("change", async (e) => {
-        const file = e.target.files && e.target.files[0];
+    if (fileInput) {
+      fileInput.onchange = async (e) => {
+        const file = e.target.files?.[0];
         if (!file) return;
 
-        const localPreviewUrl = URL.createObjectURL(file);
-        if (dpPreviewBox) {
-          dpPreviewBox.style.backgroundImage = `url('${localPreviewUrl}')`;
-          dpPreviewBox.style.opacity = "0.5";
+        if (preview) {
+          preview.style.backgroundImage = `url('${URL.createObjectURL(file)}')`;
+          preview.style.opacity = "0.6";
         }
-        if (dpCameraIcon) dpCameraIcon.style.display = "none";
+        if (icon) icon.style.display = "none";
 
         try {
-          const cdnUrl = await window.compressAndUploadImage(file);
-          window.selectedDpUrl = cdnUrl;
-          if (dpPreviewBox) {
-            dpPreviewBox.style.backgroundImage = `url('${cdnUrl}')`;
-            dpPreviewBox.style.opacity = "1";
+          const url = await window.compressAndUploadImage(file);
+          window.selectedDpUrl = url;
+          if (preview) {
+            preview.style.backgroundImage = `url('${url}')`;
+            preview.style.opacity = "1";
           }
         } catch (err) {
-          alert("डीपी अपलोड में समस्या आई: " + err.message);
-          if (dpPreviewBox) dpPreviewBox.style.opacity = "1";
+          alert("डीपी अपलोड विफल: " + err.message);
+          if (preview) preview.style.opacity = "1";
         }
-      });
-    }
-
-    const dpUpdateInput = document.getElementById("dp-update-file");
-    if (dpUpdateInput && !dpUpdateInput.getAttribute("data-bound")) {
-      dpUpdateInput.setAttribute("data-bound", "true");
-      dpUpdateInput.addEventListener("change", async (e) => {
-        const file = e.target.files && e.target.files[0];
-        if (!file) return;
-
-        alert("प्रोफाइल फोटो अपलोड हो रही है, कृपया प्रतीक्षा करें...");
-        try {
-          const cdnUrl = await window.compressAndUploadImage(file);
-          if (window.currentUser && window.currentUser.phone) {
-            window.currentUser.dpUrl = cdnUrl;
-            localStorage.setItem("jamia_chat_saved_user", JSON.stringify(window.currentUser));
-            await update(ref(db, `users/${window.currentUser.phone}`), { dpUrl: cdnUrl });
-            if (typeof window.updateUserUI === "function") window.updateUserUI();
-            alert("प्रोफाइल फोटो सफलतापूर्वक बदल गई!");
-          }
-        } catch (err) {
-          alert("अपलोड विफल: " + err.message);
-        }
-      });
-    }
-  }
-
-  // 5. DYNAMIC MSG91 SDK LOADER & INITIALIZER
-  function loadMsg91Sdk() {
-    return new Promise((resolve) => {
-      if (typeof window.initSendOTP === "function") {
-        initMsg91Widget();
-        return resolve(true);
-      }
-      const script = document.createElement("script");
-      script.type = "text/javascript";
-      script.src = "https://verify.msg91.com/otp-provider.js";
-      script.async = true;
-      script.onload = () => {
-        initMsg91Widget();
-        resolve(true);
       };
-      script.onerror = () => {
-        console.error("[MSG91] Failed to load otp-provider.js");
-        resolve(false);
-      };
-      document.head.appendChild(script);
-    });
-  }
-
-  function initMsg91Widget() {
-    const config = getMsg91Config();
-    if (!config.widgetId || !config.tokenAuth) return;
-
-    if (typeof window.initSendOTP === "function" && !msg91WidgetReady) {
-      window.initSendOTP({
-        widgetId: config.widgetId,
-        tokenAuth: config.tokenAuth,
-        exposeMethods: true,
-        success: (data) => {
-          handleMsg91VerificationSuccess(data);
-        },
-        failure: (error) => {
-          console.error("[MSG91 Widget Failure]:", error);
-          const authBtn = document.getElementById("btn-action-auth");
-          if (authBtn) {
-            authBtn.disabled = false;
-            authBtn.textContent = isOtpStepActive ? "OTP सत्यापित करें" : "OTP भेजें (Send OTP)";
-          }
-          const msg = error?.message || (typeof error === "string" ? error : "प्रमाणीकरण त्रुटि");
-          alert("MSG91 विजेट एरर: " + msg);
-        }
-      });
-      msg91WidgetReady = true;
     }
   }
 
-  function extractIndian10Digits(input) {
-    const digits = String(input || "").replace(/[^0-9]/g, "");
-    return digits.length >= 10 ? digits.slice(-10) : digits;
-  }
+  // 3. Direct Server Auth Flow
+  function initAuthButton() {
+    const btn = document.getElementById("btn-action-auth");
+    if (!btn) return;
 
-  // 6. PROCESS MSG91 ACCESS TOKEN & CUSTOM TOKEN SIGN IN
-  async function handleMsg91VerificationSuccess(data) {
-    const authBtn = document.getElementById("btn-action-auth");
-    if (authBtn) {
-      authBtn.disabled = true;
-      authBtn.textContent = "सत्र सत्यापित हो रहा है...";
-    }
-
-    const accessToken =
-      (typeof data === "string" ? data : null) ||
-      data?.["access-token"] ||
-      data?.accessToken ||
-      data?.data?.["access-token"] ||
-      data?.message;
-
-    if (!accessToken) {
-      alert("❌ त्रुटि: MSG91 सत्यापन टोकन प्राप्त नहीं हुआ।");
-      if (authBtn) {
-        authBtn.disabled = false;
-        authBtn.textContent = "OTP सत्यापित करें और लॉगिन करें";
-      }
-      return;
-    }
-
-    try {
-      const verifyRes = await fetch("/api/msg91/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accessToken })
-      });
-
-      const result = await verifyRes.json();
-      if (!verifyRes.ok || !result.success || !result.customToken) {
-        throw new Error(result.error || "सर्वर सत्यापन अस्वीकृत।");
-      }
-
-      const userCredential = await signInWithCustomToken(auth, result.customToken);
-      const firebaseUser = userCredential.user;
-      const verifiedPhone = result.phone || activeMobileNumber;
+    btn.onclick = async (e) => {
+      e.preventDefault();
 
       const nameInput = document.getElementById("user-name");
-      const rollInput = document.getElementById("user-roll");
-      const passInput = document.getElementById("user-pass");
+      const phoneInput = document.getElementById("user-phone");
+      const otpInput = document.getElementById("otp-input");
+      const otpSection = document.getElementById("otp-section");
 
-      const name = nameInput ? nameInput.value.trim() : "";
-      const roll = rollInput ? rollInput.value.trim() : "";
-      const pass = passInput ? passInput.value.trim() : "";
-      const finalDp = window.selectedDpUrl || "";
+      const rawPhone = phoneInput?.value.replace(/[^0-9]/g, "") || "";
+      const phone10 = rawPhone.length >= 10 ? rawPhone.slice(-10) : "";
 
-      const userRef = ref(db, `users/${verifiedPhone}`);
-      const userSnap = await get(userRef);
-
-      let finalName = name;
-      let finalRoll = roll;
-
-      if (userSnap.exists()) {
-        const oldData = userSnap.val();
-        finalName = oldData.name || name;
-        finalRoll = oldData.roll || roll;
-        const updatePayload = {
-          uid: firebaseUser.uid,
-          status: "online",
-          lastSeen: Date.now()
-        };
-        if (finalDp) updatePayload.dpUrl = finalDp;
-        await update(userRef, updatePayload);
-      } else {
-        await set(userRef, {
-          uid: firebaseUser.uid,
-          name: finalName,
-          phone: verifiedPhone,
-          roll: finalRoll,
-          dpUrl: finalDp,
-          displayName: finalRoll ? `${finalName} (रोल: ${finalRoll})` : finalName,
-          status: "online",
-          createdAt: Date.now(),
-          lastSeen: Date.now()
-        });
-      }
-
-      window.currentUser = {
-        uid: firebaseUser.uid,
-        name: finalName,
-        phone: verifiedPhone,
-        roll: finalRoll,
-        displayName: finalRoll ? `${finalName} (रोल: ${finalRoll})` : finalName,
-        role: pass === "razavi123" ? "admin" : "student",
-        location: window.currentUser?.location || "India",
-        dpUrl: finalDp || window.currentUser?.dpUrl || ""
-      };
-
-      localStorage.setItem("jamia_chat_saved_user", JSON.stringify(window.currentUser));
-
-      if (typeof window.updateUserUI === "function") window.updateUserUI();
-      const loginScreen = document.getElementById("login-screen");
-      if (loginScreen) loginScreen.style.display = "none";
-      document.body.classList.add("logged-in");
-
-      if (typeof window.connectScaleDrone === "function") window.connectScaleDrone();
-      if (typeof window.listenForIncomingCalls === "function") window.listenForIncomingCalls();
-
-      alert("माशाअल्लाह! MSG91 OTP द्वारा लॉगिन सफल रहा।");
-    } catch (err) {
-      console.error("[Msg91Auth] Login Error:", err);
-      alert("लॉगिन असफल: " + err.message);
-      if (authBtn) {
-        authBtn.disabled = false;
-        authBtn.textContent = "OTP सत्यापित करें और लॉगिन करें";
-      }
-    }
-  }
-
-  // 7. LOGIN UI BINDING WITH SAFETY TIMER
-  function wireLoginUI() {
-    const fakePopup = document.getElementById("sms-popup");
-    if (fakePopup) fakePopup.remove();
-
-    const oldAuthBtn = document.getElementById("btn-action-auth");
-    if (!oldAuthBtn) return;
-
-    const authBtn = oldAuthBtn.cloneNode(true);
-    oldAuthBtn.parentNode.replaceChild(authBtn, oldAuthBtn);
-
-    const nameInput = document.getElementById("user-name");
-    const phoneInput = document.getElementById("user-phone");
-    const otpInput = document.getElementById("otp-input");
-    const otpSection = document.getElementById("otp-section");
-
-    isOtpStepActive = false;
-
-    authBtn.addEventListener("click", async () => {
-      const config = getMsg91Config();
-
-      if (!config.widgetId || !config.tokenAuth) {
-        alert("⚠️ MSG91 कॉन्फ़िगरेशन अनुपलब्ध है। कृपया index.html में Widget ID व Token Auth दर्ज करें।");
-        return;
-      }
-      if (config.tokenAuth.toLowerCase() === "jamia") {
-        alert("⚠️ कॉन्फ़िगरेशन त्रुटि: 'Jamia' केवल टोकन का नाम है!\n\nकृपया MSG91 डैशबोर्ड में जाकर 'Jamia' टोकन के सामने दिख रही लंबी 'Token Value' कॉपी करके tokenAuth में पेस्ट करें।");
-        return;
-      }
-
-      const rawPhone = phoneInput ? phoneInput.value.trim() : "";
-      const cleanPhone10 = extractIndian10Digits(rawPhone);
-
-      if (cleanPhone10.length !== 10) {
+      if (phone10.length !== 10) {
         alert("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!");
         return;
       }
-      activeMobileNumber = cleanPhone10;
+      activePhone10 = phone10;
 
-      // चरण 1: OTP भेजें
+      // STEP 1: डायरेक्ट API से SMS OTP भेजें
       if (!isOtpStepActive) {
-        const name = nameInput ? nameInput.value.trim() : "";
+        const name = nameInput?.value.trim();
         if (!name) {
           alert("कृपया अपना नाम दर्ज करें!");
           return;
         }
 
-        authBtn.disabled = true;
-        authBtn.textContent = "⏳ MSG91 OTP भेजा जा रहा है...";
-
-        // 12 सेकंड का ऑटो-रीसेट टाइमआउट गार्ड (ताकि बटन कभी हमेशा के लिए न अटके)
-        const hangGuard = setTimeout(() => {
-          if (!isOtpStepActive && authBtn.disabled) {
-            authBtn.disabled = false;
-            authBtn.textContent = "OTP भेजें (Send OTP)";
-            alert("⚠️ नेटवर्क देरी: कृपया सुनिश्चित करें कि MSG91 सेटिंग्स में 'Invisible OTP' बंद है, और पुनः प्रयास करें।");
-          }
-        }, 12000);
-
-        const fullIndianNumber = "91" + cleanPhone10;
-
-        const triggerSend = () => {
-          if (typeof window.sendOtp === "function") {
-            window.sendOtp(
-              fullIndianNumber,
-              (res) => {
-                clearTimeout(hangGuard);
-                authBtn.disabled = false;
-                authBtn.textContent = "OTP सत्यापित करें (Verify & Login)";
-                isOtpStepActive = true;
-                if (otpSection) otpSection.style.display = "block";
-                if (phoneInput) phoneInput.disabled = true;
-                alert(`✅ मोबाइल नंबर (+91 ${cleanPhone10}) पर SMS OTP भेज दिया गया है।`);
-              },
-              (err) => {
-                clearTimeout(hangGuard);
-                authBtn.disabled = false;
-                authBtn.textContent = "OTP भेजें (Send OTP)";
-                const errMsg = err?.message || (typeof err === "string" ? err : JSON.stringify(err));
-                alert("OTP भेजने में विफलता: " + errMsg);
-              }
-            );
-          } else {
-            clearTimeout(hangGuard);
-            authBtn.disabled = false;
-            authBtn.textContent = "OTP भेजें (Send OTP)";
-            alert("MSG91 SDK अभी पूरी तरह लोड नहीं हुआ है। कृपया 2 सेकंड प्रतीक्षा करके पुनः दबाएं।");
-          }
-        };
-
-        if (typeof window.sendOtp === "function") {
-          triggerSend();
-        } else {
-          await loadMsg91Sdk();
-          triggerSend();
-        }
-        return;
-      }
-
-      // चरण 2: OTP सत्यापित करें
-      const enteredOtp = otpInput ? otpInput.value.trim() : "";
-      if (enteredOtp.length < 4) {
-        alert("कृपया सही OTP दर्ज करें!");
-        return;
-      }
-
-      authBtn.disabled = true;
-      authBtn.textContent = "OTP जांचा जा रहा है...";
-
-      if (typeof window.verifyOtp === "function") {
-        window.verifyOtp(
-          enteredOtp,
-          (res) => {
-            handleMsg91VerificationSuccess(res);
-          },
-          (err) => {
-            authBtn.disabled = false;
-            authBtn.textContent = "OTP सत्यापित करें और लॉगिन करें";
-            alert("❌ गलत या समाप्त हुआ OTP! कृपया सही कोड डालें।");
-          }
-        );
-      } else {
-        alert("सत्यापन विजेट सक्रिय नहीं है। कृपया पेज रिफ्रेश करें।");
-        authBtn.disabled = false;
-      }
-    });
-  }
-
-  // 8. SESSION RESTORATION
-  function setupAuthSessionSync() {
-    onAuthStateChanged(auth, async (firebaseUser) => {
-      const loginScreen = document.getElementById("login-screen");
-      if (firebaseUser) {
-        const verifiedPhone = extractIndian10Digits(firebaseUser.phoneNumber || firebaseUser.uid);
-        const userRef = ref(db, `users/${verifiedPhone}`);
+        btn.disabled = true;
+        btn.textContent = "⏳ सर्वर से OTP भेजा जा रहा है...";
 
         try {
-          const snap = await get(userRef);
-          const userData = snap.exists() ? snap.val() : {};
+          const res = await fetch("/api/msg91/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ phone: "91" + phone10 })
+          });
 
-          window.currentUser = {
-            uid: firebaseUser.uid,
-            phone: verifiedPhone,
-            name: userData.name || "छात्र",
-            roll: userData.roll || "",
-            displayName: userData.displayName || userData.name || verifiedPhone,
-            role: userData.role || (localStorage.getItem("roll") === "7877" ? "admin" : "student"),
-            location: userData.location || "India",
-            dpUrl: userData.dpUrl || ""
-          };
+          const data = await res.json();
 
-          update(userRef, { status: "online", lastSeen: Date.now(), uid: firebaseUser.uid });
-          onDisconnect(userRef).update({ status: "offline", lastSeen: Date.now() });
+          if (!res.ok || !data.success) {
+            throw new Error(data.error || "SMS नहीं भेजा जा सका");
+          }
 
-          if (loginScreen) loginScreen.style.display = "none";
-          document.body.classList.add("logged-in");
-
-          if (typeof window.updateUserUI === "function") window.updateUserUI();
-          if (typeof window.connectScaleDrone === "function") window.connectScaleDrone();
-          if (typeof window.listenForIncomingCalls === "function") window.listenForIncomingCalls();
-        } catch (e) {
-          console.warn("[SohelMsg91Auth] Session restore notice:", e);
+          btn.disabled = false;
+          btn.textContent = "OTP सत्यापित करें";
+          isOtpStepActive = true;
+          if (otpSection) otpSection.style.display = "block";
+          if (phoneInput) phoneInput.disabled = true;
+          alert(`✅ नंबर (+91 ${phone10}) पर SMS भेज दिया गया है।`);
+        } catch (err) {
+          btn.disabled = false;
+          btn.textContent = "OTP भेजें (Send OTP)";
+          alert("विफलता: " + err.message);
         }
+        return;
+      }
+
+      // STEP 2: डायरेक्ट API से OTP चेक करें व लॉगिन करें
+      const enteredOtp = otpInput?.value.trim();
+      if (!enteredOtp || enteredOtp.length < 4) {
+        alert("कृपया 4 अंकों का सही OTP दर्ज करें!");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "जाँचा जा रहा है...";
+
+      try {
+        const res = await fetch("/api/msg91/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: "91" + activePhone10, otp: enteredOtp })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "गलत OTP दर्ज किया गया");
+        }
+
+        // Firebase Sign In
+        const userCredential = await signInWithCustomToken(auth, data.customToken);
+        const firebaseUser = userCredential.user;
+
+        const name = nameInput?.value.trim() || "छात्र";
+        const roll = document.getElementById("user-roll")?.value.trim() || "";
+        const pass = document.getElementById("user-pass")?.value.trim() || "";
+
+        const userRef = ref(db, `users/${activePhone10}`);
+        await update(userRef, {
+          uid: firebaseUser.uid,
+          name,
+          roll,
+          phone: activePhone10,
+          status: "online",
+          lastSeen: Date.now(),
+          ...(window.selectedDpUrl ? { dpUrl: window.selectedDpUrl } : {})
+        });
+
+        window.currentUser = {
+          uid: firebaseUser.uid,
+          name,
+          phone: activePhone10,
+          roll,
+          role: pass === "razavi123" ? "admin" : "student",
+          dpUrl: window.selectedDpUrl || ""
+        };
+        localStorage.setItem("jamia_chat_saved_user", JSON.stringify(window.currentUser));
+
+        const loginScreen = document.getElementById("login-screen");
+        if (loginScreen) loginScreen.style.display = "none";
+        document.body.classList.add("logged-in");
+
+        alert("माशाअल्लाह! लॉगिन पूरी तरह सफल रहा।");
+        location.reload();
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = "OTP सत्यापित करें";
+        alert("त्रुटि: " + err.message);
+      }
+    };
+  }
+
+  // 4. Session Check
+  function checkSession() {
+    onAuthStateChanged(auth, (user) => {
+      const loginScreen = document.getElementById("login-screen");
+      if (user) {
+        if (loginScreen) loginScreen.style.display = "none";
+        document.body.classList.add("logged-in");
       } else {
         if (loginScreen) loginScreen.style.display = "flex";
       }
     });
   }
 
-  // 9. LOGOUT
-  window.logoutApp = async function () {
-    if (confirm("क्या आप वाकई लॉगआउट करना चाहते हैं?")) {
-      try {
-        if (window.currentUser?.phone) {
-          const uRef = ref(db, `users/${window.currentUser.phone}`);
-          await update(uRef, { status: "offline", lastSeen: Date.now() });
-        }
-        await signOut(auth);
-      } catch (e) {}
-      localStorage.removeItem("jamia_chat_saved_user");
-      location.reload();
-    }
-  };
-
-  // 10. BOOTSTRAP
-  async function start() {
-    setupDpHandlers();
-    wireLoginUI();
-    setupAuthSessionSync();
-    await loadMsg91Sdk();
+  function start() {
+    initDp();
+    initAuthButton();
+    checkSession();
   }
 
   if (document.readyState === "loading") {
