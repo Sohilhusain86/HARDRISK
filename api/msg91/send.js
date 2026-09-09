@@ -1,21 +1,25 @@
+/**
+ * 📲 MSG91 DIRECT OTP SEND ENDPOINT
+ * File: api/msg91/send.js
+ */
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ success: false, error: "Method not allowed" });
+    return res.status(405).json({ success: false, error: "Method not allowed. Use POST." });
   }
 
-  const { phone } = req.body;
+  const { phone } = req.body || {};
   const cleanPhone = String(phone || "").replace(/[^0-9]/g, "");
 
   if (cleanPhone.length !== 12 || !cleanPhone.startsWith("91")) {
     return res.status(400).json({ success: false, error: "मान्य 10 अंकों का भारतीय नंबर आवश्यक है।" });
   }
 
-  // MSG91 Dashboard से प्राप्त क्रेडेंशियल्स
-  const authKey = process.env.MSG91_AUTH_KEY || "569375AVYtiXmers66aa144b3P1";
+  // Dashboard से प्राप्त प्रामाणिक क्रेडेंशियल्स
+  const authKey = process.env.MSG91_AUTHKEY || process.env.MSG91_AUTH_KEY || "569375AVYtiXmers66aa144b3P1";
   const widgetId = process.env.MSG91_WIDGET_ID || "3669696b7335343532303131";
 
   try {
-    // MSG91 v5 Send OTP REST API
     const response = await fetch("https://control.msg91.com/api/v5/otp", {
       method: "POST",
       headers: {
