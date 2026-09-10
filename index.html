@@ -882,66 +882,54 @@
         <div style="padding: 10px 16px; font-size: 0.85rem; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.05);">
           सभी छात्र (ऑनलाइन 🟢 / ऑफ़लाइन ⚪):
         </div>
+     <!-- स्टेटस ट्रे (Story Circles) -->
+        <div id="status-tray" class="status-tray-wrapper" style="display: flex; gap: 12px; padding: 10px 14px; overflow-x: auto; background: #111b21; border-bottom: 1px solid rgba(255,255,255,0.08); white-space: nowrap;">
+          <div class="status-circle-item" onclick="document.getElementById('create-status-modal').classList.add('active')">
+            <div class="status-ring my-status">
+              <div class="status-avatar"><i class="fa-solid fa-plus"></i></div>
+            </div>
+            <div class="status-user-label">मेरा स्टेटस</div>
+          </div>
+          <div id="peer-statuses-dock" style="display:flex; gap:12px;"></div>
+        </div>
+
+        <!-- सर्च और फ़िल्टर बार -->
+        <div class="contact-search-box" style="margin: 6px 12px; position: relative;">
+          <i class="fa-solid fa-magnifying-glass contact-search-icon" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #8696a0; font-size: 0.85rem;"></i>
+          <input type="text" class="contact-search-input" placeholder="चैट या सबक खोजें..." oninput="window.filterContactsSearch(this.value)" style="width: 100%; background: #202c33; border: none; border-radius: 8px; padding: 7px 12px 7px 34px; color: #e9edef; font-size: 0.85rem; outline: none;">
+        </div>
+
+        <div id="wa-filter-bar" class="chat-filter-bar" style="display: flex; gap: 8px; padding: 8px 14px; background: #111b21; border-bottom: 1px solid rgba(255,255,255,0.06); overflow-x: auto; white-space: nowrap;">
+          <button class="filter-pill active" onclick="window.applyChatFilter('all', this)">सभी</button>
+          <button class="filter-pill" onclick="window.applyChatFilter('unread', this)">अपठित</button>
+          <button class="filter-pill" onclick="window.applyChatFilter('groups', this)">ग्रुप्स</button>
+          <button class="filter-pill" onclick="window.openStarredMessagesModal()"><i class="fa-solid fa-star" style="color:#facc15;"></i></button>
+          <button class="filter-pill" onclick="window.openBookExchangeModal()">📚 एक्सचेंज</button>
+          <button class="filter-pill" onclick="window.openNoticeBoardModal()">📌 नोटिस बोर्ड</button>
+        </div>
+
         <div id="users-dynamic-list"></div>
 
         <!-- 🎗️ तालिमी एज़ाज़ात व सनद बोर्ड (लाइव रिकॉर्ड) -->
-        <div class="sanad-board-card" style="margin: 14px 12px; background: #182229; border: 1px solid rgba(250, 204, 21, 0.25); border-radius: 12px; padding: 12px;">
+        <div class="sanad-board-card" style="margin: 14px 12px 75px 12px; background: #182229; border: 1px solid rgba(250, 204, 21, 0.25); border-radius: 12px; padding: 12px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 6px;">
             <span style="color: #facc15; font-weight: bold; font-size: 0.88rem;"><i class="fa-solid fa-award"></i> तालिमी एज़ाज़ात व सनद बोर्ड</span>
             <span style="font-size: 0.7rem; color: #8696a0;">लाइव रिकॉर्ड</span>
           </div>
           <div id="sanad-board-list">
-            <!-- डायनामिक लाइव रैंक यहाँ लोड होगी -->
+            <!-- लाइव रैंक यहाँ लोड होगी -->
           </div>
         </div>
       </main>
 
-      <!-- 🚀 नीचे का 5-बटन डॉक (30 AI, 40 आवामी, 30 इल्मी, गाइड, एडमिन) -->
-      <style>
-        .app-bottom-dock {
-          position: fixed;
-          bottom: 10px;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 95%;
-          max-width: 480px;
-          background: #111b21;
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          border-radius: 30px;
-          padding: 6px 10px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          z-index: 999;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.8);
-        }
-        .dock-btn {
-          background: #202c33;
-          border: 1px solid rgba(255,255,255,0.08);
-          color: #e9edef;
-          padding: 6px 10px;
-          border-radius: 20px;
-          font-size: 0.75rem;
-          font-weight: 600;
-          cursor: pointer;
-          display: inline-flex;
-          align-items: center;
-          gap: 5px;
-        }
-        .dock-btn.btn-dock-ai { border-color: rgba(34, 197, 94, 0.4); color: #22c55e; }
-        .dock-btn.btn-dock-awam { border-color: rgba(34, 197, 94, 0.4); color: #22c55e; }
-        .dock-btn.btn-dock-ilmi { border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; }
-        .dock-btn.btn-dock-guide { border-color: rgba(250, 204, 21, 0.4); color: #facc15; }
-        .dock-btn.btn-dock-admin { border-color: rgba(239, 68, 68, 0.4); color: #ef4444; }
-      </style>
-
-      <div class="app-bottom-dock" id="main-app-dock">
-        <button class="dock-btn" onclick="document.getElementById('ai-toolkit-modal').style.display='flex'" title="मेनू"><i class="fa-solid fa-grip"></i></button>
-        <button class="dock-btn btn-dock-ai" onclick="document.getElementById('ai-toolkit-modal').style.display='flex'"><i class="fa-solid fa-book-open"></i> 30 AI</button>
-        <button class="dock-btn btn-dock-awam" onclick="document.getElementById('ai-toolkit-modal').style.display='flex'"><i class="fa-solid fa-layer-group"></i> 40 आवामी</button>
-        <button class="dock-btn btn-dock-ilmi" onclick="window.openQuickSolverModal()"><i class="fa-solid fa-graduation-cap"></i> 30 इल्मी</button>
-        <button class="dock-btn btn-dock-guide" onclick="alert('जमात ऊला अलिफ़ मैसेंजर: सभी छात्रों के लिए क्लासरूम, तक़रार और AI डेस्क।')"><i class="fa-solid fa-circle-info"></i> गाइड</button>
-        <button class="dock-btn btn-dock-admin" id="dock-admin-btn" onclick="document.getElementById('admin-panel').classList.add('open')"><i class="fa-solid fa-shield-halved"></i> एडमिन</button>
+      <!-- 🚀 5-बटन ओरिजिनल डॉक -->
+      <div class="app-bottom-dock" id="main-app-dock" style="position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 480px; background: #111b21; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 30px; padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; z-index: 9999; box-shadow: 0 8px 24px rgba(0,0,0,0.85);">
+        <button class="dock-btn" onclick="document.getElementById('ai-toolkit-modal').style.display='flex'" style="background:#202c33; border:1px solid rgba(255,255,255,0.08); color:#e9edef; padding:6px 10px; border-radius:20px; font-size:0.75rem; cursor:pointer;" title="मेनू"><i class="fa-solid fa-grip"></i></button>
+        <button class="dock-btn" onclick="document.getElementById('ai-toolkit-modal').style.display='flex'" style="background:#202c33; border:1px solid rgba(34,197,94,0.4); color:#22c55e; padding:6px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; cursor:pointer;"><i class="fa-solid fa-book-open"></i> 30 AI</button>
+        <button class="dock-btn" onclick="document.getElementById('ai-toolkit-modal').style.display='flex'" style="background:#202c33; border:1px solid rgba(34,197,94,0.4); color:#22c55e; padding:6px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; cursor:pointer;"><i class="fa-solid fa-layer-group"></i> 40 आवामी</button>
+        <button class="dock-btn" onclick="window.openQuickSolverModal()" style="background:#202c33; border:1px solid rgba(56,189,248,0.4); color:#38bdf8; padding:6px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; cursor:pointer;"><i class="fa-solid fa-graduation-cap"></i> 30 इल्मी</button>
+        <button class="dock-btn" onclick="alert('जमात ऊला अलिफ़ मैसेंजर: सभी छात्रों के लिए क्लासरूम, तक़रार और AI डेस्क।')" style="background:#202c33; border:1px solid rgba(250,204,21,0.4); color:#facc15; padding:6px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; cursor:pointer;"><i class="fa-solid fa-circle-info"></i> गाइड</button>
+        <button class="dock-btn" id="dock-admin-btn" onclick="document.getElementById('admin-panel').classList.add('open')" style="background:#202c33; border:1px solid rgba(239,68,68,0.4); color:#ef4444; padding:6px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; cursor:pointer;"><i class="fa-solid fa-shield-halved"></i> एडमिन</button>
       </div>
 
       <!-- Tab 2: Notes & Tasks Area -->
@@ -3768,14 +3756,6 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       }
     };
 
-    // Auto-hook into RenderUsers
-    const hookRenderPhase3 = window.renderAllUsersList;
-    window.renderAllUsersList = function(usersMap) {
-      if (hookRenderPhase3) hookRenderPhase3(usersMap);
-      window.setupPhase3UI();
-    };
-    setTimeout(() => { if (window.setupPhase3UI) window.setupPhase3UI(); }, 400);
-
     // 2. Status Background Color Selector
     window.setStatusBgColor = function(colorHex, elem) {
       window.tempStatusBgColor = colorHex;
@@ -5553,6 +5533,112 @@ window.finishQuizRound = function(msg) {
 <!-- 🚀 सोहेल एआई: नो-स्प्लिट लेआउट + 5-बटन डॉक + बैज + सनद बोर्ड -->
 <!-- ========================================================== -->
 
+  <!-- 🏆 100% लाइव तालिमी एज़ाज़ात व सनद बोर्ड + छात्र लिस्ट ऑटो-लोडर -->
+<script>
+(function() {
+  function startLiveLeaderboard() {
+    // सनद बोर्ड और छात्र लिस्ट रेंडर करने वाला मास्टर फ़ंक्शन
+    window.renderAllUsersList = function(usersMap) {
+      window.lastUsersMap = usersMap;
+      if (typeof window.setupPhase2UI === 'function') window.setupPhase2UI();
+      if (typeof window.setupPhase3UI === 'function') window.setupPhase3UI();
+
+      const container = document.getElementById('users-dynamic-list');
+      const sanadContainer = document.getElementById('sanad-board-list');
+      if (container) container.innerHTML = "";
+      if (sanadContainer) sanadContainer.innerHTML = "";
+
+      // XP के आधार पर सबसे ज़्यादा नंबर वालों को ऊपर छांटना
+      const sortedKeys = Object.keys(usersMap || {}).sort((a, b) => {
+        return (usersMap[b]?.xp || 0) - (usersMap[a]?.xp || 0);
+      });
+
+      let rank = 1;
+      sortedKeys.forEach(phone => {
+        const u = usersMap[phone];
+        if (!u || !u.name) return;
+
+        const isMe = window.currentUser && phone === window.currentUser.phone;
+        const isPinned = window.pinnedChats && window.pinnedChats.includes(phone);
+        const unreadCount = u.unreadCount || 0;
+        const isOnline = u.status === 'online';
+        const xpCount = u.xp || 0;
+        const streakCount = u.streak || 0;
+
+        let medal = "";
+        if (rank === 1) medal = "🥇 ";
+        else if (rank === 2) medal = "🥈 ";
+        else if (rank === 3) medal = "🥉 ";
+
+        // 1. 🎗️ तालिमी एज़ाज़ात व सनद बोर्ड (Top 5 छात्र - पुराने स्क्रीनशॉट जैसा)
+        if (sanadContainer && rank <= 5) {
+          const sanadRow = document.createElement('div');
+          sanadRow.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: #202c33; padding: 10px 12px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #facc15;";
+          sanadRow.innerHTML = `
+            <div>
+              <div style="font-weight: bold; font-size: 0.88rem; color: #fff;">${medal}${u.displayName || u.name}</div>
+              <div style="font-size: 0.72rem; color: #facc15; margin-top: 2px;">इल्मी तरक्की: ⚡ ${xpCount} XP</div>
+            </div>
+            <div style="background: rgba(250,204,21,0.15); color: #facc15; font-weight: bold; padding: 3px 10px; border-radius: 6px; font-size: 0.75rem; border: 1px solid rgba(250,204,21,0.3);">
+              रैंक #${rank}
+            </div>
+          `;
+          sanadContainer.appendChild(sanadRow);
+        }
+
+        // 2. 💬 साथी छात्रों की चैट लिस्ट
+        if (!isMe && container) {
+          if (window.currentChatFilter === 'unread' && unreadCount === 0) return;
+          if (window.currentChatFilter === 'groups') return;
+
+          const item = document.createElement('div');
+          item.className = 'chat-item';
+          item.onclick = () => window.openPrivateChat(phone, u.displayName || u.name, u.dpUrl);
+
+          let avatarStyle = u.dpUrl ? `background-image: url('${u.dpUrl}');` : "";
+          let avatarContent = u.dpUrl ? "" : (u.name || "उ").charAt(0);
+
+          item.innerHTML = `
+            <div class="item-avatar" style="${avatarStyle}">
+              ${avatarContent}
+              <div class="${isOnline ? 'online-indicator' : 'offline-indicator'}"></div>
+            </div>
+            <div class="item-info">
+              <div class="item-name">
+                <span>${medal}${u.displayName || u.name} ${isPinned ? '<i class="fa-solid fa-thumbtack wa-pinned-icon"></i>' : ''}</span>
+                <div style="display:flex; gap:5px; align-items:center;">
+                  <span class="badge-streak">🔥 ${streakCount}</span>
+                  <span class="badge-xp">⚡ ${xpCount} XP</span>
+                  ${unreadCount > 0 ? `<span class="wa-badge-unread">${unreadCount}</span>` : ''}
+                  <span onclick="window.togglePinChat('${phone}', event)" style="color:#8696a0; cursor:pointer; font-size:0.75rem; margin-left:4px;"><i class="fa-solid fa-thumbtack"></i></span>
+                </div>
+              </div>
+              <div class="item-subtext" style="color:#8696a0;">${u.about || 'طالب علم - जमात ऊला'} | ${isOnline ? 'ऑनलाइन 🟢' : 'ऑफ़लाइन ⚪'}</div>
+            </div>
+          `;
+          container.appendChild(item);
+        }
+
+        rank++;
+      });
+    };
+
+    // Firebase से तुरंत डेटा खींचने का पक्का कनेक्शन
+    if (typeof db !== 'undefined' && typeof ref !== 'undefined' && typeof onValue !== 'undefined') {
+      onValue(ref(db, 'users'), (snapshot) => {
+        const data = snapshot.val() || {};
+        window.renderAllUsersList(data);
+      });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startLiveLeaderboard);
+  } else {
+    setTimeout(startLiveLeaderboard, 800);
+  }
+})();
+</script>
 
 <!-- बस यही 3 लाइनें होनी चाहिए, इसके अलावा कोई <script> टैग नहीं होना चाहिए -->
     <script src="./SohelCoreSystem.js" defer></script>
