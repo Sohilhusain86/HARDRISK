@@ -5375,253 +5375,88 @@ window.finishQuizRound = function(msg) {
 <script src="./SohelCoreSystem.js" defer></script>
 <script type="module" src="./SohelSecuritySystem.js"></script>
 
-  <script>
-(function() {
-  const actionAuthBtn = document.getElementById('btn-action-auth');
-  const userNameInput = document.getElementById('user-name');
-  const userPhoneInput = document.getElementById('user-phone');
-  const userRollInput = document.getElementById('user-roll');
-  const userPassInput = document.getElementById('user-pass');
-  const otpSection = document.getElementById('otp-section');
-  const otpInput = document.getElementById('otp-input');
-  const smsToast = document.getElementById('sms-toast');
-  const toastOtpCode = document.getElementById('toast-otp-code');
-  const adminCrown = document.getElementById('btn-admin-crown');
-
-  let isOtpStage = false;
-  let generatedOtp = "";
-
-  // 20 रियलिस्टिक 6-अंकीय OTPs की लिस्ट
-  const OTP_POOL = [
-    "147258", "258369", "369147", "789456", "456123",
-    "987654", "123987", "654321", "159753", "357159",
-    "852456", "951753", "753159", "123456", "654987",
-    "321654", "789123", "456789", "987123", "123789"
-  ];
-
-  // 1. ऑटो-लॉगिन चेक (अगर पहले से लॉगिन है)
-  const savedUser = localStorage.getItem('jamia_chat_saved_user');
-  if (savedUser) {
-    try {
-      window.currentUser = JSON.parse(savedUser);
-      const loginScreen = document.getElementById('login-screen');
-      if (loginScreen) loginScreen.style.display = 'none';
-      document.body.classList.add('logged-in');
-
-      const myAvatar = document.getElementById('my-avatar');
-      if (myAvatar) {
-        if (window.currentUser.dpUrl) {
-          myAvatar.textContent = '';
-          myAvatar.style.backgroundImage = `url('${window.currentUser.dpUrl}')`;
-        } else {
-          myAvatar.textContent = (window.currentUser.name || 'U').charAt(0);
-        }
-      }
-      const myNameEl = document.getElementById('my-display-name');
-      if (myNameEl) myNameEl.textContent = window.currentUser.displayName || window.currentUser.name;
-
-      if (window.currentUser.role === 'admin' && adminCrown) adminCrown.style.display = 'block';
-      if (typeof requestNotificationAccess === 'function') requestNotificationAccess();
-      if (window.registerUserFirebase) window.registerUserFirebase(window.currentUser);
-      if (typeof connectScaleDrone === 'function') connectScaleDrone();
-    } catch(e) {
-      localStorage.removeItem('jamia_chat_saved_user');
-    }
-  }
-
-  // 2. बटन क्लिक हैंडलर
-  if (actionAuthBtn) {
-    actionAuthBtn.onclick = function(e) {
-      e.preventDefault();
-
-      const name = userNameInput ? userNameInput.value.trim() : '';
-      const phone = userPhoneInput ? userPhoneInput.value.trim().replace(/[^0-9]/g, '') : '';
-      const roll = userRollInput ? userRollInput.value.trim() : '';
-      const pass = userPassInput ? userPassInput.value.trim() : '';
-
-      if (!name) { 
-        alert('कृपया अपना नाम दर्ज करें!'); 
-        userNameInput?.focus(); 
-        return; 
-      }
-      if (phone.length < 10) { 
-        alert('कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!'); 
-        userPhoneInput?.focus(); 
-        return; 
-      }
-
-      // STEP 1: OTP जनरेट करना और स्क्रीन पर SMS बैनर दिखाना
-      if (!isOtpStage) {
-        actionAuthBtn.disabled = true;
-        actionAuthBtn.textContent = "⏳ सर्वर से SMS भेजा जा रहा है...";
-
-        setTimeout(function() {
-          // लिस्ट में से एक रैंडम 6-अंकीय कोड निकालना
-          generatedOtp = OTP_POOL[Math.floor(Math.random() * OTP_POOL.length)];
-
-          // स्क्रीन पर असली SMS बैनर दिखाना
-          if (toastOtpCode) toastOtpCode.textContent = generatedOtp;
-          if (smsToast) {
-            smsToast.style.display = "block";
-            // 9 सेकंड बाद ऑटोमैटिक छिपाना
-            setTimeout(() => { smsToast.style.display = "none"; }, 9000);
-          }
-
-          // इनपुट्स अपडेट करना
-          isOtpStage = true;
-          if (otpSection) otpSection.style.display = "block";
-          if (userNameInput) userNameInput.disabled = true;
-          if (userPhoneInput) userPhoneInput.disabled = true;
-          if (otpInput) otpInput.focus();
-
-          actionAuthBtn.disabled = false;
-          actionAuthBtn.textContent = "✅ OTP सत्यापित करें";
-        }, 1200);
-
-        return;
-      }
-
-      // STEP 2: OTP वेरीफाई करना
-      const enteredOtp = otpInput ? otpInput.value.trim() : '';
-      if (!enteredOtp || enteredOtp.length !== 6) {
-        alert('कृपया 6 अंकों का OTP दर्ज करें!');
-        otpInput?.focus();
-        return;
-      }
-
-      // जाँचना कि OTP सही है या नहीं (जेनरेट किया गया कोड या पूल का कोई भी कोड)
-      if (enteredOtp !== generatedOtp && !OTP_POOL.includes(enteredOtp)) {
-        alert('गलत OTP दर्ज किया गया है! कृपया दोबारा जाँचें।');
-        return;
-      }
-
-      actionAuthBtn.disabled = true;
-      actionAuthBtn.textContent = "⏳ सत्यापित हो रहा है...";
-
-      setTimeout(function() {
-        const role = (pass === 'razavi123') ? 'admin' : 'student';
-        const displayName = roll ? `${name} (रोल: ${roll})` : `${name} (${phone.slice(-4)})`;
-
-        window.currentUser = {
-          name: name,
-          phone: phone,
-          roll: roll,
-          displayName: displayName,
-          role: role,
-          location: 'India',
-          dpUrl: window.selectedDpUrl || ''
-        };
-
-        localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
-
-        const myAvatar = document.getElementById('my-avatar');
-        if (myAvatar) {
-          if (window.currentUser.dpUrl) {
-            myAvatar.textContent = '';
-            myAvatar.style.backgroundImage = `url('${window.currentUser.dpUrl}')`;
-          } else {
-            myAvatar.textContent = name.charAt(0);
-          }
-        }
-        const myNameEl = document.getElementById('my-display-name');
-        if (myNameEl) myNameEl.textContent = displayName;
-
-        if (role === 'admin' && adminCrown) adminCrown.style.display = 'block';
-
-        const loginScreen = document.getElementById('login-screen');
-        if (loginScreen) loginScreen.style.display = 'none';
-        document.body.classList.add('logged-in');
-
-        if (typeof requestNotificationAccess === 'function') requestNotificationAccess();
-        if (window.registerUserFirebase) window.registerUserFirebase(window.currentUser);
-        if (typeof connectScaleDrone === 'function') connectScaleDrone();
-
-        alert('माशाअल्लाह! सत्यापन सफल रहा, स्वागत है।');
-      }, 800);
-    };
-  }
-})();
-  </script>
-
-  <!-- आपकी मूल फ़ाइलें (DP और सिक्योरिटी के लिए) -->
+<!-- जरूरी कोर फाइल्स -->
 <script src="./SohelCoreSystem.js" defer></script>
 <script type="module" src="./SohelSecuritySystem.js"></script>
 
-<!-- 💬 केवल SMS बैनर और 6-अंकीय OTP वेरिफिकेशन (DP से कोई छेड़छाड़ नहीं) -->
+<!-- 📱 असली Android SMS + Cloudinary DP + एडमिन/छात्र डुअल लॉगिन इंजन -->
+<style>
+  .android-sms-toast {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 94%;
+    max-width: 410px;
+    background: #2b2d31;
+    color: #f2f3f5;
+    border-radius: 20px;
+    padding: 14px 16px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255,255,255,0.08);
+    z-index: 99999999;
+    animation: androidDrop 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  @keyframes androidDrop {
+    from { top: -100px; opacity: 0; transform: translate(-50%, -10px) scale(0.95); }
+    to { top: 12px; opacity: 1; transform: translate(-50%, 0) scale(1); }
+  }
+  .sms-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.76rem;
+    color: #949ba4;
+    margin-bottom: 6px;
+  }
+  .sms-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: #dbdee1;
+  }
+  .sms-badge-icon {
+    width: 18px;
+    height: 18px;
+    background: #00a884;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: white;
+  }
+  .sms-content {
+    font-size: 0.88rem;
+    line-height: 1.35;
+    color: #dbdee1;
+  }
+  .sms-code-highlight {
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #00a884;
+    letter-spacing: 2px;
+  }
+</style>
+
+<!-- फ्लोटिंग रियल इंग्लिश SMS बैनर -->
+<div id="android-sms" class="android-sms-toast">
+  <div class="sms-top-bar">
+    <div class="sms-badge">
+      <div class="sms-badge-icon"><i class="fa-solid fa-comment-dots"></i></div>
+      <span>Messages • AX-JAMIA</span>
+    </div>
+    <span>just now</span>
+  </div>
+  <div class="sms-content">
+    <b id="sms-otp-display" class="sms-code-highlight">------</b> is your Jamia Messenger verification code. Do not share this OTP with anyone.
+  </div>
+</div>
+
 <script>
 (function() {
-  // 1. स्क्रीन के ऊपर गिरने वाला SMS बैनर (Style + Element)
-  const bannerStyle = document.createElement('style');
-  bannerStyle.innerHTML = `
-    .real-sms-banner {
-      display: none;
-      position: fixed;
-      top: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 92%;
-      max-width: 390px;
-      background: #1f2c34;
-      color: #e9edef;
-      border: 1.5px solid #00a884;
-      border-radius: 14px;
-      padding: 12px 16px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.8);
-      z-index: 9999999;
-      animation: dropSms 0.4s ease-out;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-    @keyframes dropSms {
-      from { top: -90px; opacity: 0; }
-      to { top: 15px; opacity: 1; }
-    }
-    .sms-banner-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.75rem;
-      color: #8696a0;
-      margin-bottom: 6px;
-    }
-    .sms-banner-code {
-      color: #00a884;
-      font-weight: 800;
-      font-size: 1.25rem;
-      letter-spacing: 3px;
-      background: rgba(0, 168, 132, 0.15);
-      padding: 2px 8px;
-      border-radius: 6px;
-      display: inline-block;
-      margin: 4px 0;
-    }
-  `;
-  document.head.appendChild(bannerStyle);
-
-  const bannerDiv = document.createElement('div');
-  bannerDiv.id = 'live-sms-popup';
-  bannerDiv.className = 'real-sms-banner';
-  bannerDiv.innerHTML = `
-    <div class="sms-banner-top">
-      <span><i class="fa-solid fa-comment-sms" style="color: #00a884; margin-right: 6px;"></i>संदेश • Messages</span>
-      <span>अभी</span>
-    </div>
-    <div style="font-size: 0.88rem; line-height: 1.4;">
-      जमात ऊला अलिफ़: आपका 6-अंकीय सत्यापन कोड <span id="popup-otp-text" class="sms-banner-code">------</span> है। इसे किसी से साझा न करें।
-    </div>
-  `;
-  document.body.appendChild(bannerDiv);
-
-  // 2. 20 मान्य 6-अंकीय OTPs की सूची
-  const OTP_LIST = [
-    "147258", "258369", "369147", "789456", "456123",
-    "987654", "123987", "654321", "159753", "357159",
-    "852456", "951753", "753159", "123456", "654987",
-    "321654", "789123", "456789", "987123", "123789"
-  ];
-
-  let currentOtp = "";
-  let isOtpStage = false;
-
   const authBtn = document.getElementById('btn-action-auth');
   const nameInput = document.getElementById('user-name');
   const phoneInput = document.getElementById('user-phone');
@@ -5629,14 +5464,220 @@ window.finishQuizRound = function(msg) {
   const passInput = document.getElementById('user-pass');
   const otpInput = document.getElementById('otp-input') || document.querySelector('input[placeholder*="OTP"]');
   const otpSection = document.getElementById('otp-section') || (otpInput ? otpInput.parentElement : null);
+  const smsToast = document.getElementById('android-sms');
+  const smsOtpDisplay = document.getElementById('sms-otp-display');
+  const adminCrown = document.getElementById('btn-admin-crown');
 
-  // यदि स्क्रीनशॉट की तरह OTP इनपुट पहले से खुला हो
-  if (otpInput && otpInput.offsetParent !== null) {
-    isOtpStage = true;
-    currentOtp = "789456";
-    if (authBtn) authBtn.textContent = "✅ OTP सत्यापित करें";
+  // एडमिन मास्टर पासवर्ड
+  const ADMIN_SECRET = "razavi123";
+
+  // =======================================================
+  // 1. ऑटो-लॉगिन चेक (एडमिन और छात्र दोनों के लिए)
+  // =======================================================
+  const savedUserJson = localStorage.getItem('jamia_chat_saved_user');
+  if (savedUserJson) {
+    try {
+      const savedUser = JSON.parse(savedUserJson);
+      window.currentUser = savedUser;
+
+      const loginOverlay = document.getElementById('login-screen') || document.querySelector('.login-overlay');
+      if (loginOverlay) {
+        loginOverlay.style.setProperty('display', 'none', 'important');
+        loginOverlay.remove();
+      }
+      document.body.classList.add('logged-in');
+
+      // हेडर में नाम और डीपी
+      const myAvatar = document.getElementById('my-avatar');
+      if (myAvatar) {
+        if (savedUser.dpUrl) {
+          myAvatar.textContent = '';
+          myAvatar.style.backgroundImage = `url('${savedUser.dpUrl}')`;
+          myAvatar.style.backgroundSize = 'cover';
+        } else {
+          myAvatar.textContent = (savedUser.name || 'U').charAt(0);
+        }
+      }
+      const myNameEl = document.getElementById('my-display-name');
+      if (myNameEl) myNameEl.textContent = savedUser.displayName || savedUser.name;
+
+      // एडमिन क्राउन रिस्टोर
+      if (savedUser.role === 'admin' && adminCrown) {
+        adminCrown.style.display = 'block';
+      }
+
+      setTimeout(() => {
+        try { if (typeof requestNotificationAccess === 'function') requestNotificationAccess(); } catch(e){}
+        try { if (window.registerUserFirebase) window.registerUserFirebase(savedUser); } catch(e){}
+        try { if (typeof connectScaleDrone === 'function') connectScaleDrone(); } catch(e){}
+      }, 300);
+    } catch (e) {
+      localStorage.removeItem('jamia_chat_saved_user');
+    }
   }
 
+  // =======================================================
+  // 2. Cloudinary डीपी अपलोडर
+  // =======================================================
+  window.selectedDpUrl = "";
+
+  async function uploadToCloudinary(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const maxDim = 600;
+          let w = img.width, h = img.height;
+          if (w > h && w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
+          else if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+
+          canvas.toBlob(async (blob) => {
+            if (!blob) return reject(new Error("Image compression failed"));
+            const compressedFile = new File([blob], `dp_${Date.now()}.jpg`, { type: "image/jpeg" });
+            const formData = new FormData();
+            formData.append("file", compressedFile);
+            formData.append("upload_preset", "jamia_dp");
+
+            try {
+              const res = await fetch("https://api.cloudinary.com/v1_1/xgkhockl/image/upload", {
+                method: "POST",
+                body: formData
+              });
+              const data = await res.json();
+              if (data.secure_url) resolve(data.secure_url);
+              else reject(new Error(data.error?.message || "Cloudinary upload failed"));
+            } catch (err) {
+              reject(err);
+            }
+          }, "image/jpeg", 0.8);
+        };
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  let dpInput = document.getElementById('dp-file-input');
+  if (!dpInput) {
+    dpInput = document.createElement('input');
+    dpInput.type = 'file';
+    dpInput.id = 'dp-file-input';
+    dpInput.accept = 'image/*';
+    dpInput.style.display = 'none';
+    document.body.appendChild(dpInput);
+  }
+
+  const previewBox = document.getElementById('dp-preview-box') || document.querySelector('.dp-upload-box');
+  if (previewBox) {
+    previewBox.style.cursor = 'pointer';
+    previewBox.onclick = () => dpInput.click();
+  }
+
+  dpInput.addEventListener('change', async function(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    const dpText = previewBox?.nextElementSibling;
+    if (dpText) dpText.innerHTML = '<span style="color:#eab308;">⏳ क्लाउड पर अपलोड हो रही है...</span>';
+
+    const localUrl = URL.createObjectURL(file);
+    if (previewBox) {
+      previewBox.style.backgroundImage = `url('${localUrl}')`;
+      previewBox.style.backgroundSize = 'cover';
+      previewBox.style.backgroundPosition = 'center';
+      const icon = previewBox.querySelector('i');
+      if (icon) icon.style.display = 'none';
+    }
+
+    try {
+      const cloudUrl = await uploadToCloudinary(file);
+      window.selectedDpUrl = cloudUrl;
+      if (dpText) dpText.innerHTML = '<span style="color:#00a884;">✅ फ़ोटो सुरक्षित लग चुकी है</span>';
+    } catch (err) {
+      console.error("DP Upload Error:", err);
+      if (dpText) dpText.innerHTML = '<span style="color:#ef4444;">❌ फ़ोटो अपलोड विफल, पुनः प्रयास करें</span>';
+    }
+  });
+
+  // =======================================================
+  // 3. 20 रीयल OTPs
+  // =======================================================
+  const OTP_LIST = [
+    "147258", "258369", "369147", "789456", "456123",
+    "987654", "123987", "654321", "159753", "357159",
+    "852456", "951753", "753159", "123456", "654987",
+    "321654", "789123", "456789", "987123", "123789"
+  ];
+
+  let currentOtp = "789123";
+  let isOtpStage = (otpInput && otpInput.offsetParent !== null);
+
+  // लॉगिन पूरा करने का कॉमन फंक्शन
+  function executeLogin(name, phone, roll, role) {
+    authBtn.disabled = true;
+    authBtn.textContent = (role === 'admin') ? "👑 एडमिन पैनल लोड हो रहा है..." : "⏳ लॉगिन हो रहा है...";
+
+    setTimeout(() => {
+      const displayName = roll ? `${name} (रोल: ${roll})` : `${name} (${phone.slice(-4)})`;
+      const userDp = window.selectedDpUrl || '';
+
+      window.currentUser = {
+        name: name,
+        phone: phone,
+        roll: roll,
+        displayName: displayName,
+        role: role,
+        location: 'India',
+        dpUrl: userDp
+      };
+
+      // सेशन सुरक्षित
+      localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
+
+      // लॉगिन स्क्रीन हटाना
+      const loginOverlay = document.getElementById('login-screen') || document.querySelector('.login-overlay');
+      if (loginOverlay) {
+        loginOverlay.style.setProperty('display', 'none', 'important');
+        loginOverlay.remove();
+      }
+      document.body.classList.add('logged-in');
+
+      // हेडर प्रोफाइल
+      const myAvatar = document.getElementById('my-avatar');
+      if (myAvatar) {
+        if (userDp) {
+          myAvatar.textContent = '';
+          myAvatar.style.backgroundImage = `url('${userDp}')`;
+          myAvatar.style.backgroundSize = 'cover';
+        } else {
+          myAvatar.textContent = name.charAt(0);
+        }
+      }
+      const myNameEl = document.getElementById('my-display-name');
+      if (myNameEl) myNameEl.textContent = displayName;
+
+      // एडमिन क्राउन दिखाना
+      if (role === 'admin' && adminCrown) {
+        adminCrown.style.display = 'block';
+      }
+
+      // बैकग्राउंड सर्विसेज चालू करना
+      try { if (typeof requestNotificationAccess === 'function') requestNotificationAccess(); } catch(e){}
+      try { if (window.registerUserFirebase) window.registerUserFirebase(window.currentUser); } catch(e){}
+      try { if (typeof connectScaleDrone === 'function') connectScaleDrone(); } catch(e){}
+
+      alert((role === 'admin') ? '👑 मरहबा! एडमिन अधिकार सक्रिय हो चुके हैं।' : 'माशाअल्लाह! आप सफलतापूर्वक लॉगिन हो गए हैं।');
+    }, 600);
+  }
+
+  // =======================================================
+  // 4. लॉगिन बटन हैंडलर (स्मार्ट एडमिन बायपास + छात्र OTP)
+  // =======================================================
   if (authBtn) {
     authBtn.onclick = function(e) {
       e.preventDefault();
@@ -5646,102 +5687,65 @@ window.finishQuizRound = function(msg) {
       const roll = rollInput ? rollInput.value.trim() : '';
       const pass = passInput ? passInput.value.trim() : '';
 
-      if (!name) { 
-        alert('कृपया अपना नाम दर्ज करें!'); 
-        nameInput?.focus(); 
-        return; 
-      }
-      if (phone.length < 10) { 
-        alert('कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!'); 
-        phoneInput?.focus(); 
-        return; 
+      if (!name) { alert('कृपया अपना नाम दर्ज करें!'); nameInput?.focus(); return; }
+      if (phone.length < 10) { alert('कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!'); phoneInput?.focus(); return; }
+
+      // 👑 एडमिन चेक
+      if (pass.length > 0) {
+        if (pass === ADMIN_SECRET) {
+          // सही एडमिन पासवर्ड -> बिना OTP के सीधा सुपर-फास्ट लॉगिन
+          executeLogin(name, phone, roll, 'admin');
+          return;
+        } else {
+          alert('❌ अमान्य एडमिन पासवर्ड! कृपया सही पासवर्ड दर्ज करें या इसे खाली छोड़ें।');
+          passInput?.focus();
+          return;
+        }
       }
 
-      // पहला चरण: OTP तैयार करना और SMS बैनर गिराना
+      // 🎓 छात्रों के लिए OTP फ़्लो
       if (!isOtpStage) {
         authBtn.disabled = true;
-        authBtn.textContent = "⏳ सर्वर से SMS भेजा जा रहा है...";
+        authBtn.textContent = "⏳ Requesting OTP...";
 
         setTimeout(() => {
           currentOtp = OTP_LIST[Math.floor(Math.random() * OTP_LIST.length)];
+          if (smsOtpDisplay) smsOtpDisplay.textContent = currentOtp;
 
-          const popupOtpText = document.getElementById('popup-otp-text');
-          if (popupOtpText) popupOtpText.textContent = currentOtp;
-          
-          bannerDiv.style.display = 'block';
-          if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-          setTimeout(() => { bannerDiv.style.display = 'none'; }, 9000);
+          if (smsToast) {
+            smsToast.style.display = 'block';
+            if (navigator.vibrate) navigator.vibrate([120, 60, 120]);
+            setTimeout(() => { smsToast.style.display = 'none'; }, 9000);
+          }
 
           isOtpStage = true;
           if (otpSection) otpSection.style.display = 'block';
           if (otpInput) {
             otpInput.focus();
-            otpInput.placeholder = "SMS में आया 6-अंकीय OTP दर्ज करें";
+            otpInput.placeholder = "Enter 6-digit OTP";
           }
           authBtn.disabled = false;
           authBtn.textContent = "✅ OTP सत्यापित करें";
-        }, 1200);
+        }, 1000);
 
         return;
       }
 
-      // दूसरा चरण: OTP सत्यापन
+      // छात्र OTP सत्यापन
       const enteredOtp = otpInput ? otpInput.value.trim() : '';
       if (!enteredOtp || enteredOtp.length !== 6) {
-        alert('कृपया ऊपर संदेश (SMS) में आया 6 अंकों का OTP दर्ज करें!');
+        alert('कृपया 6 अंकों का OTP दर्ज करें!');
         otpInput?.focus();
         return;
       }
 
       if (enteredOtp !== currentOtp && !OTP_LIST.includes(enteredOtp)) {
-        alert('गलत OTP! कृपया सही 6-अंकीय कोड दर्ज करें।');
+        alert('अमान्य OTP कोड! कृपया दोबारा जाँचें।');
         return;
       }
 
-      authBtn.disabled = true;
-      authBtn.textContent = "⏳ लॉगिन हो रहा है...";
-
-      setTimeout(() => {
-        const role = (pass === 'razavi123') ? 'admin' : 'student';
-        const displayName = roll ? `${name} (रोल: ${roll})` : `${name} (${phone.slice(-4)})`;
-
-        // DP का URL आपकी कोर फाइलों से ही लिया जाएगा
-        const userDp = window.selectedDpUrl || '';
-
-        window.currentUser = {
-          name: name,
-          phone: phone,
-          roll: roll,
-          displayName: displayName,
-          role: role,
-          location: 'India',
-          dpUrl: userDp
-        };
-
-        localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
-
-        const loginScreen = document.getElementById('login-screen');
-        if (loginScreen) loginScreen.style.display = 'none';
-        document.body.classList.add('logged-in');
-
-        const myAvatar = document.getElementById('my-avatar');
-        if (myAvatar) {
-          if (userDp) {
-            myAvatar.textContent = '';
-            myAvatar.style.backgroundImage = `url('${userDp}')`;
-          } else {
-            myAvatar.textContent = name.charAt(0);
-          }
-        }
-        const myNameEl = document.getElementById('my-display-name');
-        if (myNameEl) myNameEl.textContent = displayName;
-
-        if (typeof requestNotificationAccess === 'function') requestNotificationAccess();
-        if (window.registerUserFirebase) window.registerUserFirebase(window.currentUser);
-        if (typeof connectScaleDrone === 'function') connectScaleDrone();
-
-        alert('माशाअल्लाह! आप सफलतापूर्वक लॉगिन हो गए हैं।');
-      }, 700);
+      // छात्र सफल लॉगिन
+      executeLogin(name, phone, roll, 'student');
     };
   }
 })();
