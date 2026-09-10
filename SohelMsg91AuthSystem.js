@@ -1,13 +1,14 @@
 import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getDatabase, ref, get, set, update, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 (function () {
   "use strict";
 
-  if (window.__REAL_AUTH_ENGINE__) return;
-  window.__REAL_AUTH_ENGINE__ = true;
+  if (window.__DIRECT_LOGIN_ENGINE__) return;
+  window.__DIRECT_LOGIN_ENGINE__ = true;
 
+  // Firebase कॉन्फ़िगरेशन
   const firebaseConfig = {
     apiKey: "AIzaSyDpqKDayo6H0nVyjnT1JBPjpH8RjmwpvV0",
     authDomain: "ula-alif.firebaseapp.com",
@@ -22,11 +23,9 @@ import { getDatabase, ref, get, set, update, onDisconnect } from "https://www.gs
   const auth = getAuth(app);
   const db = getDatabase(app);
 
-  let isOtpStepActive = false;
-  let activePhone10 = "";
-  let activeEmail = "";
   window.selectedDpUrl = "";
 
+  // 1. डीपी अपलोड लॉजिक (Cloudinary)
   window.compressAndUploadImage = async function (file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -37,7 +36,7 @@ import { getDatabase, ref, get, set, update, onDisconnect } from "https://www.gs
           const maxDim = 800;
           let w = img.width, h = img.height;
           if (w > h && w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; } 
-          else if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
+          else if (h > maxDim) { h = Math.round((h * maxDim) / h); h = maxDim; }
           canvas.width = w; canvas.height = h;
           canvas.getContext("2d").drawImage(img, 0, 0, w, h);
           canvas.toBlob(async (blob) => {
@@ -50,7 +49,7 @@ import { getDatabase, ref, get, set, update, onDisconnect } from "https://www.gs
               const res = await fetch("https://api.cloudinary.com/v1_1/xgkhockl/image/upload", { method: "POST", body: formData });
               const data = await res.json();
               if (data.secure_url) resolve(data.secure_url);
-              else reject(new Error(data.error?.message || "क्लाउडिनरी अस्वीकृत"));
+              else reject(new Error(data.error?.message || "क्लाउडिनरी अपलोड त्रुटि"));
             } catch (err) { reject(err); }
           }, "image/jpeg", 0.75);
         };
@@ -80,8 +79,15 @@ import { getDatabase, ref, get, set, update, onDisconnect } from "https://www.gs
     }
   }
 
+  // 2. डायरेक्ट लॉगिन (बिना किसी OTP के)
   function initAuthButton() {
     const btn = document.getElementById("btn-action-auth");
+    const otpSection = document.getElementById("otp-section");
+    
+    // OTP इनपुट छुपाएं और बटन का नाम सीधा लॉगिन करें
+    if (otpSection) otpSection.style.display = "none";
+    if (btn) btn.textContent = "🚀 मैसेंजर में प्रवेश करें";
+
     if (!btn) return;
 
     btn.onclick = async (e) => {
@@ -89,128 +95,100 @@ import { getDatabase, ref, get, set, update, onDisconnect } from "https://www.gs
 
       const nameInput = document.getElementById("user-name");
       const phoneInput = document.getElementById("user-phone");
-      const emailInput = document.getElementById("user-email");
-      const otpInput = document.getElementById("otp-input");
-      const otpSection = document.getElementById("otp-section");
+      const rollInput = document.getElementById("user-roll");
+      const passInput = document.getElementById("user-pass");
 
       const name = nameInput?.value.trim();
-      const email = emailInput?.value.trim() || "";
       const rawPhone = phoneInput?.value.replace(/[^0-9]/g, "") || "";
       const phone10 = rawPhone.length >= 10 ? rawPhone.slice(-10) : "";
+      const roll = rollInput?.value.trim() || "";
+      const pass = passInput?.value.trim() || "";
 
-      if (!name) { alert("कृपया अपना नाम दर्ज करें!"); return; }
-      if (phone10.length !== 10) { alert("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!"); return; }
-      if (email && !email.includes("@")) { alert("कृपया सही ईमेल एड्रेस दर्ज करें (या खाली छोड़ दें)!"); return; }
-      
-      activePhone10 = phone10;
-      activeEmail = email;
-
-      // STEP 1: Send OTP
-      if (!isOtpStepActive) {
-        btn.disabled = true;
-        btn.textContent = "⏳ सर्वर से OTP भेजा जा रहा है...";
-
-        try {
-          const res = await fetch("/api/msg91/send", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ phone: phone10, email: email })
-          });
-          const data = await res.json();
-          if (!res.ok || !data.success) throw new Error(data.error);
-
-          btn.disabled = false;
-          btn.textContent = "OTP सत्यापित करें";
-          isOtpStepActive = true;
-          if (otpSection) otpSection.style.display = "block";
-          if (phoneInput) phoneInput.disabled = true;
-          if (emailInput) emailInput.disabled = true;
-          alert(`✅ नंबर (+91 ${phone10}) पर SMS भेज दिया गया है।`);
-        } catch (err) {
-          btn.disabled = false;
-          btn.textContent = "OTP भेजें";
-          alert("विफलता: " + err.message);
-        }
-        return;
+      if (!name) { 
+        alert("कृपया अपना नाम दर्ज करें!"); 
+        nameInput?.focus();
+        return; 
+      }
+      if (phone10.length !== 10) { 
+        alert("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!"); 
+        phoneInput?.focus();
+        return; 
       }
 
-      // STEP 2: Verify OTP
-      const enteredOtp = otpInput?.value.trim();
-      if (!enteredOtp || enteredOtp.length !== 6) { alert("कृपया सही 6-अंकों का OTP दर्ज करें!"); return; }
-
       btn.disabled = true;
-      btn.textContent = "जाँचा जा रहा है...";
+      btn.textContent = "⏳ लॉगिन हो रहा है...";
 
       try {
-        const res = await fetch("/api/msg91/verify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone: activePhone10, email: activeEmail, otp: enteredOtp })
-        });
-        const data = await res.json();
-        
-        if (!res.ok || !data.success) throw new Error(data.error || "गलत OTP");
+        // Firebase अनाम ऑथेंटिकेशन (या सीधा UID जनरेशन)
+        let uid = `user_${phone10}`;
+        try {
+          const cred = await signInAnonymously(auth);
+          if (cred?.user?.uid) uid = cred.user.uid;
+        } catch (authErr) {
+          console.warn("Auth bypass used:", authErr);
+        }
 
-        const userCredential = await signInWithCustomToken(auth, data.customToken);
-        const firebaseUser = userCredential.user;
-        const roll = document.getElementById("user-roll")?.value.trim() || "";
-        const pass = document.getElementById("user-pass")?.value.trim() || "";
-
-        const userRef = ref(db, `users/${activePhone10}`);
+        // Firebase डेटाबेस में यूज़र डेटा सुरक्षित करना
+        const userRef = ref(db, `users/${phone10}`);
         await update(userRef, {
-          uid: firebaseUser.uid,
-          name,
-          email: activeEmail,
-          roll,
-          phone: activePhone10,
+          uid: uid,
+          name: name,
+          phone: phone10,
+          roll: roll,
           status: "online",
           lastSeen: Date.now(),
           ...(window.selectedDpUrl ? { dpUrl: window.selectedDpUrl } : {})
         });
 
+        // लोकल स्टोरेज में सेशन सुरक्षित करना
         window.currentUser = {
-          uid: firebaseUser.uid,
-          name,
-          email: activeEmail,
-          phone: activePhone10,
-          roll,
+          uid: uid,
+          name: name,
+          phone: phone10,
+          roll: roll,
           role: pass === "razavi123" ? "admin" : "student",
           dpUrl: window.selectedDpUrl || ""
         };
         localStorage.setItem("jamia_chat_saved_user", JSON.stringify(window.currentUser));
 
+        // स्क्रीन खोलना
         const loginScreen = document.getElementById("login-screen");
         if (loginScreen) loginScreen.style.display = "none";
         document.body.classList.add("logged-in");
 
-        alert("माशाअल्लाह! लॉगिन पूरी तरह सफल रहा।");
+        alert("स्वागत है! आप सफलतापूर्वक लॉगिन हो चुके हैं।");
         location.reload();
+
       } catch (err) {
         btn.disabled = false;
-        btn.textContent = "OTP सत्यापित करें";
-        alert("त्रुटि: " + err.message);
+        btn.textContent = "🚀 मैसेंजर में प्रवेश करें";
+        alert("लॉगिन में त्रुटि: " + err.message);
       }
     };
   }
 
+  // 3. पहले से लॉगिन यूज़र को सीधे अंदर भेजना
   function checkSession() {
-    onAuthStateChanged(auth, (user) => {
-      const loginScreen = document.getElementById("login-screen");
-      if (user) {
+    const saved = localStorage.getItem("jamia_chat_saved_user");
+    const loginScreen = document.getElementById("login-screen");
+    if (saved) {
+      try {
+        window.currentUser = JSON.parse(saved);
         if (loginScreen) loginScreen.style.display = "none";
         document.body.classList.add("logged-in");
-      } else {
-        if (loginScreen) loginScreen.style.display = "flex";
-      }
-    });
+      } catch (e) {}
+    }
   }
 
   function start() {
+    checkSession();
     initDp();
     initAuthButton();
-    checkSession();
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
-  else start();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start);
+  } else {
+    start();
+  }
 })();
