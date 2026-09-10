@@ -1,14 +1,12 @@
-// api/msg91/verify.js
+import { getApps, initializeApp, cert } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
 
-const admin = require("firebase-admin");
-
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
+if (!getApps().length) {
+  initializeApp({
+    credential: cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: (process.env.FIREBASE_PRIVATE_KEY || "")
-        .replace(/\\n/g, "\n")
+      privateKey: (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, "\n")
     }),
     databaseURL:
       process.env.FIREBASE_DATABASE_URL ||
@@ -16,7 +14,7 @@ if (!admin.apps.length) {
   });
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
@@ -31,10 +29,13 @@ module.exports = async function handler(req, res) {
         : (req.body || {});
 
     const rawPhone = String(body.phone || "");
-    const mobile10 = rawPhone.replace(/\D/g, "").slice(-10);
+    const mobile10 = rawPhone
+      .replace(/\D/g, "")
+      .slice(-10);
 
-    const otp = String(body.otp || "").trim();
-    const reqId = String(body.reqId || "").trim();
+    const accessToken = String(
+      body.accessToken || ""
+    ).trim();
 
     if (!/^[6-9]\d{9}$/.test(mobile10)) {
       return res.status(400).json({
@@ -43,64 +44,85 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    if (!/^\d{4,8}$/.test(otp)) {
+    if (!accessToken) {
       return res.status(400).json({
         success: false,
-        error: "अमान्य OTP"
-      });
-    }
-
-    if (!reqId) {
-      return res.status(400).json({
-        success: false,
-        error: "OTP request ID missing"
+        error: "MSG91 access token missing"
       });
     }
 
     const authKey = process.env.MSG91_AUTHKEY;
-    const widgetId = process.env.MSG91_WIDGET_ID;
 
-    if (!authKey || !widgetId) {
+    if (!authKey) {
+      console.error("[MSG91] MSG91_AUTHKEY missing");
+
       return res.status(500).json({
         success: false,
-        error: "MSG91 verification configuration missing"
+        error: "MSG91 server authentication configuration missing"
       });
     }
 
-    const verifyResponse = await fetch(
-      "https://api.msg91.com/api/v5/widget/verifyOtp",
+    /*
+     * IMPORTANT:
+     * OTP itself is NOT verified here.
+     *
+     * MSG91 Web SDK verifies the OTP and returns
+     * a temporary access token.
+     *
+     * Server verifies that access token here.
+     */
+
+    const form = new URLSearchParams();
+
+    form.set("authkey", authKey);
+    form.set("access-token", accessToken);
+
+    const msg91Response = await fetch(
+      "https://control.msg91.com/api/v5/widget/verifyAccessToken",
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "authkey": authKey
+          "Content-Type":
+            "application/x-www-form-urlencoded"
         },
-        body: JSON.stringify({
-          widgetId,
-          identifier: "91" + mobile10,
-          otp,
-          reqId
-        })
+        body: form.toString()
       }
     );
 
-    const rawResponse = await verifyResponse.text();
+    const rawResponse =
+      await msg91Response.text();
 
-    let verifyData;
+    let verifyData = {};
 
     try {
       verifyData = rawResponse
         ? JSON.parse(rawResponse)
         : {};
     } catch {
+      console.error(
+        "[MSG91] Invalid verifyAccessToken response:",
+        rawResponse
+      );
+
       return res.status(502).json({
         success: false,
-        error: "MSG91 ने वैध verification response नहीं दिया।"
+        error:
+          "MSG91 ने वैध verification response नहीं दिया।"
       });
     }
 
+    console.log(
+      "[MSG91] Access-token verification status:",
+      msg91Response.status
+    );
+
+    console.log(
+      "[MSG91] Access-token verification:",
+      verifyData
+    );
+
     if (
-      !verifyResponse.ok ||
+      !msg91Response.ok ||
       verifyData.type !== "success"
     ) {
       return res.status(401).json({
@@ -108,14 +130,21 @@ module.exports = async function handler(req, res) {
         error:
           verifyData.message ||
           verifyData.error ||
-          "गलत या expired OTP।"
+          "MSG91 verification विफल हुई।"
       });
     }
 
-    const firebaseUid = `msg91_${mobile10}`;
+    /*
+     * MSG91 has now confirmed the access token.
+     *
+     * Create Firebase custom token.
+     */
+
+    const firebaseUid =
+      `msg91_${mobile10}`;
 
     const customToken =
-      await admin.auth().createCustomToken(
+      await getAuth().createCustomToken(
         firebaseUid,
         {
           phone_number: `+91${mobile10}`,
@@ -130,11 +159,15 @@ module.exports = async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error("[MSG91] Verify error:", error);
+    console.error(
+      "[MSG91] VERIFY CRASH:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
-      error: "OTP verification server error"
+      error:
+        "OTP verification server error हुआ।"
     });
   }
-};
+}
