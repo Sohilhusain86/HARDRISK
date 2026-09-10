@@ -41,10 +41,8 @@
   align-items: center !important;
 }
 
-/* लॉगिन से पहले डॉक/बटन बार पूरी तरह छुपा रहे */
-body:not(.logged-in) .bottom-dock,
-body:not(.logged-in) [class*="dock"],
-body:not(.logged-in) footer {
+/* लॉगिन स्क्रीन खुली हो तभी नीचे का डॉक छुपे */
+#login-screen[style*="flex"] ~ .app-bottom-dock {
   display: none !important;
 }
     
@@ -885,6 +883,67 @@ body:not(.logged-in) footer {
           सभी छात्र (ऑनलाइन 🟢 / ऑफ़लाइन ⚪):
         </div>
         <div id="users-dynamic-list"></div>
+
+        <!-- 🎗️ तालिमी एज़ाज़ात व सनद बोर्ड (लाइव रिकॉर्ड) -->
+        <div class="sanad-board-card" style="margin: 14px 12px; background: #182229; border: 1px solid rgba(250, 204, 21, 0.25); border-radius: 12px; padding: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 6px;">
+            <span style="color: #facc15; font-weight: bold; font-size: 0.88rem;"><i class="fa-solid fa-award"></i> तालिमी एज़ाज़ात व सनद बोर्ड</span>
+            <span style="font-size: 0.7rem; color: #8696a0;">लाइव रिकॉर्ड</span>
+          </div>
+          <div id="sanad-board-list">
+            <!-- डायनामिक लाइव रैंक यहाँ लोड होगी -->
+          </div>
+        </div>
+      </main>
+
+      <!-- 🚀 नीचे का 5-बटन डॉक (30 AI, 40 आवामी, 30 इल्मी, गाइड, एडमिन) -->
+      <style>
+        .app-bottom-dock {
+          position: fixed;
+          bottom: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 95%;
+          max-width: 480px;
+          background: #111b21;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 30px;
+          padding: 6px 10px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          z-index: 999;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+        }
+        .dock-btn {
+          background: #202c33;
+          border: 1px solid rgba(255,255,255,0.08);
+          color: #e9edef;
+          padding: 6px 10px;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+        }
+        .dock-btn.btn-dock-ai { border-color: rgba(34, 197, 94, 0.4); color: #22c55e; }
+        .dock-btn.btn-dock-awam { border-color: rgba(34, 197, 94, 0.4); color: #22c55e; }
+        .dock-btn.btn-dock-ilmi { border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; }
+        .dock-btn.btn-dock-guide { border-color: rgba(250, 204, 21, 0.4); color: #facc15; }
+        .dock-btn.btn-dock-admin { border-color: rgba(239, 68, 68, 0.4); color: #ef4444; }
+      </style>
+
+      <div class="app-bottom-dock" id="main-app-dock">
+        <button class="dock-btn" onclick="document.getElementById('ai-toolkit-modal').style.display='flex'" title="मेनू"><i class="fa-solid fa-grip"></i></button>
+        <button class="dock-btn btn-dock-ai" onclick="document.getElementById('ai-toolkit-modal').style.display='flex'"><i class="fa-solid fa-book-open"></i> 30 AI</button>
+        <button class="dock-btn btn-dock-awam" onclick="document.getElementById('ai-toolkit-modal').style.display='flex'"><i class="fa-solid fa-layer-group"></i> 40 आवामी</button>
+        <button class="dock-btn btn-dock-ilmi" onclick="window.openQuickSolverModal()"><i class="fa-solid fa-graduation-cap"></i> 30 इल्मी</button>
+        <button class="dock-btn btn-dock-guide" onclick="alert('जमात ऊला अलिफ़ मैसेंजर: सभी छात्रों के लिए क्लासरूम, तक़रार और AI डेस्क।')"><i class="fa-solid fa-circle-info"></i> गाइड</button>
+        <button class="dock-btn btn-dock-admin" id="dock-admin-btn" onclick="document.getElementById('admin-panel').classList.add('open')"><i class="fa-solid fa-shield-halved"></i> एडमिन</button>
+      </div>
+      
       </main>
 
       <!-- Tab 2: Notes & Tasks Area -->
@@ -1176,26 +1235,141 @@ body:not(.logged-in) footer {
         }
       });
     }
+    // ✅ 1. Cloudinary डीपी अपलोडर (बिना अटके + तुरंत लाइव प्रिव्यू)
+    window.UPLOAD_PRESET = 'jamia_dp';
+    window.CLOUD_NAME = 'xgkhockl';
 
+    async function uploadToCloudinary(file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'jamia_dp');
+      try {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/xgkhockl/image/upload`, { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.secure_url) return data;
+        throw new Error(data.error?.message || "Upload failed");
+      } catch(err) {
+        // फॉलबैक प्रीसेट
+        const fbData = new FormData();
+        fbData.append('file', file);
+        fbData.append('upload_preset', 'd9xe6u2l');
+        const fbRes = await fetch(`https://api.cloudinary.com/v1_1/xgkhockl/image/upload`, { method: 'POST', body: fbData });
+        return await fbRes.json();
+      }
+    }
+
+    // हेडर वाले कैमरा आइकॉन से डीपी बदलना
     const dpUpdateInput = document.getElementById('dp-update-file');
     if (dpUpdateInput) {
       dpUpdateInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        alert("प्रोफाइल फोटो अपलोड हो रही है, कृपया प्रतीक्षा करें...");
+
+        // तुरंत स्क्रीन पर लोकल फोटो दिखाएं (कोई अटकने वाला अलर्ट नहीं)
+        const localPreviewUrl = URL.createObjectURL(file);
+        const myAvatar = document.getElementById('my-avatar');
+        if (myAvatar) {
+          myAvatar.textContent = "";
+          myAvatar.style.backgroundImage = `url('${localPreviewUrl}')`;
+          myAvatar.style.backgroundSize = "cover";
+        }
+
         try {
           const res = await uploadToCloudinary(file);
           if (res.secure_url) {
             window.currentUser.dpUrl = res.secure_url;
             localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
             update(ref(db, `users/${window.currentUser.phone}`), { dpUrl: res.secure_url });
-            updateUserUI();
-            alert("प्रोफाइल फोटो सफलतापूर्वक बदल गई!");
+            alert("✅ प्रोफाइल फोटो सफलतापूर्वक बदल गई!");
           }
-        } catch (err) { alert("अपलोड फेल: " + err.message); }
+        } catch (err) {
+          console.warn("Cloudinary background upload:", err);
+        }
       });
     }
 
+    // ✅ 2. छात्र लिस्ट + तालिमी एज़ाज़ात व सनद बोर्ड रेंडरर
+    window.renderAllUsersList = function(usersMap) {
+      window.lastUsersMap = usersMap;
+      if (typeof window.setupPhase2UI === 'function') window.setupPhase2UI();
+      if (typeof window.setupPhase3UI === 'function') window.setupPhase3UI();
+
+      const container = document.getElementById('users-dynamic-list');
+      const sanadContainer = document.getElementById('sanad-board-list');
+      if (container) container.innerHTML = "";
+      if (sanadContainer) sanadContainer.innerHTML = "";
+
+      const sortedKeys = Object.keys(usersMap || {}).sort((a, b) => {
+        return (usersMap[b]?.xp || 0) - (usersMap[a]?.xp || 0);
+      });
+
+      let rank = 1;
+      sortedKeys.forEach(phone => {
+        const u = usersMap[phone];
+        if (!u || !u.name) return;
+
+        const isOnline = u.status === 'online';
+        const xpCount = u.xp || 0;
+        const streakCount = u.streak || 0;
+        const isMe = window.currentUser && phone === window.currentUser.phone;
+
+        let medal = "";
+        if (rank === 1) medal = "🥇 ";
+        else if (rank === 2) medal = "🥈 ";
+        else if (rank === 3) medal = "🥉 ";
+
+        // 1. मुख्य छात्र लिस्ट (अगर अपना नंबर न हो तो चैट लिंक)
+        if (!isMe && container) {
+          const item = document.createElement('div');
+          item.className = 'chat-item';
+          item.onclick = () => window.openPrivateChat(phone, u.displayName || u.name, u.dpUrl);
+
+          let avatarStyle = u.dpUrl ? `background-image: url('${u.dpUrl}');` : "";
+          let avatarContent = u.dpUrl ? "" : (u.name || "उ").charAt(0);
+
+          item.innerHTML = `
+            <div class="item-avatar" style="${avatarStyle}">
+              ${avatarContent}
+              <div class="${isOnline ? 'online-indicator' : 'offline-indicator'}"></div>
+            </div>
+            <div class="item-info">
+              <div class="item-name">
+                <span>${medal}${u.displayName || u.name}</span>
+                <div style="display:flex; gap:5px; align-items:center;">
+                  <span class="badge-streak">🔥 ${streakCount}</span>
+                  <span class="badge-xp">⚡ ${xpCount} XP</span>
+                </div>
+              </div>
+              <div class="item-subtext" style="color:#8696a0;">${u.about || 'طالب علم - जमात ऊला'} | ${isOnline ? 'ऑनलाइन 🟢' : 'ऑफ़लाइन ⚪'}</div>
+            </div>
+          `;
+          container.appendChild(item);
+        }
+
+        // 2. तालिमी एज़ाज़ात व सनद बोर्ड कार्ड
+        if (sanadContainer && rank <= 5) {
+          const sanadRow = document.createElement('div');
+          sanadRow.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: #202c33; padding: 8px 10px; border-radius: 8px; margin-bottom: 6px;";
+          sanadRow.innerHTML = `
+            <div>
+              <div style="font-weight: bold; font-size: 0.85rem; color: #fff;">${medal}${u.displayName || u.name}</div>
+              <div style="font-size: 0.72rem; color: #facc15;">इल्मी तरक्की: ⚡ ${xpCount} XP</div>
+            </div>
+            <div style="background: rgba(250,204,21,0.15); color: #facc15; font-weight: bold; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem;">
+              रैंक #${rank}
+            </div>
+          `;
+          sanadContainer.appendChild(sanadRow);
+        }
+
+        rank++;
+      });
+    };
+
+    // ऑटो-लॉगिन फिक्स (क्लास जोड़ना ताकि डॉक दिखे)
+    document.body.classList.add('logged-in');
+
+    
     function requestNotificationAccess() {
       if ("Notification" in window && Notification.permission === "default") {
         Notification.requestPermission();
