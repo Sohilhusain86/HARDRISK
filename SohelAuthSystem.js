@@ -5,7 +5,7 @@ import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.
 (function () {
   "use strict";
 
-  // 1. Firebase सेटअप (ताकि लीडरबोर्ड और चैट तुरंत लोड हो सके)
+  // 1. Firebase सेटअप
   const firebaseConfig = {
     apiKey: "AIzaSyDpqKDayo6H0nVyjnT1JBPjpH8RjmwpvV0",
     authDomain: "ula-alif.firebaseapp.com",
@@ -20,9 +20,9 @@ import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.
   const auth = getAuth(app);
   const db = getDatabase(app);
 
-  signInAnonymously(auth).catch(() => {}); // साइलेंट ऑथेंटिकेशन
+  signInAnonymously(auth).catch(() => {}); 
 
-  // 2. Cloudinary DP अपलोडर (बिना अटके)
+  // 2. Cloudinary DP अपलोडर 
   window.selectedDpUrl = "";
 
   window.compressAndUploadImage = async function (file) {
@@ -50,7 +50,6 @@ import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.
               if (data.secure_url) {
                 window.selectedDpUrl = data.secure_url;
                 
-                // प्रीव्यू सेट करना
                 const preview = document.getElementById("dp-preview-box") || document.querySelector(".dp-upload-box");
                 if (preview) {
                   preview.style.backgroundImage = `url('${data.secure_url}')`;
@@ -114,6 +113,10 @@ import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.
         setTimeout(() => {
           try { if (window.registerUserFirebase) window.registerUserFirebase(u); } catch(e){}
           try { if (typeof connectScaleDrone === "function") connectScaleDrone(); } catch(e){}
+          
+          // 🔥 यह वो लाइन है जो आपके पुराने सिस्टम (लीडरबोर्ड/नीचे का बार) को वापस लाएगी
+          window.dispatchEvent(new Event("login_success")); 
+          window.dispatchEvent(new CustomEvent('auth_state_changed', { detail: { user: u } }));
         }, 300);
       } catch(e){}
     }
@@ -195,6 +198,10 @@ import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.
       setTimeout(() => {
         try { if (window.registerUserFirebase) window.registerUserFirebase(window.currentUser); } catch(e){}
         try { if (typeof connectScaleDrone === "function") connectScaleDrone(); } catch(e){}
+        
+        // 🔥 यह वो लाइन है जो आपके पुराने सिस्टम (लीडरबोर्ड/नीचे का बार) को वापस लाएगी
+        window.dispatchEvent(new Event("login_success"));
+        window.dispatchEvent(new CustomEvent('auth_state_changed', { detail: { user: window.currentUser } }));
       }, 300);
     }
   }
