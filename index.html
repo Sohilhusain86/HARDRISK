@@ -943,8 +943,6 @@
         <button class="dock-btn btn-dock-guide" onclick="alert('जमात ऊला अलिफ़ मैसेंजर: सभी छात्रों के लिए क्लासरूम, तक़रार और AI डेस्क।')"><i class="fa-solid fa-circle-info"></i> गाइड</button>
         <button class="dock-btn btn-dock-admin" id="dock-admin-btn" onclick="document.getElementById('admin-panel').classList.add('open')"><i class="fa-solid fa-shield-halved"></i> एडमिन</button>
       </div>
-      
-      </main>
 
       <!-- Tab 2: Notes & Tasks Area -->
       <main class="chats-list-area" id="tab-content-notes" style="display: none;">
@@ -1207,14 +1205,6 @@
     const dpFileInput = document.getElementById('dp-file-input');
     const dpPreviewBox = document.getElementById('dp-preview-box');
     const dpCameraIcon = document.getElementById('dp-camera-icon');
-
-    async function uploadToCloudinary(file) {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', window.UPLOAD_PRESET);
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${window.CLOUD_NAME}/auto/upload`, { method: 'POST', body: formData });
-      return await res.json();
-    }
 
     if (dpFileInput) {
       dpFileInput.addEventListener('change', async (e) => {
@@ -3487,71 +3477,89 @@ Answer with ONLY ONE WORD: either "SAFE" or "UNSAFE". Do not add any punctuation
       if (window.lastUsersMap) window.renderAllUsersList(window.lastUsersMap);
     };
 
-    // 4. Overwrite RenderUsers with Pinning, Unread Badges & Filtering
+    // 4. Overwrite RenderUsers with Pinning, Unread Badges & तालिमी एज़ाज़ात सनद बोर्ड
     const prevRenderLeaderboard = window.renderAllUsersList;
     window.renderAllUsersList = function(usersMap) {
       window.lastUsersMap = usersMap;
-      window.setupPhase2UI();
+      if (typeof window.setupPhase2UI === 'function') window.setupPhase2UI();
 
       const container = document.getElementById('users-dynamic-list');
-      if (!container) return;
-      container.innerHTML = "";
+      const sanadContainer = document.getElementById('sanad-board-list');
+      if (container) container.innerHTML = "";
+      if (sanadContainer) sanadContainer.innerHTML = "";
 
-      // Sort: Pinned first, then by XP
+      // XP के अनुसार रैंकिंग
       const sortedKeys = Object.keys(usersMap || {}).sort((a, b) => {
-        const isPinnedA = window.pinnedChats.includes(a);
-        const isPinnedB = window.pinnedChats.includes(b);
-        if (isPinnedA && !isPinnedB) return -1;
-        if (!isPinnedA && isPinnedB) return 1;
         return (usersMap[b]?.xp || 0) - (usersMap[a]?.xp || 0);
       });
 
+      let rank = 1;
       sortedKeys.forEach(phone => {
-        if (window.currentUser && phone === window.currentUser.phone) return;
         const u = usersMap[phone];
         if (!u || !u.name) return;
 
-        // Apply Filter
-        const isPinned = window.pinnedChats.includes(phone);
+        const isMe = window.currentUser && phone === window.currentUser.phone;
+        const isPinned = window.pinnedChats && window.pinnedChats.includes(phone);
         const unreadCount = u.unreadCount || 0;
-        if (window.currentChatFilter === 'unread' && unreadCount === 0) return;
-        if (window.currentChatFilter === 'groups') return; // Group row handled separately
-
-        const item = document.createElement('div');
-        item.className = 'chat-item';
-        item.onclick = () => window.openPrivateChat(phone, u.displayName || u.name, u.dpUrl);
-
-        let avatarStyle = u.dpUrl ? `background-image: url('${u.dpUrl}');` : "";
-        let avatarContent = u.dpUrl ? "" : (u.name || "उ").charAt(0);
+        const isOnline = u.status === 'online';
+        const xpCount = u.xp || 0;
+        const streakCount = u.streak || 0;
 
         let medal = "";
-        const rank = sortedKeys.indexOf(phone) + 1;
         if (rank === 1) medal = "🥇 ";
         else if (rank === 2) medal = "🥈 ";
         else if (rank === 3) medal = "🥉 ";
 
-        const xpCount = u.xp || 0;
-        const streakCount = u.streak || 0;
-
-        item.innerHTML = `
-          <div class="item-avatar" style="${avatarStyle}">
-            ${avatarContent}
-            <div class="${u.status === 'online' ? 'online-indicator' : 'offline-indicator'}"></div>
-          </div>
-          <div class="item-info">
-            <div class="item-name">
-              <span>${medal}${u.displayName || u.name} ${isPinned ? '<i class="fa-solid fa-thumbtack wa-pinned-icon"></i>' : ''}</span>
-              <div style="display:flex; gap:5px; align-items:center;">
-                <span class="badge-streak">🔥 ${streakCount}</span>
-                <span class="badge-xp">⚡ ${xpCount} XP</span>
-                ${unreadCount > 0 ? `<span class="wa-badge-unread">${unreadCount}</span>` : ''}
-                <span onclick="window.togglePinChat('${phone}', event)" style="color:#8696a0; cursor:pointer; font-size:0.75rem; margin-left:4px;"><i class="fa-solid fa-thumbtack"></i></span>
-              </div>
+        // 1. तालिमी एज़ाज़ात व सनद बोर्ड (Top 5 छात्र)
+        if (sanadContainer && rank <= 5) {
+          const sanadRow = document.createElement('div');
+          sanadRow.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: #202c33; padding: 8px 10px; border-radius: 8px; margin-bottom: 6px;";
+          sanadRow.innerHTML = `
+            <div>
+              <div style="font-weight: bold; font-size: 0.85rem; color: #fff;">${medal}${u.displayName || u.name}</div>
+              <div style="font-size: 0.72rem; color: #facc15;">इल्मी तरक्की: ⚡ ${xpCount} XP</div>
             </div>
-            <div class="item-subtext" style="color:#8696a0;">${u.about || 'طالب علم - जमात ऊला'}</div>
-          </div>
-        `;
-        container.appendChild(item);
+            <div style="background: rgba(250,204,21,0.15); color: #facc15; font-weight: bold; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem;">
+              रैंक #${rank}
+            </div>
+          `;
+          sanadContainer.appendChild(sanadRow);
+        }
+
+        // 2. चैट लिस्ट (साथी छात्र)
+        if (!isMe && container) {
+          if (window.currentChatFilter === 'unread' && unreadCount === 0) return;
+          if (window.currentChatFilter === 'groups') return;
+
+          const item = document.createElement('div');
+          item.className = 'chat-item';
+          item.onclick = () => window.openPrivateChat(phone, u.displayName || u.name, u.dpUrl);
+
+          let avatarStyle = u.dpUrl ? `background-image: url('${u.dpUrl}');` : "";
+          let avatarContent = u.dpUrl ? "" : (u.name || "उ").charAt(0);
+
+          item.innerHTML = `
+            <div class="item-avatar" style="${avatarStyle}">
+              ${avatarContent}
+              <div class="${isOnline ? 'online-indicator' : 'offline-indicator'}"></div>
+            </div>
+            <div class="item-info">
+              <div class="item-name">
+                <span>${medal}${u.displayName || u.name} ${isPinned ? '<i class="fa-solid fa-thumbtack wa-pinned-icon"></i>' : ''}</span>
+                <div style="display:flex; gap:5px; align-items:center;">
+                  <span class="badge-streak">🔥 ${streakCount}</span>
+                  <span class="badge-xp">⚡ ${xpCount} XP</span>
+                  ${unreadCount > 0 ? `<span class="wa-badge-unread">${unreadCount}</span>` : ''}
+                  <span onclick="window.togglePinChat('${phone}', event)" style="color:#8696a0; cursor:pointer; font-size:0.75rem; margin-left:4px;"><i class="fa-solid fa-thumbtack"></i></span>
+                </div>
+              </div>
+              <div class="item-subtext" style="color:#8696a0;">${u.about || 'طالب علم - जमात ऊला'} | ${isOnline ? 'ऑनलाइन 🟢' : 'ऑफ़लाइन ⚪'}</div>
+            </div>
+          `;
+          container.appendChild(item);
+        }
+
+        rank++;
       });
     };
 
