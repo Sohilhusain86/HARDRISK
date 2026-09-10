@@ -1,57 +1,32 @@
-/*
- * SohelMsg91AuthSystem.js
- * ============================================
- * Jamia Messenger - MSG91 OTP Login
- *
- * Flow:
- * Browser
- *   ↓
- * MSG91 Web SDK
- *   ↓
- * SMS OTP
- *   ↓
- * MSG91 verifyOtp()
- *   ↓
- * MSG91 access token
- *   ↓
- * /api/msg91/verify
- *   ↓
- * Firebase Custom Token
- *   ↓
- * Firebase Login
- *
- * IMPORTANT:
- * - No fake OTP
- * - No Math.random OTP
- * - No /api/msg91/send for OTP
- * - No MSG91 Authkey in browser
- * - Old login button listeners are removed
- */
-
-
-/* =========================================================
-   FIREBASE
-   ========================================================= */
-
-import {
-  initializeApp,
-  getApp,
-  getApps
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+/* ============================================================
+   SOHEL MSG91 AUTH SYSTEM — FINAL
+   Jamia Students Messenger
+   MSG91 OTP Widget + Firebase Custom Token
+   ============================================================ */
 
 import {
   getAuth,
-  signInWithCustomToken
+  signInWithCustomToken,
+  signOut,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 import {
   getDatabase,
   ref,
   get,
-  set,
-  update
+  set
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+import {
+  getApps,
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+
+/* ============================================================
+   FIREBASE
+   ============================================================ */
 
 const firebaseConfig = {
   apiKey: "AIzaSyDpqKDayo6H0nVyjnT1JBPjpH8RjmwpvV0",
@@ -63,708 +38,655 @@ const firebaseConfig = {
   appId: "1:693272422991:web:081c07b083e3549b0dd83a"
 };
 
-const firebaseApp = getApps().length
-  ? getApp()
-  : initializeApp(firebaseConfig);
+const firebaseApp =
+  getApps().length > 0
+    ? getApps()[0]
+    : initializeApp(firebaseConfig);
 
 const auth = getAuth(firebaseApp);
 const db = getDatabase(firebaseApp);
 
 
-/* =========================================================
+/* ============================================================
    STATE
-   ========================================================= */
+   ============================================================ */
 
-let msg91Config = null;
-let msg91LoadingPromise = null;
-
-let otpSent = false;
+let msg91Ready = false;
+let msg91Loading = null;
 let activePhone = "";
+let otpSent = false;
 
-let loginButton = null;
 
+/* ============================================================
+   HELPERS
+   ============================================================ */
 
-/* =========================================================
-   BASIC HELPERS
-   ========================================================= */
-
-function cleanPhone(value) {
-  return String(value || "")
-    .replace(/\D/g, "")
-    .slice(-10);
+function $(id) {
+  return document.getElementById(id);
 }
 
-
-function errorMessage(error) {
-  if (!error) {
-    return "अज्ञात त्रुटि";
-  }
-
-  if (typeof error === "string") {
-    return error;
-  }
-
-  if (error.message) {
-    return error.message;
-  }
-
-  if (error.error) {
-    return error.error;
-  }
-
-  try {
-    return JSON.stringify(error);
-  } catch {
-    return "अज्ञात त्रुटि";
-  }
+function showError(message) {
+  console.error("[MSG91]", message);
+  alert(message);
 }
 
-
-/* =========================================================
-   DP URL
-   ========================================================= */
-
-function getSelectedDpUrl() {
-  const box =
-    document.getElementById("dp-preview-box");
-
-  if (!box) {
-    return "";
-  }
-
-  const background =
-    box.style.backgroundImage || "";
-
-  const match =
-    background.match(
-      /url\(["']?(.*?)["']?\)/
-    );
-
-  return match
-    ? match[1]
-    : "";
+function normalizePhone(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+  return digits.slice(-10);
 }
 
+function setButton(text, disabled = false) {
+  const btn = $("btn-action-auth");
+  if (!btn) return;
 
-/* =========================================================
-   LOAD MSG91 CONFIG
-   ========================================================= */
-
-async function loadMsg91Config() {
-
-  if (msg91Config) {
-    return msg91Config;
-  }
-
-  const response =
-    await fetch(
-      "/api/msg91/config",
-      {
-        method: "GET",
-        cache: "no-store"
-      }
-    );
-
-  const raw =
-    await response.text();
-
-  let data = {};
-
-  try {
-    data = raw
-      ? JSON.parse(raw)
-      : {};
-  } catch {
-    throw new Error(
-      "MSG91 configuration response गलत है।"
-    );
-  }
-
-  if (
-    !response.ok ||
-    !data.success ||
-    !data.widgetId ||
-    !data.tokenAuth
-  ) {
-    throw new Error(
-      data.error ||
-      "MSG91 Widget configuration नहीं मिली।"
-    );
-  }
-
-  msg91Config = {
-    widgetId: data.widgetId,
-    tokenAuth: data.tokenAuth
-  };
-
-  return msg91Config;
+  btn.textContent = text;
+  btn.disabled = disabled;
 }
 
+function extractAccessToken(data) {
+  if (!data) return "";
 
-/* =========================================================
-   WAIT FOR MSG91 FUNCTIONS
-   ========================================================= */
+  if (typeof data === "string") {
+    return data;
+  }
 
-function waitForMsg91Methods(
-  timeout = 15000
-) {
-
-  return new Promise(
-    (resolve, reject) => {
-
-      const started =
-        Date.now();
-
-      const check = () => {
-
-        const sendReady =
-          typeof window.sendOtp ===
-          "function";
-
-        const verifyReady =
-          typeof window.verifyOtp ===
-          "function";
-
-        if (
-          sendReady &&
-          verifyReady
-        ) {
-
-          console.log(
-            "[MSG91] sendOtp + verifyOtp ready"
-          );
-
-          resolve();
-          return;
-        }
-
-        if (
-          Date.now() - started >=
-          timeout
-        ) {
-
-          reject(
-            new Error(
-              "MSG91 Web SDK ने sendOtp/verifyOtp उपलब्ध नहीं किए।"
-            )
-          );
-
-          return;
-        }
-
-        setTimeout(
-          check,
-          100
-        );
-      };
-
-      check();
-    }
+  return (
+    data.accessToken ||
+    data.access_token ||
+    data["access-token"] ||
+    data.token ||
+    data.data?.accessToken ||
+    data.data?.access_token ||
+    data.data?.["access-token"] ||
+    data.data?.token ||
+    data.response?.accessToken ||
+    data.response?.access_token ||
+    data.response?.token ||
+    ""
   );
 }
 
 
-/* =========================================================
-   INITIALIZE MSG91 WEB SDK
-   ========================================================= */
+/* ============================================================
+   LOAD MSG91 CONFIG
+   ============================================================ */
+
+async function loadMsg91Config() {
+  const response = await fetch("/api/msg91/config", {
+    method: "GET",
+    cache: "no-store"
+  });
+
+  const text = await response.text();
+
+  let data;
+
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error(
+      "MSG91 config server ने वैध JSON नहीं दिया।"
+    );
+  }
+
+  if (!response.ok || !data.success) {
+    throw new Error(
+      data.error || "MSG91 configuration load नहीं हुई।"
+    );
+  }
+
+  if (!data.widgetId || !data.tokenAuth) {
+    throw new Error(
+      "MSG91 Widget ID या Token उपलब्ध नहीं है।"
+    );
+  }
+
+  return data;
+}
+
+
+/* ============================================================
+   LOAD MSG91 OFFICIAL WEB SDK
+   EXACT OFFICIAL GLOBAL CONFIGURATION PATTERN
+   ============================================================ */
 
 async function loadMsg91Widget() {
 
   if (
-    typeof window.sendOtp ===
-      "function" &&
-    typeof window.verifyOtp ===
-      "function"
+    msg91Ready &&
+    typeof window.sendOtp === "function" &&
+    typeof window.verifyOtp === "function"
   ) {
-
     return;
   }
 
-
-  if (msg91LoadingPromise) {
-    return msg91LoadingPromise;
+  if (msg91Loading) {
+    return msg91Loading;
   }
 
+  msg91Loading = new Promise(async (resolve, reject) => {
 
-  msg91LoadingPromise =
-    (async () => {
+    try {
 
-      const config =
-        await loadMsg91Config();
-
+      const config = await loadMsg91Config();
 
       /*
        * IMPORTANT:
+       * MSG91 official example uses a GLOBAL variable:
        *
-       * MSG91's documented Web SDK pattern
-       * uses a global configuration object
-       * and:
+       * var configuration = {...}
        *
-       * onload="initSendOTP(configuration)"
+       * Therefore we deliberately expose it globally.
        */
 
       window.configuration = {
+        widgetId: config.widgetId,
+        tokenAuth: config.tokenAuth,
 
-        widgetId:
-          config.widgetId,
+        exposeMethods: true,
 
-        tokenAuth:
-          config.tokenAuth,
+        /*
+         * We already have our own OTP UI.
+         * No MSG91 popup should be rendered.
+         */
+        captchaRenderId: "",
 
-        identifier:
-          "",
+        success: function (data) {
+          console.log(
+            "[MSG91] Widget success:",
+            data
+          );
+        },
 
-        exposeMethods:
-          true,
-
-        captchaRenderId:
-          "",
-
-        success:
-          (data) => {
-            console.log(
-              "[MSG91] SDK success:",
-              data
-            );
-          },
-
-        failure:
-          (error) => {
-            console.error(
-              "[MSG91] SDK failure:",
-              error
-            );
-          }
+        failure: function (error) {
+          console.error(
+            "[MSG91] Widget failure:",
+            error
+          );
+        }
       };
 
 
-      /*
-       * SDK already available?
-       */
+      /* --------------------------------------------------------
+         Remove any previously injected provider script
+         -------------------------------------------------------- */
 
-      if (
-        typeof window.initSendOTP ===
-        "function"
-      ) {
+      const oldScripts =
+        document.querySelectorAll(
+          'script[data-sohel-msg91="1"]'
+        );
+
+      oldScripts.forEach(script => script.remove());
+
+
+      /* --------------------------------------------------------
+         Create provider script
+         EXACTLY like MSG91's documented pattern:
+         
+         <script
+           onload="initSendOTP(configuration)"
+           src="https://verify.msg91.com/otp-provider.js">
+         </script>
+         -------------------------------------------------------- */
+
+      const script =
+        document.createElement("script");
+
+      script.type = "text/javascript";
+      script.src =
+        "https://verify.msg91.com/otp-provider.js";
+
+      script.async = false;
+
+      script.dataset.sohelMsg91 = "1";
+
+      script.onload = function () {
 
         console.log(
-          "[MSG91] Existing SDK found. Initializing..."
+          "[MSG91] otp-provider.js loaded"
         );
 
-        window.initSendOTP(
-          window.configuration
-        );
+        try {
 
-        await waitForMsg91Methods();
+          if (
+            typeof window.initSendOTP !==
+            "function"
+          ) {
+            reject(
+              new Error(
+                "MSG91 initSendOTP उपलब्ध नहीं है।"
+              )
+            );
+            return;
+          }
 
-        return;
-      }
+          /*
+           * This is the critical initialization.
+           */
+          window.initSendOTP(
+            window.configuration
+          );
+
+        } catch (error) {
+
+          console.error(
+            "[MSG91] initSendOTP error:",
+            error
+          );
+
+          reject(error);
+          return;
+        }
 
 
-      /*
-       * Create SDK script exactly like
-       * MSG91's documented Web SDK flow.
-       */
+        /* ------------------------------------------------------
+           Wait until MSG91 exposes its methods.
+           ------------------------------------------------------ */
 
-      await new Promise(
-        (resolve, reject) => {
+        const started = Date.now();
 
-          const oldScript =
-            document.querySelector(
-              'script[data-jamia-msg91="true"]'
+        const waitUntilReady = () => {
+
+          const sendReady =
+            typeof window.sendOtp ===
+            "function";
+
+          const verifyReady =
+            typeof window.verifyOtp ===
+            "function";
+
+          console.log(
+            "[MSG91] Methods:",
+            {
+              sendOtp: sendReady,
+              verifyOtp: verifyReady
+            }
+          );
+
+          if (sendReady && verifyReady) {
+
+            msg91Ready = true;
+
+            console.log(
+              "[MSG91] ✅ Web SDK READY"
             );
 
-          if (oldScript) {
+            resolve();
+            return;
+          }
 
-            oldScript.addEventListener(
-              "load",
-              resolve,
-              { once: true }
-            );
 
-            oldScript.addEventListener(
-              "error",
-              () => reject(
-                new Error(
-                  "MSG91 SDK load नहीं हुआ।"
-                )
-              ),
-              { once: true }
+          if (
+            Date.now() - started >
+            15000
+          ) {
+
+            reject(
+              new Error(
+                "MSG91 Web SDK ने sendOtp/verifyOtp उपलब्ध नहीं किए।"
+              )
             );
 
             return;
           }
 
-
-          const script =
-            document.createElement(
-              "script"
-            );
-
-          script.type =
-            "text/javascript";
-
-          script.src =
-            "https://verify.msg91.com/otp-provider.js";
-
-          script.setAttribute(
-            "data-jamia-msg91",
-            "true"
+          setTimeout(
+            waitUntilReady,
+            100
           );
+        };
+
+        waitUntilReady();
+      };
 
 
-          /*
-           * Exact initialization on script load.
-           */
+      script.onerror = function () {
 
-          script.onload = () => {
-
-            console.log(
-              "[MSG91] otp-provider.js loaded"
-            );
-
-            try {
-
-              if (
-                typeof window.initSendOTP !==
-                "function"
-              ) {
-
-                reject(
-                  new Error(
-                    "MSG91 initSendOTP उपलब्ध नहीं है।"
-                  )
-                );
-
-                return;
-              }
+        reject(
+          new Error(
+            "MSG91 Web SDK load नहीं हो सका।"
+          )
+        );
+      };
 
 
-              window.initSendOTP(
-                window.configuration
-              );
+      document.head.appendChild(script);
 
+    } catch (error) {
 
-              resolve();
-
-            } catch (error) {
-
-              reject(error);
-            }
-          };
-
-
-          script.onerror = () => {
-
-            reject(
-              new Error(
-                "MSG91 Web SDK load नहीं हो सका।"
-              )
-            );
-          };
-
-
-          document.head.appendChild(
-            script
-          );
-
-        }
-      );
-
-
-      /*
-       * initSendOTP के बाद methods आने तक
-       * wait करें।
-       */
-
-      await waitForMsg91Methods(
-        15000
-      );
-
-
-      console.log(
-        "[MSG91] Widget initialization complete"
-      );
-
-    })();
+      reject(error);
+    }
+  });
 
 
   try {
 
-    await msg91LoadingPromise;
+    await msg91Loading;
 
   } finally {
 
-    msg91LoadingPromise =
-      null;
+    msg91Loading = null;
   }
 }
 
 
-/* =========================================================
-   ACCESS TOKEN EXTRACTION
-   ========================================================= */
+/* ============================================================
+   SEND OTP
+   ============================================================ */
 
-function extractAccessToken(data) {
+function sendMsg91Otp(identifier) {
 
-  if (!data) {
-    return "";
-  }
-
-  const candidates = [
-
-    data.accessToken,
-
-    data.access_token,
-
-    data.token,
-
-    data.jwt,
-
-    data.data?.accessToken,
-
-    data.data?.access_token,
-
-    data.data?.token,
-
-    data.data?.jwt
-  ];
-
-
-  for (
-    const candidate of candidates
-  ) {
+  return new Promise((resolve, reject) => {
 
     if (
-      typeof candidate ===
-        "string" &&
-      candidate.trim()
+      typeof window.sendOtp !==
+      "function"
     ) {
-
-      return candidate.trim();
+      reject(
+        new Error(
+          "MSG91 sendOtp उपलब्ध नहीं है।"
+        )
+      );
+      return;
     }
-  }
 
 
-  return "";
+    console.log(
+      "[MSG91] Sending OTP to:",
+      identifier
+    );
+
+
+    window.sendOtp(
+
+      identifier,
+
+      function (data) {
+
+        console.log(
+          "[MSG91] OTP sent:",
+          data
+        );
+
+        resolve(data);
+      },
+
+      function (error) {
+
+        console.error(
+          "[MSG91] OTP send failed:",
+          error
+        );
+
+        reject(
+          new Error(
+            typeof error === "string"
+              ? error
+              : error?.message ||
+                error?.type ||
+                "OTP भेजने में विफल।"
+          )
+        );
+      }
+    );
+  });
 }
 
 
-/* =========================================================
-   SERVER → FIREBASE LOGIN
-   ========================================================= */
+/* ============================================================
+   VERIFY OTP
+   ============================================================ */
 
-async function loginThroughFirebase(
+function verifyMsg91Otp(otp) {
+
+  return new Promise((resolve, reject) => {
+
+    if (
+      typeof window.verifyOtp !==
+      "function"
+    ) {
+      reject(
+        new Error(
+          "MSG91 verifyOtp उपलब्ध नहीं है।"
+        )
+      );
+      return;
+    }
+
+
+    console.log(
+      "[MSG91] Verifying OTP..."
+    );
+
+
+    window.verifyOtp(
+
+      Number(otp),
+
+      function (data) {
+
+        console.log(
+          "[MSG91] OTP verified:",
+          data
+        );
+
+        resolve(data);
+      },
+
+      function (error) {
+
+        console.error(
+          "[MSG91] OTP verification failed:",
+          error
+        );
+
+        reject(
+          new Error(
+            typeof error === "string"
+              ? error
+              : error?.message ||
+                error?.type ||
+                "OTP गलत है या expire हो चुका है।"
+          )
+        );
+      }
+
+    );
+  });
+}
+
+
+/* ============================================================
+   SEND ACCESS TOKEN TO OUR SERVER
+   ============================================================ */
+
+async function verifyAccessTokenOnServer(
   phone,
   accessToken
 ) {
 
-  const response =
-    await fetch(
-      "/api/msg91/verify",
-      {
-        method: "POST",
+  const response = await fetch(
+    "/api/msg91/verify",
+    {
+      method: "POST",
 
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
+      headers: {
+        "Content-Type": "application/json"
+      },
 
-        body: JSON.stringify({
-
-          phone:
-            phone,
-
-          accessToken:
-            accessToken
-
-        })
-      }
-    );
+      body: JSON.stringify({
+        phone,
+        accessToken
+      })
+    }
+  );
 
 
-  const raw =
+  const text =
     await response.text();
 
-
-  let data = {};
+  let data;
 
   try {
 
-    data = raw
-      ? JSON.parse(raw)
-      : {};
+    data = JSON.parse(text);
 
   } catch {
 
     throw new Error(
-      "Server ने वैध JSON response नहीं दिया।"
+      "Server ने वैध verification response नहीं दिया।"
     );
   }
 
 
   if (
     !response.ok ||
-    !data.success ||
-    !data.customToken
+    !data.success
   ) {
 
     throw new Error(
       data.error ||
-      "Firebase login token प्राप्त नहीं हुआ।"
+      "MSG91 access-token verification विफल।"
     );
   }
 
 
-  return signInWithCustomToken(
-    auth,
-    data.customToken
-  );
+  return data;
 }
 
 
-/* =========================================================
+/* ============================================================
    SAVE USER
-   ========================================================= */
+   ============================================================ */
 
-async function saveUser(
-  name,
+async function saveUser({
   phone,
-  roll
-) {
+  name,
+  roll,
+  dpUrl
+}) {
 
   const userRef =
-    ref(
-      db,
-      `users/${phone}`
-    );
+    ref(db, `users/${phone}`);
 
-
-  const existing =
+  const snapshot =
     await get(userRef);
 
-
-  let finalName =
-    name;
-
-  let finalRoll =
-    roll;
-
-
-  if (existing.exists()) {
-
-    const oldData =
-      existing.val() || {};
-
-    finalName =
-      oldData.name ||
-      name;
-
-    finalRoll =
-      oldData.roll ||
-      roll;
-  }
-
-
-  const dpUrl =
-    getSelectedDpUrl();
+  const oldUser =
+    snapshot.exists()
+      ? snapshot.val()
+      : {};
 
 
   const userData = {
 
+    ...oldUser,
+
     name:
-      finalName,
-
-    phone:
-      phone,
-
-    roll:
-      finalRoll,
+      name ||
+      oldUser.name ||
+      "",
 
     displayName:
-      finalRoll
-        ? `${finalName} (रोल: ${finalRoll})`
-        : finalName
+      name ||
+      oldUser.displayName ||
+      "",
+
+    phone,
+
+    roll:
+      roll ||
+      oldUser.roll ||
+      "",
+
+    dpUrl:
+      dpUrl ||
+      oldUser.dpUrl ||
+      "",
+
+    /*
+     * Do NOT trust client-side admin
+     * credentials here.
+     */
+    role:
+      oldUser.role === "admin"
+        ? "admin"
+        : "student",
+
+    lastLogin:
+      Date.now()
   };
 
 
-  if (dpUrl) {
-    userData.dpUrl =
-      dpUrl;
-  }
-
-
-  if (!existing.exists()) {
-
-    await set(
-      userRef,
-      {
-        ...userData,
-        createdAt:
-          Date.now()
-      }
-    );
-
-  } else {
-
-    await update(
-      userRef,
-      userData
-    );
-  }
-
-
-  /*
-   * Keep existing app's user object.
-   */
-
-  window.currentUser =
-    window.currentUser || {};
-
-
-  window.currentUser.name =
-    finalName;
-
-  window.currentUser.phone =
-    phone;
-
-  window.currentUser.roll =
-    finalRoll;
-
-  window.currentUser.displayName =
-    userData.displayName;
-
-  window.currentUser.dpUrl =
-    dpUrl ||
-    window.currentUser.dpUrl ||
-    "";
-
-
-  /*
-   * Do NOT grant admin role from
-   * a client-side password.
-   */
-
-  window.currentUser.role =
-    "student";
-
-
-  localStorage.setItem(
-    "jamia_chat_saved_user",
-    JSON.stringify(
-      window.currentUser
-    )
+  await set(
+    userRef,
+    userData
   );
 
 
-  /*
-   * Close login screen.
-   */
+  window.currentUser = {
+    ...(window.currentUser || {}),
+    ...userData
+  };
+
+
+  return userData;
+}
+
+
+/* ============================================================
+   COMPLETE LOGIN
+   ============================================================ */
+
+async function completeLogin(
+  serverData
+) {
+
+  if (!serverData.customToken) {
+
+    throw new Error(
+      "Firebase Custom Token प्राप्त नहीं हुआ।"
+    );
+  }
+
+
+  const credential =
+    await signInWithCustomToken(
+      auth,
+      serverData.customToken
+    );
+
+
+  console.log(
+    "[MSG91] Firebase login successful:",
+    credential.user.uid
+  );
+
+
+  const name =
+    $("user-name")?.value.trim() ||
+    "";
+
+  const roll =
+    $("user-roll")?.value.trim() ||
+    "";
+
+  const dpUrl =
+    window.selectedDpUrl ||
+    window.currentUser?.dpUrl ||
+    "";
+
+
+  await saveUser({
+    phone: activePhone,
+    name,
+    roll,
+    dpUrl
+  });
+
 
   const loginScreen =
-    document.getElementById(
-      "login-screen"
-    );
+    $("screen-login");
 
   if (loginScreen) {
 
@@ -773,266 +695,138 @@ async function saveUser(
   }
 
 
+  const homeScreen =
+    $("screen-home");
+
+  if (homeScreen) {
+
+    homeScreen.style.display =
+      "";
+  }
+
+
   /*
-   * Existing application functions.
+   * Existing app functions, if available.
    */
 
-  if (
-    typeof window.registerUserFirebase ===
-    "function"
-  ) {
+  try {
 
-    try {
-
-      await window.registerUserFirebase(
-        window.currentUser
-      );
-
-    } catch (error) {
-
-      console.warn(
-        "[MSG91] registerUserFirebase:",
-        error
-      );
+    if (
+      typeof window.updateProfileUI ===
+      "function"
+    ) {
+      window.updateProfileUI();
     }
-  }
 
-
-  if (
-    typeof window.requestNotificationAccess ===
-    "function"
-  ) {
-
-    try {
-
-      window.requestNotificationAccess();
-
-    } catch {}
-  }
-
-
-  if (
-    typeof window.askForMicPermission ===
-    "function"
-  ) {
-
-    try {
-
-      window.askForMicPermission();
-
-    } catch {}
-  }
-
-
-  if (
-    typeof window.connectScaleDrone ===
-    "function"
-  ) {
-
-    try {
-
-      window.connectScaleDrone();
-
-    } catch {}
-  }
-
-
-  if (
-    typeof window.listenForIncomingCalls ===
-    "function"
-  ) {
-
-    try {
-
-      window.listenForIncomingCalls();
-
-    } catch {}
-  }
-
-
-  if (
-    typeof window.updateUserUI ===
-    "function"
-  ) {
-
-    try {
-
-      window.updateUserUI();
-
-    } catch {}
-  }
-}
-
-
-/* =========================================================
-   SEND OTP
-   ========================================================= */
-
-async function sendJamiaOtp(
-  phone
-) {
-
-  await loadMsg91Widget();
-
-
-  if (
-    typeof window.sendOtp !==
-    "function"
-  ) {
-
-    throw new Error(
-      "MSG91 sendOtp उपलब्ध नहीं है।"
+  } catch (e) {
+    console.warn(
+      "[MSG91] updateProfileUI:",
+      e
     );
   }
 
 
-  return new Promise(
-    (resolve, reject) => {
+  try {
 
-      console.log(
-        "[MSG91] Sending OTP to:",
-        "91" + phone
-      );
-
-
-      window.sendOtp(
-
-        "91" + phone,
-
-        (data) => {
-
-          console.log(
-            "[MSG91] OTP sent successfully:",
-            data
-          );
-
-          resolve(data);
-        },
-
-        (error) => {
-
-          console.error(
-            "[MSG91] OTP send failed:",
-            error
-          );
-
-          reject(error);
-        }
-      );
+    if (
+      typeof window.showMainApp ===
+      "function"
+    ) {
+      window.showMainApp();
     }
+
+  } catch (e) {
+    console.warn(
+      "[MSG91] showMainApp:",
+      e
+    );
+  }
+
+
+  alert(
+    "✅ लॉगिन सफल!\n\nजमिया मैसेंजर में आपका स्वागत है।"
   );
 }
 
 
-/* =========================================================
-   VERIFY OTP
-   ========================================================= */
+/* ============================================================
+   REPLACE OLD LOGIN BUTTON
+   This removes the old fake-OTP listener from index.html.
+   ============================================================ */
 
-async function verifyJamiaOtp(
-  otp
-) {
+function installLoginButton() {
 
-  await loadMsg91Widget();
+  const oldButton =
+    $("btn-action-auth");
 
+  if (!oldButton) {
 
-  if (
-    typeof window.verifyOtp !==
-    "function"
-  ) {
-
-    throw new Error(
-      "MSG91 verifyOtp उपलब्ध नहीं है।"
+    console.error(
+      "[MSG91] Login button नहीं मिला।"
     );
+
+    return;
   }
 
 
-  return new Promise(
-    (resolve, reject) => {
+  /*
+   * cloneNode() removes listeners that were attached
+   * with addEventListener() in the old index.html.
+   */
+  const newButton =
+    oldButton.cloneNode(true);
 
-      console.log(
-        "[MSG91] Verifying OTP..."
-      );
+
+  oldButton.replaceWith(
+    newButton
+  );
 
 
-      window.verifyOtp(
+  const button =
+    $("btn-action-auth");
 
-        Number(otp),
 
-        (data) => {
+  button.addEventListener(
+    "click",
+    handleLoginClick
+  );
 
-          console.log(
-            "[MSG91] OTP verification success:",
-            data
-          );
 
-          resolve(data);
-        },
-
-        (error) => {
-
-          console.error(
-            "[MSG91] OTP verification failed:",
-            error
-          );
-
-          reject(error);
-        }
-      );
-    }
+  console.log(
+    "[MSG91] Old login handler removed."
   );
 }
 
 
-/* =========================================================
-   LOGIN BUTTON HANDLER
-   ========================================================= */
+/* ============================================================
+   LOGIN CLICK
+   ============================================================ */
 
-async function handleLoginButton() {
+async function handleLoginClick(event) {
 
-  const nameInput =
-    document.getElementById(
-      "user-name"
-    );
-
-  const phoneInput =
-    document.getElementById(
-      "user-phone"
-    );
-
-  const rollInput =
-    document.getElementById(
-      "user-roll"
-    );
-
-  const otpInput =
-    document.getElementById(
-      "otp-input"
-    );
-
-  const otpSection =
-    document.getElementById(
-      "otp-section"
-    );
+  event.preventDefault();
+  event.stopPropagation();
 
 
   const name =
-    nameInput?.value.trim() ||
+    $("user-name")?.value.trim() ||
     "";
 
   const phone =
-    cleanPhone(
-      phoneInput?.value ||
-      ""
+    normalizePhone(
+      $("user-phone")?.value
     );
 
   const roll =
-    rollInput?.value.trim() ||
+    $("user-roll")?.value.trim() ||
     "";
 
+  const otpInput =
+    $("otp-input");
 
-  /*
-   * Name
-   */
+  const otpSection =
+    $("otp-section");
+
 
   if (!name) {
 
@@ -1044,50 +838,50 @@ async function handleLoginButton() {
   }
 
 
-  /*
-   * Indian mobile number
-   */
-
-  if (
-    !/^[6-9]\d{9}$/.test(
-      phone
-    )
-  ) {
+  if (phone.length !== 10) {
 
     alert(
-      "कृपया सही 10 अंकों का भारतीय मोबाइल नंबर दर्ज करें।"
+      "कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।"
     );
 
     return;
   }
 
 
-  /* =======================================================
+  /* ==========================================================
      STEP 1 — SEND OTP
-     ======================================================= */
+     ========================================================== */
 
   if (!otpSent) {
 
-    loginButton.disabled =
-      true;
-
-    loginButton.textContent =
-      "⏳ MSG91 से OTP भेजा जा रहा है...";
-
-
     try {
 
-      activePhone =
-        phone;
-
-
-      await sendJamiaOtp(
-        phone
+      setButton(
+        "⏳ MSG91 से OTP भेजा जा रहा है...",
+        true
       );
 
 
-      otpSent =
-        true;
+      await loadMsg91Widget();
+
+
+      activePhone = phone;
+
+
+      /*
+       * IMPORTANT:
+       * MSG91 requires country code without +
+       */
+      const identifier =
+        "91" + phone;
+
+
+      await sendMsg91Otp(
+        identifier
+      );
+
+
+      otpSent = true;
 
 
       if (otpSection) {
@@ -1097,11 +891,10 @@ async function handleLoginButton() {
       }
 
 
-      loginButton.textContent =
-        "OTP सत्यापित करें और लॉगिन करें";
-
-      loginButton.disabled =
-        false;
+      setButton(
+        "OTP सत्यापित करें और लॉगिन करें",
+        false
+      );
 
 
       if (otpInput) {
@@ -1110,7 +903,10 @@ async function handleLoginButton() {
       }
 
 
-      return;
+      console.log(
+        "[MSG91] OTP successfully sent."
+      );
+
 
     } catch (error) {
 
@@ -1120,129 +916,105 @@ async function handleLoginButton() {
       );
 
 
-      otpSent =
-        false;
+      otpSent = false;
 
 
-      loginButton.disabled =
-        false;
-
-
-      loginButton.textContent =
-        "OTP भेजें (Send OTP)";
-
-
-      alert(
-        "OTP भेजने में विफल:\n" +
-        errorMessage(error)
+      setButton(
+        "OTP भेजें (Send OTP)",
+        false
       );
 
 
-      return;
+      showError(
+        "OTP भेजने में विफल:\n" +
+        (error.message ||
+          "अज्ञात त्रुटि")
+      );
     }
+
+
+    return;
   }
 
 
-  /* =======================================================
+  /* ==========================================================
      STEP 2 — VERIFY OTP
-     ======================================================= */
+     ========================================================== */
 
   const otp =
     String(
-      otpInput?.value ||
-      ""
-    ).trim();
+      otpInput?.value || ""
+    ).replace(/\D/g, "");
 
 
-  if (
-    !/^\d{4,8}$/.test(
-      otp
-    )
-  ) {
+  if (otp.length < 4) {
 
     alert(
-      "कृपया सही OTP दर्ज करें।"
+      "कृपया प्राप्त OTP दर्ज करें।"
     );
 
     return;
   }
 
 
-  loginButton.disabled =
-    true;
-
-  loginButton.textContent =
-    "⏳ OTP सत्यापित हो रहा है...";
-
-
   try {
+
+    setButton(
+      "⏳ OTP सत्यापित हो रहा है...",
+      true
+    );
+
 
     /*
      * MSG91 itself verifies the OTP.
      */
-
-    const verifyData =
-      await verifyJamiaOtp(
+    const verificationResponse =
+      await verifyMsg91Otp(
         otp
       );
 
 
-    /*
-     * MSG91 returns an access token.
-     */
+    console.log(
+      "[MSG91] Verification response:",
+      verificationResponse
+    );
 
+
+    /*
+     * MSG91 returns a JWT access token
+     * after successful OTP verification.
+     */
     const accessToken =
       extractAccessToken(
-        verifyData
+        verificationResponse
       );
 
 
     if (!accessToken) {
 
-      console.error(
-        "[MSG91] Full verification response:",
-        verifyData
-      );
-
       throw new Error(
-        "MSG91 ने access token नहीं दिया।"
+        "MSG91 ने access-token नहीं दिया।"
       );
     }
 
 
-    loginButton.textContent =
-      "⏳ सुरक्षित Firebase login हो रहा है...";
-
-
     /*
-     * Server verifies MSG91 access token
-     * and creates Firebase custom token.
+     * Send ONLY the access token to our
+     * secure server for final verification.
      */
+    const serverData =
+      await verifyAccessTokenOnServer(
+        activePhone,
+        accessToken
+      );
 
-    await loginThroughFirebase(
-      activePhone,
-      accessToken
+
+    await completeLogin(
+      serverData
     );
 
 
-    /*
-     * Save user data.
-     */
-
-    await saveUser(
-      name,
-      activePhone,
-      roll
-    );
-
-
-    loginButton.disabled =
-      false;
-
-
-    console.log(
-      "[MSG91] Jamia login completed successfully."
-    );
+    otpSent = false;
 
 
   } catch (error) {
@@ -1253,118 +1025,104 @@ async function handleLoginButton() {
     );
 
 
-    loginButton.disabled =
-      false;
+    setButton(
+      "OTP सत्यापित करें और लॉगिन करें",
+      false
+    );
 
 
-    loginButton.textContent =
-      "OTP सत्यापित करें और लॉगिन करें";
-
-
-    alert(
-      "लॉगिन पूरा नहीं हो सका:\n" +
-      errorMessage(error)
+    showError(
+      "OTP सत्यापन विफल:\n" +
+      (
+        error.message ||
+        "कृपया OTP दोबारा जाँचें।"
+      )
     );
   }
 }
 
 
-/* =========================================================
-   REMOVE OLD FAKE OTP HANDLER
-   ========================================================= */
+/* ============================================================
+   LOGOUT
+   ============================================================ */
 
-function installSecureLoginHandler() {
+window.sohelMsg91Logout =
+  async function () {
 
-  const oldButton =
-    document.getElementById(
-      "btn-action-auth"
-    );
+    try {
+
+      await signOut(auth);
+
+      console.log(
+        "[MSG91] Firebase logout successful."
+      );
+
+    } catch (error) {
+
+      console.error(
+        "[MSG91] Logout error:",
+        error
+      );
+    }
+  };
 
 
-  if (!oldButton) {
+/* ============================================================
+   AUTH STATE
+   ============================================================ */
 
-    console.error(
-      "[MSG91] Login button #btn-action-auth नहीं मिला।"
-    );
+onAuthStateChanged(
+  auth,
+  user => {
 
-    return;
+    if (user) {
+
+      console.log(
+        "[MSG91] Authenticated:",
+        user.uid
+      );
+
+    } else {
+
+      console.log(
+        "[MSG91] No authenticated Firebase user."
+      );
+    }
   }
+);
 
+
+/* ============================================================
+   INITIALIZE
+   ============================================================ */
+
+function initialize() {
 
   /*
-   * VERY IMPORTANT
-   *
-   * Old index.html contains a listener
-   * which generates:
-   *
-   * Math.random()
-   *
-   * and writes:
-   *
-   * /otps/{phone}
-   *
-   * Clone/replace removes that old listener.
+   * Wait for the existing index.html script
+   * to finish creating the DOM.
    */
+  if (
+    document.readyState ===
+    "loading"
+  ) {
 
-  const newButton =
-    oldButton.cloneNode(
-      true
+    document.addEventListener(
+      "DOMContentLoaded",
+      installLoginButton,
+      { once: true }
     );
 
+  } else {
 
-  oldButton.replaceWith(
-    newButton
-  );
-
-
-  loginButton =
-    newButton;
-
-
-  newButton.addEventListener(
-    "click",
-    handleLoginButton
-  );
-
-
-  console.log(
-    "[MSG91] Secure login handler installed."
-  );
-}
-
-
-/* =========================================================
-   BOOT
-   ========================================================= */
-
-function bootMsg91System() {
-
-  try {
-
-    installSecureLoginHandler();
-
-  } catch (error) {
-
-    console.error(
-      "[MSG91] Boot error:",
-      error
-    );
+    installLoginButton();
   }
 }
 
 
-if (
-  document.readyState ===
-  "loading"
-) {
+initialize();
 
-  document.addEventListener(
-    "DOMContentLoaded",
-    bootMsg91System,
-    { once: true }
-  );
 
-} else {
-
-  bootMsg91System();
-}
+console.log(
+  "[SohelMsg91AuthSystem] FINAL system loaded."
+);
