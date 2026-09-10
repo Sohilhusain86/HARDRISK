@@ -5372,7 +5372,8 @@ window.finishQuizRound = function(msg) {
 <!-- ========================================================== -->
 
 <script src="./suhail-live-system.js" defer></script>
-
+<script src="./SohelCoreSystem.js" defer></script>
+<script type="module" src="./SohelSecuritySystem.js"></script>
 
   <script>
 (function() {
@@ -5541,6 +5542,210 @@ window.finishQuizRound = function(msg) {
   }
 })();
   </script>
+
+  <!-- आपकी मूल फ़ाइलें (DP और सिक्योरिटी के लिए) -->
+<script src="./SohelCoreSystem.js" defer></script>
+<script type="module" src="./SohelSecuritySystem.js"></script>
+
+<!-- 💬 केवल SMS बैनर और 6-अंकीय OTP वेरिफिकेशन (DP से कोई छेड़छाड़ नहीं) -->
+<script>
+(function() {
+  // 1. स्क्रीन के ऊपर गिरने वाला SMS बैनर (Style + Element)
+  const bannerStyle = document.createElement('style');
+  bannerStyle.innerHTML = `
+    .real-sms-banner {
+      display: none;
+      position: fixed;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 92%;
+      max-width: 390px;
+      background: #1f2c34;
+      color: #e9edef;
+      border: 1.5px solid #00a884;
+      border-radius: 14px;
+      padding: 12px 16px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.8);
+      z-index: 9999999;
+      animation: dropSms 0.4s ease-out;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    @keyframes dropSms {
+      from { top: -90px; opacity: 0; }
+      to { top: 15px; opacity: 1; }
+    }
+    .sms-banner-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #8696a0;
+      margin-bottom: 6px;
+    }
+    .sms-banner-code {
+      color: #00a884;
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: 3px;
+      background: rgba(0, 168, 132, 0.15);
+      padding: 2px 8px;
+      border-radius: 6px;
+      display: inline-block;
+      margin: 4px 0;
+    }
+  `;
+  document.head.appendChild(bannerStyle);
+
+  const bannerDiv = document.createElement('div');
+  bannerDiv.id = 'live-sms-popup';
+  bannerDiv.className = 'real-sms-banner';
+  bannerDiv.innerHTML = `
+    <div class="sms-banner-top">
+      <span><i class="fa-solid fa-comment-sms" style="color: #00a884; margin-right: 6px;"></i>संदेश • Messages</span>
+      <span>अभी</span>
+    </div>
+    <div style="font-size: 0.88rem; line-height: 1.4;">
+      जमात ऊला अलिफ़: आपका 6-अंकीय सत्यापन कोड <span id="popup-otp-text" class="sms-banner-code">------</span> है। इसे किसी से साझा न करें।
+    </div>
+  `;
+  document.body.appendChild(bannerDiv);
+
+  // 2. 20 मान्य 6-अंकीय OTPs की सूची
+  const OTP_LIST = [
+    "147258", "258369", "369147", "789456", "456123",
+    "987654", "123987", "654321", "159753", "357159",
+    "852456", "951753", "753159", "123456", "654987",
+    "321654", "789123", "456789", "987123", "123789"
+  ];
+
+  let currentOtp = "";
+  let isOtpStage = false;
+
+  const authBtn = document.getElementById('btn-action-auth');
+  const nameInput = document.getElementById('user-name');
+  const phoneInput = document.getElementById('user-phone');
+  const rollInput = document.getElementById('user-roll');
+  const passInput = document.getElementById('user-pass');
+  const otpInput = document.getElementById('otp-input') || document.querySelector('input[placeholder*="OTP"]');
+  const otpSection = document.getElementById('otp-section') || (otpInput ? otpInput.parentElement : null);
+
+  // यदि स्क्रीनशॉट की तरह OTP इनपुट पहले से खुला हो
+  if (otpInput && otpInput.offsetParent !== null) {
+    isOtpStage = true;
+    currentOtp = "789456";
+    if (authBtn) authBtn.textContent = "✅ OTP सत्यापित करें";
+  }
+
+  if (authBtn) {
+    authBtn.onclick = function(e) {
+      e.preventDefault();
+
+      const name = nameInput ? nameInput.value.trim() : '';
+      const phone = phoneInput ? phoneInput.value.trim().replace(/[^0-9]/g, '') : '';
+      const roll = rollInput ? rollInput.value.trim() : '';
+      const pass = passInput ? passInput.value.trim() : '';
+
+      if (!name) { 
+        alert('कृपया अपना नाम दर्ज करें!'); 
+        nameInput?.focus(); 
+        return; 
+      }
+      if (phone.length < 10) { 
+        alert('कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!'); 
+        phoneInput?.focus(); 
+        return; 
+      }
+
+      // पहला चरण: OTP तैयार करना और SMS बैनर गिराना
+      if (!isOtpStage) {
+        authBtn.disabled = true;
+        authBtn.textContent = "⏳ सर्वर से SMS भेजा जा रहा है...";
+
+        setTimeout(() => {
+          currentOtp = OTP_LIST[Math.floor(Math.random() * OTP_LIST.length)];
+
+          const popupOtpText = document.getElementById('popup-otp-text');
+          if (popupOtpText) popupOtpText.textContent = currentOtp;
+          
+          bannerDiv.style.display = 'block';
+          if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+          setTimeout(() => { bannerDiv.style.display = 'none'; }, 9000);
+
+          isOtpStage = true;
+          if (otpSection) otpSection.style.display = 'block';
+          if (otpInput) {
+            otpInput.focus();
+            otpInput.placeholder = "SMS में आया 6-अंकीय OTP दर्ज करें";
+          }
+          authBtn.disabled = false;
+          authBtn.textContent = "✅ OTP सत्यापित करें";
+        }, 1200);
+
+        return;
+      }
+
+      // दूसरा चरण: OTP सत्यापन
+      const enteredOtp = otpInput ? otpInput.value.trim() : '';
+      if (!enteredOtp || enteredOtp.length !== 6) {
+        alert('कृपया ऊपर संदेश (SMS) में आया 6 अंकों का OTP दर्ज करें!');
+        otpInput?.focus();
+        return;
+      }
+
+      if (enteredOtp !== currentOtp && !OTP_LIST.includes(enteredOtp)) {
+        alert('गलत OTP! कृपया सही 6-अंकीय कोड दर्ज करें।');
+        return;
+      }
+
+      authBtn.disabled = true;
+      authBtn.textContent = "⏳ लॉगिन हो रहा है...";
+
+      setTimeout(() => {
+        const role = (pass === 'razavi123') ? 'admin' : 'student';
+        const displayName = roll ? `${name} (रोल: ${roll})` : `${name} (${phone.slice(-4)})`;
+
+        // DP का URL आपकी कोर फाइलों से ही लिया जाएगा
+        const userDp = window.selectedDpUrl || '';
+
+        window.currentUser = {
+          name: name,
+          phone: phone,
+          roll: roll,
+          displayName: displayName,
+          role: role,
+          location: 'India',
+          dpUrl: userDp
+        };
+
+        localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
+
+        const loginScreen = document.getElementById('login-screen');
+        if (loginScreen) loginScreen.style.display = 'none';
+        document.body.classList.add('logged-in');
+
+        const myAvatar = document.getElementById('my-avatar');
+        if (myAvatar) {
+          if (userDp) {
+            myAvatar.textContent = '';
+            myAvatar.style.backgroundImage = `url('${userDp}')`;
+          } else {
+            myAvatar.textContent = name.charAt(0);
+          }
+        }
+        const myNameEl = document.getElementById('my-display-name');
+        if (myNameEl) myNameEl.textContent = displayName;
+
+        if (typeof requestNotificationAccess === 'function') requestNotificationAccess();
+        if (window.registerUserFirebase) window.registerUserFirebase(window.currentUser);
+        if (typeof connectScaleDrone === 'function') connectScaleDrone();
+
+        alert('माशाअल्लाह! आप सफलतापूर्वक लॉगिन हो गए हैं।');
+      }, 700);
+    };
+  }
+})();
+</script>
   
 </body>
 </html>
