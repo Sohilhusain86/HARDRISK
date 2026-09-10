@@ -15,7 +15,7 @@ if (!admin.apps.length) {
   }
 }
 
-// 20 मान्य (Valid) 6-अंकीय OTP की सूची (जो send.js में भी इस्तेमाल हो रही है)
+// 20 मान्य (Valid) 6-अंकीय OTP की सूची (इनमें से कोई भी डालने पर लॉगिन हो जाएगा)
 const VALID_OTPS = [
   "147258", "258369", "369147", "789456", "456123",
   "987654", "123987", "654321", "159753", "357159",
@@ -28,14 +28,13 @@ module.exports = async function (req, res) {
     return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
 
-  const { phone, email, otp } = req.body || {};
+  const { phone, otp } = req.body || {};
   const cleanPhone = String(phone || "").replace(/[^0-9]/g, "").slice(-10);
 
   if (!cleanPhone) {
     return res.status(400).json({ success: false, error: "मोबाइल नंबर आवश्यक है।" });
   }
 
-  // चेक करें कि डाला गया OTP हमारी 20 की वैध सूची में है या नहीं
   if (!VALID_OTPS.includes(String(otp).trim())) {
     return res.status(400).json({ success: false, error: "गलत या समाप्त हुआ OTP दर्ज किया गया है!" });
   }
@@ -43,20 +42,16 @@ module.exports = async function (req, res) {
   try {
     const firebaseUid = `msg91_${cleanPhone}`;
     
-    // Firebase कस्टम टोकन जनरेट करना ताकि यूज़र का लॉगिन सेशन पक्का हो सके
     const customToken = await admin.auth().createCustomToken(firebaseUid, {
       phone_number: `+91${cleanPhone}`,
-      email: email || "",
-      provider: "msg91_email"
+      provider: "phone_otp"
     });
 
     return res.status(200).json({
       success: true,
       phone: cleanPhone,
-      email: email || "",
       customToken: customToken
     });
-
   } catch (err) {
     console.error("Verify Error: ", err);
     return res.status(500).json({ success: false, error: "सत्यापन विफल: " + err.message });
