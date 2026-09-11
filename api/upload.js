@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     const cloud = process.env.CLOUDINARY_CLOUD_NAME || 'xgkhockl';
     const apiKey = process.env.CLOUDINARY_API_KEY;
     const apiSecret = process.env.CLOUDINARY_API_SECRET;
-    const preset = process.env.CLOUDINARY_UPLOAD_PRESET || 'd9xe6u2l';
+    const preset = String(body.preset || process.env.CLOUDINARY_UPLOAD_PRESET || 'jamia_dp');
     const timestamp = Math.floor(Date.now() / 1000);
 
     const form = new FormData();
