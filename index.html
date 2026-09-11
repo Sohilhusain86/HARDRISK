@@ -949,22 +949,15 @@
 
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, get, push, set, update, onValue, onDisconnect, onChildAdded, onChildChanged, onChildRemoved, remove, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  const db = getDatabase(app);
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDpqKDayo6H0nVyjnT1JBPjpH8RjmwpvV0",
-      authDomain: "ula-alif.firebaseapp.com",
-      databaseURL: "https://ula-alif-default-rtdb.firebaseio.com",
-      projectId: "ula-alif",
-      storageBucket: "ula-alif.firebasestorage.app",
-      messagingSenderId: "693272422991",
-      appId: "1:693272422991:web:081c07b083e3549b0dd83a"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    // 🚀 Firebase को बाहर की फ़ाइलों और ग्लोबल कॉल्स के लिए लाइव करना
+    window.db = db;
+    window.ref = ref;
+    window.push = push;
+    window.set = set;
+    window.update = update;
+    window.onValue = onValue;
 
     window.CHANNEL_ID = 'uledCtWauV1C5nWP';
     window.CLOUD_NAME = 'xgkhockl';
@@ -984,8 +977,6 @@
     let isRecording = false;
     let currentStream = null;
     let selectedDpUrl = "";
-    let generatedOtp = "";
-    let otpStepSent = false;
 
     // WebRTC Calling Variables
     let peerConnection = null;
@@ -1004,7 +995,7 @@
       document.getElementById(`tab-content-${tabName}`).style.display = 'block';
     };
 
-    // 🎤 SAFE NON-BLOCKING MIC PERMISSION
+    // 🎤 माइक अनुमति
     window.askForMicPermission = function() {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ audio: true })
@@ -1018,16 +1009,19 @@
       if (window.currentUser && window.currentUser.dpUrl) {
         myAvatar.textContent = "";
         myAvatar.style.backgroundImage = `url('${window.currentUser.dpUrl}')`;
+        myAvatar.style.backgroundSize = 'cover';
+        myAvatar.style.backgroundPosition = 'center';
       } else if (window.currentUser) {
         myAvatar.textContent = (window.currentUser.name || "उ").charAt(0);
       }
       document.getElementById('my-display-name').textContent = window.currentUser.displayName || window.currentUser.name || "जमात ऊला अलिफ़";
       if (window.currentUser && window.currentUser.role === 'admin') {
-        document.getElementById('btn-admin-crown').style.display = "block";
+        const crown = document.getElementById('btn-admin-crown');
+        if (crown) crown.style.display = "block";
       }
     }
 
-    // 🚀 ULTRA-STABLE APP INITIALIZER (PREVENTS FREEZING)
+    // 🚀 ऑटो-लॉगिन इंजन (पेज रीलोड होने पर नहीं अटकेगा)
     function initApp() {
       const savedUser = localStorage.getItem('jamia_chat_saved_user');
       if (savedUser) {
@@ -1035,6 +1029,7 @@
           window.currentUser = JSON.parse(savedUser);
           const loginScreen = document.getElementById('login-screen');
           if (loginScreen) loginScreen.style.display = "none";
+          document.body.classList.add('logged-in');
           updateUserUI();
           requestNotificationAccess();
           window.askForMicPermission();
@@ -1067,54 +1062,74 @@
       }
     };
 
+    // 🚀 डीपी अपलोडर (फ़ोटो तुरंत स्क्रीन पर दिखेगी + बैकग्राउंड अपलोड)
     const dpFileInput = document.getElementById('dp-file-input');
     const dpPreviewBox = document.getElementById('dp-preview-box');
     const dpCameraIcon = document.getElementById('dp-camera-icon');
-
-    async function uploadToCloudinary(file) {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', window.UPLOAD_PRESET);
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${window.CLOUD_NAME}/auto/upload`, { method: 'POST', body: formData });
-      return await res.json();
-    }
 
     if (dpFileInput) {
       dpFileInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        dpPreviewBox.style.opacity = "0.5";
+
+        const localUrl = URL.createObjectURL(file);
+        selectedDpUrl = localUrl;
+        if (dpPreviewBox) {
+          dpPreviewBox.style.backgroundImage = `url('${localUrl}')`;
+          dpPreviewBox.style.backgroundSize = 'cover';
+        }
+        if (dpCameraIcon) dpCameraIcon.style.display = 'none';
+
         try {
-          const result = await uploadToCloudinary(file);
-          if (result.secure_url) {
-            selectedDpUrl = result.secure_url;
-            dpPreviewBox.style.backgroundImage = `url('${selectedDpUrl}')`;
-            if (dpCameraIcon) dpCameraIcon.style.display = 'none';
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('upload_preset', 'd9xe6u2l');
+          const res = await fetch(`https://api.cloudinary.com/v1_1/${window.CLOUD_NAME}/auto/upload`, { method: 'POST', body: formData });
+          const json = await res.json();
+          if (json.secure_url) {
+            selectedDpUrl = json.secure_url;
+            if (window.currentUser && window.currentUser.phone) {
+              window.currentUser.dpUrl = json.secure_url;
+              localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
+              update(ref(db, `users/${window.currentUser.phone}`), { dpUrl: json.secure_url });
+            }
           }
         } catch (err) {
-          alert("DP अपलोड विफल रही।");
-        } finally {
-          dpPreviewBox.style.opacity = "1";
+          console.warn("Cloudinary fallback to local");
         }
       });
     }
 
+    // हेडर वाले कैमरा बटन से फ़ोटो बदलना
     const dpUpdateInput = document.getElementById('dp-update-file');
     if (dpUpdateInput) {
       dpUpdateInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        alert("प्रोफाइल फोटो अपलोड हो रही है, कृपया प्रतीक्षा करें...");
+
+        const localPreviewUrl = URL.createObjectURL(file);
+        const myAvatar = document.getElementById('my-avatar');
+        if (myAvatar) {
+          myAvatar.textContent = "";
+          myAvatar.style.backgroundImage = `url('${localPreviewUrl}')`;
+          myAvatar.style.backgroundSize = "cover";
+        }
+
         try {
-          const res = await uploadToCloudinary(file);
-          if (res.secure_url) {
-            window.currentUser.dpUrl = res.secure_url;
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('upload_preset', 'd9xe6u2l');
+          const res = await fetch(`https://api.cloudinary.com/v1_1/${window.CLOUD_NAME}/auto/upload`, { method: 'POST', body: formData });
+          const json = await res.json();
+          if (json.secure_url) {
+            window.currentUser.dpUrl = json.secure_url;
             localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
-            update(ref(db, `users/${window.currentUser.phone}`), { dpUrl: res.secure_url });
-            updateUserUI();
-            alert("प्रोफाइल फोटो सफलतापूर्वक बदल गई!");
+            update(ref(db, `users/${window.currentUser.phone}`), { dpUrl: json.secure_url });
+            alert("✅ प्रोफाइल फोटो बदल गई!");
           }
-        } catch (err) { alert("अपलोड फेल: " + err.message); }
+        } catch (err) {
+          console.warn("DP update error:", err);
+        }
       });
     }
 
@@ -1193,85 +1208,70 @@
     };
 
     const actionAuthBtn = document.getElementById('btn-action-auth');
-    const otpSection = document.getElementById('otp-section');
     const userNameInput = document.getElementById('user-name');
     const userPhoneInput = document.getElementById('user-phone');
     const userRollInput = document.getElementById('user-roll');
     const userPassInput = document.getElementById('user-pass');
-    const otpInput = document.getElementById('otp-input');
-    const adminCrown = document.getElementById('btn-admin-crown');
 
-    actionAuthBtn.addEventListener('click', async () => {
+    // 🚀 डायरेक्ट लॉगिन इंजन (सेंड बटन बिना सर्वर अटके तुरंत काम करेगा)
+    actionAuthBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
       const name = userNameInput.value.trim();
       const phone = userPhoneInput.value.trim().replace(/[^0-9]/g, '');
       const roll = userRollInput.value.trim();
+      const pass = userPassInput.value.trim();
 
-      if (!name) { alert("कृपया अपना नाम दर्ज करें।"); return; }
-      if (phone.length < 10) { alert("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।"); return; }
+      if (!name) { alert("कृपया अपना नाम दर्ज करें।"); userNameInput.focus(); return; }
+      if (phone.length < 10) { alert("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।"); userPhoneInput.focus(); return; }
 
-      if (!otpStepSent) {
-        generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-        await set(ref(db, `otps/${phone}`), { otp: generatedOtp, time: Date.now() });
-        
-        document.getElementById('sms-popup-text').textContent = `Your verification code is ${generatedOtp}. Account verification is in progress. Complete it on Jamia Messenger.`;
-        document.getElementById('sms-popup').style.display = 'flex';
+      actionAuthBtn.disabled = true;
+      actionAuthBtn.textContent = "लॉगिन हो रहा है...";
 
-        otpSection.style.display = 'block';
-        actionAuthBtn.textContent = "OTP सत्यापित करें और लॉगिन करें";
-        otpStepSent = true;
-        return;
-      }
+      const displayName = roll ? `${name} (रोल: ${roll})` : name;
+      const userRole = (pass === ADMIN_PASSKEY) ? "admin" : "student";
 
-      const enteredOtp = otpInput.value.trim();
-      const otpSnapRef = ref(db, `otps/${phone}`);
-      
-      const snap = await get(otpSnapRef);
-      const otpData = snap.val();
-      if (!otpData || otpData.otp !== enteredOtp) {
-        alert("गलत OTP! कृपया सही OTP दर्ज करें।");
-        return;
-      }
+      window.currentUser = {
+        name: name,
+        phone: phone,
+        roll: roll,
+        displayName: displayName,
+        role: userRole,
+        location: window.currentUser.location || "India",
+        dpUrl: selectedDpUrl || ""
+      };
 
-      const existingUserSnap = await get(ref(db, `users/${phone}`));
-      let finalName = name;
-      let finalRoll = roll;
+      // तुरंत लोकल स्टोरेज में सेट करना
+      localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
 
-      if (existingUserSnap.exists()) {
-        const oldData = existingUserSnap.val();
-        finalName = oldData.name || name;
-        finalRoll = oldData.roll || roll;
-      } else {
-        await set(ref(db, `users/${phone}`), {
+      // तुरंत लॉगिन स्क्रीन हटाना
+      const loginScreen = document.getElementById('login-screen');
+      if (loginScreen) loginScreen.style.display = "none";
+      document.body.classList.add('logged-in');
+      updateUserUI();
+
+      // बैकग्राउंड में Firebase रजिस्टर करना
+      try {
+        set(ref(db, `users/${phone}`), {
           name: name,
           phone: phone,
           roll: roll,
-          createdAt: Date.now()
+          displayName: displayName,
+          dpUrl: selectedDpUrl || "",
+          status: "online",
+          lastSeen: Date.now()
         });
+
+        const todayStr = new Date().toLocaleDateString().replace(/\//g, '-');
+        set(ref(db, `attendance/${phone}/${todayStr}`), true);
+        onDisconnect(ref(db, `users/${phone}`)).update({ status: "offline", lastSeen: Date.now() });
+      } catch(err) {
+        console.warn("Silent Firebase register error:", err);
       }
 
-      window.currentUser.name = finalName;
-      window.currentUser.phone = phone;
-      window.currentUser.roll = finalRoll;
-      window.currentUser.displayName = finalRoll ? `${finalName} (रोल: ${finalRoll})` : finalName;
-      window.currentUser.dpUrl = selectedDpUrl || "";
-      
-      const pass = userPassInput.value.trim();
-      if (pass === ADMIN_PASSKEY) {
-        window.currentUser.role = "admin";
-        if (adminCrown) adminCrown.style.display = "block";
-      }
-
-      localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
-      updateUserUI();
-      document.getElementById('login-screen').style.display = "none";
-      requestNotificationAccess();
-      window.askForMicPermission(); 
-      
-      if (window.registerUserFirebase) {
-        window.registerUserFirebase(window.currentUser);
-      }
       connectScaleDrone();
       listenForIncomingCalls();
+      requestNotificationAccess();
+      window.askForMicPermission();
     });
 
     function connectScaleDrone() {
