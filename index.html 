@@ -1,0 +1,2107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- ============================================================
+       NEW CHAT — INDEX / APPLICATION ENTRY
+       Phase: UI Foundation
+       This file owns the application HTML structure.
+       Styling and behavior are connected through external modules.
+  ============================================================= -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#075e54">
+  <meta name="description" content="New Chat messaging application UI foundation">
+  <title>New Chat</title>
+  <!-- ============================================================
+       EXTERNAL UI MODULES
+       ============================================================= -->
+  <!-- ============================================================
+       01 — APPLICATION ROOT
+       ============================================================= -->
+<style>
+/* ============================================================
+   EMBEDDED STYLES — merged from styles.css
+   ============================================================ */
+/* ============================================================
+   NEW CHAT — STYLES MODULE
+   This file will contain the complete visual system.
+   ============================================================ */
+:root {
+  --color-page: #d1d7db;
+  --color-surface: #ffffff;
+  --color-surface-soft: #f0f2f5;
+  --color-surface-hover: #f5f6f6;
+  --color-text: #111b21;
+  --color-muted: #667781;
+  --color-border: #d9dee2;
+  --color-accent: #128c7e;
+  --color-accent-dark: #075e54;
+  --color-outgoing: #d9fdd3;
+  --color-incoming: #ffffff;
+  --color-danger: #d32f2f;
+  --shadow-panel: 0 8px 28px rgba(0, 0, 0, .08);
+  --radius-small: 8px;
+  --radius-medium: 12px;
+  --radius-large: 16px;
+  --sidebar-width: 390px;
+  --panel-width: 360px;
+  --header-height: 70px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--color-page);
+  color: var(--color-text);
+}
+body {
+  min-height: 100vh;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: .5;
+}
+.screen {
+  min-height: 100vh;
+  display: none;
+}
+.screen.active {
+  display: flex;
+}
+.muted {
+  color: var(--color-muted);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.primary-btn {
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--radius-small);
+  padding: 12px 22px;
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 700;
+}
+.primary-btn:hover {
+  background: var(--color-accent-dark);
+}
+.icon-btn {
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+}
+.icon-btn:hover {
+  background: rgba(0, 0, 0, .06);
+}
+.avatar {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 50%;
+  background: #dfe5e7;
+  color: #425057;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+/* ============================================================
+   01 — WELCOME
+   ============================================================ */
+.screen-welcome,
+.screen-auth {
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(180deg, #e9edef, #f7f8f9);
+}
+.welcome-shell,
+.auth-shell {
+  width: min(430px, 100%);
+  padding: 38px;
+  background: var(--color-surface);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-panel);
+}
+.welcome-shell {
+  text-align: center;
+}
+.brand-mark,
+.empty-logo {
+  width: 78px;
+  height: 78px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 34px;
+  font-weight: 800;
+}
+.welcome-copy h1 {
+  margin: 0 0 8px;
+}
+.welcome-copy p,
+.auth-header p {
+  margin: 0;
+  color: var(--color-muted);
+}
+.welcome-shell .primary-btn {
+  width: 100%;
+  margin-top: 26px;
+}
+.legal-copy {
+  margin: 18px 0 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+/* ============================================================
+   02 — AUTHENTICATION UI
+   ============================================================ */
+.auth-shell {
+  position: relative;
+}
+.auth-header {
+  text-align: center;
+}
+.auth-header > .icon-btn {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+}
+.auth-symbol {
+  width: 64px;
+  height: 64px;
+  margin: 8px auto 22px;
+  border-radius: 50%;
+  background: #e8f5f2;
+  color: var(--color-accent-dark);
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+}
+.auth-header h2 {
+  margin: 0 0 8px;
+}
+.phone-form {
+  margin-top: 26px;
+}
+.phone-row {
+  display: grid;
+  grid-template-columns: 145px 1fr;
+  gap: 8px;
+}
+.phone-row select,
+.phone-row input,
+.otp-input,
+#messageInput {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  outline: 0;
+  background: #fff;
+  border-radius: var(--radius-small);
+  padding: 12px;
+}
+.phone-row select:focus,
+.phone-row input:focus,
+.otp-input:focus,
+#messageInput:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(18, 140, 126, .12);
+}
+.form-error {
+  margin: 10px 0 0;
+  color: var(--color-danger);
+  font-size: 13px;
+}
+.auth-submit {
+  width: 100%;
+  margin-top: 18px;
+}
+.otp-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 7px;
+  margin-top: 26px;
+}
+.otp-input {
+  height: 52px;
+  padding: 8px 4px;
+  text-align: center;
+  font-size: 22px;
+}
+.centered-btn {
+  display: block;
+  margin: 8px auto 0;
+  border: 0;
+  padding: 10px;
+  color: var(--color-accent-dark);
+  background: transparent;
+  font-weight: 600;
+}
+/* ============================================================
+   03 — APPLICATION FRAME
+   ============================================================ */
+.app-screen {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-page);
+}
+.sidebar {
+  width: var(--sidebar-width);
+  max-width: 42%;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-right: 1px solid var(--color-border);
+}
+.sidebar-header,
+.chat-header,
+.panel-header {
+  min-height: var(--header-height);
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--color-surface-soft);
+}
+.sidebar-header {
+  justify-content: space-between;
+}
+/* ============================================================
+   04 — SEARCH
+   ============================================================ */
+.search-box {
+  height: 44px;
+  margin: 8px 12px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 9px;
+  background: #f0f2f5;
+}
+.search-icon {
+  color: var(--color-muted);
+}
+.search-box input {
+  flex: 1;
+  border: 0;
+  padding: 7px;
+  background: transparent;
+  box-shadow: none;
+}
+/* ============================================================
+   05 — CHAT FILTERS
+   ============================================================ */
+.chat-filters {
+  display: flex;
+  gap: 6px;
+  padding: 7px 12px;
+  overflow-x: auto;
+  border-bottom: 1px solid #eee;
+}
+.filter {
+  border: 0;
+  border-radius: 18px;
+  padding: 7px 13px;
+  background: #f0f2f5;
+  color: #54656f;
+  white-space: nowrap;
+}
+.filter.active {
+  background: var(--color-outgoing);
+  color: var(--color-accent-dark);
+}
+/* ============================================================
+   06 — CHAT LIST
+   ============================================================ */
+.chat-list {
+  flex: 1;
+  overflow: auto;
+}
+.chat-item {
+  min-height: 74px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #f0f2f5;
+  cursor: pointer;
+}
+.chat-item:hover {
+  background: var(--color-surface-hover);
+}
+.chat-item.active {
+  background: #e9edef;
+}
+.chat-meta {
+  min-width: 0;
+  flex: 1;
+}
+.chat-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.chat-top strong,
+.chat-preview {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-time {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+.chat-preview {
+  margin-top: 5px;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+.unread-badge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: var(--color-accent);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+}
+/* ============================================================
+   07 — CHAT AREA
+   ============================================================ */
+.chat-area {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: #efeae2;
+}
+.chat-header {
+  gap: 10px;
+  border-bottom: 1px solid var(--color-border);
+}
+.chat-heading {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.chat-heading strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-heading span {
+  font-size: 12px;
+}
+/* ============================================================
+   08 — MESSAGE AREA
+   ============================================================ */
+.message-pane {
+  flex: 1;
+  overflow: auto;
+  padding: 22px 7%;
+  display: flex;
+  flex-direction: column;
+}
+.message-pane.empty {
+  align-items: center;
+  justify-content: center;
+}
+.empty-chat {
+  max-width: 480px;
+  text-align: center;
+  color: var(--color-muted);
+}
+.empty-logo {
+  width: 82px;
+  height: 82px;
+  margin-bottom: 18px;
+}
+.empty-chat h2 {
+  margin: 0 0 6px;
+  color: var(--color-text);
+}
+.encryption-note {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 12px;
+}
+/* ============================================================
+   09 — MESSAGE LIST / BUBBLES
+   ============================================================ */
+.message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: auto;
+}
+.date-divider {
+  margin: 12px 0;
+  text-align: center;
+}
+.date-divider span {
+  padding: 5px 10px;
+  border-radius: 7px;
+  background: #e1f3fb;
+  color: #54656f;
+  font-size: 11px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+}
+.message-row {
+  max-width: 78%;
+  display: flex;
+}
+.message-row.in {
+  align-self: flex-start;
+}
+.message-row.out {
+  align-self: flex-end;
+}
+.message-bubble {
+  min-width: 80px;
+  padding: 7px 9px 5px;
+  border-radius: 8px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .08);
+}
+.message-row.in .message-bubble {
+  background: var(--color-incoming);
+  border-top-left-radius: 2px;
+}
+.message-row.out .message-bubble {
+  background: var(--color-outgoing);
+  border-top-right-radius: 2px;
+}
+.message-text {
+  padding-right: 45px;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+  white-space: pre-wrap;
+}
+.message-info {
+  float: right;
+  margin: 4px 0 0 8px;
+  color: var(--color-muted);
+  font-size: 10px;
+  white-space: nowrap;
+}
+.message-check {
+  color: #53a9e6;
+}
+/* ============================================================
+   10 — REPLY
+   ============================================================ */
+.reply-bar {
+  min-height: 58px;
+  padding: 7px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-surface-soft);
+  border-left: 4px solid var(--color-accent);
+}
+.reply-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.reply-content strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* ============================================================
+   11 — COMPOSER
+   ============================================================ */
+.composer {
+  min-height: 64px;
+  padding: 9px 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--color-surface-soft);
+}
+#messageInput {
+  flex: 1;
+  border-radius: 9px;
+}
+.send-btn {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 19px;
+}
+/* ============================================================
+   12 — SIDE PANEL
+   ============================================================ */
+.side-panel {
+  width: var(--panel-width);
+  max-width: 36%;
+  display: none;
+  flex-direction: column;
+  background: #fff;
+  border-left: 1px solid var(--color-border);
+}
+.side-panel.open {
+  display: flex;
+}
+.panel-header {
+  justify-content: flex-start;
+  gap: 10px;
+}
+.panel-header h2 {
+  font-size: 18px;
+}
+.panel-content {
+  padding: 18px;
+  overflow: auto;
+}
+.panel-section {
+  padding: 14px 0;
+  border-bottom: 1px solid #eee;
+}
+.panel-section h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+.setting-row {
+  padding: 13px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+/* ============================================================
+   13 — MODAL
+   ============================================================ */
+.modal[hidden] {
+  display: none;
+}
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+}
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, .42);
+}
+.modal-card {
+  position: relative;
+  width: min(500px, calc(100% - 30px));
+  max-height: 80vh;
+  overflow: auto;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .25);
+}
+.modal-header {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #eee;
+}
+.modal-header h3 {
+  margin: 0;
+}
+.modal-body {
+  padding: 18px;
+}
+/* ============================================================
+   14 — MOBILE
+   ============================================================ */
+.mobile-back {
+  display: none;
+}
+@media (max-width: 900px) {
+  .sidebar {
+    width: 100%;
+    max-width: none;
+  }
+  .chat-area {
+    display: none;
+  }
+  .app-screen.chat-open .sidebar {
+    display: none;
+  }
+  .app-screen.chat-open .chat-area {
+    display: flex;
+  }
+  .side-panel {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: min(360px, 100%);
+    max-width: none;
+    z-index: 20;
+    box-shadow: var(--shadow-panel);
+  }
+  .mobile-back {
+    display: grid;
+  }
+}
+@media (max-width: 520px) {
+  .screen-welcome,
+  .screen-auth {
+    padding: 12px;
+  }
+  .welcome-shell,
+  .auth-shell {
+    padding: 28px 18px;
+  }
+  .phone-row {
+    grid-template-columns: 115px 1fr;
+  }
+  .sidebar-header,
+  .chat-header {
+    height: 62px;
+    min-height: 62px;
+  }
+  .message-pane {
+    padding: 14px 3%;
+  }
+  .message-row {
+    max-width: 88%;
+  }
+  .composer {
+    padding: 6px;
+  }
+  .composer .icon-btn {
+    width: 38px;
+    height: 38px;
+  }
+}
+</style>
+</head>
+<body>
+  <div id="app">
+    <!-- ==========================================================
+         02 — WELCOME / LANDING
+         ========================================================== -->
+    <section
+      id="welcomeScreen"
+      class="screen screen-welcome active"
+      aria-labelledby="welcomeTitle"
+    >
+      <div class="welcome-shell">
+        <div class="brand-mark" aria-hidden="true">N</div>
+        <div class="welcome-copy">
+          <h1 id="welcomeTitle">New Chat</h1>
+          <p>Private, simple and fast messaging.</p>
+        </div>
+        <button
+          type="button"
+          class="primary-btn"
+          data-action="open-login"
+        >
+          Continue
+        </button>
+        <p class="legal-copy">
+          By continuing, you agree to the Terms and Privacy Policy.
+        </p>
+      </div>
+    </section>
+    <!-- ==========================================================
+         03 — LOGIN
+         ========================================================== -->
+    <section
+      id="loginScreen"
+      class="screen screen-auth"
+      aria-labelledby="loginTitle"
+    >
+      <div class="auth-shell">
+        <header class="auth-header">
+          <button
+            type="button"
+            class="icon-btn"
+            data-action="back-welcome"
+            aria-label="Back to welcome"
+          >
+            ‹
+          </button>
+          <div class="auth-symbol" aria-hidden="true">✦</div>
+          <h2 id="loginTitle">Enter your phone number</h2>
+          <p>Choose your country and enter your mobile number.</p>
+        </header>
+        <form id="phoneForm" class="phone-form" novalidate>
+          <div class="phone-row">
+            <label class="sr-only" for="countryCode">
+              Country code
+            </label>
+            <select id="countryCode" name="countryCode">
+              <option value="+91">India +91</option>
+              <option value="+1">United States +1</option>
+              <option value="+44">United Kingdom +44</option>
+              <option value="+971">UAE +971</option>
+            </select>
+            <label class="sr-only" for="phoneNumber">
+              Mobile number
+            </label>
+            <input
+              id="phoneNumber"
+              name="phoneNumber"
+              type="tel"
+              inputmode="numeric"
+              autocomplete="tel"
+              placeholder="Mobile number"
+            >
+          </div>
+          <p
+            id="loginError"
+            class="form-error"
+            role="alert"
+            hidden
+          ></p>
+          <button
+            type="button"
+            class="primary-btn auth-submit"
+            data-action="show-otp"
+          >
+            Continue
+          </button>
+        </form>
+        <p class="legal-copy">
+          Authentication provider integration will be connected in the Auth phase.
+        </p>
+      </div>
+    </section>
+    <!-- ==========================================================
+         04 — OTP VERIFICATION UI
+         Actual verification is NOT implemented in this UI phase.
+         ========================================================== -->
+    <section
+      id="otpScreen"
+      class="screen screen-auth"
+      aria-labelledby="otpTitle"
+    >
+      <div class="auth-shell">
+        <header class="auth-header">
+          <button
+            type="button"
+            class="icon-btn"
+            data-action="back-login"
+            aria-label="Back to login"
+          >
+            ‹
+          </button>
+          <div class="auth-symbol" aria-hidden="true">✓</div>
+          <h2 id="otpTitle">Verify your number</h2>
+          <p id="otpDescription">
+            Enter the verification code.
+          </p>
+        </header>
+        <div
+          class="otp-grid"
+          id="otpGrid"
+          aria-label="Verification code"
+        >
+          <input class="otp-input" maxlength="1" inputmode="numeric" aria-label="Digit 1">
+          <input class="otp-input" maxlength="1" inputmode="numeric" aria-label="Digit 2">
+          <input class="otp-input" maxlength="1" inputmode="numeric" aria-label="Digit 3">
+          <input class="otp-input" maxlength="1" inputmode="numeric" aria-label="Digit 4">
+          <input class="otp-input" maxlength="1" inputmode="numeric" aria-label="Digit 5">
+          <input class="otp-input" maxlength="1" inputmode="numeric" aria-label="Digit 6">
+        </div>
+        <button
+          type="button"
+          class="primary-btn auth-submit"
+          data-action="enter-app"
+        >
+          Verify
+        </button>
+        <button
+          type="button"
+          class="text-btn centered-btn"
+          data-action="back-login"
+        >
+          Change number
+        </button>
+      </div>
+    </section>
+    <!-- ==========================================================
+         05 — MAIN APPLICATION
+         ========================================================== -->
+    <section
+      id="appScreen"
+      class="screen app-screen"
+      aria-label="Main application"
+    >
+      <!-- ========================================================
+           06 — LEFT NAVIGATION / CHAT SIDEBAR
+           ======================================================== -->
+      <aside
+        class="sidebar"
+        id="sidebar"
+        aria-label="Conversations"
+      >
+        <!-- ======================================================
+             07 — SIDEBAR HEADER
+             ====================================================== -->
+        <header class="sidebar-header">
+          <button
+            type="button"
+            class="avatar avatar-self"
+            data-action="open-profile"
+            aria-label="Open profile"
+          >
+            S
+          </button>
+          <div class="header-actions">
+            <button
+              type="button"
+              class="icon-btn"
+              data-action="open-status"
+              title="Updates"
+              aria-label="Updates"
+            >
+              ◌
+            </button>
+            <button
+              type="button"
+              class="icon-btn"
+              data-action="new-chat"
+              title="New chat"
+              aria-label="New chat"
+            >
+              ＋
+            </button>
+            <button
+              type="button"
+              class="icon-btn"
+              data-action="open-menu"
+              title="Menu"
+              aria-label="Menu"
+            >
+              ⋮
+            </button>
+          </div>
+        </header>
+        <!-- ======================================================
+             08 — CHAT SEARCH
+             ====================================================== -->
+        <div class="search-box">
+          <span
+            class="search-icon"
+            aria-hidden="true"
+          >
+            ⌕
+          </span>
+          <label
+            class="sr-only"
+            for="chatSearch"
+          >
+            Search conversations
+          </label>
+          <input
+            id="chatSearch"
+            type="search"
+            autocomplete="off"
+            placeholder="Search or start new chat"
+          >
+        </div>
+        <!-- ======================================================
+             09 — CHAT FILTERS
+             ====================================================== -->
+        <nav
+          class="chat-filters"
+          aria-label="Conversation filters"
+        >
+          <button
+            type="button"
+            class="filter active"
+            data-filter="all"
+          >
+            All
+          </button>
+          <button
+            type="button"
+            class="filter"
+            data-filter="unread"
+          >
+            Unread
+          </button>
+          <button
+            type="button"
+            class="filter"
+            data-filter="groups"
+          >
+            Groups
+          </button>
+          <button
+            type="button"
+            class="filter"
+            data-filter="favorites"
+          >
+            Favorites
+          </button>
+        </nav>
+        <!-- ======================================================
+             10 — CHAT LIST
+             JavaScript renders real conversation data here later.
+             ====================================================== -->
+        <div
+          id="chatList"
+          class="chat-list"
+          role="list"
+          aria-label="Chat list"
+        ></div>
+      </aside>
+      <!-- ========================================================
+           11 — INDIVIDUAL CHAT AREA
+           ======================================================== -->
+      <main
+        class="chat-area"
+        id="chatArea"
+        aria-label="Conversation"
+      >
+        <!-- ======================================================
+             12 — CHAT HEADER
+             ====================================================== -->
+        <header class="chat-header">
+          <button
+            type="button"
+            class="icon-btn mobile-back"
+            data-action="close-chat"
+            aria-label="Back to conversations"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            id="chatAvatar"
+            class="avatar"
+            aria-label="Conversation profile"
+          >
+            A
+          </button>
+          <div class="chat-heading">
+            <strong id="chatName">
+              Select a chat
+            </strong>
+            <span
+              id="chatPresence"
+              class="muted"
+            >
+              No conversation selected
+            </span>
+          </div>
+          <div class="header-actions">
+            <button
+              type="button"
+              class="icon-btn"
+              data-action="search-chat"
+              title="Search in chat"
+              aria-label="Search in chat"
+            >
+              ⌕
+            </button>
+            <button
+              type="button"
+              class="icon-btn"
+              data-action="voice-call"
+              title="Voice call"
+              aria-label="Voice call"
+            >
+              ☎
+            </button>
+            <button
+              type="button"
+              class="icon-btn"
+              data-action="video-call"
+              title="Video call"
+              aria-label="Video call"
+            >
+              ▣
+            </button>
+            <button
+              type="button"
+              class="icon-btn"
+              data-action="chat-menu"
+              title="More options"
+              aria-label="More options"
+            >
+              ⋮
+            </button>
+          </div>
+        </header>
+        <!-- ======================================================
+             13 — MESSAGE PANE
+             ====================================================== -->
+        <section
+          id="messagePane"
+          class="message-pane empty"
+          aria-label="Messages"
+        >
+          <div class="empty-chat">
+            <div
+              class="empty-logo"
+              aria-hidden="true"
+            >
+              N
+            </div>
+            <h2>New Chat</h2>
+            <p>
+              Choose a conversation to start messaging.
+            </p>
+            <span class="encryption-note">
+              🔒 Messaging security will be implemented in the Security phase.
+            </span>
+          </div>
+        </section>
+        <!-- ======================================================
+             14 — REPLY BAR
+             ====================================================== -->
+        <div
+          id="replyBar"
+          class="reply-bar"
+          hidden
+        >
+          <div class="reply-content">
+            <small>
+              Replying to
+            </small>
+            <strong id="replyText"></strong>
+          </div>
+          <button
+            type="button"
+            class="icon-btn"
+            data-action="cancel-reply"
+            aria-label="Cancel reply"
+          >
+            ×
+          </button>
+        </div>
+        <!-- ======================================================
+             15 — MESSAGE COMPOSER
+             ====================================================== -->
+        <footer
+          class="composer"
+          id="composer"
+          aria-label="Message composer"
+        >
+          <button
+            type="button"
+            class="icon-btn"
+            data-action="emoji"
+            title="Emoji"
+            aria-label="Emoji"
+          >
+            ☺
+          </button>
+          <button
+            type="button"
+            class="icon-btn"
+            data-action="attachment"
+            title="Attach"
+            aria-label="Attach"
+          >
+            ＋
+          </button>
+          <label
+            class="sr-only"
+            for="messageInput"
+          >
+            Message
+          </label>
+          <input
+            id="messageInput"
+            type="text"
+            autocomplete="off"
+            placeholder="Type a message"
+            aria-label="Type a message"
+          >
+          <button
+            type="button"
+            class="icon-btn"
+            data-action="camera"
+            title="Camera"
+            aria-label="Camera"
+          >
+            ▣
+          </button>
+          <button
+            type="button"
+            class="send-btn"
+            data-action="send-message"
+            aria-label="Send message"
+          >
+            ➤
+          </button>
+        </footer>
+      </main>
+      <!-- ========================================================
+           16 — RIGHT SIDE INFORMATION PANEL
+           ======================================================== -->
+      <aside
+        id="sidePanel"
+        class="side-panel"
+        aria-label="Information panel"
+      >
+        <header class="panel-header">
+          <button
+            type="button"
+            class="icon-btn"
+            data-action="close-panel"
+            aria-label="Close panel"
+          >
+            ×
+          </button>
+          <h2 id="panelTitle">
+            Panel
+          </h2>
+        </header>
+        <div
+          id="panelContent"
+          class="panel-content"
+        ></div>
+      </aside>
+    </section>
+    <!-- ==========================================================
+         17 — GLOBAL MODAL
+         ========================================================== -->
+    <div
+      id="modal"
+      class="modal"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+    >
+      <div
+        class="modal-backdrop"
+        data-action="close-modal"
+      ></div>
+      <div class="modal-card">
+        <header class="modal-header">
+          <h3 id="modalTitle">
+            Dialog
+          </h3>
+          <button
+            type="button"
+            class="icon-btn"
+            data-action="close-modal"
+            aria-label="Close dialog"
+          >
+            ×
+          </button>
+        </header>
+        <div
+          id="modalBody"
+          class="modal-body"
+        ></div>
+      </div>
+    </div>
+  </div>
+  <!-- ============================================================
+       APPLICATION BEHAVIOR MODULE
+       ============================================================ -->
+<script>
+/* ============================================================
+   EMBEDDED UI BEHAVIOR — merged from ui.js
+   ============================================================ */
+/* ============================================================
+   NEW CHAT — UI BEHAVIOR MODULE
+   No external service, authentication provider, database,
+   media API, WebRTC, AI API or privileged operation is included.
+   Those systems are separate future modules.
+   ============================================================ */
+"use strict";
+/* ============================================================
+   01 — APPLICATION STATE
+   ============================================================ */
+const AppState = {
+  currentScreen: "welcomeScreen",
+  activeChatId: null,
+  filter: "all",
+  query: "",
+  replyingTo: null,
+  chats: [
+    {
+      id: "aisha",
+      name: "Aisha",
+      initials: "A",
+      presence: "online",
+      preview: "See you soon!",
+      time: "18:42",
+      unread: 2,
+      group: false,
+      favorite: true,
+      messages: [
+        { id: 1, dir: "in", text: "Assalamualaikum!", time: "18:36" },
+        { id: 2, dir: "out", text: "Wa alaikum assalam. How are you?", time: "18:38", status: "read" },
+        { id: 3, dir: "in", text: "Alhamdulillah, all good. See you soon!", time: "18:42" }
+      ]
+    },
+    {
+      id: "study",
+      name: "Study Group",
+      initials: "SG",
+      presence: "12 members",
+      preview: "Ahmed: Tomorrow at 8 PM",
+      time: "17:20",
+      unread: 7,
+      group: true,
+      favorite: true,
+      messages: [
+        { id: 1, dir: "in", text: "Tomorrow's study session is at 8 PM.", time: "17:15" },
+        { id: 2, dir: "in", text: "Ahmed: Please bring your notes.", time: "17:20" }
+      ]
+    },
+    {
+      id: "umar",
+      name: "Umar",
+      initials: "U",
+      presence: "last seen recently",
+      preview: "Photo",
+      time: "Yesterday",
+      unread: 0,
+      group: false,
+      favorite: false,
+      messages: [
+        { id: 1, dir: "out", text: "Send me that photo when you can.", time: "Yesterday", status: "delivered" },
+        { id: 2, dir: "in", text: "Sure.", time: "Yesterday" }
+      ]
+    },
+    {
+      id: "family",
+      name: "Family",
+      initials: "F",
+      presence: "8 members",
+      preview: "Mom: Dinner is ready",
+      time: "Yesterday",
+      unread: 0,
+      group: true,
+      favorite: true,
+      messages: [
+        { id: 1, dir: "in", text: "Dinner is ready.", time: "Yesterday" },
+        { id: 2, dir: "out", text: "Coming in a few minutes.", time: "Yesterday", status: "read" }
+      ]
+    }
+  ]
+};
+/* ============================================================
+   02 — DOM HELPERS
+   ============================================================ */
+const UI = {
+  one(selector, root = document) {
+    return root.querySelector(selector);
+  },
+  all(selector, root = document) {
+    return [...root.querySelectorAll(selector)];
+  }
+};
+/* ============================================================
+   03 — HTML ESCAPING
+   Prevent message text from becoming executable HTML.
+   ============================================================ */
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, character => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  }[character]));
+}
+/* ============================================================
+   04 — SCREEN NAVIGATION
+   ============================================================ */
+function showScreen(screenId) {
+  UI.all(".screen").forEach(screen => {
+    screen.classList.remove("active");
+  });
+  const target = UI.one(`#${screenId}`);
+  if (!target) {
+    return;
+  }
+  target.classList.add("active");
+  AppState.currentScreen = screenId;
+}
+/* ============================================================
+   05 — CHAT FILTERING
+   ============================================================ */
+function chatMatchesFilter(chat) {
+  if (AppState.filter === "unread") {
+    return chat.unread > 0;
+  }
+  if (AppState.filter === "groups") {
+    return chat.group === true;
+  }
+  if (AppState.filter === "favorites") {
+    return chat.favorite === true;
+  }
+  return true;
+}
+function chatMatchesSearch(chat) {
+  const query = AppState.query.trim().toLowerCase();
+  if (!query) {
+    return true;
+  }
+  return (
+    chat.name.toLowerCase().includes(query) ||
+    chat.preview.toLowerCase().includes(query)
+  );
+}
+/* ============================================================
+   06 — CHAT LIST RENDERING
+   ============================================================ */
+function renderChats() {
+  const list = UI.one("#chatList");
+  if (!list) {
+    return;
+  }
+  const visibleChats = AppState.chats.filter(chat => (
+    chatMatchesFilter(chat) &&
+    chatMatchesSearch(chat)
+  ));
+  if (!visibleChats.length) {
+    list.innerHTML = `
+      <div class="empty-chat" style="padding:50px 20px">
+        <h3>No chats found</h3>
+        <p>Try another search or filter.</p>
+      </div>
+    `;
+    return;
+  }
+  list.innerHTML = visibleChats.map(chat => `
+    <article
+      class="chat-item ${chat.id === AppState.activeChatId ? "active" : ""}"
+      data-chat-id="${escapeHTML(chat.id)}"
+      role="listitem"
+      tabindex="0"
+    >
+      <div class="avatar">${escapeHTML(chat.initials)}</div>
+      <div class="chat-meta">
+        <div class="chat-top">
+          <strong>${escapeHTML(chat.name)}</strong>
+          <span class="chat-time">${escapeHTML(chat.time)}</span>
+        </div>
+        <div class="chat-preview">
+          ${escapeHTML(chat.preview)}
+        </div>
+      </div>
+      ${
+        chat.unread
+          ? `<span class="unread-badge">${chat.unread > 99 ? "99+" : chat.unread}</span>`
+          : ""
+      }
+    </article>
+  `).join("");
+}
+/* ============================================================
+   07 — OPEN CHAT
+   ============================================================ */
+function openChat(chatId) {
+  const chat = AppState.chats.find(item => item.id === chatId);
+  if (!chat) {
+    return;
+  }
+  AppState.activeChatId = chatId;
+  chat.unread = 0;
+  UI.one("#chatName").textContent = chat.name;
+  UI.one("#chatPresence").textContent = chat.presence;
+  UI.one("#chatAvatar").textContent = chat.initials;
+  renderMessages(chat);
+  renderChats();
+  UI.one(".app-screen")?.classList.add("chat-open");
+}
+/* ============================================================
+   08 — MESSAGE RENDERING
+   ============================================================ */
+function renderMessages(chat) {
+  const pane = UI.one("#messagePane");
+  if (!pane) {
+    return;
+  }
+  pane.classList.remove("empty");
+  const messages = chat.messages.map(message => `
+    <div
+      class="message-row ${message.dir}"
+      data-message-id="${escapeHTML(message.id)}"
+    >
+      <div class="message-bubble">
+        <div class="message-text">
+          ${escapeHTML(message.text)}
+        </div>
+        <span class="message-info">
+          ${escapeHTML(message.time)}
+          ${
+            message.dir === "out"
+              ? `<span class="message-check">${message.status === "read" ? "✓✓" : "✓"}</span>`
+              : ""
+          }
+        </span>
+      </div>
+    </div>
+  `).join("");
+  pane.innerHTML = `
+    <div class="message-list">
+      <div class="date-divider">
+        <span>Today</span>
+      </div>
+      ${messages}
+    </div>
+  `;
+  pane.scrollTop = pane.scrollHeight;
+}
+/* ============================================================
+   09 — SEND MESSAGE UI
+   This updates only the local UI state.
+   Real database delivery belongs to Messaging phase.
+   ============================================================ */
+function sendMessage() {
+  const input = UI.one("#messageInput");
+  if (!input) {
+    return;
+  }
+  const text = input.value.trim();
+  if (!text || !AppState.activeChatId) {
+    return;
+  }
+  const chat = AppState.chats.find(
+    item => item.id === AppState.activeChatId
+  );
+  if (!chat) {
+    return;
+  }
+  const now = new Date().toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+  chat.messages.push({
+    id: Date.now(),
+    dir: "out",
+    text,
+    time: now,
+    status: "sent"
+  });
+  chat.preview = text;
+  chat.time = now;
+  input.value = "";
+  AppState.replyingTo = null;
+  UI.one("#replyBar").hidden = true;
+  renderMessages(chat);
+  renderChats();
+}
+/* ============================================================
+   10 — SIDE PANEL
+   ============================================================ */
+function openPanel(title, content) {
+  const titleElement = UI.one("#panelTitle");
+  const contentElement = UI.one("#panelContent");
+  const panel = UI.one("#sidePanel");
+  if (!titleElement || !contentElement || !panel) {
+    return;
+  }
+  titleElement.textContent = title;
+  contentElement.innerHTML = content;
+  panel.classList.add("open");
+}
+function closePanel() {
+  UI.one("#sidePanel")?.classList.remove("open");
+}
+/* ============================================================
+   11 — PROFILE PANEL
+   ============================================================ */
+function openProfile() {
+  openPanel(
+    "Profile",
+    `
+      <div style="text-align:center;padding:10px 0 20px">
+        <div class="avatar" style="width:96px;height:96px;margin:auto;font-size:30px">
+          S
+        </div>
+        <h2 style="margin-bottom:4px">
+          Your Name
+        </h2>
+        <p class="muted">
+          Available
+        </p>
+      </div>
+      <div class="panel-section">
+        <h3>Name</h3>
+        <div>Your Name</div>
+      </div>
+      <div class="panel-section">
+        <h3>About</h3>
+        <div class="muted">
+          Hey there! I am using New Chat.
+        </div>
+      </div>
+      <div class="panel-section">
+        <h3>Phone</h3>
+        <div class="muted">
+          Authentication will populate this.
+        </div>
+      </div>
+      <button
+        type="button"
+        class="primary-btn"
+        style="width:100%;margin-top:18px"
+        data-action="edit-profile"
+      >
+        Edit profile
+      </button>
+    `
+  );
+}
+/* ============================================================
+   12 — SETTINGS PANEL
+   ============================================================ */
+function createSetting(title, description) {
+  return `
+    <div
+      class="setting-row"
+      data-setting="${escapeHTML(title)}"
+      style="cursor:pointer"
+    >
+      <div>
+        <strong>${escapeHTML(title)}</strong>
+        <div class="muted" style="font-size:12px;margin-top:3px">
+          ${escapeHTML(description)}
+        </div>
+      </div>
+      <span aria-hidden="true">›</span>
+    </div>
+  `;
+}
+function openSettings() {
+  openPanel(
+    "Settings",
+    [
+      createSetting("Account", "Security notifications, change number"),
+      createSetting("Privacy", "Last seen, profile photo, status"),
+      createSetting("Notifications", "Messages, groups and calls"),
+      createSetting("Chats", "Theme, wallpaper, chat history"),
+      createSetting("Appearance", "Light, dark and system"),
+      createSetting("Storage", "Storage usage and media"),
+      createSetting("Linked devices", "Manage signed-in devices"),
+      createSetting("Help", "Help centre and contact support"),
+      createSetting("About", "Version and legal information")
+    ].join("")
+  );
+}
+/* ============================================================
+   13 — STATUS / UPDATES PANEL
+   ============================================================ */
+function openStatus() {
+  openPanel(
+    "Updates",
+    `
+      <div class="panel-section">
+        <h3>My status</h3>
+        <div class="setting-row">
+          <div>
+            <strong>＋ Add status</strong>
+            <div class="muted">
+              Share a photo, video or text update.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h3>Recent updates</h3>
+        <div class="setting-row">
+          <div>
+            <strong>Aisha</strong>
+            <div class="muted">18 minutes ago</div>
+          </div>
+          <span>›</span>
+        </div>
+        <div class="setting-row">
+          <div>
+            <strong>Study Group</strong>
+            <div class="muted">Today, 16:05</div>
+          </div>
+          <span>›</span>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h3>Status privacy</h3>
+        <p class="muted">
+          Privacy controls will be connected in the appropriate system phase.
+        </p>
+      </div>
+    `
+  );
+}
+/* ============================================================
+   14 — CALLS UI
+   Real-time calling is intentionally a future module.
+   ============================================================ */
+function openCalls(title = "Calls") {
+  openPanel(
+    title,
+    `
+      <div class="panel-section">
+        <h3>Call history</h3>
+        <div class="setting-row">
+          <div>
+            <strong>Aisha</strong>
+            <div class="muted">↗ Outgoing · Yesterday</div>
+          </div>
+          <span>☎</span>
+        </div>
+        <div class="setting-row">
+          <div>
+            <strong>Umar</strong>
+            <div class="muted">↙ Missed · Yesterday</div>
+          </div>
+          <span>☎</span>
+        </div>
+        <div class="setting-row">
+          <div>
+            <strong>Family</strong>
+            <div class="muted">↗ Outgoing · Yesterday</div>
+          </div>
+          <span>▣</span>
+        </div>
+      </div>
+      <div class="panel-section">
+        <p class="muted">
+          Real-time voice and video calling will be implemented in the Calls phase.
+        </p>
+      </div>
+    `
+  );
+}
+/* ============================================================
+   15 — MODAL SYSTEM
+   ============================================================ */
+function openModal(title, content) {
+  const modal = UI.one("#modal");
+  if (!modal) {
+    return;
+  }
+  UI.one("#modalTitle").textContent = title;
+  UI.one("#modalBody").innerHTML = content;
+  modal.hidden = false;
+}
+function closeModal() {
+  const modal = UI.one("#modal");
+  if (modal) {
+    modal.hidden = true;
+  }
+}
+/* ============================================================
+   16 — ATTACHMENT UI
+   ============================================================ */
+function openAttachmentMenu() {
+  openModal(
+    "Attach",
+    `
+      <div class="setting-row">
+        <span>📷 Photos & videos</span>
+        <span>›</span>
+      </div>
+      <div class="setting-row">
+        <span>📄 Documents</span>
+        <span>›</span>
+      </div>
+      <div class="setting-row">
+        <span>📍 Location</span>
+        <span>›</span>
+      </div>
+      <div class="setting-row">
+        <span>👤 Contact</span>
+        <span>›</span>
+      </div>
+    `
+  );
+}
+/* ============================================================
+   17 — EVENT ROUTER
+   ============================================================ */
+document.addEventListener("click", event => {
+  const actionElement = event.target.closest("[data-action]");
+  if (actionElement) {
+    const action = actionElement.dataset.action;
+    switch (action) {
+      case "open-login":
+        showScreen("loginScreen");
+        break;
+      case "back-welcome":
+        showScreen("welcomeScreen");
+        break;
+      case "back-login":
+        showScreen("loginScreen");
+        break;
+      case "show-otp":
+        handleLoginContinue();
+        break;
+      case "enter-app":
+        showScreen("appScreen");
+        break;
+      case "open-profile":
+        openProfile();
+        break;
+      case "open-status":
+        openStatus();
+        break;
+      case "open-menu":
+        openSettings();
+        break;
+      case "close-panel":
+        closePanel();
+        break;
+      case "close-chat":
+        UI.one(".app-screen")?.classList.remove("chat-open");
+        break;
+      case "send-message":
+        sendMessage();
+        break;
+      case "cancel-reply":
+        cancelReply();
+        break;
+      case "voice-call":
+        openCalls("Voice calls");
+        break;
+      case "video-call":
+        openCalls("Video calls");
+        break;
+      case "chat-menu":
+        openChatMenu();
+        break;
+      case "search-chat":
+        openChatSearch();
+        break;
+      case "new-chat":
+        openNewChat();
+        break;
+      case "attachment":
+        openAttachmentMenu();
+        break;
+      case "emoji":
+        openEmojiPicker();
+        break;
+      case "camera":
+        openCameraNotice();
+        break;
+      case "close-modal":
+        closeModal();
+        break;
+      case "edit-profile":
+        openEditProfile();
+        break;
+      default:
+        break;
+    }
+  }
+  const chatItem = event.target.closest(".chat-item");
+  if (chatItem) {
+    openChat(chatItem.dataset.chatId);
+  }
+  const filter = event.target.closest(".filter");
+  if (filter) {
+    UI.all(".filter").forEach(button => {
+      button.classList.remove("active");
+    });
+    filter.classList.add("active");
+    AppState.filter = filter.dataset.filter;
+    renderChats();
+  }
+  const messageElement = event.target.closest(".message-row");
+  if (messageElement && AppState.activeChatId) {
+    beginReply(messageElement.dataset.messageId);
+  }
+});
+/* ============================================================
+   18 — LOGIN UI VALIDATION
+   No real authentication occurs here.
+   ============================================================ */
+function handleLoginContinue() {
+  const phoneInput = UI.one("#phoneNumber");
+  const error = UI.one("#loginError");
+  if (!phoneInput || !error) {
+    return;
+  }
+  const phone = phoneInput.value.trim();
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 7) {
+    error.hidden = false;
+    error.textContent = "Please enter a valid mobile number.";
+    return;
+  }
+  error.hidden = true;
+  const country = UI.one("#countryCode").value;
+  UI.one("#otpDescription").textContent =
+    `Enter the verification code for ${country} ${phone}.`;
+  showScreen("otpScreen");
+  window.setTimeout(() => {
+    UI.one(".otp-input")?.focus();
+  }, 50);
+}
+/* ============================================================
+   19 — OTP INPUT NAVIGATION
+   ============================================================ */
+function initializeOtpInputs() {
+  const inputs = UI.all(".otp-input");
+  inputs.forEach((input, index) => {
+    input.addEventListener("input", () => {
+      input.value = input.value
+        .replace(/\D/g, "")
+        .slice(0, 1);
+      if (input.value && inputs[index + 1]) {
+        inputs[index + 1].focus();
+      }
+    });
+    input.addEventListener("keydown", event => {
+      if (
+        event.key === "Backspace" &&
+        !input.value &&
+        inputs[index - 1]
+      ) {
+        inputs[index - 1].focus();
+      }
+    });
+  });
+}
+/* ============================================================
+   20 — MESSAGE REPLY
+   ============================================================ */
+function beginReply(messageId) {
+  const chat = AppState.chats.find(
+    item => item.id === AppState.activeChatId
+  );
+  if (!chat) {
+    return;
+  }
+  const message = chat.messages.find(
+    item => String(item.id) === String(messageId)
+  );
+  if (!message) {
+    return;
+  }
+  AppState.replyingTo = message;
+  UI.one("#replyText").textContent = message.text;
+  UI.one("#replyBar").hidden = false;
+  UI.one("#messageInput")?.focus();
+}
+function cancelReply() {
+  AppState.replyingTo = null;
+  UI.one("#replyBar").hidden = true;
+}
+/* ============================================================
+   21 — CHAT OPTIONS
+   ============================================================ */
+function openChatMenu() {
+  openModal(
+    "Chat options",
+    `
+      <div class="setting-row">
+        <span>Search in chat</span>
+        <span>⌕</span>
+      </div>
+      <div class="setting-row">
+        <span>Media, links and docs</span>
+        <span>›</span>
+      </div>
+      <div class="setting-row">
+        <span>Mute notifications</span>
+        <span>›</span>
+      </div>
+      <div class="setting-row">
+        <span>Clear chat</span>
+        <span>›</span>
+      </div>
+    `
+  );
+}
+function openChatSearch() {
+  openModal(
+    "Search in chat",
+    `
+      <input
+        type="search"
+        style="width:100%;padding:12px;border:1px solid var(--color-border);border-radius:8px"
+        placeholder="Search messages"
+        aria-label="Search messages"
+      >
+    `
+  );
+}
+function openNewChat() {
+  openModal(
+    "New chat",
+    `
+      <p class="muted">
+        Contact selection will be connected to the user directory
+        in the Messaging phase.
+      </p>
+      <button
+        type="button"
+        class="primary-btn"
+        style="margin-top:12px"
+        data-action="close-modal"
+      >
+        Close
+      </button>
+    `
+  );
+}
+/* ============================================================
+   22 — EMOJI UI
+   ============================================================ */
+function openEmojiPicker() {
+  openModal(
+    "Emoji",
+    `
+      <div style="font-size:28px;line-height:2">
+        😀 😃 😄 😁 😆 😅 😂 🙂
+        🙏 ❤️ 👍 👌 ✨ 🎉
+      </div>
+    `
+  );
+}
+/* ============================================================
+   23 — CAMERA UI
+   ============================================================ */
+function openCameraNotice() {
+  openModal(
+    "Camera",
+    `
+      <p class="muted">
+        Camera and media capture will be connected in the Media phase.
+      </p>
+    `
+  );
+}
+/* ============================================================
+   24 — PROFILE EDIT UI
+   ============================================================ */
+function openEditProfile() {
+  openModal(
+    "Edit profile",
+    `
+      <label>
+        Name
+        <input
+          type="text"
+          value="Your Name"
+          style="display:block;width:100%;margin-top:6px;padding:11px;border:1px solid var(--color-border);border-radius:8px"
+        >
+      </label>
+      <button
+        type="button"
+        class="primary-btn"
+        style="margin-top:16px;width:100%"
+        data-action="close-modal"
+      >
+        Save
+      </button>
+    `
+  );
+}
+/* ============================================================
+   25 — SEARCH EVENTS
+   ============================================================ */
+function initializeSearch() {
+  const search = UI.one("#chatSearch");
+  if (!search) {
+    return;
+  }
+  search.addEventListener("input", event => {
+    AppState.query = event.target.value;
+    renderChats();
+  });
+}
+/* ============================================================
+   26 — MESSAGE INPUT
+   ============================================================ */
+function initializeMessageInput() {
+  const input = UI.one("#messageInput");
+  if (!input) {
+    return;
+  }
+  input.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      sendMessage();
+    }
+  });
+}
+/* ============================================================
+   27 — KEYBOARD ACCESSIBILITY
+   ============================================================ */
+function initializeChatKeyboardAccess() {
+  document.addEventListener("keydown", event => {
+    const item = event.target.closest(".chat-item");
+    if (
+      item &&
+      (event.key === "Enter" || event.key === " ")
+    ) {
+      event.preventDefault();
+      openChat(item.dataset.chatId);
+    }
+    if (event.key === "Escape") {
+      closeModal();
+      closePanel();
+    }
+  });
+}
+/* ============================================================
+   28 — APPLICATION INITIALIZATION
+   ============================================================ */
+function initializeApp() {
+  renderChats();
+  initializeOtpInputs();
+  initializeSearch();
+  initializeMessageInput();
+  initializeChatKeyboardAccess();
+}
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeApp);
+} else {
+  initializeApp();
+}
+</script>
+</body>
+</html>
