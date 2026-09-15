@@ -1,5 +1,8 @@
+const { requireAuth } = require('../lib/auth');
 module.exports = async function(req,res){
   if(req.method!=='POST') return res.status(405).json({error:'POST method required'});
+  const token = await requireAuth(req,res);
+  if (!token) return;
   try{
     const {file,resourceType='auto'}=req.body||{};
     if(!file || typeof file!=='string') return res.status(400).json({error:'file required'});
@@ -10,5 +13,5 @@ module.exports = async function(req,res){
     const r=await fetch(`https://api.cloudinary.com/v1_1/${cloud}/${type}/upload`,{method:'POST',body:form});
     const d=await r.json(); if(!r.ok) return res.status(r.status).json({error:d.error?.message||'Cloudinary upload failed'});
     return res.status(200).json({secure_url:d.secure_url,public_id:d.public_id,resource_type:d.resource_type});
-  }catch(e){return res.status(500).json({error:e.message});} 
+  }catch(e){return res.status(500).json({error:e.message});}
 };
