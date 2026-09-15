@@ -1,116 +1,59 @@
-const json = (res, status, body) => {
-  res.statusCode = status;
-  res.setHeader('Content-Type', 'application/json; charset=utf-8');
-  res.setHeader('Cache-Control', 'no-store');
-  return res.end(JSON.stringify(body));
+const PROVIDERS = [
+  { name:'groq', key:'GROQ_API_KEY', url:'https://api.groq.com/openai/v1/chat/completions', model:process.env.GROQ_MODEL || 'llama-3.1-8b-instant' },
+  { name:'cerebras', key:'CEREBRAS_API_KEY', url:'https://api.cerebras.ai/v1/chat/completions', model:process.env.CEREBRAS_MODEL || 'llama-3.3-70b' },
+  { name:'sambanova', key:'SAMBANOVA_API_KEY', url:'https://api.sambanova.ai/v1/chat/completions', model:process.env.SAMBANOVA_MODEL || 'Meta-Llama-3.3-70B-Instruct' },
+  { name:'mistral', key:'MISTRAL_API_KEY', url:'https://api.mistral.ai/v1/chat/completions', model:process.env.MISTRAL_MODEL || 'mistral-small-latest' },
+  { name:'openrouter', key:'OPENROUTER_API_KEY', url:'https://openrouter.ai/api/v1/chat/completions', model:process.env.OPENROUTER_MODEL || 'openai/gpt-oss-120b:free' },
+];
+const GEMINI_KEY = process.env.GEMINI_API_KEY;
+
+function promptFor(body){
+  const p = String(body.prompt || '').slice(0, 12000);
+  const task = String(body.task || body.type || 'assistant');
+  const level = Number(body.level || 1);
+  const sys = String(body.systemInstruction || 'आप एक योग्य शैक्षणिक सहायक हैं। सरल हिंदी/उर्दू/अंग्रेज़ी में सटीक और उपयोगी उत्तर दें।').slice(0,4000);
+  return `${sys}\n\nTask: ${task}\nLevel: ${level}\n\nUser: ${p}`;
+}
+async function callProvider(p, messages, signal){
+  const key=process.env[p.key]; if(!key) throw new Error('not configured');
+  const headers={'Content-Type':'application/json','Authorization':`Bearer ${key}`};
+  if(p.name==='openrouter'){headers['HTTP-Referer']='https://hardrisk.vercel.app';headers['X-Title']='Jamat Ula Alif';}
+  const r=await fetch(p.url,{method:'POST',headers,body:JSON.stringify({model:p.model,messages,temperature:0.2,max_tokens:900}),signal});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(d.error?.message || `${p.name} ${r.status}`);
+  const text=d.choices?.[0]?.message?.content || d.choices?.[0]?.text || '';
+  if(!text) throw new Error(`${p.name} empty response`);
+  return text;
+}
+async function callGemini(messages){
+  if(!GEMINI_KEY) throw new Error('Gemini not configured');
+  const contents=messages.map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}));
+  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(GEMINI_KEY)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents, generationConfig:{temperature:0.2,maxOutputTokens:900}})});
+  const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error?.message || `Gemini ${r.status}`);
+  const text=d.candidates?.[0]?.content?.parts?.map(x=>x.text||'').join('') || ''; if(!text) throw new Error('Gemini empty response'); return text;
+}
+module.exports=async function(req,res){
+  if(req.method!=='POST') return res.status(405).json({error:'POST method required'});
+  const body=req.body||{}; const userPrompt=String(body.prompt||body.promptText||'').trim();
+  if(!userPrompt) return res.status(400).json({error:'Prompt required'});
+  const task=String(body.task||body.type||'assistant').toLowerCase();
+  const baseSystem=String(body.systemInstruction||'आप एक योग्य उस्ताद हैं। सरल, सटीक और संक्षिप्त उत्तर दें।').slice(0,4000);
+  const fastTerms=['quick','rapid','quiz','autocomplete','keyword','profile','spelling','translation','flashcard','part1_0','part1_1'];
+  const deepTerms=['summary','logic','philosophy','usul','fiqh','hadith','balaghat','mantiq','reference','analysis','report'];
+  const mode=fastTerms.some(x=>task.includes(x))?'fast':deepTerms.some(x=>task.includes(x))?'deep':'balanced';
+  const system=baseSystem+'\n\nExecution mode: '+mode+'. Tool: '+task+'. Use the requested educational function directly; do not invent unavailable facts.';
+  const messages=[{role:'system',content:system},{role:'user',content:userPrompt.slice(0,12000)}];
+  const configured=PROVIDERS.filter(p=>process.env[p.key]);
+  const priority=mode==='fast'?['groq','cerebras','mistral','sambanova','openrouter']:mode==='deep'?['sambanova','cerebras','mistral','openrouter','groq']:['cerebras','groq','sambanova','mistral','openrouter'];
+  const race=priority.map(n=>configured.find(p=>p.name===n)).filter(Boolean).slice(0,3);
+  if(!race.length && !GEMINI_KEY) return res.status(503).json({error:'कोई AI provider configured नहीं है।'});
+  const timeout=ms=>AbortSignal.timeout ? AbortSignal.timeout(ms) : undefined;
+  const attempts=race.map(p=>callProvider(p,messages,timeout(5000)));
+  if(GEMINI_KEY) attempts.push(callGemini(messages));
+  try { const reply=await Promise.any(attempts); return res.status(200).json({reply,text:reply}); }
+  catch(e){
+    const rest=configured.slice(3);
+    for(const p of rest){try{const reply=await callProvider(p,messages,timeout(6500));return res.status(200).json({reply,text:reply});}catch(_){}}
+    return res.status(502).json({error:'AI providers अभी उपलब्ध नहीं हैं।'});
+  }
 };
-
-function getBody(req) {
-  return new Promise((resolve, reject) => {
-    if (req.body && typeof req.body === 'object') return resolve(req.body);
-    let raw = '';
-    req.on('data', chunk => {
-      raw += chunk;
-      if (raw.length > 1_000_000) reject(new Error('Request too large'));
-    });
-    req.on('end', () => {
-      try { resolve(raw ? JSON.parse(raw) : {}); }
-      catch { reject(new Error('Invalid JSON body')); }
-    });
-    req.on('error', reject);
-  });
-}
-
-function normalizeMessages(body) {
-  if (Array.isArray(body.messages)) {
-    return body.messages.map(m => {
-      if (m && m.parts) return { role: m.role === 'model' ? 'assistant' : 'user', content: m.parts.map(p => p.text || '').join('') };
-      return { role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content || '') };
-    }).filter(m => m.content);
-  }
-  const prompt = String(body.prompt || '').trim();
-  const systemInstruction = String(body.systemInstruction || '').trim();
-  const type = String(body.type || body.task || 'assistant');
-  let effective = prompt;
-  if (!effective && type === 'quiz') {
-    const level = Number(body.level || 1);
-    effective = `Generate one Islamic/academic multiple-choice quiz question for level ${level}. Return ONLY JSON: {"q":"question","o":["option 1","option 2","option 3","option 4"],"a":0}`;
-  }
-  const messages = [];
-  if (systemInstruction) messages.push({ role: 'system', content: systemInstruction });
-  if (type === 'corrector') messages.unshift({ role: 'system', content: 'You are a careful language corrector. Return only the corrected text, preserving the intended meaning.' });
-  if (type === 'summary') messages.unshift({ role: 'system', content: 'Summarize clearly and accurately in simple language.' });
-  if (effective) messages.push({ role: 'user', content: effective });
-  return messages;
-}
-
-async function openAICompatible(url, key, model, messages, extraHeaders = {}) {
-  const r = await fetch(url, {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json', ...extraHeaders },
-    body: JSON.stringify({ model, messages, temperature: 0.3 })
-  });
-  const text = await r.text();
-  let data = {};
-  try { data = JSON.parse(text); } catch {}
-  if (!r.ok) throw new Error(data?.error?.message || data?.message || `Provider HTTP ${r.status}`);
-  const content = data?.choices?.[0]?.message?.content;
-  if (!content) throw new Error('Provider returned no text');
-  return String(content).trim();
-}
-
-async function gemini(key, model, messages) {
-  const contents = messages.filter(m => m.role !== 'system').map(m => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }]
-  }));
-  const system = messages.filter(m => m.role === 'system').map(m => m.content).join('\n');
-  const body = { contents, generationConfig: { temperature: 0.3 } };
-  if (system) body.systemInstruction = { parts: [{ text: system }] };
-  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-  });
-  const text = await r.text(); let data = {};
-  try { data = JSON.parse(text); } catch {}
-  if (!r.ok) throw new Error(data?.error?.message || `Gemini HTTP ${r.status}`);
-  const out = data?.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('');
-  if (!out) throw new Error('Gemini returned no text');
-  return out.trim();
-}
-
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return json(res, 405, { error: 'POST method required' });
-  try {
-    const body = await getBody(req);
-    const messages = normalizeMessages(body);
-    if (!messages.length) return json(res, 400, { error: 'Prompt is required' });
-
-    const providers = [];
-    const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
-    if (geminiKey) {
-      providers.push(() => gemini(geminiKey, process.env.GEMINI_MODEL || 'gemini-2.5-flash', messages));
-      providers.push(() => gemini(geminiKey, 'gemini-3.8-flash', messages));
-    }
-    if (process.env.CEREBRAS_KEY) providers.push(() => openAICompatible('https://api.cerebras.ai/v1/chat/completions', process.env.CEREBRAS_KEY, 'llama3.1-8b', messages));
-    if (process.env.GROQ_KEY) providers.push(() => openAICompatible('https://api.groq.com/openai/v1/chat/completions', process.env.GROQ_KEY, 'llama-3.1-8b-instant', messages));
-    if (process.env.SAMBANOVA_KEY) providers.push(() => openAICompatible('https://api.sambanova.ai/v1/chat/completions', process.env.SAMBANOVA_KEY, 'Meta-Llama-3.1-70B-Instruct', messages));
-    if (process.env.OPENROUTER_KEY) providers.push(() => openAICompatible('https://openrouter.ai/api/v1/chat/completions', process.env.OPENROUTER_KEY, 'meta-llama/llama-3.1-8b-instruct:free', messages, { 'HTTP-Referer': 'https://hardrisk.vercel.app', 'X-Title': 'Jamia Students Messenger' }));
-    if (process.env.MISTRAL_KEY) providers.push(() => openAICompatible('https://api.mistral.ai/v1/chat/completions', process.env.MISTRAL_KEY, 'mistral-small-latest', messages));
-    if (process.env.HF_TOKEN) providers.push(() => openAICompatible('https://router.huggingface.co/v1/chat/completions', process.env.HF_TOKEN, 'meta-llama/Llama-3.1-8B-Instruct', messages));
-
-    if (!providers.length) return json(res, 500, { error: 'No AI provider key configured on Vercel.' });
-
-    let lastError = 'AI providers unavailable';
-    for (const call of providers) {
-      try {
-        const reply = await call();
-        return json(res, 200, { reply, text: reply });
-      } catch (e) {
-        lastError = e?.message || lastError;
-      }
-    }
-    return json(res, 502, { error: lastError });
-  } catch (e) {
-    return json(res, 400, { error: e?.message || 'Request failed' });
-  }
-}
