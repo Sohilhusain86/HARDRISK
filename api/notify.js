@@ -9,3 +9,4 @@ module.exports=async function(req,res){
     const d=await r.json().catch(()=>({})); return res.status(r.status).json(d);
   }catch(e){return res.status(500).json({error:e.message});}
 };
+ 
