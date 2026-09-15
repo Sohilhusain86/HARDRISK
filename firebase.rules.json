@@ -1,0 +1,99 @@
+{
+  "rules": {
+    "users": {
+      ".read": "auth != null",
+      "$phone": {
+        ".write": "auth != null && (auth.token.phone === $phone || auth.token.role === 'admin')"
+      }
+    },
+    "messages": {
+      "group": {
+        ".read": "auth != null",
+        "$messageId": {
+          ".write": "auth != null && (auth.token.role === 'admin' || (!data.exists() && newData.child('senderPhone').val() === auth.token.phone) || data.child('senderPhone').val() === auth.token.phone)"
+        }
+      }
+    },
+    "private_rooms": {
+      "$roomId": {
+        ".read": "auth != null && (data.child(auth.token.phone).val() === true || auth.token.role === 'admin')",
+        "$phone": {
+          ".write": "auth != null && $phone === auth.token.phone"
+        }
+      }
+    },
+    "messages_private": {
+      "$roomId": {
+        ".read": "auth != null && (root.child('private_rooms').child($roomId).child(auth.token.phone).val() === true || auth.token.role === 'admin')",
+        "$messageId": {
+          ".write": "auth != null && (auth.token.role === 'admin' || (root.child('private_rooms').child($roomId).child(auth.token.phone).val() === true && ((!data.exists() && newData.child('senderPhone').val() === auth.token.phone) || data.child('senderPhone').val() === auth.token.phone || newData.child('senderPhone').val() === 'Suhail_Ai')))"
+        }
+      }
+    },
+    "attendance": {
+      "$phone": {
+        ".read": "auth != null && (auth.token.phone === $phone || auth.token.role === 'admin')",
+        "$day": {
+          ".write": "auth != null && (auth.token.phone === $phone || auth.token.role === 'admin')"
+        }
+      }
+    },
+    "statuses": {
+      "$phone": {
+        ".read": "auth != null",
+        ".write": "auth != null && (auth.token.phone === $phone || auth.token.role === 'admin')",
+        "viewers": {
+          "$viewer": {
+            ".write": "auth != null"
+          }
+        }
+      }
+    },
+    "settings": {
+      ".read": "auth != null",
+      ".write": "auth != null && auth.token.role === 'admin'"
+    },
+    "audit_logs": {
+      ".read": "auth != null && auth.token.role === 'admin'",
+      ".write": "auth != null && auth.token.role === 'admin'"
+    },
+    "banned_users": {
+      ".read": "auth != null",
+      ".write": "auth != null && auth.token.role === 'admin'"
+    },
+    "mutes": {
+      ".read": "auth != null",
+      ".write": "auth != null && auth.token.role === 'admin'"
+    },
+    "class_pinboard": {
+      ".read": "auth != null",
+      ".write": "auth != null && auth.token.role === 'admin'"
+    },
+    "group_shared_notes": {
+      ".read": "auth != null",
+      ".write": "auth != null && auth.token.role === 'admin'"
+    },
+    "book_exchange": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "group_shared_polls": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "quiz_duels": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "takrar_rooms": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "calls": {
+      "$roomId": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    }
+  }
+}
