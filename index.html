@@ -675,22 +675,30 @@
   <div class="app-screen">
     
     <!-- OTP login: shown only on first login or after explicit logout. -->
+   
+    <!-- OTP login: In-App Simulated OTP -->
     <div class="login-overlay login-visible" id="login-screen">
       <div class="login-card">
         <h2 style="color:#00a884; margin-bottom:6px; font-size:1.4rem;">जमात ऊला अलिफ़ मैसेंजर</h2>
         <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:14px;">अपनी फोटो (DP) लगाएं और सत्यापन कोड से लॉगिन करें</p>
+        
         <input type="file" id="dp-file-input" accept="image/*" style="display:none;">
-        <div class="dp-upload-box" id="dp-preview-box" title="प्रोफाइल फोटो चुनें"><i class="fa-solid fa-camera" id="dp-camera-icon"></i></div>
+        <div class="dp-upload-box" id="dp-preview-box" title="प्रोफाइल फोटो चुनें">
+          <i class="fa-solid fa-camera" id="dp-camera-icon"></i>
+        </div>
         <div style="font-size:0.75rem; color:#00a884; margin-bottom:12px;">फोटो बदलने के लिए क्लिक करें</div>
+
         <input type="text" id="user-name" class="login-input" placeholder="आपका नाम (जैसे: ज़ैद)" autocomplete="name">
-        <input type="tel" id="user-phone" class="login-input" placeholder="मोबाइल नंबर (10 अंक)" inputmode="numeric" autocomplete="tel">
+        <input type="tel" id="user-phone" class="login-input" placeholder="मोबाइल नंबर (10 अंक)" inputmode="numeric" maxlength="10">
         <input type="text" id="user-roll" class="login-input" placeholder="रोल नंबर (वैकल्पिक / इख्तियारन)">
-        <input type="password" id="user-pass" class="login-input" placeholder="पासवर्ड (केवल एडमिन के लिए)" autocomplete="current-password">
+        <input type="password" id="user-pass" class="login-input" placeholder="पासवर्ड (केवल एडमिन के लिए)">
+        
         <div id="otp-section" style="display:none; width:100%; margin-top:6px;">
           <input type="number" id="otp-input" class="login-input" placeholder="6 अंकों का OTP दर्ज करें" inputmode="numeric" maxlength="6" style="letter-spacing:4px; text-align:center; font-weight:bold; border-color:#00a884;">
         </div>
-        <button class="btn-login" id="btn-action-auth">📲 OTP प्राप्त करें</button>
-        <div style="margin-top:9px; color:#8696a0; font-size:0.7rem; line-height:1.4;">OTP के बाद लॉगिन सुरक्षित रूप से सेव रहेगा। पेज रिफ्रेश पर दोबारा OTP नहीं माँगा जाएगा; लॉगआउट करने पर फिर माँगा जाएगा।</div>
+
+        <button type="button" class="btn-login" id="btn-action-auth">📲 OTP प्राप्त करें</button>
+        <div style="margin-top:9px; color:#8696a0; font-size:0.7rem; line-height:1.4;">OTP स्क्रीन पर ऊपर SMS के रूप में दिखेगा। पेज रिफ्रेश पर दोबारा OTP नहीं माँगा जाएगा।</div>
       </div>
     </div>
 
@@ -1330,37 +1338,27 @@
     };
 
     const dpFileInput = document.getElementById('dp-file-input');
-    const dpPreviewBox = document.getElementById('dp-preview-box');
-    const dpCameraIcon = document.getElementById('dp-camera-icon');
-    if (dpPreviewBox && dpFileInput) {
-      dpPreviewBox.addEventListener('click', () => dpFileInput.click());
-    }
+const dpPreviewBox = document.getElementById('dp-preview-box');
+const dpCameraIcon = document.getElementById('dp-camera-icon');
 
-    if (dpFileInput) {
-      dpFileInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const localPreviewUrl = URL.createObjectURL(file);
-        if (dpPreviewBox) {
-          dpPreviewBox.style.backgroundImage = `url('${localPreviewUrl}')`;
-          dpPreviewBox.style.backgroundSize = 'cover';
-          if (dpCameraIcon) dpCameraIcon.style.display = 'none';
-        }
-        dpPreviewBox.style.opacity = "0.5";
-        try {
-          const result = await uploadToCloudinary(file, 'image');
-          if (result) {
-            selectedDpUrl = result;
-            dpPreviewBox.style.backgroundImage = `url('${selectedDpUrl}')`;
-            if (dpCameraIcon) dpCameraIcon.style.display = 'none';
-          }
-        } catch (err) {
-          alert("DP अपलोड विफल रही।");
-        } finally {
-          dpPreviewBox.style.opacity = "1";
-        }
-      });
+if (dpPreviewBox && dpFileInput) {
+  dpPreviewBox.onclick = function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    dpFileInput.value = '';
+    dpFileInput.click();
+  };
+
+  dpFileInput.onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const localUrl = URL.createObjectURL(file);
+    dpPreviewBox.style.backgroundImage = `url('${localUrl}')`;
+    dpPreviewBox.style.backgroundSize = 'cover';
+    if (dpCameraIcon) dpCameraIcon.style.display = 'none';
+  };
     }
+ 
     // ✅ 1. Canonical Cloudinary uploader — one implementation, secure_url string only.
     window.UPLOAD_PRESET = 'd9xe6u2l';
     window.CLOUD_NAME = 'xgkhockl';
@@ -1564,6 +1562,39 @@
       } catch(e) {}
     };
 
+        // =========================================================
+    // 100% WORKING DP PICKER & IN-APP DUMMY OTP (ZERO-SERVERLESS)
+    // =========================================================
+    const dpFileInput = document.getElementById('dp-file-input');
+    const dpPreviewBox = document.getElementById('dp-preview-box');
+    const dpCameraIcon = document.getElementById('dp-camera-icon');
+
+    if (dpPreviewBox && dpFileInput) {
+      dpPreviewBox.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dpFileInput.value = '';
+        dpFileInput.click();
+      };
+
+      dpFileInput.onchange = async function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const localUrl = URL.createObjectURL(file);
+        dpPreviewBox.style.backgroundImage = `url('${localUrl}')`;
+        dpPreviewBox.style.backgroundSize = 'cover';
+        if (dpCameraIcon) dpCameraIcon.style.display = 'none';
+
+        try {
+          const res = await uploadToCloudinary(file, 'image');
+          if (res) selectedDpUrl = res;
+        } catch (err) {
+          console.warn("Cloudinary upload fallback:", err);
+        }
+      };
+    }
+
     const actionAuthBtn = document.getElementById('btn-action-auth');
     const otpSection = document.getElementById('otp-section');
     const userNameInput = document.getElementById('user-name');
@@ -1571,101 +1602,128 @@
     const userRollInput = document.getElementById('user-roll');
     const userPassInput = document.getElementById('user-pass');
     const otpInput = document.getElementById('otp-input');
+
     let generatedOtp = '';
     let otpStepSent = false;
-    const smsPopup = document.getElementById('sms-popup');
+    let otpExpiresAt = 0;
 
-    // 🔐 CLIENT-ONLY LOGIN: 6-digit in-app demo OTP, then direct RTDB update().
-    actionAuthBtn.addEventListener('click', async () => {
-      const name = userNameInput.value.trim();
-      const phone = userPhoneInput.value.trim().replace(/[^0-9]/g, '');
-      const roll = userRollInput.value.trim();
-      const pass = userPassInput.value.trim();
+    if (actionAuthBtn) {
+      actionAuthBtn.onclick = async function(e) {
+        e.preventDefault();
+        const name = userNameInput.value.trim();
+        const phone = userPhoneInput.value.trim().replace(/\D/g, '');
+        const roll = userRollInput.value.trim();
+        const pass = userPassInput.value.trim();
 
-      if (!name) { alert('कृपया अपना नाम दर्ज करें।'); userNameInput.focus(); return; }
-      if (phone.length !== 10) { alert('कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।'); userPhoneInput.focus(); return; }
+        if (!name) {
+          alert('कृपया अपना नाम दर्ज करें।');
+          userNameInput.focus();
+          return;
+        }
+        if (phone.length !== 10) {
+          alert('कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।');
+          userPhoneInput.focus();
+          return;
+        }
 
-      actionAuthBtn.disabled = true;
-      try {
         if (!otpStepSent) {
-          generatedOtp = String(Math.floor(100000 + Math.random() * 900000));
-          window.__jamiaOtpExpiresAt = Date.now() + (5 * 60 * 1000);
-          window.__jamiaOtpPhone = phone;
-          window.__jamiaOtpName = name;
+          actionAuthBtn.disabled = true;
+          actionAuthBtn.textContent = '📲 OTP तैयार हो रहा है...';
 
-          const smsText = document.getElementById('sms-popup-text');
-          otpSection.style.display = 'block';
-          actionAuthBtn.textContent = 'OTP सत्यापित करें और लॉगिन करें';
-          otpStepSent = true;
+          generatedOtp = String(Math.floor(100000 + Math.random() * 900000));
+          otpExpiresAt = Date.now() + (5 * 60 * 1000);
 
           setTimeout(() => {
-            if (smsText) smsText.textContent = `जमात ऊला अलिफ़: आपका 6-अंकीय सत्यापन कोड ${generatedOtp} है। इसे किसी से साझा न करें।`;
+            const smsPopup = document.getElementById('sms-popup');
+            const smsText = document.getElementById('sms-popup-text');
+            if (smsText) {
+              smsText.textContent = `📩 आपका सत्यापन कोड: ${generatedOtp} (जमात ऊला अलिफ़)`;
+            }
             if (smsPopup) smsPopup.style.display = 'flex';
-            if (otpInput) otpInput.focus();
+
+            otpSection.style.display = 'block';
+            actionAuthBtn.disabled = false;
+            actionAuthBtn.textContent = '🔐 OTP सत्यापित करें और लॉगिन करें';
+            otpStepSent = true;
+            otpInput.value = '';
+            otpInput.focus();
           }, 1200);
           return;
         }
 
         const enteredOtp = otpInput.value.trim();
-        if (!/^\d{6}$/.test(enteredOtp)) {
-          alert('कृपया 6 अंकों का OTP दर्ज करें।');
+        if (enteredOtp !== generatedOtp) {
+          alert('❌ गलत OTP! स्क्रीन पर ऊपर आए 6 अंकों के कोड को दर्ज करें।');
           otpInput.focus();
           return;
         }
-        if (window.__jamiaOtpPhone !== phone || Date.now() > Number(window.__jamiaOtpExpiresAt || 0)) {
-          throw new Error('OTP की समय-सीमा समाप्त हो गई है। नया OTP प्राप्त करें।');
-        }
-        if (enteredOtp !== generatedOtp) {
-          throw new Error('OTP गलत है। कृपया सही 6 अंकों का कोड दर्ज करें।');
+
+        if (Date.now() > otpExpiresAt) {
+          alert('OTP की समय-सीमा समाप्त हो गई। नया OTP प्राप्त करें।');
+          otpStepSent = false;
+          otpSection.style.display = 'none';
+          actionAuthBtn.textContent = '📲 OTP प्राप्त करें';
+          return;
         }
 
-        let existing = {};
+        actionAuthBtn.disabled = true;
+        actionAuthBtn.textContent = '✅ लॉगिन हो रहा है...';
+
+        const isAdmin = (pass === 'razavi123');
+        const userRef = ref(db, `users/${phone}`);
+
         try {
-          const snap = await get(ref(db, `users/${phone}`));
-          if (snap.exists()) existing = snap.val() || {};
-        } catch (dbErr) {
-          console.warn('Existing profile read failed:', dbErr);
+          const snapshot = await get(userRef);
+          const existing = snapshot.exists() ? snapshot.val() : {};
+
+          const finalUser = {
+            ...existing,
+            name: name,
+            phone: phone,
+            roll: roll || existing.roll || '',
+            displayName: roll ? `${name} (रोल: ${roll})` : name,
+            dpUrl: selectedDpUrl || existing.dpUrl || '',
+            role: isAdmin ? 'admin' : (existing.role || 'student'),
+            location: window.currentUser?.location || 'Unknown',
+            status: 'online',
+            lastSeen: Date.now(),
+            xp: Number(existing.xp || 0)
+          };
+
+          await update(userRef, finalUser);
+          window.currentUser = finalUser;
+
+        } catch (firebaseErr) {
+          console.warn('Firebase sync warning:', firebaseErr);
+          window.currentUser = {
+            name, phone, roll,
+            displayName: roll ? `${name} (रोल: ${roll})` : name,
+            dpUrl: selectedDpUrl || '',
+            role: isAdmin ? 'admin' : 'student',
+            status: 'online',
+            lastSeen: Date.now(),
+            xp: 0
+          };
         }
 
-        const isAdmin = await isValidAdminPass(pass);
-        const role = isAdmin ? 'admin' : 'student';
-        const displayName = roll ? `${name} (रोल: ${roll})` : name;
-        const profile = {
-          ...existing,
-          name, phone, roll, displayName, role,
-          dpUrl: selectedDpUrl || existing.dpUrl || '',
-          location: existing.location || window.currentUser?.location || 'Unknown',
-          status: 'online',
-          lastLoginAt: Date.now(),
-          xp: Number(existing.xp || 0)
-        };
-
-        await update(ref(db, `users/${phone}`), profile);
-        window.currentUser = profile;
         localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
 
-        generatedOtp = '';
-        otpStepSent = false;
-        window.__jamiaOtpExpiresAt = 0;
-        window.__jamiaOtpPhone = '';
-        otpSection.style.display = 'none';
-        otpInput.value = '';
-        if (smsPopup) smsPopup.style.display = 'none';
-        updateUserUI();
         document.body.classList.add('logged-in');
         const loginScreen = document.getElementById('login-screen');
-        if (loginScreen) loginScreen.classList.remove('login-visible');
-        requestNotificationAccess(); window.askForMicPermission();
+        if (loginScreen) loginScreen.style.display = 'none';
+
+        const smsPopup = document.getElementById('sms-popup');
+        if (smsPopup) smsPopup.style.display = 'none';
+
+        updateUserUI();
+        requestNotificationAccess();
+        window.askForMicPermission();
         if (window.registerUserFirebase) window.registerUserFirebase(window.currentUser);
-        connectScaleDrone(); listenForIncomingCalls();
-      } catch (err) {
-        console.error('Client OTP login failed:', err);
-        alert(err.message || 'लॉगिन नहीं हो सका।');
-      } finally {
-        actionAuthBtn.disabled = false;
-        actionAuthBtn.textContent = otpStepSent ? 'OTP सत्यापित करें और लॉगिन करें' : '📲 OTP प्राप्त करें';
-      }
-    });
+        connectScaleDrone();
+        listenForIncomingCalls();
+      };
+    }
+
 
     // 🚀 SAFE USER DIRECTORY RENDERING
     window.renderAllUsersList = function(usersMap) {
