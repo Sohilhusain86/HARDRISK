@@ -1562,7 +1562,7 @@ if (dpPreviewBox && dpFileInput) {
       } catch(e) {}
     };
 
-        // =========================================================
+     // =========================================================
     // 100% WORKING DP PICKER & IN-APP DUMMY OTP (ZERO-SERVERLESS)
     // =========================================================
     const dpFileInput = document.getElementById('dp-file-input');
@@ -1652,6 +1652,8 @@ if (dpPreviewBox && dpFileInput) {
         }
 
         const enteredOtp = otpInput.value.trim();
+        
+        // ✅ पहले गलत OTP का चेक, फिर समय-सीमा का चेक
         if (enteredOtp !== generatedOtp) {
           alert('❌ गलत OTP! स्क्रीन पर ऊपर आए 6 अंकों के कोड को दर्ज करें।');
           otpInput.focus();
@@ -1723,8 +1725,7 @@ if (dpPreviewBox && dpFileInput) {
         listenForIncomingCalls();
       };
     }
-
-
+     
     // 🚀 SAFE USER DIRECTORY RENDERING
     window.renderAllUsersList = function(usersMap) {
       const container = document.getElementById('users-dynamic-list');
