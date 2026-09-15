@@ -3,14 +3,31 @@
     "users": {
       ".read": "auth != null",
       "$phone": {
-        ".write": "auth != null && (auth.token.phone === $phone || auth.token.role === 'admin')"
+        ".write": "auth != null && (auth.token.role === 'admin' || auth.token.phone === $phone)",
+        ".validate": "auth.token.role === 'admin' || (newData.child('role').val() === 'student' && (!data.exists() || data.child('role').val() === 'student') && (!data.exists() || newData.child('banned').val() === data.child('banned').val()) && (!data.exists() || newData.child('xp').val() === data.child('xp').val() || newData.child('xp').val() === data.child('xp').val() + 5 || newData.child('xp').val() === data.child('xp').val() + 10 || newData.child('xp').val() === data.child('xp').val() + 20))",
+        "role": {
+          ".write": "auth != null && auth.token.role === 'admin'"
+        },
+        "xp": {
+          ".write": "auth != null && auth.token.role === 'admin'"
+        },
+        "banned": {
+          ".write": "auth != null && auth.token.role === 'admin'"
+        }
       }
     },
     "messages": {
       "group": {
         ".read": "auth != null",
         "$messageId": {
-          ".write": "auth != null && (auth.token.role === 'admin' || (!data.exists() && newData.child('senderPhone').val() === auth.token.phone) || data.child('senderPhone').val() === auth.token.phone)"
+          ".write": "auth != null && (auth.token.role === 'admin' || (!data.exists() && newData.child('senderPhone').val() === auth.token.phone) || (data.exists() && data.child('senderPhone').val() === auth.token.phone))",
+          ".validate": "auth.token.role === 'admin' || (newData.child('senderPhone').val() === auth.token.phone && newData.child('role').val() === auth.token.role) || (data.exists() && newData.child('senderPhone').val() === data.child('senderPhone').val() && newData.child('role').val() === data.child('role').val())",
+          "reactions": {
+            "$user": {
+              ".write": "auth != null && $user === auth.token.phone",
+              ".validate": "newData.isString()"
+            }
+          }
         }
       }
     },
@@ -18,7 +35,8 @@
       "$roomId": {
         ".read": "auth != null && (data.child(auth.token.phone).val() === true || auth.token.role === 'admin')",
         "$phone": {
-          ".write": "auth != null && $phone === auth.token.phone"
+          ".write": "auth != null && $phone === auth.token.phone",
+          ".validate": "newData.val() === true"
         }
       }
     },
@@ -26,7 +44,14 @@
       "$roomId": {
         ".read": "auth != null && (root.child('private_rooms').child($roomId).child(auth.token.phone).val() === true || auth.token.role === 'admin')",
         "$messageId": {
-          ".write": "auth != null && (auth.token.role === 'admin' || (root.child('private_rooms').child($roomId).child(auth.token.phone).val() === true && ((!data.exists() && newData.child('senderPhone').val() === auth.token.phone) || data.child('senderPhone').val() === auth.token.phone || newData.child('senderPhone').val() === 'Suhail_Ai')))"
+          ".write": "auth != null && (auth.token.role === 'admin' || (root.child('private_rooms').child($roomId).child(auth.token.phone).val() === true && ((!data.exists() && newData.child('senderPhone').val() === auth.token.phone) || (data.exists() && data.child('senderPhone').val() === auth.token.phone))))",
+          ".validate": "auth.token.role === 'admin' || newData.child('senderPhone').val() === auth.token.phone || (data.exists() && newData.child('senderPhone').val() === data.child('senderPhone').val())",
+          "reactions": {
+            "$user": {
+              ".write": "auth != null && root.child('private_rooms').child($roomId).child(auth.token.phone).val() === true && $user === auth.token.phone",
+              ".validate": "newData.isString()"
+            }
+          }
         }
       }
     },
@@ -34,7 +59,7 @@
       "$phone": {
         ".read": "auth != null && (auth.token.phone === $phone || auth.token.role === 'admin')",
         "$day": {
-          ".write": "auth != null && (auth.token.phone === $phone || auth.token.role === 'admin')"
+          ".write": "auth != null && (auth.token.role === 'admin' || auth.token.phone === $phone)"
         }
       }
     },
@@ -44,7 +69,8 @@
         ".write": "auth != null && (auth.token.phone === $phone || auth.token.role === 'admin')",
         "viewers": {
           "$viewer": {
-            ".write": "auth != null"
+            ".write": "auth != null && $viewer === auth.token.phone",
+            ".validate": "newData.exists()"
           }
         }
       }
@@ -58,11 +84,11 @@
       ".write": "auth != null && auth.token.role === 'admin'"
     },
     "banned_users": {
-      ".read": "auth != null",
+      ".read": "auth != null && auth.token.role === 'admin'",
       ".write": "auth != null && auth.token.role === 'admin'"
     },
     "mutes": {
-      ".read": "auth != null",
+      ".read": "auth != null && auth.token.role === 'admin'",
       ".write": "auth != null && auth.token.role === 'admin'"
     },
     "class_pinboard": {
@@ -71,7 +97,7 @@
     },
     "group_shared_notes": {
       ".read": "auth != null",
-      ".write": "auth != null && auth.token.role === 'admin'"
+      ".write": "auth != null"
     },
     "book_exchange": {
       ".read": "auth != null",
@@ -91,9 +117,13 @@
     },
     "calls": {
       "$roomId": {
-        ".read": "auth != null",
-        ".write": "auth != null"
+        ".read": "auth != null && $roomId.contains(auth.token.phone)",
+        ".write": "auth != null && $roomId.contains(auth.token.phone)"
       }
+    },
+    "otps": {
+      ".read": false,
+      ".write": false
     }
   }
 }
