@@ -58,7 +58,7 @@ module.exports = async function handler(req, res) {
     const otpSnap = await db.ref(`otps/${mobile}`).once('value');
     const otpData = otpSnap.val() || {};
     if (!otpData.otp || String(otpData.otp) !== String(otp) || Date.now() - Number(otpData.time || 0) > 10 * 60 * 1000) {
-      return res.status(401).json({ error: 'गलत या समाप्त OTP! कृपया नया OTP प्राप्त करें।' });
+      return res.status(401).json({ error: 'गलत OTP या समाप्त OTP! कृपया नया OTP प्राप्त करें।' });
     }
 
     const finalRole = String(pass) === adminPass() ? 'admin' : 'student';
