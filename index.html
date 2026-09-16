@@ -1308,16 +1308,31 @@ body:not(.logged-in) footer {
         dpUrl: selectedDpUrl || ((oldData && oldData.dpUrl) || '')
       };
 
-      // Save locally FIRST so login can never be held hostage by Firebase/network latency.
-      localStorage.setItem('jamia_user_profile_' + phone, JSON.stringify(window.currentUser));
-      localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
-
-      if (adminCrown) adminCrown.style.display = window.currentUser.role === 'admin' ? 'block' : 'none';
-      updateUserUI();
+      // CRITICAL: hide the login gate FIRST. Nothing below is allowed to block the transition.
+      // This guarantees that localStorage/UI/Firebase/permission errors cannot trap the user on Login.
       const loginScreen = document.getElementById('login-screen');
-      if (loginScreen) loginScreen.style.display = 'none';
       const popup = document.getElementById('sms-popup');
+      if (loginScreen) {
+        loginScreen.style.display = 'none';
+        loginScreen.setAttribute('aria-hidden', 'true');
+      }
       if (popup) popup.style.display = 'none';
+
+      // Save locally, but never let storage errors prevent entry into the app.
+      try {
+        localStorage.setItem('jamia_user_profile_' + phone, JSON.stringify(window.currentUser));
+        localStorage.setItem('jamia_chat_saved_user', JSON.stringify(window.currentUser));
+      } catch(e) {
+        console.warn('Local session storage unavailable:', e);
+      }
+
+      try {
+        if (adminCrown) adminCrown.style.display = window.currentUser.role === 'admin' ? 'block' : 'none';
+        updateUserUI();
+      } catch(e) {
+        console.warn('Post-login UI update failed; app entry remains active:', e);
+      }
+      window.dispatchEvent(new CustomEvent('jamia:login-success', { detail: { user: window.currentUser } }));
 
       // Firebase registration is strictly background/non-blocking.
       try {
