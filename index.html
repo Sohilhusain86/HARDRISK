@@ -35,7 +35,7 @@
   height: 100vh !important;
   z-index: 999999 !important;
   background-color: #0b141a !important;
-  display: flex !important;
+  display: flex;
   flex-direction: column !important;
   justify-content: center !important;
   align-items: center !important;
@@ -664,6 +664,16 @@ body:not(.logged-in) footer {
   
 </head>
 <body>
+  <script>
+    // Early boot guard: keep the login gate visible until the application initializer
+    // explicitly authenticates a saved/local user. This script has no external dependencies.
+    (function(){
+      try {
+        var gate = document.getElementById('login-screen');
+        if (gate) gate.style.display = 'flex';
+      } catch(e) {}
+    })();
+  </script>
 
   <div class="app-screen">
     
