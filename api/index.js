@@ -1,7 +1,7 @@
 // api/index.js - Unified Zero-Dependency Backend for Suhail AI
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const ADMIN_SECRET = process.env.ADMIN_SECRET || "razavi123";
+const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 
