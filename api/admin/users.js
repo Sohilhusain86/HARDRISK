@@ -1,0 +1,2 @@
+const {verify}=require('../lib/auth'); const {firebase}=require('../lib/firebase'); const {json,method,error}=require('../lib/http');
+module.exports=async(req,res)=>{try{const c=verify(req);if(c.role!=='admin')throw new Error('FORBIDDEN');method(req,'GET');const s=await firebase().ref('users').get();const v=s.val()||{};const users=Object.entries(v).map(([id,u])=>({id,name:u.name,roll:u.roll,phone:u.phone,plan:u.plan||'FREE',activeUntil:u.activeUntil||null,createdAt:u.createdAt||0}));return json(res,200,{ok:true,users});}catch(e){return error(res,e)}};
