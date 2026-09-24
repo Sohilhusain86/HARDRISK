@@ -3,19 +3,18 @@ import crypto from "crypto";
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com";
 
-// Keys from Vercel Environment Variables
+// Vercel Environment Keys
 const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
 const MISTRAL_KEY = process.env.MISTRAL_KEY || "";
 const GROQ_KEY = process.env.GROQ_KEY || "";
 const CEREBRAS_KEY = process.env.CEREBRAS_KEY || "";
 
-// Configurable Verified Active Production Model IDs
+// Verified Official Production Models
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 const MISTRAL_MODEL = process.env.MISTRAL_MODEL || "mistral-small-latest";
-const GROQ_PRO_MODEL = process.env.GROQ_PRO_MODEL || "openai/gpt-oss-20b";
-const ALLAMA_MODEL = process.env.ALLAMA_MODEL || "gpt-oss-120b";
+const GROQ_PRO_MODEL = process.env.GROQ_PRO_MODEL || "llama-3.3-70b-versatile";
+const ALLAMA_MODEL = process.env.ALLAMA_MODEL || "llama-3.3-70b";
 
-// Password Hashing Helper
 function hashPassword(pass) {
   return crypto.createHash("sha256").update(String(pass).trim()).digest("hex");
 }
@@ -57,42 +56,40 @@ function normalizePlan(rawPlan) {
 }
 
 // -------------------------------------------------------------
-// STRICT PROVIDER ENGINES (NO SILENT SWITCHING / TIER CROSSING)
+// 1. SUHAIL AI FREE (Google Gemini)
 // -------------------------------------------------------------
-
-// TIER 1: SUHAIL AI FREE (Google Gemini)
 async function callGemini(prompt, systemInstruction) {
   if (!GEMINI_KEY) {
-    console.error("[Diagnostics] Provider: Gemini | Error: GEMINI_API_KEY missing");
-    throw { userMsg: "SUHAIL AI FREE ki service uplabdha nahi hai (API Key missing).", code: "KEY_MISSING", provider: "Gemini" };
+    throw { userMsg: "SUHAIL AI FREE की API Key (GEMINI_API_KEY) Vercel में सेट नहीं है।", code: 500, provider: "Gemini" };
   }
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_KEY}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: `${systemInstruction}\n\nTalib ka sawal: ${prompt}` }] }]
+      contents: [{ parts: [{ text: `${systemInstruction}\n\nतालिब का सवाल: ${prompt}` }] }]
     })
   });
   const data = await res.json();
   if (!res.ok || data.error) {
-    console.error(`[Diagnostics] Provider: Gemini | Model: ${GEMINI_MODEL} | Status: ${res.status} | Error:`, data.error?.message);
-    const isRateLimit = res.status === 429 || data.error?.message?.toLowerCase().includes("quota") || data.error?.message?.toLowerCase().includes("rate");
-    const msg = isRateLimit 
-      ? "SUHAIL AI FREE ki request limit is waqt poori ho gayi hai. Kripya thodi der baad dobara koshish karein."
-      : "SUHAIL AI FREE ki service is samay vyast hai. Kripya thodi der baad prayas karein.";
-    throw { userMsg: msg, code: res.status, provider: "Gemini" };
+    const errMsg = data.error?.message || res.statusText;
+    console.error(`[Gemini Error] Status ${res.status}:`, errMsg);
+    if (res.status === 429 || errMsg.toLowerCase().includes("quota") || errMsg.toLowerCase().includes("rate")) {
+      throw { userMsg: "SUHAIL AI FREE की अनुरोध सीमा (Rate Limit) पूरी हो गई है। कृपया 15 सेकंड बाद पुनः प्रयास करें।", code: 429, provider: "Gemini" };
+    }
+    throw { userMsg: `SUHAIL AI FREE (Gemini) से त्रुटि (${res.status}): ${errMsg}`, code: res.status, provider: "Gemini" };
   }
   const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!reply) throw { userMsg: "SUHAIL AI FREE se uttar prapt nahi hua.", code: "EMPTY_RESPONSE", provider: "Gemini" };
+  if (!reply) throw { userMsg: "SUHAIL AI FREE से खाली उत्तर प्राप्त हुआ।", code: 500, provider: "Gemini" };
   return reply;
 }
 
-// TIER 2: SUHAIL AI PLUS (Mistral AI)
+// -------------------------------------------------------------
+// 2. SUHAIL AI PLUS (Mistral AI)
+// -------------------------------------------------------------
 async function callMistral(prompt, systemInstruction) {
   if (!MISTRAL_KEY) {
-    console.error("[Diagnostics] Provider: Mistral | Error: MISTRAL_KEY missing");
-    throw { userMsg: "SUHAIL AI PLUS ki service uplabdha nahi hai (API Key missing).", code: "KEY_MISSING", provider: "Mistral" };
+    throw { userMsg: "SUHAIL AI PLUS की API Key (MISTRAL_KEY) Vercel में सेट नहीं है।", code: 500, provider: "Mistral" };
   }
   const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
     method: "POST",
@@ -110,19 +107,21 @@ async function callMistral(prompt, systemInstruction) {
   });
   const data = await res.json();
   if (!res.ok || data.error) {
-    console.error(`[Diagnostics] Provider: Mistral | Model: ${MISTRAL_MODEL} | Status: ${res.status} | Error:`, data.error?.message || data.message);
-    throw { userMsg: "SUHAIL AI PLUS ki AI service is samay uplabdha nahi hai. Kripya thodi der baad prayas karein.", code: res.status, provider: "Mistral" };
+    const errMsg = data.message || data.error?.message || res.statusText;
+    console.error(`[Mistral Error] Status ${res.status}:`, errMsg);
+    throw { userMsg: `SUHAIL AI PLUS (Mistral) त्रुटि (${res.status}): ${errMsg}`, code: res.status, provider: "Mistral" };
   }
   const reply = data?.choices?.[0]?.message?.content;
-  if (!reply) throw { userMsg: "SUHAIL AI PLUS se uttar prapt nahi hua.", code: "EMPTY_RESPONSE", provider: "Mistral" };
+  if (!reply) throw { userMsg: "SUHAIL AI PLUS से कोई उत्तर नहीं मिला।", code: 500, provider: "Mistral" };
   return reply;
 }
 
-// TIER 3: SUHAIL AI PRO (Groq Cloud)
+// -------------------------------------------------------------
+// 3. SUHAIL AI PRO (Groq Cloud)
+// -------------------------------------------------------------
 async function callGroq(prompt, systemInstruction) {
   if (!GROQ_KEY) {
-    console.error("[Diagnostics] Provider: Groq | Error: GROQ_KEY missing");
-    throw { userMsg: "SUHAIL AI PRO ki service uplabdha nahi hai (API Key missing).", code: "KEY_MISSING", provider: "Groq" };
+    throw { userMsg: "SUHAIL AI PRO की API Key (GROQ_KEY) Vercel में सेट नहीं है।", code: 500, provider: "Groq" };
   }
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
@@ -141,19 +140,21 @@ async function callGroq(prompt, systemInstruction) {
   });
   const data = await res.json();
   if (!res.ok || data.error) {
-    console.error(`[Diagnostics] Provider: Groq | Model: ${GROQ_PRO_MODEL} | Status: ${res.status} | Error:`, data.error?.message);
-    throw { userMsg: "SUHAIL AI PRO ki AI service is samay uplabdha nahi hai. Kripya thodi der baad prayas karein.", code: res.status, provider: "Groq" };
+    const errMsg = data.error?.message || res.statusText;
+    console.error(`[Groq Error] Status ${res.status}:`, errMsg);
+    throw { userMsg: `SUHAIL AI PRO (Groq) त्रुटि (${res.status}): ${errMsg}`, code: res.status, provider: "Groq" };
   }
   const reply = data?.choices?.[0]?.message?.content;
-  if (!reply) throw { userMsg: "SUHAIL AI PRO se uttar prapt nahi hua.", code: "EMPTY_RESPONSE", provider: "Groq" };
+  if (!reply) throw { userMsg: "SUHAIL AI PRO से कोई उत्तर नहीं मिला।", code: 500, provider: "Groq" };
   return reply;
 }
 
-// TIER 4: SUHAIL AI ALLAMA (Cerebras Fast Engine)
+// -------------------------------------------------------------
+// 4. SUHAIL AI ALLAMA (Cerebras)
+// -------------------------------------------------------------
 async function callCerebras(prompt, systemInstruction) {
   if (!CEREBRAS_KEY) {
-    console.error("[Diagnostics] Provider: Cerebras | Error: CEREBRAS_KEY missing");
-    throw { userMsg: "SUHAIL AI ALLAMA ki service uplabdha nahi hai (API Key missing).", code: "KEY_MISSING", provider: "Cerebras" };
+    throw { userMsg: "SUHAIL AI ALLAMA की API Key (CEREBRAS_KEY) Vercel में सेट नहीं है।", code: 500, provider: "Cerebras" };
   }
   const res = await fetch("https://api.cerebras.ai/v1/chat/completions", {
     method: "POST",
@@ -172,11 +173,12 @@ async function callCerebras(prompt, systemInstruction) {
   });
   const data = await res.json();
   if (!res.ok || data.error) {
-    console.error(`[Diagnostics] Provider: Cerebras | Model: ${ALLAMA_MODEL} | Status: ${res.status} | Error:`, data.error?.message);
-    throw { userMsg: "SUHAIL AI ALLAMA ki AI service is samay uplabdha nahi hai. Kripya thodi der baad prayas karein.", code: res.status, provider: "Cerebras" };
+    const errMsg = data.error?.message || res.statusText;
+    console.error(`[Cerebras Error] Status ${res.status}:`, errMsg);
+    throw { userMsg: `SUHAIL AI ALLAMA (Cerebras) त्रुटि (${res.status}): ${errMsg}`, code: res.status, provider: "Cerebras" };
   }
   const reply = data?.choices?.[0]?.message?.content;
-  if (!reply) throw { userMsg: "SUHAIL AI ALLAMA se uttar prapt nahi hua.", code: "EMPTY_RESPONSE", provider: "Cerebras" };
+  if (!reply) throw { userMsg: "SUHAIL AI ALLAMA से कोई उत्तर नहीं मिला।", code: 500, provider: "Cerebras" };
   return reply;
 }
 
@@ -195,7 +197,6 @@ export default async function handler(req, res) {
   const action = req.query?.action || searchParams.get("action");
 
   try {
-    // 1. CONFIG & PLANS
     if (action === "config" || action === "plans") {
       return res.status(200).json({
         success: true,
@@ -208,16 +209,12 @@ export default async function handler(req, res) {
       });
     }
 
-    // 2. AUTHENTICATION (Login / Registration)
     if (action === "auth" && req.method === "POST") {
       const { phone, name, roll, userPass, adminPass } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
 
-      if (cleanPhone.length !== 10) {
-        return res.status(400).json({ success: false, error: "Kripya 10 ankon ka mobile number darj karein." });
-      }
+      if (cleanPhone.length !== 10) return res.status(400).json({ success: false, error: "कृपया 10 अंकों का मोबाइल नंबर दर्ज करें।" });
 
-      // Master Admin Bypass (Permanent Allama Access)
       if (adminPass && adminPass === ADMIN_SECRET) {
         let adminUser = await dbGet(`users/${cleanPhone}`);
         if (!adminUser) {
@@ -236,27 +233,24 @@ export default async function handler(req, res) {
           await dbPatch(`users/${cleanPhone}`, { role: "admin", plan: "allama", planExpiry: null });
         }
         delete adminUser.password;
+        delete adminUser.passwordHash;
         return res.status(200).json({ success: true, user: adminUser, isAdmin: true });
       }
 
-      // Roll Number Validation (Exact 4 digits: 4000 to 9999)
       const rollNum = parseInt(roll, 10);
       if (isNaN(rollNum) || rollNum < 4000 || rollNum > 9999) {
-        return res.status(400).json({ success: false, error: "Roll number 4000 se 9999 tak (4 ankon ka) hona anivarya hai." });
+        return res.status(400).json({ success: false, error: "रोल नंबर 4000 से 9999 के बीच (सटीक 4 अंक) होना अनिवार्य है।" });
       }
 
-      // Password Validation (Minimum 6 characters)
       if (!userPass || String(userPass).length < 6) {
-        return res.status(400).json({ success: false, error: "Personal password kam se kam 6 ankon/aksharon ka hona anivarya hai." });
+        return res.status(400).json({ success: false, error: "पासवर्ड कम से कम 6 अक्षरों का होना अनिवार्य है।" });
       }
 
       const passHash = hashPassword(userPass);
       let user = await dbGet(`users/${cleanPhone}`);
 
       if (!user) {
-        if (!name || !name.trim()) {
-          return res.status(400).json({ success: false, error: "Pehli dafa jud rahe hain, kripya apna naam darj karein." });
-        }
+        if (!name || !name.trim()) return res.status(400).json({ success: false, error: "कृपया अपना नाम दर्ज करें।" });
         user = {
           phone: cleanPhone,
           name: name.trim(),
@@ -273,16 +267,14 @@ export default async function handler(req, res) {
         delete user.password;
         return res.status(200).json({ success: true, user, isNew: true });
       } else {
-        // Check hash or legacy plaintext match, then migrate to hash
         const isMatch = user.passwordHash 
           ? (user.passwordHash === passHash)
           : (user.password === String(userPass).trim());
 
         if (!isMatch) {
-          return res.status(401).json({ success: false, error: "Galat password! Kripya sahi password darj karein." });
+          return res.status(401).json({ success: false, error: "गलत पासवर्ड!" });
         }
 
-        // Migrate to passwordHash if stored plaintext
         if (!user.passwordHash) {
           await dbPatch(`users/${cleanPhone}`, { passwordHash: passHash });
         }
@@ -293,16 +285,14 @@ export default async function handler(req, res) {
       }
     }
 
-    // 3. PROFILE SYNC & 30-DAYS AUTO EXPIRY
     if (action === "get_profile" && req.method === "POST") {
       const { phone } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
       let user = await dbGet(`users/${cleanPhone}`);
-      if (!user) return res.status(404).json({ success: false, error: "User nahi mila." });
+      if (!user) return res.status(404).json({ success: false, error: "यूज़र नहीं मिला।" });
 
       user.plan = normalizePlan(user.plan);
 
-      // Auto Expiry Verification
       if (user.role !== "admin" && user.planExpiry && Date.now() > user.planExpiry) {
         user.plan = "free";
         user.planExpiry = null;
@@ -314,33 +304,31 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, user });
     }
 
-    // 4. FORGOT PASSWORD
     if (action === "forgot" && req.method === "POST") {
       const { phone, verify, newPass } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
 
-      if (cleanPhone.length !== 10) return res.status(400).json({ success: false, error: "10 ankon ka mobile number darj karein." });
-      if (!newPass || String(newPass).length < 6) return res.status(400).json({ success: false, error: "Naya password kam se kam 6 ankon ka hona chahiye." });
+      if (cleanPhone.length !== 10) return res.status(400).json({ success: false, error: "10 अंकों का मोबाइल नंबर दर्ज करें।" });
+      if (!newPass || String(newPass).length < 6) return res.status(400).json({ success: false, error: "नया पासवर्ड कम से कम 6 अक्षरों का रखें।" });
 
       const user = await dbGet(`users/${cleanPhone}`);
-      if (!user) return res.status(404).json({ success: false, error: "Is mobile number se koi khata nahi mila." });
+      if (!user) return res.status(404).json({ success: false, error: "इस नंबर से कोई खाता नहीं मिला।" });
 
       const checkVal = String(verify || "").trim().toLowerCase();
       const match = (checkVal && user.roll && checkVal === String(user.roll).toLowerCase()) ||
                     (checkVal && user.name && String(user.name).toLowerCase().includes(checkVal));
 
-      if (!match) return res.status(403).json({ success: false, error: "Satyaapan vifal! Sahi naam ya roll number darj karein." });
+      if (!match) return res.status(403).json({ success: false, error: "सत्यापन विफल! सही नाम या रोल नंबर दर्ज करें।" });
 
       const newHash = hashPassword(newPass);
       await dbPatch(`users/${cleanPhone}`, { passwordHash: newHash });
-      return res.status(200).json({ success: true, message: "Password kamiyabi se badal diya gaya! Ab login karein." });
+      return res.status(200).json({ success: true, message: "पासवर्ड बदल दिया गया! अब लॉगिन करें।" });
     }
 
-    // 5. CHAT QUERY (STRICT STUDY GUARDRAIL & TIER ROUTING)
     if (action === "ai" && req.method === "POST") {
       const { prompt, phone } = req.body || {};
       if (!prompt || !String(prompt).trim()) {
-        return res.status(400).json({ success: false, error: "Sawal khali nahi ho sakta." });
+        return res.status(400).json({ success: false, error: "सवाल खाली नहीं हो सकता।" });
       }
 
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -361,16 +349,15 @@ export default async function handler(req, res) {
       let modelUsed = GEMINI_MODEL;
       let replyText = "";
 
-      const academicInstruction = `Aapka official naam '{AI_NAME}' hai.
-Aap Suhail AI ke study-only educational platform ke sanjeeda aur moaddib ustaad hain.
-Uddeshya: Talib-e-ilm ki padhai, imtihan ki taiyari, Arabic grammar (Nahw, Sarf), Dars-e-Nizami, Urdu, Hindi, English, Maths, Science, Computer Studies, Islamiat, translation, revision, quiz aur notes me behtareen madad karna.
-Niyam:
-1. Shuruat hamesha 'अस्सलामु अलैकुम व रहमतुल्लाह' se karein.
-2. Kabhi bhi 'Namaste' ya gair-Islami adab ke alfaz istemal na karein.
-3. Kisi bahari provider/company (Gemini, Mistral, Groq, Cerebras, Meta, OpenAI) ka naam na lein. Agar koi aapki pehchan puche to spasht kahein ki 'Main {AI_NAME} hoon'.
-4. Greetings (Hi, Hello, Kaise ho) ka mukhtasar wa ba-adab jawab dein aur talib ko padhai ki taraf maayel karein. Fuzool, entertainment, political ya off-topic baaton par narmi se taaleem ki taraf redirect karein.`;
+      const academicInstruction = `आप '{AI_NAME}' हैं।
+सुहैल AI के तालीमी और स्टडी असिस्टेंट।
+उद्देश्य: छात्र की पढ़ाई, परीक्षा तैयारी, अरबी ग्रामर (नह्व, सर्फ़), दरसे निज़ामी, उर्दू, हिन्दी, अंग्रेज़ी, गणित, विज्ञान, इस्लामिक स्टडीज़ और नोट्स में मदद करना।
+नियम:
+1. बातचीत की शुरुआत हमेशा 'अस्सलामु अलैकुम व रहमतुल्लाह' से करें।
+2. कभी भी 'नमस्ते' या गैर-इस्लामी शब्दों का प्रयोग न करें।
+3. किसी बाहरी कंपनी या मॉडल (Gemini, Mistral, Groq, Cerebras) का नाम न लें। पूछने पर कहें 'मैं {AI_NAME} हूँ'।
+4. केवल तालीम और पढ़ाई से जुड़े सवालों का उत्तर दें।`;
 
-      // Execution strictly mapped to tier (No cross-tier silent switching)
       if (plan === "allama") {
         aiName = "SUHAIL AI ALLAMA";
         modelUsed = ALLAMA_MODEL;
@@ -398,17 +385,16 @@ Niyam:
       });
     }
 
-    // 6. PAYMENT SUBMISSION
     if (action === "payment" && req.method === "POST") {
       const { phone, plan, utr } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
       const normPlan = normalizePlan(plan);
 
       if (!cleanPhone || !utr || cleanPhone.length !== 10) {
-        return res.status(400).json({ success: false, error: "10 ankon ka mobile number aur 12 ankon ka UTR darj karein." });
+        return res.status(400).json({ success: false, error: "10 अंकों का मोबाइल नंबर और 12 अंकों का UTR दर्ज करें।" });
       }
       if (normPlan === "free") {
-        return res.status(400).json({ success: false, error: "Free plan ke liye payment ki zaroorat nahi hai." });
+        return res.status(400).json({ success: false, error: "Free प्लान के लिए पेमेंट आवश्यक नहीं है।" });
       }
 
       const amounts = { plus: 10, pro: 25, allama: 50 };
@@ -422,14 +408,13 @@ Niyam:
         status: "pending",
         createdAt: Date.now()
       });
-      return res.status(200).json({ success: true, message: "Darkhwast darj ho gayi hai. Admin approval ke baad 30 din ke liye unlock ho jayega." });
+      return res.status(200).json({ success: true, message: "अनुरोध दर्ज हो गया है।" });
     }
 
-    // 7. ADMIN DASHBOARD & ACTIVATION
     if (action === "admin" && req.method === "POST") {
       const { pass, cmd, requestId, targetPhone, targetPlan } = req.body || {};
       if (pass !== ADMIN_SECRET) {
-        return res.status(401).json({ success: false, error: "Galat Admin Secret." });
+        return res.status(401).json({ success: false, error: "गलत एडमिन पासवर्ड।" });
       }
 
       if (cmd === "get_requests") {
@@ -439,7 +424,7 @@ Niyam:
 
       if (cmd === "approve_request") {
         const canonicalPlan = normalizePlan(targetPlan);
-        const expiryDate = Date.now() + (30 * 24 * 60 * 60 * 1000); // Exactly 30 Days
+        const expiryDate = Date.now() + (30 * 24 * 60 * 60 * 1000);
 
         await dbPatch(`payment_requests/${requestId}`, {
           status: "approved",
@@ -451,7 +436,7 @@ Niyam:
         });
         return res.status(200).json({
           success: true,
-          message: `${canonicalPlan.toUpperCase()} plan 30 dino ke liye kamiyabi se activate kar diya gaya.`
+          message: `${canonicalPlan.toUpperCase()} प्लान 30 दिनों के लिए चालू किया गया।`
         });
       }
 
@@ -460,19 +445,17 @@ Niyam:
           status: "rejected",
           rejectedAt: Date.now()
         });
-        return res.status(200).json({ success: true, message: "Darkhwast kharij kar di gayi." });
+        return res.status(200).json({ success: true, message: "अनुरोध खारिज किया गया।" });
       }
     }
 
-    return res.status(404).json({ success: false, error: "Amanay endpoint action." });
+    return res.status(404).json({ success: false, error: "अमान्य एंडपॉइंट।" });
   } catch (err) {
-    const status = err.code && typeof err.code === "number" && err.code >= 400 && err.code < 600 ? err.code : 500;
-    return res.status(status).json({
+    return res.status(err.code || 500).json({
       success: false,
-      error: err.userMsg || err.message || "Server par takneeki kharabi aayi.",
+      error: err.userMsg || err.message || "सर्वर पर तकनीकी समस्या आई।",
       code: err.code || "SERVER_ERROR",
-      provider: err.provider || "Internal",
-      retryable: true
+      provider: err.provider || "Internal"
     });
   }
 }
