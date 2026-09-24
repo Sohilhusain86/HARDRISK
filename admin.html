@@ -1,1 +1,400 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SUHAIL AI Admin</title><style>body{margin:0;background:#070b14;color:#eef4ff;font-family:system-ui;padding:20px}.box{max-width:1050px;margin:auto;background:#0d1322;border:1px solid #22304a;border-radius:18px;padding:20px}input,button{padding:11px;border-radius:9px;border:1px solid #293c5c;background:#09101c;color:#fff;margin:5px}button{cursor:pointer}.primary{background:#6ea8fe;color:#07101f;font-weight:800}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}.card{padding:15px;border:1px solid #22304a;border-radius:12px;background:#101a2b}.approve{background:#38d39f;color:#06150f;border:0}.reject{background:#ff6b7a;color:#21070a;border:0}.muted{color:#91a0ba;font-size:13px}</style></head><body><div class="box"><h1>SUHAIL AI Admin</h1><div id="login"><input id="email" placeholder="Admin email"><input id="password" type="password" placeholder="Admin password"><button class="primary" onclick="login()">Login</button><div id="err" class="muted"></div></div><div id="panel" style="display:none"><button onclick="load()">Refresh</button><button onclick="logout()">Log out</button><h2>Pending payment requests</h2><div id="list" class="grid"></div><h2>Students</h2><div id="users" class="grid"></div></div></div><script>let token=localStorage.getItem('suhail_admin');const $=x=>document.getElementById(x);async function api(p,o={}){const r=await fetch(p,{...o,headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}});const d=await r.json();if(!r.ok)throw Error(d.error||'Request failed');return d}async function login(){try{const d=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:$('email').value,password:$('password').value})});const x=await d.json();if(!d.ok)throw Error(x.error);token=x.token;localStorage.setItem('suhail_admin',token);show();load()}catch(e){$('err').textContent=e.message}}function show(){$('login').style.display=token?'none':'block';$('panel').style.display=token?'block':'none'}async function load(){try{const d=await api('/api/admin/requests');$('list').innerHTML=d.requests.length?d.requests.map(r=>`<div class="card"><b>${r.plan} — ₹${r.amount}</b><p>${r.userName}<br>${r.userEmail}</p><div class="muted">UTR: ${r.utr||'not provided'}<br>${new Date(r.createdAt).toLocaleString()}</div><button class="approve" onclick="review('${r.id}','APPROVE')">Approve</button><button class="reject" onclick="review('${r.id}','REJECT')">Reject</button></div>`).join(''):'<div class="muted">No pending requests.</div>';const u=await api('/api/admin/users');$('users').innerHTML=u.users.map(x=>`<div class="card"><b>${x.name}</b><br>${x.email}<p>Plan: ${x.plan}<br>Until: ${x.activeUntil?new Date(x.activeUntil).toLocaleString():'—'}</p></div>`).join('')}catch(e){$('err').textContent=e.message}}async function review(id,action){if(!confirm(action==='APPROVE'?'Verify the actual payment and approve this request?':'Reject this payment request?'))return;try{await api('/api/admin/requests',{method:'POST',body:JSON.stringify({id,action})});load()}catch(e){alert(e.message)}}function logout(){localStorage.removeItem('suhail_admin');token=null;show()}show();if(token)load();</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070b14">
+  <title>SUHAIL AI Admin</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070b14;
+      --panel: #0d1322;
+      --card: #101a2b;
+      --border: #22304a;
+      --input: #09101c;
+      --text: #eef4ff;
+      --muted: #91a0ba;
+      --primary: #6ea8fe;
+      --approve: #38d39f;
+      --reject: #ff6b7a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 20px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .box {
+      width: min(1050px, 100%);
+      margin: 0 auto;
+      padding: 20px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+    }
+
+    h1, h2 { margin-top: 0; }
+    h2 { margin-top: 28px; }
+
+    input,
+    button {
+      min-height: 44px;
+      padding: 11px 13px;
+      margin: 5px;
+      border: 1px solid #293c5c;
+      border-radius: 9px;
+      background: var(--input);
+      color: #fff;
+      font: inherit;
+    }
+
+    input { width: min(100%, 360px); }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .55; }
+
+    .primary {
+      background: var(--primary);
+      color: #07101f;
+      font-weight: 800;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      padding: 15px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      overflow-wrap: anywhere;
+    }
+
+    .approve {
+      background: var(--approve);
+      color: #06150f;
+      border: 0;
+      font-weight: 700;
+    }
+
+    .reject {
+      background: var(--reject);
+      color: #21070a;
+      border: 0;
+      font-weight: 700;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: -5px;
+    }
+
+    .status {
+      min-height: 20px;
+      margin: 8px 5px;
+      color: var(--muted);
+    }
+
+    .danger-text { color: #ff9ca8; }
+    .success-text { color: #74e6be; }
+
+    @media (max-width: 520px) {
+      body { padding: 10px; }
+      .box { padding: 14px; border-radius: 14px; }
+      input, button { width: calc(100% - 10px); margin: 5px; }
+      .toolbar button { width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="box">
+    <h1>SUHAIL AI Admin</h1>
+
+    <section id="login" aria-labelledby="login-title">
+      <h2 id="login-title">Admin Login</h2>
+      <form id="loginForm">
+        <input
+          id="email"
+          type="email"
+          autocomplete="username"
+          placeholder="Admin email"
+          required
+        >
+        <input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Admin password"
+          required
+        >
+        <button class="primary" type="submit">Login</button>
+      </form>
+      <div id="err" class="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <section id="panel" hidden>
+      <div class="toolbar">
+        <button id="refreshBtn" type="button">Refresh</button>
+        <button id="logoutBtn" type="button">Log out</button>
+      </div>
+
+      <div id="panelStatus" class="status" role="status" aria-live="polite"></div>
+
+      <h2>Pending Payment Requests</h2>
+      <div id="list" class="grid"></div>
+
+      <h2>Students</h2>
+      <div id="users" class="grid"></div>
+    </section>
+  </main>
+
+  <script>
+    "use strict";
+
+    let token = localStorage.getItem("suhail_admin") || "";
+
+    const $ = (id) => document.getElementById(id);
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatDate(value) {
+      if (!value) return "—";
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString();
+    }
+
+    async function api(path, options = {}) {
+      const headers = new Headers(options.headers || {});
+      headers.set("Content-Type", "application/json");
+
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+
+      const response = await fetch(path, {
+        ...options,
+        headers
+      });
+
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (_) {
+        data = {};
+      }
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          clearSession();
+        }
+        throw new Error(data.error || "Request failed");
+      }
+
+      return data;
+    }
+
+    function setStatus(message, type = "") {
+      const target = $("panelStatus");
+      target.textContent = message;
+      target.className = `status ${type ? `${type}-text` : ""}`;
+    }
+
+    function show() {
+      $("login").hidden = Boolean(token);
+      $("panel").hidden = !token;
+    }
+
+    function clearSession() {
+      token = "";
+      localStorage.removeItem("suhail_admin");
+      show();
+    }
+
+    async function login(event) {
+      event.preventDefault();
+
+      const error = $("err");
+      error.textContent = "Signing in…";
+
+      try {
+        const response = await fetch("/api/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: $("email").value.trim(),
+            password: $("password").value
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Login failed");
+        }
+
+        if (!data.token) {
+          throw new Error("Admin token was not returned");
+        }
+
+        token = data.token;
+        localStorage.setItem("suhail_admin", token);
+        $("password").value = "";
+        error.textContent = "";
+        show();
+        await load();
+      } catch (errorValue) {
+        error.textContent = errorValue.message || "Login failed";
+      }
+    }
+
+    async function load() {
+      if (!token) return;
+
+      setStatus("Loading…");
+
+      try {
+        const [requestsData, usersData] = await Promise.all([
+          api("/api/admin/requests"),
+          api("/api/admin/users")
+        ]);
+
+        renderRequests(requestsData.requests || []);
+        renderUsers(usersData.users || []);
+        setStatus(`Updated ${new Date().toLocaleTimeString()}`, "success");
+      } catch (errorValue) {
+        setStatus(errorValue.message || "Unable to load admin data", "danger");
+      }
+    }
+
+    function renderRequests(requests) {
+      const container = $("list");
+
+      if (!requests.length) {
+        container.innerHTML = '<div class="muted">No pending requests.</div>';
+        return;
+      }
+
+      container.innerHTML = requests.map((request) => {
+        const id = escapeHtml(request.id);
+        const plan = escapeHtml(request.plan);
+        const amount = escapeHtml(request.amount);
+        const name = escapeHtml(request.userName);
+        const phone = escapeHtml(request.userPhone || request.phone);
+        const rollNumber = escapeHtml(request.userRoll || request.rollNumber);
+        const utr = escapeHtml(request.utr || "not provided");
+
+        return `
+          <article class="card">
+            <strong>${plan} — ₹${amount}</strong>
+            <p>
+              <b>${name}</b><br>
+              Roll: ${rollNumber || "—"}<br>
+              Phone: ${phone || "—"}
+            </p>
+            <div class="muted">
+              UTR: ${utr}<br>
+              Submitted: ${formatDate(request.createdAt)}
+            </div>
+            <button class="approve" type="button" data-action="approve" data-id="${id}">
+              Approve
+            </button>
+            <button class="reject" type="button" data-action="reject" data-id="${id}">
+              Reject
+            </button>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderUsers(users) {
+      const container = $("users");
+
+      if (!users.length) {
+        container.innerHTML = '<div class="muted">No students found.</div>';
+        return;
+      }
+
+      container.innerHTML = users.map((user) => `
+        <article class="card">
+          <strong>${escapeHtml(user.name)}</strong>
+          <p>
+            Roll: ${escapeHtml(user.roll || user.rollNumber || "—")}<br>
+            Phone: ${escapeHtml(user.phone || "—")}
+          </p>
+          <p>
+            Plan: <b>${escapeHtml(user.plan || "FREE")}</b><br>
+            Until: ${formatDate(user.activeUntil)}
+          </p>
+        </article>
+      `).join("");
+    }
+
+    async function review(id, action) {
+      const approved = action === "APPROVE";
+      const question = approved
+        ? "Verify the actual payment and approve this request?"
+        : "Reject this payment request?";
+
+      if (!confirm(question)) return;
+
+      setStatus(`${approved ? "Approving" : "Rejecting"}…`);
+
+      try {
+        await api("/api/admin/requests", {
+          method: "POST",
+          body: JSON.stringify({ id, action })
+        });
+
+        await load();
+      } catch (errorValue) {
+        setStatus(errorValue.message || "Action failed", "danger");
+      }
+    }
+
+    function logout() {
+      clearSession();
+      $("err").textContent = "";
+      $("list").innerHTML = "";
+      $("users").innerHTML = "";
+    }
+
+    $("loginForm").addEventListener("submit", login);
+    $("refreshBtn").addEventListener("click", load);
+    $("logoutBtn").addEventListener("click", logout);
+
+    $("list").addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+
+      const action = button.dataset.action === "approve" ? "APPROVE" : "REJECT";
+      review(button.dataset.id, action);
+    });
+
+    show();
+    if (token) load();
+  </script>
+</body>
+</html>
