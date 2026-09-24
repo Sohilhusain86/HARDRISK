@@ -82,7 +82,6 @@
   <!-- AUTH MODAL -->
   <div id="auth-modal" class="auth-overlay">
     
-    <!-- 1. LOGIN / REGISTER VIEW -->
     <div class="auth-card" id="view-login">
       <h3 style="color:var(--primary-green); text-align:center;">Suhail AI Login</h3>
       <p style="font-size:0.75rem; color:var(--text-muted); text-align:center;">Study Platform me surakshit pravesh karein</p>
@@ -96,8 +95,8 @@
         <input type="number" id="auth-roll" class="form-input" placeholder="4000 to 9999" min="4000" max="9999">
       </div>
       <div class="form-group">
-        <label>Personal Password (Kam se kam 6 Ank/Akshar)</label>
-        <input type="password" id="auth-user-pass" class="form-input" placeholder="Min 6 characters">
+        <label>Personal Password (Min 6 Ank/Akshar)</label>
+        <input type="password" id="auth-user-pass" class="form-input" placeholder="Kam se kam 6 characters">
       </div>
       <div class="form-group">
         <label>Aapka Naam (Pehli dafa judne par anivarya)</label>
@@ -112,7 +111,6 @@
       <div class="auth-link" id="link-goto-forgot">Password bhool gaye? (Forgot Password)</div>
     </div>
 
-    <!-- 2. FORGOT PASSWORD VIEW -->
     <div class="auth-card" id="view-forgot" style="display:none;">
       <h3 style="color:var(--accent-yellow); text-align:center;">Password Reset Karein</h3>
       <p style="font-size:0.75rem; color:var(--text-muted); text-align:center;">Khate me darj sahi vivaran bharein</p>
@@ -142,7 +140,7 @@
       <div class="header-avatar" id="u-avatar">S</div>
       <div class="header-info">
         <h4 id="u-name">Talib-e-Ilm</h4>
-        <span class="badge-plan" id="u-plan">FREE</span>
+        <span class="badge-plan" id="u-plan">SUHAIL AI FREE</span>
       </div>
     </div>
     <div class="header-actions">
@@ -198,13 +196,13 @@
 
     <!-- 3. PRO -->
     <div class="plan-card">
-      <div class="offer-badge">Khas Offer</div>
+      <div class="offer-badge">Special Offer</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
         <span style="font-weight:700;">SUHAIL AI PRO</span>
-        <div><span class="price-cut">₹499</span><span style="font-weight:700; color:var(--primary-green);">₹50 / 30 Din</span></div>
+        <div><span class="price-cut">₹299</span><span style="font-weight:700; color:var(--primary-green);">₹25 / 30 Din</span></div>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">500 Sawal Rozana • Super Fast Engine</div>
-      <button type="button" class="btn-action" onclick="window.goToPay('pro')">₹50 me 30 Din ke liye lein</button>
+      <div style="font-size:0.8rem; color:var(--text-muted);">500 Sawal Rozana • Super Fast Groq Engine</div>
+      <button type="button" class="btn-action" onclick="window.goToPay('pro')">₹25 me 30 Din ke liye lein</button>
     </div>
 
     <!-- 4. ALLAMA -->
@@ -212,10 +210,10 @@
       <div class="offer-badge">Super Saver</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
         <span style="font-weight:700;">SUHAIL AI ALLAMA</span>
-        <div><span class="price-cut">₹999</span><span style="font-weight:700; color:var(--primary-green);">₹100 / 30 Din</span></div>
+        <div><span class="price-cut">₹599</span><span style="font-weight:700; color:var(--primary-green);">₹50 / 30 Din</span></div>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">1000 Sawal Rozana • Aala Ilmi wa Tehqeeqi Flagship Engine</div>
-      <button type="button" class="btn-action" onclick="window.goToPay('allama')">₹100 me 30 Din ke liye lein</button>
+      <div style="font-size:0.8rem; color:var(--text-muted);">1000 Sawal Rozana • Cerebras Fast High-Level Flagship Engine</div>
+      <button type="button" class="btn-action" onclick="window.goToPay('allama')">₹50 me 30 Din ke liye lein</button>
     </div>
 
   </section>
@@ -233,8 +231,8 @@
       <label>Chuna Hua Plan (30 Din ki Muddat)</label>
       <select id="pay-plan-select" class="form-input">
         <option value="plus">SUHAIL AI PLUS (₹10 / 30 Din)</option>
-        <option value="pro">SUHAIL AI PRO (₹50 / 30 Din)</option>
-        <option value="allama">SUHAIL AI ALLAMA (₹100 / 30 Din)</option>
+        <option value="pro">SUHAIL AI PRO (₹25 / 30 Din)</option>
+        <option value="allama">SUHAIL AI ALLAMA (₹50 / 30 Din)</option>
       </select>
     </div>
 
@@ -261,17 +259,17 @@
   let currentUser = JSON.parse(localStorage.getItem('suhail_ai_user') || 'null');
   let currentAdminPass = localStorage.getItem('suhail_ai_admin_pass') || '';
 
-  // Safe API Fetch Wrapper preventing HTML/Text crashes
+  // Safe API Fetch Wrapper
   async function safeFetch(url, options = {}) {
     const res = await fetch(url, options);
     const contentType = res.headers.get("content-type") || "";
     if (!contentType.includes("application/json")) {
       const txt = await res.text();
-      throw new Error(`Server ne unexpected response diya (${res.status}).`);
+      throw new Error(`Server ne plain response diya (${res.status}).`);
     }
     const data = await res.json();
     if (!res.ok || data.success === false) {
-      throw new Error(data.error || "Server par anjaan takneeki kharabi aayi.");
+      throw new Error(data.error || "Server par takneeki kharabi aayi.");
     }
     return data;
   }
@@ -334,13 +332,13 @@
     const p = isAdmin ? 'allama' : (currentUser.plan || 'free');
 
     if (p === 'allama') {
-      planBadge = isAdmin ? 'ALLAMA (ADMIN)' : 'ALLAMA (30 DAYS)';
+      planBadge = isAdmin ? 'ALLAMA (ADMIN)' : 'SUHAIL AI ALLAMA (30 DAYS)';
       currentAiTitle = 'SUHAIL AI ALLAMA';
     } else if (p === 'pro') {
-      planBadge = 'PRO (30 DAYS)';
+      planBadge = 'SUHAIL AI PRO (30 DAYS)';
       currentAiTitle = 'SUHAIL AI PRO';
     } else if (p === 'plus') {
-      planBadge = 'PLUS (30 DAYS)';
+      planBadge = 'SUHAIL AI PLUS (30 DAYS)';
       currentAiTitle = 'SUHAIL AI PLUS';
     }
 
@@ -371,7 +369,7 @@
     if (!adminPass) {
       const rollNum = parseInt(roll, 10);
       if (isNaN(rollNum) || rollNum < 4000 || rollNum > 9999) {
-        return alert("Roll number 4000 se 9999 tak (4 ankon ka) hona lazmi hai.");
+        return alert("Roll number 4000 se 9999 tak (4 ankon ka) hona anivarya hai.");
       }
       if (!userPass || userPass.length < 6) {
         return alert("Personal password kam se kam 6 ankon/aksharon ka hona anivarya hai.");
@@ -427,7 +425,7 @@
     location.reload();
   };
 
-  // 3. CHAT QUERY
+  // 3. CHAT
   const chatBox = document.getElementById('chat-box');
   const chatInput = document.getElementById('chat-input');
   const sendBtn = document.getElementById('btn-chat-send');
@@ -489,7 +487,7 @@
     }
   };
 
-  // 5. ADMIN REQUESTS
+  // 5. ADMIN LOAD & APPROVE
   async function loadAdminRequests() {
     const list = document.getElementById('admin-requests-list');
     list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Darkhwastein load ho rahi hain...</p>';
@@ -517,7 +515,7 @@
         card.innerHTML = `
           <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.85rem;">
             <span>Phone: ${item.phone}</span>
-            <span style="color:var(--primary-green); text-transform:uppercase;">${item.plan} (30 DAYS)</span>
+            <span style="color:var(--primary-green); text-transform:uppercase;">${item.plan} (₹${item.amount || 0})</span>
           </div>
           <div style="font-size:0.75rem; color:var(--text-muted);">UTR: <b style="color:#fff;">${item.utr}</b></div>
           <div class="admin-actions">
@@ -555,7 +553,6 @@
   };
 
   renderUserUI();
-  // 4 second live polling
   setInterval(syncProfile, 4000);
 </script>
 </body>
