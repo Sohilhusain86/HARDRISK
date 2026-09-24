@@ -1,10 +1,15 @@
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com";
 
-// Vercel Environment Keys
+// Keys from Vercel
 const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
 const MISTRAL_KEY = process.env.MISTRAL_KEY || "";
 const GROQ_KEY = process.env.GROQ_KEY || "";
+
+// Configured Model IDs
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
+const MISTRAL_MODEL = process.env.MISTRAL_MODEL || "mistral-small-2603";
+const GROQ_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
 
 async function dbGet(path) {
   try {
@@ -35,29 +40,33 @@ async function dbPatch(path, data) {
 }
 
 // -------------------------------------------------------------
-// 3 TIER AI ENGINES: GEMINI -> MISTRAL -> GROQ
+// 1. FREE TIER: GOOGLE GEMINI (gemini-3.8-flash)
 // -------------------------------------------------------------
-
-// Tier 1: Free Plan -> Google Gemini
 async function callGemini(prompt, systemInstruction) {
-  if (!GEMINI_KEY) throw new Error("Gemini API Key उपलब्ध नहीं है।");
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
+  if (!GEMINI_KEY) throw new Error("GEMINI_API_KEY सेट नहीं है।");
+  
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_KEY}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: `${systemInstruction}\n\nछात्र का सवाल: ${prompt}` }] }]
+      contents: [{ parts: [{ text: `${systemInstruction}\n\nसवाल: ${prompt}` }] }]
     })
   });
   const data = await res.json();
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error(data?.error?.message || "Gemini से जवाब नहीं मिला।");
+  if (!text) {
+    throw new Error(data?.error?.message || "Suhail AI Free से उत्तर प्राप्त नहीं हुआ।");
+  }
   return text;
 }
 
-// Tier 2: Pro Monthly (₹10 Offer) -> Mistral (मध्यम व संतुलित)
+// -------------------------------------------------------------
+// 2. PLUS TIER (₹10): MISTRAL AI (mistral-small-2603)
+// -------------------------------------------------------------
 async function callMistral(prompt, systemInstruction) {
-  if (!MISTRAL_KEY) return await callGemini(prompt, systemInstruction);
+  if (!MISTRAL_KEY) throw new Error("MISTRAL_KEY सेट नहीं है।");
+  
   const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -65,7 +74,7 @@ async function callMistral(prompt, systemInstruction) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: "mistral-medium-latest",
+      model: MISTRAL_MODEL,
       messages: [
         { role: "system", content: systemInstruction },
         { role: "user", content: prompt }
@@ -74,13 +83,18 @@ async function callMistral(prompt, systemInstruction) {
   });
   const data = await res.json();
   const text = data?.choices?.[0]?.message?.content;
-  if (!text) throw new Error(data?.message || "Mistral से जवाब नहीं मिला।");
+  if (!text) {
+    throw new Error(data?.message || "Suhail AI Plus से उत्तर प्राप्त नहीं हुआ।");
+  }
   return text;
 }
 
-// Tier 3: Aalim Yearly (₹50 Mega Offer) -> Groq (अत्यंत तीव्र गति)
+// -------------------------------------------------------------
+// 3. PRO TIER (₹50) & ADMIN: GROQ (openai/gpt-oss-120b)
+// -------------------------------------------------------------
 async function callGroq(prompt, systemInstruction) {
-  if (!GROQ_KEY) return await callMistral(prompt, systemInstruction);
+  if (!GROQ_KEY) throw new Error("GROQ_KEY सेट नहीं है।");
+  
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -88,17 +102,19 @@ async function callGroq(prompt, systemInstruction) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: "llama-3.3-70b-versatile",
+      model: GROQ_MODEL,
       messages: [
         { role: "system", content: systemInstruction },
         { role: "user", content: prompt }
       ],
-      temperature: 0.6
+      temperature: 0.5
     })
   });
   const data = await res.json();
   const text = data?.choices?.[0]?.message?.content;
-  if (!text) throw new Error(data?.error?.message || "Groq से जवाब नहीं मिला।");
+  if (!text) {
+    throw new Error(data?.error?.message || "Suhail AI Pro से उत्तर प्राप्त नहीं हुआ।");
+  }
   return text;
 }
 
@@ -116,34 +132,31 @@ export default async function handler(req, res) {
   const action = req.query?.action || searchParams.get("action");
 
   try {
-    // 1. CONFIG & PLANS
-    if (action === "config" || action === "plans") {
-      return res.status(200).json({
-        success: true,
-        plans: {
-          free: { name: "Free / तालिब", price: 0, originalPrice: 0, dailyLimit: 10, engine: "Google Gemini" },
-          monthly: { name: "Pro Monthly", price: 10, originalPrice: 150, dailyLimit: 150, engine: "Mistral AI" },
-          yearly: { name: "Aalim Yearly", price: 50, originalPrice: 999, dailyLimit: 1000, engine: "Groq Fast Engine" }
-        }
-      });
-    }
-
-    // 2. AUTHENTICATION & LOGIN / REGISTER
+    // 1. AUTHENTICATION & LOGIN
     if (action === "auth" && req.method === "POST") {
       const { phone, name, roll, userPass, adminPass } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
 
-      if (cleanPhone.length !== 10) return res.status(400).json({ error: "कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।" });
+      if (cleanPhone.length !== 10) {
+        return res.status(400).json({ error: "कृपया 10 अंकों का मोबाइल नंबर दर्ज करें।" });
+      }
 
-      // एडमिन लॉगिन (SuhailAiJamia)
+      // मास्टर एडमिन बाईपास: एडमिन सीधे Pro टियर पर रहेगा
       if (adminPass && adminPass === ADMIN_SECRET) {
         let adminUser = await dbGet(`users/${cleanPhone}`);
         if (!adminUser) {
-          adminUser = { phone: cleanPhone, name: name || "Master Admin", role: "admin", plan: "yearly", status: "active" };
+          adminUser = {
+            phone: cleanPhone,
+            name: name || "Master Admin",
+            role: "admin",
+            plan: "pro",
+            status: "active"
+          };
           await dbPut(`users/${cleanPhone}`, adminUser);
-        } else if (adminUser.role !== "admin") {
-          await dbPatch(`users/${cleanPhone}`, { role: "admin", plan: "yearly" });
+        } else {
           adminUser.role = "admin";
+          adminUser.plan = "pro";
+          await dbPatch(`users/${cleanPhone}`, { role: "admin", plan: "pro" });
         }
         return res.status(200).json({ success: true, user: adminUser, isAdmin: true });
       }
@@ -170,84 +183,60 @@ export default async function handler(req, res) {
         return res.status(200).json({ success: true, user, isNew: true });
       } else {
         if (user.password && String(user.password).trim() !== String(userPass).trim()) {
-          return res.status(401).json({ error: "गलत पासवर्ड! सही पासवर्ड डालें या 'Forgot Password' करें।" });
+          return res.status(401).json({ error: "गलत पासवर्ड! कृपया सही पासवर्ड दर्ज करें।" });
         }
-        if (!user.password) await dbPatch(`users/${cleanPhone}`, { password: String(userPass).trim() });
         delete user.password;
         return res.status(200).json({ success: true, user });
       }
     }
 
-    // 3. FORGOT / RESET PASSWORD
-    if (action === "forgot" && req.method === "POST") {
-      const { phone, verify, newPass } = req.body || {};
+    // 2. LIVE PROFILE SYNC
+    if (action === "get_profile" && req.method === "POST") {
+      const { phone } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
-
-      if (cleanPhone.length !== 10) return res.status(400).json({ error: "10 अंकों का मोबाइल नंबर दर्ज करें।" });
-      if (!newPass || String(newPass).length < 4) return res.status(400).json({ error: "नया पासवर्ड कम से कम 4 अक्षरों का रखें।" });
-
       const user = await dbGet(`users/${cleanPhone}`);
-      if (!user) return res.status(404).json({ error: "खाता नहीं मिला।" });
-
-      const checkVal = String(verify || "").trim().toLowerCase();
-      const dbRoll = String(user.roll || "").trim().toLowerCase();
-      const dbName = String(user.name || "").trim().toLowerCase();
-
-      const match = (checkVal && dbRoll && checkVal === dbRoll) || (checkVal && dbName && (dbName.includes(checkVal) || checkVal.includes(dbName)));
-      if (!match) return res.status(403).json({ error: "सत्यापन विफल! सही नाम या रोल नंबर दर्ज करें।" });
-
-      await dbPatch(`users/${cleanPhone}`, { password: String(newPass).trim() });
-      return res.status(200).json({ success: true, message: "पासवर्ड बदल दिया गया! अब लॉगिन करें।" });
+      if (user) {
+        delete user.password;
+        return res.status(200).json({ success: true, user });
+      }
+      return res.status(404).json({ error: "User not found" });
     }
 
-    // 4. PLAN-BASED ROUTING (Free -> Gemini | Pro -> Mistral | Aalim -> Groq)
+    // 3. AI QUERY (IDENTITY + TIER ROUTING)
     if (action === "ai" && req.method === "POST") {
-      const { prompt, phone, mode } = req.body || {};
+      const { prompt, phone } = req.body || {};
       if (!prompt) return res.status(400).json({ error: "सवाल खाली नहीं हो सकता।" });
 
       const cleanPhone = String(phone || "").replace(/\D/g, "");
       const user = cleanPhone ? await dbGet(`users/${cleanPhone}`) : null;
-      const userPlan = user?.plan || "free";
+      const userPlan = (user?.role === "admin") ? "pro" : (user?.plan || "free");
 
-      const systemInstruction = mode === "arabic"
-        ? "आप एक माहिर दरसे निज़ामी उस्ताद हैं। नह्व, सर्फ़ और अरबी इबारत का जवाब आसान उर्दू/हिन्दी में दें।"
-        : "आप सुहैल AI स्टडी असिस्टेंट हैं। छात्र के सवाल का सटीक, सरल और उपयोगी उत्तर दें।";
-
+      let aiName = "Suhail AI Free";
+      let systemInstruction = "";
       let reply = "";
 
-      // Tier 1: Free Plan -> Google Gemini
-      if (userPlan === "free") {
-        try {
-          reply = await callGemini(prompt, systemInstruction);
-        } catch (e) {
-          reply = await callGroq(prompt, systemInstruction);
-        }
-      }
-      // Tier 2: Pro Monthly (₹10 Offer) -> Mistral
-      else if (userPlan === "monthly") {
-        try {
-          reply = await callMistral(prompt, systemInstruction);
-        } catch (e) {
-          reply = await callGroq(prompt, systemInstruction);
-        }
-      }
-      // Tier 3: Aalim Yearly (₹50 Mega Offer) / Admin -> Groq
-      else {
-        try {
-          reply = await callGroq(prompt, systemInstruction);
-        } catch (e) {
-          reply = await callMistral(prompt, systemInstruction);
-        }
+      if (userPlan === "pro" || userPlan === "yearly") {
+        aiName = "Suhail AI Pro";
+        systemInstruction = `Aapka naam '${aiName}' hai. Agar koi aapke bare me puche to kahein ki "Main Suhail AI Pro hoon, jo Groq engine (${GROQ_MODEL}) dwara sanchalit hai." Har sawal ka sarvashreshth aur spasht jawab dein.`;
+        reply = await callGroq(prompt, systemInstruction);
+      } else if (userPlan === "plus" || userPlan === "monthly") {
+        aiName = "Suhail AI Plus";
+        systemInstruction = `Aapka naam '${aiName}' hai. Agar koi aapke bare me puche to kahein ki "Main Suhail AI Plus hoon, jo Mistral engine (${MISTRAL_MODEL}) dwara sanchalit hai." Har sawal ka vistrit aur saaf jawab dein.`;
+        reply = await callMistral(prompt, systemInstruction);
+      } else {
+        aiName = "Suhail AI Free";
+        systemInstruction = `Aapka naam '${aiName}' hai. Agar koi aapke bare me puche to kahein ki "Main Suhail AI Free hoon, jo Google Gemini engine (${GEMINI_MODEL}) dwara sanchalit hai."`;
+        reply = await callGemini(prompt, systemInstruction);
       }
 
-      return res.status(200).json({ success: true, reply, engineUsed: userPlan });
+      return res.status(200).json({ success: true, reply, aiName });
     }
 
-    // 5. MANUAL PAYMENT
+    // 4. MANUAL PAYMENT REQUEST
     if (action === "payment" && req.method === "POST") {
       const { phone, plan, utr } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
-      if (!cleanPhone || !plan || !utr) return res.status(400).json({ error: "सभी विवरण अनिवार्य हैं।" });
+      if (!cleanPhone || !plan || !utr) return res.status(400).json({ error: "सभी विवरण भरें।" });
 
       const requestId = `req_${Date.now()}`;
       await dbPut(`payment_requests/${requestId}`, {
@@ -258,10 +247,10 @@ export default async function handler(req, res) {
         status: "pending",
         submittedAt: Date.now()
       });
-      return res.status(200).json({ success: true, message: "अनुरोध एडमिन को भेज दिया गया।" });
+      return res.status(200).json({ success: true, message: "अनुरोध दर्ज हो गया है।" });
     }
 
-    // 6. ADMIN CONTROL
+    // 5. ADMIN CONTROL PANEL
     if (action === "admin" && req.method === "POST") {
       const { pass, cmd, requestId, targetPhone, targetPlan } = req.body || {};
       if (pass !== ADMIN_SECRET) return res.status(401).json({ error: "गलत एडमिन पासवर्ड।" });
@@ -274,7 +263,7 @@ export default async function handler(req, res) {
       if (cmd === "approve_request") {
         await dbPatch(`payment_requests/${requestId}`, { status: "approved" });
         await dbPatch(`users/${targetPhone}`, { plan: targetPlan });
-        return res.status(200).json({ success: true, message: "प्लान एक्टिवेट हो गया!" });
+        return res.status(200).json({ success: true, message: `प्लान ${targetPlan.toUpperCase()} एक्टिवेट किया गया!` });
       }
 
       if (cmd === "reject_request") {
