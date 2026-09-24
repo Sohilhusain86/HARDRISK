@@ -1,6 +1,10 @@
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com";
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
+
+// Vercel Environment Keys
+const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
+const MISTRAL_KEY = process.env.MISTRAL_KEY || "";
+const GROQ_KEY = process.env.GROQ_KEY || "";
 
 async function dbGet(path) {
   try {
@@ -30,6 +34,77 @@ async function dbPatch(path, data) {
   return await res.json();
 }
 
+// -------------------------------------------------------------
+// 3 TIER AI ENGINES: GEMINI -> MISTRAL -> GROQ
+// -------------------------------------------------------------
+
+// Tier 1: Free Plan -> Google Gemini
+async function callGemini(prompt, systemInstruction) {
+  if (!GEMINI_KEY) throw new Error("Gemini API Key उपलब्ध नहीं है।");
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: `${systemInstruction}\n\nछात्र का सवाल: ${prompt}` }] }]
+    })
+  });
+  const data = await res.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error(data?.error?.message || "Gemini से जवाब नहीं मिला।");
+  return text;
+}
+
+// Tier 2: Pro Monthly (₹10 Offer) -> Mistral (मध्यम व संतुलित)
+async function callMistral(prompt, systemInstruction) {
+  if (!MISTRAL_KEY) return await callGemini(prompt, systemInstruction);
+  const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${MISTRAL_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "mistral-medium-latest",
+      messages: [
+        { role: "system", content: systemInstruction },
+        { role: "user", content: prompt }
+      ]
+    })
+  });
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content;
+  if (!text) throw new Error(data?.message || "Mistral से जवाब नहीं मिला।");
+  return text;
+}
+
+// Tier 3: Aalim Yearly (₹50 Mega Offer) -> Groq (अत्यंत तीव्र गति)
+async function callGroq(prompt, systemInstruction) {
+  if (!GROQ_KEY) return await callMistral(prompt, systemInstruction);
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${GROQ_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        { role: "system", content: systemInstruction },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.6
+    })
+  });
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content;
+  if (!text) throw new Error(data?.error?.message || "Groq से जवाब नहीं मिला।");
+  return text;
+}
+
+// -------------------------------------------------------------
+// MAIN SERVERLESS HANDLER
+// -------------------------------------------------------------
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -46,9 +121,9 @@ export default async function handler(req, res) {
       return res.status(200).json({
         success: true,
         plans: {
-          free: { name: "Free / Talib", price: 0, dailyLimit: 10 },
-          monthly: { name: "Pro Monthly", price: 149, dailyLimit: 150 },
-          yearly: { name: "Aalim Yearly", price: 999, dailyLimit: 1000 }
+          free: { name: "Free / तालिब", price: 0, originalPrice: 0, dailyLimit: 10, engine: "Google Gemini" },
+          monthly: { name: "Pro Monthly", price: 10, originalPrice: 150, dailyLimit: 150, engine: "Mistral AI" },
+          yearly: { name: "Aalim Yearly", price: 50, originalPrice: 999, dailyLimit: 1000, engine: "Groq Fast Engine" }
         }
       });
     }
@@ -58,21 +133,13 @@ export default async function handler(req, res) {
       const { phone, name, roll, userPass, adminPass } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
 
-      if (cleanPhone.length !== 10) {
-        return res.status(400).json({ error: "कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।" });
-      }
+      if (cleanPhone.length !== 10) return res.status(400).json({ error: "कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।" });
 
-      // मास्टर एडमिन बाईपास (SuhailAiJamia)
+      // एडमिन लॉगिन (SuhailAiJamia)
       if (adminPass && adminPass === ADMIN_SECRET) {
         let adminUser = await dbGet(`users/${cleanPhone}`);
         if (!adminUser) {
-          adminUser = {
-            phone: cleanPhone,
-            name: name || "Master Admin",
-            role: "admin",
-            plan: "yearly",
-            status: "active"
-          };
+          adminUser = { phone: cleanPhone, name: name || "Master Admin", role: "admin", plan: "yearly", status: "active" };
           await dbPut(`users/${cleanPhone}`, adminUser);
         } else if (adminUser.role !== "admin") {
           await dbPatch(`users/${cleanPhone}`, { role: "admin", plan: "yearly" });
@@ -81,18 +148,13 @@ export default async function handler(req, res) {
         return res.status(200).json({ success: true, user: adminUser, isAdmin: true });
       }
 
-      // पर्सनल पासवर्ड अनिवार्य
       if (!userPass || String(userPass).length < 4) {
-        return res.status(400).json({ error: "कृपया कम से कम 4 अंकों का अपना पर्सनल पासवर्ड दर्ज करें।" });
+        return res.status(400).json({ error: "कम से कम 4 अंकों का पर्सनल पासवर्ड दर्ज करें।" });
       }
 
       let user = await dbGet(`users/${cleanPhone}`);
-
       if (!user) {
-        // नया यूज़र: पहली बार खाता बनाना
-        if (!name) {
-          return res.status(400).json({ error: "पहली बार लॉगिन कर रहे हैं, कृपया अपना नाम दर्ज करें।" });
-        }
+        if (!name) return res.status(400).json({ error: "पहली बार जुड़ने पर अपना नाम दर्ज करें।" });
         user = {
           phone: cleanPhone,
           name: name.trim(),
@@ -107,13 +169,10 @@ export default async function handler(req, res) {
         delete user.password;
         return res.status(200).json({ success: true, user, isNew: true });
       } else {
-        // पुराना यूज़र: पर्सनल पासवर्ड सत्यापन
         if (user.password && String(user.password).trim() !== String(userPass).trim()) {
-          return res.status(401).json({ error: "गलत पासवर्ड! कृपया अपना सही पर्सनल पासवर्ड डालें या 'Forgot Password' करें।" });
+          return res.status(401).json({ error: "गलत पासवर्ड! सही पासवर्ड डालें या 'Forgot Password' करें।" });
         }
-        if (!user.password) {
-          await dbPatch(`users/${cleanPhone}`, { password: String(userPass).trim() });
-        }
+        if (!user.password) await dbPatch(`users/${cleanPhone}`, { password: String(userPass).trim() });
         delete user.password;
         return res.status(200).json({ success: true, user });
       }
@@ -124,69 +183,71 @@ export default async function handler(req, res) {
       const { phone, verify, newPass } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
 
-      if (cleanPhone.length !== 10) {
-        return res.status(400).json({ error: "कृपया 10 अंकों का मोबाइल नंबर दर्ज करें।" });
-      }
-      if (!newPass || String(newPass).length < 4) {
-        return res.status(400).json({ error: "नया पासवर्ड कम से कम 4 अक्षरों का रखें।" });
-      }
+      if (cleanPhone.length !== 10) return res.status(400).json({ error: "10 अंकों का मोबाइल नंबर दर्ज करें।" });
+      if (!newPass || String(newPass).length < 4) return res.status(400).json({ error: "नया पासवर्ड कम से कम 4 अक्षरों का रखें।" });
 
       const user = await dbGet(`users/${cleanPhone}`);
-      if (!user) {
-        return res.status(404).json({ error: "इस मोबाइल नंबर से कोई खाता नहीं मिला।" });
-      }
+      if (!user) return res.status(404).json({ error: "खाता नहीं मिला।" });
 
       const checkVal = String(verify || "").trim().toLowerCase();
       const dbRoll = String(user.roll || "").trim().toLowerCase();
       const dbName = String(user.name || "").trim().toLowerCase();
 
       const match = (checkVal && dbRoll && checkVal === dbRoll) || (checkVal && dbName && (dbName.includes(checkVal) || checkVal.includes(dbName)));
-
-      if (!match) {
-        return res.status(403).json({ error: "सत्यापन विफल! सही नाम या रोल नंबर दर्ज करें।" });
-      }
+      if (!match) return res.status(403).json({ error: "सत्यापन विफल! सही नाम या रोल नंबर दर्ज करें।" });
 
       await dbPatch(`users/${cleanPhone}`, { password: String(newPass).trim() });
-      return res.status(200).json({ success: true, message: "पासवर्ड बदल दिया गया! अब नए पासवर्ड से लॉगिन करें।" });
+      return res.status(200).json({ success: true, message: "पासवर्ड बदल दिया गया! अब लॉगिन करें।" });
     }
 
-    // 4. AI QUERY (सीधा REST API, बिना किसी पैकेज के)
+    // 4. PLAN-BASED ROUTING (Free -> Gemini | Pro -> Mistral | Aalim -> Groq)
     if (action === "ai" && req.method === "POST") {
-      const { prompt, mode } = req.body || {};
+      const { prompt, phone, mode } = req.body || {};
       if (!prompt) return res.status(400).json({ error: "सवाल खाली नहीं हो सकता।" });
 
-      if (!GEMINI_API_KEY) {
-        return res.status(500).json({ error: "Vercel Settings में GEMINI_API_KEY सेट नहीं है।" });
-      }
+      const cleanPhone = String(phone || "").replace(/\D/g, "");
+      const user = cleanPhone ? await dbGet(`users/${cleanPhone}`) : null;
+      const userPlan = user?.plan || "free";
 
       const systemInstruction = mode === "arabic"
         ? "आप एक माहिर दरसे निज़ामी उस्ताद हैं। नह्व, सर्फ़ और अरबी इबारत का जवाब आसान उर्दू/हिन्दी में दें।"
-        : "आप सुहैल AI स्टडी असिस्टेंट हैं। छात्र के सवाल का सटीक, सरल और चरणबद्ध उत्तर दें।";
+        : "आप सुहैल AI स्टडी असिस्टेंट हैं। छात्र के सवाल का सटीक, सरल और उपयोगी उत्तर दें।";
 
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-      
-      const gRes = await fetch(geminiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{ text: `${systemInstruction}\n\nछात्र का सवाल: ${prompt}` }]
-          }]
-        })
-      });
+      let reply = "";
 
-      const gData = await gRes.json();
-      const reply = gData?.candidates?.[0]?.content?.parts?.[0]?.text || "AI से जवाब प्राप्त नहीं हुआ।";
-      return res.status(200).json({ success: true, reply });
+      // Tier 1: Free Plan -> Google Gemini
+      if (userPlan === "free") {
+        try {
+          reply = await callGemini(prompt, systemInstruction);
+        } catch (e) {
+          reply = await callGroq(prompt, systemInstruction);
+        }
+      }
+      // Tier 2: Pro Monthly (₹10 Offer) -> Mistral
+      else if (userPlan === "monthly") {
+        try {
+          reply = await callMistral(prompt, systemInstruction);
+        } catch (e) {
+          reply = await callGroq(prompt, systemInstruction);
+        }
+      }
+      // Tier 3: Aalim Yearly (₹50 Mega Offer) / Admin -> Groq
+      else {
+        try {
+          reply = await callGroq(prompt, systemInstruction);
+        } catch (e) {
+          reply = await callMistral(prompt, systemInstruction);
+        }
+      }
+
+      return res.status(200).json({ success: true, reply, engineUsed: userPlan });
     }
 
     // 5. MANUAL PAYMENT
     if (action === "payment" && req.method === "POST") {
       const { phone, plan, utr } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
-      if (!cleanPhone || !plan || !utr) {
-        return res.status(400).json({ error: "फोन, प्लान और UTR नंबर अनिवार्य हैं।" });
-      }
+      if (!cleanPhone || !plan || !utr) return res.status(400).json({ error: "सभी विवरण अनिवार्य हैं।" });
 
       const requestId = `req_${Date.now()}`;
       await dbPut(`payment_requests/${requestId}`, {
@@ -203,9 +264,7 @@ export default async function handler(req, res) {
     // 6. ADMIN CONTROL
     if (action === "admin" && req.method === "POST") {
       const { pass, cmd, requestId, targetPhone, targetPlan } = req.body || {};
-      if (pass !== ADMIN_SECRET) {
-        return res.status(401).json({ error: "गलत एडमिन पासवर्ड।" });
-      }
+      if (pass !== ADMIN_SECRET) return res.status(401).json({ error: "गलत एडमिन पासवर्ड।" });
 
       if (cmd === "get_requests") {
         const requests = (await dbGet("payment_requests")) || {};
