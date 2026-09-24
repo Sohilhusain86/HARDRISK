@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="hi" dir="ltr">
+<html lang="ur" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Suhail AI - Academic Platform</title>
+  <title>Suhail AI - Academic Learning Platform</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,7 +29,6 @@
     
     .app-container { width: 100%; max-width: 600px; display: flex; flex-direction: column; height: 100vh; background: var(--panel-dark); position: relative; overflow: hidden; }
     
-    /* Top Header */
     .top-header { background: var(--card-dark); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--card-border); z-index: 10; }
     .header-user { display: flex; align-items: center; gap: 10px; }
     .header-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--primary-green); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; }
@@ -37,16 +36,13 @@
     .badge-plan { font-size: 0.68rem; padding: 2px 8px; border-radius: 12px; background: rgba(0, 168, 132, 0.2); color: var(--primary-green); font-weight: 600; text-transform: uppercase; }
     .header-actions button { background: none; border: none; color: var(--text-muted); font-size: 1.1rem; cursor: pointer; margin-left: 8px; }
 
-    /* Navigation Dock */
     .nav-dock { display: flex; background: var(--card-dark); border-bottom: 1px solid var(--card-border); }
     .nav-item { flex: 1; padding: 10px; text-align: center; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
     .nav-item.active { color: var(--primary-green); border-bottom-color: var(--primary-green); }
 
-    /* Tab Views */
     .tab-view { flex: 1; overflow-y: auto; padding: 14px; display: none; flex-direction: column; gap: 14px; }
     .tab-view.active { display: flex; }
 
-    /* Chat Messages */
     .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 10px; }
     .chat-bubble { max-width: 85%; padding: 10px 14px; border-radius: 12px; font-size: 0.88rem; line-height: 1.5; word-wrap: break-word; }
     .chat-bubble.user { align-self: flex-end; background: #005c4b; color: #fff; border-bottom-right-radius: 2px; }
@@ -56,28 +52,22 @@
     .chat-input { flex: 1; background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 24px; padding: 10px 16px; color: #fff; outline: none; font-size: 0.9rem; }
     .btn-send { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-green); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-    /* Plan Cards */
-    .plan-card { background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px; position: relative; }
+    .plan-card { background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 6px; position: relative; }
     .plan-card.highlight { border-color: var(--primary-green); }
     .offer-badge { position: absolute; top: -10px; right: 14px; background: #dc2626; color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
     .price-cut { text-decoration: line-through; color: var(--text-muted); font-size: 0.9rem; margin-right: 6px; }
     .btn-action { width: 100%; padding: 10px; border-radius: 8px; border: none; background: var(--primary-green); color: #fff; font-weight: 600; cursor: pointer; }
 
-    /* Inputs & Forms */
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-group label { font-size: 0.8rem; color: var(--text-muted); }
     .form-input { background: #182229; border: 1px solid var(--card-border); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 0.9rem; outline: none; }
     
-    /* QR Display */
     .qr-box { background: #fff; padding: 8px; border-radius: 12px; width: 220px; height: 220px; margin: 10px auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     .qr-box img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
 
-    /* Login Overlay */
     .auth-overlay { position: absolute; inset: 0; background: rgba(11, 20, 26, 0.98); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .auth-card { background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 12px; max-height: 95vh; overflow-y: auto; }
-    .auth-link { font-size: 0.78rem; color: var(--accent-yellow); cursor: pointer; text-align: center; text-decoration: underline; margin-top: 4px; }
 
-    /* Admin Cards */
     .admin-req-card { background: #182229; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
     .admin-actions { display: flex; gap: 8px; margin-top: 6px; }
     .btn-approve { flex: 1; padding: 6px; border: none; border-radius: 6px; background: var(--success); color: #fff; font-weight: 600; cursor: pointer; }
@@ -88,68 +78,44 @@
 
 <div class="app-container">
   
-  <!-- AUTH / LOGIN MODAL -->
+  <!-- AUTH MODAL -->
   <div id="auth-modal" class="auth-overlay">
-    
-    <div class="auth-card" id="view-login">
+    <div class="auth-card">
       <h3 style="color:var(--primary-green); text-align:center;">Suhail AI Login</h3>
-      <p style="font-size:0.75rem; color:var(--text-muted); text-align:center;">मोबाइल नंबर और पर्सनल पासवर्ड डालकर प्रवेश करें</p>
+      <p style="font-size:0.75rem; color:var(--text-muted); text-align:center;">मुकम्मल तफ़्सीलत के साथ दाख़िल हों</p>
       
       <div class="form-group">
         <label>मोबाइल नंबर (10 अंक, अनिवार्य)</label>
         <input type="tel" id="auth-phone" class="form-input" placeholder="e.g. 9876543210" maxlength="10">
       </div>
       <div class="form-group">
-        <label>पर्सनल पासवर्ड (आपकी सुरक्षा के लिए)</label>
-        <input type="password" id="auth-user-pass" class="form-input" placeholder="न्यूनतम 4 अक्षर">
+        <label>रोल नंबर (4000 से 9999 तक, अनिवार्य)</label>
+        <input type="number" id="auth-roll" class="form-input" placeholder="4000 to 9999" min="4000" max="9999">
       </div>
       <div class="form-group">
-        <label>आपका नाम (पहली बार जुड़ने पर)</label>
-        <input type="text" id="auth-name" class="form-input" placeholder="छात्र का नाम">
+        <label>पर्सनल पासवर्ड (कम से कम 6 अंक/अक्षर)</label>
+        <input type="password" id="auth-user-pass" class="form-input" placeholder="कम से कम 6 अक्षर">
       </div>
       <div class="form-group">
-        <label>रोल नंबर (वैकल्पिक)</label>
-        <input type="text" id="auth-roll" class="form-input" placeholder="Roll No">
+        <label>तालिब-ए-इल्म का नाम (पहली बार जुड़ने पर)</label>
+        <input type="text" id="auth-name" class="form-input" placeholder="नाम">
       </div>
       <div class="form-group">
         <label style="color:#f87171;">मास्टर एडमिन पासवर्ड (यदि एडमिन हैं)</label>
         <input type="password" id="auth-admin-pass" class="form-input" placeholder="SuhailAiJamia">
       </div>
       
-      <button type="button" class="btn-action" id="btn-login-submit">लॉगिन / रजिस्टर</button>
-      <div class="auth-link" id="link-goto-forgot">पासवर्ड भूल गए? (Forgot Password)</div>
+      <button type="button" class="btn-action" id="btn-login-submit">दाखिल हों / Register</button>
     </div>
-
-    <div class="auth-card" id="view-forgot" style="display:none;">
-      <h3 style="color:var(--accent-yellow); text-align:center;">पासवर्ड रीसेट करें</h3>
-      <p style="font-size:0.75rem; color:var(--text-muted); text-align:center;">खाते में दर्ज सही विवरण दर्ज करें</p>
-
-      <div class="form-group">
-        <label>रजिस्टर्ड मोबाइल नंबर</label>
-        <input type="tel" id="forgot-phone" class="form-input" placeholder="10 अंकों का नंबर" maxlength="10">
-      </div>
-      <div class="form-group">
-        <label>रजिस्टर्ड नाम या रोल नंबर</label>
-        <input type="text" id="forgot-verify" class="form-input" placeholder="नाम या रोल नंबर">
-      </div>
-      <div class="form-group">
-        <label>नया पासवर्ड</label>
-        <input type="password" id="forgot-new-pass" class="form-input" placeholder="नया पासवर्ड">
-      </div>
-
-      <button type="button" class="btn-action" id="btn-forgot-submit" style="background:var(--accent-yellow); color:#000;">पासवर्ड बदलें</button>
-      <div class="auth-link" id="link-goto-login">वापस लॉगिन पर जाएँ</div>
-    </div>
-
   </div>
 
-  <!-- TOP HEADER -->
+  <!-- HEADER -->
   <header class="top-header">
     <div class="header-user">
       <div class="header-avatar" id="u-avatar">S</div>
       <div class="header-info">
-        <h4 id="u-name">Student</h4>
-        <span class="badge-plan" id="u-plan">FREE</span>
+        <h4 id="u-name">Talib-e-Ilm</h4>
+        <span class="badge-plan" id="u-plan">BASIT (FREE)</span>
       </div>
     </div>
     <div class="header-actions">
@@ -170,8 +136,8 @@
   <section id="tab-study" class="tab-view active">
     <div class="chat-messages" id="chat-box">
       <div class="chat-bubble ai">
-        <span class="ai-label" id="current-ai-label">Suhail AI Free (Gemini)</span>
-        अस्सलामु अलैकुम! मैं आपका सुहैल AI स्टडी पार्टनर हूँ। पढ़ाई, नह्व-सर्फ़ या दरसी किताबों से मुतअल्लिक़ कोई भी सवाल पूछें।
+        <span class="ai-label" id="current-ai-label">Suhail AI Basit</span>
+        अस्सलामु अलैकुम व रहमतुल्लाह! मैं आपका सुहैल AI स्टडी पार्टनर हूँ। दरसे निज़ामी, नह्व, सर्फ़ या किताबों से मुतअल्लिक़ कोई भी सवाल पूछें।
       </div>
     </div>
     <div class="chat-footer">
@@ -180,55 +146,66 @@
     </div>
   </section>
 
-  <!-- TAB 2: PRICING PLANS -->
+  <!-- TAB 2: PRICING PLANS (4 TIERS WITH 30 DAYS EXPIRY) -->
   <section id="tab-plans" class="tab-view">
-    <!-- 1. FREE -->
+    <!-- 1. BASIT (FREE) -->
     <div class="plan-card">
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
-        <span style="font-weight:700;">Suhail AI Free</span>
+        <span style="font-weight:700;">Suhail AI Basit</span>
         <span style="font-weight:700; color:var(--primary-green);">₹0</span>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">10 सवाल रोज़ाना • <b>Google Gemini</b> इंजन</div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">10 सवाल रोज़ाना • बुनियादी तालीमी रहनुमाई</div>
     </div>
 
-    <!-- 2. PLUS: MISTRAL -->
+    <!-- 2. MAHIR (₹10) -->
     <div class="plan-card highlight">
-      <div class="offer-badge">लॉन्च ऑफर</div>
+      <div class="offer-badge">ऑफर (30 दिन)</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
-        <span style="font-weight:700;">Suhail AI Plus</span>
-        <div><span class="price-cut">₹150</span><span style="font-weight:700; color:var(--primary-green);">₹10/माह</span></div>
+        <span style="font-weight:700;">Suhail AI Mahir</span>
+        <div><span class="price-cut">₹150</span><span style="font-weight:700; color:var(--primary-green);">₹10 / 30 दिन</span></div>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">150 सवाल रोज़ाना • <b>Mistral AI</b> (मध्यम व सटीक हल)</div>
-      <button type="button" class="btn-action" onclick="window.goToPay('plus')">मात्र ₹10 में अपग्रेड करें</button>
+      <div style="font-size:0.8rem; color:var(--text-muted);">150 सवाल रोज़ाना • नह्व व सर्फ़ के सटीक व तफ़्सीली हल</div>
+      <button type="button" class="btn-action" onclick="window.goToPay('plus')">मात्र ₹10 में 30 दिन के लिए लें</button>
     </div>
 
-    <!-- 3. PRO: GROQ 120B -->
+    <!-- 3. FAAIQ (₹25) -->
     <div class="plan-card">
-      <div class="offer-badge">सुपर सेवर</div>
+      <div class="offer-badge">ख़ास ऑफर (30 दिन)</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
-        <span style="font-weight:700;">Suhail AI Pro</span>
-        <div><span class="price-cut">₹999</span><span style="font-weight:700; color:var(--primary-green);">₹50/वर्ष</span></div>
+        <span style="font-weight:700;">Suhail AI Faaiq</span>
+        <div><span class="price-cut">₹499</span><span style="font-weight:700; color:var(--primary-green);">₹25 / 30 दिन</span></div>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">1000 सवाल रोज़ाना • <b>Groq Fast Engine</b> (अत्यंत तेज़ स्पीड)</div>
-      <button type="button" class="btn-action" onclick="window.goToPay('pro')">मात्र ₹50 में साल भर का प्लान लें</button>
+      <div style="font-size:0.8rem; color:var(--text-muted);">500 सवाल रोज़ाना • आला इल्मी सलाहियत व तेज़ तारीन जवाब</div>
+      <button type="button" class="btn-action" onclick="window.goToPay('pro')">मात्र ₹25 में 30 दिन के लिए लें</button>
+    </div>
+
+    <!-- 4. ALLAMA (₹50) -->
+    <div class="plan-card">
+      <div class="offer-badge">सुपर सेवर (30 दिन)</div>
+      <div style="display:flex; justify-content:space-between; align-items:baseline;">
+        <span style="font-weight:700;">Suhail AI Allama</span>
+        <div><span class="price-cut">₹999</span><span style="font-weight:700; color:var(--primary-green);">₹50 / 30 दिन</span></div>
+      </div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">ला-महदूद / 1000 सवाल रोज़ाना • सबसे आला दरजे का विशेषज्ञ इंजन</div>
+      <button type="button" class="btn-action" onclick="window.goToPay('allama')">मात्र ₹50 में 30 दिन के लिए लें</button>
     </div>
   </section>
 
-  <!-- TAB 3: UPGRADE / QR PAYMENT -->
+  <!-- TAB 3: UPGRADE / PAYMENT -->
   <section id="tab-pay" class="tab-view">
     <h4 style="text-align:center; color:#fff;">FamApp QR कोड पेमेंट</h4>
     <p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">QR कोड स्कैन करके फ़ीस भेजें और 12-अंकों का UTR नंबर दर्ज करें।</p>
     
     <div class="qr-box">
-      <!-- आपका असली FamApp QR कोड -->
       <img src="/Screenshot_20260920-204342_FamApp.png" alt="FamApp Payment QR" onerror="this.src='Screenshot_20260920-204342_FamApp.png'">
     </div>
 
     <div class="form-group">
-      <label>चुना हुआ प्लान</label>
+      <label>चुना हुआ प्लान (मुद्दत: 30 दिन)</label>
       <select id="pay-plan-select" class="form-input">
-        <option value="plus">Suhail AI Plus (ऑफर मात्र ₹10)</option>
-        <option value="pro">Suhail AI Pro (ऑफर मात्र ₹50)</option>
+        <option value="plus">Suhail AI Mahir (₹10 / 30 दिन)</option>
+        <option value="pro">Suhail AI Faaiq (₹25 / 30 दिन)</option>
+        <option value="allama">Suhail AI Allama (₹50 / 30 दिन)</option>
       </select>
     </div>
 
@@ -243,7 +220,7 @@
   <!-- TAB 4: ADMIN APPROVAL PANEL -->
   <section id="tab-admin" class="tab-view">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h4 style="color:var(--accent-yellow);">लंबित पेमेंट अप्रूवल</h4>
+      <h4 style="color:var(--accent-yellow);">लंबित पेमेंट अप्रूवल (30 Days Activation)</h4>
       <button id="btn-admin-refresh" class="form-input" style="padding:4px 8px; cursor:pointer;"><i class="fa-solid fa-rotate"></i> रिफ्रेश</button>
     </div>
     <div id="admin-requests-list" style="display:flex; flex-direction:column; gap:8px;"></div>
@@ -271,16 +248,7 @@
     document.querySelector('.nav-item[data-tab="tab-pay"]').click();
   };
 
-  document.getElementById('link-goto-forgot').onclick = () => {
-    document.getElementById('view-login').style.display = 'none';
-    document.getElementById('view-forgot').style.display = 'flex';
-  };
-  document.getElementById('link-goto-login').onclick = () => {
-    document.getElementById('view-forgot').style.display = 'none';
-    document.getElementById('view-login').style.display = 'flex';
-  };
-
-  // रियल-टाइम प्रोफाइल सिंक (ताकि एडमिन के अप्रूव करते ही यूजर का लॉक लाइव खुल जाए)
+  // रियल-टाइम प्रोफाइल सिंक (ताकि एडमिन के अप्रूव करते ही 3 सेकंड में छात्र का टियर लाइव बदल जाए)
   async function syncProfile() {
     if (!currentUser || !currentUser.phone) return;
     try {
@@ -304,20 +272,30 @@
       return;
     }
     document.getElementById('auth-modal').style.display = 'none';
-    document.getElementById('u-name').textContent = currentUser.name || "Student";
+    document.getElementById('u-name').textContent = currentUser.name || "Talib-e-Ilm";
     document.getElementById('u-avatar').textContent = (currentUser.name || 'S').charAt(0).toUpperCase();
 
     const isAdmin = (currentUser.role === 'admin');
-    const planName = isAdmin ? 'PRO (ADMIN)' : (currentUser.plan ? currentUser.plan.toUpperCase() : 'FREE');
-    document.getElementById('u-plan').textContent = planName;
+    let planBadge = 'BASIT (FREE)';
+    let currentAiTitle = 'Suhail AI Basit';
 
-    // AI लेबल डायनामिक अपडेट
-    const label = document.getElementById('current-ai-label');
-    if (isAdmin || currentUser.plan === 'pro') label.textContent = 'Suhail AI Pro (Groq)';
-    else if (currentUser.plan === 'plus') label.textContent = 'Suhail AI Plus (Mistral)';
-    else label.textContent = 'Suhail AI Free (Gemini)';
+    const p = (isAdmin) ? 'allama' : (currentUser.plan || 'free');
 
-    // एडमिन सेटिंग्स: एडमिन को पेमेंट करने की आवश्यकता नहीं
+    if (p === 'allama') {
+      planBadge = isAdmin ? 'ALLAMA (ADMIN)' : 'ALLAMA (30 DAYS)';
+      currentAiTitle = 'Suhail AI Allama';
+    } else if (p === 'pro') {
+      planBadge = 'FAAIQ (30 DAYS)';
+      currentAiTitle = 'Suhail AI Faaiq';
+    } else if (p === 'plus') {
+      planBadge = 'MAHIR (30 DAYS)';
+      currentAiTitle = 'Suhail AI Mahir';
+    }
+
+    document.getElementById('u-plan').textContent = planBadge;
+    document.getElementById('current-ai-label').textContent = currentAiTitle;
+
+    // एडमिन सेटिंग्स
     document.getElementById('btn-admin-toggle').style.display = isAdmin ? 'inline-block' : 'none';
     document.getElementById('nav-item-admin').style.display = isAdmin ? 'block' : 'none';
     if (isAdmin) {
@@ -329,25 +307,34 @@
     }
   }
 
-  // 1. LOGIN / REGISTER SUBMIT
+  // LOGIN / REGISTER
   document.getElementById('btn-login-submit').addEventListener('click', async () => {
     const phone = document.getElementById('auth-phone').value.trim();
+    const roll = document.getElementById('auth-roll').value.trim();
     const userPass = document.getElementById('auth-user-pass').value.trim();
     const name = document.getElementById('auth-name').value.trim();
-    const roll = document.getElementById('auth-roll').value.trim();
     const adminPass = document.getElementById('auth-admin-pass').value.trim();
 
     if (phone.length !== 10) return alert("10 अंकों का मोबाइल नंबर दर्ज करें।");
-    if (!adminPass && (!userPass || userPass.length < 4)) return alert("कम से कम 4 अंकों का पासवर्ड डालें।");
+    
+    if (!adminPass) {
+      const rollNum = parseInt(roll, 10);
+      if (isNaN(rollNum) || rollNum < 4000 || rollNum > 9999) {
+        return alert("रोल नंबर 4000 से 9999 तक (4 अंक) होना अनिवार्य है।");
+      }
+      if (!userPass || userPass.length < 6) {
+        return alert("पर्सनल पासवर्ड कम से कम 6 अंकों/अक्षरों का होना अनिवार्य है।");
+      }
+    }
 
     try {
       const res = await fetch('/api?action=auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, userPass, name, roll, adminPass })
+        body: JSON.stringify({ phone, roll, userPass, name, adminPass })
       });
       const data = await res.json();
-      if (!res.ok || data.error) throw new Error(data.error || "लॉगिन विफल रहा");
+      if (!res.ok || data.error) throw new Error(data.error || "दाखिला विफल रहा");
 
       currentUser = data.user;
       localStorage.setItem('suhail_ai_user', JSON.stringify(currentUser));
@@ -361,39 +348,13 @@
     }
   });
 
-  // 2. FORGOT PASSWORD SUBMIT
-  document.getElementById('btn-forgot-submit').addEventListener('click', async () => {
-    const phone = document.getElementById('forgot-phone').value.trim();
-    const verify = document.getElementById('forgot-verify').value.trim();
-    const newPass = document.getElementById('forgot-new-pass').value.trim();
-
-    if (phone.length !== 10) return alert("10 अंकों का मोबाइल नंबर दर्ज करें।");
-    if (!verify) return alert("सत्यापन के लिए नाम या रोल नंबर दर्ज करें।");
-    if (!newPass || newPass.length < 4) return alert("नया पासवर्ड कम से कम 4 अक्षरों का रखें।");
-
-    try {
-      const res = await fetch('/api?action=forgot', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, verify, newPass })
-      });
-      const data = await res.json();
-      if (!res.ok || data.error) throw new Error(data.error || "रीसेट नहीं हो सका");
-
-      alert(data.message);
-      document.getElementById('link-goto-login').click();
-    } catch (e) {
-      alert(e.message);
-    }
-  });
-
   document.getElementById('btn-logout').onclick = () => {
     localStorage.removeItem('suhail_ai_user');
     localStorage.removeItem('suhail_ai_admin_pass');
     location.reload();
   };
 
-  // 3. AI CHAT
+  // CHAT SYSTEM
   const chatBox = document.getElementById('chat-box');
   const chatInput = document.getElementById('chat-input');
   const sendBtn = document.getElementById('btn-chat-send');
@@ -408,7 +369,7 @@
     chatInput.value = '';
     appendMessage(text, 'user');
     sendBtn.disabled = true;
-    const aiBubble = appendMessage("जवाब तैयार हो रहा है...", 'ai');
+    const aiBubble = appendMessage("तफ़्तीशी जवाब तैयार हो रहा है...", 'ai');
 
     try {
       const res = await fetch('/api?action=ai', {
@@ -417,11 +378,11 @@
         body: JSON.stringify({ prompt: text, phone: currentUser.phone })
       });
       const data = await res.json();
-      if (!res.ok || data.error) throw new Error(data.error || "AI उत्तर नहीं मिला");
+      if (!res.ok || data.error) throw new Error(data.error || "उत्तर प्राप्त नहीं हुआ");
 
       aiBubble.innerHTML = `<span class="ai-label">${data.aiName}</span>${data.reply}`;
     } catch (err) {
-      aiBubble.textContent = "त्रुटि: " + err.message;
+      aiBubble.textContent = "माफ़ कीजिए, " + err.message;
     } finally {
       sendBtn.disabled = false;
     }
@@ -436,7 +397,7 @@
     return div;
   }
 
-  // 4. SUBMIT PAYMENT
+  // PAYMENT SUBMISSION
   document.getElementById('btn-submit-pay').onclick = async () => {
     const utr = document.getElementById('pay-utr').value.trim();
     const plan = document.getElementById('pay-plan-select').value;
@@ -449,9 +410,9 @@
         body: JSON.stringify({ phone: currentUser.phone, plan, utr })
       });
       const data = await res.json();
-      if (!res.ok || data.error) throw new Error(data.error || "सबमिशन विफल");
+      if (!res.ok || data.error) throw new Error(data.error || "सबमिशन विफल रहा");
 
-      alert("अनुरोध भेजा गया! एडमिन की मंज़ूरी के बाद तुरंत अनलॉक हो जाएगा।");
+      alert("अनुरोध दर्ज हो गया है! उस्ताद/एडमिन की मंज़ूरी के बाद 30 दिन के लिए अनलॉक हो जाएगा।");
       document.getElementById('pay-utr').value = '';
       document.querySelector('.nav-item[data-tab="tab-study"]').click();
     } catch (e) {
@@ -459,7 +420,7 @@
     }
   };
 
-  // 5. ADMIN LOAD & APPROVE
+  // ADMIN REQUESTS
   async function loadAdminRequests() {
     const list = document.getElementById('admin-requests-list');
     list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">लोड हो रहा है...</p>';
@@ -489,11 +450,11 @@
         card.innerHTML = `
           <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.85rem;">
             <span>फ़ोन: ${item.phone}</span>
-            <span style="color:var(--primary-green); text-transform:uppercase;">${item.plan}</span>
+            <span style="color:var(--primary-green); text-transform:uppercase;">${item.plan} (30 DAYS)</span>
           </div>
           <div style="font-size:0.75rem; color:var(--text-muted);">UTR: <b style="color:#fff;">${item.utr}</b></div>
           <div class="admin-actions">
-            <button class="btn-approve" onclick="window.adminAction('approve_request', '${k}', '${item.phone}', '${item.plan}')">Approve</button>
+            <button class="btn-approve" onclick="window.adminAction('approve_request', '${k}', '${item.phone}', '${item.plan}')">Approve (30 Days)</button>
             <button class="btn-reject" onclick="window.adminAction('reject_request', '${k}')">Reject</button>
           </div>
         `;
@@ -529,8 +490,8 @@
   };
 
   renderUserUI();
-  // हर 4 सेकंड में रियल-टाइम स्टेटस सिंक
-  setInterval(syncProfile, 4000);
+  // हर 3 सेकंड में रियल-टाइम स्टेटस सिंक
+  setInterval(syncProfile, 3000);
 </script>
 </body>
 </html>
