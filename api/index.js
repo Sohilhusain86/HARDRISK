@@ -1,4 +1,5 @@
 // api/index.js - Unified Zero-Dependency Backend for Suhail AI
+
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
