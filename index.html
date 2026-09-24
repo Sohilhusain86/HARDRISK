@@ -1,630 +1,434 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b1020"><title>SUHAIL AI</title><style>
-:root {
-  --bg:#070b14;
-  --panel:#0d1322;
-  --panel2:#111a2c;
-  --line:#22304a;
-  --text:#eef4ff;
-  --muted:#91a0ba;
-  --accent:#6ea8fe;
-  --good:#38d39f;
-  --warn:#f6c453;
-  --danger:#ff6b7a;
-  --shadow:0 18px 55px #0007
-}
-* {
-  box-sizing:border-box
-}
-body {
-  margin:0;
-  background:radial-gradient(900px 500px at 20% -10%,#1b315d55,transparent 65%),var(--bg);
-  color:var(--text);
-  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  height:100vh;
-  overflow:hidden
-}
-button,input {
-  font:inherit
-}
-button {
-  cursor:pointer
-}
-.hidden {
-  display:none!important
-}
-.app {
-  height:100%;
-  display:flex
-}
-.sidebar {
-  width:300px;
-  border-right:1px solid var(--line);
-  background:#090e19;
-  display:flex;
-  flex-direction:column
-}
-.brand {
-  padding:22px;
-  border-bottom:1px solid var(--line)
-}
-.brand h1 {
-  font-size:20px;
-  margin:0 0 5px
-}
-.brand p {
-  margin:0;
-  color:var(--muted);
-  font-size:12px
-}
-.new {
-  margin:15px;
-  padding:12px;
-  border:1px solid var(--line);
-  background:var(--panel2);
-  color:var(--text);
-  border-radius:12px
-}
-.history {
-  overflow:auto;
-  padding:0 10px;
-  flex:1
-}
-.chatitem {
-  padding:12px;
-  border-radius:10px;
-  color:#cbd5e8;
-  margin:3px 0;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis
-}
-.chatitem.active,.chatitem:hover {
-  background:#17233a
-}
-.account {
-  padding:14px;
-  border-top:1px solid var(--line)
-}
-.account button {
-  width:100%;
-  margin-top:8px;
-  padding:9px;
-  border:1px solid var(--line);
-  border-radius:9px;
-  background:transparent;
-  color:var(--text)
-}
-.main {
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  min-width:0
-}
-.topbar {
-  height:70px;
-  border-bottom:1px solid var(--line);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 22px;
-  background:#080d18dd;
-  backdrop-filter:blur(14px)
-}
-.planpill {
-  border:1px solid #31435f;
-  border-radius:999px;
-  padding:7px 11px;
-  font-size:12px
-}
-.content {
-  flex:1;
-  min-height:0;
-  display:flex
-}
-.chat {
-  flex:1;
-  overflow:auto;
-  padding:30px 16px 145px
-}
-.welcome {
-  max-width:760px;
-  margin:8vh auto 0;
-  text-align:center
-}
-.welcome .logo {
-  width:68px;
-  height:68px;
-  border-radius:22px;
-  background:linear-gradient(135deg,#6ea8fe,#9b7bff);
-  display:grid;
-  place-items:center;
-  margin:auto;
-  font-weight:900;
-  color:#07101f;
-  font-size:22px
-}
-.welcome h2 {
-  font-size:32px;
-  margin:20px 0 8px
-}
-.welcome p {
-  color:var(--muted);
-  line-height:1.6
-}
-.suggestions {
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-  margin-top:25px
-}
-.suggestion {
-  padding:14px;
-  text-align:left;
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:13px;
-  color:#dbe7fb
-}
-.message {
-  max-width:820px;
-  margin:0 auto 22px;
-  display:flex;
-  gap:12px
-}
-.message.user {
-  justify-content:flex-end
-}
-.bubble {
-  max-width:min(78%,720px);
-  padding:13px 15px;
-  border-radius:16px;
-  line-height:1.6;
-  white-space:pre-wrap;
-  word-break:break-word
-}
-.assistant .bubble {
-  background:var(--panel);
-  border:1px solid var(--line)
-}
-.user .bubble {
-  background:#1c4d91
-}
-.meta {
-  font-size:10px;
-  color:var(--muted);
-  margin:0 4px 5px
-}
-.composerWrap {
-  position:fixed;
-  left:300px;
-  right:0;
-  bottom:0;
-  padding:16px;
-  background:linear-gradient(transparent,var(--bg) 25%)
-}
-.composer {
-  max-width:850px;
-  margin:auto;
-  background:var(--panel);
-  border:1px solid #2b3d5c;
-  border-radius:18px;
-  display:flex;
-  align-items:flex-end;
-  padding:10px;
-  box-shadow:var(--shadow)
-}
-textarea {
-  flex:1;
-  background:transparent;
-  border:0;
-  outline:0;
-  color:var(--text);
-  resize:none;
-  min-height:46px;
-  max-height:160px;
-  padding:10px
-}
-.send {
-  width:46px;
-  height:46px;
-  border:0;
-  border-radius:13px;
-  background:var(--accent);
-  color:#07101f;
-  font-weight:900
-}
-.send:disabled {
-  opacity:.45
-}
-.typing {
-  display:inline-flex;
-  gap:4px;
-  padding:4px
-}
-.typing i {
-  width:6px;
-  height:6px;
-  border-radius:50%;
-  background:#9db0d0;
-  animation:b 1s infinite
-}
-.typing i:nth-child(2) {
-  animation-delay:.15s
-}
-.typing i:nth-child(3) {
-  animation-delay:.3s
-}
-@keyframes b {
-  50% {
-    opacity:.2;
-    transform:translateY(-3px)
-  }
-}
-.auth {
-  position:fixed;
-  inset:0;
-  background:#050811ee;
-  display:grid;
-  place-items:center;
-  padding:20px;
-  z-index:20
-}
-.authbox {
-  width:min(440px,100%);
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:28px;
-  box-shadow:var(--shadow)
-}
-.authbox h2 {
-  margin:0 0 6px
-}
-.authbox p {
-  color:var(--muted);
-  font-size:13px
-}
-.field {
-  margin:13px 0
-}
-.field label {
-  display:block;
-  color:#aab8cf;
-  font-size:12px;
-  margin-bottom:7px
-}
-.field input {
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:1px solid var(--line);
-  background:#080d18;
-  color:var(--text);
-  outline:none
-}
-.primary {
-  width:100%;
-  padding:12px;
-  border:0;
-  border-radius:11px;
-  background:var(--accent);
-  font-weight:800;
-  color:#07101f
-}
-.link {
-  background:none;
-  border:0;
-  color:var(--accent);
-  padding:10px 0
-}
-.error {
-  color:var(--danger);
-  font-size:12px;
-  min-height:17px
-}
-.drawer {
-  position:fixed;
-  inset:0;
-  background:#0008;
-  z-index:10
-}
-.mobileMenu {
-  display:none
-}
-.modal {
-  position:fixed;
-  inset:0;
-  background:#0009;
-  display:grid;
-  place-items:center;
-  z-index:30;
-  padding:18px
-}
-.modalbox {
-  width:min(680px,100%);
-  max-height:90vh;
-  overflow:auto;
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:24px
-}
-.plans {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px
-}
-.plan {
-  border:1px solid var(--line);
-  border-radius:15px;
-  padding:18px;
-  background:#0b1220
-}
-.plan strong {
-  font-size:18px
-}
-.price {
-  font-size:28px;
-  font-weight:900;
-  margin:12px 0
-}
-.plan ul {
-  padding-left:18px;
-  color:#aebbd0;
-  font-size:13px;
-  line-height:1.7
-}
-.plan button {
-  width:100%;
-  padding:10px;
-  border:0;
-  border-radius:10px;
-  background:var(--accent);
-  font-weight:800
-}
-.paymentQR {
-  width:min(300px,100%);
-  aspect-ratio:1;
-  margin:16px auto;
-  display:block;
-  object-fit:contain;
-  background:#fff;
-  border-radius:12px;
-  padding:6px
-}
-.qrTitle {
-  text-align:center;
-  font-weight:800;
-  margin:14px 0 4px
-}
-.status {
-  padding:12px;
-  border-radius:10px;
-  background:#101b2d;
-  border:1px solid var(--line);
-  font-size:13px
-}
-.toast {
-  position:fixed;
-  right:18px;
-  bottom:90px;
-  background:#121d31;
-  border:1px solid var(--line);
-  padding:12px 15px;
-  border-radius:11px;
-  z-index:50;
-  box-shadow:var(--shadow)
-}
-@media(max-width:800px) {
-  .sidebar {
-    position:fixed;
-    left:-310px;
-    top:0;
-    bottom:0;
-    z-index:15;
-    transition:.2s
-  }
-  .sidebar.open {
-    left:0
-  }
-  .mobileMenu {
-    display:block;
-    background:none;
-    border:0;
-    color:var(--text);
-    font-size:22px
-  }
-  .composerWrap {
-    left:0
-  }
-  .topbar {
-    padding:0 12px
-  }
-  .chat {
-    padding-top:18px
-  }
-  .bubble {
-    max-width:88%
-  }
-  .plans {
-    grid-template-columns:1fr
-  }
-  .welcome {
-    margin-top:5vh
-  }
-  .suggestions {
-    grid-template-columns:1fr
-  }
-}
-</style></head><body>
-<div id="auth" class="auth"><div class="authbox"><h2>SUHAIL AI</h2><p id="authSub">पढ़ाई के लिए अपना नाम, 4 अंकों का रोल नंबर और मोबाइल नंबर डालें। OTP की जरूरत नहीं है।</p><div id="authErr" class="error"></div><form id="authForm"><div class="field"><label>नाम</label><input id="name" autocomplete="name" maxlength="60" required placeholder="अपना नाम"></div><div class="field"><label>रोल नंबर — केवल 4 अंक</label><input id="roll" inputmode="numeric" autocomplete="off" maxlength="4" minlength="4" required placeholder="जैसे 1024"></div><div class="field"><label>मोबाइल नंबर — 10 अंक</label><input id="phone" inputmode="numeric" autocomplete="tel" maxlength="10" minlength="10" required placeholder="10 अंकों का मोबाइल नंबर"></div><div class="field"><label>पासवर्ड — कम से कम 6 अक्षर</label><input id="password" type="password" autocomplete="current-password" minlength="6" maxlength="128" required placeholder="अपना पासवर्ड"></div><button class="primary" id="authBtn">SUHAIL AI में प्रवेश करें</button></form><div class="meta" style="margin-top:12px;text-align:center">पहली बार आने पर इसी जानकारी से आपका account बन जाएगा।</div></div></div>
-<div id="app" class="app hidden"><aside id="sidebar" class="sidebar"><div class="brand"><h1>SUHAIL AI</h1><p>Study • Learn • Revise</p></div><button class="new" id="newChat">＋ New chat</button><div id="history" class="history"></div><div class="account"><div id="accountName"></div><div id="accountPlan" class="meta"></div><button id="plansBtn">Plans & payment</button><button id="logout">Log out</button></div></aside><main class="main"><header class="topbar"><button class="mobileMenu" id="menuBtn">☰</button><div><b id="headerTitle">SUHAIL AI</b><div id="headerSub" class="meta">Your study assistant</div></div><div class="planpill" id="planPill">FREE</div></header><div class="content"><section id="chat" class="chat"></section></div><div class="composerWrap"><div class="composer"><textarea id="input" rows="1" maxlength="20000" placeholder="Ask SUHAIL AI a study question..."></textarea><button class="send" id="send">➤</button></div><div class="meta" style="max-width:850px;margin:7px auto 0;text-align:center">Study-only mode • AI can make mistakes; verify important academic information.</div></div></main></div>
-<div id="modal" class="modal hidden"><div class="modalbox"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><h2 id="modalTitle">Plans</h2><button class="link" id="closeModal">Close</button></div><div id="modalBody"></div></div></div><div id="toast" class="toast hidden"></div>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Suhail AI - Academic Learning Platform</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-dark: #0b141a;
+      --panel-dark: #111b21;
+      --card-dark: #202c33;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary-green: #00a884;
+      --accent-yellow: #facc15;
+      --accent-blue: #38bdf8;
+      --text-main: #e9edef;
+      --text-muted: #8696a0;
+      --danger: #ef4444;
+      --success: #22c55e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; }
+    
+    .app-container { width: 100%; max-width: 600px; display: flex; flex-direction: column; height: 100vh; background: var(--panel-dark); position: relative; overflow: hidden; }
+    
+    /* Top Header */
+    .top-header { background: var(--card-dark); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--card-border); z-index: 10; }
+    .header-user { display: flex; align-items: center; gap: 10px; }
+    .header-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--primary-green); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; }
+    .header-info h4 { font-size: 0.95rem; font-weight: 600; line-height: 1.2; }
+    .badge-plan { font-size: 0.68rem; padding: 2px 8px; border-radius: 12px; background: rgba(0, 168, 132, 0.2); color: var(--primary-green); font-weight: 600; text-transform: uppercase; }
+    .header-actions button { background: none; border: none; color: var(--text-muted); font-size: 1.1rem; cursor: pointer; margin-left: 8px; }
+    .header-actions button:hover { color: var(--text-main); }
+
+    /* Navigation Dock */
+    .nav-dock { display: flex; background: var(--card-dark); border-bottom: 1px solid var(--card-border); }
+    .nav-item { flex: 1; padding: 10px; text-align: center; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: 0.2s; }
+    .nav-item.active { color: var(--primary-green); border-bottom-color: var(--primary-green); }
+
+    /* Views container */
+    .tab-view { flex: 1; overflow-y: auto; padding: 14px; display: none; flex-direction: column; gap: 14px; }
+    .tab-view.active { display: flex; }
+
+    /* Chat Tab */
+    .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 10px; }
+    .chat-bubble { max-width: 85%; padding: 10px 14px; border-radius: 12px; font-size: 0.88rem; line-height: 1.5; word-wrap: break-word; }
+    .chat-bubble.user { align-self: flex-end; background: #005c4b; color: #fff; border-bottom-right-radius: 2px; }
+    .chat-bubble.ai { align-self: flex-start; background: var(--card-dark); border: 1px solid var(--card-border); border-bottom-left-radius: 2px; }
+    .chat-footer { display: flex; gap: 8px; padding-top: 8px; }
+    .chat-input { flex: 1; background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 24px; padding: 10px 16px; color: #fff; outline: none; font-size: 0.9rem; }
+    .btn-send { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-green); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+
+    /* Plan Cards */
+    .plan-card { background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px; position: relative; }
+    .plan-card.highlight { border-color: var(--primary-green); }
+    .plan-header { display: flex; justify-content: space-between; align-items: baseline; }
+    .plan-title { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .plan-price { font-size: 1.25rem; font-weight: 700; color: var(--primary-green); }
+    .plan-desc { font-size: 0.8rem; color: var(--text-muted); }
+    .btn-action { width: 100%; padding: 10px; border-radius: 8px; border: none; background: var(--primary-green); color: #fff; font-weight: 600; cursor: pointer; margin-top: 6px; }
+    .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Form Fields */
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 0.8rem; color: var(--text-muted); }
+    .form-input { background: #182229; border: 1px solid var(--card-border); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 0.9rem; outline: none; }
+    .qr-box { background: #fff; padding: 12px; border-radius: 12px; width: 180px; height: 180px; margin: 10px auto; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .qr-box img { width: 100%; height: 100%; object-fit: contain; }
+
+    /* Auth Overlay */
+    .auth-overlay { position: absolute; inset: 0; background: rgba(11, 20, 26, 0.96); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .auth-card { background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 16px; padding: 24px; width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 14px; }
+    
+    /* Admin Request Cards */
+    .admin-req-card { background: #182229; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+    .admin-actions { display: flex; gap: 8px; margin-top: 6px; }
+    .btn-approve { flex: 1; padding: 6px; border: none; border-radius: 6px; background: var(--success); color: #fff; font-weight: 600; cursor: pointer; }
+    .btn-reject { flex: 1; padding: 6px; border: none; border-radius: 6px; background: var(--danger); color: #fff; font-weight: 600; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  
+  <!-- 1. AUTH MODAL (LOGIN) -->
+  <div id="auth-modal" class="auth-overlay">
+    <div class="auth-card">
+      <h3 style="color:var(--primary-green); text-align:center;">Suhail AI Login</h3>
+      <p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Apna 10 ankon ka mobile number darj karke login karein</p>
+      
+      <div class="form-group">
+        <label>Naam (Student / Admin)</label>
+        <input type="text" id="auth-name" class="form-input" placeholder="Aapka Naam">
+      </div>
+      <div class="form-group">
+        <label>Mobile Number (10 Digits)</label>
+        <input type="tel" id="auth-phone" class="form-input" placeholder="e.g. 9876543210" maxlength="10">
+      </div>
+      <div class="form-group">
+        <label>Roll Number (Optional)</label>
+        <input type="text" id="auth-roll" class="form-input" placeholder="Roll No">
+      </div>
+      <div class="form-group">
+        <label>Admin Password (Sirf Admin ke liye)</label>
+        <input type="password" id="auth-pass" class="form-input" placeholder="Agar admin hain">
+      </div>
+      
+      <button type="button" class="btn-action" id="btn-login-submit">Login / Register</button>
+    </div>
+  </div>
+
+  <!-- 2. TOP HEADER -->
+  <header class="top-header">
+    <div class="header-user">
+      <div class="header-avatar" id="u-avatar">S</div>
+      <div class="header-info">
+        <h4 id="u-name">Student</h4>
+        <span class="badge-plan" id="u-plan">Free</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="btn-admin-toggle" title="Admin Panel" style="display:none;"><i class="fa-solid fa-shield-halved"></i></button>
+      <button id="btn-logout" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+    </div>
+  </header>
+
+  <!-- 3. NAVIGATION TABS -->
+  <nav class="nav-dock">
+    <div class="nav-item active" data-tab="tab-study"><i class="fa-solid fa-book-open"></i> Study AI</div>
+    <div class="nav-item" data-tab="tab-plans"><i class="fa-solid fa-crown"></i> Plans</div>
+    <div class="nav-item" data-tab="tab-pay"><i class="fa-solid fa-qrcode"></i> Upgrade</div>
+    <div class="nav-item" id="nav-item-admin" data-tab="tab-admin" style="display:none;"><i class="fa-solid fa-user-shield"></i> Requests</div>
+  </nav>
+
+  <!-- 4. TAB 1: STUDY AI CHAT -->
+  <section id="tab-study" class="tab-view active">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-size:0.8rem; color:var(--text-muted);">Mode:</span>
+      <select id="ai-mode" class="form-input" style="padding:4px 8px; font-size:0.75rem;">
+        <option value="general">General Study / Academic</option>
+        <option value="arabic">Dars-e-Nizami (Nahw / Sarf)</option>
+      </select>
+    </div>
+    <div class="chat-messages" id="chat-box">
+      <div class="chat-bubble ai">
+        Assalamu Alaikum! Main aapka Suhail AI Study Assistant hoon. Padhai, Nahw-Sarf ya dars se mutalliq koi bhi sawal puchein.
+      </div>
+    </div>
+    <div class="chat-footer">
+      <input type="text" id="chat-input" class="chat-input" placeholder="Apna sawal yahan likhein...">
+      <button type="button" class="btn-send" id="btn-chat-send"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+  </section>
+
+  <!-- 5. TAB 2: PRICING PLANS -->
+  <section id="tab-plans" class="tab-view">
+    <div class="plan-card">
+      <div class="plan-header">
+        <span class="plan-title">Free / Talib</span>
+        <span class="plan-price">₹0</span>
+      </div>
+      <div class="plan-desc">10 Sawal dainik • Normal AI response speed • Basic study access</div>
+    </div>
+
+    <div class="plan-card highlight">
+      <div class="plan-header">
+        <span class="plan-title">Pro Monthly</span>
+        <span class="plan-price">₹149<small style="font-size:0.7rem; color:var(--text-muted);">/mo</small></span>
+      </div>
+      <div class="plan-desc">150 Sawal dainik • Fast AI Engine • Priority Nahw/Sarf solver</div>
+      <button type="button" class="btn-action" onclick="window.goToPay('monthly')">Choose Monthly</button>
+    </div>
+
+    <div class="plan-card">
+      <div class="plan-header">
+        <span class="plan-title">Aalim Yearly</span>
+        <span class="plan-price">₹999<small style="font-size:0.7rem; color:var(--text-muted);">/yr</small></span>
+      </div>
+      <div class="plan-desc">1000 Sawal dainik • Ultra-Priority AI • Unlimited Study Support</div>
+      <button type="button" class="btn-action" onclick="window.goToPay('yearly')">Choose Yearly</button>
+    </div>
+  </section>
+
+  <!-- 6. TAB 3: PAYMENT SUBMISSION -->
+  <section id="tab-pay" class="tab-view">
+    <h4 style="text-align:center; color:#fff;">Manual QR Code Payment</h4>
+    <p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Scan karein aur payment ke baad UTR Reference ID submit karein.</p>
+    
+    <div class="qr-box">
+      <img id="pay-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=suhail@upi&pn=SuhailAI" alt="Payment QR">
+    </div>
+    
+    <div class="form-group">
+      <label>Selected Plan</label>
+      <select id="pay-plan-select" class="form-input">
+        <option value="monthly">Pro Monthly (₹149)</option>
+        <option value="yearly">Aalim Yearly (₹999)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>12-Digit UTR / Transaction ID (Anivarya)</label>
+      <input type="text" id="pay-utr" class="form-input" placeholder="e.g. 423456789012">
+    </div>
+
+    <button type="button" class="btn-action" id="btn-submit-pay">Verify & Activate Request</button>
+  </section>
+
+  <!-- 7. TAB 4: ADMIN APPROVAL PANEL -->
+  <section id="tab-admin" class="tab-view">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h4 style="color:var(--accent-yellow);">Payment Approval Requests</h4>
+      <button id="btn-admin-refresh" class="form-input" style="padding:4px 8px; cursor:pointer;"><i class="fa-solid fa-rotate"></i> Refresh</button>
+    </div>
+    <div id="admin-requests-list" style="display:flex; flex-direction:column; gap:8px;">
+      <p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Loading requests...</p>
+    </div>
+  </section>
+
+</div>
+
 <script>
-const S={
-token:localStorage.getItem('suhail_token'),user:null,plan:null,conversationId:localStorage.getItem('suhail_active_chat'),
-history:[],config:null
-};
-const $=id=>document.getElementById(id);
-const cacheKey=()=>S.user?`suhail_cache_${S.user.id}`:'suhail_cache_pending';
-function saveState(){try{localStorage.setItem('suhail_active_chat',S.conversationId||'');
-if(S.user)localStorage.setItem(cacheKey(),JSON.stringify({conversationId:S.conversationId,history:S.history.slice(-100),savedAt:Date.now()}));
-localStorage.setItem('suhail_draft',$('input')?.value||'')}catch{}}
-function restoreDraft(){try{const d=localStorage.getItem('suhail_draft');
-if(d&&$('input')){$('input').value=d;
-$('input').dispatchEvent(new Event('input'))}}catch{}}
-function toast(t){$('toast').textContent=t;
-$('toast').classList.remove('hidden');
-setTimeout(()=>$('toast').classList.add('hidden'),3200)}
-function headers(){return {'Content-Type':'application/json','Authorization':'Bearer '+S.token}}
-async function api(path,opt={}){const r=await fetch(path,{...opt,headers:{...headers(),...(opt.headers||{})}});
-let d={};
-try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.error||'Request failed');
-return d}
-$('roll').addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(0,4)});
-$('phone').addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(0,10)});
-$('authForm').onsubmit=async e=>{
-e.preventDefault();
-$('authErr').textContent='';
-const name=$('name').value.trim(),roll=$('roll').value.trim(),phone=$('phone').value.replace(/\D/g,''),password=$('password').value;
-if(!/^\d{4}$/.test(roll)){ $('authErr').textContent='रोल नंबर ठीक 4 अंकों का होना चाहिए।';
-return;
-}
-if(!/^[6-9]\d{9}$/.test(phone)){ $('authErr').textContent='मोबाइल नंबर 10 अंकों का होना चाहिए।';
-return;
-}
-if(password.length<6){ $('authErr').textContent='पासवर्ड कम से कम 6 अक्षरों का होना चाहिए।';
-return;
-}
-$('authBtn').disabled=true;
-try{
-const r=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,roll,phone,password})});
-const d=await r.json();
-if(!r.ok)throw new Error(d.error||'Login failed');
-S.token=d.token;
-localStorage.setItem('suhail_token',S.token);
-localStorage.removeItem('suhail_draft');
-await boot();
-}catch(x){
-const map={IDENTITY_MISMATCH:'इस रोल नंबर के साथ नाम या मोबाइल नंबर मेल नहीं खाता।',ROLL_EXISTS:'यह रोल नंबर पहले से registered है।',INVALID_NAME:'नाम ठीक से दर्ज करें।',INVALID_ROLL:'रोल नंबर ठीक 4 अंकों का होना चाहिए।',INVALID_PHONE:'मोबाइल नंबर 10 अंकों का होना चाहिए।',INVALID_PASSWORD:'पासवर्ड कम से कम 6 और अधिकतम 128 अक्षरों का होना चाहिए।',INVALID_CREDENTIALS:'पासवर्ड गलत है।',PASSWORD_NOT_SET:'इस account में अभी password सेट नहीं है। Admin से account reset करवाएँ।'};
-$('authErr').textContent=map[x.message]||x.message;
-}finally{$('authBtn').disabled=false}
-};
-async function boot(){
-try{
-const d=await api('/api/me');
-S.user=d.user;
-S.plan=d.plan;
-S.config=await (await fetch('/api/config')).json();
-$('auth').classList.add('hidden');
-$('app').classList.remove('hidden');
-renderAccount();
-let cached=null;
-try{cached=JSON.parse(localStorage.getItem(cacheKey())||'null')}catch{}
-if(cached&&cached.conversationId)S.conversationId=cached.conversationId;
-await loadChats();
-if(S.conversationId){try{await openChat(S.conversationId,true)}catch{if(cached?.history){S.history=cached.history;
-renderChat()}}}
-else if(cached?.history?.length){S.history=cached.history;
-renderChat()}
-else newChat();
-restoreDraft();
-}catch(e){
-localStorage.removeItem('suhail_token');
-localStorage.removeItem('suhail_active_chat');
-S.token=null;
-$('auth').classList.remove('hidden');
-$('app').classList.add('hidden');
-$('authErr').textContent=e.message;
-}
-}
-function renderAccount(){$('accountName').textContent=S.user.name;
-$('accountPlan').textContent=`${S.plan.name} • ${S.plan.price?'₹'+S.plan.price+' / 30 days':'Free'}`;
-$('planPill').textContent=S.user.plan;
-if(S.user.activeUntil)$('headerSub').textContent=`Active until ${new Date(S.user.activeUntil).toLocaleDateString()}`}
-async function loadChats(){const d=await api('/api/conversations');
-$('history').innerHTML='';
-d.conversations.forEach(c=>{const b=document.createElement('div');
-b.className='chatitem'+(c.id===S.conversationId?' active':'');
-b.textContent=c.title;
-b.onclick=()=>openChat(c.id);
-$('history').appendChild(b)})}
-function newChat(){S.conversationId=null;
-S.history=[];
-localStorage.removeItem('suhail_active_chat');
-saveState();
-renderChat()}
-$('newChat').onclick=newChat;
-async function openChat(id,silent=false){const d=await api('/api/conversations',{method:'POST',body:JSON.stringify({id})});
-S.conversationId=id;
-S.history=d.messages||[];
-localStorage.setItem('suhail_active_chat',id);
-saveState();
-renderChat();
-if(!silent)$('sidebar').classList.remove('open');
-document.querySelectorAll('.chatitem').forEach(x=>x.classList.remove('active'));
-}
-function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
-function renderChat(){const c=$('chat');
-if(!S.history.length){c.innerHTML=`<div class="welcome"><div class="logo">S</div><h2>How can I help you study?</h2><p>Ask about a lesson, solve a problem, translate a passage, prepare for an exam, or revise your notes.</p><div class="suggestions"><button class="suggestion">Explain this topic simply</button><button class="suggestion">Make me a revision quiz</button><button class="suggestion">Help me solve a maths problem</button><button class="suggestion">Translate and explain this passage</button></div></div>`;
-document.querySelectorAll('.suggestion').forEach(x=>x.onclick=()=>{$('input').value=x.textContent;
-$('input').focus()});
-saveState();
-return}c.innerHTML=S.history.map(m=>`<div class="message ${m.role==='user'?'user':'assistant'}"><div><div class="meta">${m.role==='user'?'You':'SUHAIL AI'}</div><div class="bubble">${esc(m.content)}</div></div></div>`).join('');
-c.scrollTop=c.scrollHeight;
-saveState()}
-async function send(){
-const text=$('input').value.trim();
-if(!text)return;
-$('input').value='';
-localStorage.removeItem('suhail_draft');
-$('send').disabled=true;
-S.history.push({role:'user',content:text,createdAt:Date.now()});
-renderChat();
-S.history.push({role:'assistant',content:'',createdAt:Date.now(),typing:true});
-renderChat();
-const bubbles=document.querySelectorAll('.assistant .bubble'),b=bubbles[bubbles.length-1];
-b.innerHTML='<span class="typing"><i></i><i></i><i></i></span>';
-try{const d=await api('/api/ai',{method:'POST',body:JSON.stringify({message:text,conversationId:S.conversationId,history:S.history.slice(0,-1)})});
-if(d.blocked){S.history[S.history.length-1]={role:'assistant',content:d.reply,createdAt:Date.now()};
-renderChat();
-return}S.conversationId=d.conversationId;
-S.history[S.history.length-1]={role:'assistant',content:d.reply,createdAt:Date.now()};
-renderChat();
-await loadChats();
-}
-catch(e){S.history[S.history.length-1]={role:'assistant',content:'त्रुटि: '+e.message,createdAt:Date.now()};
-renderChat()}
-finally{$('send').disabled=false}
-}
-$('send').onclick=send;
-$('input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();
-send()}});
-$('input').addEventListener('input',()=>{$('input').style.height='auto';
-$('input').style.height=Math.min($('input').scrollHeight,160)+'px';
-try{localStorage.setItem('suhail_draft',$('input').value)}catch{}});
-$('logout').onclick=()=>{localStorage.removeItem('suhail_token');
-localStorage.removeItem('suhail_active_chat');
-localStorage.removeItem(cacheKey());
-localStorage.removeItem('suhail_draft');
-location.reload()};
-$('menuBtn').onclick=()=>$('sidebar').classList.toggle('open');
-$('plansBtn').onclick=showPlans;
-$('closeModal').onclick=()=>$('modal').classList.add('hidden');
-async function showPlans(){const d=await (await fetch('/api/plans')).json();
-$('modalTitle').textContent='SUHAIL AI Plans';
-$('modalBody').innerHTML=`<div class="plans">${d.plans.map(p=>`<div class="plan"><strong>${p.name}</strong><div class="price">${p.price?'₹'+p.price:'FREE'}</div><div class="meta">${p.price?'30 days':'Always available'}</div><ul><li>${p.dailyMessages} messages/day</li><li>Study-only AI</li><li>${p.key==='PRO'?'High-level model':p.key==='PLUS'?'Medium model':'Gemini-powered'}</li></ul>${p.key==='FREE'?'<div class="status">Current free access</div>':`<button onclick="payment('${p.key}')">Get ${p.key}</button>`}</div>`).join('')}</div>`;
-$('modal').classList.remove('hidden')}
-async function payment(plan){const cfg=S.config||await (await fetch('/api/config')).json();
-const amount=plan==='PLUS'?10:50;
-$('modalTitle').textContent=`${plan==='PLUS'?'SUHAIL AI PLUS':'SUHAIL AI PRO'} — Payment`;
-$('modalBody').innerHTML=`<div class="status"><b>Plan:</b> ${plan==='PLUS'?'SUHAIL AI PLUS':'SUHAIL AI PRO'}<br><b>Amount:</b> ₹${amount}<br><b>Validity:</b> 30 days</div><div class="qrTitle">QR कोड scan करके ठीक ₹${amount} का payment करें</div><img class="paymentQR" src="${esc(cfg.payment.qrUrl||'/payment-qr.png')}" alt="FamPay payment QR" onerror="this.style.display='none';this.nextElementSibling.classList.remove('hidden')"><div class="status hidden" style="margin:10px 0">Payment QR अभी configure नहीं किया गया है। Vercel में PAYMENT_QR_URL या public/payment-qr.png सेट करें।</div><div class="status">Payment करने के बाद नीचे अपना <b>UTR / Transaction Reference</b> डालें और Submit करें।</div><div class="field"><label>UTR / Transaction Reference</label><input id="utr" maxlength="100" placeholder="Payment reference"></div><button class="primary" id="submitPayment">Payment Done — Submit Request</button><p class="meta">Request Admin verification तक <b>PENDING</b> रहेगी। तब तक आपका FREE plan चलता रहेगा। Approval के बाद चुना हुआ plan activate होगा।</p>`;
-$('submitPayment').onclick=async()=>{const btn=$('submitPayment');
-btn.disabled=true;
-try{await api('/api/payment',{method:'POST',body:JSON.stringify({plan,utr:$('utr').value})});
-$('modalBody').innerHTML=`<div class="status"><b>🟡 Payment request pending</b><br><br>आपकी request Admin को भेज दी गई है। Admin payment verify करके approve करेगा।<br><br><b>तब तक SUHAIL AI FREE चलता रहेगा।</b><br><br>Approval के बाद ${plan} automatically active हो जाएगा।</div>`;
-toast('Payment request submitted')}catch(e){toast(e.message);
-btn.disabled=false}}}
-window.addEventListener('beforeunload',saveState);
-if(S.token)boot();
-</script></body></html>
+  let currentUser = JSON.parse(localStorage.getItem('suhail_ai_user') || 'null');
+  let currentAdminPass = localStorage.getItem('suhail_ai_admin_pass') || '';
+
+  // Tab Switching
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+      item.classList.add('active');
+      document.getElementById(item.dataset.tab).classList.add('active');
+      if (item.dataset.tab === 'tab-admin') loadAdminRequests();
+    });
+  });
+
+  window.goToPay = function(planKey) {
+    document.getElementById('pay-plan-select').value = planKey;
+    document.querySelector('.nav-item[data-tab="tab-pay"]').click();
+  };
+
+  // Auth Handling
+  function renderUserUI() {
+    if (!currentUser) {
+      document.getElementById('auth-modal').style.display = 'flex';
+      return;
+    }
+    document.getElementById('auth-modal').style.display = 'none';
+    document.getElementById('u-name').textContent = currentUser.name || currentUser.phone;
+    document.getElementById('u-avatar').textContent = (currentUser.name || 'S').charAt(0).toUpperCase();
+    document.getElementById('u-plan').textContent = currentUser.plan || 'Free';
+
+    const isAdmin = (currentUser.role === 'admin');
+    document.getElementById('btn-admin-toggle').style.display = isAdmin ? 'inline-block' : 'none';
+    document.getElementById('nav-item-admin').style.display = isAdmin ? 'block' : 'none';
+  }
+
+  document.getElementById('btn-login-submit').addEventListener('click', async () => {
+    const name = document.getElementById('auth-name').value.trim();
+    const phone = document.getElementById('auth-phone').value.trim();
+    const roll = document.getElementById('auth-roll').value.trim();
+    const pass = document.getElementById('auth-pass').value.trim();
+
+    if (phone.length !== 10) return alert("10 ankon ka mobile number darj karein.");
+
+    try {
+      const res = await fetch('/api?action=auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, roll, pass })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || "Login fail");
+
+      currentUser = data.user;
+      localStorage.setItem('suhail_ai_user', JSON.stringify(currentUser));
+      if (pass) {
+        currentAdminPass = pass;
+        localStorage.setItem('suhail_ai_admin_pass', pass);
+      }
+      renderUserUI();
+    } catch (e) {
+      alert("Error: " + e.message);
+    }
+  });
+
+  document.getElementById('btn-logout').addEventListener('click', () => {
+    localStorage.removeItem('suhail_ai_user');
+    localStorage.removeItem('suhail_ai_admin_pass');
+    location.reload();
+  });
+
+  // AI Chat Request
+  const chatBox = document.getElementById('chat-box');
+  const chatInput = document.getElementById('chat-input');
+  const sendBtn = document.getElementById('btn-chat-send');
+
+  sendBtn.addEventListener('click', sendQuestion);
+  chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendQuestion(); });
+
+  async function sendQuestion() {
+    const text = chatInput.value.trim();
+    if (!text || !currentUser) return;
+
+    chatInput.value = '';
+    appendMessage(text, 'user');
+
+    sendBtn.disabled = true;
+    const aiBubble = appendMessage("Soch raha hai...", 'ai');
+
+    try {
+      const mode = document.getElementById('ai-mode').value;
+      const res = await fetch('/api?action=ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: text, phone: currentUser.phone, mode })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || "AI query failed");
+
+      aiBubble.textContent = data.reply;
+    } catch (err) {
+      aiBubble.textContent = "Error: " + err.message;
+    } finally {
+      sendBtn.disabled = false;
+    }
+  }
+
+  function appendMessage(text, role) {
+    const div = document.createElement('div');
+    div.className = `chat-bubble ${role}`;
+    div.textContent = text;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    return div;
+  }
+
+  // Payment Form Submission
+  document.getElementById('btn-submit-pay').addEventListener('click', async () => {
+    const utr = document.getElementById('pay-utr').value.trim();
+    const plan = document.getElementById('pay-plan-select').value;
+    if (!utr) return alert("Kripya 12-digit UTR ID darj karein.");
+
+    try {
+      const res = await fetch('/api?action=payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: currentUser.phone, plan, utr })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || "Payment submission failed");
+
+      alert("Request bhej di gayi hai! Admin verification ke baad plan activate ho jayega.");
+      document.getElementById('pay-utr').value = '';
+      document.querySelector('.nav-item[data-tab="tab-study"]').click();
+    } catch (e) {
+      alert("Error: " + e.message);
+    }
+  });
+
+  // Admin Verification & Actions
+  async function loadAdminRequests() {
+    const list = document.getElementById('admin-requests-list');
+    list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Loading...</p>';
+
+    try {
+      const res = await fetch('/api?action=admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pass: currentAdminPass, cmd: 'get_requests' })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || "Failed to load requests");
+
+      const reqs = data.requests || {};
+      const keys = Object.keys(reqs).filter(k => reqs[k].status === 'pending');
+
+      if (!keys.length) {
+        list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Koi pending payment request nahi hai.</p>';
+        return;
+      }
+
+      list.innerHTML = '';
+      keys.forEach(k => {
+        const item = reqs[k];
+        const card = document.createElement('div');
+        card.className = 'admin-req-card';
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.85rem;">
+            <span>Phone: ${item.phone}</span>
+            <span style="color:var(--primary-green); text-transform:uppercase;">${item.plan}</span>
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-muted);">UTR: <b style="color:#fff;">${item.utr}</b></div>
+          <div class="admin-actions">
+            <button class="btn-approve" onclick="window.adminAction('approve_request', '${k}', '${item.phone}', '${item.plan}')">Approve</button>
+            <button class="btn-reject" onclick="window.adminAction('reject_request', '${k}')">Reject</button>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    } catch (e) {
+      list.innerHTML = `<p style="color:var(--danger); font-size:0.8rem; text-align:center;">${e.message}</p>`;
+    }
+  }
+
+  document.getElementById('btn-admin-refresh').addEventListener('click', loadAdminRequests);
+
+  window.adminAction = async function(cmd, requestId, targetPhone, targetPlan) {
+    try {
+      const res = await fetch('/api?action=admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pass: currentAdminPass, cmd, requestId, targetPhone, targetPlan })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || "Action failed");
+      alert(data.message || "Action completed!");
+      loadAdminRequests();
+    } catch (e) {
+      alert("Error: " + e.message);
+    }
+  };
+
+  renderUserUI();
+</script>
+</body>
+</html>
