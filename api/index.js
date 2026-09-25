@@ -24,13 +24,13 @@ const TOOL_LIMITS = {
   ultra: 200
 };
 
-// DEDICATED MULTI-LINGUAL + ISLAMIC ADAB SYSTEM PROMPTS
+// DEDICATED BEHAVIOR RULES (STRICT ISLAMIC GREETING & NO NAMASTE)
 const SYSTEM_RULES = {
   free: `Aapka official naam 'SUHAIL AI FREE' hai.
 Uddeshya: Madadgaar aur ba-adab Islami tehzeeb ke sath Study wa Knowledge Assistant.
 Niyam:
 1. Zaban: User jis zaban me sawal kare (Hindi, Roman Urdu, Urdu, English, Arabic), usi zaban me jawab dein.
-2. Islami Adab: Guftagu me ba-adab aur Islami shaiyastagi ka khayal rakhein.
+2. STRICT ISLAMIC ADAB: Chahe Hindi me jawab dein ya kisi bhi bhasha me, KABHI BHI 'नमस्ते', 'नमस्कार' ya kisi gair-Islami greeting ka prayog na karein. Shuruat me agar greeting karni ho to 'अस्सलामु अलैकुम' / 'Assalamu Alaikum' kahein, ya seedha moaddab jawab shuru karein.
 3. Dars-e-Nizami, school, college, science, maths ka aasan aur seedha jawab dein.
 4. Gali-galoj ya gair-akhlaqi baaton par narmi se inkar karein.`,
 
@@ -38,7 +38,7 @@ Niyam:
 Uddeshya: Mufassal Talimi Ustaad wa Rehnuma (Detailed Study Tutor).
 Niyam:
 1. Zaban: User ki zaban me behtareen jawab dein (Hindi, Roman Urdu, Urdu, English, Arabic).
-2. Islami Adab: Baat cheet me Islami adab aur ilmi sanjeedgi barqarar rakhein.
+2. STRICT ISLAMIC ADAB: Chahe Hindi bhasha me jawab dein, KABHI BHI 'नमस्ते' ya 'नमस्कार' na kahein. Greeting me sirf 'अस्सलामु अलैकुम' / 'Assalamu Alaikum' kahein ya bina greeting seedha ilmi jawab dein.
 3. Nahw, Sarf, Arabic grammar, translation, maths, science me step-by-step aur detailed wazahat dein.
 4. Pichli guftagu ke context ko yaad rakh kar jawab dein.`,
 
@@ -46,7 +46,7 @@ Niyam:
 Uddeshya: Aala Talimi aur Tajziyati Muawin (Advanced Academic & Analytical Assistant).
 Niyam:
 1. Zaban: User ki zaban ke mutabiq fassih aur munasib andaz me jawab dein.
-2. Islami Adab: Aala ilmi wa Islami adab ke sath guftagu karein.
+2. STRICT ISLAMIC ADAB: 'नमस्ते' ya 'नमस्कार' bolna sakhti se mana hai. Hamesha Islami tahiyyaat ('अस्सलामु अलैकुम') ya seedha ilmi guftagu karein.
 3. Complex academic, scientific, grammatical aur rational sawalat ko logically break karke tajziyati jawab dein.
 4. Ibaarat Fahmi, Lughat aur Fiqhi Tatbeeq me aala darje ka tajziya dein.`,
 
@@ -54,7 +54,7 @@ Niyam:
 Uddeshya: Markazi Ilmi Tehqeeq aur Flagship Research Assistant (Flagship Scholarly Engine).
 Niyam:
 1. Zaban: User jis zaban me sawal kare, usi zaban me aala tareen ilmi mayaar par jawab pesh karein.
-2. Islami Adab: Pukhta Islami tehzeeb aur tehqeeqi waqar barqarar rakhein.
+2. STRICT ISLAMIC ADAB: KABHI BHI 'नमस्ते' ya 'नमस्कार' na kahein. Hamesha ba-adab Islami tarz-e-kalam aur 'अस्सलामु अलैकुम' ikhtiyar karein.
 3. ULTRA SPECIAL TOOLS:
    - [4 Mazahib Fiqh Matrix]: Hanafi, Shafi'i, Maliki, aur Hanbali aaraa, dalail-e-arba'a, aur Mufta-bihi qawl ka aamne-saamne muqabla karein.
    - [Mantiq & Kalam Defense]: Ilm-ul-Mantiq (Sughra, Kubra, Qiyas) se da'won ko sabit karein aur aqaid ke shubhaat ka qata'ee ilmi radd karein.
@@ -108,7 +108,7 @@ function normalizePlan(rawPlan) {
 }
 
 // -------------------------------------------------------------
-// MULTI-MODEL RESILIENT CALLERS
+// MULTI-MODEL DISPATCHER
 // -------------------------------------------------------------
 
 async function tryGroq(model, messages) {
@@ -214,7 +214,7 @@ async function executeAI(plan, prompt, instruction, conversationHistory = []) {
   }
 
   if (!reply) {
-    throw { userMsg: "सुहैल AI सेवा इस समय व्यस्त है। कृपया 5 सेकंड बाद पुनः प्रयास करें।", code: 500 };
+    throw { userMsg: "Suhail AI service is samay vyast hai. Kripya 5 second baad punah prayas karein.", code: 500 };
   }
 
   return reply;
@@ -247,7 +247,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // AUTHENTICATION (UNTOUCHED & SECURE)
     if (action === "auth" && req.method === "POST") {
       const { phone, name, roll, userPass, adminPass } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -357,7 +356,7 @@ export default async function handler(req, res) {
       const currentDailyCount = isNewDay ? 0 : (user?.dailyCount || 0);
       const currentToolCount = isNewDay ? 0 : (user?.dailyToolCount || 0);
 
-      // Separate Quota Checks for Tools vs Questions
+      // Separate Quota Checks
       if (user?.role !== "admin") {
         if (isTool) {
           const maxTools = TOOL_LIMITS[plan] || 10;
@@ -403,7 +402,6 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, reply: replyText, aiName, plan });
     }
 
-    // PAYMENT HANDLING
     if (action === "payment" && req.method === "POST") {
       const { phone, plan, utr } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -428,7 +426,6 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: "पेमेंट अनुरोध दर्ज हो गया है। एडमिन मंज़ूरी के बाद 30 दिनों के लिए चालू होगा।" });
     }
 
-    // ADMIN MANAGEMENT
     if (action === "admin" && req.method === "POST") {
       const { pass, cmd, requestId, targetPhone, targetPlan } = req.body || {};
       if (pass !== ADMIN_SECRET) return res.status(401).json({ success: false, error: "गलत एडमिन पासवर्ड।" });
