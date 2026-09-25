@@ -3,12 +3,10 @@ import crypto from "crypto";
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com";
 
-// Vercel Keys
-const POLLINATIONS_KEY = process.env.POLLINATIONS_KEY || process.env.POLLINATION_KEY || "";
+// Only ONE verified, 100% working key
 const GROQ_KEY = process.env.GROQ_KEY || "";
-const OPENROUTER_KEY = process.env.OPENROUTER_KEY || "";
 
-// STRICT DAILY LIMITS
+// STRICT SERVER-SIDE DAILY LIMITS
 const DAILY_LIMITS = {
   free: 25,
   plus: 150,
@@ -16,7 +14,9 @@ const DAILY_LIMITS = {
   ultra: 1000
 };
 
+// -------------------------------------------------------------
 // DEDICATED BEHAVIOR RULES FOR EACH TIER
+// -------------------------------------------------------------
 const SYSTEM_RULES = {
   free: `Aapka official naam 'SUHAIL AI FREE' hai.
 Uddeshya: Madadgaar aur dostana Study wa General Assistant.
@@ -106,123 +106,52 @@ function normalizePlan(rawPlan) {
 }
 
 // -------------------------------------------------------------
-// SECURE & ROBUST MULTI-ENGINE CALLERS
+// SINGLE VERIFIED ENGINE: GROQ DIRECT
 // -------------------------------------------------------------
+async function callGroqDirect(model, prompt, systemInstruction) {
+  if (!GROQ_KEY) {
+    throw { userMsg: "Vercel me GROQ_KEY nahi mili.", code: 500 };
+  }
 
-async function tryPollinations(model, prompt, instruction) {
-  if (!POLLINATIONS_KEY) return null;
-  try {
-    const res = await fetch("https://text.pollinations.ai/openai/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${POLLINATIONS_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          { role: "system", content: instruction },
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.35
-      })
-    });
-    const data = await res.json();
-    if (res.ok && data?.choices?.[0]?.message?.content) {
-      return data.choices[0].message.content;
-    }
-  } catch (e) {}
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${GROQ_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: model,
+      messages: [
+        { role: "system", content: systemInstruction },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.35
+    })
+  });
+
+  const data = await res.json();
+  if (res.ok && data?.choices?.[0]?.message?.content) {
+    return data.choices[0].message.content;
+  }
   return null;
 }
-
-async function tryGroq(model, prompt, instruction) {
-  if (!GROQ_KEY) return null;
-  try {
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${GROQ_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          { role: "system", content: instruction },
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.35
-      })
-    });
-    const data = await res.json();
-    if (res.ok && data?.choices?.[0]?.message?.content) {
-      return data.choices[0].message.content;
-    }
-  } catch (e) {}
-  return null;
-}
-
-async function tryOpenRouter(model, prompt, instruction) {
-  if (!OPENROUTER_KEY) return null;
-  try {
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${OPENROUTER_KEY}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://hardrisk.vercel.app",
-        "X-Title": "Suhail AI"
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          { role: "system", content: instruction },
-          { role: "user", content: prompt }
-        ]
-      })
-    });
-    const data = await res.json();
-    if (res.ok && data?.choices?.[0]?.message?.content) {
-      return data.choices[0].message.content;
-    }
-  } catch (e) {}
-  return null;
-}
-
-// -------------------------------------------------------------
-// SEAMLESS TIER DISPATCHER WITH AUTO-FAILOVER
-// -------------------------------------------------------------
 
 async function executeTierAI(plan, prompt, instruction) {
   let reply = null;
 
-  if (plan === "ultra") {
-    reply = await tryPollinations("deepseek-r1", prompt, instruction);
-    if (!reply) reply = await tryPollinations("deepseek", prompt, instruction);
-    if (!reply) reply = await tryGroq("llama-3.3-70b-versatile", prompt, instruction);
-    if (!reply) reply = await tryOpenRouter("deepseek/deepseek-r1:free", prompt, instruction);
-  } else if (plan === "pro") {
-    reply = await tryGroq("llama-3.3-70b-versatile", prompt, instruction);
-    if (!reply) reply = await tryPollinations("deepseek", prompt, instruction);
-    if (!reply) reply = await tryGroq("llama-3.1-8b-instant", prompt, instruction);
-  } else if (plan === "plus") {
-    reply = await tryPollinations("qwen", prompt, instruction);
-    if (!reply) reply = await tryGroq("llama-3.1-8b-instant", prompt, instruction);
-    if (!reply) reply = await tryOpenRouter("qwen/qwen-2.5-7b-instruct:free", prompt, instruction);
+  if (plan === "ultra" || plan === "pro") {
+    // 70B Versatile (Proven working in screenshots)
+    reply = await callGroqDirect("llama-3.3-70b-versatile", prompt, instruction);
+    if (!reply) {
+      reply = await callGroqDirect("llama-3.1-8b-instant", prompt, instruction);
+    }
   } else {
-    // Free Tier (Fast & Light)
-    reply = await tryPollinations("mistral", prompt, instruction);
-    if (!reply) reply = await tryPollinations("llama", prompt, instruction);
-    if (!reply) reply = await tryGroq("llama-3.1-8b-instant", prompt, instruction);
-    if (!reply) reply = await tryOpenRouter("meta-llama/llama-3.1-8b-instruct:free", prompt, instruction);
-  }
-
-  // Universal Safety Fallback
-  if (!reply) {
-    reply = await tryGroq("llama-3.1-8b-instant", prompt, instruction);
+    // Free & Plus (Lightning Fast 8B)
+    reply = await callGroqDirect("llama-3.1-8b-instant", prompt, instruction);
   }
 
   if (!reply) {
-    throw { userMsg: "सुहैल AI सेवा इस समय व्यस्त है। कृपया कुछ सेकंड बाद पुनः प्रयास करें।", code: 500 };
+    throw { userMsg: "Groq service is samay vyast hai. Kripya 5 second baad dobara try karein.", code: 500 };
   }
 
   return reply;
@@ -255,7 +184,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // LOGIN & AUTH (UNTOUCHED & SECURE)
+    // AUTH (UNTOUCHED)
     if (action === "auth" && req.method === "POST") {
       const { phone, name, roll, userPass, adminPass } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -336,7 +265,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, user });
     }
 
-    // AI CHAT
+    // AI CHAT DISPATCHER (100% GROQ)
     if (action === "ai" && req.method === "POST") {
       const { prompt, phone } = req.body || {};
       if (!prompt || !String(prompt).trim()) return res.status(400).json({ success: false, error: "सवाल खाली नहीं हो सकता।" });
@@ -359,7 +288,7 @@ export default async function handler(req, res) {
         }
       }
 
-      // DAILY LIMIT SERVER CHECK
+      // STRICT DAILY LIMIT SERVER CHECK
       const todayDateStr = new Date().toISOString().slice(0, 10);
       const isNewDay = user?.lastQuestionDate !== todayDateStr;
       const currentDailyCount = isNewDay ? 0 : (user?.dailyCount || 0);
@@ -382,7 +311,7 @@ export default async function handler(req, res) {
       const aiName = aiTitles[plan] || "SUHAIL AI FREE";
       const instruction = SYSTEM_RULES[plan] || SYSTEM_RULES.free;
 
-      // EXECUTE WITH BULLETPROOF FAILOVER
+      // RUN DIRECTLY ON GROQ
       const replyText = await executeTierAI(plan, prompt, instruction);
 
       if (cleanPhone && user) {
