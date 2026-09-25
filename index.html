@@ -114,10 +114,11 @@
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 12px;
+      padding: 14px;
       display: none;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
+      padding-bottom: 70px; /* Safe space for ad banner */
     }
     .tab-view.active { display: flex; }
 
@@ -215,7 +216,6 @@
     .btn-copy { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 3px 6px; border-radius: 4px; }
     .btn-copy:hover { color: var(--primary-green); background: rgba(255,255,255,0.05); }
 
-    /* ALL TOOLS WITH HORIZONTAL SCROLL */
     .shortcuts-wrapper { display: flex; flex-direction: column; gap: 6px; width: 100%; }
     .study-shortcuts { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px; scrollbar-width: none; }
     .study-shortcuts::-webkit-scrollbar { display: none; }
@@ -299,6 +299,26 @@
     .plan-card.ultra-card { border: 2px solid var(--vip-gold); background: linear-gradient(145deg, #182229 0%, #2e2008 100%); }
     .plan-card.active-owned { border: 2px solid var(--success); background: rgba(34, 197, 94, 0.06); }
     
+    /* UPCOMING VIP CARDS */
+    .plan-card.vip {
+      border: 1px dashed var(--vip-purple);
+      background: linear-gradient(145deg, #182229 0%, #1e1b4b 100%);
+      opacity: 0.88;
+    }
+    .badge-coming-soon {
+      position: absolute;
+      top: -10px;
+      right: 14px;
+      background: var(--vip-purple);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
     .offer-badge { position: absolute; top: -10px; right: 14px; background: #dc2626; color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
     .owned-badge { position: absolute; top: -10px; right: 14px; background: var(--success); color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
     
@@ -320,14 +340,33 @@
       font-size: 0.88rem;
     }
     .btn-action.active-btn { background: #166534; color: #86efac; cursor: default; }
+    .btn-action.disabled { background: #374151; color: #9ca3af; cursor: not-allowed; }
 
     .status-banner { background: #132f2b; border: 1px solid var(--primary-green); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px; }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-group label { font-size: 0.8rem; color: var(--text-muted); }
     .form-input { background: #182229; border: 1px solid var(--card-border); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 0.9rem; outline: none; }
     
-    .qr-box { background: #fff; padding: 8px; border-radius: 12px; width: 220px; height: 220px; margin: 10px auto; display: flex; align-items: center; justify-content: center; }
-    .qr-box img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
+    /* CORPORATE CRISP QR FRAME */
+    .qr-container-card {
+      background: #ffffff;
+      padding: 14px;
+      border-radius: 16px;
+      width: 240px;
+      height: 240px;
+      margin: 12px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    .qr-container-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 8px;
+    }
 
     .auth-overlay { position: absolute; inset: 0; background: rgba(11, 20, 26, 0.98); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .auth-card { background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 12px; max-height: 95vh; overflow-y: auto; }
@@ -477,7 +516,7 @@
 
     <div class="chat-messages" id="chat-box"></div>
 
-    <!-- COMPLETE DEDICATED TOOLBAR -->
+    <!-- 9 TOOL SHORTCUT PILLS -->
     <div class="shortcuts-wrapper">
       <div class="study-shortcuts">
         <!-- FREE TOOLS -->
@@ -529,7 +568,7 @@
     </div>
   </section>
 
-  <!-- TAB 2: PLANS (DISTINCT ULTRA VALUE PROPOSITION) -->
+  <!-- TAB 2: PLANS (WITH RESTORED UPCOMING VIP TIERS) -->
   <section id="tab-plans" class="tab-view">
     <!-- FREE -->
     <div class="plan-card" id="card-plan-free">
@@ -596,6 +635,43 @@
       </div>
       <button type="button" class="btn-action" id="btn-plan-ultra" style="background:var(--vip-gold); color:#000;" onclick="window.goToPay('ultra')">₹50 me ULTRA Flagship lein</button>
     </div>
+
+    <!-- RESTORED: FUTURE UPCOMING VIP TIERS -->
+    <div style="margin-top:16px; border-top:1px dashed rgba(255,255,255,0.12); padding-top:14px;">
+      <h4 style="color:var(--vip-purple); font-size:0.9rem; text-align:center; margin-bottom:10px;">
+        <i class="fa-solid fa-sparkles"></i> Future Elite AI Tiers (Coming Soon)
+      </h4>
+    </div>
+
+    <div class="plan-card vip">
+      <div class="badge-coming-soon"><i class="fa-solid fa-lock"></i> Coming Soon</div>
+      <div style="display:flex; justify-content:space-between; align-items:baseline;">
+        <span style="font-weight:700; color:#fff;">SUHAIL AI MAX</span>
+        <span style="font-weight:700; color:var(--vip-purple);">VIP Tier</span>
+      </div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">Audio Dars, Voice Interaction & Unlimited Tahqeeq Engine</div>
+      <button type="button" class="btn-action disabled"><i class="fa-solid fa-clock"></i> जल्द आ रहा है (Coming Soon)</button>
+    </div>
+
+    <div class="plan-card vip">
+      <div class="badge-coming-soon"><i class="fa-solid fa-lock"></i> Coming Soon</div>
+      <div style="display:flex; justify-content:space-between; align-items:baseline;">
+        <span style="font-weight:700; color:#fff;">SUHAIL AI ELITE</span>
+        <span style="font-weight:700; color:var(--vip-purple);">Elite Tier</span>
+      </div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">Kitab Scanner, Complete Ibaarat Tashkeel & Auto Exam Solver</div>
+      <button type="button" class="btn-action disabled"><i class="fa-solid fa-clock"></i> जल्द आ रहा है (Coming Soon)</button>
+    </div>
+
+    <div class="plan-card vip">
+      <div class="badge-coming-soon"><i class="fa-solid fa-lock"></i> Coming Soon</div>
+      <div style="display:flex; justify-content:space-between; align-items:baseline;">
+        <span style="font-weight:700; color:#fff;">SUHAIL AI PRIME</span>
+        <span style="font-weight:700; color:var(--vip-gold);">Crown Tier</span>
+      </div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">1-on-1 Dedicated AI Ustad, Live Fatawa Support & Infinite Quota</div>
+      <button type="button" class="btn-action disabled"><i class="fa-solid fa-clock"></i> जल्द आ रहा है (Coming Soon)</button>
+    </div>
   </section>
 
   <!-- TAB 3: UPGRADE -->
@@ -614,7 +690,8 @@
     <h4 style="text-align:center; color:#fff; margin-top:6px;">QR Code Payment Gateway</h4>
     <p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">QR code scan karke fees bhejein aur 12 ankon ka UTR number darj karein.</p>
     
-    <div class="qr-box">
+    <!-- CORPORATE CLEAN QR FRAME -->
+    <div class="qr-container-card">
       <img src="/file_00000000111881f5a2d7ab5b856c5026.png" alt="Payment QR" onerror="this.src='file_00000000111881f5a2d7ab5b856c5026.png'">
     </div>
 
@@ -706,7 +783,6 @@
       }
       return { allowed: true };
     }
-    // ULTRA EXCLUSIVE SUPER-TOOLS
     if (type === 'taqabul_fiqh' || type === 'mantiq_kalam' || type === 'shurooh_hashiya') {
       if (p !== 'ultra') {
         return { allowed: false, minPlan: 'ultra', msg: '👑 Yeh nayab Super-Tool sirf aur sirf SUHAIL AI ULTRA me uplabdh hai! 4 Mazahib Matrix aur Mantiq Defense ke liye ULTRA me upgrade karein.' };
@@ -819,7 +895,6 @@
     document.getElementById('lock-quiz').style.display = (p === 'free') ? 'inline-block' : 'none';
     document.getElementById('lock-tahqeeq').style.display = (p === 'free' || p === 'plus') ? 'inline-block' : 'none';
     document.getElementById('lock-tatbeeq').style.display = (p === 'free' || p === 'plus') ? 'inline-block' : 'none';
-    // Ultra Exclusive Locks
     document.getElementById('lock-taqabul').style.display = (p !== 'ultra') ? 'inline-block' : 'none';
     document.getElementById('lock-mantiq').style.display = (p !== 'ultra') ? 'inline-block' : 'none';
     document.getElementById('lock-hashiya').style.display = (p !== 'ultra') ? 'inline-block' : 'none';
