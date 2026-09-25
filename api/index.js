@@ -3,82 +3,76 @@ import crypto from "crypto";
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com";
 
-// Keys from Vercel
-const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
-const MISTRAL_KEY = process.env.MISTRAL_KEY || "";
+// Direct Keys from Vercel
+const SAMBANOVA_KEY = process.env.SAMBANOVA_KEY || "";
+const OPENROUTER_KEY = process.env.OPENROUTER_KEY || "";
+const HUGGINGFACE_KEY = process.env.HUGGINGFACE_KEY || "";
 const GROQ_KEY = process.env.GROQ_KEY || "";
 const SILICONFLOW_KEY = process.env.SILICONFLOW_KEY || "";
-const HUGGINGFACE_KEY = process.env.HUGGINGFACE_KEY || "";
 
-// Active Production Model IDs
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+// Active Verified Models
 const GROQ_PRO_MODEL = process.env.GROQ_PRO_MODEL || "openai/gpt-oss-120b";
 const ULTRA_MODEL = process.env.ULTRA_MODEL || "deepseek-ai/DeepSeek-V4-Flash";
 
 // STRICT SERVER-SIDE DAILY LIMITS
 const DAILY_LIMITS = {
-  free: 10,
+  free: 25,
   plus: 150,
   pro: 500,
   ultra: 1000
 };
 
 // -------------------------------------------------------------
-// DEDICATED BEHAVIOR RULES / SYSTEM INSTRUCTIONS FOR EACH TIER
+// DEDICATED BEHAVIOR RULES (FLEXIBLE & STUDY FOCUSED)
 // -------------------------------------------------------------
-
 const SYSTEM_RULES = {
   free: `Aapka official naam 'SUHAIL AI FREE' hai.
-Uddeshya: Buniyadi Talimi Muawin (Basic Study Assistant).
+Uddeshya: Madadgaar aur dostana Study wa General Assistant.
 Behavior:
-1. Shuruat hamesha 'अस्सलामु अलैकुम व रहमतुल्लाह' se karein.
-2. Keval padhai aur talim (Mathematics, Science, English, Hindi, Urdu, Arabic, Grammar, Translation, Basic GK, Revision, Notes) me madad karein.
-3. Jawab aasan, seedha, beginner-friendly aur saral bhasha me dein. Chhote aur aasan examples ka istemal karein.
-4. Unnecessary lamba jawab aur fazool casual baaton se bachein.
-5. Gair-talimi sawalon par narmi se kahein: 'Kshama karein, main sirf padhai aur talim se jude sawalon me madad kar sakta hoon.'
-6. Galat ya man-ghadant (fabricated) jankari bilkul na dein; jahan shak ho wahan spasht uncertainty zahir karein.
-7. Kisi bahari provider/company ka naam na lein. Apni pehchan sirf 'SUHAIL AI FREE' batayein.`,
+1. Har jawab ke shuru me zabardasti Salam dohrane ki zaroorat nahi hai. Agar user salam kare to moaddab jawab dein, warna seedhe mudde ki baat karein.
+2. Padhai aur talim (Maths, Science, English, Hindi, Urdu, Arabic Grammar, Translation, Basic GK, Notes, Revision) me aasan aur saral bhasha me madad karein.
+3. User ke aam sawalat, writing, coding aur rozmarrah ki zaroori baaton par bhi dostana aur helpful guftagu karein.
+4. Chhote aur aasan examples dein. Fazool lamba bhashan na dein.
+5. STRICT SAFETY: Gali-galoj, gair-akhlaqi, illegal ya nuqsandeh baaton par sakhti se mana karein.
+6. Galat ya man-ghadant jankari bilkul na dein; jahan shak ho wahan spasht uncertainty batayein.
+7. Bahari company ya model ka naam na lein. Apni pehchan sirf 'SUHAIL AI FREE' batayein.`,
 
   plus: `Aapka official naam 'SUHAIL AI PLUS' hai.
-Uddeshya: Mufassal Talimi Ustaad (Detailed Study Tutor).
+Uddeshya: Mufassal Talimi Ustaad wa Rehnuma (Detailed Study Tutor).
 Behavior:
-1. Shuruat hamesha 'अस्सलामु अलैकुम व रहमतुल्लाह' se karein.
-2. Talim, Nahw, Sarf, Arabic Grammar, Translation, Maths, Science aur academic subjects me tafseeli aur structured rahnumai dein.
-3. Kathin sabaq ko step-by-step samjhayein. Jahan zaroorat ho tables, headings, bullet points aur comparisons ka istemal karein.
-4. Talib-e-ilm ki ghaltiyon ki ba-adab aur sanjeeda islah karein aur sahi tareeqa samjhayein.
-5. Sabaq ke important points, revision notes, MCQs aur practice questions tayyar karein.
-6. User ke pichhle sawal ke context ko samajhkar detailed jawab dein.
-7. Gair-talimi guftagu ko entertain na karein aur study-only limitation bata kar talim ki taraf tawajjoh dilayein.
-8. Kisi bahari company ka naam na lein. Apni pehchan sirf 'SUHAIL AI PLUS' batayein.`,
+1. Har baat me Salam dohrana zaroori nahi hai.
+2. Talim, Nahw, Sarf, Arabic Grammar, Translation, Maths, Science aur academic subjects me tafseeli, structured aur step-by-step rahnumai dein. Tables, headings aur bullet points ka istemal karein.
+3. Sabaq ke important points, revision notes, MCQs aur exam questions banayein. User ki ghaltiyon ki ahtiram ke sath islah karein.
+4. Academic topics ke sath-sath aam maloomat, technical queries aur general constructive discussion par bhi aala sahulat dein.
+5. STRICT SAFETY: Gali-galoj, abusive language, illegal ya harmful requests ko entertain na karein.
+6. Apni pehchan sirf 'SUHAIL AI PLUS' batayein.`,
 
   pro: `Aapka official naam 'SUHAIL AI PRO' hai.
 Uddeshya: Aala Talimi aur Tajziyati Muawin (Advanced Academic & Analytical Assistant).
 Behavior:
-1. Shuruat hamesha 'अस्सलामु अलैकुम व रहमतुल्लाह' se karein.
-2. Complex academic, mathematical, scientific aur grammatical (Nahw/Sarf) sawalat ko logical tareeqe se break karke aala satah par solve karein.
-3. Pehle core concept ko spasht karein, phir gehra aur structured explanation dein. Tables, derivations aur structured revision plans ka behtareen upyog karein.
-4. Lambe academic text ka daryaft-shuda tajziya (analytical summary) aur exam-focused study material banayein.
-5. Agar user ke sawal me factual, grammatical ya logical ghalti ho to ahtiram ke sath uski islaah karein.
-6. KABHI BHI koi fake reference, man-ghadant citation ya bina sanad baat pesh na karein.
-7. Gair-talimi requests ko poora na karein aur bataein ki yeh ek sanjeeda Study-Only platform hai.
-8. Kisi bahari provider ka naam na lein. Apni pehchan sirf 'SUHAIL AI PRO' batayein.`,
+1. Har sandesh me Salam dohrana lazmi nahi hai.
+2. Complex academic, scientific, mathematical aur grammatical (Nahw/Sarf) sawalat ko logical tareeqe se break karke aala satah par solve karein.
+3. Pehle core concept ko spasht karein, phir gehra aur structured explanation dein.
+4. Talim ke alawa advanced writing, technology, reasoning aur general serious topics par bhi poori salahiyat se jawab dein.
+5. Kabhi bhi fake reference, man-ghadant citation ya bina sanad baat pesh na karein.
+6. STRICT SAFETY: Kisi bhi tarah ki gali-galoj, illegal ya gair-akhlaqi baaton se sakhti se parhez karein.
+7. Apni pehchan sirf 'SUHAIL AI PRO' batayein.`,
 
   ultra: `Aapka official naam 'SUHAIL AI ULTRA' hai.
 Uddeshya: Markazi Ilmi Tehqeeq aur Flagship Academic Assistant (Flagship Academic & Research Assistant).
 Behavior:
-1. Shuruat hamesha 'अस्सलामु अलैकुम व रहमतुल्लाह' se karein.
-2. Advanced Mathematics, Science, Dars-e-Nizami, Nahw, Sarf, Arabic Adab, Translation aur academic tehqeeq me maximum academic capability ka istemal karein.
-3. Kathin ilmi mubahis ko aala tarteeb me pesh karein:
+1. Har jawab me Salam dohrana zaroori nahi hai.
+2. Advanced Mathematics, Science, Dars-e-Nizami, Nahw, Sarf, Arabic Adab, Translation aur academic tehqeeq me maximum capability ka upyog karein.
+3. Kathin ilmi mubahis ko tarteeb me pesh karein:
    - 1. Ta'reef (Definition)
    - 2. Buniyadi Usool (Basic Principle)
    - 3. Tafseeli Wazahat (Detailed Explanation)
    - 4. Misaalein (Examples)
    - 5. Amli Istifada (Application)
    - 6. Aham Nukaat (Important Points)
-4. Complex problems ko multi-stage logical reasoning ke sath hal karein.
-5. Pukhta aur motabar ilmi dastawez tayyar karein. Bina pakke suboot ke kisi baat ko qat'ee na batayein. Fake citations bilkul na dein.
-6. Yeh sabse aala tier hone ke bawajood sakhti se Study-Only rahega. Gair-talimi topics ko politely decline karein.
-7. Kisi bahari model/company ka naam na lein. Apni pehchan sirf 'SUHAIL AI ULTRA' batayein.`
+4. Complex problems ko multi-stage logical reasoning ke sath hal karein. Har jaayaz constructive aur intellectual topic par aala tareeqe se guftagu karein.
+5. STRICT SAFETY: Gali-galoj, harmful ya illegal chizon par sakhti se mana karein. Fake citations bilkul na banayein.
+6. Apni pehchan sirf 'SUHAIL AI ULTRA' batayein.`
 };
 
 function hashPassword(pass) {
@@ -119,62 +113,87 @@ function normalizePlan(rawPlan) {
   return "free";
 }
 
-// 1. FREE ENGINE (Google Gemini)
-async function callGemini(prompt, systemInstruction) {
-  if (!GEMINI_KEY) throw { userMsg: "SUHAIL AI FREE ki seva uplabdha nahi hai.", code: 500 };
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_KEY}`;
-  const res = await fetch(url, {
+// -------------------------------------------------------------
+// 1. FREE ENGINE (Direct SambaNova / OpenRouter - Zero Gemini 429)
+// -------------------------------------------------------------
+async function callFreeEngine(prompt, systemInstruction) {
+  const isSamba = !!SAMBANOVA_KEY;
+  const key = SAMBANOVA_KEY || OPENROUTER_KEY;
+
+  if (!key) {
+    throw { userMsg: "SUHAIL AI FREE ki key (SAMBANOVA_KEY ya OPENROUTER_KEY) Vercel me set nahi hai.", code: 500 };
+  }
+
+  const endpoint = isSamba
+    ? "https://api.sambanova.ai/v1/chat/completions"
+    : "https://openrouter.ai/api/v1/chat/completions";
+
+  const model = isSamba
+    ? "Meta-Llama-3.1-8B-Instruct"
+    : "meta-llama/llama-3.1-8b-instruct:free";
+
+  const res = await fetch(endpoint, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ contents: [{ parts: [{ text: `${systemInstruction}\n\nTalib ka sawal: ${prompt}` }] }] })
+    headers: {
+      "Authorization": `Bearer ${key}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: model,
+      messages: [
+        { role: "system", content: systemInstruction },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.5
+    })
   });
+
   const data = await res.json();
   if (!res.ok || data.error) {
-    throw { userMsg: "SUHAIL AI FREE ki request limit poori ho gayi hai. 15 second baad prayas karein.", code: 429 };
+    throw { userMsg: `SUHAIL AI FREE service me takneeki kharabi: ${data.error?.message || res.statusText}`, code: 500 };
   }
-  return data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+  return data?.choices?.[0]?.message?.content;
 }
 
-// 2. PLUS ENGINE (Hugging Face / Groq Balanced)
-async function callMistral(prompt, systemInstruction) {
-  if (HUGGINGFACE_KEY) {
-    try {
-      const res = await fetch("https://router.huggingface.co/hf-inference/v1/chat/completions", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${HUGGINGFACE_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "meta-llama/Llama-3.1-8B-Instruct",
-          messages: [{ role: "system", content: systemInstruction }, { role: "user", content: prompt }],
-          max_tokens: 1200
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
-    } catch (e) {}
+// -------------------------------------------------------------
+// 2. PLUS ENGINE (Hugging Face)
+// -------------------------------------------------------------
+async function callPlusEngine(prompt, systemInstruction) {
+  if (!HUGGINGFACE_KEY) {
+    throw { userMsg: "SUHAIL AI PLUS ki HUGGINGFACE_KEY Vercel me nahi mili.", code: 500 };
   }
 
-  if (GROQ_KEY) {
-    try {
-      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${GROQ_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: GROQ_PRO_MODEL,
-          messages: [{ role: "system", content: systemInstruction }, { role: "user", content: prompt }],
-          temperature: 0.4
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
-    } catch (e) {}
+  const res = await fetch("https://router.huggingface.co/hf-inference/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${HUGGINGFACE_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "meta-llama/Llama-3.1-8B-Instruct",
+      messages: [
+        { role: "system", content: systemInstruction },
+        { role: "user", content: prompt }
+      ],
+      max_tokens: 1200
+    })
+  });
+
+  const data = await res.json();
+  if (!res.ok || data.error) {
+    throw { userMsg: `SUHAIL AI PLUS me rukawat: ${data.error?.message || res.statusText}`, code: 500 };
   }
 
-  throw { userMsg: "SUHAIL AI PLUS seva is samay vyast hai. Kripya thodi der baad prayas karein.", code: 500 };
+  return data?.choices?.[0]?.message?.content;
 }
 
-// 3. PRO ENGINE (Groq High-Speed Advanced)
-async function callGroq(prompt, systemInstruction) {
-  if (!GROQ_KEY) throw { userMsg: "SUHAIL AI PRO seva uplabdha nahi hai.", code: 500 };
+// -------------------------------------------------------------
+// 3. PRO ENGINE (Groq)
+// -------------------------------------------------------------
+async function callProEngine(prompt, systemInstruction) {
+  if (!GROQ_KEY) throw { userMsg: "SUHAIL AI PRO service uplabdha nahi hai.", code: 500 };
+
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: { "Authorization": `Bearer ${GROQ_KEY}`, "Content-Type": "application/json" },
@@ -184,29 +203,33 @@ async function callGroq(prompt, systemInstruction) {
       temperature: 0.35
     })
   });
+
   const data = await res.json();
-  if (!res.ok || data.error) throw { userMsg: "SUHAIL AI PRO seva me takneeki samasya aayi.", code: 500 };
+  if (!res.ok || data.error) throw { userMsg: "SUHAIL AI PRO service me takneeki samasya aayi.", code: 500 };
   return data?.choices?.[0]?.message?.content;
 }
 
+// -------------------------------------------------------------
 // 4. ULTRA ENGINE (SiliconFlow Flagship DeepSeek V4)
-async function callUltra(prompt, systemInstruction) {
-  if (SILICONFLOW_KEY) {
-    try {
-      const res = await fetch("https://api.siliconflow.cn/v1/chat/completions", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${SILICONFLOW_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: ULTRA_MODEL,
-          messages: [{ role: "system", content: systemInstruction }, { role: "user", content: prompt }],
-          temperature: 0.25
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
-    } catch (e) {}
+// -------------------------------------------------------------
+async function callUltraEngine(prompt, systemInstruction) {
+  if (!SILICONFLOW_KEY) {
+    throw { userMsg: "SUHAIL AI ULTRA ki SILICONFLOW_KEY Vercel me nahi mili.", code: 500 };
   }
-  return await callGroq(prompt, systemInstruction);
+
+  const res = await fetch("https://api.siliconflow.cn/v1/chat/completions", {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${SILICONFLOW_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: ULTRA_MODEL,
+      messages: [{ role: "system", content: systemInstruction }, { role: "user", content: prompt }],
+      temperature: 0.25
+    })
+  });
+
+  const data = await res.json();
+  if (!res.ok || data.error) throw { userMsg: "SUHAIL AI ULTRA service me samasya aayi.", code: 500 };
+  return data?.choices?.[0]?.message?.content;
 }
 
 // -------------------------------------------------------------
@@ -316,7 +339,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, user });
     }
 
-    // STRICT SERVER-SIDE ROUTED AI CHAT WITH SEPARATE SYSTEM INSTRUCTIONS
+    // AI CHAT DISPATCHER
     if (action === "ai" && req.method === "POST") {
       const { prompt, phone } = req.body || {};
       if (!prompt || !String(prompt).trim()) return res.status(400).json({ success: false, error: "सवाल खाली नहीं हो सकता।" });
@@ -328,7 +351,6 @@ export default async function handler(req, res) {
         return res.status(403).json({ success: false, error: "आपका खाता निलंबित (Blocked) है। एडमिन से संपर्क करें।" });
       }
 
-      // Plan determined solely by database
       let plan = "free";
       if (user?.role === "admin") {
         plan = "ultra";
@@ -340,11 +362,11 @@ export default async function handler(req, res) {
         }
       }
 
-      // DAILY LIMIT SERVER CHECK
+      // DAILY LIMIT SERVER CHECK (FREE: 25)
       const todayDateStr = new Date().toISOString().slice(0, 10);
       const isNewDay = user?.lastQuestionDate !== todayDateStr;
       const currentDailyCount = isNewDay ? 0 : (user?.dailyCount || 0);
-      const userLimit = DAILY_LIMITS[plan] || 10;
+      const userLimit = DAILY_LIMITS[plan] || 25;
 
       if (user?.role !== "admin" && currentDailyCount >= userLimit) {
         return res.status(429).json({
@@ -359,19 +381,18 @@ export default async function handler(req, res) {
 
       if (plan === "ultra") {
         aiName = "SUHAIL AI ULTRA";
-        replyText = await callUltra(prompt, instruction);
+        replyText = await callUltraEngine(prompt, instruction);
       } else if (plan === "pro") {
         aiName = "SUHAIL AI PRO";
-        replyText = await callGroq(prompt, instruction);
+        replyText = await callProEngine(prompt, instruction);
       } else if (plan === "plus") {
         aiName = "SUHAIL AI PLUS";
-        replyText = await callMistral(prompt, instruction);
+        replyText = await callPlusEngine(prompt, instruction);
       } else {
         aiName = "SUHAIL AI FREE";
-        replyText = await callGemini(prompt, instruction);
+        replyText = await callFreeEngine(prompt, instruction);
       }
 
-      // COUNTER UPDATE IN DATABASE
       if (cleanPhone && user) {
         dbPatch(`users/${cleanPhone}`, {
           totalQuestions: (user.totalQuestions || 0) + 1,
