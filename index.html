@@ -69,14 +69,24 @@
     .btn-copy { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 3px 6px; border-radius: 4px; }
     .btn-copy:hover { color: var(--primary-green); background: rgba(255,255,255,0.05); }
 
+    /* SHORTCUT PILLS CONTAINER */
+    .shortcuts-wrapper { display: flex; flex-direction: column; gap: 6px; }
     .study-shortcuts { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px; scrollbar-width: none; }
     .study-shortcuts::-webkit-scrollbar { display: none; }
     .shortcut-pill { flex-shrink: 0; background: #182229; border: 1px solid rgba(255,255,255,0.08); color: var(--text-muted); padding: 5px 10px; border-radius: 16px; font-size: 0.74rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
-    .shortcut-pill:hover { border-color: var(--primary-green); color: #fff; background: rgba(0, 168, 132, 0.1); }
+    .shortcut-pill:hover, .shortcut-pill.active { border-color: var(--primary-green); color: #fff; background: rgba(0, 168, 132, 0.15); }
+
+    /* 5-LANGUAGE CHOICE BAR */
+    .lang-choice-bar { display: none; gap: 6px; overflow-x: auto; padding: 6px 8px; background: #182229; border: 1px solid rgba(0, 168, 132, 0.3); border-radius: 12px; align-items: center; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+    .lang-label { font-size: 0.72rem; color: var(--accent-yellow); font-weight: 600; flex-shrink: 0; margin-right: 4px; }
+    .lang-pill { flex-shrink: 0; background: #111b21; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 4px 8px; border-radius: 10px; font-size: 0.72rem; cursor: pointer; font-weight: 500; }
+    .lang-pill:hover { background: var(--primary-green); border-color: var(--primary-green); color: #fff; }
+    .btn-close-lang { background: none; border: none; color: var(--danger); font-size: 0.85rem; cursor: pointer; margin-left: auto; padding: 0 4px; }
 
     /* MULTI-LINE AUTO-RESIZING TEXTAREA FOOTER */
     .chat-footer { display: flex; align-items: flex-end; gap: 8px; padding-top: 4px; }
-    .chat-input { flex: 1; background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 18px; padding: 10px 16px; color: #fff; outline: none; font-size: 0.88rem; line-height: 1.4; resize: none; max-height: 120px; min-height: 42px; overflow-y: auto; }
+    .chat-input { flex: 1; background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 18px; padding: 10px 16px; color: #fff; outline: none; font-size: 0.88rem; line-height: 1.4; resize: none; max-height: 140px; min-height: 44px; overflow-y: auto; }
     .btn-send { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-green); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
     .plan-card { background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 6px; position: relative; }
@@ -178,21 +188,34 @@
 
     <div class="chat-messages" id="chat-box"></div>
 
-    <div class="study-shortcuts">
-      <span class="shortcut-pill" onclick="window.useShortcut('तशकील व तरकीब:')">📌 एराब व तरकीब</span>
-      <span class="shortcut-pill" onclick="window.useShortcut('उर्दू व सरल हिन्दी में तर्जुमा करें:')">📖 तर्जुमा (Translation)</span>
-      <span class="shortcut-pill" onclick="window.useShortcut('इस सबक का आसान खुलासा बयान करें:')">📝 सबक का ख़ुलासा</span>
-      <span class="shortcut-pill" onclick="window.useShortcut('इस उनवान से इम्तिहान के लिए अहम सवालात और जवाबात बनाएं:')">❓ इम्तिहान के सवालात</span>
+    <!-- SHORTCUT PILLS & 5-LANGUAGE BAR -->
+    <div class="shortcuts-wrapper">
+      <div class="study-shortcuts">
+        <span class="shortcut-pill" onclick="window.triggerShortcut('tarqeeb', 'एराब व तरकीब')">📌 एराब व तरकीब</span>
+        <span class="shortcut-pill" onclick="window.triggerShortcut('tarjuma', 'तर्जुमा (Translation)')">📖 तर्जुमा (Translation)</span>
+        <span class="shortcut-pill" onclick="window.triggerShortcut('khulasa', 'सबक का ख़ुलासा')">📝 सबक का ख़ुलासा</span>
+        <span class="shortcut-pill" onclick="window.triggerShortcut('quiz', 'इम्तिहान के सवालात')">❓ इम्तिहान के सवालात</span>
+      </div>
+
+      <div class="lang-choice-bar" id="lang-bar">
+        <span class="lang-label" id="lang-title">भाषा चुनें:</span>
+        <span class="lang-pill" onclick="window.applyShortcutLang('Urdu')">اردو (Urdu)</span>
+        <span class="lang-pill" onclick="window.applyShortcutLang('Hindi')">हिन्दी (Hindi)</span>
+        <span class="lang-pill" onclick="window.applyShortcutLang('English')">English</span>
+        <span class="lang-pill" onclick="window.applyShortcutLang('Roman Urdu')">Roman Urdu</span>
+        <span class="lang-pill" onclick="window.applyShortcutLang('Arabic')">العربية (Arabic)</span>
+        <button type="button" class="btn-close-lang" onclick="window.closeLangBar()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
     </div>
 
     <!-- MULTI-LINE TEXTAREA (Auto-Expands, Shift+Enter for New Line) -->
     <div class="chat-footer">
-      <textarea id="chat-input" class="chat-input" rows="1" placeholder="Padhai ka sawal yahan likhein..."></textarea>
+      <textarea id="chat-input" class="chat-input" rows="1" placeholder="Padhai ya koi bhi sawal yahan likhein..."></textarea>
       <button type="button" class="btn-send" id="btn-chat-send"><i class="fa-solid fa-paper-plane"></i></button>
     </div>
   </section>
 
-  <!-- TAB 2: PLANS -->
+  <!-- TAB 2: PLANS (FREE IS 25/DAY) -->
   <section id="tab-plans" class="tab-view">
     <div class="plan-card" id="card-plan-free">
       <div id="badge-free" class="offer-badge" style="display:none;">Active</div>
@@ -200,7 +223,7 @@
         <span style="font-weight:700;">SUHAIL AI FREE</span>
         <span style="font-weight:700; color:var(--primary-green);">₹0</span>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">10 Sawal Rozana • Buniyadi Taaleemi Rahnumai</div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">25 Sawal Rozana • Resilient Study & General Assistant</div>
       <button type="button" class="btn-action active-btn" id="btn-plan-free" style="display:none;"><i class="fa-solid fa-check"></i> Aapka Current Plan Hai</button>
     </div>
 
@@ -322,6 +345,7 @@
 <script>
   let currentUser = JSON.parse(localStorage.getItem('suhail_ai_user') || 'null');
   let currentAdminPass = localStorage.getItem('suhail_ai_admin_pass') || '';
+  let activeShortcutType = null;
 
   function containsArabic(text) {
     return /[\u0600-\u06FF]/.test(text);
@@ -355,12 +379,40 @@
     document.querySelector('.nav-item[data-tab="tab-pay"]').click();
   };
 
-  window.useShortcut = (prefix) => {
+  // 5-LANGUAGE SHORTCUT HANDLERS
+  window.triggerShortcut = (type, title) => {
+    activeShortcutType = type;
+    const bar = document.getElementById('lang-bar');
+    document.getElementById('lang-title').textContent = title + " किस ज़बान में?:";
+    bar.style.display = 'flex';
+  };
+
+  window.closeLangBar = () => {
+    document.getElementById('lang-bar').style.display = 'none';
+    activeShortcutType = null;
+  };
+
+  window.applyShortcutLang = (lang) => {
     const inp = document.getElementById('chat-input');
-    inp.value = prefix + "\n";
+    let promptPrefix = "";
+
+    if (activeShortcutType === 'tarqeeb') {
+      promptPrefix = `[एराब व तरकीब - ${lang}]: कृपया इस इबारत की मुकम्मल तरकीब और एराब ${lang} में समझाएं:\n`;
+    } else if (activeShortcutType === 'tarjuma') {
+      promptPrefix = `[तर्जुमा - ${lang}]: कृपया इस इबारत का सरल व सटीक अनुवाद (Translation) ${lang} में करें:\n`;
+    } else if (activeShortcutType === 'khulasa') {
+      promptPrefix = `[सबक का ख़ुलासा - ${lang}]: कृपया इस सबक का आसान व विस्तृत खुलासा ${lang} में बयान करें:\n`;
+    } else if (activeShortcutType === 'quiz') {
+      promptPrefix = `[इम्तिहान के सवालात - ${lang}]: इस उनवान से इम्तिहान के लिए महत्वपूर्ण सवालात और जवाबात ${lang} में तैयार करें:\n`;
+    } else {
+      promptPrefix = `[${lang}]: `;
+    }
+
+    inp.value = promptPrefix + inp.value;
+    window.closeLangBar();
     inp.focus();
     inp.style.height = 'auto';
-    inp.style.height = Math.min(inp.scrollHeight, 120) + 'px';
+    inp.style.height = Math.min(inp.scrollHeight, 140) + 'px';
   };
 
   window.copyText = (btn) => {
@@ -400,7 +452,7 @@
     const isAdmin = (currentUser.role === 'admin');
     const p = isAdmin ? 'ultra' : (currentUser.plan || 'free');
 
-    let planBadge = 'SUHAIL AI FREE';
+    let planBadge = 'SUHAIL AI FREE (25/DAY)';
     if (p === 'ultra') planBadge = isAdmin ? 'ULTRA (ADMIN)' : 'SUHAIL AI ULTRA (30 DAYS)';
     else if (p === 'pro') planBadge = 'SUHAIL AI PRO (30 DAYS)';
     else if (p === 'plus') planBadge = 'SUHAIL AI PLUS (30 DAYS)';
@@ -417,12 +469,12 @@
       document.getElementById('active-plan-status').textContent = `Active (${daysLeft} Din Baaqi)`;
       if (daysLeft <= 3) {
         bannerExpiry.style.display = 'flex';
-        document.getElementById('txt-expiry-msg').textContent = `Aapka ${p.toUpperCase()} plan ${daysLeft} din me khatam ho jayega! Padhai jari rakhne ke liye renew karein.`;
+        document.getElementById('txt-expiry-msg').textContent = `Aapka ${p.toUpperCase()} plan ${daysLeft} din me khatam ho jayega! Renew karein.`;
       } else {
         bannerExpiry.style.display = 'none';
       }
     } else {
-      document.getElementById('active-plan-status').textContent = 'Free Tier (10 Sawal Rozana)';
+      document.getElementById('active-plan-status').textContent = 'Free Tier (25 Sawal Rozana)';
       bannerExpiry.style.display = 'none';
     }
 
@@ -521,14 +573,15 @@
   const chatInput = document.getElementById('chat-input');
   const sendBtn = document.getElementById('btn-chat-send');
 
-  // MULTI-LINE AUTO-EXPAND & KEY EVENTS
+  // MULTI-LINE AUTO-EXPAND & MOBILE/DESKTOP KEY EVENTS
   chatInput.addEventListener('input', function() {
     this.style.height = 'auto';
-    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    this.style.height = Math.min(this.scrollHeight, 140) + 'px';
   });
 
   chatInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 600);
+    if (e.key === 'Enter' && !e.shiftKey && !isMobile) {
       e.preventDefault();
       sendQuestion();
     }
@@ -542,7 +595,7 @@
     chatBox.innerHTML = '';
     const saved = JSON.parse(localStorage.getItem(getHistoryKey()) || '[]');
     if (!saved.length) {
-      appendMessage("अस्सलामु अलैकुम व रहमतुल्लाह! मैं आपका सुहैल AI स्टडी पार्टनर हूँ। दरसे निज़ामी, नह्व, सर्फ़, अरबी इबारत या दीनी व असरी किताबों से मुतअल्लिक़ कोई भी सवाल पूछें।", 'ai', 'SUHAIL AI FREE', false);
+      appendMessage("अस्सलामु अलैकुम! मैं आपका सुहैल AI पार्टनर हूँ। पढ़ाई, इल्मी मबाहिस, ग्रामर या किसी भी अहम सवाल में मदद के लिए तैयार हूँ।", 'ai', 'SUHAIL AI FREE', false);
     } else {
       saved.forEach(m => appendMessage(m.text, m.role, m.aiName, false));
     }
@@ -568,10 +621,10 @@
     if (!text || !currentUser) return;
 
     chatInput.value = '';
-    chatInput.style.height = 'auto'; // Reset height
+    chatInput.style.height = 'auto';
     appendMessage(text, 'user', null, true);
     sendBtn.disabled = true;
-    const aiBubble = appendMessage("इल्मी जवाब तैयार किया जा रहा है...", 'ai', 'SUHAIL AI', false);
+    const aiBubble = appendMessage("जवाब तैयार किया जा रहा है...", 'ai', 'SUHAIL AI', false);
 
     try {
       const data = await safeFetch('/api?action=ai', {
