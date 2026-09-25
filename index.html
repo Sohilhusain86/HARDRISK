@@ -36,10 +36,8 @@
       min-height: 100vh;
       overflow-x: hidden;
       overscroll-behavior: contain;
-      overscroll-behavior-y: contain;
     }
     
-    /* NO FLEX CENTERING TO PREVENT LEFT-CLIPPING */
     .app-container {
       width: 100%;
       max-width: 600px;
@@ -51,7 +49,6 @@
       position: relative;
       overflow-x: hidden;
       overflow-y: hidden;
-      box-sizing: border-box;
     }
     
     .top-header {
@@ -62,8 +59,6 @@
       justify-content: space-between;
       border-bottom: 1px solid var(--card-border);
       z-index: 10;
-      width: 100%;
-      box-sizing: border-box;
     }
     .header-user { display: flex; align-items: center; gap: 10px; }
     .header-avatar {
@@ -101,7 +96,7 @@
     }
     .header-actions button:hover { color: #fff; background: rgba(255,255,255,0.05); }
 
-    .nav-dock { display: flex; background: var(--card-dark); border-bottom: 1px solid var(--card-border); width: 100%; }
+    .nav-dock { display: flex; background: var(--card-dark); border-bottom: 1px solid var(--card-border); }
     .nav-item {
       flex: 1;
       padding: 10px 4px;
@@ -123,8 +118,6 @@
       display: none;
       flex-direction: column;
       gap: 10px;
-      box-sizing: border-box;
-      width: 100%;
     }
     .tab-view.active { display: flex; }
 
@@ -149,8 +142,6 @@
       flex-direction: column;
       gap: 12px;
       padding-bottom: 6px;
-      width: 100%;
-      box-sizing: border-box;
     }
     
     .chat-bubble {
@@ -160,9 +151,7 @@
       font-size: 0.88rem;
       line-height: 1.6;
       word-break: break-word;
-      overflow-wrap: break-word;
       position: relative;
-      box-sizing: border-box;
     }
     .chat-bubble.user {
       align-self: flex-end;
@@ -177,7 +166,7 @@
       border: 1px solid var(--card-border);
       border-bottom-left-radius: 2px;
       width: fit-content;
-      max-width: 90%;
+      max-width: 92%;
     }
     
     .ai-label {
@@ -190,7 +179,7 @@
       padding-bottom: 3px;
     }
     
-    .chat-content { width: 100%; box-sizing: border-box; word-break: break-word; }
+    .chat-content { width: 100%; word-break: break-word; }
     .chat-content h1, .chat-content h2, .chat-content h3 { font-size: 0.98rem; font-weight: 700; margin: 8px 0 4px 0; color: #fff; }
     .chat-content p { margin-bottom: 6px; }
     .chat-content ul, .chat-content ol { margin-left: 18px; margin-bottom: 6px; }
@@ -198,7 +187,6 @@
     .chat-content code { background: #111b21; padding: 2px 5px; border-radius: 4px; font-size: 0.82rem; font-family: monospace; }
     .chat-content blockquote { border-left: 3px solid var(--primary-green); padding-left: 8px; color: var(--text-muted); margin: 6px 0; }
     
-    /* HORIZONTAL TABLE WRAPPER (Never overflows screen) */
     .table-responsive {
       width: 100%;
       max-width: 100%;
@@ -206,7 +194,6 @@
       margin: 10px 0;
       border-radius: 8px;
       border: 1px solid rgba(255,255,255,0.1);
-      -webkit-overflow-scrolling: touch;
       display: block;
     }
     .table-responsive table {
@@ -228,9 +215,9 @@
     .btn-copy { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 3px 6px; border-radius: 4px; }
     .btn-copy:hover { color: var(--primary-green); background: rgba(255,255,255,0.05); }
 
-    /* ALL 6 TOOLS IN HORIZONTAL SCROLL */
-    .shortcuts-wrapper { display: flex; flex-direction: column; gap: 6px; width: 100%; box-sizing: border-box; }
-    .study-shortcuts { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px; scrollbar-width: none; width: 100%; box-sizing: border-box; }
+    /* ALL TOOLS WITH HORIZONTAL SCROLL */
+    .shortcuts-wrapper { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+    .study-shortcuts { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px; scrollbar-width: none; }
     .study-shortcuts::-webkit-scrollbar { display: none; }
     
     .shortcut-pill {
@@ -249,6 +236,7 @@
       white-space: nowrap;
     }
     .shortcut-pill:hover { border-color: var(--primary-green); color: #fff; background: rgba(0, 168, 132, 0.15); }
+    .shortcut-pill.ultra-pill { border-color: rgba(245, 158, 11, 0.4); color: #fef08a; background: rgba(245, 158, 11, 0.08); }
     .shortcut-pill.locked { opacity: 0.75; }
     .shortcut-pill.locked i.fa-lock { color: var(--vip-gold); font-size: 0.7rem; }
 
@@ -261,15 +249,13 @@
       border: 1px solid rgba(0, 168, 132, 0.3);
       border-radius: 12px;
       align-items: center;
-      width: 100%;
-      box-sizing: border-box;
     }
     .lang-label { font-size: 0.72rem; color: var(--accent-yellow); font-weight: 600; flex-shrink: 0; margin-right: 4px; }
     .lang-pill { flex-shrink: 0; background: #111b21; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 4px 8px; border-radius: 10px; font-size: 0.72rem; cursor: pointer; }
     .lang-pill:hover { background: var(--primary-green); color: #fff; }
     .btn-close-lang { background: none; border: none; color: var(--danger); font-size: 0.85rem; cursor: pointer; margin-left: auto; padding: 0 4px; }
 
-    .chat-footer { display: flex; align-items: flex-end; gap: 8px; padding-top: 4px; width: 100%; box-sizing: border-box; }
+    .chat-footer { display: flex; align-items: flex-end; gap: 8px; padding-top: 4px; width: 100%; }
     .chat-input {
       flex: 1;
       background: var(--card-dark);
@@ -284,7 +270,6 @@
       max-height: 140px;
       min-height: 44px;
       overflow-y: auto;
-      box-sizing: border-box;
     }
     .btn-send {
       width: 44px;
@@ -311,14 +296,16 @@
       position: relative;
     }
     .plan-card.highlight { border-color: var(--primary-green); }
+    .plan-card.ultra-card { border: 2px solid var(--vip-gold); background: linear-gradient(145deg, #182229 0%, #2e2008 100%); }
     .plan-card.active-owned { border: 2px solid var(--success); background: rgba(34, 197, 94, 0.06); }
     
     .offer-badge { position: absolute; top: -10px; right: 14px; background: #dc2626; color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
     .owned-badge { position: absolute; top: -10px; right: 14px; background: var(--success); color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
     
-    .tool-perk-list { font-size: 0.78rem; color: #94a3b8; display: flex; flex-direction: column; gap: 3px; margin: 4px 0; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 6px; }
+    .tool-perk-list { font-size: 0.78rem; color: #94a3b8; display: flex; flex-direction: column; gap: 4px; margin: 6px 0; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 6px; }
     .tool-perk-list span { display: flex; align-items: center; gap: 6px; }
     .tool-perk-list span i { color: var(--primary-green); font-size: 0.75rem; }
+    .tool-perk-list span i.gold-star { color: var(--vip-gold); }
 
     .price-cut { text-decoration: line-through; color: var(--text-muted); font-size: 0.9rem; margin-right: 6px; }
     .btn-action {
@@ -345,7 +332,7 @@
     .auth-overlay { position: absolute; inset: 0; background: rgba(11, 20, 26, 0.98); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .auth-card { background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 12px; max-height: 95vh; overflow-y: auto; }
 
-    /* ABOUT ME MODAL */
+    /* ABOUT MODAL */
     .about-overlay { position: absolute; inset: 0; background: rgba(11, 20, 26, 0.95); z-index: 120; display: none; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(8px); }
     .about-card {
       background: linear-gradient(145deg, #182229 0%, #1a162b 100%);
@@ -411,13 +398,10 @@
         </p>
       </div>
 
-      <div class="about-section" style="border-color: rgba(0, 168, 132, 0.3);">
-        <h5 style="color:var(--accent-yellow);"><i class="fa-solid fa-gem"></i> Dedicated Tool Limits & Quotas</h5>
+      <div class="about-section" style="border-color: rgba(245, 158, 11, 0.4);">
+        <h5 style="color:var(--accent-yellow);"><i class="fa-solid fa-crown"></i> Exclusive Ultra Power</h5>
         <p style="font-size:0.75rem;">
-          ✨ <b>Free:</b> 25 Questions + <b>10 Tool Uses/Day</b> (Tarjuma, Khulasa)<br>
-          ⚡ <b>Plus:</b> 75 Questions + <b>40 Tool Uses/Day</b> (+ Erab wa Tarqeeb, Exam Quiz)<br>
-          💎 <b>Pro:</b> 150 Questions + <b>100 Tool Uses/Day</b> (+ Ibaarat & Lughat, Fiqhi Tatbeeq)<br>
-          👑 <b>Ultra:</b> 250 Questions + <b>200 Tool Uses/Day</b> (All 6 Tools with Deep Research)
+          👑 <b>Ultra Special:</b> 4 Mazahib Fiqhi Matrix, Mantiq Syllogism Defense, aur Hashiya/Shurooh Comparison jaise nayab tools jo aam AI me nahi milte!
         </p>
       </div>
 
@@ -479,7 +463,7 @@
   <!-- NAVIGATION TABS -->
   <nav class="nav-dock">
     <div class="nav-item active" data-tab="tab-study"><i class="fa-solid fa-book-open"></i> Study AI</div>
-    <div class="nav-item" id="nav-item-plans" data-tab="tab-plans"><i class="fa-solid fa-crown"></i> Plans</div>
+    <div class="nav-item" id="nav-item-plans" data-tab="tab-plans"><i class="fa-solid fa-crown"></i> Plans & Perks</div>
     <div class="nav-item" id="nav-item-pay" data-tab="tab-pay"><i class="fa-solid fa-qrcode"></i> Upgrade</div>
     <div class="nav-item" id="nav-item-admin" data-tab="tab-admin" style="display:none;"><i class="fa-solid fa-user-shield"></i> Requests</div>
   </nav>
@@ -493,24 +477,38 @@
 
     <div class="chat-messages" id="chat-box"></div>
 
-    <!-- 6 TIER-BASED SHORTCUT PILLS (SCROLLABLE & FULLY VISIBLE) -->
+    <!-- COMPLETE DEDICATED TOOLBAR -->
     <div class="shortcuts-wrapper">
       <div class="study-shortcuts">
-        <span class="shortcut-pill" onclick="window.triggerShortcut('tarjuma', 'Tarjuma (Translation)')">📖 Tarjuma</span>
-        <span class="shortcut-pill" onclick="window.triggerShortcut('khulasa', 'Sabak Ka Khulasa')">📝 Khulasa</span>
+        <!-- FREE TOOLS -->
+        <span class="shortcut-pill" onclick="window.triggerShortcut('tarjuma', 'Tarjuma')">📖 Tarjuma</span>
+        <span class="shortcut-pill" onclick="window.triggerShortcut('khulasa', 'Khulasa')">📝 Khulasa</span>
 
+        <!-- PLUS TOOLS -->
         <span class="shortcut-pill" id="pill-tarqeeb" onclick="window.triggerShortcut('tarqeeb', 'Erab wa Tarqeeb')">
           <i class="fa-solid fa-lock" id="lock-tarqeeb"></i> 📌 Erab wa Tarqeeb
         </span>
-        <span class="shortcut-pill" id="pill-quiz" onclick="window.triggerShortcut('quiz', 'Exam Questions')">
-          <i class="fa-solid fa-lock" id="lock-quiz"></i> ❓ Exam Questions
+        <span class="shortcut-pill" id="pill-quiz" onclick="window.triggerShortcut('quiz', 'Exam MCQs')">
+          <i class="fa-solid fa-lock" id="lock-quiz"></i> ❓ Exam MCQs
         </span>
 
-        <span class="shortcut-pill" id="pill-tahqeeq" onclick="window.triggerShortcut('tahqeeq', 'Ibaarat & Lughwi Tehqeeq')">
+        <!-- PRO TOOLS -->
+        <span class="shortcut-pill" id="pill-tahqeeq" onclick="window.triggerShortcut('tahqeeq', 'Ibaarat & Lughat')">
           <i class="fa-solid fa-lock" id="lock-tahqeeq"></i> 🔍 Ibaarat & Lughat
         </span>
-        <span class="shortcut-pill" id="pill-tatbeeq" onclick="window.triggerShortcut('tatbeeq', 'Fiqhi wa Usooli Tatbeeq')">
+        <span class="shortcut-pill" id="pill-tatbeeq" onclick="window.triggerShortcut('tatbeeq', 'Fiqhi Tatbeeq')">
           <i class="fa-solid fa-lock" id="lock-tatbeeq"></i> ⚖️ Fiqhi Tatbeeq
+        </span>
+
+        <!-- ULTRA EXCLUSIVE SUPER-TOOLS -->
+        <span class="shortcut-pill ultra-pill" id="pill-taqabul" onclick="window.triggerShortcut('taqabul_fiqh', '4 Mazahib Fiqh Matrix')">
+          <i class="fa-solid fa-lock" id="lock-taqabul"></i> 👑 4 Mazahib Fiqh Matrix
+        </span>
+        <span class="shortcut-pill ultra-pill" id="pill-mantiq" onclick="window.triggerShortcut('mantiq_kalam', 'Mantiq Syllogism Defense')">
+          <i class="fa-solid fa-lock" id="lock-mantiq"></i> 👑 Mantiq Defense
+        </span>
+        <span class="shortcut-pill ultra-pill" id="pill-hashiya" onclick="window.triggerShortcut('shurooh_hashiya', 'Hashiya Synthesizer')">
+          <i class="fa-solid fa-lock" id="lock-hashiya"></i> 👑 Hashiya Synthesizer
         </span>
       </div>
 
@@ -531,8 +529,9 @@
     </div>
   </section>
 
-  <!-- TAB 2: PLANS (WITH EXPLICIT TOOL LIMITS SHOWN) -->
+  <!-- TAB 2: PLANS (DISTINCT ULTRA VALUE PROPOSITION) -->
   <section id="tab-plans" class="tab-view">
+    <!-- FREE -->
     <div class="plan-card" id="card-plan-free">
       <div id="badge-free" class="offer-badge" style="display:none;">Active</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
@@ -547,6 +546,7 @@
       <button type="button" class="btn-action active-btn" id="btn-plan-free" style="display:none;"><i class="fa-solid fa-check"></i> Current Plan</button>
     </div>
 
+    <!-- PLUS -->
     <div class="plan-card highlight" id="card-plan-plus">
       <div id="badge-plus" class="offer-badge">30 Din Offer</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
@@ -557,11 +557,12 @@
       <div class="tool-perk-list">
         <span><i class="fa-solid fa-check"></i> 📌 <b>Erab wa Nahw-Sarf Ki Poori Tarqeeb (Unlocked)</b></span>
         <span><i class="fa-solid fa-check"></i> ❓ <b>Exam MCQs wa Questions-Answers (Unlocked)</b></span>
-        <span><i class="fa-solid fa-check"></i> Tables, Step-by-Step Hal wa Detailed Analysis</span>
+        <span><i class="fa-solid fa-check"></i> Detailed Step-by-Step Hal wa Tables</span>
       </div>
       <button type="button" class="btn-action" id="btn-plan-plus" onclick="window.goToPay('plus')">₹10 me 30 Din ke liye lein</button>
     </div>
 
+    <!-- PRO -->
     <div class="plan-card" id="card-plan-pro">
       <div id="badge-pro" class="offer-badge">Khas Offer</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
@@ -570,27 +571,30 @@
       </div>
       <div style="font-size:0.8rem; color:var(--text-muted);">150 Sawal Rozana • <b>100 Tool Uses/Day</b></div>
       <div class="tool-perk-list">
-        <span><i class="fa-solid fa-check"></i> Plus Plan ke sabhi features</span>
-        <span><i class="fa-solid fa-star" style="color:var(--vip-gold);"></i> 🔍 <b>Ibaarat Fahmi wa Lughwi Tehqeeq (Unlocked)</b></span>
-        <span><i class="fa-solid fa-star" style="color:var(--vip-gold);"></i> ⚖️ <b>Fiqhi wa Usooli Tatbeeq Engine (Unlocked)</b></span>
-        <span><i class="fa-solid fa-check"></i> Kathin Maths, Science wa Logic Solving</span>
+        <span><i class="fa-solid fa-check"></i> Plus Plan ke sabhi 4 tools</span>
+        <span><i class="fa-solid fa-check"></i> 🔍 <b>Ibaarat Fahmi wa Lughwi Tehqeeq (Unlocked)</b></span>
+        <span><i class="fa-solid fa-check"></i> ⚖️ <b>Fiqhi wa Usooli Tatbeeq Engine (Unlocked)</b></span>
+        <span><i class="fa-solid fa-check"></i> Complex Maths, Science wa Rational Logic Solving</span>
       </div>
       <button type="button" class="btn-action" id="btn-plan-pro" onclick="window.goToPay('pro')">₹25 me 30 Din ke liye lein</button>
     </div>
 
-    <div class="plan-card" id="card-plan-ultra">
-      <div id="badge-ultra" class="offer-badge">Super Saver</div>
+    <!-- ULTRA (THE FLAGSHIP UNMATCHED TIER) -->
+    <div class="plan-card ultra-card" id="card-plan-ultra">
+      <div id="badge-ultra" class="offer-badge" style="background:var(--vip-gold); color:#000;">Flagship Tier</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
-        <span style="font-weight:700;">SUHAIL AI ULTRA</span>
-        <div><span class="price-cut">₹599</span><span style="font-weight:700; color:var(--primary-green);">₹50 / 30 Din</span></div>
+        <span style="font-weight:700; color:#fef08a;">SUHAIL AI ULTRA</span>
+        <div><span class="price-cut">₹599</span><span style="font-weight:700; color:#fef08a;">₹50 / 30 Din</span></div>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">250 Sawal Rozana • <b>200 Tool Uses/Day</b></div>
+      <div style="font-size:0.8rem; color:#fef08a;">250 Sawal Rozana • <b>200 Tool Uses/Day (Maximum Power)</b></div>
       <div class="tool-perk-list">
-        <span><i class="fa-solid fa-check"></i> Sabhi 6 Academic & Research Tools Unlimited Power ke sath</span>
-        <span><i class="fa-solid fa-check"></i> 6-Stage Deep Research (Tareef, Usool, Wazahat, Misaal, Tatbeeq)</span>
-        <span><i class="fa-solid fa-check"></i> Dars-e-Nizami Shurooh, Hawashi wa Highest Academic Reasoning</span>
+        <span><i class="fa-solid fa-check gold-star"></i> Sabhi 6 Standard Tools Uncapped Speed par</span>
+        <span><i class="fa-solid fa-crown gold-star"></i> 👑 <b>4 Mazahib Fiqh Comparative Matrix (Exclusive)</b></span>
+        <span><i class="fa-solid fa-crown gold-star"></i> 👑 <b>Mantiq Syllogism & Scholarly Defense Engine (Exclusive)</b></span>
+        <span><i class="fa-solid fa-crown gold-star"></i> 👑 <b>Classical Hashiya & Shurooh Synthesizer (Exclusive)</b></span>
+        <span><i class="fa-solid fa-check gold-star"></i> 6-Stage Deep Academic Research (Tareef, Usool, Wazahat, Tatbeeq)</span>
       </div>
-      <button type="button" class="btn-action" id="btn-plan-ultra" onclick="window.goToPay('ultra')">₹50 me 30 Din ke liye lein</button>
+      <button type="button" class="btn-action" id="btn-plan-ultra" style="background:var(--vip-gold); color:#000;" onclick="window.goToPay('ultra')">₹50 me ULTRA Flagship lein</button>
     </div>
   </section>
 
@@ -602,7 +606,7 @@
         <span id="active-plan-name" style="font-weight:700; color:var(--primary-green); font-size:0.9rem;">SUHAIL AI FREE</span>
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size:0.75rem; color:var(--text-muted);">Usage & Quota:</span>
+        <span style="font-size:0.75rem; color:var(--text-muted);">Status:</span>
         <span id="active-plan-status" style="font-size:0.75rem; color:#fff; font-weight:600;">Active</span>
       </div>
     </div>
@@ -683,7 +687,7 @@
     document.getElementById('modal-about').style.display = 'flex';
   };
 
-  // TOOL PERMISSION GATEWAY
+  // TOOL PERMISSION GATEWAY (DISTINCT ULTRA EXCLUSIVITY)
   function checkToolAccess(type) {
     const p = (currentUser?.role === 'admin') ? 'ultra' : (currentUser?.plan || 'free');
 
@@ -692,13 +696,20 @@
     }
     if (type === 'tarqeeb' || type === 'quiz') {
       if (p === 'free') {
-        return { allowed: false, minPlan: 'PLUS', msg: 'Yeh tool SUHAIL AI PLUS, PRO aur ULTRA me uplabdh hai. Abhi upgrade karein!' };
+        return { allowed: false, minPlan: 'plus', msg: 'Yeh tool SUHAIL AI PLUS, PRO aur ULTRA me uplabdh hai. Abhi upgrade karein!' };
       }
       return { allowed: true };
     }
     if (type === 'tahqeeq' || type === 'tatbeeq') {
       if (p === 'free' || p === 'plus') {
-        return { allowed: false, minPlan: 'PRO', msg: 'Yeh aala tehqeeqi tool SUHAIL AI PRO aur ULTRA me uplabdh hai.' };
+        return { allowed: false, minPlan: 'pro', msg: 'Yeh aala tehqeeqi tool SUHAIL AI PRO aur ULTRA me uplabdh hai.' };
+      }
+      return { allowed: true };
+    }
+    // ULTRA EXCLUSIVE SUPER-TOOLS
+    if (type === 'taqabul_fiqh' || type === 'mantiq_kalam' || type === 'shurooh_hashiya') {
+      if (p !== 'ultra') {
+        return { allowed: false, minPlan: 'ultra', msg: '👑 Yeh nayab Super-Tool sirf aur sirf SUHAIL AI ULTRA me uplabdh hai! 4 Mazahib Matrix aur Mantiq Defense ke liye ULTRA me upgrade karein.' };
       }
       return { allowed: true };
     }
@@ -708,7 +719,7 @@
   window.triggerShortcut = (type, title) => {
     const access = checkToolAccess(type);
     if (!access.allowed) {
-      if (confirm(access.msg + "\n\nKya aap upgrade page par jana chahte hain?")) {
+      if (confirm(access.msg + "\n\nKya aap Upgrade page par jana chahte hain?")) {
         window.goToPay(access.minPlan.toLowerCase());
       }
       return;
@@ -732,7 +743,7 @@
     if (activeShortcutType === 'tarqeeb') {
       promptPrefix = `[Erab wa Tarqeeb - ${lang}]: Kripya is ibaarat ki mukammal tarqeeb aur erab ${lang} me samjhayein:\n`;
     } else if (activeShortcutType === 'tarjuma') {
-      promptPrefix = `[Tarjuma - ${lang}]: Kripya is ibaarat ka sateek tarjuma (translation) ${lang} me karein:\n`;
+      promptPrefix = `[Tarjuma - ${lang}]: Kripya is ibaarat ka sateek tarjuma ${lang} me karein:\n`;
     } else if (activeShortcutType === 'khulasa') {
       promptPrefix = `[Khulasa - ${lang}]: Kripya is sabaq ka aasan wa jaame khulasa ${lang} me bayan karein:\n`;
     } else if (activeShortcutType === 'quiz') {
@@ -741,6 +752,12 @@
       promptPrefix = `[Ibaarat & Lughat - ${lang}]: Is ibaarat ki lughwi wa darsi tehqeeq ${lang} me pesh karein:\n`;
     } else if (activeShortcutType === 'tatbeeq') {
       promptPrefix = `[Fiqhi Tatbeeq - ${lang}]: Is mas'ale ki fiqhi wa usooli tatbeeq ${lang} me tahreer karein:\n`;
+    } else if (activeShortcutType === 'taqabul_fiqh') {
+      promptPrefix = `[4 Mazahib Fiqh Matrix - ${lang}]: Is fiqhi mas'ale par 4 Mazahib (Hanafi, Shafi'i, Maliki, Hanbali) ke aaraa, dalail aur rajih qawl ka aamne-saamne muqabla ${lang} me pesh karein:\n`;
+    } else if (activeShortcutType === 'mantiq_kalam') {
+      promptPrefix = `[Mantiq & Kalam Defense - ${lang}]: Is da'we ya shubhe ka Ilm-ul-Mantiq (Sughra, Kubra, Qiyas) aur Aqaid-e-Ahl-us-Sunnah ke dalail ke sath qata'ee radd ${lang} me pesh karein:\n`;
+    } else if (activeShortcutType === 'shurooh_hashiya') {
+      promptPrefix = `[Hashiya Synthesizer - ${lang}]: Is darsi ibaarat par ahem shurooh aur mutaqaddimeen/muta'akhireen hawashi ke ikhtilafat aur bariq nukat ${lang} me wazeh karein:\n`;
     } else {
       promptPrefix = `[${lang}]: `;
     }
@@ -797,11 +814,15 @@
     document.getElementById('u-plan').textContent = planBadge;
     document.getElementById('active-plan-name').textContent = planBadge;
 
-    // Visual Lock Indicator for Tools
+    // Visual Lock Indicators
     document.getElementById('lock-tarqeeb').style.display = (p === 'free') ? 'inline-block' : 'none';
     document.getElementById('lock-quiz').style.display = (p === 'free') ? 'inline-block' : 'none';
     document.getElementById('lock-tahqeeq').style.display = (p === 'free' || p === 'plus') ? 'inline-block' : 'none';
     document.getElementById('lock-tatbeeq').style.display = (p === 'free' || p === 'plus') ? 'inline-block' : 'none';
+    // Ultra Exclusive Locks
+    document.getElementById('lock-taqabul').style.display = (p !== 'ultra') ? 'inline-block' : 'none';
+    document.getElementById('lock-mantiq').style.display = (p !== 'ultra') ? 'inline-block' : 'none';
+    document.getElementById('lock-hashiya').style.display = (p !== 'ultra') ? 'inline-block' : 'none';
 
     const bannerExpiry = document.getElementById('banner-expiry');
     if (isAdmin) {
@@ -847,13 +868,13 @@
           } else {
             btn.style.display = 'block';
             btn.className = 'btn-action';
-            const prices = { plus: '₹10 me 30 Din ke liye lein', pro: '₹25 me 30 Din ke liye lein', ultra: '₹50 me 30 Din ke liye lein' };
+            const prices = { plus: '₹10 me 30 Din ke liye lein', pro: '₹25 me 30 Din ke liye lein', ultra: '₹50 me ULTRA Flagship lein' };
             btn.textContent = prices[planId] || 'Upgrade Karein';
             btn.onclick = () => window.goToPay(planId);
             if (badge) {
               badge.style.display = 'block';
               badge.className = 'offer-badge';
-              const offers = { plus: '30 Din Offer', pro: 'Khas Offer', ultra: 'Super Saver' };
+              const offers = { plus: '30 Din Offer', pro: 'Khas Offer', ultra: 'Flagship Tier' };
               badge.textContent = offers[planId] || 'Offer';
             }
           }
@@ -930,7 +951,7 @@
   });
 
   function getHistoryKey() {
-    return currentUser ? `suhail_chat_v4_${currentUser.phone}` : 'suhail_chat_temp';
+    return currentUser ? `suhail_chat_v5_${currentUser.phone}` : 'suhail_chat_temp';
   }
 
   function loadChatHistory() {
@@ -1010,8 +1031,6 @@
   function renderAiBubble(div, text, aiName) {
     const isAr = containsArabic(text);
     let parsedHtml = (typeof marked !== 'undefined') ? marked.parse(text) : text;
-    
-    // Wrap tables inside responsive scrollable container
     parsedHtml = parsedHtml.replace(/<table>/g, '<div class="table-responsive"><table>').replace(/<\/table>/g, '</table></div>');
 
     div.innerHTML = `
