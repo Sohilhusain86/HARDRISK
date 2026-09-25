@@ -3,14 +3,14 @@ import crypto from "crypto";
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com";
 
-// Environment Keys
+// Keys from Vercel Environment Variables
 const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
 const MISTRAL_KEY = process.env.MISTRAL_KEY || "";
 const GROQ_KEY = process.env.GROQ_KEY || "";
 const SILICONFLOW_KEY = process.env.SILICONFLOW_KEY || "";
 const CEREBRAS_KEY = process.env.CEREBRAS_KEY || "";
 
-// Active Production Models
+// Production Models
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 const MISTRAL_MODEL = process.env.MISTRAL_MODEL || "mistral-small-latest";
 const GROQ_PRO_MODEL = process.env.GROQ_PRO_MODEL || "openai/gpt-oss-120b";
@@ -54,9 +54,9 @@ function normalizePlan(rawPlan) {
   return "free";
 }
 
-// 1. FREE: Gemini
+// 1. FREE (Google Gemini)
 async function callGemini(prompt, systemInstruction) {
-  if (!GEMINI_KEY) throw { userMsg: "SUHAIL AI FREE ki GEMINI_API_KEY Vercel me nahi mili.", code: 500 };
+  if (!GEMINI_KEY) throw { userMsg: "SUHAIL AI FREE ki service uplabdha nahi hai.", code: 500 };
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_KEY}`;
   const res = await fetch(url, {
     method: "POST",
@@ -65,13 +65,14 @@ async function callGemini(prompt, systemInstruction) {
   });
   const data = await res.json();
   if (!res.ok || data.error) {
-    throw { userMsg: "SUHAIL AI FREE ki request limit is waqt poori ho gayi hai. 15 second baad dobara koshish karein.", code: 429 };
+    throw { userMsg: "SUHAIL AI FREE ki request limit poori ho gayi hai. 15 second baad prayas karein.", code: 429 };
   }
   return data?.candidates?.[0]?.content?.parts?.[0]?.text;
 }
 
-// 2. PLUS: Mistral / SiliconFlow Fallback
+// 2. PLUS (Mistral with SiliconFlow/Groq resilience)
 async function callMistral(prompt, systemInstruction) {
+  // Try Mistral directly if key valid
   if (MISTRAL_KEY) {
     try {
       const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
@@ -86,24 +87,43 @@ async function callMistral(prompt, systemInstruction) {
       if (res.ok && data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
     } catch (e) {}
   }
+  // Try SiliconFlow Qwen
   if (SILICONFLOW_KEY) {
-    const res = await fetch("https://api.siliconflow.cn/v1/chat/completions", {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${SILICONFLOW_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "Qwen/Qwen2.5-7B-Instruct",
-        messages: [{ role: "system", content: systemInstruction }, { role: "user", content: prompt }]
-      })
-    });
-    const data = await res.json();
-    if (res.ok && data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
+    try {
+      const res = await fetch("https://api.siliconflow.cn/v1/chat/completions", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${SILICONFLOW_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "Qwen/Qwen2.5-7B-Instruct",
+          messages: [{ role: "system", content: systemInstruction }, { role: "user", content: prompt }]
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
+    } catch (e) {}
   }
-  throw { userMsg: "SUHAIL AI PLUS is samay uplabdha nahi hai. Kripya thodi der baad prayas karein.", code: 500 };
+  // Groq Fast model backup to guarantee Plus never drops a request
+  if (GROQ_KEY) {
+    try {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${GROQ_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "llama-3.1-8b-instant",
+          messages: [{ role: "system", content: systemInstruction }, { role: "user", content: prompt }],
+          temperature: 0.4
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
+    } catch (e) {}
+  }
+  throw { userMsg: "SUHAIL AI PLUS is samay vyast hai. Kripya thodi der baad dobara prayas karein.", code: 500 };
 }
 
-// 3. PRO: Groq
+// 3. PRO (Groq)
 async function callGroq(prompt, systemInstruction) {
-  if (!GROQ_KEY) throw { userMsg: "SUHAIL AI PRO ki GROQ_KEY Vercel me nahi mili.", code: 500 };
+  if (!GROQ_KEY) throw { userMsg: "SUHAIL AI PRO service an-upalabdha hai.", code: 500 };
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: { "Authorization": `Bearer ${GROQ_KEY}`, "Content-Type": "application/json" },
@@ -118,7 +138,7 @@ async function callGroq(prompt, systemInstruction) {
   return data?.choices?.[0]?.message?.content;
 }
 
-// 4. ULTRA: SiliconFlow Flagship (DeepSeek V4) / Cerebras Fallback
+// 4. ULTRA (SiliconFlow Flagship / High-End Engine)
 async function callUltra(prompt, systemInstruction) {
   if (SILICONFLOW_KEY) {
     try {
@@ -135,7 +155,6 @@ async function callUltra(prompt, systemInstruction) {
       if (res.ok && data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
     } catch (e) {}
   }
-  // Groq High-End fallback if SiliconFlow not active
   return await callGroq(prompt, systemInstruction);
 }
 
@@ -250,11 +269,11 @@ export default async function handler(req, res) {
       let replyText = "";
 
       const academicInstruction = `Aapka official naam '{AI_NAME}' hai.
-Aap Suhail AI study platform ke sanjeeda ustaad hain.
+Aap Suhail AI study platform ke sanjeeda aur moaddib ustaad hain.
 Niyam:
 1. Shuruat hamesha 'अस्सलामु अलैकुम व रहमतुल्लाह' se karein.
-2. Kabhi bhi 'Namaste' ya gair-Islami adab istemal na karein.
-3. Kisi bahari model/company ka naam na lein. Pehchan puchne par 'Main {AI_NAME} hoon' kahein.
+2. Kabhi bhi 'Namaste' ya gair-Islami adab ke alfaz istemal na karein.
+3. Kisi bahari provider/company (Gemini, Mistral, Groq, DeepSeek) ka naam na lein. Pehchan puchne par 'Main {AI_NAME} hoon' kahein.
 4. Talib ko Nahw, Sarf, Arabic, Urdu, English, Maths, Science aur Dars-e-Nizami me behtareen padhai karwayen.`;
 
       if (plan === "ultra") {
@@ -274,11 +293,24 @@ Niyam:
       return res.status(200).json({ success: true, reply: replyText, aiName, plan });
     }
 
+    // STRICT 12-DIGIT UTR PAYMENT VALIDATION
     if (action === "payment" && req.method === "POST") {
       const { phone, plan, utr } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
+      const cleanUtr = String(utr || "").replace(/\D/g, "");
       const normPlan = normalizePlan(plan);
-      if (!cleanPhone || !utr || cleanPhone.length !== 10) return res.status(400).json({ success: false, error: "Details sahi bharein." });
+
+      if (!cleanPhone || cleanPhone.length !== 10) {
+        return res.status(400).json({ success: false, error: "Kripya 10 ankon ka mobile number darj karein." });
+      }
+
+      if (!cleanUtr || cleanUtr.length !== 12) {
+        return res.status(400).json({ success: false, error: "Amanay UTR! UTR / Transaction No. theek 12 ankon (12 Digits) ka hona anivarya hai." });
+      }
+
+      if (normPlan === "free") {
+        return res.status(400).json({ success: false, error: "Free plan ke liye payment darkhwast ki zaroorat nahi hai." });
+      }
 
       const amounts = { plus: 10, pro: 25, ultra: 50 };
       const requestId = `req_${Date.now()}`;
@@ -287,11 +319,11 @@ Niyam:
         phone: cleanPhone,
         plan: normPlan,
         amount: amounts[normPlan] || 0,
-        utr: String(utr).trim(),
+        utr: cleanUtr,
         status: "pending",
         createdAt: Date.now()
       });
-      return res.status(200).json({ success: true, message: "Darkhwast darj ho gayi hai. Admin tasdeeq ke baad unlock ho jayega." });
+      return res.status(200).json({ success: true, message: "Payment darkhwast darj ho gayi hai. Admin tasdeeq ke baad 30 din ke liye unlock ho jayega." });
     }
 
     if (action === "admin" && req.method === "POST") {
