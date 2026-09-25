@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ur" dir="ltr">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,7 +7,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Nastaliq+Urdu:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
@@ -28,42 +28,189 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
-    body { background: var(--bg-dark); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; }
     
-    .app-container { width: 100%; max-width: 600px; display: flex; flex-direction: column; height: 100vh; background: var(--panel-dark); position: relative; overflow: hidden; }
+    html, body {
+      background: var(--bg-dark);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      overscroll-behavior: contain;
+      overscroll-behavior-y: contain;
+    }
     
-    .top-header { background: var(--card-dark); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--card-border); z-index: 10; }
+    .app-container {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: var(--panel-dark);
+      position: relative;
+      overflow: hidden;
+      overscroll-behavior: contain;
+    }
+    
+    .top-header {
+      background: var(--card-dark);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--card-border);
+      z-index: 10;
+    }
     .header-user { display: flex; align-items: center; gap: 10px; }
-    .header-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--primary-green); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; }
-    .header-info h4 { font-size: 0.92rem; font-weight: 600; line-height: 1.2; }
-    .badge-plan { font-size: 0.65rem; padding: 2px 8px; border-radius: 12px; background: rgba(0, 168, 132, 0.2); color: var(--primary-green); font-weight: 600; text-transform: uppercase; }
-    .header-actions { display: flex; align-items: center; gap: 4px; }
-    .header-actions button { background: none; border: none; color: var(--text-muted); font-size: 1.05rem; cursor: pointer; padding: 6px; border-radius: 50%; }
+    .header-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--primary-green);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    .header-info h4 { font-size: 0.92rem; font-weight: 600; line-height: 1.2; text-align: left; }
+    .badge-plan {
+      font-size: 0.65rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: rgba(0, 168, 132, 0.2);
+      color: var(--primary-green);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .header-actions { display: flex; align-items: center; gap: 6px; }
+    .header-actions button {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 50%;
+    }
     .header-actions button:hover { color: #fff; background: rgba(255,255,255,0.05); }
 
     .nav-dock { display: flex; background: var(--card-dark); border-bottom: 1px solid var(--card-border); }
-    .nav-item { flex: 1; padding: 10px; text-align: center; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+    .nav-item {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
     .nav-item.active { color: var(--primary-green); border-bottom-color: var(--primary-green); }
 
-    .tab-view { flex: 1; overflow-y: auto; padding: 14px; display: none; flex-direction: column; gap: 12px; }
+    .tab-view { flex: 1; overflow-y: auto; padding: 14px; display: none; flex-direction: column; gap: 12px; overscroll-behavior: contain; }
     .tab-view.active { display: flex; }
 
-    .expiry-alert { background: #451a03; border: 1px solid var(--vip-gold); color: #fef08a; padding: 8px 12px; border-radius: 8px; font-size: 0.78rem; display: none; align-items: center; justify-content: space-between; gap: 6px; }
+    .expiry-alert {
+      background: #451a03;
+      border: 1px solid var(--vip-gold);
+      color: #fef08a;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
 
-    .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-bottom: 6px; }
-    .chat-bubble { max-width: 90%; padding: 12px 14px; border-radius: 14px; font-size: 0.88rem; line-height: 1.6; word-wrap: break-word; position: relative; }
-    .chat-bubble.user { align-self: flex-end; background: #005c4b; color: #fff; border-bottom-right-radius: 2px; white-space: pre-wrap; }
-    .chat-bubble.ai { align-self: flex-start; background: var(--card-dark); border: 1px solid var(--card-border); border-bottom-left-radius: 2px; width: 92%; }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-bottom: 6px;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+    .chat-bubble {
+      max-width: 92%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      word-wrap: break-word;
+      position: relative;
+    }
+    .chat-bubble.user {
+      align-self: flex-end;
+      background: #005c4b;
+      color: #fff;
+      border-bottom-right-radius: 2px;
+      white-space: pre-wrap;
+      text-align: left;
+    }
+    .chat-bubble.ai {
+      align-self: flex-start;
+      background: var(--card-dark);
+      border: 1px solid var(--card-border);
+      border-bottom-left-radius: 2px;
+      width: 95%;
+      text-align: left;
+    }
     
-    .ai-label { font-size: 0.72rem; color: var(--primary-green); font-weight: 700; margin-bottom: 6px; display: block; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 3px; }
+    .ai-label {
+      font-size: 0.72rem;
+      color: var(--primary-green);
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: block;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding-bottom: 3px;
+    }
     
+    .chat-content { direction: ltr; text-align: left; }
     .chat-content h1, .chat-content h2, .chat-content h3 { font-size: 0.98rem; font-weight: 700; margin: 8px 0 4px 0; color: #fff; }
     .chat-content p { margin-bottom: 6px; }
     .chat-content ul, .chat-content ol { margin-left: 18px; margin-bottom: 6px; }
     .chat-content li { margin-bottom: 3px; }
     .chat-content code { background: #111b21; padding: 2px 5px; border-radius: 4px; font-size: 0.82rem; font-family: monospace; }
     .chat-content blockquote { border-left: 3px solid var(--primary-green); padding-left: 8px; color: var(--text-muted); margin: 6px 0; }
-    .arabic-text { font-family: 'Amiri', serif !important; font-size: 1.15rem; line-height: 1.8; direction: rtl; text-align: right; display: block; }
+    
+    /* TABLE SCROLL & FIX FOR SQUISHED COLUMNS */
+    .chat-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+    }
+    .chat-content th, .chat-content td {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      min-width: 110px;
+      white-space: normal;
+      vertical-align: top;
+      text-align: left;
+    }
+    .chat-content th {
+      background: #182229;
+      color: var(--primary-green);
+      font-weight: 600;
+    }
+
+    .arabic-text {
+      font-family: 'Amiri', 'Noto Nastaliq Urdu', serif !important;
+      font-size: 1.15rem;
+      line-height: 1.9;
+      direction: rtl;
+      text-align: right;
+      display: block;
+    }
 
     .bubble-actions { display: flex; justify-content: flex-end; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 4px; }
     .btn-copy { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 3px 6px; border-radius: 4px; }
@@ -72,10 +219,36 @@
     .shortcuts-wrapper { display: flex; flex-direction: column; gap: 6px; }
     .study-shortcuts { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px; scrollbar-width: none; }
     .study-shortcuts::-webkit-scrollbar { display: none; }
-    .shortcut-pill { flex-shrink: 0; background: #182229; border: 1px solid rgba(255,255,255,0.08); color: var(--text-muted); padding: 5px 10px; border-radius: 16px; font-size: 0.74rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
-    .shortcut-pill:hover, .shortcut-pill.active { border-color: var(--primary-green); color: #fff; background: rgba(0, 168, 132, 0.15); }
+    
+    .shortcut-pill {
+      flex-shrink: 0;
+      background: #182229;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text-muted);
+      padding: 6px 11px;
+      border-radius: 16px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .shortcut-pill:hover { border-color: var(--primary-green); color: #fff; background: rgba(0, 168, 132, 0.15); }
+    .shortcut-pill.locked i.fa-lock { color: var(--vip-gold); font-size: 0.7rem; }
 
-    .lang-choice-bar { display: none; gap: 6px; overflow-x: auto; padding: 6px 8px; background: #182229; border: 1px solid rgba(0, 168, 132, 0.3); border-radius: 12px; align-items: center; animation: fadeIn 0.2s ease; }
+    .lang-choice-bar {
+      display: none;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 6px 8px;
+      background: #182229;
+      border: 1px solid rgba(0, 168, 132, 0.3);
+      border-radius: 12px;
+      align-items: center;
+      animation: fadeIn 0.2s ease;
+    }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
     .lang-label { font-size: 0.72rem; color: var(--accent-yellow); font-weight: 600; flex-shrink: 0; margin-right: 4px; }
     .lang-pill { flex-shrink: 0; background: #111b21; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 4px 8px; border-radius: 10px; font-size: 0.72rem; cursor: pointer; font-weight: 500; }
@@ -83,33 +256,117 @@
     .btn-close-lang { background: none; border: none; color: var(--danger); font-size: 0.85rem; cursor: pointer; margin-left: auto; padding: 0 4px; }
 
     .chat-footer { display: flex; align-items: flex-end; gap: 8px; padding-top: 4px; }
-    .chat-input { flex: 1; background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 18px; padding: 10px 16px; color: #fff; outline: none; font-size: 0.88rem; line-height: 1.4; resize: none; max-height: 140px; min-height: 44px; overflow-y: auto; }
-    .btn-send { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-green); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .chat-input {
+      flex: 1;
+      background: var(--card-dark);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 10px 16px;
+      color: #fff;
+      outline: none;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      resize: none;
+      max-height: 140px;
+      min-height: 44px;
+      overflow-y: auto;
+      text-align: left;
+      direction: ltr;
+    }
+    .btn-send {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--primary-green);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
 
-    .plan-card { background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 6px; position: relative; }
+    .plan-card {
+      background: var(--card-dark);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
     .plan-card.highlight { border-color: var(--primary-green); }
     .plan-card.active-owned { border: 2px solid var(--success); background: rgba(34, 197, 94, 0.06); }
-    .plan-card.vip { border: 1px dashed var(--vip-purple); background: linear-gradient(145deg, #182229 0%, #1e1b4b 100%); opacity: 0.85; }
     
     .offer-badge { position: absolute; top: -10px; right: 14px; background: #dc2626; color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
     .owned-badge { position: absolute; top: -10px; right: 14px; background: var(--success); color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
-    .badge-coming-soon { position: absolute; top: -10px; right: 14px; background: var(--vip-purple); color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
     
+    .tool-perk-list { font-size: 0.78rem; color: #94a3b8; display: flex; flex-direction: column; gap: 3px; margin: 4px 0; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 6px; }
+    .tool-perk-list span { display: flex; align-items: center; gap: 6px; }
+    .tool-perk-list span i { color: var(--primary-green); font-size: 0.75rem; }
+
     .price-cut { text-decoration: line-through; color: var(--text-muted); font-size: 0.9rem; margin-right: 6px; }
-    .btn-action { width: 100%; padding: 10px; border-radius: 8px; border: none; background: var(--primary-green); color: #fff; font-weight: 600; cursor: pointer; font-size: 0.88rem; }
+    .btn-action {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background: var(--primary-green);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.88rem;
+    }
     .btn-action.active-btn { background: #166534; color: #86efac; cursor: default; }
-    .btn-action.disabled { background: #374151; color: #9ca3af; cursor: not-allowed; }
 
     .status-banner { background: #132f2b; border: 1px solid var(--primary-green); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px; }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-group label { font-size: 0.8rem; color: var(--text-muted); }
     .form-input { background: #182229; border: 1px solid var(--card-border); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 0.9rem; outline: none; }
     
-    .qr-box { background: #fff; padding: 8px; border-radius: 12px; width: 220px; height: 220px; margin: 10px auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    .qr-box { background: #fff; padding: 8px; border-radius: 12px; width: 220px; height: 220px; margin: 10px auto; display: flex; align-items: center; justify-content: center; }
     .qr-box img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
 
     .auth-overlay { position: absolute; inset: 0; background: rgba(11, 20, 26, 0.98); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .auth-card { background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 12px; max-height: 95vh; overflow-y: auto; }
+
+    /* ABOUT ME MODAL */
+    .about-overlay { position: absolute; inset: 0; background: rgba(11, 20, 26, 0.95); z-index: 120; display: none; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(8px); }
+    .about-card {
+      background: linear-gradient(145deg, #182229 0%, #1a162b 100%);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+      border-radius: 20px;
+      padding: 22px;
+      width: 100%;
+      max-width: 440px;
+      max-height: 90vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .about-hero { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .about-avatar {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00a884, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 2rem;
+      box-shadow: 0 4px 15px rgba(0, 168, 132, 0.4);
+    }
+    .about-title { font-size: 1.25rem; font-weight: 700; background: linear-gradient(90deg, #38bdf8, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .about-badge { background: rgba(245, 158, 11, 0.15); border: 1px solid var(--vip-gold); color: #fef08a; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+    
+    .about-section { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+    .about-section h5 { color: var(--primary-green); font-size: 0.86rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .about-section p { font-size: 0.8rem; color: #cbd5e1; line-height: 1.6; }
 
     .admin-req-card { background: #182229; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
     .admin-actions { display: flex; gap: 8px; margin-top: 6px; }
@@ -121,6 +378,51 @@
 
 <div class="app-container">
   
+  <!-- ABOUT ME MODAL -->
+  <div id="modal-about" class="about-overlay">
+    <div class="about-card">
+      <div style="display:flex; justify-content:flex-end;">
+        <button onclick="document.getElementById('modal-about').style.display='none'" style="background:none; border:none; color:var(--text-muted); font-size:1.2rem; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      
+      <div class="about-hero">
+        <div class="about-avatar"><i class="fa-solid fa-graduation-cap"></i></div>
+        <h3 class="about-title">Suhail AI - Study Platform</h3>
+        <span class="about-badge"><i class="fa-solid fa-star"></i> Ilm wa Adab Ka Smart AI Companion</span>
+      </div>
+
+      <div class="about-section">
+        <h5><i class="fa-solid fa-user-tie"></i> Hamare Baare Me (About Creator)</h5>
+        <p>
+          Humara maqsad tamam tulba-e-kiram (Dars-e-Nizami, Madaris wa Asri Idare) ke liye ek aesa jadeed AI platform faraham karna hai jo unke sawalat ka <b>ba-adab, sanjeeda aur ilmi mayaar</b> ke mutabiq jawab de sake.
+        </p>
+      </div>
+
+      <div class="about-section">
+        <h5><i class="fa-solid fa-compass-drafting"></i> Suhail AI Ka Mission</h5>
+        <p>
+          • <b>Dars-e-Nizami:</b> Nahw, Sarf, Ibaarat fahmi, aur Tarjuma ki aasan wazahat.<br>
+          • <b>Asri Taleem:</b> Maths, Science, English, GK aur Competitive Exams ki behtareen tayyari.<br>
+          • <b>Multi-lingual:</b> Urdu, Hindi, Roman Urdu, Arabic aur English har zaban me barabar salahiyat.
+        </p>
+      </div>
+
+      <div class="about-section" style="border-color: rgba(0, 168, 132, 0.3);">
+        <h5 style="color:var(--accent-yellow);"><i class="fa-solid fa-gem"></i> Powerful Tiered Tools</h5>
+        <p style="font-size:0.75rem;">
+          ✨ <b>Free:</b> Tarjuma wa Khulasa (25 Daily)<br>
+          ⚡ <b>Plus:</b> Nahwi Tarkeebei'n wa Exam Quiz (75 Daily)<br>
+          💎 <b>Pro:</b> Ibaarat & Lughwi Tehqeeq + Fiqhi Reasoning (150 Daily)<br>
+          👑 <b>Ultra:</b> 6-Stage Deep Academic Research Engine (250 Daily)
+        </p>
+      </div>
+
+      <button type="button" class="btn-action" onclick="document.getElementById('modal-about').style.display='none'">
+        MashaAllah, Shuru Karein!
+      </button>
+    </div>
+  </div>
+
   <!-- AUTH MODAL -->
   <div id="auth-modal" class="auth-overlay">
     <div class="auth-card">
@@ -144,11 +446,10 @@
         <input type="text" id="auth-name" class="form-input" placeholder="Talib-e-Ilm ka naam">
       </div>
       
-      <!-- FIXED: ADMIN PASSWORD NEVER EXPOSED IN PLACEHOLDER -->
       <div class="form-group">
-  <label style="color:#f87171;">Master Admin Password (Sirf Admin ke liye)</label>
-  <input type="password" id="auth-admin-pass" class="form-input" placeholder="Admin password darj karein" autocomplete="new-password">
-</div>
+        <label style="color:#f87171;">Master Admin Password (Sirf Admin ke liye)</label>
+        <input type="password" id="auth-admin-pass" class="form-input" placeholder="" autocomplete="new-password">
+      </div>
       
       <button type="button" class="btn-action" id="btn-login-submit">Login / Register</button>
     </div>
@@ -164,7 +465,8 @@
       </div>
     </div>
     <div class="header-actions">
-      <button id="btn-new-chat" title="नई गुफ़्तगू (New Chat)"><i class="fa-solid fa-arrows-rotate"></i></button>
+      <button id="btn-open-about" title="About Suhail AI & Creator" style="color:var(--accent-yellow);"><i class="fa-solid fa-circle-info"></i></button>
+      <button id="btn-new-chat" title="New Chat"><i class="fa-solid fa-arrows-rotate"></i></button>
       <button id="btn-admin-toggle" title="Admin Requests" style="display:none;"><i class="fa-solid fa-shield-halved"></i></button>
       <button id="btn-logout" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
     </div>
@@ -187,27 +489,41 @@
 
     <div class="chat-messages" id="chat-box"></div>
 
+    <!-- 6 TIER-BASED STUDY SHORTCUTS -->
     <div class="shortcuts-wrapper">
       <div class="study-shortcuts">
-        <span class="shortcut-pill" onclick="window.triggerShortcut('tarqeeb', 'एराब व तरकीब')">📌 एराब व तरकीब</span>
-        <span class="shortcut-pill" onclick="window.triggerShortcut('tarjuma', 'तर्जुमा (Translation)')">📖 तर्जुमा (Translation)</span>
-        <span class="shortcut-pill" onclick="window.triggerShortcut('khulasa', 'सबक का ख़ुलासा')">📝 सबक का ख़ुलासा</span>
-        <span class="shortcut-pill" onclick="window.triggerShortcut('quiz', 'इम्तिहान के सवालात')">❓ इम्तिहान के सवालात</span>
+        <span class="shortcut-pill" onclick="window.triggerShortcut('tarjuma', 'Tarjuma (Translation)')">📖 Tarjuma</span>
+        <span class="shortcut-pill" onclick="window.triggerShortcut('khulasa', 'Sabak Ka Khulasa')">📝 Khulasa</span>
+
+        <span class="shortcut-pill" id="pill-tarqeeb" onclick="window.triggerShortcut('tarqeeb', 'Erab wa Tarqeeb')">
+          <i class="fa-solid fa-lock" id="lock-tarqeeb"></i> 📌 Erab wa Tarqeeb
+        </span>
+        <span class="shortcut-pill" id="pill-quiz" onclick="window.triggerShortcut('quiz', 'Exam Questions')">
+          <i class="fa-solid fa-lock" id="lock-quiz"></i> ❓ Exam Questions
+        </span>
+
+        <span class="shortcut-pill" id="pill-tahqeeq" onclick="window.triggerShortcut('tahqeeq', 'Ibaarat & Lughwi Tehqeeq')">
+          <i class="fa-solid fa-lock" id="lock-tahqeeq"></i> 🔍 Ibaarat & Lughat
+        </span>
+        <span class="shortcut-pill" id="pill-tatbeeq" onclick="window.triggerShortcut('tatbeeq', 'Fiqhi wa Usooli Tatbeeq')">
+          <i class="fa-solid fa-lock" id="lock-tatbeeq"></i> ⚖️ Fiqhi Tatbeeq
+        </span>
       </div>
 
+      <!-- 5-LANGUAGE CHOICE BAR -->
       <div class="lang-choice-bar" id="lang-bar">
-        <span class="lang-label" id="lang-title">भाषा चुनें:</span>
+        <span class="lang-label" id="lang-title">Choose Language:</span>
         <span class="lang-pill" onclick="window.applyShortcutLang('Urdu')">اردو (Urdu)</span>
+        <span class="lang-pill" onclick="window.applyShortcutLang('Roman Urdu')">Roman Urdu</span>
         <span class="lang-pill" onclick="window.applyShortcutLang('Hindi')">हिन्दी (Hindi)</span>
         <span class="lang-pill" onclick="window.applyShortcutLang('English')">English</span>
-        <span class="lang-pill" onclick="window.applyShortcutLang('Roman Urdu')">Roman Urdu</span>
         <span class="lang-pill" onclick="window.applyShortcutLang('Arabic')">العربية (Arabic)</span>
         <button type="button" class="btn-close-lang" onclick="window.closeLangBar()"><i class="fa-solid fa-xmark"></i></button>
       </div>
     </div>
 
     <div class="chat-footer">
-      <textarea id="chat-input" class="chat-input" rows="1" placeholder="Padhai ya koi bhi sawal yahan likhein..."></textarea>
+      <textarea id="chat-input" class="chat-input" rows="1" placeholder="Padhai ka sawal ya koi bhi baat yahan likhein..."></textarea>
       <button type="button" class="btn-send" id="btn-chat-send"><i class="fa-solid fa-paper-plane"></i></button>
     </div>
   </section>
@@ -220,7 +536,11 @@
         <span style="font-weight:700;">SUHAIL AI FREE</span>
         <span style="font-weight:700; color:var(--primary-green);">₹0</span>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">25 Sawal Rozana • Resilient Study & Knowledge Assistant</div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">25 Sawal Rozana • Basic Study & Knowledge Assistant</div>
+      <div class="tool-perk-list">
+        <span><i class="fa-solid fa-check"></i> 📖 Sateek Tarjuma (Translation)</span>
+        <span><i class="fa-solid fa-check"></i> 📝 Sabaq Ka Aasan Khulasa</span>
+      </div>
       <button type="button" class="btn-action active-btn" id="btn-plan-free" style="display:none;"><i class="fa-solid fa-check"></i> Aapka Current Plan Hai</button>
     </div>
 
@@ -230,7 +550,12 @@
         <span style="font-weight:700;">SUHAIL AI PLUS</span>
         <div><span class="price-cut">₹150</span><span style="font-weight:700; color:var(--primary-green);">₹10 / 30 Din</span></div>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">150 Sawal Rozana • Nahw, Sarf wa Detailed Hal</div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">75 Sawal Rozana • Detailed Step-by-Step Tutor</div>
+      <div class="tool-perk-list">
+        <span><i class="fa-solid fa-check"></i> 📌 <b>Erab wa Nahw-Sarf Ki Poori Tarqeeb (Unlocked)</b></span>
+        <span><i class="fa-solid fa-check"></i> ❓ <b>Exam MCQs wa Questions-Answers (Unlocked)</b></span>
+        <span><i class="fa-solid fa-check"></i> Tables, Bullet Points wa Detailed Analysis</span>
+      </div>
       <button type="button" class="btn-action" id="btn-plan-plus" onclick="window.goToPay('plus')">₹10 me 30 Din ke liye lein</button>
     </div>
 
@@ -240,7 +565,13 @@
         <span style="font-weight:700;">SUHAIL AI PRO</span>
         <div><span class="price-cut">₹299</span><span style="font-weight:700; color:var(--primary-green);">₹25 / 30 Din</span></div>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">500 Sawal Rozana • Super Fast Academic Engine</div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">150 Sawal Rozana • Super Fast High-End Reasoning Engine</div>
+      <div class="tool-perk-list">
+        <span><i class="fa-solid fa-check"></i> Plus Plan ke sabhi features</span>
+        <span><i class="fa-solid fa-star" style="color:var(--vip-gold);"></i> 🔍 <b>Ibaarat Fahmi wa Lughwi Tehqeeq (Exclusive Tool)</b></span>
+        <span><i class="fa-solid fa-star" style="color:var(--vip-gold);"></i> ⚖️ <b>Fiqhi wa Usooli Tatbeeq Engine (Exclusive Tool)</b></span>
+        <span><i class="fa-solid fa-check"></i> Kathin Maths, Science wa Logic Solving</span>
+      </div>
       <button type="button" class="btn-action" id="btn-plan-pro" onclick="window.goToPay('pro')">₹25 me 30 Din ke liye lein</button>
     </div>
 
@@ -250,44 +581,13 @@
         <span style="font-weight:700;">SUHAIL AI ULTRA</span>
         <div><span class="price-cut">₹599</span><span style="font-weight:700; color:var(--primary-green);">₹50 / 30 Din</span></div>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">1000 Sawal Rozana • Flagship Research Engine (Aala Tehqeeq)</div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">250 Sawal Rozana • Flagship Deep Research Engine</div>
+      <div class="tool-perk-list">
+        <span><i class="fa-solid fa-check"></i> Sabhi 6 Academic & Research Tools Unlimited Power ke sath</span>
+        <span><i class="fa-solid fa-check"></i> 6-Stage Deep Research (Tareef, Usool, Wazahat, Misaal, Tatbeeq)</span>
+        <span><i class="fa-solid fa-check"></i> Dars-e-Nizami Shurooh, Hawashi wa Highest Academic Reasoning</span>
+      </div>
       <button type="button" class="btn-action" id="btn-plan-ultra" onclick="window.goToPay('ultra')">₹50 me 30 Din ke liye lein</button>
-    </div>
-
-    <div style="margin-top:14px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:12px;">
-      <h4 style="color:var(--vip-purple); font-size:0.9rem; text-align:center; margin-bottom:8px;">
-        <i class="fa-solid fa-sparkles"></i> Future Elite AI Tiers (Coming Soon)
-      </h4>
-    </div>
-
-    <div class="plan-card vip">
-      <div class="badge-coming-soon"><i class="fa-solid fa-lock"></i> Coming Soon</div>
-      <div style="display:flex; justify-content:space-between; align-items:baseline;">
-        <span style="font-weight:700; color:#fff;">SUHAIL AI MAX</span>
-        <span style="font-weight:700; color:var(--vip-purple);">VIP Tier</span>
-      </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">Audio Dars, Voice Interaction & Unlimited Tahqeeq Engine</div>
-      <button type="button" class="btn-action disabled"><i class="fa-solid fa-clock"></i> जल्द आ रहा है (Coming Soon)</button>
-    </div>
-
-    <div class="plan-card vip">
-      <div class="badge-coming-soon"><i class="fa-solid fa-lock"></i> Coming Soon</div>
-      <div style="display:flex; justify-content:space-between; align-items:baseline;">
-        <span style="font-weight:700; color:#fff;">SUHAIL AI ELITE</span>
-        <span style="font-weight:700; color:var(--vip-purple);">Elite Tier</span>
-      </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">Kitab Scanner, Complete Ibaarat Tashkeel & Auto Exam Solver</div>
-      <button type="button" class="btn-action disabled"><i class="fa-solid fa-clock"></i> जल्द आ रहा है (Coming Soon)</button>
-    </div>
-
-    <div class="plan-card vip">
-      <div class="badge-coming-soon"><i class="fa-solid fa-lock"></i> Coming Soon</div>
-      <div style="display:flex; justify-content:space-between; align-items:baseline;">
-        <span style="font-weight:700; color:#fff;">SUHAIL AI PRIME</span>
-        <span style="font-weight:700; color:var(--vip-gold);">Crown Tier</span>
-      </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">1-on-1 Dedicated AI Ustad, Live Fatawa Support & Infinite Quota</div>
-      <button type="button" class="btn-action disabled"><i class="fa-solid fa-clock"></i> जल्द आ रहा है (Coming Soon)</button>
     </div>
   </section>
 
@@ -312,11 +612,11 @@
     </div>
 
     <div class="form-group">
-      <label>Upgrade ya Renew Plan Chunein (30 Din)</label>
+      <label>Plan Chunein (30 Din)</label>
       <select id="pay-plan-select" class="form-input">
-        <option value="plus">SUHAIL AI PLUS (₹10 / 30 Din)</option>
-        <option value="pro">SUHAIL AI PRO (₹25 / 30 Din)</option>
-        <option value="ultra">SUHAIL AI ULTRA (₹50 / 30 Din)</option>
+        <option value="plus">SUHAIL AI PLUS (75 Sawal - ₹10 / 30 Din)</option>
+        <option value="pro">SUHAIL AI PRO (150 Sawal - ₹25 / 30 Din)</option>
+        <option value="ultra">SUHAIL AI ULTRA (250 Sawal - ₹50 / 30 Din)</option>
       </select>
     </div>
 
@@ -376,10 +676,43 @@
     document.querySelector('.nav-item[data-tab="tab-pay"]').click();
   };
 
+  document.getElementById('btn-open-about').onclick = () => {
+    document.getElementById('modal-about').style.display = 'flex';
+  };
+
+  function checkToolAccess(type) {
+    const p = (currentUser?.role === 'admin') ? 'ultra' : (currentUser?.plan || 'free');
+
+    if (type === 'tarjuma' || type === 'khulasa') {
+      return { allowed: true };
+    }
+    if (type === 'tarqeeb' || type === 'quiz') {
+      if (p === 'free') {
+        return { allowed: false, minPlan: 'PLUS', msg: 'Yeh tool SUHAIL AI PLUS, PRO aur ULTRA me uplabdh hai. Abhi upgrade karein!' };
+      }
+      return { allowed: true };
+    }
+    if (type === 'tahqeeq' || type === 'tatbeeq') {
+      if (p === 'free' || p === 'plus') {
+        return { allowed: false, minPlan: 'PRO', msg: 'Yeh aala tehqeeqi tool SUHAIL AI PRO aur ULTRA me uplabdh hai.' };
+      }
+      return { allowed: true };
+    }
+    return { allowed: true };
+  }
+
   window.triggerShortcut = (type, title) => {
+    const access = checkToolAccess(type);
+    if (!access.allowed) {
+      if (confirm(access.msg + "\n\nKya aap upgrade page par jana chahte hain?")) {
+        window.goToPay(access.minPlan.toLowerCase());
+      }
+      return;
+    }
+
     activeShortcutType = type;
     const bar = document.getElementById('lang-bar');
-    document.getElementById('lang-title').textContent = title + " किस ज़बान में?:";
+    document.getElementById('lang-title').textContent = title + " kis zaban me?:";
     bar.style.display = 'flex';
   };
 
@@ -393,13 +726,17 @@
     let promptPrefix = "";
 
     if (activeShortcutType === 'tarqeeb') {
-      promptPrefix = `[एराब व तरकीब - ${lang}]: कृपया इस इबारत की मुकम्मल तरकीब और एराब ${lang} में समझाएं:\n`;
+      promptPrefix = `[Erab wa Tarqeeb - ${lang}]: Kripya is ibaarat ki mukammal tarqeeb aur erab ${lang} me samjhayein:\n`;
     } else if (activeShortcutType === 'tarjuma') {
-      promptPrefix = `[तर्जुमा - ${lang}]: कृपया इस इबारत का सरल व सटीक अनुवाद (Translation) ${lang} में करें:\n`;
+      promptPrefix = `[Tarjuma - ${lang}]: Kripya is ibaarat ka sateek tarjuma (translation) ${lang} me karein:\n`;
     } else if (activeShortcutType === 'khulasa') {
-      promptPrefix = `[सबक का ख़ुलासा - ${lang}]: कृपया इस सबक का आसान व विस्तृत खुलासा ${lang} में बयान करें:\n`;
+      promptPrefix = `[Khulasa - ${lang}]: Kripya is sabaq ka aasan wa jaame khulasa ${lang} me bayan karein:\n`;
     } else if (activeShortcutType === 'quiz') {
-      promptPrefix = `[इम्तिहान के सवालात - ${lang}]: इस उनवान से इम्तिहान के लिए महत्वपूर्ण सवालात और जवाबात ${lang} में तैयार करें:\n`;
+      promptPrefix = `[Exam Questions - ${lang}]: Is unwan se imtihan ke liye ahem sawalat wa jawabat ${lang} me banayein:\n`;
+    } else if (activeShortcutType === 'tahqeeq') {
+      promptPrefix = `[Ibaarat & Lughat - ${lang}]: Is ibaarat ki lughwi wa darsi tehqeeq ${lang} me pesh karein:\n`;
+    } else if (activeShortcutType === 'tatbeeq') {
+      promptPrefix = `[Fiqhi Tatbeeq - ${lang}]: Is mas'ale ki fiqhi wa usooli tatbeeq ${lang} me tahreer karein:\n`;
     } else {
       promptPrefix = `[${lang}]: `;
     }
@@ -415,8 +752,8 @@
     const bubble = btn.closest('.chat-bubble');
     const content = bubble.querySelector('.chat-content').innerText;
     navigator.clipboard.writeText(content).then(() => {
-      btn.innerHTML = '<i class="fa-solid fa-check"></i> कॉपी हो गया';
-      setTimeout(() => { btn.innerHTML = '<i class="fa-regular fa-copy"></i> कॉपी करें'; }, 2000);
+      btn.innerHTML = '<i class="fa-solid fa-check"></i> Copy Ho Gaya';
+      setTimeout(() => { btn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy Karein'; }, 2000);
     });
   };
 
@@ -449,12 +786,17 @@
     const p = isAdmin ? 'ultra' : (currentUser.plan || 'free');
 
     let planBadge = 'SUHAIL AI FREE (25/DAY)';
-    if (p === 'ultra') planBadge = isAdmin ? 'ULTRA (ADMIN)' : 'SUHAIL AI ULTRA (30 DAYS)';
-    else if (p === 'pro') planBadge = 'SUHAIL AI PRO (30 DAYS)';
-    else if (p === 'plus') planBadge = 'SUHAIL AI PLUS (30 DAYS)';
+    if (p === 'ultra') planBadge = isAdmin ? 'ULTRA (ADMIN)' : 'SUHAIL AI ULTRA (250/DAY)';
+    else if (p === 'pro') planBadge = 'SUHAIL AI PRO (150/DAY)';
+    else if (p === 'plus') planBadge = 'SUHAIL AI PLUS (75/DAY)';
 
     document.getElementById('u-plan').textContent = planBadge;
     document.getElementById('active-plan-name').textContent = planBadge;
+
+    document.getElementById('lock-tarqeeb').style.display = (p === 'free') ? 'inline-block' : 'none';
+    document.getElementById('lock-quiz').style.display = (p === 'free') ? 'inline-block' : 'none';
+    document.getElementById('lock-tahqeeq').style.display = (p === 'free' || p === 'plus') ? 'inline-block' : 'none';
+    document.getElementById('lock-tatbeeq').style.display = (p === 'free' || p === 'plus') ? 'inline-block' : 'none';
 
     const bannerExpiry = document.getElementById('banner-expiry');
     if (isAdmin) {
@@ -583,14 +925,14 @@
   });
 
   function getHistoryKey() {
-    return currentUser ? `suhail_chat_v2_${currentUser.phone}` : 'suhail_chat_temp';
+    return currentUser ? `suhail_chat_v3_${currentUser.phone}` : 'suhail_chat_temp';
   }
 
   function loadChatHistory() {
     chatBox.innerHTML = '';
     const saved = JSON.parse(localStorage.getItem(getHistoryKey()) || '[]');
     if (!saved.length) {
-      appendMessage("अस्सलामु अलैकुम! मैं आपका सुहैल AI पार्टनर हूँ। पढ़ाई, इल्मी मबाहिस, ग्रामर या किसी भी अहम सवाल में मदद के लिए तैयार हूँ।", 'ai', 'SUHAIL AI FREE', false);
+      appendMessage("Assalamu Alaikum wa Rahmatullahi! Main aapka Suhail AI Study Partner hoon. Padhai, Dars-e-Nizami, Grammar, Science ya kisi bhi sawal par bejhijhak guftagu karein.", 'ai', 'SUHAIL AI FREE', false);
     } else {
       saved.forEach(m => appendMessage(m.text, m.role, m.aiName, false));
     }
@@ -604,7 +946,7 @@
   }
 
   document.getElementById('btn-new-chat').onclick = () => {
-    if (!confirm("क्या आप नई गुफ़्तगू शुरू करना चाहते हैं? पुरानी चैट साफ़ हो जाएगी।")) return;
+    if (!confirm("Kya aap nayi guftagu shuru karna chahte hain?")) return;
     localStorage.removeItem(getHistoryKey());
     loadChatHistory();
   };
@@ -615,22 +957,29 @@
     const text = chatInput.value.trim();
     if (!text || !currentUser) return;
 
+    const isToolCall = text.startsWith("[");
     chatInput.value = '';
     chatInput.style.height = 'auto';
     appendMessage(text, 'user', null, true);
     sendBtn.disabled = true;
-    const aiBubble = appendMessage("जवाब तैयार किया जा रहा है...", 'ai', 'SUHAIL AI', false);
+    const aiBubble = appendMessage("Jawab tayyar kiya ja raha hai...", 'ai', 'SUHAIL AI', false);
+
+    const saved = JSON.parse(localStorage.getItem(getHistoryKey()) || '[]');
+    const historyContext = saved.slice(-6).map(m => ({
+      role: m.role === 'user' ? 'user' : 'assistant',
+      content: m.text
+    }));
 
     try {
       const data = await safeFetch('/api?action=ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: text, phone: currentUser.phone })
+        body: JSON.stringify({ prompt: text, phone: currentUser.phone, history: historyContext, isTool: isToolCall })
       });
       renderAiBubble(aiBubble, data.reply, data.aiName);
       saveMessageToHistory(data.reply, 'ai', data.aiName);
     } catch (err) {
-      aiBubble.innerHTML = `<span class="ai-label">त्रुटि</span><div class="chat-content" style="color:var(--danger);">${err.message}</div>`;
+      aiBubble.innerHTML = `<span class="ai-label">Error</span><div class="chat-content" style="color:var(--danger);">${err.message}</div>`;
     } finally {
       sendBtn.disabled = false;
       syncProfile();
@@ -661,7 +1010,7 @@
       <span class="ai-label">${aiName || 'SUHAIL AI'}</span>
       <div class="chat-content ${isAr ? 'arabic-text' : ''}">${parsedHtml}</div>
       <div class="bubble-actions">
-        <button class="btn-copy" onclick="window.copyText(this)"><i class="fa-regular fa-copy"></i> कॉपी करें</button>
+        <button class="btn-copy" onclick="window.copyText(this)"><i class="fa-regular fa-copy"></i> Copy Karein</button>
       </div>
     `;
   }
@@ -672,7 +1021,7 @@
     const plan = document.getElementById('pay-plan-select').value;
 
     if (!cleanUtr || cleanUtr.length !== 12) {
-      return alert("अमान्य UTR! कृपया ठीक 12 अंकों का न्यूमेरिक UTR नंबर दर्ज करें।");
+      return alert("12 ankon ka sahi UTR number darj karein.");
     }
 
     try {
@@ -691,7 +1040,7 @@
 
   async function loadAdminRequests() {
     const list = document.getElementById('admin-requests-list');
-    list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">लोड हो रहा है...</p>';
+    list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Load ho raha hai...</p>';
 
     try {
       const data = await safeFetch('/api?action=admin', {
@@ -704,7 +1053,7 @@
       const keys = Object.keys(reqs).filter(k => reqs[k].status === 'pending');
 
       if (!keys.length) {
-        list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">कोई पेंडिंग अनुरोध नहीं है।</p>';
+        list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Koi pending request nahi hai.</p>';
         return;
       }
 
@@ -715,13 +1064,13 @@
         card.className = 'admin-req-card';
         card.innerHTML = `
           <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.85rem;">
-            <span>फ़ोन: ${item.phone}</span>
+            <span>Phone: ${item.phone}</span>
             <span style="color:var(--primary-green); text-transform:uppercase;">${item.plan} (₹${item.amount || 0})</span>
           </div>
-          <div style="font-size:0.75rem; color:var(--text-muted);">UTR (12-Digit): <b style="color:#fff;">${item.utr}</b></div>
+          <div style="font-size:0.75rem; color:var(--text-muted);">UTR: <b style="color:#fff;">${item.utr}</b></div>
           <div class="admin-actions">
-            <button class="btn-approve" onclick="window.adminAction('approve_request', '${k}', '${item.phone}', '${item.plan}')">मंज़ूर करें (30 दिन)</button>
-            <button class="btn-reject" onclick="window.adminAction('reject_request', '${k}')">खारिज करें</button>
+            <button class="btn-approve" onclick="window.adminAction('approve_request', '${k}', '${item.phone}', '${item.plan}')">Manzoor Karein (30 Din)</button>
+            <button class="btn-reject" onclick="window.adminAction('reject_request', '${k}')">Kharij Karein</button>
           </div>
         `;
         list.appendChild(card);
