@@ -1,4 +1,3 @@
-
 import crypto from "crypto";
 
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
@@ -6,13 +5,8 @@ const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-d
 
 // Keys from Vercel
 const OPENROUTER_KEY = process.env.OPENROUTER_KEY || "";
-const HUGGINGFACE_KEY = process.env.HUGGINGFACE_KEY || "";
 const GROQ_KEY = process.env.GROQ_KEY || "";
-const SILICONFLOW_KEY = process.env.SILICONFLOW_KEY || "";
-
-// Active Production Model IDs
-const GROQ_PRO_MODEL = process.env.GROQ_PRO_MODEL || "openai/gpt-oss-120b";
-const ULTRA_MODEL = process.env.ULTRA_MODEL || "deepseek-ai/DeepSeek-V4-Flash";
+const HUGGINGFACE_KEY = process.env.HUGGINGFACE_KEY || "";
 
 // STRICT SERVER-SIDE DAILY LIMITS
 const DAILY_LIMITS = {
@@ -114,143 +108,121 @@ function normalizePlan(rawPlan) {
 }
 
 // -------------------------------------------------------------
-// 1. FREE ENGINE (OpenRouter with Groq Instant Shield)
+// CORE MODEL RUNNERS (OpenRouter & Groq Integration)
 // -------------------------------------------------------------
-async function callFreeEngine(prompt, systemInstruction) {
-  if (OPENROUTER_KEY) {
-    try {
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${OPENROUTER_KEY}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "https://hardrisk.vercel.app",
-          "X-Title": "Suhail AI"
-        },
-        body: JSON.stringify({
-          model: "meta-llama/llama-3.1-8b-instruct:free",
-          messages: [
-            { role: "system", content: systemInstruction },
-            { role: "user", content: prompt }
-          ]
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data?.choices?.[0]?.message?.content) {
-        return data.choices[0].message.content;
-      }
-    } catch (e) {}
-  }
 
-  // Guaranteed Fast Groq Fallback (No Card Required, 100% Free)
-  if (GROQ_KEY) {
-    try {
-      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${GROQ_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "llama-3.1-8b-instant",
-          messages: [{ role: "system", content: systemInstruction }, { role: "user", content: prompt }],
-          temperature: 0.5
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
-    } catch (e) {}
-  }
+async function callOpenRouter(modelName, prompt, systemInstruction) {
+  if (!OPENROUTER_KEY) return null;
+  try {
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${OPENROUTER_KEY}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://hardrisk.vercel.app",
+        "X-Title": "Suhail AI"
+      },
+      body: JSON.stringify({
+        model: modelName,
+        messages: [
+          { role: "system", content: systemInstruction },
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.4
+      })
+    });
+    const data = await res.json();
+    if (res.ok && data?.choices?.[0]?.message?.content) {
+      return data.choices[0].message.content;
+    }
+  } catch (e) {}
+  return null;
+}
 
-  throw { userMsg: "SUHAIL AI FREE seva is samay vyast hai. Kripya punah prayas karein.", code: 500 };
+async function callGroq(modelName, prompt, systemInstruction) {
+  if (!GROQ_KEY) return null;
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${GROQ_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: modelName,
+        messages: [
+          { role: "system", content: systemInstruction },
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.35
+      })
+    });
+    const data = await res.json();
+    if (res.ok && data?.choices?.[0]?.message?.content) {
+      return data.choices[0].message.content;
+    }
+  } catch (e) {}
+  return null;
 }
 
 // -------------------------------------------------------------
-// 2. PLUS ENGINE (Hugging Face Open Qwen + Groq Tutor Fallback)
+// TIER-BASED SMART DISPATCHER (LOW TO HIGH MODELS)
 // -------------------------------------------------------------
-async function callPlusEngine(prompt, systemInstruction) {
-  if (HUGGINGFACE_KEY) {
-    try {
-      const res = await fetch("https://router.huggingface.co/hf-inference/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${HUGGINGFACE_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "Qwen/Qwen2.5-7B-Instruct",
-          messages: [
-            { role: "system", content: systemInstruction },
-            { role: "user", content: prompt }
-          ],
-          max_tokens: 1200
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
-    } catch (e) {}
-  }
 
-  // Backup on Groq so student never gets Bad Request
-  if (GROQ_KEY) {
-    try {
-      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${GROQ_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "llama-3.1-8b-instant",
-          messages: [{ role: "system", content: systemInstruction }, { role: "user", content: prompt }],
-          temperature: 0.4
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
-    } catch (e) {}
-  }
+// 1. FREE (Low Model - Fast & Lightweight)
+async function callFree(prompt, systemInstruction) {
+  // Option A: OpenRouter Free Llama 8B
+  let reply = await callOpenRouter("meta-llama/llama-3.1-8b-instruct:free", prompt, systemInstruction);
+  if (reply) return reply;
 
-  throw { userMsg: "SUHAIL AI PLUS seva is samay vyast hai. Kripya punah prayas karein.", code: 500 };
+  // Option B: Groq Fast Llama 8B
+  reply = await callGroq("llama-3.1-8b-instant", prompt, systemInstruction);
+  if (reply) return reply;
+
+  throw { userMsg: "SUHAIL AI FREE service is samay vyast hai. Kripya punah prayas karein.", code: 500 };
 }
 
-// -------------------------------------------------------------
-// 3. PRO ENGINE (Groq Verified 100% Working)
-// -------------------------------------------------------------
-async function callProEngine(prompt, systemInstruction) {
-  if (!GROQ_KEY) throw { userMsg: "SUHAIL AI PRO seva uplabdha nahi hai.", code: 500 };
+// 2. PLUS (Mid Model - Detailed Tutor)
+async function callPlus(prompt, systemInstruction) {
+  // Option A: OpenRouter Mid Tutor
+  let reply = await callOpenRouter("qwen/qwen-2.5-7b-instruct:free", prompt, systemInstruction);
+  if (reply) return reply;
 
-  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: { "Authorization": `Bearer ${GROQ_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: GROQ_PRO_MODEL,
-      messages: [{ role: "system", content: systemInstruction }, { role: "user", content: prompt }],
-      temperature: 0.35
-    })
-  });
+  // Option B: Groq Balanced Tutor
+  reply = await callGroq("llama-3.1-8b-instant", prompt, systemInstruction);
+  if (reply) return reply;
 
-  const data = await res.json();
-  if (!res.ok || data.error) throw { userMsg: "SUHAIL AI PRO service me takneeki samasya aayi.", code: 500 };
-  return data?.choices?.[0]?.message?.content;
+  throw { userMsg: "SUHAIL AI PLUS service is samay vyast hai. Kripya thodi der baad prayas karein.", code: 500 };
 }
 
-// -------------------------------------------------------------
-// 4. ULTRA ENGINE (SiliconFlow Flagship with Groq High-End Shield)
-// -------------------------------------------------------------
-async function callUltraEngine(prompt, systemInstruction) {
-  if (SILICONFLOW_KEY) {
-    try {
-      const res = await fetch("https://api.siliconflow.cn/v1/chat/completions", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${SILICONFLOW_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: ULTRA_MODEL,
-          messages: [{ role: "system", content: systemInstruction }, { role: "user", content: prompt }],
-          temperature: 0.25
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
-    } catch (e) {}
-  }
+// 3. PRO (High Model - Advanced Analytical 70B)
+async function callPro(prompt, systemInstruction) {
+  // Option A: Groq 70B Heavy Engine (Already 100% working in PRO)
+  let reply = await callGroq("llama-3.3-70b-versatile", prompt, systemInstruction);
+  if (reply) return reply;
 
-  // High-End Groq Fallback to never drop an Ultra query
-  return await callProEngine(prompt, systemInstruction);
+  // Option B: OpenRouter 70B
+  reply = await callOpenRouter("meta-llama/llama-3.3-70b-instruct:free", prompt, systemInstruction);
+  if (reply) return reply;
+
+  throw { userMsg: "SUHAIL AI PRO service me samasya aayi. Kripya punah prayas karein.", code: 500 };
+}
+
+// 4. ULTRA (Flagship / Research Model - DeepSeek Reasoning)
+async function callUltra(prompt, systemInstruction) {
+  // Option A: Groq DeepSeek-R1 Distill 70B Engine
+  let reply = await callGroq("deepseek-r1-distill-llama-70b", prompt, systemInstruction);
+  if (reply) return reply;
+
+  // Option B: OpenRouter DeepSeek R1 Flagship
+  reply = await callOpenRouter("deepseek/deepseek-r1:free", prompt, systemInstruction);
+  if (reply) return reply;
+
+  // Option C: Groq 70B Versatile
+  reply = await callGroq("llama-3.3-70b-versatile", prompt, systemInstruction);
+  if (reply) return reply;
+
+  throw { userMsg: "SUHAIL AI ULTRA service me samasya aayi. Kripya punah prayas karein.", code: 500 };
 }
 
 // -------------------------------------------------------------
@@ -383,7 +355,7 @@ export default async function handler(req, res) {
         }
       }
 
-      // STRICT DAILY LIMIT SERVER CHECK
+      // DAILY LIMIT SERVER CHECK (FREE: 25)
       const todayDateStr = new Date().toISOString().slice(0, 10);
       const isNewDay = user?.lastQuestionDate !== todayDateStr;
       const currentDailyCount = isNewDay ? 0 : (user?.dailyCount || 0);
@@ -402,16 +374,16 @@ export default async function handler(req, res) {
 
       if (plan === "ultra") {
         aiName = "SUHAIL AI ULTRA";
-        replyText = await callUltraEngine(prompt, instruction);
+        replyText = await callUltra(prompt, instruction);
       } else if (plan === "pro") {
         aiName = "SUHAIL AI PRO";
-        replyText = await callProEngine(prompt, instruction);
+        replyText = await callPro(prompt, instruction);
       } else if (plan === "plus") {
         aiName = "SUHAIL AI PLUS";
-        replyText = await callPlusEngine(prompt, instruction);
+        replyText = await callPlus(prompt, instruction);
       } else {
         aiName = "SUHAIL AI FREE";
-        replyText = await callFreeEngine(prompt, instruction);
+        replyText = await callFree(prompt, instruction);
       }
 
       if (cleanPhone && user) {
@@ -475,6 +447,6 @@ export default async function handler(req, res) {
 
     return res.status(404).json({ success: false, error: "अमान्य एक्शन।" });
   } catch (err) {
-    return res.status(err.code || 500).json({ success: false, error: err.userMsg || err.message || "सर्वर त्रुटि", code: err.code || 500 });
+    return res.status(err.code || 500).json({ success: false, error: err.userMsg || err.message || "सर्ver त्रुटि", code: err.code || 500 });
   }
 }
