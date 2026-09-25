@@ -32,33 +32,38 @@
     html, body {
       background: var(--bg-dark);
       color: var(--text-main);
-      display: flex;
-      justify-content: center;
+      width: 100%;
       min-height: 100vh;
+      overflow-x: hidden;
       overscroll-behavior: contain;
       overscroll-behavior-y: contain;
     }
     
+    /* NO FLEX CENTERING TO PREVENT LEFT-CLIPPING */
     .app-container {
       width: 100%;
       max-width: 600px;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
       height: 100vh;
       background: var(--panel-dark);
       position: relative;
-      overflow: hidden;
-      overscroll-behavior: contain;
+      overflow-x: hidden;
+      overflow-y: hidden;
+      box-sizing: border-box;
     }
     
     .top-header {
       background: var(--card-dark);
-      padding: 10px 16px;
+      padding: 10px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid var(--card-border);
       z-index: 10;
+      width: 100%;
+      box-sizing: border-box;
     }
     .header-user { display: flex; align-items: center; gap: 10px; }
     .header-avatar {
@@ -72,8 +77,9 @@
       justify-content: center;
       font-weight: bold;
       font-size: 1.1rem;
+      flex-shrink: 0;
     }
-    .header-info h4 { font-size: 0.92rem; font-weight: 600; line-height: 1.2; text-align: left; }
+    .header-info h4 { font-size: 0.92rem; font-weight: 600; line-height: 1.2; }
     .badge-plan {
       font-size: 0.65rem;
       padding: 2px 8px;
@@ -83,7 +89,7 @@
       font-weight: 600;
       text-transform: uppercase;
     }
-    .header-actions { display: flex; align-items: center; gap: 6px; }
+    .header-actions { display: flex; align-items: center; gap: 4px; }
     .header-actions button {
       background: none;
       border: none;
@@ -95,20 +101,31 @@
     }
     .header-actions button:hover { color: #fff; background: rgba(255,255,255,0.05); }
 
-    .nav-dock { display: flex; background: var(--card-dark); border-bottom: 1px solid var(--card-border); }
+    .nav-dock { display: flex; background: var(--card-dark); border-bottom: 1px solid var(--card-border); width: 100%; }
     .nav-item {
       flex: 1;
-      padding: 10px;
+      padding: 10px 4px;
       text-align: center;
       font-size: 0.82rem;
       font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
       border-bottom: 2px solid transparent;
+      white-space: nowrap;
     }
     .nav-item.active { color: var(--primary-green); border-bottom-color: var(--primary-green); }
 
-    .tab-view { flex: 1; overflow-y: auto; padding: 14px; display: none; flex-direction: column; gap: 12px; overscroll-behavior: contain; }
+    .tab-view {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 12px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      box-sizing: border-box;
+      width: 100%;
+    }
     .tab-view.active { display: flex; }
 
     .expiry-alert {
@@ -127,21 +144,25 @@
     .chat-messages {
       flex: 1;
       overflow-y: auto;
+      overflow-x: hidden;
       display: flex;
       flex-direction: column;
       gap: 12px;
       padding-bottom: 6px;
-      overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
+      width: 100%;
+      box-sizing: border-box;
     }
+    
     .chat-bubble {
-      max-width: 92%;
+      max-width: 88%;
       padding: 12px 14px;
       border-radius: 14px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       line-height: 1.6;
-      word-wrap: break-word;
+      word-break: break-word;
+      overflow-wrap: break-word;
       position: relative;
+      box-sizing: border-box;
     }
     .chat-bubble.user {
       align-self: flex-end;
@@ -149,15 +170,14 @@
       color: #fff;
       border-bottom-right-radius: 2px;
       white-space: pre-wrap;
-      text-align: left;
     }
     .chat-bubble.ai {
       align-self: flex-start;
       background: var(--card-dark);
       border: 1px solid var(--card-border);
       border-bottom-left-radius: 2px;
-      width: 95%;
-      text-align: left;
+      width: fit-content;
+      max-width: 90%;
     }
     
     .ai-label {
@@ -170,7 +190,7 @@
       padding-bottom: 3px;
     }
     
-    .chat-content { direction: ltr; text-align: left; }
+    .chat-content { width: 100%; box-sizing: border-box; word-break: break-word; }
     .chat-content h1, .chat-content h2, .chat-content h3 { font-size: 0.98rem; font-weight: 700; margin: 8px 0 4px 0; color: #fff; }
     .chat-content p { margin-bottom: 6px; }
     .chat-content ul, .chat-content ol { margin-left: 18px; margin-bottom: 6px; }
@@ -178,46 +198,39 @@
     .chat-content code { background: #111b21; padding: 2px 5px; border-radius: 4px; font-size: 0.82rem; font-family: monospace; }
     .chat-content blockquote { border-left: 3px solid var(--primary-green); padding-left: 8px; color: var(--text-muted); margin: 6px 0; }
     
-    /* TABLE SCROLL & FIX FOR SQUISHED COLUMNS */
-    .chat-content table {
+    /* HORIZONTAL TABLE WRAPPER (Never overflows screen) */
+    .table-responsive {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      -webkit-overflow-scrolling: touch;
+      display: block;
+    }
+    .table-responsive table {
       width: 100%;
       border-collapse: collapse;
-      margin: 10px 0;
-      display: block;
-      overflow-x: auto;
-      white-space: nowrap;
-      -webkit-overflow-scrolling: touch;
+      min-width: 280px;
     }
-    .chat-content th, .chat-content td {
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      padding: 8px 12px;
-      font-size: 0.82rem;
-      min-width: 110px;
-      white-space: normal;
-      vertical-align: top;
+    .table-responsive th, .table-responsive td {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 10px;
+      font-size: 0.8rem;
       text-align: left;
     }
-    .chat-content th {
-      background: #182229;
-      color: var(--primary-green);
-      font-weight: 600;
-    }
+    .table-responsive th { background: #182229; color: var(--primary-green); }
 
-    .arabic-text {
-      font-family: 'Amiri', 'Noto Nastaliq Urdu', serif !important;
-      font-size: 1.15rem;
-      line-height: 1.9;
-      direction: rtl;
-      text-align: right;
-      display: block;
-    }
+    .arabic-text { font-family: 'Amiri', 'Noto Nastaliq Urdu', serif !important; font-size: 1.15rem; line-height: 1.8; direction: rtl; text-align: right; display: block; }
 
     .bubble-actions { display: flex; justify-content: flex-end; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 4px; }
     .btn-copy { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 3px 6px; border-radius: 4px; }
     .btn-copy:hover { color: var(--primary-green); background: rgba(255,255,255,0.05); }
 
-    .shortcuts-wrapper { display: flex; flex-direction: column; gap: 6px; }
-    .study-shortcuts { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px; scrollbar-width: none; }
+    /* ALL 6 TOOLS IN HORIZONTAL SCROLL */
+    .shortcuts-wrapper { display: flex; flex-direction: column; gap: 6px; width: 100%; box-sizing: border-box; }
+    .study-shortcuts { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px; scrollbar-width: none; width: 100%; box-sizing: border-box; }
     .study-shortcuts::-webkit-scrollbar { display: none; }
     
     .shortcut-pill {
@@ -225,17 +238,18 @@
       background: #182229;
       border: 1px solid rgba(255,255,255,0.08);
       color: var(--text-muted);
-      padding: 6px 11px;
+      padding: 6px 12px;
       border-radius: 16px;
       font-size: 0.75rem;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s ease;
       display: flex;
       align-items: center;
       gap: 5px;
+      white-space: nowrap;
     }
     .shortcut-pill:hover { border-color: var(--primary-green); color: #fff; background: rgba(0, 168, 132, 0.15); }
+    .shortcut-pill.locked { opacity: 0.75; }
     .shortcut-pill.locked i.fa-lock { color: var(--vip-gold); font-size: 0.7rem; }
 
     .lang-choice-bar {
@@ -247,15 +261,15 @@
       border: 1px solid rgba(0, 168, 132, 0.3);
       border-radius: 12px;
       align-items: center;
-      animation: fadeIn 0.2s ease;
+      width: 100%;
+      box-sizing: border-box;
     }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
     .lang-label { font-size: 0.72rem; color: var(--accent-yellow); font-weight: 600; flex-shrink: 0; margin-right: 4px; }
-    .lang-pill { flex-shrink: 0; background: #111b21; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 4px 8px; border-radius: 10px; font-size: 0.72rem; cursor: pointer; font-weight: 500; }
-    .lang-pill:hover { background: var(--primary-green); border-color: var(--primary-green); color: #fff; }
+    .lang-pill { flex-shrink: 0; background: #111b21; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 4px 8px; border-radius: 10px; font-size: 0.72rem; cursor: pointer; }
+    .lang-pill:hover { background: var(--primary-green); color: #fff; }
     .btn-close-lang { background: none; border: none; color: var(--danger); font-size: 0.85rem; cursor: pointer; margin-left: auto; padding: 0 4px; }
 
-    .chat-footer { display: flex; align-items: flex-end; gap: 8px; padding-top: 4px; }
+    .chat-footer { display: flex; align-items: flex-end; gap: 8px; padding-top: 4px; width: 100%; box-sizing: border-box; }
     .chat-input {
       flex: 1;
       background: var(--card-dark);
@@ -264,14 +278,13 @@
       padding: 10px 16px;
       color: #fff;
       outline: none;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       line-height: 1.4;
       resize: none;
       max-height: 140px;
       min-height: 44px;
       overflow-y: auto;
-      text-align: left;
-      direction: ltr;
+      box-sizing: border-box;
     }
     .btn-send {
       width: 44px;
@@ -378,7 +391,7 @@
 
 <div class="app-container">
   
-  <!-- ABOUT ME MODAL -->
+  <!-- ABOUT MODAL -->
   <div id="modal-about" class="about-overlay">
     <div class="about-card">
       <div style="display:flex; justify-content:flex-end;">
@@ -392,28 +405,19 @@
       </div>
 
       <div class="about-section">
-        <h5><i class="fa-solid fa-user-tie"></i> Hamare Baare Me (About Creator)</h5>
+        <h5><i class="fa-solid fa-user-tie"></i> Hamare Baare Me (About Platform)</h5>
         <p>
           Humara maqsad tamam tulba-e-kiram (Dars-e-Nizami, Madaris wa Asri Idare) ke liye ek aesa jadeed AI platform faraham karna hai jo unke sawalat ka <b>ba-adab, sanjeeda aur ilmi mayaar</b> ke mutabiq jawab de sake.
         </p>
       </div>
 
-      <div class="about-section">
-        <h5><i class="fa-solid fa-compass-drafting"></i> Suhail AI Ka Mission</h5>
-        <p>
-          • <b>Dars-e-Nizami:</b> Nahw, Sarf, Ibaarat fahmi, aur Tarjuma ki aasan wazahat.<br>
-          • <b>Asri Taleem:</b> Maths, Science, English, GK aur Competitive Exams ki behtareen tayyari.<br>
-          • <b>Multi-lingual:</b> Urdu, Hindi, Roman Urdu, Arabic aur English har zaban me barabar salahiyat.
-        </p>
-      </div>
-
       <div class="about-section" style="border-color: rgba(0, 168, 132, 0.3);">
-        <h5 style="color:var(--accent-yellow);"><i class="fa-solid fa-gem"></i> Powerful Tiered Tools</h5>
+        <h5 style="color:var(--accent-yellow);"><i class="fa-solid fa-gem"></i> Dedicated Tool Limits & Quotas</h5>
         <p style="font-size:0.75rem;">
-          ✨ <b>Free:</b> Tarjuma wa Khulasa (25 Daily)<br>
-          ⚡ <b>Plus:</b> Nahwi Tarkeebei'n wa Exam Quiz (75 Daily)<br>
-          💎 <b>Pro:</b> Ibaarat & Lughwi Tehqeeq + Fiqhi Reasoning (150 Daily)<br>
-          👑 <b>Ultra:</b> 6-Stage Deep Academic Research Engine (250 Daily)
+          ✨ <b>Free:</b> 25 Questions + <b>10 Tool Uses/Day</b> (Tarjuma, Khulasa)<br>
+          ⚡ <b>Plus:</b> 75 Questions + <b>40 Tool Uses/Day</b> (+ Erab wa Tarqeeb, Exam Quiz)<br>
+          💎 <b>Pro:</b> 150 Questions + <b>100 Tool Uses/Day</b> (+ Ibaarat & Lughat, Fiqhi Tatbeeq)<br>
+          👑 <b>Ultra:</b> 250 Questions + <b>200 Tool Uses/Day</b> (All 6 Tools with Deep Research)
         </p>
       </div>
 
@@ -465,7 +469,7 @@
       </div>
     </div>
     <div class="header-actions">
-      <button id="btn-open-about" title="About Suhail AI & Creator" style="color:var(--accent-yellow);"><i class="fa-solid fa-circle-info"></i></button>
+      <button id="btn-open-about" title="About Platform" style="color:var(--accent-yellow);"><i class="fa-solid fa-circle-info"></i></button>
       <button id="btn-new-chat" title="New Chat"><i class="fa-solid fa-arrows-rotate"></i></button>
       <button id="btn-admin-toggle" title="Admin Requests" style="display:none;"><i class="fa-solid fa-shield-halved"></i></button>
       <button id="btn-logout" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
@@ -489,7 +493,7 @@
 
     <div class="chat-messages" id="chat-box"></div>
 
-    <!-- 6 TIER-BASED STUDY SHORTCUTS -->
+    <!-- 6 TIER-BASED SHORTCUT PILLS (SCROLLABLE & FULLY VISIBLE) -->
     <div class="shortcuts-wrapper">
       <div class="study-shortcuts">
         <span class="shortcut-pill" onclick="window.triggerShortcut('tarjuma', 'Tarjuma (Translation)')">📖 Tarjuma</span>
@@ -510,7 +514,6 @@
         </span>
       </div>
 
-      <!-- 5-LANGUAGE CHOICE BAR -->
       <div class="lang-choice-bar" id="lang-bar">
         <span class="lang-label" id="lang-title">Choose Language:</span>
         <span class="lang-pill" onclick="window.applyShortcutLang('Urdu')">اردو (Urdu)</span>
@@ -528,7 +531,7 @@
     </div>
   </section>
 
-  <!-- TAB 2: PLANS -->
+  <!-- TAB 2: PLANS (WITH EXPLICIT TOOL LIMITS SHOWN) -->
   <section id="tab-plans" class="tab-view">
     <div class="plan-card" id="card-plan-free">
       <div id="badge-free" class="offer-badge" style="display:none;">Active</div>
@@ -536,12 +539,12 @@
         <span style="font-weight:700;">SUHAIL AI FREE</span>
         <span style="font-weight:700; color:var(--primary-green);">₹0</span>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">25 Sawal Rozana • Basic Study & Knowledge Assistant</div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">25 Sawal Rozana • <b>10 Tool Uses/Day</b></div>
       <div class="tool-perk-list">
         <span><i class="fa-solid fa-check"></i> 📖 Sateek Tarjuma (Translation)</span>
         <span><i class="fa-solid fa-check"></i> 📝 Sabaq Ka Aasan Khulasa</span>
       </div>
-      <button type="button" class="btn-action active-btn" id="btn-plan-free" style="display:none;"><i class="fa-solid fa-check"></i> Aapka Current Plan Hai</button>
+      <button type="button" class="btn-action active-btn" id="btn-plan-free" style="display:none;"><i class="fa-solid fa-check"></i> Current Plan</button>
     </div>
 
     <div class="plan-card highlight" id="card-plan-plus">
@@ -550,11 +553,11 @@
         <span style="font-weight:700;">SUHAIL AI PLUS</span>
         <div><span class="price-cut">₹150</span><span style="font-weight:700; color:var(--primary-green);">₹10 / 30 Din</span></div>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">75 Sawal Rozana • Detailed Step-by-Step Tutor</div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">75 Sawal Rozana • <b>40 Tool Uses/Day</b></div>
       <div class="tool-perk-list">
         <span><i class="fa-solid fa-check"></i> 📌 <b>Erab wa Nahw-Sarf Ki Poori Tarqeeb (Unlocked)</b></span>
         <span><i class="fa-solid fa-check"></i> ❓ <b>Exam MCQs wa Questions-Answers (Unlocked)</b></span>
-        <span><i class="fa-solid fa-check"></i> Tables, Bullet Points wa Detailed Analysis</span>
+        <span><i class="fa-solid fa-check"></i> Tables, Step-by-Step Hal wa Detailed Analysis</span>
       </div>
       <button type="button" class="btn-action" id="btn-plan-plus" onclick="window.goToPay('plus')">₹10 me 30 Din ke liye lein</button>
     </div>
@@ -565,11 +568,11 @@
         <span style="font-weight:700;">SUHAIL AI PRO</span>
         <div><span class="price-cut">₹299</span><span style="font-weight:700; color:var(--primary-green);">₹25 / 30 Din</span></div>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">150 Sawal Rozana • Super Fast High-End Reasoning Engine</div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">150 Sawal Rozana • <b>100 Tool Uses/Day</b></div>
       <div class="tool-perk-list">
         <span><i class="fa-solid fa-check"></i> Plus Plan ke sabhi features</span>
-        <span><i class="fa-solid fa-star" style="color:var(--vip-gold);"></i> 🔍 <b>Ibaarat Fahmi wa Lughwi Tehqeeq (Exclusive Tool)</b></span>
-        <span><i class="fa-solid fa-star" style="color:var(--vip-gold);"></i> ⚖️ <b>Fiqhi wa Usooli Tatbeeq Engine (Exclusive Tool)</b></span>
+        <span><i class="fa-solid fa-star" style="color:var(--vip-gold);"></i> 🔍 <b>Ibaarat Fahmi wa Lughwi Tehqeeq (Unlocked)</b></span>
+        <span><i class="fa-solid fa-star" style="color:var(--vip-gold);"></i> ⚖️ <b>Fiqhi wa Usooli Tatbeeq Engine (Unlocked)</b></span>
         <span><i class="fa-solid fa-check"></i> Kathin Maths, Science wa Logic Solving</span>
       </div>
       <button type="button" class="btn-action" id="btn-plan-pro" onclick="window.goToPay('pro')">₹25 me 30 Din ke liye lein</button>
@@ -581,7 +584,7 @@
         <span style="font-weight:700;">SUHAIL AI ULTRA</span>
         <div><span class="price-cut">₹599</span><span style="font-weight:700; color:var(--primary-green);">₹50 / 30 Din</span></div>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">250 Sawal Rozana • Flagship Deep Research Engine</div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">250 Sawal Rozana • <b>200 Tool Uses/Day</b></div>
       <div class="tool-perk-list">
         <span><i class="fa-solid fa-check"></i> Sabhi 6 Academic & Research Tools Unlimited Power ke sath</span>
         <span><i class="fa-solid fa-check"></i> 6-Stage Deep Research (Tareef, Usool, Wazahat, Misaal, Tatbeeq)</span>
@@ -599,7 +602,7 @@
         <span id="active-plan-name" style="font-weight:700; color:var(--primary-green); font-size:0.9rem;">SUHAIL AI FREE</span>
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size:0.75rem; color:var(--text-muted);">Subscription Status:</span>
+        <span style="font-size:0.75rem; color:var(--text-muted);">Usage & Quota:</span>
         <span id="active-plan-status" style="font-size:0.75rem; color:#fff; font-weight:600;">Active</span>
       </div>
     </div>
@@ -614,9 +617,9 @@
     <div class="form-group">
       <label>Plan Chunein (30 Din)</label>
       <select id="pay-plan-select" class="form-input">
-        <option value="plus">SUHAIL AI PLUS (75 Sawal - ₹10 / 30 Din)</option>
-        <option value="pro">SUHAIL AI PRO (150 Sawal - ₹25 / 30 Din)</option>
-        <option value="ultra">SUHAIL AI ULTRA (250 Sawal - ₹50 / 30 Din)</option>
+        <option value="plus">SUHAIL AI PLUS (75 Sawal + 40 Tools - ₹10 / 30 Din)</option>
+        <option value="pro">SUHAIL AI PRO (150 Sawal + 100 Tools - ₹25 / 30 Din)</option>
+        <option value="ultra">SUHAIL AI ULTRA (250 Sawal + 200 Tools - ₹50 / 30 Din)</option>
       </select>
     </div>
 
@@ -680,6 +683,7 @@
     document.getElementById('modal-about').style.display = 'flex';
   };
 
+  // TOOL PERMISSION GATEWAY
   function checkToolAccess(type) {
     const p = (currentUser?.role === 'admin') ? 'ultra' : (currentUser?.plan || 'free');
 
@@ -793,6 +797,7 @@
     document.getElementById('u-plan').textContent = planBadge;
     document.getElementById('active-plan-name').textContent = planBadge;
 
+    // Visual Lock Indicator for Tools
     document.getElementById('lock-tarqeeb').style.display = (p === 'free') ? 'inline-block' : 'none';
     document.getElementById('lock-quiz').style.display = (p === 'free') ? 'inline-block' : 'none';
     document.getElementById('lock-tahqeeq').style.display = (p === 'free' || p === 'plus') ? 'inline-block' : 'none';
@@ -812,7 +817,7 @@
         bannerExpiry.style.display = 'none';
       }
     } else {
-      document.getElementById('active-plan-status').textContent = 'Free Tier (25 Sawal Rozana)';
+      document.getElementById('active-plan-status').textContent = 'Free Tier (25 Sawal + 10 Tools/Day)';
       bannerExpiry.style.display = 'none';
     }
 
@@ -827,7 +832,7 @@
           card.classList.add('active-owned');
           btn.style.display = 'block';
           btn.className = 'btn-action active-btn';
-          btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Aapka Current Plan Hai';
+          btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Current Plan';
           btn.onclick = null;
           if (badge) {
             badge.style.display = 'block';
@@ -925,7 +930,7 @@
   });
 
   function getHistoryKey() {
-    return currentUser ? `suhail_chat_v3_${currentUser.phone}` : 'suhail_chat_temp';
+    return currentUser ? `suhail_chat_v4_${currentUser.phone}` : 'suhail_chat_temp';
   }
 
   function loadChatHistory() {
@@ -1004,7 +1009,10 @@
 
   function renderAiBubble(div, text, aiName) {
     const isAr = containsArabic(text);
-    const parsedHtml = (typeof marked !== 'undefined') ? marked.parse(text) : text;
+    let parsedHtml = (typeof marked !== 'undefined') ? marked.parse(text) : text;
+    
+    // Wrap tables inside responsive scrollable container
+    parsedHtml = parsedHtml.replace(/<table>/g, '<div class="table-responsive"><table>').replace(/<\/table>/g, '</table></div>');
 
     div.innerHTML = `
       <span class="ai-label">${aiName || 'SUHAIL AI'}</span>
