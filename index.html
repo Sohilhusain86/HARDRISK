@@ -48,18 +48,15 @@
     .tab-view { flex: 1; overflow-y: auto; padding: 14px; display: none; flex-direction: column; gap: 12px; }
     .tab-view.active { display: flex; }
 
-    /* EXPIRY WARNING */
     .expiry-alert { background: #451a03; border: 1px solid var(--vip-gold); color: #fef08a; padding: 8px 12px; border-radius: 8px; font-size: 0.78rem; display: none; align-items: center; justify-content: space-between; gap: 6px; }
 
-    /* CHAT BUBBLES & FORMATTING */
     .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-bottom: 6px; }
     .chat-bubble { max-width: 90%; padding: 12px 14px; border-radius: 14px; font-size: 0.88rem; line-height: 1.6; word-wrap: break-word; position: relative; }
-    .chat-bubble.user { align-self: flex-end; background: #005c4b; color: #fff; border-bottom-right-radius: 2px; }
+    .chat-bubble.user { align-self: flex-end; background: #005c4b; color: #fff; border-bottom-right-radius: 2px; white-space: pre-wrap; }
     .chat-bubble.ai { align-self: flex-start; background: var(--card-dark); border: 1px solid var(--card-border); border-bottom-left-radius: 2px; width: 92%; }
     
     .ai-label { font-size: 0.72rem; color: var(--primary-green); font-weight: 700; margin-bottom: 6px; display: block; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 3px; }
     
-    /* Markdown Styles inside AI bubble */
     .chat-content h1, .chat-content h2, .chat-content h3 { font-size: 0.98rem; font-weight: 700; margin: 8px 0 4px 0; color: #fff; }
     .chat-content p { margin-bottom: 6px; }
     .chat-content ul, .chat-content ol { margin-left: 18px; margin-bottom: 6px; }
@@ -68,22 +65,20 @@
     .chat-content blockquote { border-left: 3px solid var(--primary-green); padding-left: 8px; color: var(--text-muted); margin: 6px 0; }
     .arabic-text { font-family: 'Amiri', serif !important; font-size: 1.15rem; line-height: 1.8; direction: rtl; text-align: right; display: block; }
 
-    /* Bubble Action Bar */
     .bubble-actions { display: flex; justify-content: flex-end; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 4px; }
     .btn-copy { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 3px 6px; border-radius: 4px; }
     .btn-copy:hover { color: var(--primary-green); background: rgba(255,255,255,0.05); }
 
-    /* QUICK STUDY SHORTCUT PILLS */
     .study-shortcuts { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px; scrollbar-width: none; }
     .study-shortcuts::-webkit-scrollbar { display: none; }
     .shortcut-pill { flex-shrink: 0; background: #182229; border: 1px solid rgba(255,255,255,0.08); color: var(--text-muted); padding: 5px 10px; border-radius: 16px; font-size: 0.74rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
     .shortcut-pill:hover { border-color: var(--primary-green); color: #fff; background: rgba(0, 168, 132, 0.1); }
 
-    .chat-footer { display: flex; gap: 8px; padding-top: 4px; }
-    .chat-input { flex: 1; background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 24px; padding: 10px 16px; color: #fff; outline: none; font-size: 0.88rem; }
-    .btn-send { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-green); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    /* MULTI-LINE AUTO-RESIZING TEXTAREA FOOTER */
+    .chat-footer { display: flex; align-items: flex-end; gap: 8px; padding-top: 4px; }
+    .chat-input { flex: 1; background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 18px; padding: 10px 16px; color: #fff; outline: none; font-size: 0.88rem; line-height: 1.4; resize: none; max-height: 120px; min-height: 42px; overflow-y: auto; }
+    .btn-send { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-green); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
-    /* PLANS & CARDS */
     .plan-card { background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 6px; position: relative; }
     .plan-card.highlight { border-color: var(--primary-green); }
     .plan-card.active-owned { border: 2px solid var(--success); background: rgba(34, 197, 94, 0.06); }
@@ -176,26 +171,23 @@
 
   <!-- TAB 1: CHAT -->
   <section id="tab-study" class="tab-view active">
-    <!-- EXPIRY WARNING -->
     <div class="expiry-alert" id="banner-expiry">
       <span><i class="fa-solid fa-triangle-exclamation"></i> <span id="txt-expiry-msg">Plan jald khatam hone wala hai.</span></span>
       <button onclick="document.querySelector('.nav-item[data-tab=\'tab-pay\']').click()" style="background:var(--vip-gold); color:#000; border:none; padding:3px 8px; border-radius:4px; font-weight:700; font-size:0.7rem; cursor:pointer;">Renew Karein</button>
     </div>
 
-    <!-- MESSAGES -->
     <div class="chat-messages" id="chat-box"></div>
 
-    <!-- QUICK STUDY SHORTCUTS -->
     <div class="study-shortcuts">
       <span class="shortcut-pill" onclick="window.useShortcut('तशकील व तरकीब:')">📌 एराब व तरकीब</span>
       <span class="shortcut-pill" onclick="window.useShortcut('उर्दू व सरल हिन्दी में तर्जुमा करें:')">📖 तर्जुमा (Translation)</span>
-      <span class="shortcut-pill" onclick="window.useShortcut('इस सबक का आसान खुलास बयान करें:')">📝 सबक का ख़ुलासा</span>
+      <span class="shortcut-pill" onclick="window.useShortcut('इस सबक का आसान खुलासा बयान करें:')">📝 सबक का ख़ुलासा</span>
       <span class="shortcut-pill" onclick="window.useShortcut('इस उनवान से इम्तिहान के लिए अहम सवालात और जवाबात बनाएं:')">❓ इम्तिहान के सवालात</span>
     </div>
 
-    <!-- INPUT -->
+    <!-- MULTI-LINE TEXTAREA (Auto-Expands, Shift+Enter for New Line) -->
     <div class="chat-footer">
-      <input type="text" id="chat-input" class="chat-input" placeholder="Padhai ka sawal yahan likhein...">
+      <textarea id="chat-input" class="chat-input" rows="1" placeholder="Padhai ka sawal yahan likhein..."></textarea>
       <button type="button" class="btn-send" id="btn-chat-send"><i class="fa-solid fa-paper-plane"></i></button>
     </div>
   </section>
@@ -331,13 +323,10 @@
   let currentUser = JSON.parse(localStorage.getItem('suhail_ai_user') || 'null');
   let currentAdminPass = localStorage.getItem('suhail_ai_admin_pass') || '';
 
-  // Arabic detection helper
   function containsArabic(text) {
-    const arabicRegex = /[\u0600-\u06FF]/;
-    return arabicRegex.test(text);
+    return /[\u0600-\u06FF]/.test(text);
   }
 
-  // Safe API Fetch
   async function safeFetch(url, options = {}) {
     const res = await fetch(url, options);
     const contentType = res.headers.get("content-type") || "";
@@ -351,7 +340,6 @@
     return data;
   }
 
-  // Navigation
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -367,14 +355,14 @@
     document.querySelector('.nav-item[data-tab="tab-pay"]').click();
   };
 
-  // Shortcut Pill Click
   window.useShortcut = (prefix) => {
     const inp = document.getElementById('chat-input');
-    inp.value = prefix + " ";
+    inp.value = prefix + "\n";
     inp.focus();
+    inp.style.height = 'auto';
+    inp.style.height = Math.min(inp.scrollHeight, 120) + 'px';
   };
 
-  // Copy Answer
   window.copyText = (btn) => {
     const bubble = btn.closest('.chat-bubble');
     const content = bubble.querySelector('.chat-content').innerText;
@@ -384,7 +372,6 @@
     });
   };
 
-  // Sync User Profile
   async function syncProfile() {
     if (!currentUser || !currentUser.phone) return;
     try {
@@ -421,7 +408,6 @@
     document.getElementById('u-plan').textContent = planBadge;
     document.getElementById('active-plan-name').textContent = planBadge;
 
-    // EXPIRY BANNER & CALCULATIONS
     const bannerExpiry = document.getElementById('banner-expiry');
     if (isAdmin) {
       document.getElementById('active-plan-status').textContent = 'Lifetime Admin VIP';
@@ -440,7 +426,6 @@
       bannerExpiry.style.display = 'none';
     }
 
-    // UPDATE PLANS BUTTONS
     const plans = ['free', 'plus', 'pro', 'ultra'];
     plans.forEach(planId => {
       const card = document.getElementById(`card-plan-${planId}`);
@@ -492,7 +477,6 @@
     }
   }
 
-  // LOGIN / AUTH
   document.getElementById('btn-login-submit').addEventListener('click', async () => {
     const phone = document.getElementById('auth-phone').value.trim();
     const roll = document.getElementById('auth-roll').value.trim();
@@ -533,10 +517,22 @@
     location.reload();
   };
 
-  // CHAT SYSTEM & LOCAL STORAGE PERSISTENCE
   const chatBox = document.getElementById('chat-box');
   const chatInput = document.getElementById('chat-input');
   const sendBtn = document.getElementById('btn-chat-send');
+
+  // MULTI-LINE AUTO-EXPAND & KEY EVENTS
+  chatInput.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+
+  chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendQuestion();
+    }
+  });
 
   function getHistoryKey() {
     return currentUser ? `suhail_chat_v2_${currentUser.phone}` : 'suhail_chat_temp';
@@ -555,11 +551,10 @@
   function saveMessageToHistory(text, role, aiName) {
     const saved = JSON.parse(localStorage.getItem(getHistoryKey()) || '[]');
     saved.push({ text, role, aiName, time: Date.now() });
-    if (saved.length > 50) saved.shift(); // keep last 50
+    if (saved.length > 50) saved.shift();
     localStorage.setItem(getHistoryKey(), JSON.stringify(saved));
   }
 
-  // NEW CHAT
   document.getElementById('btn-new-chat').onclick = () => {
     if (!confirm("क्या आप नई गुफ़्तगू शुरू करना चाहते हैं? पुरानी चैट साफ़ हो जाएगी।")) return;
     localStorage.removeItem(getHistoryKey());
@@ -567,13 +562,13 @@
   };
 
   sendBtn.onclick = sendQuestion;
-  chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendQuestion(); });
 
   async function sendQuestion() {
     const text = chatInput.value.trim();
     if (!text || !currentUser) return;
 
     chatInput.value = '';
+    chatInput.style.height = 'auto'; // Reset height
     appendMessage(text, 'user', null, true);
     sendBtn.disabled = true;
     const aiBubble = appendMessage("इल्मी जवाब तैयार किया जा रहा है...", 'ai', 'SUHAIL AI', false);
@@ -623,7 +618,6 @@
     `;
   }
 
-  // SUBMIT PAYMENT (STRICT 12-DIGIT)
   document.getElementById('btn-submit-pay').onclick = async () => {
     const rawUtr = document.getElementById('pay-utr').value.trim();
     const cleanUtr = rawUtr.replace(/\D/g, '');
@@ -647,7 +641,6 @@
     }
   };
 
-  // ADMIN REQUESTS
   async function loadAdminRequests() {
     const list = document.getElementById('admin-requests-list');
     list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">लोड हो रहा है...</p>';
@@ -716,7 +709,6 @@
   setInterval(syncProfile, 5000);
 </script>
 
-<!-- EXTERNAL ADMIN DASHBOARD SCRIPT -->
 <script src="/admin-dashboard.js"></script>
 </body>
 </html>
