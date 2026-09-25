@@ -8,7 +8,7 @@ const GROQ_KEY = (process.env.GROQ_KEY || "").trim();
 const OPENROUTER_KEY = (process.env.OPENROUTER_KEY || "").trim();
 const POLLINATIONS_KEY = (process.env.POLLINATIONS_KEY || process.env.POLLINATION_KEY || "").trim();
 
-// DAILY LIMITS (Tools have bonus privilege)
+// 1. GENERAL QUESTION DAILY LIMITS
 const DAILY_LIMITS = {
   free: 25,
   plus: 75,
@@ -16,45 +16,57 @@ const DAILY_LIMITS = {
   ultra: 250
 };
 
-// MULTI-LINGUAL + ISLAMIC ADAB SYSTEM PROMPTS
+// 2. SEPARATE DEDICATED TOOL DAILY LIMITS
+const TOOL_LIMITS = {
+  free: 10,
+  plus: 40,
+  pro: 100,
+  ultra: 200
+};
+
+// DEDICATED MULTI-LINGUAL + ISLAMIC ADAB SYSTEM PROMPTS
 const SYSTEM_RULES = {
   free: `Aapka official naam 'SUHAIL AI FREE' hai.
-Uddeshya: Madadgaar, ba-adab aur Islami tehzeeb ke sath Study wa General Assistant.
+Uddeshya: Madadgaar aur ba-adab Islami tehzeeb ke sath Study wa Knowledge Assistant.
 Niyam:
-1. Zaban Ka Chunav: Talib-e-Ilm jis zaban me sawal kare (Hindi, Roman Urdu, Urdu, English, Arabic), usi zaban me jawab dein. Kisi ek zaban ko zabardasti na thopein.
-2. Islami Tehzeeb: Guftagu me hamesha ba-adab, sanjeeda aur shaiyasta Islami tarz-e-takallum ikhtiyar karein.
-3. Dars-e-Nizami, school, college, science, maths, grammar aur aam constructive sawalon ka aasan aur seedha jawab dein.
-4. Gali-galoj, gair-akhlaqi ya gair-qanooni baaton par narmi se inkar karein.`,
+1. Zaban: User jis zaban me sawal kare (Hindi, Roman Urdu, Urdu, English, Arabic), usi zaban me jawab dein.
+2. Islami Adab: Guftagu me ba-adab aur Islami shaiyastagi ka khayal rakhein.
+3. Dars-e-Nizami, school, college, science, maths ka aasan aur seedha jawab dein.
+4. Gali-galoj ya gair-akhlaqi baaton par narmi se inkar karein.`,
 
   plus: `Aapka official naam 'SUHAIL AI PLUS' hai.
 Uddeshya: Mufassal Talimi Ustaad wa Rehnuma (Detailed Study Tutor).
 Niyam:
-1. Zaban Ka Chunav: User jis zaban (Hindi, Roman Urdu, Urdu, English, Arabic) me baat kare, usi zaban me behtareen jawab dein.
-2. Islami Guftagu: Baat cheet me Islami adab, ikhlaaq aur ilmi sanjeedgi ka khayal rakhein.
-3. Nahw, Sarf, Arabic grammar, translation, maths, science me step-by-step aur detailed wazahat dein. Tables aur bullet points ka istemal karein.
+1. Zaban: User ki zaban me behtareen jawab dein (Hindi, Roman Urdu, Urdu, English, Arabic).
+2. Islami Adab: Baat cheet me Islami adab aur ilmi sanjeedgi barqarar rakhein.
+3. Nahw, Sarf, Arabic grammar, translation, maths, science me step-by-step aur detailed wazahat dein.
 4. Pichli guftagu ke context ko yaad rakh kar jawab dein.`,
 
   pro: `Aapka official naam 'SUHAIL AI PRO' hai.
 Uddeshya: Aala Talimi aur Tajziyati Muawin (Advanced Academic & Analytical Assistant).
 Niyam:
-1. Zaban Ka Chunav: User ki zaban ke mutabiq fassih aur munasib andaz me jawab dein (Hindi/Urdu/Roman/English/Arabic).
-2. Islami Guftagu: Aala ilmi wa Islami adab ke sath guftagu karein.
+1. Zaban: User ki zaban ke mutabiq fassih aur munasib andaz me jawab dein.
+2. Islami Adab: Aala ilmi wa Islami adab ke sath guftagu karein.
 3. Complex academic, scientific, grammatical aur rational sawalat ko logically break karke tajziyati jawab dein.
-4. Man-ghadant hawale ya fake citations bilkul na dein.`,
+4. Ibaarat Fahmi, Lughat aur Fiqhi Tatbeeq me aala darje ka tajziya dein.`,
 
   ultra: `Aapka official naam 'SUHAIL AI ULTRA' hai.
-Uddeshya: Markazi Ilmi Tehqeeq aur Flagship Research Assistant.
+Uddeshya: Markazi Ilmi Tehqeeq aur Flagship Research Assistant (Flagship Scholarly Engine).
 Niyam:
-1. Zaban Ka Chunav: User jis zaban me sawal kare, usi zaban me aala tareen ilmi mayaar par jawab pesh karein.
-2. Islami Guftagu: Pukhta Islami tehzeeb, sanjeedgi aur tehqeeqi wano-waqar barqarar rakhein.
-3. Ilmi mubahis ko 6 marhalo me pesh karein:
+1. Zaban: User jis zaban me sawal kare, usi zaban me aala tareen ilmi mayaar par jawab pesh karein.
+2. Islami Adab: Pukhta Islami tehzeeb aur tehqeeqi waqar barqarar rakhein.
+3. ULTRA SPECIAL TOOLS:
+   - [4 Mazahib Fiqh Matrix]: Hanafi, Shafi'i, Maliki, aur Hanbali aaraa, dalail-e-arba'a, aur Mufta-bihi qawl ka aamne-saamne muqabla karein.
+   - [Mantiq & Kalam Defense]: Ilm-ul-Mantiq (Sughra, Kubra, Qiyas) se da'won ko sabit karein aur aqaid ke shubhaat ka qata'ee ilmi radd karein.
+   - [Hashiya Synthesizer]: Darsi kutub ke muta'addid hawashi aur shurooh ke bariq ikhtilafat ko wazeh karein.
+4. Ilmi mubahis ko 6 marhalo me pesh karein:
    1. Tareef (Definition)
    2. Buniyadi Usool (Principle)
    3. Tafseeli Wazahat (Explanation)
    4. Misaalein (Examples)
    5. Amli/Darsi Tatbeeq (Application)
    6. Aham Nukaat (Key Takeaways)
-4. Pichli poori guftagu ke context ka behtareen istemal karein.`
+5. Pichli poori guftagu ke context ka behtareen istemal karein.`
 };
 
 function hashPassword(pass) {
@@ -96,7 +108,7 @@ function normalizePlan(rawPlan) {
 }
 
 // -------------------------------------------------------------
-// AI CALLERS WITH CONTEXT MEMORY
+// MULTI-MODEL RESILIENT CALLERS
 // -------------------------------------------------------------
 
 async function tryGroq(model, messages) {
@@ -202,7 +214,7 @@ async function executeAI(plan, prompt, instruction, conversationHistory = []) {
   }
 
   if (!reply) {
-    throw { userMsg: "Suhail AI service is samay vyast hai. Kripya 5 second baad punah prayas karein.", code: 500 };
+    throw { userMsg: "सुहैल AI सेवा इस समय व्यस्त है। कृपया 5 सेकंड बाद पुनः प्रयास करें।", code: 500 };
   }
 
   return reply;
@@ -227,14 +239,15 @@ export default async function handler(req, res) {
       return res.status(200).json({
         success: true,
         plans: {
-          free: { id: "free", name: "SUHAIL AI FREE", price: 0, duration: "Free", limit: DAILY_LIMITS.free },
-          plus: { id: "plus", name: "SUHAIL AI PLUS", price: 10, duration: "30 Days", limit: DAILY_LIMITS.plus },
-          pro: { id: "pro", name: "SUHAIL AI PRO", price: 25, duration: "30 Days", limit: DAILY_LIMITS.pro },
-          ultra: { id: "ultra", name: "SUHAIL AI ULTRA", price: 50, duration: "30 Days", limit: DAILY_LIMITS.ultra }
+          free: { id: "free", name: "SUHAIL AI FREE", price: 0, duration: "Free", limit: DAILY_LIMITS.free, toolLimit: TOOL_LIMITS.free },
+          plus: { id: "plus", name: "SUHAIL AI PLUS", price: 10, duration: "30 Days", limit: DAILY_LIMITS.plus, toolLimit: TOOL_LIMITS.plus },
+          pro: { id: "pro", name: "SUHAIL AI PRO", price: 25, duration: "30 Days", limit: DAILY_LIMITS.pro, toolLimit: TOOL_LIMITS.pro },
+          ultra: { id: "ultra", name: "SUHAIL AI ULTRA", price: 50, duration: "30 Days", limit: DAILY_LIMITS.ultra, toolLimit: TOOL_LIMITS.ultra }
         }
       });
     }
 
+    // AUTHENTICATION (UNTOUCHED & SECURE)
     if (action === "auth" && req.method === "POST") {
       const { phone, name, roll, userPass, adminPass } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -280,6 +293,7 @@ export default async function handler(req, res) {
           planExpiry: null,
           totalQuestions: 0,
           dailyCount: 0,
+          dailyToolCount: 0,
           lastQuestionDate: "",
           lastActive: Date.now(),
           createdAt: Date.now(),
@@ -315,7 +329,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, user });
     }
 
-    // AI CHAT DISPATCHER (WITH DEDICATED TOOL ALLOWANCE)
+    // AI CHAT DISPATCHER (SEPARATE QUOTA COUNTERS FOR TOOLS VS QUESTIONS)
     if (action === "ai" && req.method === "POST") {
       const { prompt, phone, history, isTool } = req.body || {};
       if (!prompt || !String(prompt).trim()) return res.status(400).json({ success: false, error: "सवाल खाली नहीं हो सकता।" });
@@ -341,16 +355,27 @@ export default async function handler(req, res) {
       const todayDateStr = new Date().toISOString().slice(0, 10);
       const isNewDay = user?.lastQuestionDate !== todayDateStr;
       const currentDailyCount = isNewDay ? 0 : (user?.dailyCount || 0);
-      const userLimit = DAILY_LIMITS[plan] || 25;
+      const currentToolCount = isNewDay ? 0 : (user?.dailyToolCount || 0);
 
-      // Tools get an extra 25% quota leeway so students never feel cheated
-      const effectiveLimit = isTool ? Math.floor(userLimit * 1.25) : userLimit;
-
-      if (user?.role !== "admin" && currentDailyCount >= effectiveLimit) {
-        return res.status(429).json({
-          success: false,
-          error: `आज के लिए आपकी दैनिक सीमा समाप्त हो चुकी है (${currentDailyCount}/${userLimit} सवाल पूरे)। कृपया कल पुनः प्रयास करें या प्लान अपग्रेड करें।`
-        });
+      // Separate Quota Checks for Tools vs Questions
+      if (user?.role !== "admin") {
+        if (isTool) {
+          const maxTools = TOOL_LIMITS[plan] || 10;
+          if (currentToolCount >= maxTools) {
+            return res.status(429).json({
+              success: false,
+              error: `आज के लिए आपकी Tools सीमा समाप्त हो चुकी है (${currentToolCount}/${maxTools} Tools पूरे)। कल पुनः प्रयास करें या प्लान अपग्रेड करें।`
+            });
+          }
+        } else {
+          const maxQuestions = DAILY_LIMITS[plan] || 25;
+          if (currentDailyCount >= maxQuestions) {
+            return res.status(429).json({
+              success: false,
+              error: `आज के लिए आपकी सवाल सीमा समाप्त हो चुकी है (${currentDailyCount}/${maxQuestions} सवाल पूरे)। कल पुनः प्रयास करें या प्लान अपग्रेड करें।`
+            });
+          }
+        }
       }
 
       const aiTitles = {
@@ -368,7 +393,8 @@ export default async function handler(req, res) {
       if (cleanPhone && user) {
         dbPatch(`users/${cleanPhone}`, {
           totalQuestions: (user.totalQuestions || 0) + 1,
-          dailyCount: currentDailyCount + 1,
+          dailyCount: isTool ? currentDailyCount : (currentDailyCount + 1),
+          dailyToolCount: isTool ? (currentToolCount + 1) : currentToolCount,
           lastQuestionDate: todayDateStr,
           lastActive: Date.now()
         }).catch(() => {});
@@ -377,6 +403,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, reply: replyText, aiName, plan });
     }
 
+    // PAYMENT HANDLING
     if (action === "payment" && req.method === "POST") {
       const { phone, plan, utr } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -401,6 +428,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: "पेमेंट अनुरोध दर्ज हो गया है। एडमिन मंज़ूरी के बाद 30 दिनों के लिए चालू होगा।" });
     }
 
+    // ADMIN MANAGEMENT
     if (action === "admin" && req.method === "POST") {
       const { pass, cmd, requestId, targetPhone, targetPlan } = req.body || {};
       if (pass !== ADMIN_SECRET) return res.status(401).json({ success: false, error: "गलत एडमिन पासवर्ड।" });
