@@ -22,6 +22,8 @@
       --text-muted: #8696a0;
       --danger: #ef4444;
       --success: #22c55e;
+      --vip-purple: #8b5cf6;
+      --vip-gold: #f59e0b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
@@ -54,9 +56,14 @@
 
     .plan-card { background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 6px; position: relative; }
     .plan-card.highlight { border-color: var(--primary-green); }
+    .plan-card.vip { border: 1px dashed var(--vip-purple); background: linear-gradient(145deg, #182229 0%, #1e1b4b 100%); opacity: 0.85; }
+    
     .offer-badge { position: absolute; top: -10px; right: 14px; background: #dc2626; color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+    .badge-coming-soon { position: absolute; top: -10px; right: 14px; background: var(--vip-purple); color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    
     .price-cut { text-decoration: line-through; color: var(--text-muted); font-size: 0.9rem; margin-right: 6px; }
     .btn-action { width: 100%; padding: 10px; border-radius: 8px; border: none; background: var(--primary-green); color: #fff; font-weight: 600; cursor: pointer; }
+    .btn-action.disabled { background: #374151; color: #9ca3af; cursor: not-allowed; }
 
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-group label { font-size: 0.8rem; color: var(--text-muted); }
@@ -67,7 +74,6 @@
 
     .auth-overlay { position: absolute; inset: 0; background: rgba(11, 20, 26, 0.98); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .auth-card { background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 12px; max-height: 95vh; overflow-y: auto; }
-    .auth-link { font-size: 0.78rem; color: var(--accent-yellow); cursor: pointer; text-align: center; text-decoration: underline; margin-top: 4px; }
 
     .admin-req-card { background: #182229; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
     .admin-actions { display: flex; gap: 8px; margin-top: 6px; }
@@ -81,8 +87,7 @@
   
   <!-- AUTH MODAL -->
   <div id="auth-modal" class="auth-overlay">
-    
-    <div class="auth-card" id="view-login">
+    <div class="auth-card">
       <h3 style="color:var(--primary-green); text-align:center;">Suhail AI Login</h3>
       <p style="font-size:0.75rem; color:var(--text-muted); text-align:center;">Study Platform me surakshit pravesh karein</p>
       
@@ -96,7 +101,7 @@
       </div>
       <div class="form-group">
         <label>Personal Password (Min 6 Ank/Akshar)</label>
-        <input type="password" id="auth-user-pass" class="form-input" placeholder="Kam se kam 6 characters">
+        <input type="password" id="auth-user-pass" class="form-input" placeholder="Min 6 characters">
       </div>
       <div class="form-group">
         <label>Aapka Naam (Pehli dafa judne par anivarya)</label>
@@ -108,30 +113,7 @@
       </div>
       
       <button type="button" class="btn-action" id="btn-login-submit">Login / Register</button>
-      <div class="auth-link" id="link-goto-forgot">Password bhool gaye? (Forgot Password)</div>
     </div>
-
-    <div class="auth-card" id="view-forgot" style="display:none;">
-      <h3 style="color:var(--accent-yellow); text-align:center;">Password Reset Karein</h3>
-      <p style="font-size:0.75rem; color:var(--text-muted); text-align:center;">Khate me darj sahi vivaran bharein</p>
-
-      <div class="form-group">
-        <label>Registered Mobile Number</label>
-        <input type="tel" id="forgot-phone" class="form-input" placeholder="10 ankon ka number" maxlength="10">
-      </div>
-      <div class="form-group">
-        <label>Registered Naam ya Roll Number</label>
-        <input type="text" id="forgot-verify" class="form-input" placeholder="Naam ya Roll">
-      </div>
-      <div class="form-group">
-        <label>Naya Password (Min 6 Ank)</label>
-        <input type="password" id="forgot-new-pass" class="form-input" placeholder="Naya Password">
-      </div>
-
-      <button type="button" class="btn-action" id="btn-forgot-submit" style="background:var(--accent-yellow); color:#000;">Password Badlein</button>
-      <div class="auth-link" id="link-goto-login">Wapas Login par jayein</div>
-    </div>
-
   </div>
 
   <!-- HEADER -->
@@ -157,7 +139,7 @@
     <div class="nav-item" id="nav-item-admin" data-tab="tab-admin" style="display:none;"><i class="fa-solid fa-user-shield"></i> Requests</div>
   </nav>
 
-  <!-- TAB 1: STUDY AI CHAT -->
+  <!-- TAB 1: CHAT -->
   <section id="tab-study" class="tab-view active">
     <div class="chat-messages" id="chat-box">
       <div class="chat-bubble ai">
@@ -171,10 +153,10 @@
     </div>
   </section>
 
-  <!-- TAB 2: PRICING PLANS (4 TIERS) -->
+  <!-- TAB 2: PLANS & UPCOMING TIERS -->
   <section id="tab-plans" class="tab-view">
     
-    <!-- 1. FREE -->
+    <!-- ACTIVE TIER 1 -->
     <div class="plan-card">
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
         <span style="font-weight:700;">SUHAIL AI FREE</span>
@@ -183,7 +165,7 @@
       <div style="font-size:0.8rem; color:var(--text-muted);">10 Sawal Rozana • Buniyadi Taaleemi Rahnumai</div>
     </div>
 
-    <!-- 2. PLUS -->
+    <!-- ACTIVE TIER 2 -->
     <div class="plan-card highlight">
       <div class="offer-badge">30 Din Offer</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
@@ -194,9 +176,9 @@
       <button type="button" class="btn-action" onclick="window.goToPay('plus')">₹10 me 30 Din ke liye lein</button>
     </div>
 
-    <!-- 3. PRO -->
+    <!-- ACTIVE TIER 3 -->
     <div class="plan-card">
-      <div class="offer-badge">Special Offer</div>
+      <div class="offer-badge">Khas Offer</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
         <span style="font-weight:700;">SUHAIL AI PRO</span>
         <div><span class="price-cut">₹299</span><span style="font-weight:700; color:var(--primary-green);">₹25 / 30 Din</span></div>
@@ -205,20 +187,59 @@
       <button type="button" class="btn-action" onclick="window.goToPay('pro')">₹25 me 30 Din ke liye lein</button>
     </div>
 
-    <!-- 4. ALLAMA -->
+    <!-- ACTIVE TIER 4 -->
     <div class="plan-card">
       <div class="offer-badge">Super Saver</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
-        <span style="font-weight:700;">SUHAIL AI ALLAMA</span>
+        <span style="font-weight:700;">SUHAIL AI ULTRA</span>
         <div><span class="price-cut">₹599</span><span style="font-weight:700; color:var(--primary-green);">₹50 / 30 Din</span></div>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">1000 Sawal Rozana • Cerebras Fast High-Level Flagship Engine</div>
-      <button type="button" class="btn-action" onclick="window.goToPay('allama')">₹50 me 30 Din ke liye lein</button>
+      <div style="font-size:0.8rem; color:var(--text-muted);">1000 Sawal Rozana • Flagship DeepSeek Engine (Aala Tehqeeq)</div>
+      <button type="button" class="btn-action" onclick="window.goToPay('ultra')">₹50 me 30 Din ke liye lein</button>
+    </div>
+
+    <div style="margin-top:14px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:12px;">
+      <h4 style="color:var(--vip-purple); font-size:0.9rem; text-align:center; margin-bottom:8px;">
+        <i class="fa-solid fa-sparkles"></i> Future Elite AI Tiers (Coming Soon)
+      </h4>
+    </div>
+
+    <!-- UPCOMING TIER 1: MAX -->
+    <div class="plan-card vip">
+      <div class="badge-coming-soon"><i class="fa-solid fa-lock"></i> Coming Soon</div>
+      <div style="display:flex; justify-content:space-between; align-items:baseline;">
+        <span style="font-weight:700; color:#fff;">SUHAIL AI MAX</span>
+        <span style="font-weight:700; color:var(--vip-purple);">VIP Tier</span>
+      </div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">Audio Dars, Voice Interaction & Unlimited Tahqeeq Engine</div>
+      <button type="button" class="btn-action disabled"><i class="fa-solid fa-clock"></i> जल्द आ रहा है (Coming Soon)</button>
+    </div>
+
+    <!-- UPCOMING TIER 2: ELITE -->
+    <div class="plan-card vip">
+      <div class="badge-coming-soon"><i class="fa-solid fa-lock"></i> Coming Soon</div>
+      <div style="display:flex; justify-content:space-between; align-items:baseline;">
+        <span style="font-weight:700; color:#fff;">SUHAIL AI ELITE</span>
+        <span style="font-weight:700; color:var(--vip-purple);">Elite Tier</span>
+      </div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">Kitab Scanner, Complete Ibaarat Tashkeel & Auto Exam Solver</div>
+      <button type="button" class="btn-action disabled"><i class="fa-solid fa-clock"></i> जल्द आ रहा है (Coming Soon)</button>
+    </div>
+
+    <!-- UPCOMING TIER 3: PRIME -->
+    <div class="plan-card vip">
+      <div class="badge-coming-soon"><i class="fa-solid fa-lock"></i> Coming Soon</div>
+      <div style="display:flex; justify-content:space-between; align-items:baseline;">
+        <span style="font-weight:700; color:#fff;">SUHAIL AI PRIME</span>
+        <span style="font-weight:700; color:var(--vip-gold);">Crown Tier</span>
+      </div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">1-on-1 Dedicated AI Ustad, Live Fatawa Support & Infinite Quota</div>
+      <button type="button" class="btn-action disabled"><i class="fa-solid fa-clock"></i> जल्द आ रहा है (Coming Soon)</button>
     </div>
 
   </section>
 
-  <!-- TAB 3: UPGRADE / PAYMENT -->
+  <!-- TAB 3: UPGRADE -->
   <section id="tab-pay" class="tab-view">
     <h4 style="text-align:center; color:#fff;">FamApp QR Code Payment</h4>
     <p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">QR code scan karke fees bhejein aur 12 ankon ka UTR number darj karein.</p>
@@ -232,7 +253,7 @@
       <select id="pay-plan-select" class="form-input">
         <option value="plus">SUHAIL AI PLUS (₹10 / 30 Din)</option>
         <option value="pro">SUHAIL AI PRO (₹25 / 30 Din)</option>
-        <option value="allama">SUHAIL AI ALLAMA (₹50 / 30 Din)</option>
+        <option value="ultra">SUHAIL AI ULTRA (₹50 / 30 Din)</option>
       </select>
     </div>
 
@@ -244,7 +265,7 @@
     <button type="button" class="btn-action" id="btn-submit-pay">Verification ke liye Submit karein</button>
   </section>
 
-  <!-- TAB 4: ADMIN APPROVAL PANEL -->
+  <!-- TAB 4: ADMIN -->
   <section id="tab-admin" class="tab-view">
     <div style="display:flex; justify-content:space-between; align-items:center;">
       <h4 style="color:var(--accent-yellow);">Pending Approvals (30 Days Activation)</h4>
@@ -259,22 +280,19 @@
   let currentUser = JSON.parse(localStorage.getItem('suhail_ai_user') || 'null');
   let currentAdminPass = localStorage.getItem('suhail_ai_admin_pass') || '';
 
-  // Safe API Fetch Wrapper
   async function safeFetch(url, options = {}) {
     const res = await fetch(url, options);
     const contentType = res.headers.get("content-type") || "";
     if (!contentType.includes("application/json")) {
-      const txt = await res.text();
-      throw new Error(`Server ne plain response diya (${res.status}).`);
+      throw new Error(`Server ne unexpected response diya (${res.status}).`);
     }
     const data = await res.json();
     if (!res.ok || data.success === false) {
-      throw new Error(data.error || "Server par takneeki kharabi aayi.");
+      throw new Error(data.error || "Server Error");
     }
     return data;
   }
 
-  // Navigation
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -290,16 +308,6 @@
     document.querySelector('.nav-item[data-tab="tab-pay"]').click();
   };
 
-  document.getElementById('link-goto-forgot').onclick = () => {
-    document.getElementById('view-login').style.display = 'none';
-    document.getElementById('view-forgot').style.display = 'flex';
-  };
-  document.getElementById('link-goto-login').onclick = () => {
-    document.getElementById('view-forgot').style.display = 'none';
-    document.getElementById('view-login').style.display = 'flex';
-  };
-
-  // Live Profile Sync
   async function syncProfile() {
     if (!currentUser || !currentUser.phone) return;
     try {
@@ -329,11 +337,11 @@
     let planBadge = 'SUHAIL AI FREE';
     let currentAiTitle = 'SUHAIL AI FREE';
 
-    const p = isAdmin ? 'allama' : (currentUser.plan || 'free');
+    const p = isAdmin ? 'ultra' : (currentUser.plan || 'free');
 
-    if (p === 'allama') {
-      planBadge = isAdmin ? 'ALLAMA (ADMIN)' : 'SUHAIL AI ALLAMA (30 DAYS)';
-      currentAiTitle = 'SUHAIL AI ALLAMA';
+    if (p === 'ultra') {
+      planBadge = isAdmin ? 'ULTRA (ADMIN)' : 'SUHAIL AI ULTRA (30 DAYS)';
+      currentAiTitle = 'SUHAIL AI ULTRA';
     } else if (p === 'pro') {
       planBadge = 'SUHAIL AI PRO (30 DAYS)';
       currentAiTitle = 'SUHAIL AI PRO';
@@ -356,7 +364,6 @@
     }
   }
 
-  // 1. LOGIN
   document.getElementById('btn-login-submit').addEventListener('click', async () => {
     const phone = document.getElementById('auth-phone').value.trim();
     const roll = document.getElementById('auth-roll').value.trim();
@@ -368,12 +375,8 @@
     
     if (!adminPass) {
       const rollNum = parseInt(roll, 10);
-      if (isNaN(rollNum) || rollNum < 4000 || rollNum > 9999) {
-        return alert("Roll number 4000 se 9999 tak (4 ankon ka) hona anivarya hai.");
-      }
-      if (!userPass || userPass.length < 6) {
-        return alert("Personal password kam se kam 6 ankon/aksharon ka hona anivarya hai.");
-      }
+      if (isNaN(rollNum) || rollNum < 4000 || rollNum > 9999) return alert("Roll number 4000 se 9999 tak hona lazmi hai.");
+      if (!userPass || userPass.length < 6) return alert("Password kam se kam 6 ankon ka hona anivarya hai.");
     }
 
     try {
@@ -382,7 +385,6 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, roll, userPass, name, adminPass })
       });
-
       currentUser = data.user;
       localStorage.setItem('suhail_ai_user', JSON.stringify(currentUser));
       if (adminPass) {
@@ -395,37 +397,12 @@
     }
   });
 
-  // 2. FORGOT
-  document.getElementById('btn-forgot-submit').addEventListener('click', async () => {
-    const phone = document.getElementById('forgot-phone').value.trim();
-    const verify = document.getElementById('forgot-verify').value.trim();
-    const newPass = document.getElementById('forgot-new-pass').value.trim();
-
-    if (phone.length !== 10) return alert("10 ankon ka mobile number darj karein.");
-    if (!verify) return alert("Satyaapan ke liye naam ya roll number darj karein.");
-    if (!newPass || newPass.length < 6) return alert("Naya password kam se kam 6 ankon ka hona chahiye.");
-
-    try {
-      const data = await safeFetch('/api?action=forgot', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, verify, newPass })
-      });
-
-      alert(data.message);
-      document.getElementById('link-goto-login').click();
-    } catch (e) {
-      alert(e.message);
-    }
-  });
-
   document.getElementById('btn-logout').onclick = () => {
     localStorage.removeItem('suhail_ai_user');
     localStorage.removeItem('suhail_ai_admin_pass');
     location.reload();
   };
 
-  // 3. CHAT
   const chatBox = document.getElementById('chat-box');
   const chatInput = document.getElementById('chat-input');
   const sendBtn = document.getElementById('btn-chat-send');
@@ -448,7 +425,6 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: text, phone: currentUser.phone })
       });
-
       aiBubble.innerHTML = `<span class="ai-label">${data.aiName}</span>${data.reply}`;
     } catch (err) {
       aiBubble.textContent = "Kshama karein: " + err.message;
@@ -466,11 +442,10 @@
     return div;
   }
 
-  // 4. SUBMIT PAYMENT
   document.getElementById('btn-submit-pay').onclick = async () => {
     const utr = document.getElementById('pay-utr').value.trim();
     const plan = document.getElementById('pay-plan-select').value;
-    if (!utr) return alert("Kripya 12 ankon ka UTR number darj karein.");
+    if (!utr) return alert("Kripya 12 ankon ka UTR darj karein.");
 
     try {
       const data = await safeFetch('/api?action=payment', {
@@ -478,7 +453,6 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone: currentUser.phone, plan, utr })
       });
-
       alert(data.message);
       document.getElementById('pay-utr').value = '';
       document.querySelector('.nav-item[data-tab="tab-study"]').click();
@@ -487,10 +461,9 @@
     }
   };
 
-  // 5. ADMIN LOAD & APPROVE
   async function loadAdminRequests() {
     const list = document.getElementById('admin-requests-list');
-    list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Darkhwastein load ho rahi hain...</p>';
+    list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Loading...</p>';
 
     try {
       const data = await safeFetch('/api?action=admin', {
@@ -503,7 +476,7 @@
       const keys = Object.keys(reqs).filter(k => reqs[k].status === 'pending');
 
       if (!keys.length) {
-        list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Koi pending darkhwast nahi hai.</p>';
+        list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Koi pending request nahi hai.</p>';
         return;
       }
 
@@ -540,7 +513,6 @@
         body: JSON.stringify({ pass: currentAdminPass, cmd, requestId, targetPhone, targetPlan })
       });
       alert(data.message);
-      
       if (currentUser && currentUser.phone === targetPhone) {
         currentUser.plan = targetPlan;
         localStorage.setItem('suhail_ai_user', JSON.stringify(currentUser));
