@@ -1,440 +1,242 @@
 import crypto from "crypto";
 
-const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com";
-
-// Keys from Vercel
-const POLLINATIONS_KEY = process.env.POLLINATIONS_KEY || process.env.POLLINATION_KEY || "";
+const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
+const MISTRAL_KEY = process.env.MISTRAL_KEY || "";
 const GROQ_KEY = process.env.GROQ_KEY || "";
-const OPENROUTER_KEY = process.env.OPENROUTER_KEY || "";
+const ADMIN_SECRET = process.env.ADMIN_SECRET || "";
+const SESSION_SECRET = process.env.SESSION_SECRET || process.env.ADMIN_SECRET || "";
+const PAYMENT_QR_URL = process.env.PAYMENT_QR_URL || "/payment-qr.png";
 
-// STRICT SERVER-SIDE DAILY LIMITS
-const DAILY_LIMITS = {
-  free: 25,
-  plus: 150,
-  pro: 500,
-  ultra: 1000
+const DAILY_LIMITS = { free: 25, plus: 150, pro: 500, ultra: 1000 };
+const PLANS = {
+  free:  { id:"free",  key:"FREE",  name:"SUHAIL AI FREE",  price:0,  duration:"Free",    dailyMessages:25,   provider:"Google Gemini", model:"gemini-2.5-flash" },
+  plus:  { id:"plus",  key:"PLUS",  name:"SUHAIL AI PLUS",  price:10, duration:"30 Days", dailyMessages:150,  provider:"Mistral",       model:"mistral-small-latest" },
+  pro:   { id:"pro",   key:"PRO",   name:"SUHAIL AI PRO",   price:25, duration:"30 Days", dailyMessages:500,  provider:"Groq",          model:"openai/gpt-oss-20b" },
+  ultra: { id:"ultra", key:"ULTRA", name:"SUHAIL AI ULTRA", price:50, duration:"30 Days", dailyMessages:1000, provider:"Groq",          model:"openai/gpt-oss-120b" }
 };
 
-// -------------------------------------------------------------
-// DEDICATED BEHAVIOR RULES FOR EACH TIER
-// -------------------------------------------------------------
 const SYSTEM_RULES = {
-  free: `Aapka official naam 'SUHAIL AI FREE' hai.
+  free: `Aapka official naam "SUHAIL AI FREE" hai.
 Uddeshya: Madadgaar aur dostana Study wa General Assistant.
 Behavior:
-1. Har jawab ke shuru me zabardasti Salam dohrane ki zaroorat nahi hai. Agar user salam kare to moaddab jawab dein, warna seedhe mudde ki baat karein.
-2. Padhai aur talim (Maths, Science, English, Hindi, Urdu, Arabic Grammar, Translation, Basic GK, Notes, Revision) me aasan aur saral bhasha me madad karein.
-3. User ke aam sawalat, writing, coding aur rozmarrah ki zaroori baaton par bhi dostana aur helpful guftagu karein.
-4. Chhote aur aasan examples dein. Fazool lamba bhashan na dein.
-5. STRICT SAFETY: Gali-galoj, gair-akhlaqi, illegal ya nuqsandeh baaton par sakhti se mana karein.
-6. Galat ya man-ghadant jankari bilkul na dein; jahan shak ho wahan spasht uncertainty batayein.
-7. Bahari company ya model ka naam na lein. Apni pehchan sirf 'SUHAIL AI FREE' batayein.`,
-
-  plus: `Aapka official naam 'SUHAIL AI PLUS' hai.
-Uddeshya: Mufassal Talimi Ustaad wa Rehnuma (Detailed Study Tutor).
+1. Har jawab ke shuru me zabardasti Salam dohrane ki zaroorat nahi. Agar user salam kare to moaddab jawab dein, warna seedhe mudde ki baat karein.
+2. Maths, Science, English, Hindi, Urdu, Arabic Grammar, Translation, Basic GK, Notes aur Revision me aasan bhasha me madad karein.
+3. Aam sawalat, writing, coding aur rozmarrah ki zaroori baaton par bhi helpful rahen.
+4. Chhote aur aasan examples dein; fazool lamba bhashan na dein.
+5. Ghalat ya man-ghadant jankari na dein; shak ho to uncertainty batayein.
+6. Illegal, harmful ya unsafe requests me madad na dein.
+7. Apni pehchan sirf "SUHAIL AI FREE" batayein.`,
+  plus: `Aapka official naam "SUHAIL AI PLUS" hai.
+Uddeshya: Mufassal Talimi Ustaad wa Rehnuma.
 Behavior:
-1. Har baat me Salam dohrana zaroori nahi hai.
-2. Talim, Nahw, Sarf, Arabic Grammar, Translation, Maths, Science aur academic subjects me tafseeli, structured aur step-by-step rahnumai dein. Tables, headings aur bullet points ka istemal karein.
-3. Sabaq ke important points, revision notes, MCQs aur exam questions banayein. User ki ghaltiyon ki ahtiram ke sath islah karein.
-4. Academic topics ke sath-sath aam maloomat, technical queries aur general constructive discussion par bhi aala sahulat dein.
-5. STRICT SAFETY: Gali-galoj, abusive language, illegal ya harmful requests ko entertain na karein.
-6. Apni pehchan sirf 'SUHAIL AI PLUS' batayein.`,
-
-  pro: `Aapka official naam 'SUHAIL AI PRO' hai.
-Uddeshya: Aala Talimi aur Tajziyati Muawin (Advanced Academic & Analytical Assistant).
+1. Har baat me Salam dohrana zaroori nahi.
+2. Talim, Nahw, Sarf, Arabic Grammar, Translation, Maths, Science aur academic subjects me tafseeli, structured aur step-by-step rahnumai dein.
+3. Headings, bullets, tables, revision notes, MCQs aur exam questions zarurat ke mutabiq banayein.
+4. User ki ghaltiyon ki ahtiram ke sath islah karein.
+5. Academic ke sath aam maloomat, technical queries aur constructive discussion me bhi madad karein.
+6. Fake references ya man-ghadant citations na banayein.
+7. Illegal, harmful ya unsafe requests me madad na dein.
+8. Apni pehchan sirf "SUHAIL AI PLUS" batayein.`,
+  pro: `Aapka official naam "SUHAIL AI PRO" hai.
+Uddeshya: Aala Talimi aur Tajziyati Muawin.
 Behavior:
-1. Har sandesh me Salam dohrana lazmi nahi hai.
-2. Complex academic, scientific, mathematical aur grammatical (Nahw/Sarf) sawalat ko logical tareeqe se break karke aala satah par solve karein.
-3. Pehle core concept ko spasht karein, phir gehra aur structured explanation dein.
-4. Talim ke alawa advanced writing, technology, reasoning aur general serious topics par bhi poori salahiyat se jawab dein.
-5. Kabhi bhi fake reference, man-ghadant citation ya bina sanad baat pesh na karein.
-6. STRICT SAFETY: Kisi bhi tarah ki gali-galoj, illegal ya gair-akhlaqi baaton se sakhti se parhez karein.
-7. Apni pehchan sirf 'SUHAIL AI PRO' batayein.`,
-
-  ultra: `Aapka official naam 'SUHAIL AI ULTRA' hai.
-Uddeshya: Markazi Ilmi Tehqeeq aur Flagship Academic Assistant (Flagship Academic & Research Assistant).
+1. Har sandesh me Salam dohrana lazmi nahi.
+2. Complex academic, scientific, mathematical aur Nahw/Sarf sawalat ko logical tareeqe se break karke solve karein.
+3. Pehle core concept spasht karein, phir gehri structured explanation dein.
+4. Advanced writing, technology, reasoning aur serious constructive topics par bhi madad karein.
+5. Fake reference, man-ghadant citation ya bina sanad baat ko fact ke taur par pesh na karein.
+6. Illegal, harmful ya unsafe requests me madad na dein.
+7. Apni pehchan sirf "SUHAIL AI PRO" batayein.`,
+  ultra: `Aapka official naam "SUHAIL AI ULTRA" hai.
+Uddeshya: Markazi Ilmi Tehqeeq aur Flagship Academic Assistant.
 Behavior:
-1. Har jawab me Salam dohrana zaroori nahi hai.
-2. Advanced Mathematics, Science, Dars-e-Nizami, Nahw, Sarf, Arabic Adab, Translation aur academic tehqeeq me maximum capability ka upyog karein.
-3. Kathin ilmi mubahis ko tarteeb me pesh karein:
-   - 1. Ta'reef (Definition)
-   - 2. Buniyadi Usool (Basic Principle)
-   - 3. Tafseeli Wazahat (Detailed Explanation)
-   - 4. Misaalein (Examples)
-   - 5. Amli Istifada (Application)
-   - 6. Aham Nukaat (Important Points)
-4. Complex problems ko multi-stage logical reasoning ke sath hal karein. Har jaayaz constructive aur intellectual topic par aala tareeqe se guftagu karein.
-5. STRICT SAFETY: Gali-galoj, harmful ya illegal chizon par sakhti se mana karein. Fake citations bilkul na banayein.
-6. Apni pehchan sirf 'SUHAIL AI ULTRA' batayein.`
+1. Har jawab me Salam dohrana zaroori nahi.
+2. Advanced Mathematics, Science, Dars-e-Nizami, Nahw, Sarf, Arabic Adab, Translation aur academic research me maximum available capability ka istemal karein.
+3. Kathin mubahis ko: 1. Ta'reef 2. Buniyadi Usool 3. Tafseeli Wazahat 4. Misaalein 5. Amli Istifada 6. Aham Nukaat ke tartib se pesh karein.
+4. Complex problems ko multi-stage logical reasoning ke sath hal karein.
+5. Fake citations bilkul na banayein.
+6. Illegal, harmful ya unsafe requests me madad na dein.
+7. Apni pehchan sirf "SUHAIL AI ULTRA" batayein.`
 };
 
-function hashPassword(pass) {
-  return crypto.createHash("sha256").update(String(pass).trim()).digest("hex");
+const cleanPhone = v => String(v || "").replace(/\D/g, "").slice(-10);
+const normalizePlan = v => { const p=String(v||"free").toLowerCase().trim(); return p==="plus"||p==="monthly"?"plus":p==="pro"?"pro":p==="ultra"||p==="allama"||p==="yearly"?"ultra":"free"; };
+const hashPassword = p => crypto.createHash("sha256").update(String(p).trim()).digest("hex");
+const safeUser = u => { if(!u)return null; const x={...u}; delete x.password; delete x.passwordHash; return x; };
+const publicPlan = id => { const p=PLANS[normalizePlan(id)]||PLANS.free; return {...p}; };
+const today = () => new Date().toISOString().slice(0,10);
+const conversationId = () => `chat_${Date.now()}_${crypto.randomBytes(5).toString("hex")}`;
+const requestId = () => `req_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`;
+const titleFrom = s => { const x=String(s||"").replace(/\s+/g," ").trim(); return x ? (x.length>55?x.slice(0,55)+"…":x) : "New chat"; };
+
+function b64(v){return Buffer.from(v).toString("base64url");}
+function tokenFor(phone){
+  if(!SESSION_SECRET)return null;
+  const body=b64(JSON.stringify({phone,iat:Date.now()}));
+  const sig=crypto.createHmac("sha256",SESSION_SECRET).update(body).digest("base64url");
+  return `${body}.${sig}`;
+}
+function verifyToken(token){
+  if(!SESSION_SECRET||!token)return null;
+  const [body,sig]=String(token).split("."); if(!body||!sig)return null;
+  const expected=crypto.createHmac("sha256",SESSION_SECRET).update(body).digest("base64url");
+  if(sig.length!==expected.length||!crypto.timingSafeEqual(Buffer.from(sig),Buffer.from(expected)))return null;
+  try{const p=JSON.parse(Buffer.from(body,"base64url").toString("utf8")); if(!p.phone||Date.now()-Number(p.iat||0)>30*86400000)return null; return p;}catch{return null;}
+}
+function bearer(req){const h=req.headers?.authorization||"";return h.startsWith("Bearer ")?h.slice(7).trim():"";}
+
+async function dbGet(path){try{const r=await fetch(`${FIREBASE_DB_URL}/${path}.json`);if(!r.ok)return null;return await r.json();}catch{return null;}}
+async function dbPut(path,data){const r=await fetch(`${FIREBASE_DB_URL}/${path}.json`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});if(!r.ok)throw new Error(`Firebase PUT failed: ${r.status}`);return r.json();}
+async function dbPatch(path,data){const r=await fetch(`${FIREBASE_DB_URL}/${path}.json`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});if(!r.ok)throw new Error(`Firebase PATCH failed: ${r.status}`);return r.json();}
+
+async function requireUser(req){
+  const session=verifyToken(bearer(req));
+  if(!session?.phone){const e=new Error("आपका session समाप्त हो गया है। दोबारा login करें।");e.code=401;throw e;}
+  const user=await dbGet(`users/${session.phone}`);
+  if(!user){const e=new Error("यूज़र नहीं मिला। दोबारा login करें।");e.code=401;throw e;}
+  if(user.status==="blocked"){const e=new Error("आपका account Blocked है। Admin से संपर्क करें।");e.code=403;throw e;}
+  return {phone:session.phone,user};
+}
+function buildPrompt(message,history){
+  const h=Array.isArray(history)?history.filter(m=>m&&(m.role==="user"||m.role==="assistant")&&typeof m.content==="string").slice(-20).map(m=>`${m.role==="user"?"User":"Assistant"}: ${m.content}`).join("\n"):"";
+  return h?`Conversation context:\n${h}\n\nLatest user message:\n${message}\n\nAnswer the latest user message while using relevant context.`:String(message);
 }
 
-async function dbGet(path) {
-  try {
-    const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`);
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (e) { return null; }
-}
-
-async function dbPut(path, data) {
-  const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  return await res.json();
-}
-
-async function dbPatch(path, data) {
-  const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  return await res.json();
-}
-
-function normalizePlan(rawPlan) {
-  const p = String(rawPlan || "free").toLowerCase().trim();
-  if (p === "plus" || p === "monthly") return "plus";
-  if (p === "pro") return "pro";
-  if (p === "ultra" || p === "allama" || p === "yearly") return "ultra";
-  return "free";
-}
-
-// -------------------------------------------------------------
-// CORE CALL FUNCTIONS (POLLINATIONS + GROQ FAILOVER)
-// -------------------------------------------------------------
-
-async function callPollinations(modelName, prompt, systemInstruction) {
-  if (!POLLINATIONS_KEY) return null;
-  try {
-    const res = await fetch("https://text.pollinations.ai/openai/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${POLLINATIONS_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: modelName,
-        messages: [
-          { role: "system", content: systemInstruction },
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.35
-      })
-    });
-    const data = await res.json();
-    if (res.ok && data?.choices?.[0]?.message?.content) {
-      return data.choices[0].message.content;
-    }
-  } catch (e) {}
+async function callGemini(prompt,system){
+  if(!GEMINI_KEY)return null;
+  try{
+    const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":GEMINI_KEY},body:JSON.stringify({systemInstruction:{parts:[{text:system}]},contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:.35}})});
+    const d=await r.json();
+    const text=d?.candidates?.[0]?.content?.parts?.map(x=>x?.text||"").join("").trim();
+    if(r.ok&&text)return text;
+    console.error("Gemini error:",d);
+  }catch(e){console.error("Gemini request failed:",e);}
   return null;
 }
-
-async function callGroqDirect(modelName, prompt, systemInstruction) {
-  if (!GROQ_KEY) return null;
-  try {
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${GROQ_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: modelName,
-        messages: [
-          { role: "system", content: systemInstruction },
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.35
-      })
-    });
-    const data = await res.json();
-    if (res.ok && data?.choices?.[0]?.message?.content) {
-      return data.choices[0].message.content;
-    }
-  } catch (e) {}
-  return null;
+async function callMistral(prompt,system){
+  if(!MISTRAL_KEY)return null;
+  try{
+    const r=await fetch("https://api.mistral.ai/v1/chat/completions",{method:"POST",headers:{Authorization:`Bearer ${MISTRAL_KEY}`,"Content-Type":"application/json"},body:JSON.stringify({model:"mistral-small-latest",messages:[{role:"system",content:system},{role:"user",content:prompt}],temperature:.35})});
+    const d=await r.json(); if(r.ok&&d?.choices?.[0]?.message?.content)return d.choices[0].message.content; console.error("Mistral error:",d);
+  }catch(e){console.error("Mistral request failed:",e);} return null;
+}
+async function callGroq(model,prompt,system){
+  if(!GROQ_KEY)return null;
+  try{
+    const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{Authorization:`Bearer ${GROQ_KEY}`,"Content-Type":"application/json"},body:JSON.stringify({model,messages:[{role:"system",content:system},{role:"user",content:prompt}],temperature:.35})});
+    const d=await r.json(); if(r.ok&&d?.choices?.[0]?.message?.content)return d.choices[0].message.content; console.error(`Groq ${model} error:`,d);
+  }catch(e){console.error(`Groq ${model} failed:`,e);} return null;
+}
+async function dispatch(plan,prompt){
+  const p=normalizePlan(plan),system=SYSTEM_RULES[p]||SYSTEM_RULES.free;
+  let reply=null,name="SUHAIL AI FREE";
+  if(p==="ultra"){name="SUHAIL AI ULTRA";reply=await callGroq("openai/gpt-oss-120b",prompt,system);}
+  else if(p==="pro"){name="SUHAIL AI PRO";reply=await callGroq("openai/gpt-oss-20b",prompt,system);}
+  else if(p==="plus"){name="SUHAIL AI PLUS";reply=await callMistral(prompt,system);}
+  else {name="SUHAIL AI FREE";reply=await callGemini(prompt,system);}
+  if(reply)return {name,reply};
+  const e=new Error(`${name} service is samay vyast hai. Kripya kuch der baad punah prayas karein.`);e.code=500;throw e;
 }
 
-// 1. FREE (Pollinations Mistral/Llama -> Groq Instant)
-async function callFree(prompt, systemInstruction) {
-  let reply = await callPollinations("mistral", prompt, systemInstruction);
-  if (reply) return reply;
+export default async function handler(req,res){
+  res.setHeader("Access-Control-Allow-Origin","*");
+  res.setHeader("Access-Control-Allow-Methods","GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers","Content-Type, Authorization");
+  res.setHeader("Content-Type","application/json; charset=utf-8");
+  if(req.method==="OPTIONS")return res.status(200).end();
+  const {searchParams}=new URL(req.url,`http://${req.headers.host||"localhost"}`);
+  const raw=req.query?.action||searchParams.get("action")||"";
+  const action=raw||String(req.url||"").split("/api/")[1]?.split("?")[0]||"";
+  try{
+    if(action==="config")return res.status(200).json({success:true,payment:{qrUrl:PAYMENT_QR_URL},plans:Object.values(PLANS).map(publicPlan)});
+    if(action==="plans")return res.status(200).json({success:true,plans:Object.values(PLANS).map(publicPlan)});
 
-  reply = await callPollinations("llama", prompt, systemInstruction);
-  if (reply) return reply;
-
-  reply = await callGroqDirect("llama-3.1-8b-instant", prompt, systemInstruction);
-  if (reply) return reply;
-
-  throw { userMsg: "SUHAIL AI FREE service is samay vyast hai. Kripya punah prayas karein.", code: 500 };
-}
-
-// 2. PLUS (Pollinations Qwen Tutor -> Groq Fast)
-async function callPlus(prompt, systemInstruction) {
-  let reply = await callPollinations("qwen", prompt, systemInstruction);
-  if (reply) return reply;
-
-  reply = await callGroqDirect("llama-3.1-8b-instant", prompt, systemInstruction);
-  if (reply) return reply;
-
-  throw { userMsg: "SUHAIL AI PLUS service is samay vyast hai. Kripya punah prayas karein.", code: 500 };
-}
-
-// 3. PRO (Groq 70B Proven -> Pollinations DeepSeek)
-async function callPro(prompt, systemInstruction) {
-  let reply = await callGroqDirect("llama-3.3-70b-versatile", prompt, systemInstruction);
-  if (reply) return reply;
-
-  reply = await callPollinations("deepseek", prompt, systemInstruction);
-  if (reply) return reply;
-
-  throw { userMsg: "SUHAIL AI PRO service me takneeki samasya aayi.", code: 500 };
-}
-
-// 4. ULTRA (Pollinations DeepSeek-R1 -> Groq 70B Shield)
-async function callUltra(prompt, systemInstruction) {
-  let reply = await callPollinations("deepseek-r1", prompt, systemInstruction);
-  if (reply) return reply;
-
-  reply = await callPollinations("deepseek", prompt, systemInstruction);
-  if (reply) return reply;
-
-  reply = await callGroqDirect("llama-3.3-70b-versatile", prompt, systemInstruction);
-  if (reply) return reply;
-
-  throw { userMsg: "SUHAIL AI ULTRA service me samasya aayi.", code: 500 };
-}
-
-// -------------------------------------------------------------
-// MAIN SERVERLESS HANDLER
-// -------------------------------------------------------------
-export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader("Content-Type", "application/json; charset=utf-8");
-
-  if (req.method === "OPTIONS") return res.status(200).end();
-
-  const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
-  const action = req.query?.action || searchParams.get("action");
-
-  try {
-    if (action === "config" || action === "plans") {
-      return res.status(200).json({
-        success: true,
-        plans: {
-          free: { id: "free", name: "SUHAIL AI FREE", price: 0, duration: "Free", limit: DAILY_LIMITS.free },
-          plus: { id: "plus", name: "SUHAIL AI PLUS", price: 10, duration: "30 Days", limit: DAILY_LIMITS.plus },
-          pro: { id: "pro", name: "SUHAIL AI PRO", price: 25, duration: "30 Days", limit: DAILY_LIMITS.pro },
-          ultra: { id: "ultra", name: "SUHAIL AI ULTRA", price: 50, duration: "30 Days", limit: DAILY_LIMITS.ultra }
-        }
-      });
+    if(action==="auth"&&req.method==="POST"){
+      const b=req.body||{},name=String(b.name||"").trim(),roll=String(b.roll||"").replace(/\D/g,""),phone=cleanPhone(b.phone),password=String(b.password||"");
+      if(!/^\d{4}$/.test(roll))return res.status(400).json({success:false,error:"INVALID_ROLL"});
+      if(!/^[6-9]\d{9}$/.test(phone))return res.status(400).json({success:false,error:"INVALID_PHONE"});
+      if(!name||name.length<2)return res.status(400).json({success:false,error:"INVALID_NAME"});
+      if(password.length<6||password.length>128)return res.status(400).json({success:false,error:"INVALID_PASSWORD"});
+      if(!SESSION_SECRET)return res.status(500).json({success:false,error:"SESSION_SECRET Vercel Environment Variable set nahi hai."});
+      const existing=await dbGet(`users/${phone}`);
+      if(!existing){
+        const user={phone,name,roll,passwordHash:hashPassword(password),role:"student",plan:"free",planExpiry:null,totalQuestions:0,dailyCount:0,lastQuestionDate:"",lastActive:Date.now(),createdAt:Date.now(),status:"active"};
+        await dbPut(`users/${phone}`,user);
+        return res.status(200).json({success:true,isNew:true,token:tokenFor(phone),user:safeUser(user),plan:publicPlan("free")});
+      }
+      if(String(existing.roll||"")!==roll)return res.status(409).json({success:false,error:"IDENTITY_MISMATCH"});
+      const match=existing.passwordHash?existing.passwordHash===hashPassword(password):String(existing.password||"").trim()===password.trim();
+      if(!match)return res.status(401).json({success:false,error:"INVALID_CREDENTIALS"});
+      let plan=normalizePlan(existing.plan),updates={lastActive:Date.now(),plan};
+      if(!existing.passwordHash)updates.passwordHash=hashPassword(password);
+      if(existing.role!=="admin"&&existing.planExpiry&&Date.now()>Number(existing.planExpiry)){plan="free";updates.plan="free";updates.planExpiry=null;}
+      await dbPatch(`users/${phone}`,updates); const user={...existing,...updates};
+      return res.status(200).json({success:true,token:tokenFor(phone),user:safeUser(user),plan:publicPlan(plan)});
     }
 
-    if (action === "auth" && req.method === "POST") {
-      const { phone, name, roll, userPass, adminPass } = req.body || {};
-      const cleanPhone = String(phone || "").replace(/\D/g, "");
+    if(action==="me"||action==="get_profile"){
+      const {phone,user}=await requireUser(req);let plan=normalizePlan(user.plan);
+      if(user.role!=="admin"&&user.planExpiry&&Date.now()>Number(user.planExpiry)){plan="free";await dbPatch(`users/${phone}`,{plan:"free",planExpiry:null});user.plan="free";user.planExpiry=null;}
+      return res.status(200).json({success:true,user:safeUser({...user,id:phone}),plan:publicPlan(plan)});
+    }
 
-      if (cleanPhone.length !== 10) return res.status(400).json({ success: false, error: "कृपया 10 अंकों का मोबाइल नंबर दर्ज करें।" });
-
-      if (adminPass && adminPass === ADMIN_SECRET) {
-        let adminUser = await dbGet(`users/${cleanPhone}`);
-        if (!adminUser) {
-          adminUser = { phone: cleanPhone, name: name || "Master Admin", role: "admin", plan: "ultra", planExpiry: null, status: "active" };
-          await dbPut(`users/${cleanPhone}`, adminUser);
-        } else {
-          adminUser.role = "admin";
-          adminUser.plan = "ultra";
-          await dbPatch(`users/${cleanPhone}`, { role: "admin", plan: "ultra", planExpiry: null });
-        }
-        delete adminUser.password;
-        delete adminUser.passwordHash;
-        return res.status(200).json({ success: true, user: adminUser, isAdmin: true });
+    if(action==="conversations"){
+      const {phone}=await requireUser(req);
+      if(req.method==="GET"){
+        const root=await dbGet(`conversations/${phone}`)||{};
+        const conversations=Object.entries(root).map(([id,d])=>({id,title:d?.title||"New chat",updatedAt:d?.updatedAt||d?.createdAt||0})).sort((a,b)=>b.updatedAt-a.updatedAt);
+        return res.status(200).json({success:true,conversations});
       }
-
-      const rollNum = parseInt(roll, 10);
-      if (isNaN(rollNum) || rollNum < 4000 || rollNum > 9999) {
-        return res.status(400).json({ success: false, error: "रोल नंबर 4000 से 9999 तक होना अनिवार्य है।" });
-      }
-
-      if (!userPass || String(userPass).length < 6) {
-        return res.status(400).json({ success: false, error: "पासवर्ड कम से कम 6 अक्षरों का होना अनिवार्य है।" });
-      }
-
-      const passHash = hashPassword(userPass);
-      let user = await dbGet(`users/${cleanPhone}`);
-
-      if (!user) {
-        if (!name || !name.trim()) return res.status(400).json({ success: false, error: "कृपया अपना नाम दर्ज करें।" });
-        user = {
-          phone: cleanPhone,
-          name: name.trim(),
-          roll: String(rollNum),
-          passwordHash: passHash,
-          role: "student",
-          plan: "free",
-          planExpiry: null,
-          totalQuestions: 0,
-          dailyCount: 0,
-          lastQuestionDate: "",
-          lastActive: Date.now(),
-          createdAt: Date.now(),
-          status: "active"
-        };
-        await dbPut(`users/${cleanPhone}`, user);
-        delete user.passwordHash;
-        return res.status(200).json({ success: true, user, isNew: true });
-      } else {
-        const isMatch = user.passwordHash ? (user.passwordHash === passHash) : (user.password === String(userPass).trim());
-        if (!isMatch) return res.status(401).json({ success: false, error: "गलत पासवर्ड!" });
-        if (!user.passwordHash) await dbPatch(`users/${cleanPhone}`, { passwordHash: passHash });
-        user.plan = normalizePlan(user.plan);
-        delete user.passwordHash;
-        delete user.password;
-        return res.status(200).json({ success: true, user });
+      if(req.method==="POST"){
+        const id=String(req.body?.id||"").trim(); if(!id)return res.status(400).json({success:false,error:"Conversation ID required."});
+        const c=await dbGet(`conversations/${phone}/${id}`); if(!c)return res.status(404).json({success:false,error:"Conversation not found."});
+        return res.status(200).json({success:true,conversationId:id,messages:Array.isArray(c.messages)?c.messages:[]});
       }
     }
 
-    if (action === "get_profile" && req.method === "POST") {
-      const { phone } = req.body || {};
-      const cleanPhone = String(phone || "").replace(/\D/g, "");
-      let user = await dbGet(`users/${cleanPhone}`);
-      if (!user) return res.status(404).json({ success: false, error: "यूज़र नहीं मिला।" });
-
-      user.plan = normalizePlan(user.plan);
-      if (user.role !== "admin" && user.planExpiry && Date.now() > user.planExpiry) {
-        user.plan = "free";
-        user.planExpiry = null;
-        await dbPatch(`users/${cleanPhone}`, { plan: "free", planExpiry: null });
-      }
-      delete user.passwordHash;
-      return res.status(200).json({ success: true, user });
+    if(action==="ai"&&req.method==="POST"){
+      const {phone,user}=await requireUser(req); const message=String(req.body?.message??req.body?.prompt??"").trim();
+      if(!message)return res.status(400).json({success:false,error:"सवाल खाली नहीं हो सकता।"});
+      let plan=normalizePlan(user.plan);
+      if(user.role!=="admin"&&user.planExpiry&&Date.now()>Number(user.planExpiry)){plan="free";await dbPatch(`users/${phone}`,{plan:"free",planExpiry:null});}
+      const day=today(),count=user.lastQuestionDate===day?Number(user.dailyCount||0):0,limit=user.role==="admin"?Number.MAX_SAFE_INTEGER:DAILY_LIMITS[plan];
+      if(count>=limit)return res.status(429).json({success:false,error:`आज की message limit समाप्त हो गई है (${count}/${limit}). कल दोबारा प्रयास करें या plan upgrade करें।`});
+      const id=String(req.body?.conversationId||"").trim()||conversationId(),history=Array.isArray(req.body?.history)?req.body.history:[];
+      const result=await dispatch(plan,buildPrompt(message,history)); const old=await dbGet(`conversations/${phone}/${id}`)||{},messages=Array.isArray(old.messages)?[...old.messages]:[];
+      const last=messages[messages.length-1]; if(!last||last.role!=="user"||last.content!==message)messages.push({role:"user",content:message,createdAt:Date.now()});
+      messages.push({role:"assistant",content:result.reply,createdAt:Date.now(),aiName:result.name}); const now=Date.now();
+      await dbPut(`conversations/${phone}/${id}`,{id,title:old.title||titleFrom(message),createdAt:old.createdAt||now,updatedAt:now,messages});
+      await dbPatch(`users/${phone}`,user.role==="admin"?{totalQuestions:Number(user.totalQuestions||0)+1,lastActive:now,plan:"ultra"}:{totalQuestions:Number(user.totalQuestions||0)+1,dailyCount:count+1,lastQuestionDate:day,lastActive:now,plan});
+      return res.status(200).json({success:true,reply:result.reply,aiName:result.name,plan:publicPlan(plan),conversationId:id});
     }
 
-    // AI CHAT DISPATCHER
-    if (action === "ai" && req.method === "POST") {
-      const { prompt, phone } = req.body || {};
-      if (!prompt || !String(prompt).trim()) return res.status(400).json({ success: false, error: "सवाल खाली नहीं हो सकता।" });
-
-      const cleanPhone = String(phone || "").replace(/\D/g, "");
-      let user = cleanPhone ? await dbGet(`users/${cleanPhone}`) : null;
-
-      if (user && user.status === "blocked") {
-        return res.status(403).json({ success: false, error: "आपका खाता निलंबित (Blocked) है। एडमिन से संपर्क करें।" });
-      }
-
-      let plan = "free";
-      if (user?.role === "admin") {
-        plan = "ultra";
-      } else if (user) {
-        plan = normalizePlan(user.plan);
-        if (user.planExpiry && Date.now() > user.planExpiry) {
-          plan = "free";
-          await dbPatch(`users/${cleanPhone}`, { plan: "free", planExpiry: null });
-        }
-      }
-
-      // STRICT DAILY LIMIT SERVER CHECK (FREE: 25)
-      const todayDateStr = new Date().toISOString().slice(0, 10);
-      const isNewDay = user?.lastQuestionDate !== todayDateStr;
-      const currentDailyCount = isNewDay ? 0 : (user?.dailyCount || 0);
-      const userLimit = DAILY_LIMITS[plan] || 25;
-
-      if (user?.role !== "admin" && currentDailyCount >= userLimit) {
-        return res.status(429).json({
-          success: false,
-          error: `आज के लिए आपकी सवाल सीमा समाप्त हो चुकी है (${currentDailyCount}/${userLimit} सवाल पूरे)। कृपया कल पुनः प्रयास करें या प्लान अपग्रेड करें।`
-        });
-      }
-
-      let aiName = "SUHAIL AI FREE";
-      let replyText = "";
-      const instruction = SYSTEM_RULES[plan] || SYSTEM_RULES.free;
-
-      if (plan === "ultra") {
-        aiName = "SUHAIL AI ULTRA";
-        replyText = await callUltra(prompt, instruction);
-      } else if (plan === "pro") {
-        aiName = "SUHAIL AI PRO";
-        replyText = await callPro(prompt, instruction);
-      } else if (plan === "plus") {
-        aiName = "SUHAIL AI PLUS";
-        replyText = await callPlus(prompt, instruction);
-      } else {
-        aiName = "SUHAIL AI FREE";
-        replyText = await callFree(prompt, instruction);
-      }
-
-      if (cleanPhone && user) {
-        dbPatch(`users/${cleanPhone}`, {
-          totalQuestions: (user.totalQuestions || 0) + 1,
-          dailyCount: currentDailyCount + 1,
-          lastQuestionDate: todayDateStr,
-          lastActive: Date.now()
-        }).catch(() => {});
-      }
-
-      return res.status(200).json({ success: true, reply: replyText, aiName, plan });
+    if(action==="payment"&&req.method==="POST"){
+      const {phone}=await requireUser(req); const plan=normalizePlan(req.body?.plan),utr=String(req.body?.utr||"").trim();
+      if(plan==="free")return res.status(400).json({success:false,error:"Free plan ke liye payment required nahi hai."});
+      if(utr.length<6||utr.length>100)return res.status(400).json({success:false,error:"Valid UTR / Transaction Reference दर्ज करें।"});
+      const amounts={plus:10,pro:25,ultra:50},id=requestId();
+      await dbPut(`payment_requests/${id}`,{requestId:id,phone,plan,amount:amounts[plan],utr,status:"pending",createdAt:Date.now()});
+      return res.status(200).json({success:true,requestId:id,message:"Payment request दर्ज हो गई है। Admin verification के बाद plan activate होगा।"});
     }
 
-    if (action === "payment" && req.method === "POST") {
-      const { phone, plan, utr } = req.body || {};
-      const cleanPhone = String(phone || "").replace(/\D/g, "");
-      const cleanUtr = String(utr || "").replace(/\D/g, "");
-      const normPlan = normalizePlan(plan);
-
-      if (!cleanPhone || cleanPhone.length !== 10) return res.status(400).json({ success: false, error: "कृपया 10 अंकों का मोबाइल नंबर दर्ज करें।" });
-      if (!cleanUtr || cleanUtr.length !== 12) return res.status(400).json({ success: false, error: "अमान्य UTR! ठीक 12 अंकों का न्यूमेरिक UTR नंबर अनिवार्य है।" });
-      if (normPlan === "free") return res.status(400).json({ success: false, error: "Free प्लान के लिए पेमेंट आवश्यक नहीं है।" });
-
-      const amounts = { plus: 10, pro: 25, ultra: 50 };
-      const requestId = `req_${Date.now()}`;
-      await dbPut(`payment_requests/${requestId}`, {
-        requestId,
-        phone: cleanPhone,
-        plan: normPlan,
-        amount: amounts[normPlan] || 0,
-        utr: cleanUtr,
-        status: "pending",
-        createdAt: Date.now()
-      });
-      return res.status(200).json({ success: true, message: "पेमेंट अनुरोध दर्ज हो गया है। एडमिन मंज़ूरी के बाद 30 दिनों के लिए चालू होगा।" });
+    if(action==="admin"&&req.method==="POST"){
+      if(!ADMIN_SECRET)return res.status(500).json({success:false,error:"ADMIN_SECRET configured नहीं है।"});
+      const b=req.body||{}; if(b.pass!==ADMIN_SECRET)return res.status(401).json({success:false,error:"गलत एडमिन पासवर्ड।"});
+      if(b.cmd==="get_requests")return res.status(200).json({success:true,requests:await dbGet("payment_requests")||{}});
+      if(b.cmd==="approve_request"){
+        const id=String(b.requestId||""),request=await dbGet(`payment_requests/${id}`); if(!request)return res.status(404).json({success:false,error:"Payment request नहीं मिली।"});
+        const plan=normalizePlan(request.plan),phone=cleanPhone(request.phone),expiry=Date.now()+30*86400000;
+        await dbPatch(`payment_requests/${id}`,{status:"approved",approvedAt:Date.now()}); await dbPatch(`users/${phone}`,{plan,planExpiry:expiry,lastActive:Date.now()});
+        return res.status(200).json({success:true,message:`${plan.toUpperCase()} plan 30 दिनों के लिए activate हो गया।`});
+      }
+      if(b.cmd==="reject_request"){const id=String(b.requestId||"");await dbPatch(`payment_requests/${id}`,{status:"rejected",rejectedAt:Date.now()});return res.status(200).json({success:true,message:"Payment request reject कर दी गई।"});}
+      return res.status(400).json({success:false,error:"Invalid admin command."});
     }
-
-    if (action === "admin" && req.method === "POST") {
-      const { pass, cmd, requestId, targetPhone, targetPlan } = req.body || {};
-      if (pass !== ADMIN_SECRET) return res.status(401).json({ success: false, error: "गलत एडमिन पासवर्ड।" });
-
-      if (cmd === "get_requests") {
-        const requests = (await dbGet("payment_requests")) || {};
-        return res.status(200).json({ success: true, requests });
-      }
-
-      if (cmd === "approve_request") {
-        const canonicalPlan = normalizePlan(targetPlan);
-        const expiryDate = Date.now() + (30 * 24 * 60 * 60 * 1000);
-        await dbPatch(`payment_requests/${requestId}`, { status: "approved", approvedAt: Date.now() });
-        await dbPatch(`users/${targetPhone}`, { plan: canonicalPlan, planExpiry: expiryDate });
-        return res.status(200).json({ success: true, message: `${canonicalPlan.toUpperCase()} प्लान 30 दिनों के लिए चालू हो गया।` });
-      }
-
-      if (cmd === "reject_request") {
-        await dbPatch(`payment_requests/${requestId}`, { status: "rejected", rejectedAt: Date.now() });
-        return res.status(200).json({ success: true, message: "अनुरोध खारिज किया गया।" });
-      }
-    }
-
-    return res.status(404).json({ success: false, error: "अमान्य एक्शन।" });
-  } catch (err) {
-    return res.status(err.code || 500).json({ success: false, error: err.userMsg || err.message || "सर्वर त्रुटि", code: err.code || 500 });
+    return res.status(404).json({success:false,error:"अमान्य API action."});
+  }catch(err){
+    console.error("SUHAIL AI API error:",err);
+    const status=Number(err?.code)>=400&&Number(err?.code)<600?Number(err.code):500;
+    return res.status(status).json({success:false,error:err?.userMsg||err?.message||"सर्वर त्रुटि",code:status});
   }
 }
