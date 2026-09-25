@@ -437,7 +437,44 @@
     min-width: 130px !important;
     white-space: normal !important;
   }
+
+    /* नीचे के इनपुट बार को हर फ़ोन के हिसाब से बैलेंस करना */
+  .input-area, .chat-input-container {
+    padding-bottom: max(10px, env(safe-area-inset-bottom)) !important;
+    margin-bottom: 0px !important;
+  }
+    
   </style>
+
+  <!-- प्रीमियम अपग्रेड मॉडल -->
+<div id="customUpgradeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(4px);">
+  <div style="background:#131c21; border:1px solid #00a884; border-radius:16px; padding:20px; width:85%; max-width:340px; text-align:center; color:#fff; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
+    <div style="font-size:2rem; margin-bottom:10px;">👑</div>
+    <h3 style="margin:0 0 10px; color:#00a884; font-size:1.2rem;">प्रीमियम फीचर</h3>
+    <p style="color:#b0bec5; font-size:0.9rem; line-height:1.4; margin-bottom:20px;">
+      यह टूल <b>SUHAIL AI PLUS, PRO aur ULTRA</b> में उपलब्ध है। अभी अपग्रेड करें!
+    </p>
+    <div style="display:flex; gap:10px;">
+      <button onclick="closeCustomModal()" style="flex:1; padding:10px; border-radius:8px; border:1px solid #444; background:transparent; color:#bbb; font-weight:600;">बाद में</button>
+      <button onclick="goToUpgrade()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#00a884; color:#fff; font-weight:bold;">अपग्रेड करें</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showUpgradeAlert() {
+    document.getElementById('customUpgradeModal').style.display = 'flex';
+  }
+  function closeCustomModal() {
+    document.getElementById('customUpgradeModal').style.display = 'none';
+  }
+  function goToUpgrade() {
+    closeCustomModal();
+    // अपग्रेड टैब या लिंक पर ले जाएं
+    const upgradeTab = document.querySelector('[data-tab="upgrade"]') || document.querySelector('.tab-upgrade');
+    if(upgradeTab) upgradeTab.click();
+  }
+</script>
   
 </head>
 <body>
