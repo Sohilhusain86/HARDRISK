@@ -3,18 +3,25 @@ import crypto from "crypto";
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com";
 
-// Vercel Environment Variables Keys
+// Keys
 const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
 const MISTRAL_KEY = process.env.MISTRAL_KEY || "";
 const GROQ_KEY = process.env.GROQ_KEY || "";
 const SILICONFLOW_KEY = process.env.SILICONFLOW_KEY || "";
-const CEREBRAS_KEY = process.env.CEREBRAS_KEY || "";
 
-// Active Production Model IDs
+// Active Production Models
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 const MISTRAL_MODEL = process.env.MISTRAL_MODEL || "mistral-small-latest";
 const GROQ_PRO_MODEL = process.env.GROQ_PRO_MODEL || "openai/gpt-oss-120b";
 const ULTRA_MODEL = process.env.ULTRA_MODEL || "deepseek-ai/DeepSeek-V4-Flash";
+
+// STRICT DAILY LIMITS
+const DAILY_LIMITS = {
+  free: 10,
+  plus: 150,
+  pro: 500,
+  ultra: 1000
+};
 
 function hashPassword(pass) {
   return crypto.createHash("sha256").update(String(pass).trim()).digest("hex");
@@ -54,7 +61,7 @@ function normalizePlan(rawPlan) {
   return "free";
 }
 
-// 1. FREE (Google Gemini)
+// 1. FREE (Gemini)
 async function callGemini(prompt, systemInstruction) {
   if (!GEMINI_KEY) throw { userMsg: "SUHAIL AI FREE की सेवा उपलब्ध नहीं है।", code: 500 };
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_KEY}`;
@@ -70,7 +77,7 @@ async function callGemini(prompt, systemInstruction) {
   return data?.candidates?.[0]?.content?.parts?.[0]?.text;
 }
 
-// 2. PLUS (Mistral with SiliconFlow/Groq Failover)
+// 2. PLUS (Mistral with Verified Groq Failover)
 async function callMistral(prompt, systemInstruction) {
   if (MISTRAL_KEY) {
     try {
@@ -100,13 +107,14 @@ async function callMistral(prompt, systemInstruction) {
       if (res.ok && data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
     } catch (e) {}
   }
+  // Groq Active Production Fallback (llama-3.3-70b-versatile)
   if (GROQ_KEY) {
     try {
       const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: { "Authorization": `Bearer ${GROQ_KEY}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "llama-3.1-8b-instant",
+          model: "llama-3.3-70b-versatile",
           messages: [{ role: "system", content: systemInstruction }, { role: "user", content: prompt }],
           temperature: 0.4
         })
@@ -115,7 +123,7 @@ async function callMistral(prompt, systemInstruction) {
       if (res.ok && data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
     } catch (e) {}
   }
-  throw { userMsg: "SUHAIL AI PLUS इस समय व्यस्त है। कृपया थोड़ी देर बाद पुनः प्रयास करें।", code: 500 };
+  throw { userMsg: "SUHAIL AI PLUS सेवा इस समय व्यस्त है। कृपया पुनः प्रयास करें।", code: 500 };
 }
 
 // 3. PRO (Groq)
@@ -135,7 +143,7 @@ async function callGroq(prompt, systemInstruction) {
   return data?.choices?.[0]?.message?.content;
 }
 
-// 4. ULTRA (SiliconFlow Flagship DeepSeek / Fallback)
+// 4. ULTRA (SiliconFlow Flagship DeepSeek / Failover)
 async function callUltra(prompt, systemInstruction) {
   if (SILICONFLOW_KEY) {
     try {
@@ -155,9 +163,6 @@ async function callUltra(prompt, systemInstruction) {
   return await callGroq(prompt, systemInstruction);
 }
 
-// -------------------------------------------------------------
-// MAIN SERVERLESS HANDLER
-// -------------------------------------------------------------
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -188,7 +193,6 @@ export default async function handler(req, res) {
 
       if (cleanPhone.length !== 10) return res.status(400).json({ success: false, error: "कृपया 10 अंकों का मोबाइल नंबर दर्ज करें।" });
 
-      // मास्टर एडमिन
       if (adminPass && adminPass === ADMIN_SECRET) {
         let adminUser = await dbGet(`users/${cleanPhone}`);
         if (!adminUser) {
@@ -263,6 +267,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, user });
     }
 
+    // AI CHAT WITH STRICT DAILY QUOTA ENFORCEMENT
     if (action === "ai" && req.method === "POST") {
       const { prompt, phone } = req.body || {};
       if (!prompt || !String(prompt).trim()) return res.status(400).json({ success: false, error: "सवाल खाली नहीं हो सकता।" });
@@ -270,9 +275,8 @@ export default async function handler(req, res) {
       const cleanPhone = String(phone || "").replace(/\D/g, "");
       let user = cleanPhone ? await dbGet(`users/${cleanPhone}`) : null;
 
-      // ब्लॉक चेक
       if (user && user.status === "blocked") {
-        return res.status(403).json({ success: false, error: "आपका खाता निलंबित (Block) कर दिया गया है। एडमिन से संपर्क करें।" });
+        return res.status(403).json({ success: false, error: "आपका खाता निलंबित (Blocked) है। एडमिन से संपर्क करें।" });
       }
 
       let plan = "free";
@@ -286,6 +290,19 @@ export default async function handler(req, res) {
         }
       }
 
+      // STRICT DAILY LIMIT BLOCKER
+      const todayDateStr = new Date().toISOString().slice(0, 10);
+      const isNewDay = user?.lastQuestionDate !== todayDateStr;
+      const currentDailyCount = isNewDay ? 0 : (user?.dailyCount || 0);
+      const userLimit = DAILY_LIMITS[plan] || 10;
+
+      if (user?.role !== "admin" && currentDailyCount >= userLimit) {
+        return res.status(429).json({
+          success: false,
+          error: `आज के लिए आपकी सवाल सीमा समाप्त हो चुकी है (${currentDailyCount}/${userLimit} सवाल पूरे)। कृपया कल पुनः प्रयास करें या उच्च प्लान में अपग्रेड करें।`
+        });
+      }
+
       let aiName = "SUHAIL AI FREE";
       let replyText = "";
 
@@ -294,7 +311,7 @@ export default async function handler(req, res) {
 नियम:
 1. बातचीत की शुरुआत हमेशा 'अस्सलामु अलैकुम व रहमतुल्लाह' से करें।
 2. कभी भी 'नमस्ते' या गैर-इस्लामी शब्दों का प्रयोग न करें।
-3. किसी बाहरी कंपनी या मॉडल (Gemini, Mistral, Groq, DeepSeek) का नाम न लें। पूछने पर कहें 'मैं {AI_NAME} हूँ'।
+3. किसी बाहरी कंपनी या मॉडल का नाम न लें। पूछने पर कहें 'मैं {AI_NAME} हूँ'।
 4. केवल तालीम, पढ़ाई, दरसे निज़ामी, नह्व, सर्फ़, अरबी, उर्दू, अंग्रेज़ी, हिसाब और साइंस पर सटीक मदद करें।`;
 
       if (plan === "ultra") {
@@ -311,15 +328,11 @@ export default async function handler(req, res) {
         replyText = await callGemini(prompt, academicInstruction.replace(/{AI_NAME}/g, aiName));
       }
 
-      // सवाल काउंटर और ट्रैकिंग को Firebase में अपडेट करना
+      // अपडेट सवाल काउंटर
       if (cleanPhone && user) {
-        const todayDateStr = new Date().toISOString().slice(0, 10);
-        const isNewDay = user.lastQuestionDate !== todayDateStr;
-        const newDailyCount = isNewDay ? 1 : ((user.dailyCount || 0) + 1);
-
         dbPatch(`users/${cleanPhone}`, {
           totalQuestions: (user.totalQuestions || 0) + 1,
-          dailyCount: newDailyCount,
+          dailyCount: currentDailyCount + 1,
           lastQuestionDate: todayDateStr,
           lastActive: Date.now()
         }).catch(() => {});
@@ -328,7 +341,6 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, reply: replyText, aiName, plan });
     }
 
-    // 12-अंकों का सख्त UTR वेरिफिकेशन
     if (action === "payment" && req.method === "POST") {
       const { phone, plan, utr } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -340,11 +352,11 @@ export default async function handler(req, res) {
       }
 
       if (!cleanUtr || cleanUtr.length !== 12) {
-        return res.status(400).json({ success: false, error: "अमान्य UTR! UTR / Transaction No. ठीक 12 अंकों का होना अनिवार्य है।" });
+        return res.status(400).json({ success: false, error: "अमान्य UTR! UTR ठीक 12 अंकों का होना अनिवार्य है।" });
       }
 
       if (normPlan === "free") {
-        return res.status(400).json({ success: false, error: "Free प्लान के लिए पेमेंट आवश्यक नहीं है।" });
+        return res.status(400).json({ success: false, error: "Free प्लान के लिए पेमेंट की आवश्यकता नहीं है।" });
       }
 
       const amounts = { plus: 10, pro: 25, ultra: 50 };
@@ -358,7 +370,7 @@ export default async function handler(req, res) {
         status: "pending",
         createdAt: Date.now()
       });
-      return res.status(200).json({ success: true, message: "पेमेंट अनुरोध दर्ज हो गया है। एडमिन की मंज़ूरी के बाद 30 दिनों के लिए अनलॉक हो जाएगा।" });
+      return res.status(200).json({ success: true, message: "पेमेंट अनुरोध दर्ज हो गया है। एडमिन मंज़ूरी के बाद 30 दिनों के लिए अनलॉक हो जाएगा।" });
     }
 
     if (action === "admin" && req.method === "POST") {
