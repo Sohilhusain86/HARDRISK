@@ -69,14 +69,12 @@
     .btn-copy { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 3px 6px; border-radius: 4px; }
     .btn-copy:hover { color: var(--primary-green); background: rgba(255,255,255,0.05); }
 
-    /* SHORTCUT PILLS CONTAINER */
     .shortcuts-wrapper { display: flex; flex-direction: column; gap: 6px; }
     .study-shortcuts { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px; scrollbar-width: none; }
     .study-shortcuts::-webkit-scrollbar { display: none; }
     .shortcut-pill { flex-shrink: 0; background: #182229; border: 1px solid rgba(255,255,255,0.08); color: var(--text-muted); padding: 5px 10px; border-radius: 16px; font-size: 0.74rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
     .shortcut-pill:hover, .shortcut-pill.active { border-color: var(--primary-green); color: #fff; background: rgba(0, 168, 132, 0.15); }
 
-    /* 5-LANGUAGE CHOICE BAR */
     .lang-choice-bar { display: none; gap: 6px; overflow-x: auto; padding: 6px 8px; background: #182229; border: 1px solid rgba(0, 168, 132, 0.3); border-radius: 12px; align-items: center; animation: fadeIn 0.2s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
     .lang-label { font-size: 0.72rem; color: var(--accent-yellow); font-weight: 600; flex-shrink: 0; margin-right: 4px; }
@@ -84,7 +82,6 @@
     .lang-pill:hover { background: var(--primary-green); border-color: var(--primary-green); color: #fff; }
     .btn-close-lang { background: none; border: none; color: var(--danger); font-size: 0.85rem; cursor: pointer; margin-left: auto; padding: 0 4px; }
 
-    /* MULTI-LINE AUTO-RESIZING TEXTAREA FOOTER */
     .chat-footer { display: flex; align-items: flex-end; gap: 8px; padding-top: 4px; }
     .chat-input { flex: 1; background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 18px; padding: 10px 16px; color: #fff; outline: none; font-size: 0.88rem; line-height: 1.4; resize: none; max-height: 140px; min-height: 44px; overflow-y: auto; }
     .btn-send { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-green); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -146,9 +143,11 @@
         <label>Aapka Naam (Pehli dafa judne par anivarya)</label>
         <input type="text" id="auth-name" class="form-input" placeholder="Talib-e-Ilm ka naam">
       </div>
+      
+      <!-- FIXED: ADMIN PASSWORD NEVER EXPOSED IN PLACEHOLDER -->
       <div class="form-group">
         <label style="color:#f87171;">Master Admin Password (Sirf Admin ke liye)</label>
-        <input type="password" id="auth-admin-pass" class="form-input" placeholder="SuhailAiJamia">
+        <input type="password" id="auth-admin-pass" class="form-input" placeholder="••••••••">
       </div>
       
       <button type="button" class="btn-action" id="btn-login-submit">Login / Register</button>
@@ -188,7 +187,6 @@
 
     <div class="chat-messages" id="chat-box"></div>
 
-    <!-- SHORTCUT PILLS & 5-LANGUAGE BAR -->
     <div class="shortcuts-wrapper">
       <div class="study-shortcuts">
         <span class="shortcut-pill" onclick="window.triggerShortcut('tarqeeb', 'एराब व तरकीब')">📌 एराब व तरकीब</span>
@@ -208,14 +206,13 @@
       </div>
     </div>
 
-    <!-- MULTI-LINE TEXTAREA (Auto-Expands, Shift+Enter for New Line) -->
     <div class="chat-footer">
       <textarea id="chat-input" class="chat-input" rows="1" placeholder="Padhai ya koi bhi sawal yahan likhein..."></textarea>
       <button type="button" class="btn-send" id="btn-chat-send"><i class="fa-solid fa-paper-plane"></i></button>
     </div>
   </section>
 
-  <!-- TAB 2: PLANS (FREE IS 25/DAY) -->
+  <!-- TAB 2: PLANS -->
   <section id="tab-plans" class="tab-view">
     <div class="plan-card" id="card-plan-free">
       <div id="badge-free" class="offer-badge" style="display:none;">Active</div>
@@ -223,7 +220,7 @@
         <span style="font-weight:700;">SUHAIL AI FREE</span>
         <span style="font-weight:700; color:var(--primary-green);">₹0</span>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">25 Sawal Rozana • Resilient Study & General Assistant</div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">25 Sawal Rozana • Resilient Study & Knowledge Assistant</div>
       <button type="button" class="btn-action active-btn" id="btn-plan-free" style="display:none;"><i class="fa-solid fa-check"></i> Aapka Current Plan Hai</button>
     </div>
 
@@ -379,7 +376,6 @@
     document.querySelector('.nav-item[data-tab="tab-pay"]').click();
   };
 
-  // 5-LANGUAGE SHORTCUT HANDLERS
   window.triggerShortcut = (type, title) => {
     activeShortcutType = type;
     const bar = document.getElementById('lang-bar');
@@ -573,7 +569,6 @@
   const chatInput = document.getElementById('chat-input');
   const sendBtn = document.getElementById('btn-chat-send');
 
-  // MULTI-LINE AUTO-EXPAND & MOBILE/DESKTOP KEY EVENTS
   chatInput.addEventListener('input', function() {
     this.style.height = 'auto';
     this.style.height = Math.min(this.scrollHeight, 140) + 'px';
