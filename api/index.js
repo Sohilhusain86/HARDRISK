@@ -3,20 +3,20 @@ import crypto from "crypto";
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com";
 
-// Only ONE verified, 100% working key
-const GROQ_KEY = process.env.GROQ_KEY || "";
+// Keys
+const GROQ_KEY = (process.env.GROQ_KEY || "").trim();
+const OPENROUTER_KEY = (process.env.OPENROUTER_KEY || "").trim();
+const POLLINATIONS_KEY = (process.env.POLLINATIONS_KEY || process.env.POLLINATION_KEY || "").trim();
 
-// STRICT SERVER-SIDE DAILY LIMITS
+// UPDATED STRICT DAILY LIMITS
 const DAILY_LIMITS = {
   free: 25,
-  plus: 150,
-  pro: 500,
-  ultra: 1000
+  plus: 75,
+  pro: 150,
+  ultra: 250
 };
 
-// -------------------------------------------------------------
 // DEDICATED BEHAVIOR RULES FOR EACH TIER
-// -------------------------------------------------------------
 const SYSTEM_RULES = {
   free: `Aapka official naam 'SUHAIL AI FREE' hai.
 Uddeshya: Madadgaar aur dostana Study wa General Assistant.
@@ -106,52 +106,124 @@ function normalizePlan(rawPlan) {
 }
 
 // -------------------------------------------------------------
-// SINGLE VERIFIED ENGINE: GROQ DIRECT
+// BULLETPROOF MULTI-MODEL ENGINE
 // -------------------------------------------------------------
-async function callGroqDirect(model, prompt, systemInstruction) {
-  if (!GROQ_KEY) {
-    throw { userMsg: "Vercel me GROQ_KEY nahi mili.", code: 500 };
-  }
 
-  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${GROQ_KEY}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: model,
-      messages: [
-        { role: "system", content: systemInstruction },
-        { role: "user", content: prompt }
-      ],
-      temperature: 0.35
-    })
-  });
-
-  const data = await res.json();
-  if (res.ok && data?.choices?.[0]?.message?.content) {
-    return data.choices[0].message.content;
-  }
+async function tryGroqModel(model, prompt, instruction) {
+  if (!GROQ_KEY) return null;
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${GROQ_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          { role: "system", content: instruction },
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.35
+      })
+    });
+    const data = await res.json();
+    if (res.ok && data?.choices?.[0]?.message?.content) {
+      return data.choices[0].message.content;
+    }
+  } catch (e) {}
   return null;
 }
 
-async function executeTierAI(plan, prompt, instruction) {
+async function tryOpenRouterModel(model, prompt, instruction) {
+  if (!OPENROUTER_KEY) return null;
+  try {
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${OPENROUTER_KEY}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://hardrisk.vercel.app",
+        "X-Title": "Suhail AI"
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          { role: "system", content: instruction },
+          { role: "user", content: prompt }
+        ]
+      })
+    });
+    const data = await res.json();
+    if (res.ok && data?.choices?.[0]?.message?.content) {
+      return data.choices[0].message.content;
+    }
+  } catch (e) {}
+  return null;
+}
+
+async function tryPollinationsModel(model, prompt, instruction) {
+  if (!POLLINATIONS_KEY) return null;
+  try {
+    const res = await fetch("https://text.pollinations.ai/openai/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${POLLINATIONS_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          { role: "system", content: instruction },
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.35
+      })
+    });
+    const data = await res.json();
+    if (res.ok && data?.choices?.[0]?.message?.content) {
+      return data.choices[0].message.content;
+    }
+  } catch (e) {}
+  return null;
+}
+
+async function executeAI(plan, prompt, instruction) {
   let reply = null;
 
-  if (plan === "ultra" || plan === "pro") {
-    // 70B Versatile (Proven working in screenshots)
-    reply = await callGroqDirect("llama-3.3-70b-versatile", prompt, instruction);
-    if (!reply) {
-      reply = await callGroqDirect("llama-3.1-8b-instant", prompt, instruction);
-    }
-  } else {
-    // Free & Plus (Lightning Fast 8B)
-    reply = await callGroqDirect("llama-3.1-8b-instant", prompt, instruction);
+  // Ultra Tier (250)
+  if (plan === "ultra") {
+    reply = await tryGroqModel("llama-3.3-70b-versatile", prompt, instruction);
+    if (!reply) reply = await tryPollinationsModel("deepseek-r1", prompt, instruction);
+    if (!reply) reply = await tryOpenRouterModel("deepseek/deepseek-r1:free", prompt, instruction);
+    if (!reply) reply = await tryGroqModel("llama-3.1-8b-instant", prompt, instruction);
+  }
+  // Pro Tier (150)
+  else if (plan === "pro") {
+    reply = await tryGroqModel("llama-3.3-70b-versatile", prompt, instruction);
+    if (!reply) reply = await tryGroqModel("llama-3.1-8b-instant", prompt, instruction);
+    if (!reply) reply = await tryOpenRouterModel("meta-llama/llama-3.3-70b-instruct:free", prompt, instruction);
+  }
+  // Plus Tier (75)
+  else if (plan === "plus") {
+    reply = await tryGroqModel("llama-3.1-8b-instant", prompt, instruction);
+    if (!reply) reply = await tryGroqModel("llama-3.3-70b-versatile", prompt, instruction);
+    if (!reply) reply = await tryPollinationsModel("qwen", prompt, instruction);
+  }
+  // Free Tier (25)
+  else {
+    reply = await tryGroqModel("llama-3.1-8b-instant", prompt, instruction);
+    if (!reply) reply = await tryGroqModel("llama-3.3-70b-versatile", prompt, instruction);
+    if (!reply) reply = await tryOpenRouterModel("meta-llama/llama-3.1-8b-instruct:free", prompt, instruction);
+  }
+
+  // Universal Fallback
+  if (!reply) {
+    reply = await tryPollinationsModel("mistral", prompt, instruction);
   }
 
   if (!reply) {
-    throw { userMsg: "Groq service is samay vyast hai. Kripya 5 second baad dobara try karein.", code: 500 };
+    throw { userMsg: "Suhail AI service is samay vyast hai. Kripya 5 second baad dobara prayas karein.", code: 500 };
   }
 
   return reply;
@@ -184,7 +256,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // AUTH (UNTOUCHED)
     if (action === "auth" && req.method === "POST") {
       const { phone, name, roll, userPass, adminPass } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -265,7 +336,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, user });
     }
 
-    // AI CHAT DISPATCHER (100% GROQ)
+    // AI CHAT
     if (action === "ai" && req.method === "POST") {
       const { prompt, phone } = req.body || {};
       if (!prompt || !String(prompt).trim()) return res.status(400).json({ success: false, error: "सवाल खाली नहीं हो सकता।" });
@@ -311,8 +382,7 @@ export default async function handler(req, res) {
       const aiName = aiTitles[plan] || "SUHAIL AI FREE";
       const instruction = SYSTEM_RULES[plan] || SYSTEM_RULES.free;
 
-      // RUN DIRECTLY ON GROQ
-      const replyText = await executeTierAI(plan, prompt, instruction);
+      const replyText = await executeAI(plan, prompt, instruction);
 
       if (cleanPhone && user) {
         dbPatch(`users/${cleanPhone}`, {
@@ -326,7 +396,6 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, reply: replyText, aiName, plan });
     }
 
-    // PAYMENT & ADMIN (UNTOUCHED)
     if (action === "payment" && req.method === "POST") {
       const { phone, plan, utr } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
