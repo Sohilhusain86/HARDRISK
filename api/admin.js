@@ -20,6 +20,22 @@ async function dbPatch(path, data) {
   return await res.json();
 }
 
+async function dbPut(path, data) {
+  const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return await res.json();
+}
+
+async function dbDelete(path) {
+  const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`, {
+    method: "DELETE",
+  });
+  return await res.json();
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -49,21 +65,18 @@ export default async function handler(req, res) {
 
       for (const phone in allUsers) {
         const u = allUsers[phone];
-        if (u.role === "admin") continue; // एडमिन को छात्रों की लिस्ट से अलग रखें
+        if (u.role === "admin") continue;
 
         const totalQ = u.totalQuestions || 0;
         const dailyQ = u.dailyCount || 0;
         totalQuestionsAcrossPlatform += totalQ;
 
-        // एक्टिव प्लान व एक्सपायरी कैलकुलेशन
         let plan = u.plan || "free";
         let daysLeft = 0;
-        let isExpired = false;
 
         if (u.planExpiry) {
           if (now > u.planExpiry) {
             plan = "free";
-            isExpired = true;
           } else {
             daysLeft = Math.ceil((u.planExpiry - now) / (1000 * 60 * 60 * 24));
           }
@@ -71,7 +84,6 @@ export default async function handler(req, res) {
 
         if (planCounts[plan] !== undefined) planCounts[plan]++;
 
-        // आख़िरी बार सक्रिय रहने का समय
         let lastActiveFormatted = "कभी नहीं";
         if (u.lastActive) {
           const d = new Date(u.lastActive);
@@ -79,7 +91,7 @@ export default async function handler(req, res) {
         }
 
         userList.push({
-          phone: u.phone,
+          phone: u.phone || phone,
           name: u.name || "अज्ञात",
           roll: u.roll || "N/A",
           plan: plan.toUpperCase(),
@@ -92,7 +104,6 @@ export default async function handler(req, res) {
         });
       }
 
-      // सबसे ज़्यादा सवाल पूछने वाले छात्रों को ऊपर रखें
       userList.sort((a, b) => b.totalQuestions - a.totalQuestions);
 
       return res.status(200).json({
@@ -125,7 +136,7 @@ export default async function handler(req, res) {
 
       const newExpiry = Date.now() + (parseInt(days, 10) * 24 * 60 * 60 * 1000);
       await dbPatch(`users/${targetPhone}`, {
-        plan: targetPlan,
+        plan: targetPlan.toLowerCase(),
         planExpiry: newExpiry,
         status: "active"
       });
@@ -133,6 +144,72 @@ export default async function handler(req, res) {
       return res.status(200).json({
         success: true,
         message: `छात्र का ${targetPlan.toUpperCase()} प्लान ${days} दिनों के लिए बढ़ा दिया गया।`
+      });
+    }
+
+    // 5. [NEW] छात्र की दैनिक सीमा रीसेट करना (Reset Daily Questions)
+    if (action === "reset_daily_limit") {
+      const { targetPhone } = req.body || {};
+      if (!targetPhone) return res.status(400).json({ success: false, error: "फ़ोन नंबर अनिवार्य है।" });
+
+      await dbPatch(`users/${targetPhone}`, { dailyCount: 0 });
+      return res.status(200).json({
+        success: true,
+        message: `छात्र ${targetPhone} की आज की दैनिक सीमा रीसेट कर दी गई।`
+      });
+    }
+
+    // 6. [NEW] ग्लोबल नोटिस सेट करना या हटाना (Broadcast Notice)
+    if (action === "set_notice") {
+      const { noticeText, isActive } = req.body || {};
+      await dbPut("system_notice", {
+        text: noticeText || "",
+        active: !!isActive,
+        updatedAt: Date.now()
+      });
+      return res.status(200).json({
+        success: true,
+        message: isActive ? "ग्लोबल नोटिस प्रसारित कर दिया गया।" : "नोटिस हटा दिया गया।"
+      });
+    }
+
+    // 7. [NEW] अपग्रेड रिक्वेस्ट लिस्ट व स्टेटस बदलना (Manage Upgrade Requests)
+    if (action === "get_requests") {
+      const requests = (await dbGet("upgrade_requests")) || {};
+      return res.status(200).json({ success: true, requests });
+    }
+
+    if (action === "resolve_request") {
+      const { reqId, targetPhone, approve, plan, days } = req.body || {};
+      if (!reqId || !targetPhone) return res.status(400).json({ success: false, error: "डेटा अधूरा है।" });
+
+      if (approve) {
+        const newExpiry = Date.now() + (parseInt(days || 30, 10) * 24 * 60 * 60 * 1000);
+        await dbPatch(`users/${targetPhone}`, {
+          plan: (plan || "plus").toLowerCase(),
+          planExpiry: newExpiry,
+          status: "active"
+        });
+        await dbPatch(`upgrade_requests/${reqId}`, { status: "approved", resolvedAt: Date.now() });
+      } else {
+        await dbPatch(`upgrade_requests/${reqId}`, { status: "rejected", resolvedAt: Date.now() });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: approve ? "अनुरोध स्वीकृत किया गया।" : "अनुरोध अस्वीकार कर दिया गया।"
+      });
+    }
+
+    // 8. [NEW] चैट हिस्ट्री रीसेट (Clear Student Chat)
+    if (action === "clear_user_chat") {
+      const { targetPhone } = req.body || {};
+      if (!targetPhone) return res.status(400).json({ success: false, error: "फ़ोन नंबर अनिवार्य है।" });
+
+      await dbDelete(`chats/${targetPhone}`);
+      return res.status(200).json({
+        success: true,
+        message: `छात्र ${targetPhone} की चैट हिस्ट्री साफ़ कर दी गई।`
       });
     }
 
