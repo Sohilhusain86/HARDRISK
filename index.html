@@ -56,19 +56,25 @@
 
     .plan-card { background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 6px; position: relative; }
     .plan-card.highlight { border-color: var(--primary-green); }
+    .plan-card.active-owned { border: 2px solid var(--success); background: rgba(34, 197, 94, 0.06); }
     .plan-card.vip { border: 1px dashed var(--vip-purple); background: linear-gradient(145deg, #182229 0%, #1e1b4b 100%); opacity: 0.85; }
     
     .offer-badge { position: absolute; top: -10px; right: 14px; background: #dc2626; color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+    .owned-badge { position: absolute; top: -10px; right: 14px; background: var(--success); color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
     .badge-coming-soon { position: absolute; top: -10px; right: 14px; background: var(--vip-purple); color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
     
     .price-cut { text-decoration: line-through; color: var(--text-muted); font-size: 0.9rem; margin-right: 6px; }
-    .btn-action { width: 100%; padding: 10px; border-radius: 8px; border: none; background: var(--primary-green); color: #fff; font-weight: 600; cursor: pointer; }
+    .btn-action { width: 100%; padding: 10px; border-radius: 8px; border: none; background: var(--primary-green); color: #fff; font-weight: 600; cursor: pointer; font-size: 0.88rem; }
+    .btn-action.active-btn { background: #166534; color: #86efac; cursor: default; }
     .btn-action.disabled { background: #374151; color: #9ca3af; cursor: not-allowed; }
 
+    .status-banner { background: #132f2b; border: 1px solid var(--primary-green); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px; }
+    
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-group label { font-size: 0.8rem; color: var(--text-muted); }
     .form-input { background: #182229; border: 1px solid var(--card-border); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 0.9rem; outline: none; }
     
+    /* QR BOX WITH NEW UPLOADED IMAGE */
     .qr-box { background: #fff; padding: 8px; border-radius: 12px; width: 220px; height: 220px; margin: 10px auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     .qr-box img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
 
@@ -153,49 +159,51 @@
     </div>
   </section>
 
-  <!-- TAB 2: PLANS & UPCOMING TIERS -->
+  <!-- TAB 2: PLANS -->
   <section id="tab-plans" class="tab-view">
     
-    <!-- ACTIVE TIER 1 -->
-    <div class="plan-card">
+    <!-- FREE TIER -->
+    <div class="plan-card" id="card-plan-free">
+      <div id="badge-free" class="offer-badge" style="display:none;">Active</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
         <span style="font-weight:700;">SUHAIL AI FREE</span>
         <span style="font-weight:700; color:var(--primary-green);">₹0</span>
       </div>
       <div style="font-size:0.8rem; color:var(--text-muted);">10 Sawal Rozana • Buniyadi Taaleemi Rahnumai</div>
+      <button type="button" class="btn-action active-btn" id="btn-plan-free" style="display:none;"><i class="fa-solid fa-check"></i> Aapka Current Plan Hai</button>
     </div>
 
-    <!-- ACTIVE TIER 2 -->
-    <div class="plan-card highlight">
-      <div class="offer-badge">30 Din Offer</div>
+    <!-- PLUS TIER -->
+    <div class="plan-card highlight" id="card-plan-plus">
+      <div id="badge-plus" class="offer-badge">30 Din Offer</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
         <span style="font-weight:700;">SUHAIL AI PLUS</span>
         <div><span class="price-cut">₹150</span><span style="font-weight:700; color:var(--primary-green);">₹10 / 30 Din</span></div>
       </div>
       <div style="font-size:0.8rem; color:var(--text-muted);">150 Sawal Rozana • Nahw, Sarf wa Detailed Hal</div>
-      <button type="button" class="btn-action" onclick="window.goToPay('plus')">₹10 me 30 Din ke liye lein</button>
+      <button type="button" class="btn-action" id="btn-plan-plus" onclick="window.goToPay('plus')">₹10 me 30 Din ke liye lein</button>
     </div>
 
-    <!-- ACTIVE TIER 3 -->
-    <div class="plan-card">
-      <div class="offer-badge">Khas Offer</div>
+    <!-- PRO TIER -->
+    <div class="plan-card" id="card-plan-pro">
+      <div id="badge-pro" class="offer-badge">Khas Offer</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
         <span style="font-weight:700;">SUHAIL AI PRO</span>
         <div><span class="price-cut">₹299</span><span style="font-weight:700; color:var(--primary-green);">₹25 / 30 Din</span></div>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">500 Sawal Rozana • Super Fast Groq Engine</div>
-      <button type="button" class="btn-action" onclick="window.goToPay('pro')">₹25 me 30 Din ke liye lein</button>
+      <div style="font-size:0.8rem; color:var(--text-muted);">500 Sawal Rozana • Super Fast Academic Engine</div>
+      <button type="button" class="btn-action" id="btn-plan-pro" onclick="window.goToPay('pro')">₹25 me 30 Din ke liye lein</button>
     </div>
 
-    <!-- ACTIVE TIER 4 -->
-    <div class="plan-card">
-      <div class="offer-badge">Super Saver</div>
+    <!-- ULTRA TIER -->
+    <div class="plan-card" id="card-plan-ultra">
+      <div id="badge-ultra" class="offer-badge">Super Saver</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
         <span style="font-weight:700;">SUHAIL AI ULTRA</span>
         <div><span class="price-cut">₹599</span><span style="font-weight:700; color:var(--primary-green);">₹50 / 30 Din</span></div>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">1000 Sawal Rozana • Flagship DeepSeek Engine (Aala Tehqeeq)</div>
-      <button type="button" class="btn-action" onclick="window.goToPay('ultra')">₹50 me 30 Din ke liye lein</button>
+      <div style="font-size:0.8rem; color:var(--text-muted);">1000 Sawal Rozana • Flagship Research Engine (Aala Tehqeeq)</div>
+      <button type="button" class="btn-action" id="btn-plan-ultra" onclick="window.goToPay('ultra')">₹50 me 30 Din ke liye lein</button>
     </div>
 
     <div style="margin-top:14px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:12px;">
@@ -204,7 +212,7 @@
       </h4>
     </div>
 
-    <!-- UPCOMING TIER 1: MAX -->
+    <!-- COMING SOON TIERS -->
     <div class="plan-card vip">
       <div class="badge-coming-soon"><i class="fa-solid fa-lock"></i> Coming Soon</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
@@ -215,7 +223,6 @@
       <button type="button" class="btn-action disabled"><i class="fa-solid fa-clock"></i> जल्द आ रहा है (Coming Soon)</button>
     </div>
 
-    <!-- UPCOMING TIER 2: ELITE -->
     <div class="plan-card vip">
       <div class="badge-coming-soon"><i class="fa-solid fa-lock"></i> Coming Soon</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
@@ -226,7 +233,6 @@
       <button type="button" class="btn-action disabled"><i class="fa-solid fa-clock"></i> जल्द आ रहा है (Coming Soon)</button>
     </div>
 
-    <!-- UPCOMING TIER 3: PRIME -->
     <div class="plan-card vip">
       <div class="badge-coming-soon"><i class="fa-solid fa-lock"></i> Coming Soon</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
@@ -241,15 +247,29 @@
 
   <!-- TAB 3: UPGRADE -->
   <section id="tab-pay" class="tab-view">
-    <h4 style="text-align:center; color:#fff;">FamApp QR Code Payment</h4>
+    
+    <!-- CURRENT ACTIVE PLAN SUMMARY BANNER -->
+    <div class="status-banner" id="current-plan-banner">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:0.82rem; color:var(--text-muted);">Aapka Current Plan:</span>
+        <span id="active-plan-name" style="font-weight:700; color:var(--primary-green); font-size:0.9rem;">SUHAIL AI FREE</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:0.75rem; color:var(--text-muted);">Subscription Status:</span>
+        <span id="active-plan-status" style="font-size:0.75rem; color:#fff; font-weight:600;">Active</span>
+      </div>
+    </div>
+
+    <h4 style="text-align:center; color:#fff; margin-top:6px;">QR Code Payment Gateway</h4>
     <p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">QR code scan karke fees bhejein aur 12 ankon ka UTR number darj karein.</p>
     
     <div class="qr-box">
-      <img src="/Screenshot_20260920-204342_FamApp.png" alt="FamApp Payment QR" onerror="this.src='Screenshot_20260920-204342_FamApp.png'">
+      <!-- NEW UPLOADED QR IMAGE -->
+      <img src="/file_00000000111881f5a2d7ab5b856c5026.png" alt="Payment QR" onerror="this.src='file_00000000111881f5a2d7ab5b856c5026.png'">
     </div>
 
     <div class="form-group">
-      <label>Chuna Hua Plan (30 Din ki Muddat)</label>
+      <label>Upgrade ya Renew Plan Chunein (30 Din)</label>
       <select id="pay-plan-select" class="form-input">
         <option value="plus">SUHAIL AI PLUS (₹10 / 30 Din)</option>
         <option value="pro">SUHAIL AI PRO (₹25 / 30 Din)</option>
@@ -258,8 +278,8 @@
     </div>
 
     <div class="form-group">
-      <label>12-Digit UTR / Transaction ID (Anivarya)</label>
-      <input type="text" id="pay-utr" class="form-input" placeholder="e.g. 423456789012">
+      <label>12-Digit UTR / Transaction ID (Numeric 12 Digits Anivarya)</label>
+      <input type="text" id="pay-utr" class="form-input" placeholder="e.g. 423456789012" maxlength="12" inputmode="numeric">
     </div>
 
     <button type="button" class="btn-action" id="btn-submit-pay">Verification ke liye Submit karein</button>
@@ -334,10 +354,10 @@
     document.getElementById('u-avatar').textContent = (currentUser.name || 'S').charAt(0).toUpperCase();
 
     const isAdmin = (currentUser.role === 'admin');
+    const p = isAdmin ? 'ultra' : (currentUser.plan || 'free');
+
     let planBadge = 'SUHAIL AI FREE';
     let currentAiTitle = 'SUHAIL AI FREE';
-
-    const p = isAdmin ? 'ultra' : (currentUser.plan || 'free');
 
     if (p === 'ultra') {
       planBadge = isAdmin ? 'ULTRA (ADMIN)' : 'SUHAIL AI ULTRA (30 DAYS)';
@@ -352,6 +372,58 @@
 
     document.getElementById('u-plan').textContent = planBadge;
     document.getElementById('current-ai-label').textContent = currentAiTitle;
+
+    // ACTIVE PLAN STATE IN UPGRADE TAB
+    document.getElementById('active-plan-name').textContent = planBadge;
+    if (isAdmin) {
+      document.getElementById('active-plan-status').textContent = 'Lifetime Admin VIP';
+    } else if (currentUser.planExpiry) {
+      const daysLeft = Math.max(0, Math.ceil((currentUser.planExpiry - Date.now()) / (1000 * 60 * 60 * 24)));
+      document.getElementById('active-plan-status').textContent = `Active (${daysLeft} Din Baaqi)`;
+    } else {
+      document.getElementById('active-plan-status').textContent = 'Free Tier (Permanent)';
+    }
+
+    // UPDATE BUTTONS & CARDS IN PLANS TAB
+    const plans = ['free', 'plus', 'pro', 'ultra'];
+    plans.forEach(planId => {
+      const card = document.getElementById(`card-plan-${planId}`);
+      const btn = document.getElementById(`btn-plan-${planId}`);
+      const badge = document.getElementById(`badge-${planId}`);
+
+      if (card && btn) {
+        if (p === planId) {
+          card.classList.add('active-owned');
+          btn.style.display = 'block';
+          btn.className = 'btn-action active-btn';
+          btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Aapka Current Plan Hai';
+          btn.onclick = null;
+          if (badge) {
+            badge.style.display = 'block';
+            badge.className = 'owned-badge';
+            badge.textContent = 'Active Plan';
+          }
+        } else {
+          card.classList.remove('active-owned');
+          if (planId === 'free') {
+            btn.style.display = 'none';
+            if (badge) badge.style.display = 'none';
+          } else {
+            btn.style.display = 'block';
+            btn.className = 'btn-action';
+            const prices = { plus: '₹10 me 30 Din ke liye lein', pro: '₹25 me 30 Din ke liye lein', ultra: '₹50 me 30 Din ke liye lein' };
+            btn.textContent = prices[planId] || 'Updrade Karein';
+            btn.onclick = () => window.goToPay(planId);
+            if (badge) {
+              badge.style.display = 'block';
+              badge.className = 'offer-badge';
+              const offers = { plus: '30 Din Offer', pro: 'Khas Offer', ultra: 'Super Saver' };
+              badge.textContent = offers[planId] || 'Offer';
+            }
+          }
+        }
+      }
+    });
 
     document.getElementById('btn-admin-toggle').style.display = isAdmin ? 'inline-block' : 'none';
     document.getElementById('nav-item-admin').style.display = isAdmin ? 'block' : 'none';
@@ -442,16 +514,21 @@
     return div;
   }
 
+  // STRICT 12-DIGIT UTR PAYMENT SUBMIT
   document.getElementById('btn-submit-pay').onclick = async () => {
-    const utr = document.getElementById('pay-utr').value.trim();
+    const rawUtr = document.getElementById('pay-utr').value.trim();
+    const cleanUtr = rawUtr.replace(/\D/g, '');
     const plan = document.getElementById('pay-plan-select').value;
-    if (!utr) return alert("Kripya 12 ankon ka UTR darj karein.");
+
+    if (!cleanUtr || cleanUtr.length !== 12) {
+      return alert("Amanay UTR! Kripya sahi 12 ankon ka numeric UTR / Transaction Ref No. darj karein. Sirf 12 ank hi manya hain.");
+    }
 
     try {
       const data = await safeFetch('/api?action=payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: currentUser.phone, plan, utr })
+        body: JSON.stringify({ phone: currentUser.phone, plan, utr: cleanUtr })
       });
       alert(data.message);
       document.getElementById('pay-utr').value = '';
@@ -490,7 +567,7 @@
             <span>Phone: ${item.phone}</span>
             <span style="color:var(--primary-green); text-transform:uppercase;">${item.plan} (₹${item.amount || 0})</span>
           </div>
-          <div style="font-size:0.75rem; color:var(--text-muted);">UTR: <b style="color:#fff;">${item.utr}</b></div>
+          <div style="font-size:0.75rem; color:var(--text-muted);">UTR (12-Digit): <b style="color:#fff;">${item.utr}</b></div>
           <div class="admin-actions">
             <button class="btn-approve" onclick="window.adminAction('approve_request', '${k}', '${item.phone}', '${item.plan}')">Approve (30 Days)</button>
             <button class="btn-reject" onclick="window.adminAction('reject_request', '${k}')">Reject</button>
