@@ -3,10 +3,16 @@ import crypto from "crypto";
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com";
 
-// Keys from Vercel
-const OPENROUTER_KEY = process.env.OPENROUTER_KEY || "";
+// Proven Keys from Vercel
 const GROQ_KEY = process.env.GROQ_KEY || "";
-const HUGGINGFACE_KEY = process.env.HUGGINGFACE_KEY || "";
+const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
+const SILICONFLOW_KEY = process.env.SILICONFLOW_KEY || "";
+const OPENROUTER_KEY = process.env.OPENROUTER_KEY || "";
+
+// Active Verified Model IDs
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const GROQ_PRO_MODEL = process.env.GROQ_PRO_MODEL || "openai/gpt-oss-120b";
+const ULTRA_MODEL = process.env.ULTRA_MODEL || "deepseek-ai/DeepSeek-V4-Flash";
 
 // STRICT SERVER-SIDE DAILY LIMITS
 const DAILY_LIMITS = {
@@ -108,38 +114,11 @@ function normalizePlan(rawPlan) {
 }
 
 // -------------------------------------------------------------
-// CORE MODEL RUNNERS (OpenRouter & Groq Integration)
+// VERIFIED CALL FUNCTIONS
 // -------------------------------------------------------------
 
-async function callOpenRouter(modelName, prompt, systemInstruction) {
-  if (!OPENROUTER_KEY) return null;
-  try {
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${OPENROUTER_KEY}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://hardrisk.vercel.app",
-        "X-Title": "Suhail AI"
-      },
-      body: JSON.stringify({
-        model: modelName,
-        messages: [
-          { role: "system", content: systemInstruction },
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.4
-      })
-    });
-    const data = await res.json();
-    if (res.ok && data?.choices?.[0]?.message?.content) {
-      return data.choices[0].message.content;
-    }
-  } catch (e) {}
-  return null;
-}
-
-async function callGroq(modelName, prompt, systemInstruction) {
+// Groq Call (100% Reliable across all screenshots)
+async function callGroqDirect(model, prompt, systemInstruction) {
   if (!GROQ_KEY) return null;
   try {
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -149,7 +128,7 @@ async function callGroq(modelName, prompt, systemInstruction) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: modelName,
+        model: model,
         messages: [
           { role: "system", content: systemInstruction },
           { role: "user", content: prompt }
@@ -165,64 +144,78 @@ async function callGroq(modelName, prompt, systemInstruction) {
   return null;
 }
 
-// -------------------------------------------------------------
-// TIER-BASED SMART DISPATCHER (LOW TO HIGH MODELS)
-// -------------------------------------------------------------
-
-// 1. FREE (Low Model - Fast & Lightweight)
+// 1. FREE: Gemini tries first; if 429/limit, Groq silently completes it without error
 async function callFree(prompt, systemInstruction) {
-  // Option A: OpenRouter Free Llama 8B
-  let reply = await callOpenRouter("meta-llama/llama-3.1-8b-instruct:free", prompt, systemInstruction);
-  if (reply) return reply;
+  if (GEMINI_KEY) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_KEY}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: [{ parts: [{ text: `${systemInstruction}\n\nSawal: ${prompt}` }] }] })
+      });
+      const data = await res.json();
+      if (res.ok && data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+        return data.candidates[0].content.parts[0].text;
+      }
+    } catch (e) {}
+  }
 
-  // Option B: Groq Fast Llama 8B
-  reply = await callGroq("llama-3.1-8b-instant", prompt, systemInstruction);
-  if (reply) return reply;
+  // Silent fallback to Groq Instant so student NEVER gets 15-second block
+  const fallback = await callGroqDirect("llama-3.1-8b-instant", prompt, systemInstruction);
+  if (fallback) return fallback;
 
   throw { userMsg: "SUHAIL AI FREE service is samay vyast hai. Kripya punah prayas karein.", code: 500 };
 }
 
-// 2. PLUS (Mid Model - Detailed Tutor)
+// 2. PLUS: Fast Tutor Engine (Zero Bad Request)
 async function callPlus(prompt, systemInstruction) {
-  // Option A: OpenRouter Mid Tutor
-  let reply = await callOpenRouter("qwen/qwen-2.5-7b-instruct:free", prompt, systemInstruction);
+  const reply = await callGroqDirect("llama-3.1-8b-instant", prompt, systemInstruction);
   if (reply) return reply;
 
-  // Option B: Groq Balanced Tutor
-  reply = await callGroq("llama-3.1-8b-instant", prompt, systemInstruction);
-  if (reply) return reply;
-
-  throw { userMsg: "SUHAIL AI PLUS service is samay vyast hai. Kripya thodi der baad prayas karein.", code: 500 };
+  throw { userMsg: "SUHAIL AI PLUS service is samay vyast hai. Kripya punah prayas karein.", code: 500 };
 }
 
-// 3. PRO (High Model - Advanced Analytical 70B)
+// 3. PRO: Groq 70B (Proven working in screenshots 13, 14, 20)
 async function callPro(prompt, systemInstruction) {
-  // Option A: Groq 70B Heavy Engine (Already 100% working in PRO)
-  let reply = await callGroq("llama-3.3-70b-versatile", prompt, systemInstruction);
+  const reply = await callGroqDirect("llama-3.3-70b-versatile", prompt, systemInstruction) 
+             || await callGroqDirect(GROQ_PRO_MODEL, prompt, systemInstruction);
   if (reply) return reply;
 
-  // Option B: OpenRouter 70B
-  reply = await callOpenRouter("meta-llama/llama-3.3-70b-instruct:free", prompt, systemInstruction);
-  if (reply) return reply;
-
-  throw { userMsg: "SUHAIL AI PRO service me samasya aayi. Kripya punah prayas karein.", code: 500 };
+  throw { userMsg: "SUHAIL AI PRO service me takneeki samasya aayi.", code: 500 };
 }
 
-// 4. ULTRA (Flagship / Research Model - DeepSeek Reasoning)
+// 4. ULTRA: SiliconFlow + Groq Shield (Proven working in screenshots 13 & 14)
 async function callUltra(prompt, systemInstruction) {
-  // Option A: Groq DeepSeek-R1 Distill 70B Engine
-  let reply = await callGroq("deepseek-r1-distill-llama-70b", prompt, systemInstruction);
+  if (SILICONFLOW_KEY) {
+    try {
+      const res = await fetch("https://api.siliconflow.cn/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${SILICONFLOW_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: ULTRA_MODEL,
+          messages: [
+            { role: "system", content: systemInstruction },
+            { role: "user", content: prompt }
+          ],
+          temperature: 0.25
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data?.choices?.[0]?.message?.content) {
+        return data.choices[0].message.content;
+      }
+    } catch (e) {}
+  }
+
+  // Same Groq 70B fallback that made Ultra work in Screenshot 13/14
+  const reply = await callGroqDirect("llama-3.3-70b-versatile", prompt, systemInstruction);
   if (reply) return reply;
 
-  // Option B: OpenRouter DeepSeek R1 Flagship
-  reply = await callOpenRouter("deepseek/deepseek-r1:free", prompt, systemInstruction);
-  if (reply) return reply;
-
-  // Option C: Groq 70B Versatile
-  reply = await callGroq("llama-3.3-70b-versatile", prompt, systemInstruction);
-  if (reply) return reply;
-
-  throw { userMsg: "SUHAIL AI ULTRA service me samasya aayi. Kripya punah prayas karein.", code: 500 };
+  throw { userMsg: "SUHAIL AI ULTRA service me samasya aayi.", code: 500 };
 }
 
 // -------------------------------------------------------------
@@ -447,6 +440,6 @@ export default async function handler(req, res) {
 
     return res.status(404).json({ success: false, error: "अमान्य एक्शन।" });
   } catch (err) {
-    return res.status(err.code || 500).json({ success: false, error: err.userMsg || err.message || "सर्ver त्रुटि", code: err.code || 500 });
+    return res.status(err.code || 500).json({ success: false, error: err.userMsg || err.message || "सर्वर त्रुटि", code: err.code || 500 });
   }
 }
