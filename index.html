@@ -1273,5 +1273,60 @@
 </script>
 
 <script src="/admin-dashboard.js"></script>
+
+  <!-- एडमिन एआई ऑडिट मॉडल -->
+<div id="adminAiModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; align-items:center; justify-content:center; padding:15px; backdrop-filter:blur(5px);">
+  <div style="background:#182229; border:1px solid #00a884; border-radius:14px; max-width:550px; width:100%; max-height:85vh; display:flex; flex-direction:column; padding:18px; color:#e9edef; box-shadow:0 12px 30px rgba(0,0,0,0.7);">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2a3942; padding-bottom:10px; margin-bottom:12px;">
+      <h3 style="margin:0; color:#00a884; font-size:1.1rem; display:flex; align-items:center; gap:8px;">
+        <i class="fa-solid fa-brain"></i> एआई चैट ऑडिट व सुधार समरी
+      </h3>
+      <button onclick="document.getElementById('adminAiModal').style.display='none'" style="background:transparent; border:none; color:#8696a0; font-size:1.4rem; cursor:pointer;">&times;</button>
+    </div>
+    
+    <div id="aiSummaryContent" style="flex:1; overflow-y:auto; font-size:0.9rem; line-height:1.6; white-space:pre-wrap; color:#d1d7db; padding-right:5px;">
+      बटन दबाकर तमाम छात्रों की चैट का एआई विश्लेषण निकालें...
+    </div>
+
+    <div style="margin-top:14px; display:flex; gap:10px;">
+      <button id="btnFetchAiSummary" onclick="fetchAiAuditSummary()" style="flex:1; background:#00a884; color:#fff; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">
+        समरी जनरेट करें (AI Audit)
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+async function fetchAiAuditSummary() {
+  const contentBox = document.getElementById('aiSummaryContent');
+  const btn = document.getElementById('btnFetchAiSummary');
+  contentBox.innerText = "तमाम छात्रों के सवाल और एआई के जवाबों का विश्लेषण हो रहा है... कृपया 5-10 सेकंड इंतज़ार करें...";
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/admin?action=ai_chat_summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pass: 'SuhailAiJamia' }) // आपका एडमिन सीक्रेट
+    });
+    const data = await res.json();
+    if(data.success) {
+      contentBox.innerText = data.insights;
+    } else {
+      contentBox.innerText = "त्रुटि: " + (data.error || "डेटा नहीं मिल सका");
+    }
+  } catch(err) {
+    contentBox.innerText = "कनेक्शन में समस्या आई: " + err.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// एडमिन को यह मॉडल खोलने का फंक्शन
+function openAdminAiAudit() {
+  document.getElementById('adminAiModal').style.display = 'flex';
+}
+</script>
+  
 </body>
 </html>
