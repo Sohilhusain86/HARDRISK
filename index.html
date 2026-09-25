@@ -416,7 +416,17 @@
   <link rel="manifest" href="/manifest.json">
   
   <style>
-  /* टेबल को मोबाइल में दायें-बायें स्क्रॉल करने के लिए */
+  /* 1. मोबाइल में सिंगल उंगली से स्मूथ स्क्रॉल के लिए */
+  html, body {
+    touch-action: pan-y !important;
+    overscroll-behavior-y: contain !important;
+  }
+  .app-container {
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* 2. टेबल को दायें-बायें स्क्रॉल करने के लिए */
   table {
     display: block !important;
     width: 100% !important;
