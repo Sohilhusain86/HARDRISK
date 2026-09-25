@@ -3,14 +3,14 @@ import crypto from "crypto";
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com";
 
-// Keys from Vercel Environment Variables
+// Vercel Environment Variables Keys
 const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
 const MISTRAL_KEY = process.env.MISTRAL_KEY || "";
 const GROQ_KEY = process.env.GROQ_KEY || "";
 const SILICONFLOW_KEY = process.env.SILICONFLOW_KEY || "";
 const CEREBRAS_KEY = process.env.CEREBRAS_KEY || "";
 
-// Production Models
+// Active Production Model IDs
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 const MISTRAL_MODEL = process.env.MISTRAL_MODEL || "mistral-small-latest";
 const GROQ_PRO_MODEL = process.env.GROQ_PRO_MODEL || "openai/gpt-oss-120b";
@@ -56,23 +56,22 @@ function normalizePlan(rawPlan) {
 
 // 1. FREE (Google Gemini)
 async function callGemini(prompt, systemInstruction) {
-  if (!GEMINI_KEY) throw { userMsg: "SUHAIL AI FREE ki service uplabdha nahi hai.", code: 500 };
+  if (!GEMINI_KEY) throw { userMsg: "SUHAIL AI FREE की सेवा उपलब्ध नहीं है।", code: 500 };
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_KEY}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ contents: [{ parts: [{ text: `${systemInstruction}\n\nSawal: ${prompt}` }] }] })
+    body: JSON.stringify({ contents: [{ parts: [{ text: `${systemInstruction}\n\nतालिब का सवाल: ${prompt}` }] }] })
   });
   const data = await res.json();
   if (!res.ok || data.error) {
-    throw { userMsg: "SUHAIL AI FREE ki request limit poori ho gayi hai. 15 second baad prayas karein.", code: 429 };
+    throw { userMsg: "SUHAIL AI FREE की अनुरोध सीमा पूरी हो गई है। कृपया 15 सेकंड बाद पुनः प्रयास करें।", code: 429 };
   }
   return data?.candidates?.[0]?.content?.parts?.[0]?.text;
 }
 
-// 2. PLUS (Mistral with SiliconFlow/Groq resilience)
+// 2. PLUS (Mistral with SiliconFlow/Groq Failover)
 async function callMistral(prompt, systemInstruction) {
-  // Try Mistral directly if key valid
   if (MISTRAL_KEY) {
     try {
       const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
@@ -87,7 +86,6 @@ async function callMistral(prompt, systemInstruction) {
       if (res.ok && data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
     } catch (e) {}
   }
-  // Try SiliconFlow Qwen
   if (SILICONFLOW_KEY) {
     try {
       const res = await fetch("https://api.siliconflow.cn/v1/chat/completions", {
@@ -102,7 +100,6 @@ async function callMistral(prompt, systemInstruction) {
       if (res.ok && data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
     } catch (e) {}
   }
-  // Groq Fast model backup to guarantee Plus never drops a request
   if (GROQ_KEY) {
     try {
       const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -118,12 +115,12 @@ async function callMistral(prompt, systemInstruction) {
       if (res.ok && data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
     } catch (e) {}
   }
-  throw { userMsg: "SUHAIL AI PLUS is samay vyast hai. Kripya thodi der baad dobara prayas karein.", code: 500 };
+  throw { userMsg: "SUHAIL AI PLUS इस समय व्यस्त है। कृपया थोड़ी देर बाद पुनः प्रयास करें।", code: 500 };
 }
 
 // 3. PRO (Groq)
 async function callGroq(prompt, systemInstruction) {
-  if (!GROQ_KEY) throw { userMsg: "SUHAIL AI PRO service an-upalabdha hai.", code: 500 };
+  if (!GROQ_KEY) throw { userMsg: "SUHAIL AI PRO सेवा उपलब्ध नहीं है।", code: 500 };
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: { "Authorization": `Bearer ${GROQ_KEY}`, "Content-Type": "application/json" },
@@ -134,11 +131,11 @@ async function callGroq(prompt, systemInstruction) {
     })
   });
   const data = await res.json();
-  if (!res.ok || data.error) throw { userMsg: "SUHAIL AI PRO service me takneeki kharabi aayi.", code: 500 };
+  if (!res.ok || data.error) throw { userMsg: "SUHAIL AI PRO सेवा में समस्या आई।", code: 500 };
   return data?.choices?.[0]?.message?.content;
 }
 
-// 4. ULTRA (SiliconFlow Flagship / High-End Engine)
+// 4. ULTRA (SiliconFlow Flagship DeepSeek / Fallback)
 async function callUltra(prompt, systemInstruction) {
   if (SILICONFLOW_KEY) {
     try {
@@ -158,6 +155,9 @@ async function callUltra(prompt, systemInstruction) {
   return await callGroq(prompt, systemInstruction);
 }
 
+// -------------------------------------------------------------
+// MAIN SERVERLESS HANDLER
+// -------------------------------------------------------------
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -186,8 +186,9 @@ export default async function handler(req, res) {
       const { phone, name, roll, userPass, adminPass } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
 
-      if (cleanPhone.length !== 10) return res.status(400).json({ success: false, error: "10 ankon ka mobile number darj karein." });
+      if (cleanPhone.length !== 10) return res.status(400).json({ success: false, error: "कृपया 10 अंकों का मोबाइल नंबर दर्ज करें।" });
 
+      // मास्टर एडमिन
       if (adminPass && adminPass === ADMIN_SECRET) {
         let adminUser = await dbGet(`users/${cleanPhone}`);
         if (!adminUser) {
@@ -205,28 +206,43 @@ export default async function handler(req, res) {
 
       const rollNum = parseInt(roll, 10);
       if (isNaN(rollNum) || rollNum < 4000 || rollNum > 9999) {
-        return res.status(400).json({ success: false, error: "Roll number 4000 se 9999 tak hona anivarya hai." });
+        return res.status(400).json({ success: false, error: "रोल नंबर 4000 से 9999 तक होना अनिवार्य है।" });
       }
 
       if (!userPass || String(userPass).length < 6) {
-        return res.status(400).json({ success: false, error: "Password kam se kam 6 characters ka hona anivarya hai." });
+        return res.status(400).json({ success: false, error: "पासवर्ड कम से कम 6 अक्षरों का होना अनिवार्य है।" });
       }
 
       const passHash = hashPassword(userPass);
       let user = await dbGet(`users/${cleanPhone}`);
 
       if (!user) {
-        if (!name || !name.trim()) return res.status(400).json({ success: false, error: "Kripya apna naam darj karein." });
-        user = { phone: cleanPhone, name: name.trim(), roll: String(rollNum), passwordHash: passHash, role: "student", plan: "free", planExpiry: null, createdAt: Date.now(), status: "active" };
+        if (!name || !name.trim()) return res.status(400).json({ success: false, error: "कृपया अपना नाम दर्ज करें।" });
+        user = {
+          phone: cleanPhone,
+          name: name.trim(),
+          roll: String(rollNum),
+          passwordHash: passHash,
+          role: "student",
+          plan: "free",
+          planExpiry: null,
+          totalQuestions: 0,
+          dailyCount: 0,
+          lastQuestionDate: "",
+          lastActive: Date.now(),
+          createdAt: Date.now(),
+          status: "active"
+        };
         await dbPut(`users/${cleanPhone}`, user);
         delete user.passwordHash;
         return res.status(200).json({ success: true, user, isNew: true });
       } else {
         const isMatch = user.passwordHash ? (user.passwordHash === passHash) : (user.password === String(userPass).trim());
-        if (!isMatch) return res.status(401).json({ success: false, error: "Galat password!" });
+        if (!isMatch) return res.status(401).json({ success: false, error: "गलत पासवर्ड!" });
         if (!user.passwordHash) await dbPatch(`users/${cleanPhone}`, { passwordHash: passHash });
         user.plan = normalizePlan(user.plan);
         delete user.passwordHash;
+        delete user.password;
         return res.status(200).json({ success: true, user });
       }
     }
@@ -235,7 +251,7 @@ export default async function handler(req, res) {
       const { phone } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
       let user = await dbGet(`users/${cleanPhone}`);
-      if (!user) return res.status(404).json({ success: false, error: "User nahi mila." });
+      if (!user) return res.status(404).json({ success: false, error: "यूज़र नहीं मिला।" });
 
       user.plan = normalizePlan(user.plan);
       if (user.role !== "admin" && user.planExpiry && Date.now() > user.planExpiry) {
@@ -249,10 +265,15 @@ export default async function handler(req, res) {
 
     if (action === "ai" && req.method === "POST") {
       const { prompt, phone } = req.body || {};
-      if (!prompt || !String(prompt).trim()) return res.status(400).json({ success: false, error: "Sawal khali nahi ho sakta." });
+      if (!prompt || !String(prompt).trim()) return res.status(400).json({ success: false, error: "सवाल खाली नहीं हो सकता।" });
 
       const cleanPhone = String(phone || "").replace(/\D/g, "");
       let user = cleanPhone ? await dbGet(`users/${cleanPhone}`) : null;
+
+      // ब्लॉक चेक
+      if (user && user.status === "blocked") {
+        return res.status(403).json({ success: false, error: "आपका खाता निलंबित (Block) कर दिया गया है। एडमिन से संपर्क करें।" });
+      }
 
       let plan = "free";
       if (user?.role === "admin") {
@@ -268,13 +289,13 @@ export default async function handler(req, res) {
       let aiName = "SUHAIL AI FREE";
       let replyText = "";
 
-      const academicInstruction = `Aapka official naam '{AI_NAME}' hai.
-Aap Suhail AI study platform ke sanjeeda aur moaddib ustaad hain.
-Niyam:
-1. Shuruat hamesha 'अस्सलामु अलैकुम व रहमतुल्लाह' se karein.
-2. Kabhi bhi 'Namaste' ya gair-Islami adab ke alfaz istemal na karein.
-3. Kisi bahari provider/company (Gemini, Mistral, Groq, DeepSeek) ka naam na lein. Pehchan puchne par 'Main {AI_NAME} hoon' kahein.
-4. Talib ko Nahw, Sarf, Arabic, Urdu, English, Maths, Science aur Dars-e-Nizami me behtareen padhai karwayen.`;
+      const academicInstruction = `आप '{AI_NAME}' हैं।
+सुहैल AI स्टडी प्लेटफ़ॉर्म के उस्ताद हैं।
+नियम:
+1. बातचीत की शुरुआत हमेशा 'अस्सलामु अलैकुम व रहमतुल्लाह' से करें।
+2. कभी भी 'नमस्ते' या गैर-इस्लामी शब्दों का प्रयोग न करें।
+3. किसी बाहरी कंपनी या मॉडल (Gemini, Mistral, Groq, DeepSeek) का नाम न लें। पूछने पर कहें 'मैं {AI_NAME} हूँ'।
+4. केवल तालीम, पढ़ाई, दरसे निज़ामी, नह्व, सर्फ़, अरबी, उर्दू, अंग्रेज़ी, हिसाब और साइंस पर सटीक मदद करें।`;
 
       if (plan === "ultra") {
         aiName = "SUHAIL AI ULTRA";
@@ -290,10 +311,24 @@ Niyam:
         replyText = await callGemini(prompt, academicInstruction.replace(/{AI_NAME}/g, aiName));
       }
 
+      // सवाल काउंटर और ट्रैकिंग को Firebase में अपडेट करना
+      if (cleanPhone && user) {
+        const todayDateStr = new Date().toISOString().slice(0, 10);
+        const isNewDay = user.lastQuestionDate !== todayDateStr;
+        const newDailyCount = isNewDay ? 1 : ((user.dailyCount || 0) + 1);
+
+        dbPatch(`users/${cleanPhone}`, {
+          totalQuestions: (user.totalQuestions || 0) + 1,
+          dailyCount: newDailyCount,
+          lastQuestionDate: todayDateStr,
+          lastActive: Date.now()
+        }).catch(() => {});
+      }
+
       return res.status(200).json({ success: true, reply: replyText, aiName, plan });
     }
 
-    // STRICT 12-DIGIT UTR PAYMENT VALIDATION
+    // 12-अंकों का सख्त UTR वेरिफिकेशन
     if (action === "payment" && req.method === "POST") {
       const { phone, plan, utr } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -301,15 +336,15 @@ Niyam:
       const normPlan = normalizePlan(plan);
 
       if (!cleanPhone || cleanPhone.length !== 10) {
-        return res.status(400).json({ success: false, error: "Kripya 10 ankon ka mobile number darj karein." });
+        return res.status(400).json({ success: false, error: "कृपया 10 अंकों का मोबाइल नंबर दर्ज करें।" });
       }
 
       if (!cleanUtr || cleanUtr.length !== 12) {
-        return res.status(400).json({ success: false, error: "Amanay UTR! UTR / Transaction No. theek 12 ankon (12 Digits) ka hona anivarya hai." });
+        return res.status(400).json({ success: false, error: "अमान्य UTR! UTR / Transaction No. ठीक 12 अंकों का होना अनिवार्य है।" });
       }
 
       if (normPlan === "free") {
-        return res.status(400).json({ success: false, error: "Free plan ke liye payment darkhwast ki zaroorat nahi hai." });
+        return res.status(400).json({ success: false, error: "Free प्लान के लिए पेमेंट आवश्यक नहीं है।" });
       }
 
       const amounts = { plus: 10, pro: 25, ultra: 50 };
@@ -323,12 +358,12 @@ Niyam:
         status: "pending",
         createdAt: Date.now()
       });
-      return res.status(200).json({ success: true, message: "Payment darkhwast darj ho gayi hai. Admin tasdeeq ke baad 30 din ke liye unlock ho jayega." });
+      return res.status(200).json({ success: true, message: "पेमेंट अनुरोध दर्ज हो गया है। एडमिन की मंज़ूरी के बाद 30 दिनों के लिए अनलॉक हो जाएगा।" });
     }
 
     if (action === "admin" && req.method === "POST") {
       const { pass, cmd, requestId, targetPhone, targetPlan } = req.body || {};
-      if (pass !== ADMIN_SECRET) return res.status(401).json({ success: false, error: "Galat Admin Password." });
+      if (pass !== ADMIN_SECRET) return res.status(401).json({ success: false, error: "गलत एडमिन पासवर्ड।" });
 
       if (cmd === "get_requests") {
         const requests = (await dbGet("payment_requests")) || {};
@@ -340,17 +375,17 @@ Niyam:
         const expiryDate = Date.now() + (30 * 24 * 60 * 60 * 1000);
         await dbPatch(`payment_requests/${requestId}`, { status: "approved", approvedAt: Date.now() });
         await dbPatch(`users/${targetPhone}`, { plan: canonicalPlan, planExpiry: expiryDate });
-        return res.status(200).json({ success: true, message: `${canonicalPlan.toUpperCase()} plan 30 dino ke liye activate ho gaya.` });
+        return res.status(200).json({ success: true, message: `${canonicalPlan.toUpperCase()} प्लान 30 दिनों के लिए चालू हो गया।` });
       }
 
       if (cmd === "reject_request") {
         await dbPatch(`payment_requests/${requestId}`, { status: "rejected", rejectedAt: Date.now() });
-        return res.status(200).json({ success: true, message: "Darkhwast kharij kar di gayi." });
+        return res.status(200).json({ success: true, message: "अनुरोध खारिज किया गया।" });
       }
     }
 
-    return res.status(404).json({ success: false, error: "Amanay action." });
+    return res.status(404).json({ success: false, error: "अमान्य एक्शन।" });
   } catch (err) {
-    return res.status(err.code || 500).json({ success: false, error: err.userMsg || err.message || "Server Error", code: err.code || 500 });
+    return res.status(err.code || 500).json({ success: false, error: err.userMsg || err.message || "सर्वर त्रुटि", code: err.code || 500 });
   }
 }
