@@ -3,16 +3,10 @@ import crypto from "crypto";
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com";
 
-// Proven Keys from Vercel
+// Keys from Vercel
+const POLLINATIONS_KEY = process.env.POLLINATIONS_KEY || process.env.POLLINATION_KEY || "";
 const GROQ_KEY = process.env.GROQ_KEY || "";
-const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
-const SILICONFLOW_KEY = process.env.SILICONFLOW_KEY || "";
 const OPENROUTER_KEY = process.env.OPENROUTER_KEY || "";
-
-// Active Verified Model IDs
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-const GROQ_PRO_MODEL = process.env.GROQ_PRO_MODEL || "openai/gpt-oss-120b";
-const ULTRA_MODEL = process.env.ULTRA_MODEL || "deepseek-ai/DeepSeek-V4-Flash";
 
 // STRICT SERVER-SIDE DAILY LIMITS
 const DAILY_LIMITS = {
@@ -114,21 +108,20 @@ function normalizePlan(rawPlan) {
 }
 
 // -------------------------------------------------------------
-// VERIFIED CALL FUNCTIONS
+// CORE CALL FUNCTIONS (POLLINATIONS + GROQ FAILOVER)
 // -------------------------------------------------------------
 
-// Groq Call (100% Reliable across all screenshots)
-async function callGroqDirect(model, prompt, systemInstruction) {
-  if (!GROQ_KEY) return null;
+async function callPollinations(modelName, prompt, systemInstruction) {
+  if (!POLLINATIONS_KEY) return null;
   try {
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    const res = await fetch("https://text.pollinations.ai/openai/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${GROQ_KEY}`,
+        "Authorization": `Bearer ${POLLINATIONS_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: model,
+        model: modelName,
         messages: [
           { role: "system", content: systemInstruction },
           { role: "user", content: prompt }
@@ -144,75 +137,77 @@ async function callGroqDirect(model, prompt, systemInstruction) {
   return null;
 }
 
-// 1. FREE: Gemini tries first; if 429/limit, Groq silently completes it without error
-async function callFree(prompt, systemInstruction) {
-  if (GEMINI_KEY) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_KEY}`;
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: `${systemInstruction}\n\nSawal: ${prompt}` }] }] })
-      });
-      const data = await res.json();
-      if (res.ok && data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-        return data.candidates[0].content.parts[0].text;
-      }
-    } catch (e) {}
-  }
+async function callGroqDirect(modelName, prompt, systemInstruction) {
+  if (!GROQ_KEY) return null;
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${GROQ_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: modelName,
+        messages: [
+          { role: "system", content: systemInstruction },
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.35
+      })
+    });
+    const data = await res.json();
+    if (res.ok && data?.choices?.[0]?.message?.content) {
+      return data.choices[0].message.content;
+    }
+  } catch (e) {}
+  return null;
+}
 
-  // Silent fallback to Groq Instant so student NEVER gets 15-second block
-  const fallback = await callGroqDirect("llama-3.1-8b-instant", prompt, systemInstruction);
-  if (fallback) return fallback;
+// 1. FREE (Pollinations Mistral/Llama -> Groq Instant)
+async function callFree(prompt, systemInstruction) {
+  let reply = await callPollinations("mistral", prompt, systemInstruction);
+  if (reply) return reply;
+
+  reply = await callPollinations("llama", prompt, systemInstruction);
+  if (reply) return reply;
+
+  reply = await callGroqDirect("llama-3.1-8b-instant", prompt, systemInstruction);
+  if (reply) return reply;
 
   throw { userMsg: "SUHAIL AI FREE service is samay vyast hai. Kripya punah prayas karein.", code: 500 };
 }
 
-// 2. PLUS: Fast Tutor Engine (Zero Bad Request)
+// 2. PLUS (Pollinations Qwen Tutor -> Groq Fast)
 async function callPlus(prompt, systemInstruction) {
-  const reply = await callGroqDirect("llama-3.1-8b-instant", prompt, systemInstruction);
+  let reply = await callPollinations("qwen", prompt, systemInstruction);
+  if (reply) return reply;
+
+  reply = await callGroqDirect("llama-3.1-8b-instant", prompt, systemInstruction);
   if (reply) return reply;
 
   throw { userMsg: "SUHAIL AI PLUS service is samay vyast hai. Kripya punah prayas karein.", code: 500 };
 }
 
-// 3. PRO: Groq 70B (Proven working in screenshots 13, 14, 20)
+// 3. PRO (Groq 70B Proven -> Pollinations DeepSeek)
 async function callPro(prompt, systemInstruction) {
-  const reply = await callGroqDirect("llama-3.3-70b-versatile", prompt, systemInstruction) 
-             || await callGroqDirect(GROQ_PRO_MODEL, prompt, systemInstruction);
+  let reply = await callGroqDirect("llama-3.3-70b-versatile", prompt, systemInstruction);
+  if (reply) return reply;
+
+  reply = await callPollinations("deepseek", prompt, systemInstruction);
   if (reply) return reply;
 
   throw { userMsg: "SUHAIL AI PRO service me takneeki samasya aayi.", code: 500 };
 }
 
-// 4. ULTRA: SiliconFlow + Groq Shield (Proven working in screenshots 13 & 14)
+// 4. ULTRA (Pollinations DeepSeek-R1 -> Groq 70B Shield)
 async function callUltra(prompt, systemInstruction) {
-  if (SILICONFLOW_KEY) {
-    try {
-      const res = await fetch("https://api.siliconflow.cn/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${SILICONFLOW_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: ULTRA_MODEL,
-          messages: [
-            { role: "system", content: systemInstruction },
-            { role: "user", content: prompt }
-          ],
-          temperature: 0.25
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data?.choices?.[0]?.message?.content) {
-        return data.choices[0].message.content;
-      }
-    } catch (e) {}
-  }
+  let reply = await callPollinations("deepseek-r1", prompt, systemInstruction);
+  if (reply) return reply;
 
-  // Same Groq 70B fallback that made Ultra work in Screenshot 13/14
-  const reply = await callGroqDirect("llama-3.3-70b-versatile", prompt, systemInstruction);
+  reply = await callPollinations("deepseek", prompt, systemInstruction);
+  if (reply) return reply;
+
+  reply = await callGroqDirect("llama-3.3-70b-versatile", prompt, systemInstruction);
   if (reply) return reply;
 
   throw { userMsg: "SUHAIL AI ULTRA service me samasya aayi.", code: 500 };
@@ -348,7 +343,7 @@ export default async function handler(req, res) {
         }
       }
 
-      // DAILY LIMIT SERVER CHECK (FREE: 25)
+      // STRICT DAILY LIMIT SERVER CHECK (FREE: 25)
       const todayDateStr = new Date().toISOString().slice(0, 10);
       const isNewDay = user?.lastQuestionDate !== todayDateStr;
       const currentDailyCount = isNewDay ? 0 : (user?.dailyCount || 0);
