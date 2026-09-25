@@ -3,12 +3,12 @@ import crypto from "crypto";
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com";
 
-// Active Verified Keys
+// Active Production Keys
 const GROQ_KEY = (process.env.GROQ_KEY || "").trim();
 const OPENROUTER_KEY = (process.env.OPENROUTER_KEY || "").trim();
 const POLLINATIONS_KEY = (process.env.POLLINATIONS_KEY || process.env.POLLINATION_KEY || "").trim();
 
-// EXACT SPECIFIED DAILY LIMITS
+// DAILY LIMITS (Tools have bonus privilege)
 const DAILY_LIMITS = {
   free: 25,
   plus: 75,
@@ -16,55 +16,45 @@ const DAILY_LIMITS = {
   ultra: 250
 };
 
-// DEDICATED BEHAVIOR RULES FOR EACH TIER
+// MULTI-LINGUAL + ISLAMIC ADAB SYSTEM PROMPTS
 const SYSTEM_RULES = {
   free: `Aapka official naam 'SUHAIL AI FREE' hai.
-Uddeshya: Madadgaar aur dostana Study wa General Assistant.
-Behavior:
-1. Har jawab ke shuru me zabardasti Salam dohrane ki zaroorat nahi hai. Agar user salam kare to moaddab jawab dein, warna seedhe mudde ki baat karein.
-2. Padhai aur talim (Maths, Science, English, Hindi, Urdu, Arabic Grammar, Translation, Basic GK, Notes, Revision) me aasan aur saral bhasha me madad karein.
-3. User ke aam sawalat, writing, coding aur rozmarrah ki zaroori baaton par bhi dostana aur helpful guftagu karein.
-4. Chhote aur aasan examples dein. Fazool lamba bhashan na dein.
-5. STRICT SAFETY: Gali-galoj, gair-akhlaqi, illegal ya nuqsandeh baaton par sakhti se mana karein.
-6. Galat ya man-ghadant jankari bilkul na dein; jahan shak ho wahan spasht uncertainty batayein.
-7. Bahari company ya model ka naam na lein. Apni pehchan sirf 'SUHAIL AI FREE' batayein.`,
+Uddeshya: Madadgaar, ba-adab aur Islami tehzeeb ke sath Study wa General Assistant.
+Niyam:
+1. Zaban Ka Chunav: Talib-e-Ilm jis zaban me sawal kare (Hindi, Roman Urdu, Urdu, English, Arabic), usi zaban me jawab dein. Kisi ek zaban ko zabardasti na thopein.
+2. Islami Tehzeeb: Guftagu me hamesha ba-adab, sanjeeda aur shaiyasta Islami tarz-e-takallum ikhtiyar karein.
+3. Dars-e-Nizami, school, college, science, maths, grammar aur aam constructive sawalon ka aasan aur seedha jawab dein.
+4. Gali-galoj, gair-akhlaqi ya gair-qanooni baaton par narmi se inkar karein.`,
 
   plus: `Aapka official naam 'SUHAIL AI PLUS' hai.
 Uddeshya: Mufassal Talimi Ustaad wa Rehnuma (Detailed Study Tutor).
-Behavior:
-1. Har baat me Salam dohrana zaroori nahi hai.
-2. Talim, Nahw, Sarf, Arabic Grammar, Translation, Maths, Science aur academic subjects me tafseeli, structured aur step-by-step rahnumai dein. Tables, headings aur bullet points ka istemal karein.
-3. Sabaq ke important points, revision notes, MCQs aur exam questions banayein. User ki ghaltiyon ki ahtiram ke sath islah karein.
-4. Academic topics ke sath-sath aam maloomat, technical queries aur general constructive discussion par bhi aala sahulat dein.
-5. STRICT SAFETY: Gali-galoj, abusive language, illegal ya harmful requests ko entertain na karein.
-6. Apni pehchan sirf 'SUHAIL AI PLUS' batayein.`,
+Niyam:
+1. Zaban Ka Chunav: User jis zaban (Hindi, Roman Urdu, Urdu, English, Arabic) me baat kare, usi zaban me behtareen jawab dein.
+2. Islami Guftagu: Baat cheet me Islami adab, ikhlaaq aur ilmi sanjeedgi ka khayal rakhein.
+3. Nahw, Sarf, Arabic grammar, translation, maths, science me step-by-step aur detailed wazahat dein. Tables aur bullet points ka istemal karein.
+4. Pichli guftagu ke context ko yaad rakh kar jawab dein.`,
 
   pro: `Aapka official naam 'SUHAIL AI PRO' hai.
 Uddeshya: Aala Talimi aur Tajziyati Muawin (Advanced Academic & Analytical Assistant).
-Behavior:
-1. Har sandesh me Salam dohrana lazmi nahi hai.
-2. Complex academic, scientific, mathematical aur grammatical (Nahw/Sarf) sawalat ko logical tareeqe se break karke aala satah par solve karein.
-3. Pehle core concept ko spasht karein, phir gehra aur structured explanation dein.
-4. Talim ke alawa advanced writing, technology, reasoning aur general serious topics par bhi poori salahiyat se jawab dein.
-5. Kabhi bhi fake reference, man-ghadant citation ya bina sanad baat pesh na karein.
-6. STRICT SAFETY: Kisi bhi tarah ki gali-galoj, illegal ya gair-akhlaqi baaton se sakhti se parhez karein.
-7. Apni pehchan sirf 'SUHAIL AI PRO' batayein.`,
+Niyam:
+1. Zaban Ka Chunav: User ki zaban ke mutabiq fassih aur munasib andaz me jawab dein (Hindi/Urdu/Roman/English/Arabic).
+2. Islami Guftagu: Aala ilmi wa Islami adab ke sath guftagu karein.
+3. Complex academic, scientific, grammatical aur rational sawalat ko logically break karke tajziyati jawab dein.
+4. Man-ghadant hawale ya fake citations bilkul na dein.`,
 
   ultra: `Aapka official naam 'SUHAIL AI ULTRA' hai.
-Uddeshya: Markazi Ilmi Tehqeeq aur Flagship Academic Assistant (Flagship Academic & Research Assistant).
-Behavior:
-1. Har jawab me Salam dohrana zaroori nahi hai.
-2. Advanced Mathematics, Science, Dars-e-Nizami, Nahw, Sarf, Arabic Adab, Translation aur academic tehqeeq me maximum capability ka upyog karein.
-3. Kathin ilmi mubahis ko tarteeb me pesh karein:
-   - 1. Ta'reef (Definition)
-   - 2. Buniyadi Usool (Basic Principle)
-   - 3. Tafseeli Wazahat (Detailed Explanation)
-   - 4. Misaalein (Examples)
-   - 5. Amli Istifada (Application)
-   - 6. Aham Nukaat (Important Points)
-4. Complex problems ko multi-stage logical reasoning ke sath hal karein. Har jaayaz constructive aur intellectual topic par aala tareeqe se guftagu karein.
-5. STRICT SAFETY: Gali-galoj, harmful ya illegal chizon par sakhti se mana karein. Fake citations bilkul na banayein.
-6. Apni pehchan sirf 'SUHAIL AI ULTRA' batayein.`
+Uddeshya: Markazi Ilmi Tehqeeq aur Flagship Research Assistant.
+Niyam:
+1. Zaban Ka Chunav: User jis zaban me sawal kare, usi zaban me aala tareen ilmi mayaar par jawab pesh karein.
+2. Islami Guftagu: Pukhta Islami tehzeeb, sanjeedgi aur tehqeeqi wano-waqar barqarar rakhein.
+3. Ilmi mubahis ko 6 marhalo me pesh karein:
+   1. Tareef (Definition)
+   2. Buniyadi Usool (Principle)
+   3. Tafseeli Wazahat (Explanation)
+   4. Misaalein (Examples)
+   5. Amli/Darsi Tatbeeq (Application)
+   6. Aham Nukaat (Key Takeaways)
+4. Pichli poori guftagu ke context ka behtareen istemal karein.`
 };
 
 function hashPassword(pass) {
@@ -106,10 +96,10 @@ function normalizePlan(rawPlan) {
 }
 
 // -------------------------------------------------------------
-// CALLERS FOR ACTIVE PRODUCTION MODELS
+// AI CALLERS WITH CONTEXT MEMORY
 // -------------------------------------------------------------
 
-async function tryGroq(model, prompt, instruction) {
+async function tryGroq(model, messages) {
   if (!GROQ_KEY) return null;
   try {
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -120,10 +110,7 @@ async function tryGroq(model, prompt, instruction) {
       },
       body: JSON.stringify({
         model: model,
-        messages: [
-          { role: "system", content: instruction },
-          { role: "user", content: prompt }
-        ],
+        messages: messages,
         temperature: 0.35
       })
     });
@@ -135,7 +122,7 @@ async function tryGroq(model, prompt, instruction) {
   return null;
 }
 
-async function tryOpenRouter(model, prompt, instruction) {
+async function tryOpenRouter(model, messages) {
   if (!OPENROUTER_KEY) return null;
   try {
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -148,10 +135,7 @@ async function tryOpenRouter(model, prompt, instruction) {
       },
       body: JSON.stringify({
         model: model,
-        messages: [
-          { role: "system", content: instruction },
-          { role: "user", content: prompt }
-        ]
+        messages: messages
       })
     });
     const data = await res.json();
@@ -162,7 +146,7 @@ async function tryOpenRouter(model, prompt, instruction) {
   return null;
 }
 
-async function tryPollinations(model, prompt, instruction) {
+async function tryPollinations(model, messages) {
   if (!POLLINATIONS_KEY) return null;
   try {
     const res = await fetch("https://text.pollinations.ai/openai/chat/completions", {
@@ -173,10 +157,7 @@ async function tryPollinations(model, prompt, instruction) {
       },
       body: JSON.stringify({
         model: model,
-        messages: [
-          { role: "system", content: instruction },
-          { role: "user", content: prompt }
-        ],
+        messages: messages,
         temperature: 0.35
       })
     });
@@ -188,55 +169,40 @@ async function tryPollinations(model, prompt, instruction) {
   return null;
 }
 
-// -------------------------------------------------------------
-// PRODUCTION DISPATCHER: GROQ-FIRST PRODUCTION CHAIN
-// -------------------------------------------------------------
+async function executeAI(plan, prompt, instruction, conversationHistory = []) {
+  const messages = [
+    { role: "system", content: instruction },
+    ...(Array.isArray(conversationHistory) ? conversationHistory.slice(-6) : []),
+    { role: "user", content: prompt }
+  ];
 
-async function executeAI(plan, prompt, instruction) {
   let reply = null;
 
   if (plan === "ultra") {
-    // 1. Groq GPT-OSS 120B (High Reasoning Production)
-    reply = await tryGroq("openai/gpt-oss-120b", prompt, instruction);
-    // 2. Groq GPT-OSS 20B (Ultra-Fast 1000 tps)
-    if (!reply) reply = await tryGroq("openai/gpt-oss-20b", prompt, instruction);
-    // 3. Pollinations DeepSeek-R1 (Flagship Research)
-    if (!reply) reply = await tryPollinations("deepseek-r1", prompt, instruction);
-    // 4. OpenRouter Flagship
-    if (!reply) reply = await tryOpenRouter("deepseek/deepseek-r1:free", prompt, instruction);
+    reply = await tryGroq("openai/gpt-oss-120b", messages);
+    if (!reply) reply = await tryGroq("llama-3.3-70b-versatile", messages);
+    if (!reply) reply = await tryPollinations("deepseek-r1", messages);
+    if (!reply) reply = await tryGroq("openai/gpt-oss-20b", messages);
   } else if (plan === "pro") {
-    // 1. Groq GPT-OSS 120B
-    reply = await tryGroq("openai/gpt-oss-120b", prompt, instruction);
-    // 2. Groq GPT-OSS 20B
-    if (!reply) reply = await tryGroq("openai/gpt-oss-20b", prompt, instruction);
-    // 3. OpenRouter Pro
-    if (!reply) reply = await tryOpenRouter("openai/gpt-oss-120b", prompt, instruction);
+    reply = await tryGroq("openai/gpt-oss-120b", messages);
+    if (!reply) reply = await tryGroq("llama-3.3-70b-versatile", messages);
+    if (!reply) reply = await tryGroq("openai/gpt-oss-20b", messages);
   } else if (plan === "plus") {
-    // 1. Groq GPT-OSS 20B (Super Fast Tutor)
-    reply = await tryGroq("openai/gpt-oss-20b", prompt, instruction);
-    // 2. Groq GPT-OSS 120B (Detailed Step-by-Step)
-    if (!reply) reply = await tryGroq("openai/gpt-oss-120b", prompt, instruction);
-    // 3. Pollinations Qwen Tutor
-    if (!reply) reply = await tryPollinations("qwen", prompt, instruction);
+    reply = await tryGroq("openai/gpt-oss-20b", messages);
+    if (!reply) reply = await tryGroq("llama-3.1-8b-instant", messages);
+    if (!reply) reply = await tryPollinations("qwen", messages);
   } else {
-    // Free Tier (25 Sawal)
-    // 1. Groq GPT-OSS 20B
-    reply = await tryGroq("openai/gpt-oss-20b", prompt, instruction);
-    // 2. Groq GPT-OSS 120B
-    if (!reply) reply = await tryGroq("openai/gpt-oss-120b", prompt, instruction);
-    // 3. OpenRouter Free
-    if (!reply) reply = await tryOpenRouter("openai/gpt-oss-20b", prompt, instruction);
-    // 4. Pollinations Mistral
-    if (!reply) reply = await tryPollinations("mistral", prompt, instruction);
-  }
-
-  // Universal Safety Net
-  if (!reply) {
-    reply = await tryPollinations("mistral", prompt, instruction);
+    reply = await tryGroq("openai/gpt-oss-20b", messages);
+    if (!reply) reply = await tryGroq("llama-3.1-8b-instant", messages);
+    if (!reply) reply = await tryPollinations("mistral", messages);
   }
 
   if (!reply) {
-    throw { userMsg: "सुहैल AI सेवा इस समय व्यस्त है। कृपया 5 सेकंड बाद पुनः प्रयास करें।", code: 500 };
+    reply = await tryGroq("llama-3.1-8b-instant", messages) || await tryPollinations("mistral", messages);
+  }
+
+  if (!reply) {
+    throw { userMsg: "Suhail AI service is samay vyast hai. Kripya 5 second baad punah prayas karein.", code: 500 };
   }
 
   return reply;
@@ -269,7 +235,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // LOGIN & AUTH (UNTOUCHED)
     if (action === "auth" && req.method === "POST") {
       const { phone, name, roll, userPass, adminPass } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -350,9 +315,9 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, user });
     }
 
-    // AI CHAT
+    // AI CHAT DISPATCHER (WITH DEDICATED TOOL ALLOWANCE)
     if (action === "ai" && req.method === "POST") {
-      const { prompt, phone } = req.body || {};
+      const { prompt, phone, history, isTool } = req.body || {};
       if (!prompt || !String(prompt).trim()) return res.status(400).json({ success: false, error: "सवाल खाली नहीं हो सकता।" });
 
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -373,16 +338,18 @@ export default async function handler(req, res) {
         }
       }
 
-      // STRICT DAILY LIMIT SERVER CHECK
       const todayDateStr = new Date().toISOString().slice(0, 10);
       const isNewDay = user?.lastQuestionDate !== todayDateStr;
       const currentDailyCount = isNewDay ? 0 : (user?.dailyCount || 0);
       const userLimit = DAILY_LIMITS[plan] || 25;
 
-      if (user?.role !== "admin" && currentDailyCount >= userLimit) {
+      // Tools get an extra 25% quota leeway so students never feel cheated
+      const effectiveLimit = isTool ? Math.floor(userLimit * 1.25) : userLimit;
+
+      if (user?.role !== "admin" && currentDailyCount >= effectiveLimit) {
         return res.status(429).json({
           success: false,
-          error: `आज के लिए आपकी सवाल सीमा समाप्त हो चुकी है (${currentDailyCount}/${userLimit} सवाल पूरे)। कृपया कल पुनः प्रयास करें या प्लान अपग्रेड करें।`
+          error: `आज के लिए आपकी दैनिक सीमा समाप्त हो चुकी है (${currentDailyCount}/${userLimit} सवाल पूरे)। कृपया कल पुनः प्रयास करें या प्लान अपग्रेड करें।`
         });
       }
 
@@ -396,7 +363,7 @@ export default async function handler(req, res) {
       const aiName = aiTitles[plan] || "SUHAIL AI FREE";
       const instruction = SYSTEM_RULES[plan] || SYSTEM_RULES.free;
 
-      const replyText = await executeAI(plan, prompt, instruction);
+      const replyText = await executeAI(plan, prompt, instruction, history);
 
       if (cleanPhone && user) {
         dbPatch(`users/${cleanPhone}`, {
@@ -410,7 +377,6 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, reply: replyText, aiName, plan });
     }
 
-    // PAYMENT & ADMIN (UNTOUCHED)
     if (action === "payment" && req.method === "POST") {
       const { phone, plan, utr } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
