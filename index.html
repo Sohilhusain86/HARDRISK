@@ -7,8 +7,9 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <style>
     :root {
@@ -31,29 +32,58 @@
     
     .app-container { width: 100%; max-width: 600px; display: flex; flex-direction: column; height: 100vh; background: var(--panel-dark); position: relative; overflow: hidden; }
     
-    .top-header { background: var(--card-dark); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--card-border); z-index: 10; }
+    .top-header { background: var(--card-dark); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--card-border); z-index: 10; }
     .header-user { display: flex; align-items: center; gap: 10px; }
     .header-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--primary-green); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; }
-    .header-info h4 { font-size: 0.95rem; font-weight: 600; line-height: 1.2; }
-    .badge-plan { font-size: 0.68rem; padding: 2px 8px; border-radius: 12px; background: rgba(0, 168, 132, 0.2); color: var(--primary-green); font-weight: 600; text-transform: uppercase; }
-    .header-actions button { background: none; border: none; color: var(--text-muted); font-size: 1.1rem; cursor: pointer; margin-left: 8px; }
+    .header-info h4 { font-size: 0.92rem; font-weight: 600; line-height: 1.2; }
+    .badge-plan { font-size: 0.65rem; padding: 2px 8px; border-radius: 12px; background: rgba(0, 168, 132, 0.2); color: var(--primary-green); font-weight: 600; text-transform: uppercase; }
+    .header-actions { display: flex; align-items: center; gap: 4px; }
+    .header-actions button { background: none; border: none; color: var(--text-muted); font-size: 1.05rem; cursor: pointer; padding: 6px; border-radius: 50%; }
+    .header-actions button:hover { color: #fff; background: rgba(255,255,255,0.05); }
 
     .nav-dock { display: flex; background: var(--card-dark); border-bottom: 1px solid var(--card-border); }
     .nav-item { flex: 1; padding: 10px; text-align: center; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
     .nav-item.active { color: var(--primary-green); border-bottom-color: var(--primary-green); }
 
-    .tab-view { flex: 1; overflow-y: auto; padding: 14px; display: none; flex-direction: column; gap: 14px; }
+    .tab-view { flex: 1; overflow-y: auto; padding: 14px; display: none; flex-direction: column; gap: 12px; }
     .tab-view.active { display: flex; }
 
-    .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 10px; }
-    .chat-bubble { max-width: 85%; padding: 10px 14px; border-radius: 12px; font-size: 0.88rem; line-height: 1.5; word-wrap: break-word; }
+    /* EXPIRY WARNING */
+    .expiry-alert { background: #451a03; border: 1px solid var(--vip-gold); color: #fef08a; padding: 8px 12px; border-radius: 8px; font-size: 0.78rem; display: none; align-items: center; justify-content: space-between; gap: 6px; }
+
+    /* CHAT BUBBLES & FORMATTING */
+    .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-bottom: 6px; }
+    .chat-bubble { max-width: 90%; padding: 12px 14px; border-radius: 14px; font-size: 0.88rem; line-height: 1.6; word-wrap: break-word; position: relative; }
     .chat-bubble.user { align-self: flex-end; background: #005c4b; color: #fff; border-bottom-right-radius: 2px; }
-    .chat-bubble.ai { align-self: flex-start; background: var(--card-dark); border: 1px solid var(--card-border); border-bottom-left-radius: 2px; }
-    .ai-label { font-size: 0.72rem; color: var(--primary-green); font-weight: 700; margin-bottom: 4px; display: block; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 2px; }
-    .chat-footer { display: flex; gap: 8px; padding-top: 8px; }
-    .chat-input { flex: 1; background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 24px; padding: 10px 16px; color: #fff; outline: none; font-size: 0.9rem; }
+    .chat-bubble.ai { align-self: flex-start; background: var(--card-dark); border: 1px solid var(--card-border); border-bottom-left-radius: 2px; width: 92%; }
+    
+    .ai-label { font-size: 0.72rem; color: var(--primary-green); font-weight: 700; margin-bottom: 6px; display: block; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 3px; }
+    
+    /* Markdown Styles inside AI bubble */
+    .chat-content h1, .chat-content h2, .chat-content h3 { font-size: 0.98rem; font-weight: 700; margin: 8px 0 4px 0; color: #fff; }
+    .chat-content p { margin-bottom: 6px; }
+    .chat-content ul, .chat-content ol { margin-left: 18px; margin-bottom: 6px; }
+    .chat-content li { margin-bottom: 3px; }
+    .chat-content code { background: #111b21; padding: 2px 5px; border-radius: 4px; font-size: 0.82rem; font-family: monospace; }
+    .chat-content blockquote { border-left: 3px solid var(--primary-green); padding-left: 8px; color: var(--text-muted); margin: 6px 0; }
+    .arabic-text { font-family: 'Amiri', serif !important; font-size: 1.15rem; line-height: 1.8; direction: rtl; text-align: right; display: block; }
+
+    /* Bubble Action Bar */
+    .bubble-actions { display: flex; justify-content: flex-end; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 4px; }
+    .btn-copy { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 3px 6px; border-radius: 4px; }
+    .btn-copy:hover { color: var(--primary-green); background: rgba(255,255,255,0.05); }
+
+    /* QUICK STUDY SHORTCUT PILLS */
+    .study-shortcuts { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px; scrollbar-width: none; }
+    .study-shortcuts::-webkit-scrollbar { display: none; }
+    .shortcut-pill { flex-shrink: 0; background: #182229; border: 1px solid rgba(255,255,255,0.08); color: var(--text-muted); padding: 5px 10px; border-radius: 16px; font-size: 0.74rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+    .shortcut-pill:hover { border-color: var(--primary-green); color: #fff; background: rgba(0, 168, 132, 0.1); }
+
+    .chat-footer { display: flex; gap: 8px; padding-top: 4px; }
+    .chat-input { flex: 1; background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 24px; padding: 10px 16px; color: #fff; outline: none; font-size: 0.88rem; }
     .btn-send { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-green); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
+    /* PLANS & CARDS */
     .plan-card { background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 6px; position: relative; }
     .plan-card.highlight { border-color: var(--primary-green); }
     .plan-card.active-owned { border: 2px solid var(--success); background: rgba(34, 197, 94, 0.06); }
@@ -69,12 +99,10 @@
     .btn-action.disabled { background: #374151; color: #9ca3af; cursor: not-allowed; }
 
     .status-banner { background: #132f2b; border: 1px solid var(--primary-green); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px; }
-    
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-group label { font-size: 0.8rem; color: var(--text-muted); }
     .form-input { background: #182229; border: 1px solid var(--card-border); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 0.9rem; outline: none; }
     
-    /* QR BOX WITH NEW UPLOADED IMAGE */
     .qr-box { background: #fff; padding: 8px; border-radius: 12px; width: 220px; height: 220px; margin: 10px auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     .qr-box img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
 
@@ -132,6 +160,7 @@
       </div>
     </div>
     <div class="header-actions">
+      <button id="btn-new-chat" title="नई गुफ़्तगू (New Chat)"><i class="fa-solid fa-arrows-rotate"></i></button>
       <button id="btn-admin-toggle" title="Admin Requests" style="display:none;"><i class="fa-solid fa-shield-halved"></i></button>
       <button id="btn-logout" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
     </div>
@@ -147,12 +176,24 @@
 
   <!-- TAB 1: CHAT -->
   <section id="tab-study" class="tab-view active">
-    <div class="chat-messages" id="chat-box">
-      <div class="chat-bubble ai">
-        <span class="ai-label" id="current-ai-label">SUHAIL AI FREE</span>
-        अस्सलामु अलैकुम व रहमतुल्लाह! मैं आपका सुहैल AI स्टडी पार्टनर हूँ। दरसे निज़ामी, नह्व, सर्फ़, अरबी इबारत या दीनी व असरी किताबों से मुतअल्लिक़ कोई भी सवाल पूछें।
-      </div>
+    <!-- EXPIRY WARNING -->
+    <div class="expiry-alert" id="banner-expiry">
+      <span><i class="fa-solid fa-triangle-exclamation"></i> <span id="txt-expiry-msg">Plan jald khatam hone wala hai.</span></span>
+      <button onclick="document.querySelector('.nav-item[data-tab=\'tab-pay\']').click()" style="background:var(--vip-gold); color:#000; border:none; padding:3px 8px; border-radius:4px; font-weight:700; font-size:0.7rem; cursor:pointer;">Renew Karein</button>
     </div>
+
+    <!-- MESSAGES -->
+    <div class="chat-messages" id="chat-box"></div>
+
+    <!-- QUICK STUDY SHORTCUTS -->
+    <div class="study-shortcuts">
+      <span class="shortcut-pill" onclick="window.useShortcut('तशकील व तरकीब:')">📌 एराब व तरकीब</span>
+      <span class="shortcut-pill" onclick="window.useShortcut('उर्दू व सरल हिन्दी में तर्जुमा करें:')">📖 तर्जुमा (Translation)</span>
+      <span class="shortcut-pill" onclick="window.useShortcut('इस सबक का आसान खुलास बयान करें:')">📝 सबक का ख़ुलासा</span>
+      <span class="shortcut-pill" onclick="window.useShortcut('इस उनवान से इम्तिहान के लिए अहम सवालात और जवाबात बनाएं:')">❓ इम्तिहान के सवालात</span>
+    </div>
+
+    <!-- INPUT -->
     <div class="chat-footer">
       <input type="text" id="chat-input" class="chat-input" placeholder="Padhai ka sawal yahan likhein...">
       <button type="button" class="btn-send" id="btn-chat-send"><i class="fa-solid fa-paper-plane"></i></button>
@@ -161,8 +202,6 @@
 
   <!-- TAB 2: PLANS -->
   <section id="tab-plans" class="tab-view">
-    
-    <!-- FREE TIER -->
     <div class="plan-card" id="card-plan-free">
       <div id="badge-free" class="offer-badge" style="display:none;">Active</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
@@ -173,7 +212,6 @@
       <button type="button" class="btn-action active-btn" id="btn-plan-free" style="display:none;"><i class="fa-solid fa-check"></i> Aapka Current Plan Hai</button>
     </div>
 
-    <!-- PLUS TIER -->
     <div class="plan-card highlight" id="card-plan-plus">
       <div id="badge-plus" class="offer-badge">30 Din Offer</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
@@ -184,7 +222,6 @@
       <button type="button" class="btn-action" id="btn-plan-plus" onclick="window.goToPay('plus')">₹10 me 30 Din ke liye lein</button>
     </div>
 
-    <!-- PRO TIER -->
     <div class="plan-card" id="card-plan-pro">
       <div id="badge-pro" class="offer-badge">Khas Offer</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
@@ -195,7 +232,6 @@
       <button type="button" class="btn-action" id="btn-plan-pro" onclick="window.goToPay('pro')">₹25 me 30 Din ke liye lein</button>
     </div>
 
-    <!-- ULTRA TIER -->
     <div class="plan-card" id="card-plan-ultra">
       <div id="badge-ultra" class="offer-badge">Super Saver</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
@@ -212,7 +248,6 @@
       </h4>
     </div>
 
-    <!-- COMING SOON TIERS -->
     <div class="plan-card vip">
       <div class="badge-coming-soon"><i class="fa-solid fa-lock"></i> Coming Soon</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
@@ -242,13 +277,10 @@
       <div style="font-size:0.8rem; color:var(--text-muted);">1-on-1 Dedicated AI Ustad, Live Fatawa Support & Infinite Quota</div>
       <button type="button" class="btn-action disabled"><i class="fa-solid fa-clock"></i> जल्द आ रहा है (Coming Soon)</button>
     </div>
-
   </section>
 
   <!-- TAB 3: UPGRADE -->
   <section id="tab-pay" class="tab-view">
-    
-    <!-- CURRENT ACTIVE PLAN SUMMARY BANNER -->
     <div class="status-banner" id="current-plan-banner">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <span style="font-size:0.82rem; color:var(--text-muted);">Aapka Current Plan:</span>
@@ -264,7 +296,6 @@
     <p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">QR code scan karke fees bhejein aur 12 ankon ka UTR number darj karein.</p>
     
     <div class="qr-box">
-      <!-- NEW UPLOADED QR IMAGE -->
       <img src="/file_00000000111881f5a2d7ab5b856c5026.png" alt="Payment QR" onerror="this.src='file_00000000111881f5a2d7ab5b856c5026.png'">
     </div>
 
@@ -300,11 +331,18 @@
   let currentUser = JSON.parse(localStorage.getItem('suhail_ai_user') || 'null');
   let currentAdminPass = localStorage.getItem('suhail_ai_admin_pass') || '';
 
+  // Arabic detection helper
+  function containsArabic(text) {
+    const arabicRegex = /[\u0600-\u06FF]/;
+    return arabicRegex.test(text);
+  }
+
+  // Safe API Fetch
   async function safeFetch(url, options = {}) {
     const res = await fetch(url, options);
     const contentType = res.headers.get("content-type") || "";
     if (!contentType.includes("application/json")) {
-      throw new Error(`Server ne unexpected response diya (${res.status}).`);
+      throw new Error(`Server response error (${res.status}).`);
     }
     const data = await res.json();
     if (!res.ok || data.success === false) {
@@ -313,13 +351,14 @@
     return data;
   }
 
+  // Navigation
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
       item.classList.add('active');
       document.getElementById(item.dataset.tab).classList.add('active');
-      if (item.dataset.tab === 'tab-admin') loadAdminRequests();
+      if (item.dataset.tab === 'tab-admin' && window.loadAdminRequests) loadAdminRequests();
     });
   });
 
@@ -328,6 +367,24 @@
     document.querySelector('.nav-item[data-tab="tab-pay"]').click();
   };
 
+  // Shortcut Pill Click
+  window.useShortcut = (prefix) => {
+    const inp = document.getElementById('chat-input');
+    inp.value = prefix + " ";
+    inp.focus();
+  };
+
+  // Copy Answer
+  window.copyText = (btn) => {
+    const bubble = btn.closest('.chat-bubble');
+    const content = bubble.querySelector('.chat-content').innerText;
+    navigator.clipboard.writeText(content).then(() => {
+      btn.innerHTML = '<i class="fa-solid fa-check"></i> कॉपी हो गया';
+      setTimeout(() => { btn.innerHTML = '<i class="fa-regular fa-copy"></i> कॉपी करें'; }, 2000);
+    });
+  };
+
+  // Sync User Profile
   async function syncProfile() {
     if (!currentUser || !currentUser.phone) return;
     try {
@@ -357,34 +414,33 @@
     const p = isAdmin ? 'ultra' : (currentUser.plan || 'free');
 
     let planBadge = 'SUHAIL AI FREE';
-    let currentAiTitle = 'SUHAIL AI FREE';
-
-    if (p === 'ultra') {
-      planBadge = isAdmin ? 'ULTRA (ADMIN)' : 'SUHAIL AI ULTRA (30 DAYS)';
-      currentAiTitle = 'SUHAIL AI ULTRA';
-    } else if (p === 'pro') {
-      planBadge = 'SUHAIL AI PRO (30 DAYS)';
-      currentAiTitle = 'SUHAIL AI PRO';
-    } else if (p === 'plus') {
-      planBadge = 'SUHAIL AI PLUS (30 DAYS)';
-      currentAiTitle = 'SUHAIL AI PLUS';
-    }
+    if (p === 'ultra') planBadge = isAdmin ? 'ULTRA (ADMIN)' : 'SUHAIL AI ULTRA (30 DAYS)';
+    else if (p === 'pro') planBadge = 'SUHAIL AI PRO (30 DAYS)';
+    else if (p === 'plus') planBadge = 'SUHAIL AI PLUS (30 DAYS)';
 
     document.getElementById('u-plan').textContent = planBadge;
-    document.getElementById('current-ai-label').textContent = currentAiTitle;
-
-    // ACTIVE PLAN STATE IN UPGRADE TAB
     document.getElementById('active-plan-name').textContent = planBadge;
+
+    // EXPIRY BANNER & CALCULATIONS
+    const bannerExpiry = document.getElementById('banner-expiry');
     if (isAdmin) {
       document.getElementById('active-plan-status').textContent = 'Lifetime Admin VIP';
+      bannerExpiry.style.display = 'none';
     } else if (currentUser.planExpiry) {
       const daysLeft = Math.max(0, Math.ceil((currentUser.planExpiry - Date.now()) / (1000 * 60 * 60 * 24)));
       document.getElementById('active-plan-status').textContent = `Active (${daysLeft} Din Baaqi)`;
+      if (daysLeft <= 3) {
+        bannerExpiry.style.display = 'flex';
+        document.getElementById('txt-expiry-msg').textContent = `Aapka ${p.toUpperCase()} plan ${daysLeft} din me khatam ho jayega! Padhai jari rakhne ke liye renew karein.`;
+      } else {
+        bannerExpiry.style.display = 'none';
+      }
     } else {
-      document.getElementById('active-plan-status').textContent = 'Free Tier (Permanent)';
+      document.getElementById('active-plan-status').textContent = 'Free Tier (10 Sawal Rozana)';
+      bannerExpiry.style.display = 'none';
     }
 
-    // UPDATE BUTTONS & CARDS IN PLANS TAB
+    // UPDATE PLANS BUTTONS
     const plans = ['free', 'plus', 'pro', 'ultra'];
     plans.forEach(planId => {
       const card = document.getElementById(`card-plan-${planId}`);
@@ -412,7 +468,7 @@
             btn.style.display = 'block';
             btn.className = 'btn-action';
             const prices = { plus: '₹10 me 30 Din ke liye lein', pro: '₹25 me 30 Din ke liye lein', ultra: '₹50 me 30 Din ke liye lein' };
-            btn.textContent = prices[planId] || 'Updrade Karein';
+            btn.textContent = prices[planId] || 'Upgrade Karein';
             btn.onclick = () => window.goToPay(planId);
             if (badge) {
               badge.style.display = 'block';
@@ -436,6 +492,7 @@
     }
   }
 
+  // LOGIN / AUTH
   document.getElementById('btn-login-submit').addEventListener('click', async () => {
     const phone = document.getElementById('auth-phone').value.trim();
     const roll = document.getElementById('auth-roll').value.trim();
@@ -464,6 +521,7 @@
         localStorage.setItem('suhail_ai_admin_pass', adminPass);
       }
       renderUserUI();
+      loadChatHistory();
     } catch (e) {
       alert(e.message);
     }
@@ -475,9 +533,38 @@
     location.reload();
   };
 
+  // CHAT SYSTEM & LOCAL STORAGE PERSISTENCE
   const chatBox = document.getElementById('chat-box');
   const chatInput = document.getElementById('chat-input');
   const sendBtn = document.getElementById('btn-chat-send');
+
+  function getHistoryKey() {
+    return currentUser ? `suhail_chat_v2_${currentUser.phone}` : 'suhail_chat_temp';
+  }
+
+  function loadChatHistory() {
+    chatBox.innerHTML = '';
+    const saved = JSON.parse(localStorage.getItem(getHistoryKey()) || '[]');
+    if (!saved.length) {
+      appendMessage("अस्सलामु अलैकुम व रहमतुल्लाह! मैं आपका सुहैल AI स्टडी पार्टनर हूँ। दरसे निज़ामी, नह्व, सर्फ़, अरबी इबारत या दीनी व असरी किताबों से मुतअल्लिक़ कोई भी सवाल पूछें।", 'ai', 'SUHAIL AI FREE', false);
+    } else {
+      saved.forEach(m => appendMessage(m.text, m.role, m.aiName, false));
+    }
+  }
+
+  function saveMessageToHistory(text, role, aiName) {
+    const saved = JSON.parse(localStorage.getItem(getHistoryKey()) || '[]');
+    saved.push({ text, role, aiName, time: Date.now() });
+    if (saved.length > 50) saved.shift(); // keep last 50
+    localStorage.setItem(getHistoryKey(), JSON.stringify(saved));
+  }
+
+  // NEW CHAT
+  document.getElementById('btn-new-chat').onclick = () => {
+    if (!confirm("क्या आप नई गुफ़्तगू शुरू करना चाहते हैं? पुरानी चैट साफ़ हो जाएगी।")) return;
+    localStorage.removeItem(getHistoryKey());
+    loadChatHistory();
+  };
 
   sendBtn.onclick = sendQuestion;
   chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendQuestion(); });
@@ -487,9 +574,9 @@
     if (!text || !currentUser) return;
 
     chatInput.value = '';
-    appendMessage(text, 'user');
+    appendMessage(text, 'user', null, true);
     sendBtn.disabled = true;
-    const aiBubble = appendMessage("Ilmi jawab taiyar kiya ja raha hai...", 'ai');
+    const aiBubble = appendMessage("इल्मी जवाब तैयार किया जा रहा है...", 'ai', 'SUHAIL AI', false);
 
     try {
       const data = await safeFetch('/api?action=ai', {
@@ -497,31 +584,53 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: text, phone: currentUser.phone })
       });
-      aiBubble.innerHTML = `<span class="ai-label">${data.aiName}</span>${data.reply}`;
+      renderAiBubble(aiBubble, data.reply, data.aiName);
+      saveMessageToHistory(data.reply, 'ai', data.aiName);
     } catch (err) {
-      aiBubble.textContent = "Kshama karein: " + err.message;
+      aiBubble.innerHTML = `<span class="ai-label">त्रुटि</span><div class="chat-content" style="color:var(--danger);">${err.message}</div>`;
     } finally {
       sendBtn.disabled = false;
+      syncProfile();
     }
   }
 
-  function appendMessage(text, role) {
+  function appendMessage(text, role, aiName, shouldSave) {
     const div = document.createElement('div');
     div.className = `chat-bubble ${role}`;
-    div.textContent = text;
+
+    if (role === 'user') {
+      div.textContent = text;
+      if (shouldSave) saveMessageToHistory(text, 'user');
+    } else {
+      renderAiBubble(div, text, aiName);
+    }
+
     chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
     return div;
   }
 
-  // STRICT 12-DIGIT UTR PAYMENT SUBMIT
+  function renderAiBubble(div, text, aiName) {
+    const isAr = containsArabic(text);
+    const parsedHtml = (typeof marked !== 'undefined') ? marked.parse(text) : text;
+
+    div.innerHTML = `
+      <span class="ai-label">${aiName || 'SUHAIL AI'}</span>
+      <div class="chat-content ${isAr ? 'arabic-text' : ''}">${parsedHtml}</div>
+      <div class="bubble-actions">
+        <button class="btn-copy" onclick="window.copyText(this)"><i class="fa-regular fa-copy"></i> कॉपी करें</button>
+      </div>
+    `;
+  }
+
+  // SUBMIT PAYMENT (STRICT 12-DIGIT)
   document.getElementById('btn-submit-pay').onclick = async () => {
     const rawUtr = document.getElementById('pay-utr').value.trim();
     const cleanUtr = rawUtr.replace(/\D/g, '');
     const plan = document.getElementById('pay-plan-select').value;
 
     if (!cleanUtr || cleanUtr.length !== 12) {
-      return alert("Amanay UTR! Kripya sahi 12 ankon ka numeric UTR / Transaction Ref No. darj karein. Sirf 12 ank hi manya hain.");
+      return alert("अमान्य UTR! कृपया ठीक 12 अंकों का न्यूमेरिक UTR नंबर दर्ज करें।");
     }
 
     try {
@@ -538,9 +647,10 @@
     }
   };
 
+  // ADMIN REQUESTS
   async function loadAdminRequests() {
     const list = document.getElementById('admin-requests-list');
-    list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Loading...</p>';
+    list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">लोड हो रहा है...</p>';
 
     try {
       const data = await safeFetch('/api?action=admin', {
@@ -553,7 +663,7 @@
       const keys = Object.keys(reqs).filter(k => reqs[k].status === 'pending');
 
       if (!keys.length) {
-        list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Koi pending request nahi hai.</p>';
+        list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">कोई पेंडिंग अनुरोध नहीं है।</p>';
         return;
       }
 
@@ -564,13 +674,13 @@
         card.className = 'admin-req-card';
         card.innerHTML = `
           <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.85rem;">
-            <span>Phone: ${item.phone}</span>
+            <span>फ़ोन: ${item.phone}</span>
             <span style="color:var(--primary-green); text-transform:uppercase;">${item.plan} (₹${item.amount || 0})</span>
           </div>
           <div style="font-size:0.75rem; color:var(--text-muted);">UTR (12-Digit): <b style="color:#fff;">${item.utr}</b></div>
           <div class="admin-actions">
-            <button class="btn-approve" onclick="window.adminAction('approve_request', '${k}', '${item.phone}', '${item.plan}')">Approve (30 Days)</button>
-            <button class="btn-reject" onclick="window.adminAction('reject_request', '${k}')">Reject</button>
+            <button class="btn-approve" onclick="window.adminAction('approve_request', '${k}', '${item.phone}', '${item.plan}')">मंज़ूर करें (30 दिन)</button>
+            <button class="btn-reject" onclick="window.adminAction('reject_request', '${k}')">खारिज करें</button>
           </div>
         `;
         list.appendChild(card);
@@ -602,10 +712,11 @@
   };
 
   renderUserUI();
-  setInterval(syncProfile, 4000);
+  loadChatHistory();
+  setInterval(syncProfile, 5000);
 </script>
 
+<!-- EXTERNAL ADMIN DASHBOARD SCRIPT -->
 <script src="/admin-dashboard.js"></script>
-
 </body>
 </html>
