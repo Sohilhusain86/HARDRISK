@@ -3,12 +3,12 @@ import crypto from "crypto";
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com";
 
-// Keys
+// Active Verified Keys
 const GROQ_KEY = (process.env.GROQ_KEY || "").trim();
 const OPENROUTER_KEY = (process.env.OPENROUTER_KEY || "").trim();
 const POLLINATIONS_KEY = (process.env.POLLINATIONS_KEY || process.env.POLLINATION_KEY || "").trim();
 
-// UPDATED STRICT DAILY LIMITS
+// EXACT SPECIFIED DAILY LIMITS
 const DAILY_LIMITS = {
   free: 25,
   plus: 75,
@@ -106,10 +106,10 @@ function normalizePlan(rawPlan) {
 }
 
 // -------------------------------------------------------------
-// BULLETPROOF MULTI-MODEL ENGINE
+// CALLERS FOR ACTIVE PRODUCTION MODELS
 // -------------------------------------------------------------
 
-async function tryGroqModel(model, prompt, instruction) {
+async function tryGroq(model, prompt, instruction) {
   if (!GROQ_KEY) return null;
   try {
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -135,7 +135,7 @@ async function tryGroqModel(model, prompt, instruction) {
   return null;
 }
 
-async function tryOpenRouterModel(model, prompt, instruction) {
+async function tryOpenRouter(model, prompt, instruction) {
   if (!OPENROUTER_KEY) return null;
   try {
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -162,7 +162,7 @@ async function tryOpenRouterModel(model, prompt, instruction) {
   return null;
 }
 
-async function tryPollinationsModel(model, prompt, instruction) {
+async function tryPollinations(model, prompt, instruction) {
   if (!POLLINATIONS_KEY) return null;
   try {
     const res = await fetch("https://text.pollinations.ai/openai/chat/completions", {
@@ -188,42 +188,55 @@ async function tryPollinationsModel(model, prompt, instruction) {
   return null;
 }
 
+// -------------------------------------------------------------
+// PRODUCTION DISPATCHER: GROQ-FIRST PRODUCTION CHAIN
+// -------------------------------------------------------------
+
 async function executeAI(plan, prompt, instruction) {
   let reply = null;
 
-  // Ultra Tier (250)
   if (plan === "ultra") {
-    reply = await tryGroqModel("llama-3.3-70b-versatile", prompt, instruction);
-    if (!reply) reply = await tryPollinationsModel("deepseek-r1", prompt, instruction);
-    if (!reply) reply = await tryOpenRouterModel("deepseek/deepseek-r1:free", prompt, instruction);
-    if (!reply) reply = await tryGroqModel("llama-3.1-8b-instant", prompt, instruction);
-  }
-  // Pro Tier (150)
-  else if (plan === "pro") {
-    reply = await tryGroqModel("llama-3.3-70b-versatile", prompt, instruction);
-    if (!reply) reply = await tryGroqModel("llama-3.1-8b-instant", prompt, instruction);
-    if (!reply) reply = await tryOpenRouterModel("meta-llama/llama-3.3-70b-instruct:free", prompt, instruction);
-  }
-  // Plus Tier (75)
-  else if (plan === "plus") {
-    reply = await tryGroqModel("llama-3.1-8b-instant", prompt, instruction);
-    if (!reply) reply = await tryGroqModel("llama-3.3-70b-versatile", prompt, instruction);
-    if (!reply) reply = await tryPollinationsModel("qwen", prompt, instruction);
-  }
-  // Free Tier (25)
-  else {
-    reply = await tryGroqModel("llama-3.1-8b-instant", prompt, instruction);
-    if (!reply) reply = await tryGroqModel("llama-3.3-70b-versatile", prompt, instruction);
-    if (!reply) reply = await tryOpenRouterModel("meta-llama/llama-3.1-8b-instruct:free", prompt, instruction);
+    // 1. Groq GPT-OSS 120B (High Reasoning Production)
+    reply = await tryGroq("openai/gpt-oss-120b", prompt, instruction);
+    // 2. Groq GPT-OSS 20B (Ultra-Fast 1000 tps)
+    if (!reply) reply = await tryGroq("openai/gpt-oss-20b", prompt, instruction);
+    // 3. Pollinations DeepSeek-R1 (Flagship Research)
+    if (!reply) reply = await tryPollinations("deepseek-r1", prompt, instruction);
+    // 4. OpenRouter Flagship
+    if (!reply) reply = await tryOpenRouter("deepseek/deepseek-r1:free", prompt, instruction);
+  } else if (plan === "pro") {
+    // 1. Groq GPT-OSS 120B
+    reply = await tryGroq("openai/gpt-oss-120b", prompt, instruction);
+    // 2. Groq GPT-OSS 20B
+    if (!reply) reply = await tryGroq("openai/gpt-oss-20b", prompt, instruction);
+    // 3. OpenRouter Pro
+    if (!reply) reply = await tryOpenRouter("openai/gpt-oss-120b", prompt, instruction);
+  } else if (plan === "plus") {
+    // 1. Groq GPT-OSS 20B (Super Fast Tutor)
+    reply = await tryGroq("openai/gpt-oss-20b", prompt, instruction);
+    // 2. Groq GPT-OSS 120B (Detailed Step-by-Step)
+    if (!reply) reply = await tryGroq("openai/gpt-oss-120b", prompt, instruction);
+    // 3. Pollinations Qwen Tutor
+    if (!reply) reply = await tryPollinations("qwen", prompt, instruction);
+  } else {
+    // Free Tier (25 Sawal)
+    // 1. Groq GPT-OSS 20B
+    reply = await tryGroq("openai/gpt-oss-20b", prompt, instruction);
+    // 2. Groq GPT-OSS 120B
+    if (!reply) reply = await tryGroq("openai/gpt-oss-120b", prompt, instruction);
+    // 3. OpenRouter Free
+    if (!reply) reply = await tryOpenRouter("openai/gpt-oss-20b", prompt, instruction);
+    // 4. Pollinations Mistral
+    if (!reply) reply = await tryPollinations("mistral", prompt, instruction);
   }
 
-  // Universal Fallback
+  // Universal Safety Net
   if (!reply) {
-    reply = await tryPollinationsModel("mistral", prompt, instruction);
+    reply = await tryPollinations("mistral", prompt, instruction);
   }
 
   if (!reply) {
-    throw { userMsg: "Suhail AI service is samay vyast hai. Kripya 5 second baad dobara prayas karein.", code: 500 };
+    throw { userMsg: "सुहैल AI सेवा इस समय व्यस्त है। कृपया 5 सेकंड बाद पुनः प्रयास करें।", code: 500 };
   }
 
   return reply;
@@ -256,6 +269,7 @@ export default async function handler(req, res) {
       });
     }
 
+    // LOGIN & AUTH (UNTOUCHED)
     if (action === "auth" && req.method === "POST") {
       const { phone, name, roll, userPass, adminPass } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -396,6 +410,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, reply: replyText, aiName, plan });
     }
 
+    // PAYMENT & ADMIN (UNTOUCHED)
     if (action === "payment" && req.method === "POST") {
       const { phone, plan, utr } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
