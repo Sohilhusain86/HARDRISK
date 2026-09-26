@@ -35,7 +35,8 @@
       width: 100%;
       min-height: 100vh;
       overflow-x: hidden;
-      overscroll-behavior: contain;
+      touch-action: pan-y !important;
+      overscroll-behavior-y: contain !important;
     }
     
     .app-container {
@@ -44,11 +45,12 @@
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      height: 100dvh;
       background: var(--panel-dark);
       position: relative;
-      overflow-x: hidden;
-      overflow-y: hidden;
+      overflow: hidden;
+      touch-action: pan-y !important;
+      -webkit-overflow-scrolling: touch !important;
     }
     
     .top-header {
@@ -118,7 +120,7 @@
       display: none;
       flex-direction: column;
       gap: 12px;
-      padding-bottom: 70px; /* Safe space for ad banner */
+      padding-bottom: max(80px, env(safe-area-inset-bottom));
     }
     .tab-view.active { display: flex; }
 
@@ -196,6 +198,7 @@
       border-radius: 8px;
       border: 1px solid rgba(255,255,255,0.1);
       display: block;
+      -webkit-overflow-scrolling: touch !important;
     }
     .table-responsive table {
       width: 100%;
@@ -207,6 +210,8 @@
       padding: 8px 10px;
       font-size: 0.8rem;
       text-align: left;
+      min-width: 130px;
+      white-space: normal;
     }
     .table-responsive th { background: #182229; color: var(--primary-green); }
 
@@ -255,7 +260,14 @@
     .lang-pill:hover { background: var(--primary-green); color: #fff; }
     .btn-close-lang { background: none; border: none; color: var(--danger); font-size: 0.85rem; cursor: pointer; margin-left: auto; padding: 0 4px; }
 
-    .chat-footer { display: flex; align-items: flex-end; gap: 8px; padding-top: 4px; width: 100%; }
+    .chat-footer {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      padding: 6px 2px;
+      padding-bottom: max(10px, env(safe-area-inset-bottom)) !important;
+      width: 100%;
+    }
     .chat-input {
       flex: 1;
       background: var(--card-dark);
@@ -299,7 +311,6 @@
     .plan-card.ultra-card { border: 2px solid var(--vip-gold); background: linear-gradient(145deg, #182229 0%, #2e2008 100%); }
     .plan-card.active-owned { border: 2px solid var(--success); background: rgba(34, 197, 94, 0.06); }
     
-    /* UPCOMING VIP CARDS */
     .plan-card.vip {
       border: 1px dashed var(--vip-purple);
       background: linear-gradient(145deg, #182229 0%, #1e1b4b 100%);
@@ -347,7 +358,6 @@
     .form-group label { font-size: 0.8rem; color: var(--text-muted); }
     .form-input { background: #182229; border: 1px solid var(--card-border); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 0.9rem; outline: none; }
     
-    /* CORPORATE CRISP QR FRAME */
     .qr-container-card {
       background: #ffffff;
       padding: 14px;
@@ -371,7 +381,6 @@
     .auth-overlay { position: absolute; inset: 0; background: rgba(11, 20, 26, 0.98); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .auth-card { background: var(--card-dark); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 12px; max-height: 95vh; overflow-y: auto; }
 
-    /* ABOUT MODAL */
     .about-overlay { position: absolute; inset: 0; background: rgba(11, 20, 26, 0.95); z-index: 120; display: none; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(8px); }
     .about-card {
       background: linear-gradient(145deg, #182229 0%, #1a162b 100%);
@@ -414,68 +423,6 @@
   </style>
 
   <link rel="manifest" href="/manifest.json">
-  
-  <style>
-  /* 1. मोबाइल में सिंगल उंगली से स्मूथ स्क्रॉल के लिए */
-  html, body {
-    touch-action: pan-y !important;
-    overscroll-behavior-y: contain !important;
-  }
-  .app-container {
-    touch-action: pan-y !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-
-  /* 2. टेबल को दायें-बायें स्क्रॉल करने के लिए */
-  table {
-    display: block !important;
-    width: 100% !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-  th, td {
-    min-width: 130px !important;
-    white-space: normal !important;
-  }
-
-    /* नीचे के इनपुट बार को हर फ़ोन के हिसाब से बैलेंस करना */
-  .input-area, .chat-input-container {
-    padding-bottom: max(10px, env(safe-area-inset-bottom)) !important;
-    margin-bottom: 0px !important;
-  }
-    
-  </style>
-
-  <!-- प्रीमियम अपग्रेड मॉडल -->
-<div id="customUpgradeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(4px);">
-  <div style="background:#131c21; border:1px solid #00a884; border-radius:16px; padding:20px; width:85%; max-width:340px; text-align:center; color:#fff; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
-    <div style="font-size:2rem; margin-bottom:10px;">👑</div>
-    <h3 style="margin:0 0 10px; color:#00a884; font-size:1.2rem;">प्रीमियम फीचर</h3>
-    <p style="color:#b0bec5; font-size:0.9rem; line-height:1.4; margin-bottom:20px;">
-      यह टूल <b>SUHAIL AI PLUS, PRO aur ULTRA</b> में उपलब्ध है। अभी अपग्रेड करें!
-    </p>
-    <div style="display:flex; gap:10px;">
-      <button onclick="closeCustomModal()" style="flex:1; padding:10px; border-radius:8px; border:1px solid #444; background:transparent; color:#bbb; font-weight:600;">बाद में</button>
-      <button onclick="goToUpgrade()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#00a884; color:#fff; font-weight:bold;">अपग्रेड करें</button>
-    </div>
-  </div>
-</div>
-
-<script>
-  function showUpgradeAlert() {
-    document.getElementById('customUpgradeModal').style.display = 'flex';
-  }
-  function closeCustomModal() {
-    document.getElementById('customUpgradeModal').style.display = 'none';
-  }
-  function goToUpgrade() {
-    closeCustomModal();
-    // अपग्रेड टैब या लिंक पर ले जाएं
-    const upgradeTab = document.querySelector('[data-tab="upgrade"]') || document.querySelector('.tab-upgrade');
-    if(upgradeTab) upgradeTab.click();
-  }
-</script>
-  
 </head>
 <body>
 
@@ -558,7 +505,7 @@
     <div class="header-actions">
       <button id="btn-open-about" title="About Platform" style="color:var(--accent-yellow);"><i class="fa-solid fa-circle-info"></i></button>
       <button id="btn-new-chat" title="New Chat"><i class="fa-solid fa-arrows-rotate"></i></button>
-      <button id="btn-admin-toggle" title="Admin Requests" style="display:none;"><i class="fa-solid fa-shield-halved"></i></button>
+      <button id="btn-admin-toggle" title="Admin Control Center" style="display:none; color:var(--primary-green);"><i class="fa-solid fa-shield-halved"></i></button>
       <button id="btn-logout" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
     </div>
   </header>
@@ -632,7 +579,7 @@
     </div>
   </section>
 
-  <!-- TAB 2: PLANS (WITH RESTORED UPCOMING VIP TIERS) -->
+  <!-- TAB 2: PLANS -->
   <section id="tab-plans" class="tab-view">
     <!-- FREE -->
     <div class="plan-card" id="card-plan-free">
@@ -682,7 +629,7 @@
       <button type="button" class="btn-action" id="btn-plan-pro" onclick="window.goToPay('pro')">₹25 me 30 Din ke liye lein</button>
     </div>
 
-    <!-- ULTRA (THE FLAGSHIP UNMATCHED TIER) -->
+    <!-- ULTRA -->
     <div class="plan-card ultra-card" id="card-plan-ultra">
       <div id="badge-ultra" class="offer-badge" style="background:var(--vip-gold); color:#000;">Flagship Tier</div>
       <div style="display:flex; justify-content:space-between; align-items:baseline;">
@@ -695,12 +642,12 @@
         <span><i class="fa-solid fa-crown gold-star"></i> 👑 <b>4 Mazahib Fiqh Comparative Matrix (Exclusive)</b></span>
         <span><i class="fa-solid fa-crown gold-star"></i> 👑 <b>Mantiq Syllogism & Scholarly Defense Engine (Exclusive)</b></span>
         <span><i class="fa-solid fa-crown gold-star"></i> 👑 <b>Classical Hashiya & Shurooh Synthesizer (Exclusive)</b></span>
-        <span><i class="fa-solid fa-check gold-star"></i> 6-Stage Deep Academic Research (Tareef, Usool, Wazahat, Tatbeeq)</span>
+        <span><i class="fa-solid fa-check gold-star"></i> 6-Stage Deep Academic Research</span>
       </div>
       <button type="button" class="btn-action" id="btn-plan-ultra" style="background:var(--vip-gold); color:#000;" onclick="window.goToPay('ultra')">₹50 me ULTRA Flagship lein</button>
     </div>
 
-    <!-- RESTORED: FUTURE UPCOMING VIP TIERS -->
+    <!-- UPCOMING VIP TIERS -->
     <div style="margin-top:16px; border-top:1px dashed rgba(255,255,255,0.12); padding-top:14px;">
       <h4 style="color:var(--vip-purple); font-size:0.9rem; text-align:center; margin-bottom:10px;">
         <i class="fa-solid fa-sparkles"></i> Future Elite AI Tiers (Coming Soon)
@@ -726,16 +673,6 @@
       <div style="font-size:0.8rem; color:var(--text-muted);">Kitab Scanner, Complete Ibaarat Tashkeel & Auto Exam Solver</div>
       <button type="button" class="btn-action disabled"><i class="fa-solid fa-clock"></i> जल्द आ रहा है (Coming Soon)</button>
     </div>
-
-    <div class="plan-card vip">
-      <div class="badge-coming-soon"><i class="fa-solid fa-lock"></i> Coming Soon</div>
-      <div style="display:flex; justify-content:space-between; align-items:baseline;">
-        <span style="font-weight:700; color:#fff;">SUHAIL AI PRIME</span>
-        <span style="font-weight:700; color:var(--vip-gold);">Crown Tier</span>
-      </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">1-on-1 Dedicated AI Ustad, Live Fatawa Support & Infinite Quota</div>
-      <button type="button" class="btn-action disabled"><i class="fa-solid fa-clock"></i> जल्द आ रहा है (Coming Soon)</button>
-    </div>
   </section>
 
   <!-- TAB 3: UPGRADE -->
@@ -754,7 +691,6 @@
     <h4 style="text-align:center; color:#fff; margin-top:6px;">QR Code Payment Gateway</h4>
     <p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">QR code scan karke fees bhejein aur 12 ankon ka UTR number darj karein.</p>
     
-    <!-- CORPORATE CLEAN QR FRAME -->
     <div class="qr-container-card">
       <img src="/file_00000000111881f5a2d7ab5b856c5026.png" alt="Payment QR" onerror="this.src='file_00000000111881f5a2d7ab5b856c5026.png'">
     </div>
@@ -776,10 +712,10 @@
     <button type="button" class="btn-action" id="btn-submit-pay">Verification ke liye Submit karein</button>
   </section>
 
-  <!-- TAB 4: ADMIN -->
+  <!-- TAB 4: ADMIN REQUESTS -->
   <section id="tab-admin" class="tab-view">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h4 style="color:var(--accent-yellow);">Pending Approvals (30 Days Activation)</h4>
+      <h4 style="color:var(--accent-yellow);">Pending Approvals</h4>
       <button id="btn-admin-refresh" class="form-input" style="padding:4px 8px; cursor:pointer;"><i class="fa-solid fa-rotate"></i> Refresh</button>
     </div>
     <div id="admin-requests-list" style="display:flex; flex-direction:column; gap:8px;"></div>
@@ -787,9 +723,70 @@
 
 </div>
 
+<!-- ================= PREMIUM UPGRADE ALERT MODAL ================= -->
+<div id="customUpgradeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(4px);">
+  <div style="background:#131c21; border:1px solid #00a884; border-radius:16px; padding:20px; width:85%; max-width:340px; text-align:center; color:#fff; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
+    <div style="font-size:2rem; margin-bottom:10px;">👑</div>
+    <h3 style="margin:0 0 10px; color:#00a884; font-size:1.2rem;">प्रीमियम फीचर</h3>
+    <p id="upgradeModalMsg" style="color:#b0bec5; font-size:0.9rem; line-height:1.4; margin-bottom:20px;">
+      यह टूल <b>SUHAIL AI PLUS, PRO aur ULTRA</b> में उपलब्ध है। अभी अपग्रेड करें!
+    </p>
+    <div style="display:flex; gap:10px;">
+      <button onclick="document.getElementById('customUpgradeModal').style.display='none'" style="flex:1; padding:10px; border-radius:8px; border:1px solid #444; background:transparent; color:#bbb; font-weight:600;">बाद में</button>
+      <button onclick="goToUpgradeTab()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#00a884; color:#fff; font-weight:bold;">अपग्रेड करें</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= ADMIN CONTROL CENTER MODAL ================= -->
+<div id="adminControlModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; align-items:center; justify-content:center; padding:15px; backdrop-filter:blur(6px);">
+  <div style="background:#131c21; border:1px solid #00a884; border-radius:16px; max-width:520px; width:100%; max-height:88vh; display:flex; flex-direction:column; padding:18px; color:#e9edef; box-shadow:0 15px 35px rgba(0,0,0,0.7);">
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2a3942; padding-bottom:10px; margin-bottom:14px;">
+      <h3 style="margin:0; color:#00a884; font-size:1.15rem; display:flex; align-items:center; gap:8px;">
+        <i class="fa-solid fa-shield-halved"></i> Admin Control Center
+      </h3>
+      <button onclick="document.getElementById('adminControlModal').style.display='none'" style="background:transparent; border:none; color:#8696a0; font-size:1.5rem; cursor:pointer;">&times;</button>
+    </div>
+
+    <!-- 6 Admin Action Buttons -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+      <button onclick="runAudit('all')" style="background:#1f2c34; border:1px solid #00a884; color:#00a884; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+        <i class="fa-solid fa-brain"></i> All Users Chat Audit
+      </button>
+
+      <button onclick="runAudit('single')" style="background:#1f2c34; border:1px solid #25d366; color:#25d366; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+        <i class="fa-solid fa-user-check"></i> Single User Audit
+      </button>
+
+      <button onclick="triggerAdminAction('change_plan')" style="background:#1f2c34; border:1px solid #eab308; color:#facc15; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+        <i class="fa-solid fa-crown"></i> Change Plan / Upgrade
+      </button>
+
+      <button onclick="triggerAdminAction('toggle_block')" style="background:#1f2c34; border:1px solid #ef4444; color:#f87171; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+        <i class="fa-solid fa-ban"></i> Block / Unblock User
+      </button>
+
+      <button onclick="triggerAdminAction('reset_limit')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+        <i class="fa-solid fa-rotate-left"></i> Daily Limit Reset
+      </button>
+
+      <button onclick="triggerAdminAction('set_notice')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+        <i class="fa-solid fa-bullhorn"></i> Global Notice
+      </button>
+    </div>
+
+    <!-- Output Area -->
+    <div id="adminPanelOutput" style="flex:1; overflow-y:auto; background:#0b141a; border:1px solid #222d34; border-radius:10px; padding:12px; font-size:0.85rem; line-height:1.6; color:#d1d7db; white-space:pre-wrap; min-height:190px;">
+      ऊपर दिए गए किसी भी टूल पर टैप करें...
+    </div>
+
+  </div>
+</div>
+
 <script>
   let currentUser = JSON.parse(localStorage.getItem('suhail_ai_user') || 'null');
-  let currentAdminPass = localStorage.getItem('suhail_ai_admin_pass') || '';
+  let currentAdminPass = localStorage.getItem('suhail_ai_admin_pass') || 'SuhailAiJamia';
   let activeShortcutType = null;
 
   function containsArabic(text) {
@@ -824,11 +821,20 @@
     document.querySelector('.nav-item[data-tab="tab-pay"]').click();
   };
 
+  function goToUpgradeTab() {
+    document.getElementById('customUpgradeModal').style.display = 'none';
+    document.querySelector('.nav-item[data-tab="tab-pay"]').click();
+  }
+
   document.getElementById('btn-open-about').onclick = () => {
     document.getElementById('modal-about').style.display = 'flex';
   };
 
-  // TOOL PERMISSION GATEWAY (DISTINCT ULTRA EXCLUSIVITY)
+  // Header Shield Icon Click -> Opens Admin Control Center
+  document.getElementById('btn-admin-toggle').onclick = () => {
+    document.getElementById('adminControlModal').style.display = 'flex';
+  };
+
   function checkToolAccess(type) {
     const p = (currentUser?.role === 'admin') ? 'ultra' : (currentUser?.plan || 'free');
 
@@ -837,7 +843,7 @@
     }
     if (type === 'tarqeeb' || type === 'quiz') {
       if (p === 'free') {
-        return { allowed: false, minPlan: 'plus', msg: 'Yeh tool SUHAIL AI PLUS, PRO aur ULTRA me uplabdh hai. Abhi upgrade karein!' };
+        return { allowed: false, minPlan: 'plus', msg: 'Yeh tool SUHAIL AI PLUS, PRO aur ULTRA me uplabdh hai.' };
       }
       return { allowed: true };
     }
@@ -849,7 +855,7 @@
     }
     if (type === 'taqabul_fiqh' || type === 'mantiq_kalam' || type === 'shurooh_hashiya') {
       if (p !== 'ultra') {
-        return { allowed: false, minPlan: 'ultra', msg: '👑 Yeh nayab Super-Tool sirf aur sirf SUHAIL AI ULTRA me uplabdh hai! 4 Mazahib Matrix aur Mantiq Defense ke liye ULTRA me upgrade karein.' };
+        return { allowed: false, minPlan: 'ultra', msg: '👑 Yeh nayab Super-Tool sirf aur sirf SUHAIL AI ULTRA me uplabdh hai!' };
       }
       return { allowed: true };
     }
@@ -859,9 +865,8 @@
   window.triggerShortcut = (type, title) => {
     const access = checkToolAccess(type);
     if (!access.allowed) {
-      if (confirm(access.msg + "\n\nKya aap Upgrade page par jana chahte hain?")) {
-        window.goToPay(access.minPlan.toLowerCase());
-      }
+      document.getElementById('upgradeModalMsg').innerHTML = access.msg + "<br><br><b>Kya aap Upgrade karna chahte hain?</b>";
+      document.getElementById('customUpgradeModal').style.display = 'flex';
       return;
     }
 
@@ -893,11 +898,11 @@
     } else if (activeShortcutType === 'tatbeeq') {
       promptPrefix = `[Fiqhi Tatbeeq - ${lang}]: Is mas'ale ki fiqhi wa usooli tatbeeq ${lang} me tahreer karein:\n`;
     } else if (activeShortcutType === 'taqabul_fiqh') {
-      promptPrefix = `[4 Mazahib Fiqh Matrix - ${lang}]: Is fiqhi mas'ale par 4 Mazahib (Hanafi, Shafi'i, Maliki, Hanbali) ke aaraa, dalail aur rajih qawl ka aamne-saamne muqabla ${lang} me pesh karein:\n`;
+      promptPrefix = `[4 Mazahib Fiqh Matrix - ${lang}]: Is fiqhi mas'ale par 4 Mazahib (Hanafi, Shafi'i, Maliki, Hanbali) ke aaraa, dalail aur rajih qawl ka muqabla ${lang} me pesh karein:\n`;
     } else if (activeShortcutType === 'mantiq_kalam') {
-      promptPrefix = `[Mantiq & Kalam Defense - ${lang}]: Is da'we ya shubhe ka Ilm-ul-Mantiq (Sughra, Kubra, Qiyas) aur Aqaid-e-Ahl-us-Sunnah ke dalail ke sath qata'ee radd ${lang} me pesh karein:\n`;
+      promptPrefix = `[Mantiq & Kalam Defense - ${lang}]: Is da'we ka Ilm-ul-Mantiq aur Aqaid-e-Ahl-us-Sunnah ke dalail ke sath radd ${lang} me pesh karein:\n`;
     } else if (activeShortcutType === 'shurooh_hashiya') {
-      promptPrefix = `[Hashiya Synthesizer - ${lang}]: Is darsi ibaarat par ahem shurooh aur mutaqaddimeen/muta'akhireen hawashi ke ikhtilafat aur bariq nukat ${lang} me wazeh karein:\n`;
+      promptPrefix = `[Hashiya Synthesizer - ${lang}]: Is darsi ibaarat par hawashi ke ikhtilafat ${lang} me wazeh karein:\n`;
     } else {
       promptPrefix = `[${lang}]: `;
     }
@@ -954,7 +959,6 @@
     document.getElementById('u-plan').textContent = planBadge;
     document.getElementById('active-plan-name').textContent = planBadge;
 
-    // Visual Lock Indicators
     document.getElementById('lock-tarqeeb').style.display = (p === 'free') ? 'inline-block' : 'none';
     document.getElementById('lock-quiz').style.display = (p === 'free') ? 'inline-block' : 'none';
     document.getElementById('lock-tahqeeq').style.display = (p === 'free' || p === 'plus') ? 'inline-block' : 'none';
@@ -1267,167 +1271,19 @@
     }
   };
 
-  renderUserUI();
-  loadChatHistory();
-  setInterval(syncProfile, 5000);
-</script>
-
-<script src="/admin-dashboard.js"></script>
-
-  <!-- एडमिन एआई ऑडिट मॉडल -->
-<div id="adminAiModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; align-items:center; justify-content:center; padding:15px; backdrop-filter:blur(5px);">
-  <div style="background:#182229; border:1px solid #00a884; border-radius:14px; max-width:550px; width:100%; max-height:85vh; display:flex; flex-direction:column; padding:18px; color:#e9edef; box-shadow:0 12px 30px rgba(0,0,0,0.7);">
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2a3942; padding-bottom:10px; margin-bottom:12px;">
-      <h3 style="margin:0; color:#00a884; font-size:1.1rem; display:flex; align-items:center; gap:8px;">
-        <i class="fa-solid fa-brain"></i> एआई चैट ऑडिट व सुधार समरी
-      </h3>
-      <button onclick="document.getElementById('adminAiModal').style.display='none'" style="background:transparent; border:none; color:#8696a0; font-size:1.4rem; cursor:pointer;">&times;</button>
-    </div>
-    
-    <div id="aiSummaryContent" style="flex:1; overflow-y:auto; font-size:0.9rem; line-height:1.6; white-space:pre-wrap; color:#d1d7db; padding-right:5px;">
-      बटन दबाकर तमाम छात्रों की चैट का एआई विश्लेषण निकालें...
-    </div>
-
-    <div style="margin-top:14px; display:flex; gap:10px;">
-      <button id="btnFetchAiSummary" onclick="fetchAiAuditSummary()" style="flex:1; background:#00a884; color:#fff; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">
-        समरी जनरेट करें (AI Audit)
-      </button>
-    </div>
-  </div>
-</div>
-
-<script>
-async function fetchAiAuditSummary() {
-  const contentBox = document.getElementById('aiSummaryContent');
-  const btn = document.getElementById('btnFetchAiSummary');
-  contentBox.innerText = "तमाम छात्रों के सवाल और एआई के जवाबों का विश्लेषण हो रहा है... कृपया 5-10 सेकंड इंतज़ार करें...";
-  btn.disabled = true;
-
-  try {
-    const res = await fetch('/api/admin?action=ai_chat_summary', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pass: 'SuhailAiJamia' }) // आपका एडमिन सीक्रेट
-    });
-    const data = await res.json();
-    if(data.success) {
-      contentBox.innerText = data.insights;
-    } else {
-      contentBox.innerText = "त्रुटि: " + (data.error || "डेटा नहीं मिल सका");
-    }
-  } catch(err) {
-    contentBox.innerText = "कनेक्शन में समस्या आई: " + err.message;
-  } finally {
-    btn.disabled = false;
-  }
-}
-
-//       <button onclick="triggerAdminAction('toggle_block')" style="background:#1f2c34; border:1px solid #ef4444; color:#f87171; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer;">
-        <i class="fa-solid fa-ban"></i> Block / Unblock User
-      </button>
-
-      <button onclick="triggerAdminAction('reset_limit')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer;">
-        <i class="fa-solid fa-rotate-left"></i> Daily Limit Reset
-      </button>
-
-      <button onclick="triggerAdminAction('set_notice')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer;">
-        <i class="fa-solid fa-bullhorn"></i> Global Notice
-      </button>
-    </div>
-
-    <!-- Output Area -->
-    <div id="adminPanelOutput" style="flex:1; overflow-y:auto; background:#0b141a; border:1px solid #222d34; border-radius:10px; padding:12px; font-size:0.85rem; line-height:1.6; color:#d1d7db; white-space:pre-wrap; min-height:200px;">
-      Upar diye gaye kisi bhi tool par click karein...
-    </div>
-
-  </div>
-</div>
-
-          <!-- ================= ADMIN CONTROL PANEL MODAL ================= -->
-<div id="adminControlModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; align-items:center; justify-content:center; padding:15px; backdrop-filter:blur(6px);">
-  <div style="background:#131c21; border:1px solid #00a884; border-radius:16px; max-width:520px; width:100%; max-height:88vh; display:flex; flex-direction:column; padding:18px; color:#e9edef; box-shadow:0 15px 35px rgba(0,0,0,0.7);">
-    
-    <!-- Modal Header -->
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2a3942; padding-bottom:10px; margin-bottom:14px;">
-      <h3 style="margin:0; color:#00a884; font-size:1.15rem; display:flex; align-items:center; gap:8px;">
-        <i class="fa-solid fa-shield-halved"></i> Admin Control Center
-      </h3>
-      <button onclick="closeAdminControlPanel()" style="background:transparent; border:none; color:#8696a0; font-size:1.5rem; cursor:pointer;">&times;</button>
-    </div>
-
-    <!-- 6 Admin Action Buttons -->
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
-      <button onclick="runAudit('all')" style="background:#1f2c34; border:1px solid #00a884; color:#00a884; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
-        <i class="fa-solid fa-brain"></i> All Users Chat Audit
-      </button>
-
-      <button onclick="runAudit('single')" style="background:#1f2c34; border:1px solid #25d366; color:#25d366; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
-        <i class="fa-solid fa-user-check"></i> Single User Audit
-      </button>
-
-      <button onclick="triggerAdminAction('change_plan')" style="background:#1f2c34; border:1px solid #eab308; color:#facc15; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
-        <i class="fa-solid fa-crown"></i> Change Plan / Upgrade
-      </button>
-
-      <button onclick="triggerAdminAction('toggle_block')" style="background:#1f2c34; border:1px solid #ef4444; color:#f87171; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
-        <i class="fa-solid fa-ban"></i> Block / Unblock User
-      </button>
-
-      <button onclick="triggerAdminAction('reset_limit')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
-        <i class="fa-solid fa-rotate-left"></i> Daily Limit Reset
-      </button>
-
-      <button onclick="triggerAdminAction('set_notice')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
-        <i class="fa-solid fa-bullhorn"></i> Global Notice
-      </button>
-    </div>
-
-    <!-- Output Box -->
-    <div id="adminPanelOutput" style="flex:1; overflow-y:auto; background:#0b141a; border:1px solid #222d34; border-radius:10px; padding:12px; font-size:0.85rem; line-height:1.6; color:#d1d7db; white-space:pre-wrap; min-height:190px;">
-      ऊपर दिए गए किसी भी टूल पर टैप करें...
-    </div>
-
-  </div>
-</div>
-
-<script>
+  // ================= ADMIN CONTROL CENTER LOGIC =================
   const SUHAIL_ADMIN_PASS = "SuhailAiJamia";
 
-  function openAdminControlPanel() {
-    const modal = document.getElementById('adminControlModal');
-    if (modal) modal.style.display = 'flex';
-  }
-
-  function closeAdminControlPanel() {
-    const modal = document.getElementById('adminControlModal');
-    if (modal) modal.style.display = 'none';
-  }
-
-  // टॉप हेडर वाले असली शील्ड आइकन पर क्लिक जोड़ना
-  function attachHeaderShield() {
-    const shieldIcons = document.querySelectorAll('.fa-shield-halved, .fa-shield');
-    shieldIcons.forEach(icon => {
-      const parent = icon.closest('button') || icon;
-      parent.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        openAdminControlPanel();
-      };
-    });
-  }
-  setInterval(attachHeaderShield, 1500);
-
-  // 1. वास्तविक चैट ऑडिट और AI समरी
   async function runAudit(mode) {
     const out = document.getElementById('adminPanelOutput');
     let phoneParam = null;
 
     if (mode === 'single') {
-      phoneParam = prompt("जिस छात्र के सवाल-जवाब का विश्लेषण देखना है, उसका फ़ोन नंबर डालें:");
+      phoneParam = prompt("Jis student ke sawaal-jawab ka tajziya dekhna hai, phone number daalein:");
       if (!phoneParam) return;
     }
 
-    out.innerText = "चैट्स पढ़कर AI समीक्षा व समरी तैयार कर रहा है... कृपया 5-10 सेकंड इंतज़ार करें...";
+    out.innerText = "Chats read karke AI audit report tayyar ho rahi hai... 5-10 second intezar karein...";
 
     try {
       const res = await fetch('/api/admin?action=ai_chat_summary', {
@@ -1436,71 +1292,61 @@ async function fetchAiAuditSummary() {
         body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS, targetPhone: phoneParam ? phoneParam.trim() : null })
       });
       const data = await res.json();
-      out.innerText = data.success ? data.insights : ("त्रुटि: " + (data.error || "डेटा नहीं मिल सका"));
+      out.innerText = data.success ? data.insights : ("Error: " + (data.error || "Data nahi mila"));
     } catch (e) {
-      out.innerText = "कनेक्शन में समस्या: " + e.message;
+      out.innerText = "Connection error: " + e.message;
     }
   }
 
-  // 2. बाकी एडमिन एक्शन टूल्स
   async function triggerAdminAction(type) {
     const out = document.getElementById('adminPanelOutput');
 
     if (type === 'change_plan') {
-      const phone = prompt("छात्र का फ़ोन नंबर डालें:");
+      const phone = prompt("Student ka phone number daalein:");
       if (!phone) return;
-      const plan = prompt("प्लान चुनें (free / plus / pro / ultra):", "pro");
+      const plan = prompt("Plan chunein (free / plus / pro / ultra):", "pro");
       if (!plan) return;
-      const days = prompt("कितने दिनों के लिए?:", "30");
+      const days = prompt("Kitne dino ke liye?:", "30");
       if (!days) return;
 
-      out.innerText = "प्लान अपडेट किया जा रहा है...";
+      out.innerText = "Plan update ho raha hai...";
       try {
         const res = await fetch('/api/admin?action=extend_plan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            pass: SUHAIL_ADMIN_PASS,
-            targetPhone: phone.trim(),
-            targetPlan: plan.trim().toLowerCase(),
-            days: days.trim()
-          })
+          body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS, targetPhone: phone.trim(), targetPlan: plan.trim().toLowerCase(), days: days.trim() })
         });
         const data = await res.json();
-        out.innerText = data.success ? data.message : ("त्रुटि: " + data.error);
+        out.innerText = data.success ? data.message : ("Error: " + data.error);
       } catch (e) {
-        out.innerText = "त्रुटि: " + e.message;
+        out.innerText = "Error: " + e.message;
       }
     }
 
     if (type === 'toggle_block') {
-      const phone = prompt("छात्र का फ़ोन नंबर डालें:");
+      const phone = prompt("Student ka phone number daalein:");
       if (!phone) return;
-      const status = prompt("स्थिति चुनें (active / blocked):", "blocked");
+      const status = prompt("Status (active / blocked):", "blocked");
       if (!status) return;
 
-      out.innerText = "स्थिति अपडेट की जा रही है...";
+      out.innerText = "Status update ho raha hai...";
       try {
         const res = await fetch('/api/admin?action=toggle_block', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            pass: SUHAIL_ADMIN_PASS,
-            targetPhone: phone.trim(),
-            newStatus: status.trim().toLowerCase()
-          })
+          body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS, targetPhone: phone.trim(), newStatus: status.trim().toLowerCase() })
         });
         const data = await res.json();
-        out.innerText = data.success ? data.message : ("त्रुटि: " + data.error);
+        out.innerText = data.success ? data.message : ("Error: " + data.error);
       } catch (e) {
-        out.innerText = "त्रुटि: " + e.message;
+        out.innerText = "Error: " + e.message;
       }
     }
 
     if (type === 'reset_limit') {
-      const phone = prompt("छात्र का फ़ोन नंबर डालें:");
+      const phone = prompt("Student ka phone number daalein:");
       if (!phone) return;
-      out.innerText = "दैनिक सीमा रीसेट की जा रही है...";
+      out.innerText = "Daily limit reset ho rahi hai...";
       try {
         const res = await fetch('/api/admin?action=reset_daily_limit', {
           method: 'POST',
@@ -1510,33 +1356,34 @@ async function fetchAiAuditSummary() {
         const data = await res.json();
         out.innerText = data.message || data.error;
       } catch (e) {
-        out.innerText = "त्रुटि: " + e.message;
+        out.innerText = "Error: " + e.message;
       }
     }
 
     if (type === 'set_notice') {
-      const msg = prompt("तमाम छात्रों के लिए नोटिस लिखें (हटाने के लिए खाली छोड़ें):");
+      const msg = prompt("Tamam tulba ke liye notice likhein (Hatane ke liye khali chhod dein):");
       if (msg === null) return;
-      out.innerText = "नोटिस अपडेट हो रहा है...";
+      out.innerText = "Notice update ho raha hai...";
       try {
         const res = await fetch('/api/admin?action=set_notice', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            pass: SUHAIL_ADMIN_PASS,
-            noticeText: msg.trim(),
-            isActive: msg.trim().length > 0
-          })
+          body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS, noticeText: msg.trim(), isActive: msg.trim().length > 0 })
         });
         const data = await res.json();
         out.innerText = data.message || data.error;
       } catch (e) {
-        out.innerText = "त्रुटि: " + e.message;
+        out.innerText = "Error: " + e.message;
       }
     }
   }
+
+  renderUserUI();
+  loadChatHistory();
+  setInterval(syncProfile, 5000);
 </script>
-  
-  
+
+<script src="/admin-dashboard.js"></script>
+
 </body>
 </html>
