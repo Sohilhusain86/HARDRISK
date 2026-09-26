@@ -1560,8 +1560,87 @@ function openAdminAiAudit() {
   </div>
 </div>
 
+<!-- ================= ADMIN FLOATING BUTTON (Sirf Admin ko Dikhayi Dega) ================= -->
+<div id="suhailAdminFloatingBtn" onclick="openAdminControlPanel()" style="display:none; position: fixed; bottom: 85px; right: 18px; z-index: 99998; background: #00a884; color: #fff; width: 44px; height: 44px; border-radius: 50%; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(0,0,0,0.6); cursor: pointer; border: 2px solid rgba(255,255,255,0.25);">
+  <i class="fa-solid fa-shield-halved" style="font-size: 20px;"></i>
+</div>
+
+<!-- ================= ADMIN CONTROL CENTER MODAL ================= -->
+<div id="adminControlModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; align-items:center; justify-content:center; padding:15px; backdrop-filter:blur(6px);">
+  <div style="background:#131c21; border:1px solid #00a884; border-radius:16px; max-width:500px; width:100%; max-height:88vh; display:flex; flex-direction:column; padding:18px; color:#e9edef; box-shadow:0 15px 35px rgba(0,0,0,0.7);">
+    
+    <!-- Modal Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2a3942; padding-bottom:10px; margin-bottom:14px;">
+      <h3 style="margin:0; color:#00a884; font-size:1.15rem; display:flex; align-items:center; gap:8px;">
+        <i class="fa-solid fa-shield-halved"></i> Admin Control Center
+      </h3>
+      <button onclick="closeAdminControlPanel()" style="background:transparent; border:none; color:#8696a0; font-size:1.5rem; cursor:pointer;">&times;</button>
+    </div>
+
+    <!-- 6 Primary Admin Tools Grid -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+      <button onclick="triggerAdminAction('ai_summary')" style="background:#1f2c34; border:1px solid #00a884; color:#00a884; padding:10px 8px; border-radius:10px; font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+        <i class="fa-solid fa-brain"></i> AI Chat Audit
+      </button>
+
+      <button onclick="triggerAdminAction('students_list')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px 8px; border-radius:10px; font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+        <i class="fa-solid fa-users"></i> Students Data
+      </button>
+
+      <button onclick="triggerAdminAction('change_plan')" style="background:#1f2c34; border:1px solid #eab308; color:#facc15; padding:10px 8px; border-radius:10px; font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+        <i class="fa-solid fa-crown"></i> Change Plan / Upgrade
+      </button>
+
+      <button onclick="triggerAdminAction('toggle_block')" style="background:#1f2c34; border:1px solid #ef4444; color:#f87171; padding:10px 8px; border-radius:10px; font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+        <i class="fa-solid fa-ban"></i> Block / Unblock User
+      </button>
+
+      <button onclick="triggerAdminAction('reset_limit')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px 8px; border-radius:10px; font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+        <i class="fa-solid fa-rotate-left"></i> Daily Limit Reset
+      </button>
+
+      <button onclick="triggerAdminAction('set_notice')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px 8px; border-radius:10px; font-size:0.82rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+        <i class="fa-solid fa-bullhorn"></i> Global Notice
+      </button>
+    </div>
+
+    <!-- Terminal/Output Area -->
+    <div id="adminPanelOutput" style="flex:1; overflow-y:auto; background:#0b141a; border:1px solid #222d34; border-radius:10px; padding:12px; font-size:0.85rem; line-height:1.5; color:#d1d7db; white-space:pre-wrap; min-height:190px;">
+      Kisi bhi tool par click karein...
+    </div>
+
+  </div>
+</div>
+
 <script>
   const SUHAIL_ADMIN_PASS = "SuhailAiJamia";
+
+  // Check karein ki logged-in user admin hai ya nahi
+  function checkAdminButtonVisibility() {
+    const btn = document.getElementById('suhailAdminFloatingBtn');
+    if (!btn) return;
+    // Local storage ya session se check
+    const savedUser = localStorage.getItem('currentUser') || localStorage.getItem('user');
+    if (savedUser) {
+      try {
+        const u = JSON.parse(savedUser);
+        if (u.role === 'admin' || (u.name && u.name.includes('Suhail Husain'))) {
+          btn.style.display = 'flex';
+          return;
+        }
+      } catch(e) {}
+    }
+    // Agar header me ULTRA (ADMIN) badge dikh raha ho
+    const adminBadge = document.querySelector('.badge-admin, .status-admin');
+    if (document.body.innerText.includes('ULTRA (ADMIN)')) {
+      btn.style.display = 'flex';
+    } else {
+      btn.style.display = 'none';
+    }
+  }
+
+  // Page load aur DOM badalne par check karein
+  setInterval(checkAdminButtonVisibility, 2000);
 
   function openAdminControlPanel() {
     document.getElementById('adminControlModal').style.display = 'flex';
