@@ -1612,95 +1612,105 @@ function openAdminAiAudit() {
   </div>
 </div>
 
+<!-- Admin Control Center Modal -->
+<div id="adminControlModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; align-items:center; justify-content:center; padding:15px; backdrop-filter:blur(6px);">
+  <div style="background:#131c21; border:1px solid #00a884; border-radius:16px; max-width:520px; width:100%; max-height:88vh; display:flex; flex-direction:column; padding:18px; color:#e9edef; box-shadow:0 15px 35px rgba(0,0,0,0.7);">
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2a3942; padding-bottom:10px; margin-bottom:14px;">
+      <h3 style="margin:0; color:#00a884; font-size:1.1rem; display:flex; align-items:center; gap:8px;">
+        <i class="fa-solid fa-shield-halved"></i> Admin Control Center
+      </h3>
+      <button onclick="document.getElementById('adminControlModal').style.display='none'" style="background:transparent; border:none; color:#8696a0; font-size:1.5rem; cursor:pointer;">&times;</button>
+    </div>
+
+    <!-- Actions Grid -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+      <button onclick="runAudit('all')" style="background:#1f2c34; border:1px solid #00a884; color:#00a884; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer;">
+        <i class="fa-solid fa-brain"></i> All Users Chat Summary
+      </button>
+
+      <button onclick="runAudit('single')" style="background:#1f2c34; border:1px solid #25d366; color:#25d366; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer;">
+        <i class="fa-solid fa-user-check"></i> Single User Chat Audit
+      </button>
+
+      <button onclick="triggerAdminAction('change_plan')" style="background:#1f2c34; border:1px solid #eab308; color:#facc15; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer;">
+        <i class="fa-solid fa-crown"></i> Change Plan / Upgrade
+      </button>
+
+      <button onclick="triggerAdminAction('toggle_block')" style="background:#1f2c34; border:1px solid #ef4444; color:#f87171; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer;">
+        <i class="fa-solid fa-ban"></i> Block / Unblock User
+      </button>
+
+      <button onclick="triggerAdminAction('reset_limit')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer;">
+        <i class="fa-solid fa-rotate-left"></i> Daily Limit Reset
+      </button>
+
+      <button onclick="triggerAdminAction('set_notice')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer;">
+        <i class="fa-solid fa-bullhorn"></i> Global Notice
+      </button>
+    </div>
+
+    <!-- Output Area -->
+    <div id="adminPanelOutput" style="flex:1; overflow-y:auto; background:#0b141a; border:1px solid #222d34; border-radius:10px; padding:12px; font-size:0.85rem; line-height:1.6; color:#d1d7db; white-space:pre-wrap; min-height:200px;">
+      Upar diye gaye kisi bhi tool par click karein...
+    </div>
+
+  </div>
+</div>
+
 <script>
   const SUHAIL_ADMIN_PASS = "SuhailAiJamia";
 
-  // Check karein ki logged-in user admin hai ya nahi
-  function checkAdminButtonVisibility() {
-    const btn = document.getElementById('suhailAdminFloatingBtn');
-    if (!btn) return;
-    // Local storage ya session se check
-    const savedUser = localStorage.getItem('currentUser') || localStorage.getItem('user');
-    if (savedUser) {
-      try {
-        const u = JSON.parse(savedUser);
-        if (u.role === 'admin' || (u.name && u.name.includes('Suhail Husain'))) {
-          btn.style.display = 'flex';
-          return;
-        }
-      } catch(e) {}
+  // Header ke shield icon par click event jodne ka function
+  function attachShieldEvent() {
+    const shieldIcons = document.querySelectorAll('.fa-shield-halved, .fa-shield');
+    shieldIcons.forEach(icon => {
+      const parent = icon.closest('button') || icon;
+      parent.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        document.getElementById('adminControlModal').style.display = 'flex';
+      };
+    });
+  }
+
+  setInterval(attachShieldEvent, 1500);
+
+  // Sawaal-Jawab ki Asal Summary nikalna
+  async function runAudit(mode) {
+    const out = document.getElementById('adminPanelOutput');
+    let phoneParam = null;
+
+    if (mode === 'single') {
+      phoneParam = prompt("Kis student ke sawaal-jawab dekhne hain? Phone number daalein:");
+      if (!phoneParam) return;
     }
-    // Agar header me ULTRA (ADMIN) badge dikh raha ho
-    const adminBadge = document.querySelector('.badge-admin, .status-admin');
-    if (document.body.innerText.includes('ULTRA (ADMIN)')) {
-      btn.style.display = 'flex';
-    } else {
-      btn.style.display = 'none';
+
+    out.innerText = "Chats read karke AI tajziya (summary) tayyar kar raha hai... Kripya 5-10 second intezar karein...";
+
+    try {
+      const res = await fetch('/api/admin?action=ai_chat_summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS, targetPhone: phoneParam ? phoneParam.trim() : null })
+      });
+      const data = await res.json();
+      out.innerText = data.success ? data.insights : ("Error: " + data.error);
+    } catch (e) {
+      out.innerText = "Connection error: " + e.message;
     }
   }
 
-  // Page load aur DOM badalne par check karein
-  setInterval(checkAdminButtonVisibility, 2000);
-
-  function openAdminControlPanel() {
-    document.getElementById('adminControlModal').style.display = 'flex';
-  }
-
-  function closeAdminControlPanel() {
-    document.getElementById('adminControlModal').style.display = 'none';
-  }
-
+  // Baaqi Admin Tools
   async function triggerAdminAction(type) {
     const out = document.getElementById('adminPanelOutput');
 
-    // 1. AI Chat Audit & Insights
-    if (type === 'ai_summary') {
-      out.innerText = "Students ke sawaal aur AI jawab analyze ho rahe hain... 5-10 second rukiye...";
-      try {
-        const res = await fetch('/api/admin?action=ai_chat_summary', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS })
-        });
-        const data = await res.json();
-        out.innerText = data.success ? data.insights : ("Error: " + data.error);
-      } catch (e) {
-        out.innerText = "Connection error: " + e.message;
-      }
-    }
-
-    // 2. Students List & Total Platform Stats
-    if (type === 'students_list') {
-      out.innerText = "Data load ho raha hai...";
-      try {
-        const res = await fetch('/api/admin?action=students_summary', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS })
-        });
-        const data = await res.json();
-        if (data.success) {
-          let report = `📊 Total Students: ${data.summary.totalStudents} | Total Questions: ${data.summary.totalQuestions}\n`;
-          report += `------------------------------------\n`;
-          data.students.forEach((s, idx) => {
-            report += `${idx + 1}. ${s.name} (${s.phone})\n   Plan: ${s.plan} | Status: ${s.status} | Total: ${s.totalQuestions} | Today: ${s.dailyQuestions}\n   Expiry: ${s.daysLeft}\n\n`;
-          });
-          out.innerText = report;
-        } else {
-          out.innerText = "Error: " + data.error;
-        }
-      } catch (e) {
-        out.innerText = "Connection error: " + e.message;
-      }
-    }
-
-    // 3. Change Plan / Manual Upgrade
     if (type === 'change_plan') {
-      const phone = prompt("Student ka phone number daalein (e.g. 9865586355):");
+      const phone = prompt("Student ka phone number daalein:");
       if (!phone) return;
-      const plan = prompt("Kaunsa plan dena hai? (plus / pro / ultra / free):", "pro");
+      const plan = prompt("Plan chunein (free / plus / pro / ultra):", "pro");
       if (!plan) return;
-      const days = prompt("Kitne dino ke liye? (e.g. 30):", "30");
+      const days = prompt("Kitne dino ke liye?:", "30");
       if (!days) return;
 
       out.innerText = "Plan update ho raha hai...";
@@ -1708,12 +1718,7 @@ function openAdminAiAudit() {
         const res = await fetch('/api/admin?action=extend_plan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            pass: SUHAIL_ADMIN_PASS,
-            targetPhone: phone.trim(),
-            targetPlan: plan.trim().toLowerCase(),
-            days: days.trim()
-          })
+          body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS, targetPhone: phone.trim(), targetPlan: plan.trim().toLowerCase(), days: days.trim() })
         });
         const data = await res.json();
         out.innerText = data.success ? data.message : ("Error: " + data.error);
@@ -1722,23 +1727,18 @@ function openAdminAiAudit() {
       }
     }
 
-    // 4. Block / Unblock User
     if (type === 'toggle_block') {
-      const phone = prompt("Student ka phone number daalein:");
+      const phone = prompt("Student ka phone number:");
       if (!phone) return;
-      const status = prompt("Status kya rakhna hai? (active / blocked):", "blocked");
+      const status = prompt("Status (active / blocked):", "blocked");
       if (!status) return;
 
-      out.innerText = "Status update ho raha hai...";
+      out.innerText = "Updating status...";
       try {
         const res = await fetch('/api/admin?action=toggle_block', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            pass: SUHAIL_ADMIN_PASS,
-            targetPhone: phone.trim(),
-            newStatus: status.trim().toLowerCase()
-          })
+          body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS, targetPhone: phone.trim(), newStatus: status.trim().toLowerCase() })
         });
         const data = await res.json();
         out.innerText = data.success ? data.message : ("Error: " + data.error);
@@ -1747,9 +1747,8 @@ function openAdminAiAudit() {
       }
     }
 
-    // 5. Reset Daily Limit
     if (type === 'reset_limit') {
-      const phone = prompt("Student ka phone number daalein:");
+      const phone = prompt("Student ka phone number:");
       if (!phone) return;
       out.innerText = "Limit reset ho rahi hai...";
       try {
@@ -1765,20 +1764,15 @@ function openAdminAiAudit() {
       }
     }
 
-    // 6. Global Broadcast Notice
     if (type === 'set_notice') {
-      const msg = prompt("Notice text likhein (Hatane ke liye khali chhod dein):");
+      const msg = prompt("Notice text likhein (Khali chhodne par hat jayega):");
       if (msg === null) return;
       out.innerText = "Notice update ho raha hai...";
       try {
         const res = await fetch('/api/admin?action=set_notice', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            pass: SUHAIL_ADMIN_PASS,
-            noticeText: msg.trim(),
-            isActive: msg.trim().length > 0
-          })
+          body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS, noticeText: msg.trim(), isActive: msg.trim().length > 0 })
         });
         const data = await res.json();
         out.innerText = data.message || data.error;
