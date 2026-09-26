@@ -1463,6 +1463,142 @@ function openAdminAiAudit() {
     }
   }
 </script>
+
+  <!-- ADMIN FLOATING BUTTON (Bina dhoondhe screen ke kone me aayega) -->
+<div id="suhailAdminFloatingBtn" onclick="openAdminControlPanel()" style="position: fixed; top: 12px; right: 12px; z-index: 99998; background: #00a884; color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; border: 1px solid rgba(255,255,255,0.2);">
+  <i class="fa-solid fa-shield-halved" style="font-size: 16px;"></i>
+</div>
+
+<!-- ================= ADMIN CONTROL PANEL MODAL ================= -->
+<div id="adminControlModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; align-items:center; justify-content:center; padding:15px; backdrop-filter:blur(6px);">
+  <div style="background:#131c21; border:1px solid #00a884; border-radius:16px; max-width:480px; width:100%; max-height:88vh; display:flex; flex-direction:column; padding:18px; color:#e9edef; box-shadow:0 15px 35px rgba(0,0,0,0.7);">
+    
+    <!-- Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2a3942; padding-bottom:10px; margin-bottom:14px;">
+      <h3 style="margin:0; color:#00a884; font-size:1.15rem; display:flex; align-items:center; gap:8px;">
+        <i class="fa-solid fa-shield-halved"></i> Admin Control Center
+      </h3>
+      <button onclick="closeAdminControlPanel()" style="background:transparent; border:none; color:#8696a0; font-size:1.5rem; cursor:pointer;">&times;</button>
+    </div>
+
+    <!-- Buttons Grid -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+      <button onclick="triggerAdminAction('ai_summary')" style="background:#1f2c34; border:1px solid #00a884; color:#00a884; padding:10px; border-radius:10px; font-size:0.85rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+        <i class="fa-solid fa-brain"></i> AI Chat Audit
+      </button>
+
+      <button onclick="triggerAdminAction('students_list')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px; border-radius:10px; font-size:0.85rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+        <i class="fa-solid fa-users"></i> Students Data
+      </button>
+
+      <button onclick="triggerAdminAction('reset_limit')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px; border-radius:10px; font-size:0.85rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+        <i class="fa-solid fa-rotate-left"></i> Daily Limit Reset
+      </button>
+
+      <button onclick="triggerAdminAction('set_notice')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px; border-radius:10px; font-size:0.85rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+        <i class="fa-solid fa-bullhorn"></i> Global Notice
+      </button>
+    </div>
+
+    <!-- Output Box -->
+    <div id="adminPanelOutput" style="flex:1; overflow-y:auto; background:#0b141a; border:1px solid #222d34; border-radius:10px; padding:12px; font-size:0.85rem; line-height:1.5; color:#d1d7db; white-space:pre-wrap; min-height:180px;">
+      Kisi bhi tool par click karein...
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const SUHAIL_ADMIN_PASS = "SuhailAiJamia";
+
+  function openAdminControlPanel() {
+    document.getElementById('adminControlModal').style.display = 'flex';
+  }
+
+  function closeAdminControlPanel() {
+    document.getElementById('adminControlModal').style.display = 'none';
+  }
+
+  async function triggerAdminAction(type) {
+    const out = document.getElementById('adminPanelOutput');
+
+    if (type === 'ai_summary') {
+      out.innerText = "Students ke sawaal aur AI jawab analyze ho rahe hain... 5-10 second rukiye...";
+      try {
+        const res = await fetch('/api/admin?action=ai_chat_summary', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS })
+        });
+        const data = await res.json();
+        out.innerText = data.success ? data.insights : ("Error: " + data.error);
+      } catch (e) {
+        out.innerText = "Connection error: " + e.message;
+      }
+    }
+
+    if (type === 'students_list') {
+      out.innerText = "Data load ho raha hai...";
+      try {
+        const res = await fetch('/api/admin?action=students_summary', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS })
+        });
+        const data = await res.json();
+        if (data.success) {
+          let report = `Total Students: ${data.summary.totalStudents} | Total Questions: ${data.summary.totalQuestions}\n------------------------------------\n`;
+          data.students.forEach((s, idx) => {
+            report += `${idx + 1}. ${s.name} (${s.phone})\nPlan: ${s.plan} | Total: ${s.totalQuestions} | Today: ${s.dailyQuestions}\n\n`;
+          });
+          out.innerText = report;
+        } else {
+          out.innerText = "Error: " + data.error;
+        }
+      } catch (e) {
+        out.innerText = "Connection error: " + e.message;
+      }
+    }
+
+    if (type === 'reset_limit') {
+      const phone = prompt("Student ka phone number daalein:");
+      if (!phone) return;
+      out.innerText = "Limit reset ho rahi hai...";
+      try {
+        const res = await fetch('/api/admin?action=reset_daily_limit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS, targetPhone: phone.trim() })
+        });
+        const data = await res.json();
+        out.innerText = data.message || data.error;
+      } catch (e) {
+        out.innerText = "Error: " + e.message;
+      }
+    }
+
+    if (type === 'set_notice') {
+      const msg = prompt("Notice text likhein (Hatane ke liye khali chhod dein):");
+      if (msg === null) return;
+      out.innerText = "Notice update ho raha hai...";
+      try {
+        const res = await fetch('/api/admin?action=set_notice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pass: SUHAIL_ADMIN_PASS,
+            noticeText: msg.trim(),
+            isActive: msg.trim().length > 0
+          })
+        });
+        const data = await res.json();
+        out.innerText = data.message || data.error;
+      } catch (e) {
+        out.innerText = "Error: " + e.message;
+      }
+    }
+  }
+</script>
   
 </body>
 </html>
