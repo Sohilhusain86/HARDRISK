@@ -58,7 +58,7 @@ const SYSTEM_RULES = {
   ultra: "Aap Suhail AI Ultra hain. Master Academic & Islamic research assistant. Har pehlu ko nihayat gehrai, hawala-jaat aur jamia andaz me pesh karein."
 };
 
-// AI Engine Caller (Groq Llama 3.3)
+// Stable & Fast Groq Engine
 async function executeAI(plan, prompt, instruction, history = []) {
   if (!GROQ_KEY) {
     return "AI Service temporarily unavailable (API Key missing).";
@@ -84,9 +84,9 @@ async function executeAI(plan, prompt, instruction, history = []) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "llama-3.1-8b-instant",
         messages: messages,
-        temperature: 0.5,
+        temperature: 0.4,
         max_tokens: 2048
       })
     });
@@ -99,7 +99,7 @@ async function executeAI(plan, prompt, instruction, history = []) {
   }
 }
 
-// AI Audit Report Generator for Admin
+// AI Audit Report for Admin
 async function generateAiAuditReport(chatLogsText) {
   const prompt = `Aap 'Suhail AI' platform ke Chief Auditor hain. Neeche tulba (students) ki ahem chats hain:
 ---
@@ -161,14 +161,14 @@ export default async function handler(req, res) {
   const action = req.query?.action || searchParams.get("action");
 
   try {
-    // 1. GET ACTIVE GLOBAL NOTICE (Student View)
+    // 1. GLOBAL NOTICE (STUDENT VIEW)
     if (action === "get-notice" || action === "get_notice") {
       const settings = (await dbGet("system_settings")) || {};
       const noticeText = (settings.noticeActive && settings.notice) ? settings.notice : "";
       return res.status(200).json({ success: true, notice: noticeText });
     }
 
-    // 2. SET GLOBAL NOTICE (Admin View)
+    // 2. GLOBAL NOTICE (ADMIN ACTION)
     if (action === "set_notice" || action === "set-notice") {
       const { noticeText, isActive, pass, phone } = req.body || {};
       
@@ -344,7 +344,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, user });
     }
 
-    // 6. PAYMENT SUBMIT (UTR)
+    // 6. PAYMENT SUBMIT (STUDENT UTR)
     if (action === "payment" && req.method === "POST") {
       const { phone, utr, plan } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -364,11 +364,36 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: "भुगतान सत्यापन के लिए भेज दिया गया है।" });
     }
 
-    // 7. ADMIN ENDPOINTS (Using pass or admin session)
+    // 7. PENDING PAYMENTS & APPROVAL (Handles both action names)
+    if (action === "admin-payments" || action === "pending_payments" || action === "get_payments") {
+      const payments = (await dbGet("paymentRequests")) || {};
+      return res.status(200).json({ success: true, payments });
+    }
+
+    if (action === "admin-approve-payment" || action === "approve_payment" || action === "reject_payment") {
+      const { payId, status } = req.body || {};
+      const payReq = await dbGet(`paymentRequests/${payId}`);
+      if (!payReq) return res.status(404).json({ success: false, error: "पेमेंट रिक्वेस्ट नहीं मिली।" });
+
+      const finalStatus = status || (action === "reject_payment" ? "rejected" : "approved");
+
+      if (finalStatus === "approved") {
+        const expiryTime = Date.now() + (30 * 24 * 60 * 60 * 1000);
+        await dbPatch(`users/${payReq.phone}`, {
+          plan: payReq.plan,
+          planExpiry: expiryTime
+        });
+      }
+
+      await dbPatch(`paymentRequests/${payId}`, { status: finalStatus });
+      return res.status(200).json({ success: true, message: `पेमेंट रिक्वेस्ट ${finalStatus} कर दी गई।` });
+    }
+
+    // 8. ADMIN CONTROL CENTER (Password Protected)
     const { pass } = req.body || {};
     const isAdminPass = (pass === ADMIN_SECRET);
 
-    // 7.1 AI Chat Audit
+    // 8.1 AI Chat Audit
     if (action === "ai_chat_summary") {
       if (!isAdminPass) return res.status(401).json({ success: false, error: "अमान्य एडमिन पासवर्ड!" });
       const allChats = (await dbGet("chats")) || {};
@@ -411,7 +436,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, insights: report });
     }
 
-    // 7.2 Students Summary
+    // 8.2 Students Summary
     if (action === "students_summary") {
       if (!isAdminPass) return res.status(401).json({ success: false, error: "अमान्य एडमिन पासवर्ड!" });
       const allUsers = (await dbGet("users")) || {};
@@ -473,7 +498,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // 7.3 Extend Plan
+    // 8.3 Extend / Change Plan
     if (action === "extend_plan") {
       if (!isAdminPass) return res.status(401).json({ success: false, error: "अमान्य एडमिन पासवर्ड!" });
       const { targetPhone, targetPlan, days } = req.body || {};
@@ -493,7 +518,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // 7.4 Block / Unblock User
+    // 8.4 Block / Unblock User
     if (action === "toggle_block") {
       if (!isAdminPass) return res.status(401).json({ success: false, error: "अमान्य एडमिन पासवर्ड!" });
       const { targetPhone, newStatus } = req.body || {};
@@ -507,7 +532,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // 7.5 Reset Daily Limit
+    // 8.5 Reset Daily Limit
     if (action === "reset_daily_limit") {
       if (!isAdminPass) return res.status(401).json({ success: false, error: "अमान्य एडमिन पासवर्ड!" });
       const { targetPhone } = req.body || {};
@@ -519,29 +544,6 @@ export default async function handler(req, res) {
         success: true,
         message: `छात्र ${cleanTarget} की दैनिक सीमा रीसेट कर दी गई।`
       });
-    }
-
-    // 7.6 Payment Requests Admin Audit
-    if (action === "admin-payments") {
-      const payments = (await dbGet("paymentRequests")) || {};
-      return res.status(200).json({ success: true, payments });
-    }
-
-    if (action === "admin-approve-payment") {
-      const { payId, status } = req.body || {};
-      const payReq = await dbGet(`paymentRequests/${payId}`);
-      if (!payReq) return res.status(404).json({ success: false, error: "पेमेंट रिक्वेस्ट नहीं मिली।" });
-
-      if (status === "approved") {
-        const expiryTime = Date.now() + (30 * 24 * 60 * 60 * 1000);
-        await dbPatch(`users/${payReq.phone}`, {
-          plan: payReq.plan,
-          planExpiry: expiryTime
-        });
-      }
-
-      await dbPatch(`paymentRequests/${payId}`, { status: status || "approved" });
-      return res.status(200).json({ success: true, message: `पेमेंट रिक्वेस्ट ${status} कर दी गई।` });
     }
 
     return res.status(404).json({ success: false, error: "Invalid action" });
