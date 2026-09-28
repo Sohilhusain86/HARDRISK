@@ -983,8 +983,7 @@ function triggerFollowupAction(actionType) {
   sendQuestion();
 }
 
-// 4. renderAiBubble में क्विक एक्शन बटन जोड़ना
-// अपने मौजूदा renderAiBubble के अंदर bubble-actions वाले हिस्से को इस तरह अपडेट करें:
+// 4. renderAiBubble में क्विक एक्शन और बुकमार्क बटन जोड़ना
 function renderAiBubble(div, text, aiName) {
   const isAr = containsArabic(text);
   let parsedHtml = (typeof marked !== 'undefined') ? marked.parse(text) : text;
@@ -994,6 +993,7 @@ function renderAiBubble(div, text, aiName) {
     <span class="ai-label">${aiName || 'SUHAIL AI'}</span>
     <div class="chat-content ${isAr ? 'arabic-text' : ''}">${parsedHtml}</div>
     <div class="bubble-actions" style="display:flex; justify-content:flex-end; gap:8px;">
+      <button class="btn-copy" onclick="window.toggleBookmark(this)" title="Sabaq Mehfooz Karein"><i class="fa-regular fa-bookmark"></i> Save</button>
       <button class="btn-copy" onclick="window.copyText(this)"><i class="fa-regular fa-copy"></i> Copy Karein</button>
       <button class="btn-copy" onclick="window.exportBubbleToPdf(this)" style="color:var(--accent-yellow);"><i class="fa-solid fa-file-pdf"></i> PDF Download</button>
     </div>
