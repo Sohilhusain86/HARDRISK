@@ -32,6 +32,12 @@ async function dbPatch(path, data) {
   return await res.json();
 }
 
+async function dbDelete(path) {
+  const url = `${FIREBASE_DB_URL}/${path}.json${FIREBASE_AUTH ? `?auth=${FIREBASE_AUTH}` : ""}`;
+  const res = await fetch(url, { method: "DELETE" });
+  return await res.json();
+}
+
 // Plan Limits & System Rules
 const DAILY_LIMITS = { free: 25, plus: 75, pro: 150, ultra: 250 };
 const TOOL_LIMITS = { free: 10, plus: 40, pro: 100, ultra: 250 };
@@ -106,13 +112,14 @@ export default async function handler(req, res) {
   const action = req.query.action;
 
   try {
-    // 1. GET ACTIVE GLOBAL NOTICE
+    // ==========================================
+    // 1. GLOBAL NOTICE ENDPOINTS
+    // ==========================================
     if (action === "get-notice" && req.method === "GET") {
       const notice = await dbGet("globalNotice");
       return res.status(200).json({ success: true, notice: notice || "" });
     }
 
-    // 2. SET GLOBAL NOTICE (ADMIN ACTION)
     if (action === "set-notice" && req.method === "POST") {
       const { notice, phone } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -126,7 +133,56 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: "ग्लोबल नोटिस सफलतापूर्वक प्रसारित कर दिया गया।" });
     }
 
+    // ==========================================
+    // 2. AUTHENTICATION (LOGIN & REGISTER)
+    // ==========================================
+    if (action === "auth" && req.method === "POST") {
+      const { phone, password, name, type } = req.body || {};
+      const cleanPhone = String(phone || "").replace(/\D/g, "");
+      if (!cleanPhone || cleanPhone.length !== 10) {
+        return res.status(400).json({ success: false, error: "10 अंकों का वैध मोबाइल नंबर दर्ज करें।" });
+      }
+      if (!password || String(password).length < 4) {
+        return res.status(400).json({ success: false, error: "पासवर्ड कम से कम 4 अक्षरों का होना चाहिए।" });
+      }
+
+      let user = await dbGet(`users/${cleanPhone}`);
+
+      if (type === "register") {
+        if (user) {
+          return res.status(400).json({ success: false, error: "यह नंबर पहले से पंजीकृत है। लॉगिन करें।" });
+        }
+        const newUser = {
+          name: String(name || "Talib-e-Ilm").trim(),
+          phone: cleanPhone,
+          passwordHash: password,
+          plan: "free",
+          role: "student",
+          status: "active",
+          dailyCount: 0,
+          dailyToolCount: 0,
+          totalQuestions: 0,
+          createdAt: Date.now(),
+          lastActive: Date.now()
+        };
+        await dbPut(`users/${cleanPhone}`, newUser);
+        delete newUser.passwordHash;
+        return res.status(200).json({ success: true, user: newUser });
+      } else {
+        if (!user) {
+          return res.status(404).json({ success: false, error: "उपयोगकर्ता नहीं मिला। कृपया पहले पंजीकरण करें।" });
+        }
+        if (user.passwordHash !== password) {
+          return res.status(401).json({ success: false, error: "गलत पासवर्ड दर्ज किया गया है।" });
+        }
+        delete user.passwordHash;
+        return res.status(200).json({ success: true, user });
+      }
+    }
+
+    // ==========================================
     // 3. AI CHAT DISPATCHER & CLOUD DATABASE SYNC
+    // ==========================================
     if (action === "ai" && req.method === "POST") {
       const { prompt, phone, history, isTool, customPersona } = req.body || {};
       if (!prompt || !String(prompt).trim()) {
@@ -220,7 +276,9 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, reply: replyText, aiName, plan });
     }
 
+    // ==========================================
     // 4. USER PROFILE SYNC
+    // ==========================================
     if (action === "profile" && req.method === "POST") {
       const { phone } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -233,7 +291,9 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, user });
     }
 
+    // ==========================================
     // 5. PAYMENT SUBMIT (UTR)
+    // ==========================================
     if (action === "payment" && req.method === "POST") {
       const { phone, utr, plan } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -251,6 +311,104 @@ export default async function handler(req, res) {
       });
 
       return res.status(200).json({ success: true, message: "भुगतान सत्यापन के लिए भेज दिया गया है।" });
+    }
+
+    // ==========================================
+    // 6. ADMIN CONTROL CENTER (FULL SUITE)
+    // ==========================================
+    if (action === "admin-action" && req.method === "POST") {
+      const { adminPhone, subAction, targetPhone, newPlan, days, noticeText } = req.body || {};
+      const cleanAdmin = String(adminPhone || "").replace(/\D/g, "");
+      const admin = cleanAdmin ? await dbGet(`users/${cleanAdmin}`) : null;
+
+      if (!admin || admin.role !== "admin") {
+        return res.status(403).json({ success: false, error: "एडमिन अनुमति आवश्यक है।" });
+      }
+
+      const cleanTarget = String(targetPhone || "").replace(/\D/g, "");
+
+      // 6.1 All Users Chat Audit
+      if (subAction === "all-chats-audit") {
+        const allChats = (await dbGet("chats")) || {};
+        const allUsers = (await dbGet("users")) || {};
+        return res.status(200).json({ success: true, chats: allChats, users: allUsers });
+      }
+
+      // 6.2 Single User Audit
+      if (subAction === "single-user-audit") {
+        if (!cleanTarget) return res.status(400).json({ success: false, error: "यूज़र का फ़ोन नंबर दर्ज करें।" });
+        const userChats = (await dbGet(`chats/${cleanTarget}`)) || {};
+        const userData = (await dbGet(`users/${cleanTarget}`)) || null;
+        return res.status(200).json({ success: true, user: userData, chats: userChats });
+      }
+
+      // 6.3 Change Plan / Upgrade User
+      if (subAction === "change-plan") {
+        if (!cleanTarget) return res.status(400).json({ success: false, error: "यूज़र का फ़ोन नंबर दर्ज करें।" });
+        const expiryDuration = (parseInt(days) || 30) * 24 * 60 * 60 * 1000;
+        await dbPatch(`users/${cleanTarget}`, {
+          plan: newPlan || "free",
+          planExpiry: newPlan === "free" ? null : Date.now() + expiryDuration
+        });
+        return res.status(200).json({ success: true, message: `यूज़र का प्लान सफलतापूर्वक ${newPlan || 'free'} कर दिया गया।` });
+      }
+
+      // 6.4 Block / Unblock User
+      if (subAction === "toggle-block") {
+        if (!cleanTarget) return res.status(400).json({ success: false, error: "यूज़र का फ़ोन नंबर दर्ज करें।" });
+        const targetUser = await dbGet(`users/${cleanTarget}`);
+        if (!targetUser) return res.status(404).json({ success: false, error: "यूज़र नहीं मिला।" });
+        const newStatus = targetUser.status === "blocked" ? "active" : "blocked";
+        await dbPatch(`users/${cleanTarget}`, { status: newStatus });
+        return res.status(200).json({ success: true, message: `यूज़र अब ${newStatus === "blocked" ? "ब्लॉक" : "अनब्लॉक"} है।`, status: newStatus });
+      }
+
+      // 6.5 Daily Limit Reset
+      if (subAction === "reset-limit") {
+        if (!cleanTarget) return res.status(400).json({ success: false, error: "यूज़र का फ़ोन नंबर दर्ज करें।" });
+        await dbPatch(`users/${cleanTarget}`, { dailyCount: 0, dailyToolCount: 0 });
+        return res.status(200).json({ success: true, message: "यूज़र की दैनिक सीमा रीसेट कर दी गई।" });
+      }
+
+      // 6.6 Global Notice from Admin
+      if (subAction === "global-notice") {
+        await dbPut("globalNotice", String(noticeText || "").trim());
+        return res.status(200).json({ success: true, message: "ग्लोबल नोटिस सफलतापूर्वक प्रसारित कर दिया गया।" });
+      }
+
+      return res.status(400).json({ success: false, error: "अवैध एडमिन एक्शन।" });
+    }
+
+    // ==========================================
+    // 7. ADMIN PAYMENT AUDIT & APPROVAL
+    // ==========================================
+    if (action === "admin-payments" && req.method === "GET") {
+      const payments = (await dbGet("paymentRequests")) || {};
+      return res.status(200).json({ success: true, payments });
+    }
+
+    if (action === "admin-approve-payment" && req.method === "POST") {
+      const { adminPhone, payId, status } = req.body || {};
+      const cleanAdmin = String(adminPhone || "").replace(/\D/g, "");
+      const admin = cleanAdmin ? await dbGet(`users/${cleanAdmin}`) : null;
+
+      if (!admin || admin.role !== "admin") {
+        return res.status(403).json({ success: false, error: "एडमिन अनुमति आवश्यक है।" });
+      }
+
+      const payReq = await dbGet(`paymentRequests/${payId}`);
+      if (!payReq) return res.status(404).json({ success: false, error: "पेमेंट रिक्वेस्ट नहीं मिली।" });
+
+      if (status === "approved") {
+        const expiryTime = Date.now() + (30 * 24 * 60 * 60 * 1000); // 30 Din
+        await dbPatch(`users/${payReq.phone}`, {
+          plan: payReq.plan,
+          planExpiry: expiryTime
+        });
+      }
+
+      await dbPatch(`paymentRequests/${payId}`, { status: status || "approved" });
+      return res.status(200).json({ success: true, message: `पेमेंट रिक्वेस्ट ${status} कर दी गई।` });
     }
 
     return res.status(404).json({ success: false, error: "Invalid action" });
