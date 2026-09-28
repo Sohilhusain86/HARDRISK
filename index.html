@@ -718,10 +718,15 @@ html, body {
       </div>
     </div>
 
-    <div class="chat-footer">
+   <div class="chat-footer">
       <textarea id="chat-input" class="chat-input" rows="1" placeholder="Padhai ka sawal ya koi bhi baat yahan likhein..."></textarea>
+      <!-- Voice Input Mic Button -->
+      <button type="button" id="btn-voice-input" onclick="toggleVoiceInput()" style="background:transparent; border:none; color:#8696a0; font-size:1.25rem; padding:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;" title="बोलकर लिखें">
+        <i class="fa-solid fa-microphone" id="mic-icon"></i>
+      </button>
       <button type="button" class="btn-send" id="btn-chat-send"><i class="fa-solid fa-paper-plane"></i></button>
-    </div>
+   </div>
+    
   </section>
 
   <!-- TAB 2: PLANS -->
@@ -1860,6 +1865,91 @@ function triggerFollowupAction(actionType) {
   localStorage.setItem('suhail_quick_action_count', (currentUsage + 1).toString());
   chatInput.value = promptText;
   sendQuestion();
+}
+
+  // ==========================================
+// VOICE-TO-TEXT (SPEECH RECOGNITION) SYSTEM
+// ==========================================
+let recognition = null;
+let isRecording = false;
+
+function initVoiceRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    console.warn("Speech Recognition not supported in this browser.");
+    return null;
+  }
+  
+  const rec = new SpeechRecognition();
+  rec.continuous = false;
+  rec.interimResults = false;
+  rec.lang = 'hi-IN'; // उर्दू और हिन्दी दोनों बोलियों को सटीक पकड़ता है
+
+  rec.onstart = () => {
+    isRecording = true;
+    const micIcon = document.getElementById('mic-icon');
+    if (micIcon) {
+      micIcon.style.color = '#ef4444';
+      micIcon.classList.add('fa-beat');
+    }
+    if (chatInput) {
+      chatInput.placeholder = "सुना जा रहा है... बोलिए...";
+    }
+  };
+
+  rec.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    if (chatInput && transcript) {
+      chatInput.value = (chatInput.value ? chatInput.value + ' ' : '') + transcript;
+      chatInput.style.height = 'auto';
+      chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + 'px';
+    }
+  };
+
+  rec.onerror = (event) => {
+    console.error("Voice Error:", event.error);
+    stopVoiceRecognition();
+  };
+
+  rec.onend = () => {
+    stopVoiceRecognition();
+  };
+
+  return rec;
+}
+
+function stopVoiceRecognition() {
+  isRecording = false;
+  const micIcon = document.getElementById('mic-icon');
+  if (micIcon) {
+    micIcon.style.color = '#8696a0';
+    micIcon.classList.remove('fa-beat');
+  }
+  if (chatInput) {
+    chatInput.placeholder = "Padhai ka sawal ya koi bhi baat yahan likhein...";
+  }
+}
+
+function toggleVoiceInput() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert("आपका ब्राउज़र वॉइस टाइपिंग सपोर्ट नहीं करता। कृपया Chrome ब्राउज़र का इस्तेमाल करें।");
+    return;
+  }
+
+  if (!recognition) {
+    recognition = initVoiceRecognition();
+  }
+
+  if (isRecording) {
+    recognition.stop();
+  } else {
+    try {
+      recognition.start();
+    } catch (e) {
+      recognition.stop();
+    }
+  }
 }
   
 </script>
