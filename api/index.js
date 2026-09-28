@@ -158,7 +158,7 @@ async function executeAI(plan, prompt, instruction, history = []) {
 
 // AI Audit Report for Admin
 async function generateAiAuditReport(chatLogsText) {
-  const prompt = `Aap 'Suhail AI' platform ke Chief Auditor hain. Neeche tulba (students) ki ahem chats hain:\n---\n${chatLogsText}\n---\nAdmin (Suhail Husain) ke liye Urdu/Hindi me mukhtasar aur behtareen tajziya (Audit Summary) pesh karein:\n1. Tulba ne buniyadi taur par kya sawalat pooche?\n2. AI ne kaisa jawab diya aur kya koi ilmi kami thi?\n3. Poori guftagu ka mukhtasar khulasa aur platform behtar banane ke mashware.`;
+  const prompt = `Aap 'Suhail AI' platform ke Chief Auditor hain. Neeche tulba (students) ki ahem chats hain, aap koi bhi jawab mein islaam ke khilaaf wale alfaaz hargiz istemaal na karein, jaise namaste wagairah :\n---\n${chatLogsText}\n---\nAdmin (Suhail Husain) ke liye Urdu/Hindi me mukhtasar aur behtareen tajziya (Audit Summary) pesh karein:\n1. Tulba ne buniyadi taur par kya sawalat pooche?\n2. AI ne kaisa jawab diya aur kya koi ilmi kami thi?\n3. Poori guftagu ka mukhtasar khulasa aur platform behtar banane ke mashware.`;
 
   if (GROQ_API_KEY) {
     for (const model of GROQ_MODELS) {
