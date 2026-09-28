@@ -31,13 +31,6 @@ async function dbPut(path, data) {
   return await res.json();
 }
 
-async function dbDelete(path) {
-  const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`, {
-    method: "DELETE",
-  });
-  return await res.json();
-}
-
 // Gemini AI से छात्रों के सवालों और जवाबों का ऑडिट व समरी निकालने का फंक्शन
 async function generateAiAuditReport(chatLogsText) {
   if (!GEMINI_API_KEY) {
@@ -89,7 +82,7 @@ export default async function handler(req, res) {
       return res.status(401).json({ success: false, error: "अमान्य एडमिन पासवर्ड!" });
     }
 
-    // 2. छात्रों के वास्तविक सवाल-जवाब की AI समरी व ऑडिट (Real Chat Audit)
+    // 2. छात्रों के वास्तविक सवाल-जवाब की AI समरी व ऑडिट (All Users & Single User Audit)
     if (action === "ai_chat_summary") {
       const allChats = (await dbGet("chats")) || {};
       const { targetPhone } = req.body || {};
@@ -97,24 +90,28 @@ export default async function handler(req, res) {
 
       if (targetPhone) {
         // किसी खास एक छात्र की पूरी बातचीत
-        const userChat = allChats[targetPhone] || {};
+        const cleanTarget = String(targetPhone).replace(/\D/g, "");
+        const userChat = allChats[cleanTarget] || {};
         const msgs = Array.isArray(userChat) ? userChat : Object.values(userChat);
-        logsText += `--- छात्र (${targetPhone}) की बातचीत ---\n`;
-        msgs.slice(-30).forEach(m => {
-          const sender = m.role || (m.isUser ? "छात्र" : "AI");
-          const txt = m.text || m.content || "";
-          logsText += `${sender}: ${txt}\n`;
+        logsText += `--- छात्र (${cleanTarget}) की बातचीत ---\n`;
+        msgs.slice(-25).forEach(m => {
+          const q = m.question || m.text || m.content || "";
+          const a = m.reply || "";
+          if (q) logsText += `छात्र: ${q}\n`;
+          if (a) logsText += `AI: ${a}\n\n`;
         });
       } else {
-        // सभी छात्रों के हालिया महत्वपूर्ण सवाल और जवाब
+        // सभी छात्रों के हालिया सवाल और AI के जवाब
         for (const ph in allChats) {
-          const msgs = Array.isArray(allChats[ph]) ? allChats[ph] : Object.values(allChats[ph]);
+          const userChat = allChats[ph] || {};
+          const msgs = Array.isArray(userChat) ? userChat : Object.values(userChat);
           if (msgs.length > 0) {
-            logsText += `\n[छात्र: ${ph}]\n`;
+            logsText += `\n[छात्र फ़ोन: ${ph}]\n`;
             msgs.slice(-6).forEach(m => {
-              const sender = m.role || (m.isUser ? "छात्र" : "AI");
-              const txt = m.text || m.content || "";
-              logsText += `${sender}: ${txt}\n`;
+              const q = m.question || m.text || m.content || "";
+              const a = m.reply || "";
+              if (q) logsText += `छात्र: ${q}\n`;
+              if (a) logsText += `AI: ${a}\n`;
             });
           }
         }
@@ -131,7 +128,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, insights: report });
     }
 
-    // 3. छात्रों की पूरी सूची व यूसेज विवरण
+    // 3. छात्रों की पूरी सूची व यूसेज विवरण (Students Data)
     if (action === "students_summary") {
       const allUsers = (await dbGet("users")) || {};
       const userList = [];
@@ -192,49 +189,52 @@ export default async function handler(req, res) {
       });
     }
 
-    // 4. छात्र का प्लान बदलना / अपग्रेड करना
+    // 4. छात्र का प्लान बदलना / अपग्रेड करना (Change Plan)
     if (action === "extend_plan") {
       const { targetPhone, targetPlan, days } = req.body || {};
-      if (!targetPhone || !days) return res.status(400).json({ success: false, error: "विवरण अधूरा है।" });
+      const cleanTarget = String(targetPhone || "").replace(/\D/g, "");
+      if (!cleanTarget || !days) return res.status(400).json({ success: false, error: "फ़ोन नंबर और दिन अनिवार्य हैं।" });
 
       const newExpiry = Date.now() + (parseInt(days, 10) * 24 * 60 * 60 * 1000);
-      await dbPatch(`users/${targetPhone}`, {
-        plan: targetPlan.toLowerCase(),
+      await dbPatch(`users/${cleanTarget}`, {
+        plan: String(targetPlan || "pro").toLowerCase(),
         planExpiry: newExpiry,
         status: "active"
       });
 
       return res.status(200).json({
         success: true,
-        message: `छात्र का ${targetPlan.toUpperCase()} प्लान ${days} दिनों के लिए सक्रिय कर दिया गया।`
+        message: `छात्र ${cleanTarget} का ${(targetPlan || "PRO").toUpperCase()} प्लान ${days} दिनों के लिए सक्रिय कर दिया गया।`
       });
     }
 
-    // 5. खाता ब्लॉक या अनब्लॉक करना
+    // 5. खाता ब्लॉक या अनब्लॉक करना (Block / Unblock User)
     if (action === "toggle_block") {
       const { targetPhone, newStatus } = req.body || {};
-      if (!targetPhone) return res.status(400).json({ success: false, error: "फ़ोन नंबर अनिवार्य है।" });
+      const cleanTarget = String(targetPhone || "").replace(/\D/g, "");
+      if (!cleanTarget) return res.status(400).json({ success: false, error: "फ़ोन नंबर अनिवार्य है।" });
 
-      await dbPatch(`users/${targetPhone}`, { status: newStatus });
+      await dbPatch(`users/${cleanTarget}`, { status: newStatus || "blocked" });
       return res.status(200).json({
         success: true,
-        message: `खाता स्थिति सफलतापूर्वक '${newStatus}' कर दी गई।`
+        message: `छात्र ${cleanTarget} की स्थिति '${newStatus}' कर दी गई।`
       });
     }
 
-    // 6. छात्र की आज की सवाल सीमा रीसेट करना
+    // 6. छात्र की आज की सवाल सीमा रीसेट करना (Daily Limit Reset)
     if (action === "reset_daily_limit") {
       const { targetPhone } = req.body || {};
-      if (!targetPhone) return res.status(400).json({ success: false, error: "फ़ोन नंबर अनिवार्य है।" });
+      const cleanTarget = String(targetPhone || "").replace(/\D/g, "");
+      if (!cleanTarget) return res.status(400).json({ success: false, error: "फ़ोन नंबर अनिवार्य है।" });
 
-      await dbPatch(`users/${targetPhone}`, { dailyCount: 0 });
+      await dbPatch(`users/${cleanTarget}`, { dailyCount: 0, dailyToolCount: 0 });
       return res.status(200).json({
         success: true,
-        message: `छात्र ${targetPhone} की आज की दैनिक सीमा शून्य (रीसेट) कर दी गई।`
+        message: `छात्र ${cleanTarget} की दैनिक सीमा रीसेट (0) कर दी गई।`
       });
     }
 
-    // 7. ऐप पर ग्लोबल नोटिस लगाना या हटाना
+    // 7. ऐप पर ग्लोबल नोटिस लगाना या हटाना (Global Notice)
     if (action === "set_notice") {
       const { noticeText, isActive } = req.body || {};
       await dbPut("system_settings", {
@@ -244,7 +244,7 @@ export default async function handler(req, res) {
       });
       return res.status(200).json({
         success: true,
-        message: isActive ? "ग्लोबल नोटिस प्रसारित कर दिया गया।" : "नोटिस हटा दिया गया।"
+        message: isActive ? "ग्लोबल नोटिस सफलतापूर्वक प्रसारित कर दिया गया।" : "नोटिस हटा दिया गया।"
       });
     }
 
