@@ -1737,6 +1737,43 @@ if (window.visualViewport) {
     if (activeChat) activeChat.scrollTop = activeChat.scrollHeight;
   });
 }
+
+  // ग्लोबल नोटिस लोड और शो करना
+let lastSeenNoticeKey = 'suhail_last_seen_notice';
+
+async function checkGlobalNotice() {
+  try {
+    const res = await safeFetch('/api?action=get-notice');
+    if (res && res.success && res.notice && res.notice.trim() !== '') {
+      const activeNotice = res.notice.trim();
+      const lastSeen = localStorage.getItem(lastSeenNoticeKey);
+
+      // अगर नया नोटिस है तो स्क्रीन पर दिखाएं
+      if (lastSeen !== activeNotice) {
+        const modal = document.getElementById('globalNoticeModal');
+        const contentBox = document.getElementById('globalNoticeContent');
+        if (modal && contentBox) {
+          contentBox.innerText = activeNotice;
+          modal.style.display = 'flex';
+        }
+      }
+    }
+  } catch (err) {
+    console.error("Notice fetch error:", err);
+  }
+}
+
+function dismissGlobalNotice() {
+  const contentBox = document.getElementById('globalNoticeContent');
+  if (contentBox && contentBox.innerText) {
+    localStorage.setItem(lastSeenNoticeKey, contentBox.innerText.trim());
+  }
+  const modal = document.getElementById('globalNoticeModal');
+  if (modal) modal.style.display = 'none';
+}
+
+// ऐप खुलते ही नोटिस चेक करें
+setTimeout(checkGlobalNotice, 1500);
   
 </script>
 
@@ -1781,6 +1818,29 @@ if (window.visualViewport) {
     <div style="display:flex; justify-content:flex-end; gap:10px;">
       <button onclick="document.getElementById('personaModal').style.display='none'" style="background:transparent; border:none; color:#8696a0; padding:8px 14px; cursor:pointer;">रद्द करें</button>
       <button onclick="savePersonaSettings()" style="background:#00a884; border:none; color:#fff; border-radius:8px; padding:8px 16px; font-weight:600; cursor:pointer;">सेव करें</button>
+    </div>
+  </div>
+</div>
+
+  <!-- ग्लोबल एडमिन नोटिस मोडल (About पैनल जैसा खूबसूरत डिज़ाइन) -->
+<div id="globalNoticeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999999; backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:18px;">
+  <div style="background:linear-gradient(145deg, #111b21, #0b141a); border:1px solid rgba(0,168,132,0.4); width:100%; max-width:420px; margin:auto; border-radius:18px; padding:22px; box-shadow:0 15px 35px rgba(0,0,0,0.9); animation:fadeInUp 0.3s ease-out;">
+    <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; margin-bottom:14px;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="background:rgba(0,168,132,0.15); color:#00a884; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1rem;">
+          <i class="fa-solid fa-bullhorn"></i>
+        </span>
+        <h3 style="color:#00a884; font-size:1.1rem; margin:0; font-weight:700;">इल्तिफ़ात / अहम नोटिस</h3>
+      </div>
+      <button onclick="dismissGlobalNotice()" style="background:transparent; border:none; color:#8696a0; font-size:1.2rem; cursor:pointer;">&times;</button>
+    </div>
+    
+    <div id="globalNoticeContent" style="color:#e9edef; font-size:0.92rem; line-height:1.6; margin-bottom:20px; white-space:pre-wrap; word-break:break-word;">
+      <!-- यहाँ एडमिन का नोटिस आएगा -->
+    </div>
+
+    <div style="text-align:right;">
+      <button onclick="dismissGlobalNotice()" style="background:#00a884; border:none; color:#fff; border-radius:8px; padding:9px 22px; font-weight:600; font-size:0.85rem; cursor:pointer;">समझ गया (OK)</button>
     </div>
   </div>
 </div>
