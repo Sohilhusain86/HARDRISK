@@ -497,6 +497,55 @@
     .admin-actions { display: flex; gap: 8px; margin-top: 6px; }
     .btn-approve { flex: 1; padding: 6px; border: none; border-radius: 6px; background: var(--success); color: #fff; font-weight: 600; cursor: pointer; }
     .btn-reject { flex: 1; padding: 6px; border: none; border-radius: 6px; background: var(--danger); color: #fff; font-weight: 600; cursor: pointer; }
+
+    /* --- Mobile Viewport, Header & Keyboard Fix --- */
+html, body {
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.app-container {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100dvh !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.top-header {
+  flex-shrink: 0 !important;
+  padding-top: max(8px, env(safe-area-inset-top)) !important;
+  min-height: 56px !important;
+  box-sizing: border-box !important;
+}
+
+.tab-view.active {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 !important;
+  height: calc(100% - 60px) !important;
+  overflow: hidden !important;
+}
+
+.chat-messages {
+  flex: 1 !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding-bottom: 12px !important;
+}
+
+.auth-card, .modal-box {
+  max-height: 90dvh !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+    
   </style>
 
   <link rel="manifest" href="/manifest.json">
@@ -1665,6 +1714,25 @@ function typeWriterEffect(bubbleElement, fullText, aiName) {
   renderUserUI();
   loadChatHistory();
   setInterval(syncProfile, 5000);
+
+  // Keyboard aane par input ko screen ke center me lana
+document.querySelectorAll('input, textarea').forEach(element => {
+  element.addEventListener('focus', () => {
+    setTimeout(() => {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+  });
+});
+
+// Viewport resize handle karna jab keyboard open/close ho
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    document.body.style.height = `${window.visualViewport.height}px`;
+    const activeChat = document.getElementById('chat-box');
+    if (activeChat) activeChat.scrollTop = activeChat.scrollHeight;
+  });
+}
+  
 </script>
 
 <script src="/admin-dashboard.js"></script>
