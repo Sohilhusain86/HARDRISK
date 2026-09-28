@@ -1502,8 +1502,9 @@ function typeWriterEffect(bubbleElement, fullText, aiName) {
       bubbleElement.innerHTML = `
         <span class="ai-label">${aiName || 'SUHAIL AI'}</span>
         <div class="chat-content ${isAr ? 'arabic-text' : ''}">${finalHtml}</div>
-        <div class="bubble-actions">
-          <button class="btn-copy" onclick="window.copyText(this)">Copy Karein</button>
+        <div class="bubble-actions" style="display:flex; justify-content:flex-end; gap:8px;">
+          <button class="btn-copy" onclick="window.copyText(this)"><i class="fa-regular fa-copy"></i> Copy Karein</button>
+          <button class="btn-copy" onclick="window.exportBubbleToPdf(this)" style="color:var(--accent-yellow);"><i class="fa-solid fa-file-pdf"></i> PDF Download</button>
         </div>
         <div class="bubble-quick-actions" style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
           <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('simplify')">🧠 आसान समझाओ</button>
@@ -1526,8 +1527,13 @@ function typeWriterEffect(bubbleElement, fullText, aiName) {
     div.innerHTML = `
       <span class="ai-label">${aiName || 'SUHAIL AI'}</span>
       <div class="chat-content ${isAr ? 'arabic-text' : ''}">${parsedHtml}</div>
-      <div class="bubble-actions">
+      <div class="bubble-actions" style="display:flex; justify-content:flex-end; gap:8px;">
         <button class="btn-copy" onclick="window.copyText(this)"><i class="fa-regular fa-copy"></i> Copy Karein</button>
+        <button class="btn-copy" onclick="window.exportBubbleToPdf(this)" style="color:var(--accent-yellow);"><i class="fa-solid fa-file-pdf"></i> PDF Download</button>
+      </div>
+      <div class="bubble-quick-actions" style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
+        <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('simplify')">🧠 आसान समझाओ</button>
+        <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('detail')">📚 गहराई में बताओ</button>
       </div>
     `;
   }
