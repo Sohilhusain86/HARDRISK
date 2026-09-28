@@ -1397,16 +1397,14 @@ function renderAiBubble(div, text, aiName) {
     return div;
   }
 
-   function typeWriterEffect(bubbleElement, fullText, aiName) {
+function typeWriterEffect(bubbleElement, fullText, aiName) {
   const isAr = containsArabic(fullText);
   let words = fullText.split(' ');
   let currentIndex = 0;
   let currentText = '';
 
-  // Track karein ki kya user khud upar padh raha hai
   let userIsScrollingUp = false;
   const onUserScroll = () => {
-    // Agar user bottom se 80px se zyada upar hai toh auto-scroll na karein
     const distanceFromBottom = chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight;
     userIsScrollingUp = distanceFromBottom > 80;
   };
@@ -1428,20 +1426,34 @@ function renderAiBubble(div, text, aiName) {
         </div>
       `;
 
-      // Sirf tabhi neeche le jao agar user ne manually upar scroll na kiya ho
       if (!userIsScrollingUp) {
         chatBox.scrollTop = chatBox.scrollHeight;
       }
     } else {
       clearInterval(typingInterval);
       chatBox.removeEventListener('scroll', onUserScroll);
-      renderAiBubble(bubbleElement, fullText, aiName);
+
+      let finalHtml = (typeof marked !== 'undefined') ? marked.parse(fullText) : fullText;
+      finalHtml = finalHtml.replace(/<table>/g, '<div class="table-responsive"><table>').replace(/<\/table>/g, '</table></div>');
+
+      bubbleElement.innerHTML = `
+        <span class="ai-label">${aiName || 'SUHAIL AI'}</span>
+        <div class="chat-content ${isAr ? 'arabic-text' : ''}">${finalHtml}</div>
+        <div class="bubble-actions">
+          <button class="btn-copy" onclick="window.copyText(this)">Copy Karein</button>
+        </div>
+        <div class="bubble-quick-actions" style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
+          <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('simplify')">🧠 आसान समझाओ</button>
+          <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('detail')">📚 गहराई में बताओ</button>
+        </div>
+      `;
+
       if (!userIsScrollingUp) {
         chatBox.scrollTop = chatBox.scrollHeight;
       }
     }
   }, 35);
-   }
+}
 
   function renderAiBubble(div, text, aiName) {
     const isAr = containsArabic(text);
