@@ -12,6 +12,34 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <style>
+
+    /* ब्लिंकिंग कर्सर एनीमेशन */
+.typing-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 15px;
+  background-color: var(--primary-green);
+  margin-left: 4px;
+  vertical-align: middle;
+  border-radius: 2px;
+  animation: blinkCursor 0.7s infinite;
+}
+
+@keyframes blinkCursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* नए मैसेज का स्मूथ फ़ेड-इन एनीमेशन */
+.chat-bubble.ai {
+  animation: fadeInBubble 0.3s ease-in-out;
+}
+
+@keyframes fadeInBubble {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+    
     :root {
       --bg-dark: #0b141a;
       --panel-dark: #111b21;
@@ -1145,7 +1173,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: text, phone: currentUser.phone, history: historyContext, isTool: isToolCall })
       });
-      renderAiBubble(aiBubble, data.reply, data.aiName);
+      typeWriterEffect(aiBubble, data.reply, data.aiName);
       saveMessageToHistory(data.reply, 'ai', data.aiName);
     } catch (err) {
       aiBubble.innerHTML = `<span class="ai-label">Error</span><div class="chat-content" style="color:var(--danger);">${err.message}</div>`;
@@ -1170,6 +1198,38 @@
     chatBox.scrollTop = chatBox.scrollHeight;
     return div;
   }
+
+  function typeWriterEffect(bubbleElement, fullText, aiName) {
+  const isAr = containsArabic(fullText);
+  let words = fullText.split(' ');
+  let currentIndex = 0;
+  let currentText = '';
+
+  const typingInterval = setInterval(() => {
+    if (currentIndex < words.length) {
+      currentText += (currentIndex === 0 ? '' : ' ') + words[currentIndex];
+      currentIndex++;
+
+      let parsedHtml = (typeof marked !== 'undefined') ? marked.parse(currentText) : currentText;
+      parsedHtml = parsedHtml.replace(/<table>/g, '<div class="table-responsive"><table>').replace(/<\/table>/g, '</table></div>');
+
+      bubbleElement.innerHTML = `
+        <span class="ai-label">${aiName || 'SUHAIL AI'}</span>
+        <div class="chat-content ${isAr ? 'arabic-text' : ''}">
+          ${parsedHtml}
+          <span class="typing-cursor"></span>
+        </div>
+      `;
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+    } else {
+      clearInterval(typingInterval);
+      renderAiBubble(bubbleElement, fullText, aiName);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  }, 35);
+  }
+  
 
   function renderAiBubble(div, text, aiName) {
     const isAr = containsArabic(text);
