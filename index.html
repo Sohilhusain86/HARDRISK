@@ -1738,7 +1738,9 @@ if (window.visualViewport) {
   });
 }
 
-  // ग्लोबल नोटिस लोड और शो करना
+  // ==========================================
+// 1. ग्लोबल नोटिस सिस्टम (Fetch & Dismiss)
+// ==========================================
 let lastSeenNoticeKey = 'suhail_last_seen_notice';
 
 async function checkGlobalNotice() {
@@ -1748,7 +1750,6 @@ async function checkGlobalNotice() {
       const activeNotice = res.notice.trim();
       const lastSeen = localStorage.getItem(lastSeenNoticeKey);
 
-      // अगर नया नोटिस है तो स्क्रीन पर दिखाएं
       if (lastSeen !== activeNotice) {
         const modal = document.getElementById('globalNoticeModal');
         const contentBox = document.getElementById('globalNoticeContent');
@@ -1759,7 +1760,7 @@ async function checkGlobalNotice() {
       }
     }
   } catch (err) {
-    console.error("Notice fetch error:", err);
+    console.error("Notice check error:", err);
   }
 }
 
@@ -1772,8 +1773,94 @@ function dismissGlobalNotice() {
   if (modal) modal.style.display = 'none';
 }
 
-// ऐप खुलते ही नोटिस चेक करें
-setTimeout(checkGlobalNotice, 1500);
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(checkGlobalNotice, 1000);
+});
+
+// ==========================================
+// 2. एडमिन नोटिस भेजने का फ़ंक्शन
+// ==========================================
+async function sendAdminGlobalNotice() {
+  const text = prompt("तमाम छात्रों के लिए नोटिस लिखें (हटाने के लिए खाली छोड़ें):");
+  if (text === null) return;
+
+  const isActive = text.trim().length > 0;
+  try {
+    const res = await safeFetch('/api?action=set_notice', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pass: "SuhailAiJamia",
+        phone: currentUser?.phone,
+        noticeText: text.trim(),
+        isActive: isActive
+      })
+    });
+
+    if (res && res.success) {
+      alert("✅ " + res.message);
+      localStorage.removeItem(lastSeenNoticeKey);
+      checkGlobalNotice();
+    } else {
+      alert("Error: " + (res?.error || "नोटिस प्रसारित नहीं हो सका।"));
+    }
+  } catch (e) {
+    alert("Error: " + e.message);
+  }
+}
+
+// ==========================================
+// 3. क्विक एक्शन बटन्स कोटा लॉजिक
+// (Free: 1, Plus: 3, Pro: 7, Ultra: 15)
+// ==========================================
+function getQuickActionLimit(plan) {
+  const p = (plan || 'free').toLowerCase();
+  if (p.includes('ultra')) return 15;
+  if (p.includes('pro')) return 7;
+  if (p.includes('plus')) return 3;
+  return 1;
+}
+
+function triggerFollowupAction(actionType) {
+  const userPlan = (currentUser?.plan || 'free').toLowerCase();
+  const maxLimit = (currentUser?.role === 'admin') ? 9999 : getQuickActionLimit(userPlan);
+
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const storedDate = localStorage.getItem('suhail_quick_action_date');
+  let currentUsage = parseInt(localStorage.getItem('suhail_quick_action_count') || '0', 10);
+
+  if (storedDate !== todayStr) {
+    currentUsage = 0;
+    localStorage.setItem('suhail_quick_action_date', todayStr);
+    localStorage.setItem('suhail_quick_action_count', '0');
+  }
+
+  if (currentUsage >= maxLimit) {
+    let upgradeMsg = `आज के लिए आपकी क्विक एक्शन सीमा समाप्त हो चुकी है (${currentUsage}/${maxLimit} बार इस्तेमाल)।`;
+    if (userPlan.includes('free')) {
+      upgradeMsg += '\n\nमज़ीद इस्तेमाल के लिए Plus (3 बार), Pro (7 बार) या Ultra (15 बार) में अपग्रेड करें!';
+    } else if (userPlan.includes('plus')) {
+      upgradeMsg += '\n\nरोज़ाना 7 बार के लिए Pro या 15 बार के लिए Ultra में अपग्रेड करें!';
+    } else if (userPlan.includes('pro')) {
+      upgradeMsg += '\n\nरोज़ाना 15 बार के लिए Ultra प्लान में अपग्रेड करें!';
+    }
+    alert(upgradeMsg);
+    return;
+  }
+
+  let promptText = '';
+  if (actionType === 'simplify') {
+    promptText = 'ऊपर दिए गए जवाब को और अधिक आसान मिसालों और सरल भाषा में समझाएं।';
+  } else if (actionType === 'detail') {
+    promptText = 'ऊपर दिए गए जवाब को मुकम्मल गहराई, बुनियादी उसूलों और पूरी तफ़सील से बताएं।';
+  }
+
+  if (!promptText) return;
+
+  localStorage.setItem('suhail_quick_action_count', (currentUsage + 1).toString());
+  chatInput.value = promptText;
+  sendQuestion();
+}
   
 </script>
 
@@ -1822,9 +1909,9 @@ setTimeout(checkGlobalNotice, 1500);
   </div>
 </div>
 
-  <!-- ग्लोबल एडमिन नोटिस मोडल (About पैनल जैसा खूबसूरत डिज़ाइन) -->
-<div id="globalNoticeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999999; backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:18px;">
-  <div style="background:linear-gradient(145deg, #111b21, #0b141a); border:1px solid rgba(0,168,132,0.4); width:100%; max-width:420px; margin:auto; border-radius:18px; padding:22px; box-shadow:0 15px 35px rgba(0,0,0,0.9); animation:fadeInUp 0.3s ease-out;">
+ <!-- ग्लोबल एडमिन नोटिस मोडल (About पैनल जैसा प्रीमियम ग्लास डिज़ाइन) -->
+<div id="globalNoticeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999999; backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:18px;">
+  <div style="background:linear-gradient(145deg, #111b21, #0b141a); border:1px solid rgba(0,168,132,0.4); width:100%; max-width:420px; margin:auto; border-radius:18px; padding:22px; box-shadow:0 15px 35px rgba(0,0,0,0.9);">
     <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; margin-bottom:14px;">
       <div style="display:flex; align-items:center; gap:8px;">
         <span style="background:rgba(0,168,132,0.15); color:#00a884; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1rem;">
@@ -1832,15 +1919,15 @@ setTimeout(checkGlobalNotice, 1500);
         </span>
         <h3 style="color:#00a884; font-size:1.1rem; margin:0; font-weight:700;">इल्तिफ़ात / अहम नोटिस</h3>
       </div>
-      <button onclick="dismissGlobalNotice()" style="background:transparent; border:none; color:#8696a0; font-size:1.2rem; cursor:pointer;">&times;</button>
+      <button onclick="dismissGlobalNotice()" style="background:transparent; border:none; color:#8696a0; font-size:1.4rem; cursor:pointer;">&times;</button>
     </div>
     
-    <div id="globalNoticeContent" style="color:#e9edef; font-size:0.92rem; line-height:1.6; margin-bottom:20px; white-space:pre-wrap; word-break:break-word;">
+    <div id="globalNoticeContent" style="color:#e9edef; font-size:0.95rem; line-height:1.6; margin-bottom:22px; white-space:pre-wrap; word-break:break-word;">
       <!-- यहाँ एडमिन का नोटिस आएगा -->
     </div>
 
     <div style="text-align:right;">
-      <button onclick="dismissGlobalNotice()" style="background:#00a884; border:none; color:#fff; border-radius:8px; padding:9px 22px; font-weight:600; font-size:0.85rem; cursor:pointer;">समझ गया (OK)</button>
+      <button onclick="dismissGlobalNotice()" style="background:#00a884; border:none; color:#fff; border-radius:8px; padding:10px 24px; font-weight:600; font-size:0.9rem; cursor:pointer;">समझ गया (OK)</button>
     </div>
   </div>
 </div>
