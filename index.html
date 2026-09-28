@@ -13,6 +13,50 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
 
+    /* COMPACT MOBILE VIEW & CLEAN SCREEN */
+.compact-mode .top-header {
+  padding: 4px 8px !important;
+  min-height: 44px !important;
+}
+.compact-mode .header-avatar {
+  width: 28px !important;
+  height: 28px !important;
+  font-size: 0.75rem !important;
+}
+.compact-mode #u-name {
+  font-size: 0.8rem !important;
+}
+.compact-mode .badge-plan {
+  display: none !important; /* Screen par jagah bachane ke liye badge hide */
+}
+.compact-mode .prompt-chips-container {
+  padding: 4px 8px !important;
+}
+.compact-mode .prompt-chip {
+  padding: 3px 8px !important;
+  font-size: 0.7rem !important;
+}
+.compact-mode .chat-bubble {
+  padding: 8px 12px !important;
+  margin-bottom: 6px !important;
+}
+.compact-mode .bubble-actions .btn-copy {
+  padding: 2px 6px !important;
+  font-size: 0.7rem !important;
+}
+.compact-mode .bubble-quick-actions {
+  display: none !important; /* Congestion hatane ke liye quick buttons hide */
+}
+.compact-mode #shortcut-bar-container,
+.compact-mode .tool-shortcuts-container {
+  display: none !important; /* Neeche wale 9 tools ko hide karke chat ko poori jagah dega */
+}
+
+/* Screen Density Zoom Scaling */
+html.screen-condensed {
+  font-size: 85% !important;
+}
+
     /* प्रॉम्प्ट कार्ड्स */
 .prompt-chips-container {
   display: flex;
@@ -638,6 +682,7 @@ html, body {
     </div>
    <div class="header-actions">
       <!-- Font Scaler Buttons -->
+      <button type="button" onclick="toggleScreenDensity()" title="Screen Khula / Chhota Karein" style="background:none; border:none; color:var(--primary-green); font-size:1rem; cursor:pointer; padding:4px 6px;"><i id="density-icon" class="fa-solid fa-compress"></i></button>
       <button type="button" onclick="adjustFontSize(-1)" title="फॉन्ट छोटा करें" style="background:none; border:none; color:var(--text-muted); font-size:0.85rem; font-weight:700; cursor:pointer; padding:4px 6px;">A-</button>
       <button type="button" onclick="adjustFontSize(1)" title="फॉन्ट बड़ा करें" style="background:none; border:none; color:var(--text-muted); font-size:1.05rem; font-weight:700; cursor:pointer; padding:4px 6px;">A+</button>
       <button id="btn-open-about" title="About Platform" style="color:var(--accent-yellow);"><i class="fa-solid fa-circle-info"></i></button>
@@ -1502,6 +1547,7 @@ function typeWriterEffect(bubbleElement, fullText, aiName) {
         <span class="ai-label">${aiName || 'SUHAIL AI'}</span>
         <div class="chat-content ${isAr ? 'arabic-text' : ''}">${finalHtml}</div>
         <div class="bubble-actions" style="display:flex; justify-content:flex-end; gap:8px;">
+          <button class="btn-copy" onclick="window.toggleBookmark(this)" title="Sabaq Mehfooz Karein"><i class="fa-regular fa-bookmark"></i> Save</button>
           <button class="btn-copy" onclick="window.copyText(this)"><i class="fa-regular fa-copy"></i> Copy Karein</button>
           <button class="btn-copy" onclick="window.exportBubbleToPdf(this)" style="color:var(--accent-yellow);"><i class="fa-solid fa-file-pdf"></i> PDF Download</button>
         </div>
@@ -2133,6 +2179,37 @@ function removeBookmark(index) {
   saveBookmarksToStorage(bookmarks);
   renderBookmarksList();
 }
+
+  // SCREEN DENSITY & COMPACT SCREEN TOGGLE
+function toggleScreenDensity() {
+  const isCompact = document.body.classList.toggle('compact-mode');
+  document.documentElement.classList.toggle('screen-condensed');
+  
+  const icon = document.getElementById('density-icon');
+  if (icon) {
+    if (isCompact) {
+      icon.className = 'fa-solid fa-expand';
+      icon.style.color = 'var(--accent-yellow)';
+    } else {
+      icon.className = 'fa-solid fa-compress';
+      icon.style.color = 'var(--primary-green)';
+    }
+  }
+  localStorage.setItem('suhail_screen_density', isCompact ? 'compact' : 'normal');
+}
+
+// Auto-load preference on refresh
+window.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('suhail_screen_density') === 'compact') {
+    document.body.classList.add('compact-mode');
+    document.documentElement.classList.add('screen-condensed');
+    const icon = document.getElementById('density-icon');
+    if (icon) {
+      icon.className = 'fa-solid fa-expand';
+      icon.style.color = 'var(--accent-yellow)';
+    }
+  }
+});
   
 </script>
 
