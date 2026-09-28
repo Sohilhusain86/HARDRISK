@@ -693,6 +693,10 @@ html, body {
       <button id="btn-open-bookmarks" type="button" onclick="openBookmarksModal()" title="Mehfooz Sabaq (Bookmarks)" style="background:none; border:none; color:var(--vip-gold); font-size:1.1rem; cursor:pointer; padding:6px;"><i class="fa-solid fa-bookmark"></i></button>
     </div>
   </header>
+  <!-- OFFLINE STATUS BANNER -->
+<div id="offline-network-alert" style="display:none; background:#ef4444; color:#fff; text-align:center; padding:6px 12px; font-size:0.8rem; font-weight:600; position:sticky; top:0; z-index:99999;">
+  <i class="fa-solid fa-triangle-exclamation"></i> Internet band hai. Kripya connection check karein.
+</div>
 
   <!-- NAVIGATION TABS -->
   <nav class="nav-dock">
@@ -752,6 +756,7 @@ html, body {
         <span class="shortcut-pill ultra-pill" id="pill-hashiya" onclick="window.triggerShortcut('shurooh_hashiya', 'Hashiya Synthesizer')">
           <i class="fa-solid fa-lock" id="lock-hashiya"></i> 👑 Hashiya Synthesizer
         </span>
+        <button type="button" class="tool-pill" onclick="triggerTashkeelPrompt()" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:#e9edef; border-radius:14px; padding:4px 10px; font-size:0.75rem; cursor:pointer; display:flex; align-items:center; gap:5px;"><span>✏️</span> Ibaarat Tashkeel</button>
       </div>
 
       <div class="lang-choice-bar" id="lang-bar">
@@ -767,11 +772,19 @@ html, body {
 
    <div class="chat-footer">
       <textarea id="chat-input" class="chat-input" rows="1" placeholder="Padhai ka sawal ya koi bhi baat yahan likhein..."></textarea>
-      <!-- Voice Input Mic Button -->
-      <button type="button" id="btn-voice-input" onclick="toggleVoiceInput()" style="background:transparent; border:none; color:#8696a0; font-size:1.25rem; padding:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;" title="बोलकर लिखें">
-        <i class="fa-solid fa-microphone" id="mic-icon"></i>
-      </button>
-      <button type="button" class="btn-send" id="btn-chat-send"><i class="fa-solid fa-paper-plane"></i></button>
+      <!-- Hidden File Input for Image OCR -->
+        <input type="file" id="ocr-file-input" accept="image/*" style="display:none;" onchange="handleImageOcr(event)" />
+
+        <!-- Camera / OCR Button -->
+        <button type="button" onclick="document.getElementById('ocr-file-input').click()" title="Kitaab ki Photo se Text Padhain" style="background:none; border:none; color:var(--text-muted); font-size:1.15rem; cursor:pointer; padding:6px; display:flex; align-items:center;">
+          <i class="fa-solid fa-camera"></i>
+        </button>
+
+        <!-- Voice Input Mic Button -->
+        <button type="button" id="btn-voice-input" onclick="toggleVoiceInput()">
+          <i class="fa-solid fa-microphone" id="mic-icon"></i>
+        </button>
+        <button type="button" class="btn-send" id="btn-chat-send"><i class="fa-solid fa-paper-plane"></i></button>
    </div>
     
   </section>
@@ -2209,6 +2222,102 @@ window.addEventListener('DOMContentLoaded', () => {
       icon.style.color = 'var(--accent-yellow)';
     }
   }
+});
+
+  // ==========================================
+// 1. KITAAB / IBAARAT IMAGE OCR SCANNER
+// ==========================================
+async function handleImageOcr(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  const chatInput = document.getElementById('chat-input') || document.querySelector('input[type="text"]');
+  if (!chatInput) return;
+
+  const originalPlaceholder = chatInput.placeholder;
+  chatInput.placeholder = "📷 Tasveer se ibaarat padhi ja rahi hai...";
+  chatInput.disabled = true;
+
+  try {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64Data = e.target.result.split(',')[1];
+      const mimeType = file.type || 'image/jpeg';
+
+      // Send to Backend for OCR processing
+      const res = await fetch('/api?action=ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: "Is tasveer me likhi hui Arabi ya Urdu ibaarat ko bina kisi ghalti ke saaf-saaf text me convert karein. Sirf text dein, koi faltu baat na likhein.",
+          phone: currentUser ? currentUser.phone : '',
+          isTool: true
+        })
+      });
+
+      const data = await res.json();
+      if (data && data.reply) {
+        chatInput.value = data.reply.trim();
+      } else {
+        alert("Tasveer se text padhne me dikkat aayi. Kripya dobara koshish karein.");
+      }
+      chatInput.disabled = false;
+      chatInput.placeholder = originalPlaceholder;
+      chatInput.focus();
+    };
+    reader.readAsDataURL(file);
+  } catch (err) {
+    console.error("OCR Error:", err);
+    chatInput.disabled = false;
+    chatInput.placeholder = originalPlaceholder;
+  }
+}
+
+// ==========================================
+// 2. FULL IBAARAT TASHKEEL ENGINE
+// ==========================================
+function triggerTashkeelPrompt() {
+  const chatInput = document.getElementById('chat-input') || document.querySelector('input[type="text"]');
+  if (!chatInput) return;
+
+  const selectedText = chatInput.value.trim();
+  if (!selectedText) {
+    chatInput.value = "Neeche di gayi Arabi ibaarat par Dars-e-Nizami ke usoolon ke mutabiq mukammal tashkeel (zer, zabar, pesh) lagayein aur ahem asmaa wa af'aal ka nahwi sabab wazeh karein:\n\n[Yahan ibaarat paste karein]";
+    chatInput.focus();
+  } else {
+    chatInput.value = `Neeche di gayi Arabi ibaarat par Dars-e-Nizami ke usoolon ke mutabiq mukammal tashkeel (zer, zabar, pesh) lagayein aur ahem asmaa wa af'aal ka nahwi sabab wazeh karein:\n\n${selectedText}`;
+    if (typeof sendQuestion === 'function') sendQuestion();
+  }
+}
+
+// ==========================================
+// 3. NETWORK OFFLINE / ONLINE DETECTION
+// ==========================================
+function setupNetworkSync() {
+  const alertBox = document.getElementById('offline-network-alert');
+  
+  function updateNetworkStatus() {
+    if (!navigator.onLine) {
+      if (alertBox) alertBox.style.display = 'block';
+    } else {
+      if (alertBox) {
+        alertBox.style.background = 'var(--primary-green)';
+        alertBox.innerHTML = '<i class="fa-solid fa-circle-check"></i> Internet wapas jud gaya hai!';
+        setTimeout(() => {
+          alertBox.style.display = 'none';
+          alertBox.style.background = '#ef4444';
+          alertBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Internet band hai. Kripya connection check karein.';
+        }, 2500);
+      }
+    }
+  }
+
+  window.addEventListener('offline', updateNetworkStatus);
+  window.addEventListener('online', updateNetworkStatus);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setupNetworkSync();
 });
   
 </script>
