@@ -528,7 +528,12 @@ html, body {
   flex-direction: column !important;
   flex: 1 !important;
   height: calc(100% - 60px) !important;
-  overflow: hidden !important;
+  overflow-y: auto !important; /* यहाँ auto करने से Plans और Upgrade आराम से स्क्रॉल होंगे */
+  -webkit-overflow-scrolling: touch !important;
+}
+
+#tab-study.active {
+  overflow: hidden !important; /* सिर्फ चैट वाले टैब का बाहरी हिस्सा लॉक रहेगा, ताकि अंदर की चैट स्क्रॉल हो */
 }
 
 .chat-messages {
