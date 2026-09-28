@@ -523,8 +523,11 @@
 
   <!-- HEADER -->
   <header class="top-header">
-    <div class="header-user">
-      <div class="header-avatar" id="u-avatar">S</div>
+  <div class="header-user">
+  <button type="button" id="btn-open-sidebar" style="background:none; border:none; color:#e9edef; font-size:1.2rem; cursor:pointer; padding-right:8px;">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+  <div class="header-avatar" id="u-avatar">S</div>
       <div class="header-info">
         <h4 id="u-name">Talib-e-Ilm</h4>
         <span class="badge-plan" id="u-plan">SUHAIL AI FREE</span>
@@ -1121,13 +1124,23 @@
     }
   });
 
-  function getHistoryKey() {
-    return currentUser ? `suhail_chat_v5_${currentUser.phone}` : 'suhail_chat_temp';
+  let currentSessionId = localStorage.getItem('suhail_active_session_id') || ('sess_' + Date.now());
+  localStorage.setItem('suhail_active_session_id', currentSessionId);
+
+  function getAllSessions() {
+    const userPrefix = currentUser ? currentUser.phone : 'guest';
+    return JSON.parse(localStorage.getItem(`suhail_sessions_${userPrefix}`) || '{}');
+  }
+
+  function saveAllSessions(sessions) {
+    const userPrefix = currentUser ? currentUser.phone : 'guest';
+    localStorage.setItem(`suhail_sessions_${userPrefix}`, JSON.stringify(sessions));
   }
 
   function loadChatHistory() {
     chatBox.innerHTML = '';
-    const saved = JSON.parse(localStorage.getItem(getHistoryKey()) || '[]');
+    const sessions = getAllSessions();
+    const saved = sessions[currentSessionId]?.messages || [];
     if (!saved.length) {
       appendMessage("Assalamu Alaikum wa Rahmatullahi! Main aapka Suhail AI Study Partner hoon. Padhai, Dars-e-Nizami, Grammar, Science ya kisi bhi sawal par bejhijhak guftagu karein.", 'ai', 'SUHAIL AI FREE', false);
     } else {
@@ -1136,17 +1149,71 @@
   }
 
   function saveMessageToHistory(text, role, aiName) {
-    const saved = JSON.parse(localStorage.getItem(getHistoryKey()) || '[]');
-    saved.push({ text, role, aiName, time: Date.now() });
-    if (saved.length > 50) saved.shift();
-    localStorage.setItem(getHistoryKey(), JSON.stringify(saved));
+    const sessions = getAllSessions();
+    if (!sessions[currentSessionId]) {
+      const cleanTitle = text.replace(/\[.*?\]/g, '').trim();
+      const title = cleanTitle.length > 28 ? (cleanTitle.substring(0, 28) + '...') : (cleanTitle || 'Nayi Guftagu');
+      sessions[currentSessionId] = { title: title, createdAt: Date.now(), messages: [] };
+    }
+    sessions[currentSessionId].messages.push({ text, role, aiName, time: Date.now() });
+    if (sessions[currentSessionId].messages.length > 60) sessions[currentSessionId].messages.shift();
+    saveAllSessions(sessions);
+  }
+
+  function renderSidebarSessions() {
+    const container = document.getElementById('sidebarRecentSessionsList');
+    if (!container) return;
+    const sessions = getAllSessions();
+    const keys = Object.keys(sessions).reverse();
+
+    if (keys.length === 0) {
+      container.innerHTML = '<div style="font-size:0.8rem; color:#64748b; padding:10px;">Koi purani chat nahi hai.</div>';
+      return;
+    }
+
+    container.innerHTML = '';
+    keys.forEach(k => {
+      const s = sessions[k];
+      const item = document.createElement('div');
+      const isActive = (k === currentSessionId);
+      item.style.cssText = `padding:9px 12px; border-radius:10px; font-size:0.82rem; cursor:pointer; display:flex; align-items:center; gap:8px; color:${isActive ? '#00a884' : '#cbd5e1'}; background:${isActive ? '#182229' : 'transparent'}; border:1px solid ${isActive ? '#00a884' : 'transparent'};`;
+      item.innerHTML = `<i class="fa-regular fa-message" style="font-size:0.8rem;"></i> <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;">${s.title || 'Untitled Chat'}</span>`;
+      item.onclick = () => switchChatSession(k);
+      container.appendChild(item);
+    });
+  }
+
+  function switchChatSession(sessionId) {
+    currentSessionId = sessionId;
+    localStorage.setItem('suhail_active_session_id', currentSessionId);
+    closeSidebarDrawer();
+    loadChatHistory();
+  }
+
+  function startFreshNewSession() {
+    currentSessionId = 'sess_' + Date.now();
+    localStorage.setItem('suhail_active_session_id', currentSessionId);
+    closeSidebarDrawer();
+    chatBox.innerHTML = '';
+    loadChatHistory();
+  }
+
+  function openSidebarDrawer() {
+    renderSidebarSessions();
+    const drawer = document.getElementById('chatSidebarDrawer');
+    if (drawer) drawer.style.display = 'block';
+  }
+
+  function closeSidebarDrawer() {
+    const drawer = document.getElementById('chatSidebarDrawer');
+    if (drawer) drawer.style.display = 'none';
   }
 
   document.getElementById('btn-new-chat').onclick = () => {
-    if (!confirm("Kya aap nayi guftagu shuru karna chahte hain?")) return;
-    localStorage.removeItem(getHistoryKey());
-    loadChatHistory();
+    startFreshNewSession();
   };
+
+  document.getElementById('btn-open-sidebar')?.addEventListener('click', openSidebarDrawer);
 
   sendBtn.onclick = sendQuestion;
 
@@ -1161,7 +1228,7 @@
     sendBtn.disabled = true;
     const aiBubble = appendMessage("Jawab tayyar kiya ja raha hai...", 'ai', 'SUHAIL AI', false);
 
-    const saved = JSON.parse(localStorage.getItem(getHistoryKey()) || '[]');
+    const saved = (getAllSessions()[currentSessionId]?.messages) || [];
     const historyContext = saved.slice(-6).map(m => ({
       role: m.role === 'user' ? 'user' : 'assistant',
       content: m.text
@@ -1199,11 +1266,20 @@
     return div;
   }
 
-  function typeWriterEffect(bubbleElement, fullText, aiName) {
+   function typeWriterEffect(bubbleElement, fullText, aiName) {
   const isAr = containsArabic(fullText);
   let words = fullText.split(' ');
   let currentIndex = 0;
   let currentText = '';
+
+  // Track karein ki kya user khud upar padh raha hai
+  let userIsScrollingUp = false;
+  const onUserScroll = () => {
+    // Agar user bottom se 80px se zyada upar hai toh auto-scroll na karein
+    const distanceFromBottom = chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight;
+    userIsScrollingUp = distanceFromBottom > 80;
+  };
+  chatBox.addEventListener('scroll', onUserScroll);
 
   const typingInterval = setInterval(() => {
     if (currentIndex < words.length) {
@@ -1221,15 +1297,20 @@
         </div>
       `;
 
-      chatBox.scrollTop = chatBox.scrollHeight;
+      // Sirf tabhi neeche le jao agar user ne manually upar scroll na kiya ho
+      if (!userIsScrollingUp) {
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
     } else {
       clearInterval(typingInterval);
+      chatBox.removeEventListener('scroll', onUserScroll);
       renderAiBubble(bubbleElement, fullText, aiName);
-      chatBox.scrollTop = chatBox.scrollHeight;
+      if (!userIsScrollingUp) {
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
     }
   }, 35);
-  }
-  
+   }
 
   function renderAiBubble(div, text, aiName) {
     const isAr = containsArabic(text);
@@ -1445,5 +1526,29 @@
 
 <script src="/admin-dashboard.js"></script>
 
+    <!-- GEMINI STYLE SIDEBAR DRAWER -->
+<div id="chatSidebarDrawer" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:999999; backdrop-filter:blur(3px);">
+  <div style="background:#0b141a; width:80%; max-width:320px; height:100%; display:flex; flex-direction:column; padding:16px; border-right:1px solid rgba(255,255,255,0.08); box-shadow:5px 0 25px rgba(0,0,0,0.8);">
+    
+    <!-- Top Actions -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+      <h3 style="color:#00a884; font-size:1.1rem; margin:0;"><i class="fa-solid fa-book-bookmark"></i> Suhail AI</h3>
+      <button onclick="closeSidebarDrawer()" style="background:none; border:none; color:#8696a0; font-size:1.4rem; cursor:pointer;">&times;</button>
+    </div>
+
+    <!-- New Chat Button -->
+    <button onclick="startFreshNewSession()" style="display:flex; align-items:center; gap:10px; background:#182229; color:#fff; border:1px solid rgba(255,255,255,0.1); padding:10px 14px; border-radius:12px; font-weight:600; font-size:0.88rem; cursor:pointer; margin-bottom:16px;">
+      <i class="fa-solid fa-plus" style="color:#00a884;"></i> New Chat
+    </button>
+
+    <div style="font-size:0.75rem; color:#8696a0; font-weight:600; text-transform:uppercase; margin-bottom:8px; padding-left:4px;">Recent Chats</div>
+
+    <!-- Saved Chats List -->
+    <div id="sidebarRecentSessionsList" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
+      <!-- Dynamic Chat Links yahan load honge -->
+    </div>
+  </div>
+</div>
+    
 </body>
 </html>
