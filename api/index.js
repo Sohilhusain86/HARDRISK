@@ -332,9 +332,9 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, user });
     }
 
-    // AI CHAT DISPATCHER & CLOUD DATABASE SYNC
+        // AI CHAT DISPATCHER & CLOUD DATABASE SYNC
     if (action === "ai" && req.method === "POST") {
-      const { prompt, phone, history, isTool } = req.body || {};
+      const { prompt, phone, history, isTool, customPersona } = req.body || {};
       if (!prompt || !String(prompt).trim()) return res.status(400).json({ success: false, error: "सवाल खाली नहीं हो सकता।" });
 
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -389,11 +389,15 @@ export default async function handler(req, res) {
       };
 
       const aiName = aiTitles[plan] || "SUHAIL AI FREE";
-      const instruction = SYSTEM_RULES[plan] || SYSTEM_RULES.free;
+      let instruction = SYSTEM_RULES[plan] || SYSTEM_RULES.free;
+
+      // Custom persona injection
+      if (customPersona && String(customPersona).trim()) {
+        instruction += `\n\n[USER CUSTOM INSTRUCTIONS]: ${String(customPersona).trim()}`;
+      }
 
       const replyText = await executeAI(plan, prompt, instruction, history);
 
-      // 1. User stats counter update
       if (cleanPhone && user) {
         dbPatch(`users/${cleanPhone}`, {
           totalQuestions: (user.totalQuestions || 0) + 1,
@@ -404,7 +408,6 @@ export default async function handler(req, res) {
         }).catch(() => {});
       }
 
-      // 2. Chat history ko Firebase me save karna (Admin Chat Audit ke liye)
       if (cleanPhone) {
         const timestamp = Date.now();
         dbPut(`chats/${cleanPhone}/${timestamp}`, {
@@ -418,6 +421,7 @@ export default async function handler(req, res) {
 
       return res.status(200).json({ success: true, reply: replyText, aiName, plan });
     }
+
 
     if (action === "payment" && req.method === "POST") {
       const { phone, plan, utr } = req.body || {};
