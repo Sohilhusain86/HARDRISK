@@ -13,6 +13,55 @@
 
   <style>
 
+    /* प्रॉम्प्ट कार्ड्स */
+.prompt-chips-container {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 12px;
+  background: var(--card-dark);
+  border-bottom: 1px solid var(--card-border);
+  scrollbar-width: none;
+}
+.prompt-chips-container::-webkit-scrollbar { display: none; }
+.prompt-chip {
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.prompt-chip:hover {
+  background: rgba(0, 168, 132, 0.15);
+  border-color: var(--primary-green);
+  color: var(--primary-green);
+}
+
+/* क्विक एक्शन बटन्स */
+.bubble-quick-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.btn-action-pill {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-muted);
+  border-radius: 12px;
+  padding: 4px 8px;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+.btn-action-pill:hover {
+  color: #fff;
+  border-color: var(--primary-green);
+}
+
     /* ब्लिंकिंग कर्सर एनीमेशन */
 .typing-cursor {
   display: inline-block;
@@ -556,6 +605,14 @@
       <button onclick="document.querySelector('.nav-item[data-tab=\'tab-pay\']').click()" style="background:var(--vip-gold); color:#000; border:none; padding:3px 8px; border-radius:4px; font-weight:700; font-size:0.7rem; cursor:pointer;">Renew Karein</button>
     </div>
 
+    <!-- रेडीमेड प्रॉम्प्ट चिप्स -->
+    <div class="prompt-chips-container">
+      <button type="button" class="prompt-chip" onclick="quickFillPrompt('इस इबारत का खुलासा और नह्वी तरकीब पेश करें:')">📝 खुलासा व तरकीब</button>
+      <button type="button" class="prompt-chip" onclick="quickFillPrompt('इस मौज़ू पर मेरा एक इम्तिहान (Mock Test / 5 सवालात) लें:')">🎯 इम्तिहान लें</button>
+      <button type="button" class="prompt-chip" onclick="quickFillPrompt('इस अरबी/उर्दू इबारत की ग़लतियाँ दुरुस्त करें:')">🔍 ग़लती सुधारें</button>
+      <button type="button" class="prompt-chip" onclick="quickFillPrompt('दरसी नुक्ते-नज़र से इसकी आसान मिसाल पेश करें:')">💡 आसान मिसाल</button>
+    </div>
+    
     <div class="chat-messages" id="chat-box"></div>
 
     <!-- 9 TOOL SHORTCUT PILLS -->
@@ -816,6 +873,71 @@
 </div>
 
 <script>
+
+  // 1. रेडीमेड प्रॉम्प्ट इनपुट में डालना
+function quickFillPrompt(text) {
+  chatInput.value = text + ' ';
+  chatInput.focus();
+}
+
+// 2. कस्टम इंस्ट्रक्शन सेव और लोड
+function openPersonaModal() {
+  document.getElementById('personaUserRole').value = localStorage.getItem('suhail_persona_role') || '';
+  document.getElementById('personaUserPrefs').value = localStorage.getItem('suhail_persona_prefs') || '';
+  document.getElementById('personaModal').style.display = 'block';
+}
+
+function savePersonaSettings() {
+  const role = document.getElementById('personaUserRole').value.trim();
+  const prefs = document.getElementById('personaUserPrefs').value.trim();
+  localStorage.setItem('suhail_persona_role', role);
+  localStorage.setItem('suhail_persona_prefs', prefs);
+  document.getElementById('personaModal').style.display = 'none';
+  alert('कस्टम सेटिंग्स सुरक्षित हो गईं!');
+}
+
+function getCombinedPersona() {
+  const role = localStorage.getItem('suhail_persona_role') || '';
+  const prefs = localStorage.getItem('suhail_persona_prefs') || '';
+  let str = '';
+  if (role) str += `Student Profile: ${role}. `;
+  if (prefs) str += `Response Preference: ${prefs}. `;
+  return str;
+}
+
+// 3. क्विक एक्शन बटन (आसान समझाओ / गहराई में बताओ)
+function triggerFollowupAction(actionType) {
+  let promptText = '';
+  if (actionType === 'simplify') {
+    promptText = 'ऊपर दिए गए जवाब को और अधिक आसान मिसालों और सरल भाषा में समझाएँ।';
+  } else if (actionType === 'detail') {
+    promptText = 'ऊपर दिए गए जवाब को मुकम्मल गहराई, बुनियादी उसूलों और तफ़सीलात के साथ खोलें।';
+  }
+  if (!promptText) return;
+  chatInput.value = promptText;
+  sendQuestion();
+}
+
+// 4. renderAiBubble में क्विक एक्शन बटन जोड़ना
+// अपने मौजूदा renderAiBubble के अंदर bubble-actions वाले हिस्से को इस तरह अपडेट करें:
+function renderAiBubble(div, text, aiName) {
+  const isAr = containsArabic(text);
+  let parsedHtml = (typeof marked !== 'undefined') ? marked.parse(text) : text;
+  parsedHtml = parsedHtml.replace(/<table>/g, '<div class="table-responsive"><table>').replace(/<\/table>/g, '</table></div>');
+
+  div.innerHTML = `
+    <span class="ai-label">${aiName || 'SUHAIL AI'}</span>
+    <div class="chat-content ${isAr ? 'arabic-text' : ''}">${parsedHtml}</div>
+    <div class="bubble-actions">
+      <button class="btn-copy" onclick="window.copyText(this)">Copy Karein</button>
+    </div>
+    <div class="bubble-quick-actions">
+      <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('simplify')">🧠 आसान समझाओ</button>
+      <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('detail')">📚 गहराई में बताओ</button>
+    </div>
+  `;
+}
+  
   let currentUser = JSON.parse(localStorage.getItem('suhail_ai_user') || 'null');
   let currentAdminPass = localStorage.getItem('suhail_ai_admin_pass') || 'SuhailAiJamia';
   let activeShortcutType = null;
@@ -1238,7 +1360,13 @@
       const data = await safeFetch('/api?action=ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: text, phone: currentUser.phone, history: historyContext, isTool: isToolCall })
+        body: JSON.stringify({
+          prompt: text,
+          phone: currentUser.phone,
+          history: historyContext,
+          isTool: isToolCall,
+          customPersona: getCombinedPersona()
+        })
       });
       typeWriterEffect(aiBubble, data.reply, data.aiName);
       saveMessageToHistory(data.reply, 'ai', data.aiName);
@@ -1549,6 +1677,25 @@
     </div>
   </div>
 </div>
+
+  <!-- कस्टम इंस्ट्रक्शन मोडल -->
+<div id="personaModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:999999; backdrop-filter:blur(3px);">
+  <div style="background:#111b21; border:1px solid rgba(255,255,255,0.1); width:90%; max-width:400px; margin:70px auto; border-radius:16px; padding:20px;">
+    <h3 style="color:#00a884; font-size:1.1rem; margin-bottom:8px;"><i class="fa-solid fa-sliders"></i> कस्टम निर्देश (AI Persona)</h3>
+    <p style="color:#8696a0; font-size:0.8rem; margin-bottom:14px;">AI को तय करें कि वह आपके स्तर और पसंद के अनुसार कैसा जवाब दे।</p>
     
+    <label style="color:#e9edef; font-size:0.8rem; display:block; margin-bottom:6px;">आप कौन हैं और क्या पढ़ते हैं?</label>
+    <input type="text" id="personaUserRole" placeholder="उदा. दर्जा-ए-आलिया छात्र, 10वीं छात्र..." style="width:100%; background:#0b141a; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px; color:#fff; font-size:0.85rem; margin-bottom:14px;">
+    
+    <label style="color:#e9edef; font-size:0.8rem; display:block; margin-bottom:6px;">AI से आप किस अंदाज़ में जवाब चाहते हैं?</label>
+    <textarea id="personaUserPrefs" rows="3" placeholder="उदा. हमेशा आसान ज़बान में समझाना, तरकीब ज़रूर बताना..." style="width:100%; background:#0b141a; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px; color:#fff; font-size:0.85rem; margin-bottom:16px;"></textarea>
+
+    <div style="display:flex; justify-content:flex-end; gap:10px;">
+      <button onclick="document.getElementById('personaModal').style.display='none'" style="background:transparent; border:none; color:#8696a0; padding:8px 14px; cursor:pointer;">रद्द करें</button>
+      <button onclick="savePersonaSettings()" style="background:#00a884; border:none; color:#fff; border-radius:8px; padding:8px 16px; font-weight:600; cursor:pointer;">सेव करें</button>
+    </div>
+  </div>
+</div>
+  
 </body>
 </html>
