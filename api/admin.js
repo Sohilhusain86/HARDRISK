@@ -1,12 +1,9 @@
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com";
 
-// Active Keys
 const GROQ_KEY = (process.env.GROQ_KEY || "").trim();
 const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || "").trim();
-const POLLINATIONS_KEY = (process.env.POLLINATIONS_KEY || process.env.POLLINATION_KEY || "").trim();
 
-// Firebase Helper Functions
 async function dbGet(path) {
   try {
     const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`);
@@ -35,7 +32,7 @@ async function dbPut(path, data) {
   return await res.json();
 }
 
-// Multi-Engine AI Audit Generator (Groq -> Gemini -> Pollinations)
+// AI Summary Generator with Fallback to Direct Chat Display
 async function generateAiAuditReport(chatLogsText) {
   const prompt = `Aap 'Suhail AI' platform ke Chief Auditor hain. Neeche tulba (students) ki ahem chats hain:
 ---
@@ -44,10 +41,9 @@ ${chatLogsText}
 Admin (Suhail Husain) ke liye Urdu/Hindi me mukhtasar aur behtareen tajziya (Audit Summary) pesh karein:
 1. Tulba ne buniyadi taur par kya sawalat pooche?
 2. AI ne kaisa jawab diya aur kya koi ilmi kami thi?
-3. Poori guftagu ka mukhtasar khulasa.
-4. Platform ke AI ko aur behtar banane ke liye 2 ahem mashware.`;
+3. Poori guftagu ka mukhtasar khulasa aur platform behtar banane ke mashware.`;
 
-  // 1. Groq Engine (Fastest & Most Reliable)
+  // 1. Try Groq (Llama-3.1 8b instant - very fast and stable)
   if (GROQ_KEY) {
     try {
       const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -57,19 +53,19 @@ Admin (Suhail Husain) ke liye Urdu/Hindi me mukhtasar aur behtareen tajziya (Aud
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
+          model: "llama-3.1-8b-instant",
           messages: [{ role: "user", content: prompt }],
           temperature: 0.3
         })
       });
       const data = await res.json();
       if (data?.choices?.[0]?.message?.content) {
-        return data.choices[0].message.content;
+        return "✨ [AI मुख्य समीक्षा रिपोर्ट]:\n\n" + data.choices[0].message.content;
       }
     } catch (e) {}
   }
 
-  // 2. Gemini Engine (Fallback)
+  // 2. Try Gemini
   if (GEMINI_API_KEY) {
     try {
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
@@ -81,28 +77,13 @@ Admin (Suhail Husain) ke liye Urdu/Hindi me mukhtasar aur behtareen tajziya (Aud
       });
       const data = await res.json();
       if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-        return data.candidates[0].content.parts[0].text;
+        return "✨ [AI मुख्य समीक्षा रिपोर्ट (Gemini)]:\n\n" + data.candidates[0].content.parts[0].text;
       }
     } catch (e) {}
   }
 
-  // 3. Pollinations Engine (Key-free Fallback)
-  try {
-    const res = await fetch("https://text.pollinations.ai/openai/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "mistral",
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
-    const data = await res.json();
-    if (data?.choices?.[0]?.message?.content) {
-      return data.choices[0].message.content;
-    }
-  } catch (e) {}
-
-  return "समरी तैयार नहीं हो सकी: कृपया नेटवर्क कनेक्शन या API Keys की जाँच करें।";
+  // 3. Fallback: Agar AI keys busy hon toh seedhe chat logs dikha do taaki admin ko data zaroor dikhe
+  return "📋 [सीधा चैट रिकॉर्ड - लाइव डेटाबेस]:\n(नोट: AI समरी की व्यस्तता के कारण सीधा रिकॉर्ड दिखाया जा रहा है)\n\n" + chatLogsText;
 }
 
 export default async function handler(req, res) {
@@ -122,7 +103,7 @@ export default async function handler(req, res) {
       return res.status(401).json({ success: false, error: "अमान्य एडमिन पासवर्ड!" });
     }
 
-    // AI CHAT AUDIT (All Users & Single User)
+    // AI CHAT AUDIT
     if (action === "ai_chat_summary") {
       const allChats = (await dbGet("chats")) || {};
       const { targetPhone } = req.body || {};
@@ -136,21 +117,22 @@ export default async function handler(req, res) {
         msgs.slice(-25).forEach(m => {
           const q = m.question || m.text || m.content || "";
           const a = m.reply || "";
-          if (q) logsText += `छात्र: ${q}\n`;
-          if (a) logsText += `AI: ${a}\n\n`;
+          if (q) logsText += `🔹 छात्र: ${q}\n`;
+          if (a) logsText += `🔸 AI: ${a}\n\n`;
         });
       } else {
         for (const ph in allChats) {
           const userChat = allChats[ph] || {};
           const msgs = Array.isArray(userChat) ? userChat : Object.values(userChat);
           if (msgs.length > 0) {
-            logsText += `\n[छात्र फ़ोन: ${ph}]\n`;
+            logsText += `\n👤 [छात्र फ़ोन: ${ph}]\n`;
             msgs.slice(-6).forEach(m => {
               const q = m.question || m.text || m.content || "";
               const a = m.reply || "";
-              if (q) logsText += `छात्र: ${q}\n`;
-              if (a) logsText += `AI: ${a}\n`;
+              if (q) logsText += `🔹 छात्र: ${q}\n`;
+              if (a) logsText += `🔸 AI: ${a}\n`;
             });
+            logsText += "-----------------------------\n";
           }
         }
       }
