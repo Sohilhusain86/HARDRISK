@@ -1,15 +1,21 @@
 import fetch from "node-fetch";
 
-const FIREBASE_DB_URL = process.env.FIREBASE_DB_URL || "https://hardrisk-default-rtdb.firebaseio.com";
+const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
+const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || process.env.FIREBASE_DB_URL || "https://ula-alif-default-rtdb.firebaseio.com";
 const FIREBASE_AUTH = process.env.FIREBASE_AUTH || "";
-const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
+const GROQ_KEY = (process.env.GROQ_KEY || process.env.GROQ_API_KEY || "").trim();
+const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || "").trim();
 
 // Firebase Helper Functions
 async function dbGet(path) {
-  const url = `${FIREBASE_DB_URL}/${path}.json${FIREBASE_AUTH ? `?auth=${FIREBASE_AUTH}` : ""}`;
-  const res = await fetch(url);
-  if (!res.ok) return null;
-  return await res.json();
+  try {
+    const url = `${FIREBASE_DB_URL}/${path}.json${FIREBASE_AUTH ? `?auth=${FIREBASE_AUTH}` : ""}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
 }
 
 async function dbPut(path, data) {
@@ -29,12 +35,6 @@ async function dbPatch(path, data) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
   });
-  return await res.json();
-}
-
-async function dbDelete(path) {
-  const url = `${FIREBASE_DB_URL}/${path}.json${FIREBASE_AUTH ? `?auth=${FIREBASE_AUTH}` : ""}`;
-  const res = await fetch(url, { method: "DELETE" });
   return await res.json();
 }
 
@@ -58,15 +58,13 @@ const SYSTEM_RULES = {
   ultra: "Aap Suhail AI Ultra hain. Master Academic & Islamic research assistant. Har pehlu ko nihayat gehrai, hawala-jaat aur jamia andaz me pesh karein."
 };
 
-// Groq API Caller
+// AI Engine Caller (Groq Llama 3.3)
 async function executeAI(plan, prompt, instruction, history = []) {
-  if (!GROQ_API_KEY) {
+  if (!GROQ_KEY) {
     return "AI Service temporarily unavailable (API Key missing).";
   }
 
-  const messages = [
-    { role: "system", content: instruction }
-  ];
+  const messages = [{ role: "system", content: instruction }];
 
   if (Array.isArray(history)) {
     history.slice(-6).forEach(msg => {
@@ -82,7 +80,7 @@ async function executeAI(plan, prompt, instruction, history = []) {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${GROQ_API_KEY}`,
+        "Authorization": `Bearer ${GROQ_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -101,41 +99,103 @@ async function executeAI(plan, prompt, instruction, history = []) {
   }
 }
 
-// MAIN VERCEL HANDLER
+// AI Audit Report Generator for Admin
+async function generateAiAuditReport(chatLogsText) {
+  const prompt = `Aap 'Suhail AI' platform ke Chief Auditor hain. Neeche tulba (students) ki ahem chats hain:
+---
+${chatLogsText}
+---
+Admin (Suhail Husain) ke liye Urdu/Hindi me mukhtasar aur behtareen tajziya (Audit Summary) pesh karein:
+1. Tulba ne buniyadi taur par kya sawalat pooche?
+2. AI ne kaisa jawab diya aur kya koi ilmi kami thi?
+3. Poori guftagu ka mukhtasar khulasa aur platform behtar banane ke mashware.`;
+
+  if (GROQ_KEY) {
+    try {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${GROQ_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "llama-3.1-8b-instant",
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.3
+        })
+      });
+      const data = await res.json();
+      if (data?.choices?.[0]?.message?.content) {
+        return "✨ [AI मुख्य समीक्षा रिपोर्ट]:\n\n" + data.choices[0].message.content;
+      }
+    } catch (e) {}
+  }
+
+  if (GEMINI_API_KEY) {
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      });
+      const data = await res.json();
+      if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+        return "✨ [AI मुख्य समीक्षा रिपोर्ट (Gemini)]:\n\n" + data.candidates[0].content.parts[0].text;
+      }
+    } catch (e) {}
+  }
+
+  return "📋 [सीधा चैट रिकॉर्ड - लाइव डेटाबेस]:\n\n" + chatLogsText;
+}
+
+// MAIN HANDLER
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
 
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  const action = req.query.action;
+  const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
+  const action = req.query?.action || searchParams.get("action");
 
   try {
-    // ==========================================
-    // 1. GLOBAL NOTICE ENDPOINTS
-    // ==========================================
-    if (action === "get-notice" && req.method === "GET") {
-      const notice = await dbGet("globalNotice");
-      return res.status(200).json({ success: true, notice: notice || "" });
+    // 1. GET ACTIVE GLOBAL NOTICE (Student View)
+    if (action === "get-notice" || action === "get_notice") {
+      const settings = (await dbGet("system_settings")) || {};
+      const noticeText = (settings.noticeActive && settings.notice) ? settings.notice : "";
+      return res.status(200).json({ success: true, notice: noticeText });
     }
 
-    if (action === "set-notice" && req.method === "POST") {
-      const { notice, phone } = req.body || {};
-      const cleanPhone = String(phone || "").replace(/\D/g, "");
-      const adminUser = cleanPhone ? await dbGet(`users/${cleanPhone}`) : null;
-
-      if (!adminUser || adminUser.role !== "admin") {
-        return res.status(403).json({ success: false, error: "Unauthorized. Admin rights required." });
+    // 2. SET GLOBAL NOTICE (Admin View)
+    if (action === "set_notice" || action === "set-notice") {
+      const { noticeText, isActive, pass, phone } = req.body || {};
+      
+      let isAuthorized = (pass === ADMIN_SECRET);
+      if (!isAuthorized && phone) {
+        const cleanPhone = String(phone).replace(/\D/g, "");
+        const adminUser = await dbGet(`users/${cleanPhone}`);
+        if (adminUser?.role === "admin") isAuthorized = true;
       }
 
-      await dbPut("globalNotice", String(notice || "").trim());
-      return res.status(200).json({ success: true, message: "ग्लोबल नोटिस सफलतापूर्वक प्रसारित कर दिया गया।" });
+      if (!isAuthorized) {
+        return res.status(401).json({ success: false, error: "अमान्य एडमिन पासवर्ड या अनुमति!" });
+      }
+
+      await dbPut("system_settings", {
+        notice: noticeText || "",
+        noticeActive: isActive !== undefined ? !!isActive : true,
+        updatedAt: Date.now()
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: isActive ? "ग्लोबल नोटिस सफलतापूर्वक प्रसारित कर दिया गया।" : "नोटिस हटा दिया गया।"
+      });
     }
 
-    // ==========================================
-    // 2. AUTHENTICATION (LOGIN & REGISTER)
-    // ==========================================
+    // 3. AUTHENTICATION (LOGIN & REGISTER)
     if (action === "auth" && req.method === "POST") {
       const { phone, password, name, type } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -180,9 +240,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // ==========================================
-    // 3. AI CHAT DISPATCHER & CLOUD DATABASE SYNC
-    // ==========================================
+    // 4. AI CHAT DISPATCHER
     if (action === "ai" && req.method === "POST") {
       const { prompt, phone, history, isTool, customPersona } = req.body || {};
       if (!prompt || !String(prompt).trim()) {
@@ -212,7 +270,7 @@ export default async function handler(req, res) {
       const currentDailyCount = isNewDay ? 0 : (user?.dailyCount || 0);
       const currentToolCount = isNewDay ? 0 : (user?.dailyToolCount || 0);
 
-      // Separate Quota Limits
+      // Quotas
       if (user?.role !== "admin") {
         if (isTool) {
           const maxTools = TOOL_LIMITS[plan] || 10;
@@ -243,14 +301,12 @@ export default async function handler(req, res) {
       const aiName = aiTitles[plan] || "SUHAIL AI FREE";
       let instruction = SYSTEM_RULES[plan] || SYSTEM_RULES.free;
 
-      // Custom User Persona Injection
       if (customPersona && String(customPersona).trim()) {
         instruction += `\n\n[USER CUSTOM INSTRUCTIONS]: ${String(customPersona).trim()}`;
       }
 
       const replyText = await executeAI(plan, prompt, instruction, history);
 
-      // Update User Counters
       if (cleanPhone && user) {
         dbPatch(`users/${cleanPhone}`, {
           totalQuestions: (user.totalQuestions || 0) + 1,
@@ -261,7 +317,6 @@ export default async function handler(req, res) {
         }).catch(() => {});
       }
 
-      // Save Message to Firebase Chat History
       if (cleanPhone) {
         const timestamp = Date.now();
         dbPut(`chats/${cleanPhone}/${timestamp}`, {
@@ -270,15 +325,13 @@ export default async function handler(req, res) {
           time: timestamp,
           role: "student",
           plan: plan
-        }).catch((err) => console.error("Firebase chat write error:", err));
+        }).catch(() => {});
       }
 
       return res.status(200).json({ success: true, reply: replyText, aiName, plan });
     }
 
-    // ==========================================
-    // 4. USER PROFILE SYNC
-    // ==========================================
+    // 5. USER PROFILE SYNC
     if (action === "profile" && req.method === "POST") {
       const { phone } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -291,9 +344,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, user });
     }
 
-    // ==========================================
-    // 5. PAYMENT SUBMIT (UTR)
-    // ==========================================
+    // 6. PAYMENT SUBMIT (UTR)
     if (action === "payment" && req.method === "POST") {
       const { phone, utr, plan } = req.body || {};
       const cleanPhone = String(phone || "").replace(/\D/g, "");
@@ -313,94 +364,176 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: "भुगतान सत्यापन के लिए भेज दिया गया है।" });
     }
 
-    // ==========================================
-    // 6. ADMIN CONTROL CENTER (FULL SUITE)
-    // ==========================================
-    if (action === "admin-action" && req.method === "POST") {
-      const { adminPhone, subAction, targetPhone, newPlan, days, noticeText } = req.body || {};
-      const cleanAdmin = String(adminPhone || "").replace(/\D/g, "");
-      const admin = cleanAdmin ? await dbGet(`users/${cleanAdmin}`) : null;
+    // 7. ADMIN ENDPOINTS (Using pass or admin session)
+    const { pass } = req.body || {};
+    const isAdminPass = (pass === ADMIN_SECRET);
 
-      if (!admin || admin.role !== "admin") {
-        return res.status(403).json({ success: false, error: "एडमिन अनुमति आवश्यक है।" });
-      }
+    // 7.1 AI Chat Audit
+    if (action === "ai_chat_summary") {
+      if (!isAdminPass) return res.status(401).json({ success: false, error: "अमान्य एडमिन पासवर्ड!" });
+      const allChats = (await dbGet("chats")) || {};
+      const { targetPhone } = req.body || {};
+      let logsText = "";
 
-      const cleanTarget = String(targetPhone || "").replace(/\D/g, "");
-
-      // 6.1 All Users Chat Audit
-      if (subAction === "all-chats-audit") {
-        const allChats = (await dbGet("chats")) || {};
-        const allUsers = (await dbGet("users")) || {};
-        return res.status(200).json({ success: true, chats: allChats, users: allUsers });
-      }
-
-      // 6.2 Single User Audit
-      if (subAction === "single-user-audit") {
-        if (!cleanTarget) return res.status(400).json({ success: false, error: "यूज़र का फ़ोन नंबर दर्ज करें।" });
-        const userChats = (await dbGet(`chats/${cleanTarget}`)) || {};
-        const userData = (await dbGet(`users/${cleanTarget}`)) || null;
-        return res.status(200).json({ success: true, user: userData, chats: userChats });
-      }
-
-      // 6.3 Change Plan / Upgrade User
-      if (subAction === "change-plan") {
-        if (!cleanTarget) return res.status(400).json({ success: false, error: "यूज़र का फ़ोन नंबर दर्ज करें।" });
-        const expiryDuration = (parseInt(days) || 30) * 24 * 60 * 60 * 1000;
-        await dbPatch(`users/${cleanTarget}`, {
-          plan: newPlan || "free",
-          planExpiry: newPlan === "free" ? null : Date.now() + expiryDuration
+      if (targetPhone) {
+        const cleanTarget = String(targetPhone).replace(/\D/g, "");
+        const userChat = allChats[cleanTarget] || {};
+        const msgs = Array.isArray(userChat) ? userChat : Object.values(userChat);
+        logsText += `--- छात्र (${cleanTarget}) की बातचीत ---\n`;
+        msgs.slice(-25).forEach(m => {
+          const q = m.question || m.text || m.content || "";
+          const a = m.reply || "";
+          if (q) logsText += `🔹 छात्र: ${q}\n`;
+          if (a) logsText += `🔸 AI: ${a}\n\n`;
         });
-        return res.status(200).json({ success: true, message: `यूज़र का प्लान सफलतापूर्वक ${newPlan || 'free'} कर दिया गया।` });
+      } else {
+        for (const ph in allChats) {
+          const userChat = allChats[ph] || {};
+          const msgs = Array.isArray(userChat) ? userChat : Object.values(userChat);
+          if (msgs.length > 0) {
+            logsText += `\n👤 [छात्र फ़ोन: ${ph}]\n`;
+            msgs.slice(-6).forEach(m => {
+              const q = m.question || m.text || m.content || "";
+              const a = m.reply || "";
+              if (q) logsText += `🔹 छात्र: ${q}\n`;
+              if (a) logsText += `🔸 AI: ${a}\n`;
+            });
+            logsText += "-----------------------------\n";
+          }
+        }
       }
 
-      // 6.4 Block / Unblock User
-      if (subAction === "toggle-block") {
-        if (!cleanTarget) return res.status(400).json({ success: false, error: "यूज़र का फ़ोन नंबर दर्ज करें।" });
-        const targetUser = await dbGet(`users/${cleanTarget}`);
-        if (!targetUser) return res.status(404).json({ success: false, error: "यूज़र नहीं मिला।" });
-        const newStatus = targetUser.status === "blocked" ? "active" : "blocked";
-        await dbPatch(`users/${cleanTarget}`, { status: newStatus });
-        return res.status(200).json({ success: true, message: `यूज़र अब ${newStatus === "blocked" ? "ब्लॉक" : "अनब्लॉक"} है।`, status: newStatus });
+      if (!logsText.trim()) {
+        return res.status(200).json({ success: true, insights: "डेटाबेस में अभी तक कोई चैट रिकॉर्ड नहीं मिला।" });
       }
 
-      // 6.5 Daily Limit Reset
-      if (subAction === "reset-limit") {
-        if (!cleanTarget) return res.status(400).json({ success: false, error: "यूज़र का फ़ोन नंबर दर्ज करें।" });
-        await dbPatch(`users/${cleanTarget}`, { dailyCount: 0, dailyToolCount: 0 });
-        return res.status(200).json({ success: true, message: "यूज़र की दैनिक सीमा रीसेट कर दी गई।" });
-      }
-
-      // 6.6 Global Notice from Admin
-      if (subAction === "global-notice") {
-        await dbPut("globalNotice", String(noticeText || "").trim());
-        return res.status(200).json({ success: true, message: "ग्लोबल नोटिस सफलतापूर्वक प्रसारित कर दिया गया।" });
-      }
-
-      return res.status(400).json({ success: false, error: "अवैध एडमिन एक्शन।" });
+      const report = await generateAiAuditReport(logsText);
+      return res.status(200).json({ success: true, insights: report });
     }
 
-    // ==========================================
-    // 7. ADMIN PAYMENT AUDIT & APPROVAL
-    // ==========================================
-    if (action === "admin-payments" && req.method === "GET") {
+    // 7.2 Students Summary
+    if (action === "students_summary") {
+      if (!isAdminPass) return res.status(401).json({ success: false, error: "अमान्य एडमिन पासवर्ड!" });
+      const allUsers = (await dbGet("users")) || {};
+      const userList = [];
+      let totalQuestionsAcrossPlatform = 0;
+      let planCounts = { free: 0, plus: 0, pro: 0, ultra: 0 };
+      const now = Date.now();
+
+      for (const phone in allUsers) {
+        const u = allUsers[phone];
+        if (u.role === "admin") continue;
+
+        const totalQ = u.totalQuestions || 0;
+        const dailyQ = u.dailyCount || 0;
+        totalQuestionsAcrossPlatform += totalQ;
+
+        let plan = u.plan || "free";
+        let daysLeft = 0;
+
+        if (u.planExpiry) {
+          if (now > u.planExpiry) {
+            plan = "free";
+          } else {
+            daysLeft = Math.ceil((u.planExpiry - now) / (1000 * 60 * 60 * 24));
+          }
+        }
+
+        if (planCounts[plan] !== undefined) planCounts[plan]++;
+
+        let lastActiveFormatted = "कभी नहीं";
+        if (u.lastActive) {
+          lastActiveFormatted = new Date(u.lastActive).toLocaleString("hi-IN", { timeZone: "Asia/Kolkata" });
+        }
+
+        userList.push({
+          phone: u.phone || phone,
+          name: u.name || "अज्ञात",
+          roll: u.roll || "N/A",
+          plan: plan.toUpperCase(),
+          totalQuestions: totalQ,
+          dailyQuestions: dailyQ,
+          daysLeft: plan === "free" ? "स्थायी" : `${daysLeft} दिन शेष`,
+          lastActive: lastActiveFormatted,
+          status: u.status || "active",
+          createdAt: u.createdAt ? new Date(u.createdAt).toLocaleDateString("hi-IN") : "N/A"
+        });
+      }
+
+      userList.sort((a, b) => b.totalQuestions - a.totalQuestions);
+
+      return res.status(200).json({
+        success: true,
+        summary: {
+          totalStudents: userList.length,
+          totalQuestions: totalQuestionsAcrossPlatform,
+          planBreakdown: planCounts
+        },
+        students: userList
+      });
+    }
+
+    // 7.3 Extend Plan
+    if (action === "extend_plan") {
+      if (!isAdminPass) return res.status(401).json({ success: false, error: "अमान्य एडमिन पासवर्ड!" });
+      const { targetPhone, targetPlan, days } = req.body || {};
+      const cleanTarget = String(targetPhone || "").replace(/\D/g, "");
+      if (!cleanTarget || !days) return res.status(400).json({ success: false, error: "फ़ोन नंबर और दिन अनिवार्य हैं।" });
+
+      const newExpiry = Date.now() + (parseInt(days, 10) * 24 * 60 * 60 * 1000);
+      await dbPatch(`users/${cleanTarget}`, {
+        plan: String(targetPlan || "pro").toLowerCase(),
+        planExpiry: newExpiry,
+        status: "active"
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: `छात्र ${cleanTarget} का ${(targetPlan || "PRO").toUpperCase()} प्लान ${days} दिनों के लिए सक्रिय कर दिया गया।`
+      });
+    }
+
+    // 7.4 Block / Unblock User
+    if (action === "toggle_block") {
+      if (!isAdminPass) return res.status(401).json({ success: false, error: "अमान्य एडमिन पासवर्ड!" });
+      const { targetPhone, newStatus } = req.body || {};
+      const cleanTarget = String(targetPhone || "").replace(/\D/g, "");
+      if (!cleanTarget) return res.status(400).json({ success: false, error: "फ़ोन नंबर अनिवार्य है।" });
+
+      await dbPatch(`users/${cleanTarget}`, { status: newStatus || "blocked" });
+      return res.status(200).json({
+        success: true,
+        message: `छात्र ${cleanTarget} की स्थिति '${newStatus}' कर दी गई।`
+      });
+    }
+
+    // 7.5 Reset Daily Limit
+    if (action === "reset_daily_limit") {
+      if (!isAdminPass) return res.status(401).json({ success: false, error: "अमान्य एडमिन पासवर्ड!" });
+      const { targetPhone } = req.body || {};
+      const cleanTarget = String(targetPhone || "").replace(/\D/g, "");
+      if (!cleanTarget) return res.status(400).json({ success: false, error: "फ़ोन नंबर अनिवार्य है।" });
+
+      await dbPatch(`users/${cleanTarget}`, { dailyCount: 0, dailyToolCount: 0 });
+      return res.status(200).json({
+        success: true,
+        message: `छात्र ${cleanTarget} की दैनिक सीमा रीसेट कर दी गई।`
+      });
+    }
+
+    // 7.6 Payment Requests Admin Audit
+    if (action === "admin-payments") {
       const payments = (await dbGet("paymentRequests")) || {};
       return res.status(200).json({ success: true, payments });
     }
 
-    if (action === "admin-approve-payment" && req.method === "POST") {
-      const { adminPhone, payId, status } = req.body || {};
-      const cleanAdmin = String(adminPhone || "").replace(/\D/g, "");
-      const admin = cleanAdmin ? await dbGet(`users/${cleanAdmin}`) : null;
-
-      if (!admin || admin.role !== "admin") {
-        return res.status(403).json({ success: false, error: "एडमिन अनुमति आवश्यक है।" });
-      }
-
+    if (action === "admin-approve-payment") {
+      const { payId, status } = req.body || {};
       const payReq = await dbGet(`paymentRequests/${payId}`);
       if (!payReq) return res.status(404).json({ success: false, error: "पेमेंट रिक्वेस्ट नहीं मिली।" });
 
       if (status === "approved") {
-        const expiryTime = Date.now() + (30 * 24 * 60 * 60 * 1000); // 30 Din
+        const expiryTime = Date.now() + (30 * 24 * 60 * 60 * 1000);
         await dbPatch(`users/${payReq.phone}`, {
           plan: payReq.plan,
           planExpiry: expiryTime
