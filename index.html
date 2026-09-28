@@ -636,7 +636,7 @@ html, body {
         <span class="badge-plan" id="u-plan">SUHAIL AI FREE</span>
       </div>
     </div>
-    <div class="header-actions">
+   <div class="header-actions">
       <!-- Font Scaler Buttons -->
       <button type="button" onclick="adjustFontSize(-1)" title="फॉन्ट छोटा करें" style="background:none; border:none; color:var(--text-muted); font-size:0.85rem; font-weight:700; cursor:pointer; padding:4px 6px;">A-</button>
       <button type="button" onclick="adjustFontSize(1)" title="फॉन्ट बड़ा करें" style="background:none; border:none; color:var(--text-muted); font-size:1.05rem; font-weight:700; cursor:pointer; padding:4px 6px;">A+</button>
@@ -644,9 +644,8 @@ html, body {
       <button id="btn-new-chat" title="New Chat"><i class="fa-solid fa-arrows-rotate"></i></button>
       <button id="btn-admin-toggle" title="Admin Control Center" style="display:none; color:var(--primary-green);"><i class="fa-solid fa-shield-halved"></i></button>
       <button id="btn-logout" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
-      <button id="btn-open-persona" type="button" onclick="openPersonaModal()" title="AI Settings" style="background:none; border:none; color:#8696a0; font-size:1.1rem; cursor:pointer; padding:6px;">
-  <i class="fa-solid fa-sliders"></i>
-      </button>
+      <button id="btn-open-persona" type="button" onclick="openPersonaModal()" title="AI Settings" style="background:none; border:none; color:#8696a0; font-size:1.1rem; cursor:pointer; padding:6px;"><i class="fa-solid fa-sliders"></i></button>
+      <button id="btn-open-bookmarks" type="button" onclick="openBookmarksModal()" title="Mehfooz Sabaq (Bookmarks)" style="background:none; border:none; color:var(--vip-gold); font-size:1.1rem; cursor:pointer; padding:6px;"><i class="fa-solid fa-bookmark"></i></button>
     </div>
   </header>
 
@@ -2034,6 +2033,106 @@ window.exportBubbleToPdf = function(btn) {
     }, 2000);
   });
 };
+
+  // ==========================================
+// 3. BOOKMARK / SAVED SABAQ SYSTEM
+// ==========================================
+function getBookmarksKey() {
+  const phone = currentUser ? currentUser.phone : 'guest';
+  return `suhail_bookmarks_${phone}`;
+}
+
+function getAllBookmarks() {
+  return JSON.parse(localStorage.getItem(getBookmarksKey()) || '[]');
+}
+
+function saveBookmarksToStorage(list) {
+  localStorage.setItem(getBookmarksKey(), JSON.stringify(list));
+}
+
+window.toggleBookmark = function(btn) {
+  const bubble = btn.closest('.chat-bubble');
+  if (!bubble) return;
+
+  const content = bubble.querySelector('.chat-content')?.innerText || '';
+  const htmlContent = bubble.querySelector('.chat-content')?.innerHTML || '';
+  const aiLabel = bubble.querySelector('.ai-label')?.innerText || 'Suhail AI';
+
+  if (!content.trim()) return;
+
+  let bookmarks = getAllBookmarks();
+  const title = content.substring(0, 40).replace(/\n/g, ' ') + '...';
+  
+  // Check agar pehle se saved hai
+  const existingIndex = bookmarks.findIndex(b => b.text === content);
+
+  if (existingIndex > -1) {
+    bookmarks.splice(existingIndex, 1);
+    btn.innerHTML = '<i class="fa-regular fa-bookmark"></i> Save';
+    btn.style.color = 'var(--text-muted)';
+  } else {
+    bookmarks.unshift({
+      id: 'bm_' + Date.now(),
+      title: title,
+      html: htmlContent,
+      text: content,
+      aiLabel: aiLabel,
+      date: new Date().toLocaleDateString('hi-IN')
+    });
+    btn.innerHTML = '<i class="fa-solid fa-bookmark"></i> Saved';
+    btn.style.color = 'var(--vip-gold)';
+  }
+
+  saveBookmarksToStorage(bookmarks);
+};
+
+function openBookmarksModal() {
+  renderBookmarksList();
+  const m = document.getElementById('modalBookmarks');
+  if (m) m.style.display = 'flex';
+}
+
+function closeBookmarksModal() {
+  const m = document.getElementById('modalBookmarks');
+  if (m) m.style.display = 'none';
+}
+
+function renderBookmarksList() {
+  const container = document.getElementById('bookmarksListContainer');
+  if (!container) return;
+
+  const bookmarks = getAllBookmarks();
+  if (bookmarks.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center; padding:30px 10px; color:#8696a0; font-size:0.88rem;">
+        <i class="fa-regular fa-bookmark" style="font-size:2rem; margin-bottom:8px; display:block; opacity:0.5;"></i>
+        Koi sabaq mehfooz nahi kiya gaya.<br>Chat bubble ke 'Save' button par click karke mehfooz karein.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = '';
+  bookmarks.forEach((item, index) => {
+    const card = document.createElement('div');
+    card.style.cssText = 'background:#182229; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:6px;';
+    card.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:6px;">
+        <span style="font-size:0.75rem; color:var(--primary-green); font-weight:700;">${item.aiLabel} • ${item.date}</span>
+        <button onclick="removeBookmark(${index})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.85rem;" title="Hataein"><i class="fa-solid fa-trash"></i></button>
+      </div>
+      <div style="font-size:0.84rem; color:#e9edef; line-height:1.5; max-height:120px; overflow-y:auto; white-space:pre-wrap;">${item.text}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function removeBookmark(index) {
+  let bookmarks = getAllBookmarks();
+  bookmarks.splice(index, 1);
+  saveBookmarksToStorage(bookmarks);
+  renderBookmarksList();
+}
   
 </script>
 
@@ -2101,6 +2200,24 @@ window.exportBubbleToPdf = function(btn) {
 
     <div style="text-align:right;">
       <button onclick="dismissGlobalNotice()" style="background:#00a884; border:none; color:#fff; border-radius:8px; padding:10px 24px; font-weight:600; font-size:0.9rem; cursor:pointer;">समझ गया (OK)</button>
+    </div>
+  </div>
+</div>
+
+  <!-- SAVED SABAQ (BOOKMARKS) MODAL -->
+<div id="modalBookmarks" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999999; backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:16px;">
+  <div style="background:#111b21; border:1px solid rgba(245,158,11,0.4); width:100%; max-width:480px; max-height:85vh; border-radius:18px; display:flex; flex-direction:column; padding:18px; box-shadow:0 12px 35px rgba(0,0,0,0.8);">
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px; margin-bottom:12px;">
+      <h3 style="color:var(--vip-gold); font-size:1.1rem; margin:0; display:flex; align-items:center; gap:8px;">
+        <i class="fa-solid fa-bookmark"></i> Mehfooz Sabaq (Saved Items)
+      </h3>
+      <button onclick="closeBookmarksModal()" style="background:none; border:none; color:#8696a0; font-size:1.4rem; cursor:pointer;">&times;</button>
+    </div>
+
+    <!-- List Container -->
+    <div id="bookmarksListContainer" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-right:4px;">
+      <!-- Saved Sabaq dynamic card yahan render honge -->
     </div>
   </div>
 </div>
