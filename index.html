@@ -637,6 +637,9 @@ html, body {
       </div>
     </div>
     <div class="header-actions">
+      <!-- Font Scaler Buttons -->
+      <button type="button" onclick="adjustFontSize(-1)" title="फॉन्ट छोटा करें" style="background:none; border:none; color:var(--text-muted); font-size:0.85rem; font-weight:700; cursor:pointer; padding:4px 6px;">A-</button>
+      <button type="button" onclick="adjustFontSize(1)" title="फॉन्ट बड़ा करें" style="background:none; border:none; color:var(--text-muted); font-size:1.05rem; font-weight:700; cursor:pointer; padding:4px 6px;">A+</button>
       <button id="btn-open-about" title="About Platform" style="color:var(--accent-yellow);"><i class="fa-solid fa-circle-info"></i></button>
       <button id="btn-new-chat" title="New Chat"><i class="fa-solid fa-arrows-rotate"></i></button>
       <button id="btn-admin-toggle" title="Admin Control Center" style="display:none; color:var(--primary-green);"><i class="fa-solid fa-shield-halved"></i></button>
@@ -990,8 +993,9 @@ function renderAiBubble(div, text, aiName) {
   div.innerHTML = `
     <span class="ai-label">${aiName || 'SUHAIL AI'}</span>
     <div class="chat-content ${isAr ? 'arabic-text' : ''}">${parsedHtml}</div>
-    <div class="bubble-actions">
-      <button class="btn-copy" onclick="window.copyText(this)">Copy Karein</button>
+    <div class="bubble-actions" style="display:flex; justify-content:flex-end; gap:8px;">
+      <button class="btn-copy" onclick="window.copyText(this)"><i class="fa-regular fa-copy"></i> Copy Karein</button>
+      <button class="btn-copy" onclick="window.exportBubbleToPdf(this)" style="color:var(--accent-yellow);"><i class="fa-solid fa-file-pdf"></i> PDF Download</button>
     </div>
     <div class="bubble-quick-actions">
       <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('simplify')">🧠 आसान समझाओ</button>
@@ -1951,6 +1955,79 @@ function toggleVoiceInput() {
     }
   }
 }
+
+  // ==========================================
+// 1. DYNAMIC FONT SCALING (A- / A+)
+// ==========================================
+let currentFontScale = parseInt(localStorage.getItem('suhail_font_scale') || '0', 10);
+
+function applyFontScale() {
+  const baseSize = 0.88 + (currentFontScale * 0.08);
+  const arabicBaseSize = 1.15 + (currentFontScale * 0.1);
+
+  document.querySelectorAll('.chat-content').forEach(el => {
+    el.style.fontSize = `${baseSize}rem`;
+  });
+  document.querySelectorAll('.arabic-text').forEach(el => {
+    el.style.fontSize = `${arabicBaseSize}rem`;
+  });
+}
+
+function adjustFontSize(delta) {
+  currentFontScale += delta;
+  if (currentFontScale < -2) currentFontScale = -2;
+  if (currentFontScale > 4) currentFontScale = 4;
+  
+  localStorage.setItem('suhail_font_scale', currentFontScale.toString());
+  applyFontScale();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(applyFontScale, 500);
+});
+
+// ==========================================
+// 2. EXPORT CHAT BUBBLE TO PDF
+// ==========================================
+window.exportBubbleToPdf = function(btn) {
+  const bubble = btn.closest('.chat-bubble');
+  if (!bubble) return;
+
+  const content = bubble.querySelector('.chat-content');
+  const aiLabel = bubble.querySelector('.ai-label')?.innerText || 'Suhail AI';
+
+  const printDiv = document.createElement('div');
+  printDiv.style.cssText = 'padding:24px; color:#111; font-family:"Poppins", "Amiri", sans-serif; line-height:1.8; background:#fff;';
+  
+  const headerHtml = `
+    <div style="border-bottom:2px solid #00a884; padding-bottom:8px; margin-bottom:16px;">
+      <h2 style="color:#00a884; margin:0; font-size:18px;">Suhail AI - Academic Learning Platform</h2>
+      <span style="font-size:12px; color:#666;">Darsi wa Ilmi Mavad | ${aiLabel} | ${new Date().toLocaleDateString('en-GB')}</span>
+    </div>
+  `;
+
+  printDiv.innerHTML = headerHtml + `<div>${content.innerHTML}</div>`;
+
+  const opt = {
+    margin: [10, 10, 10, 10],
+    filename: `Suhail_AI_Sabaq_${Date.now()}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> PDF ban rahi hai...';
+  
+  html2pdf().set(opt).from(printDiv).save().then(() => {
+    btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i> PDF Download';
+  }).catch(err => {
+    console.error("PDF export error:", err);
+    btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Error';
+    setTimeout(() => {
+      btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i> PDF Download';
+    }, 2000);
+  });
+};
   
 </script>
 
