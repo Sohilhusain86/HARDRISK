@@ -8,7 +8,7 @@ const GROQ_API_KEY = (process.env.GROQ_API_KEY || process.env.GROQ_KEY || "").tr
 const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || "").trim();
 
 // Firebase Helper Functions
-p
+async function dbGet(path) {
   try {
     const url = `${FIREBASE_DB_URL}/${path}.json${FIREBASE_AUTH ? `?auth=${FIREBASE_AUTH}` : ""}`;
     const res = await fetch(url);
@@ -58,58 +58,26 @@ function normalizePlan(plan) {
   return "free";
 }
 
+// Islamic Adab & Urdu-amez Hindi Rules (No Namaste, No Repeated Salam)
 const SYSTEM_RULES = {
   free: "Aap 'Suhail AI' hain, ek ba-adab aur sanjeeda Islamic wa Academic Study Partner. Zaban ka lehja Urdu-aamez Hindi (Hindustani) hona chahiye. Har sawal par baar-baar salam na karein. 'Namaste' ya 'Pranam' jaise shabdon ka istemal sakhti se mana hai. Sawal ka seedha, mukhtasar aur wazeh jawab dein.",
-
   plus: "Aap 'Suhail AI Plus' hain. Aapka lehja ba-adab, ilmi aur Urdu-aamez Hindi me hona chahiye. Namaste ya Pranam ka istemal qatan na karein. Dars-e-Nizami, Nahw-Sarf aur darasi sawalat ko nihayat aasan misalon aur wazeh nukat ke sath samjhayein.",
-
   pro: "Aap 'Suhail AI Pro' hain. Ilmi tehqeeq, ibaarat fahmi, aur Fiqhi masail ko usoolon ke sath sanjeeda aur ilmi zaban me wazeh karein. Points aur mukammal tauseeh ka istemal karein. Namaste jaise alfaz sakhti se mana hain.",
-
   ultra: "Aap 'Suhail AI Ultra' hain—Master Academic wa Islamic Research Assistant. Aapka tarz-e-kalam nihayat shaista, ba-adab, ilmi aur tehqeeqi hona chahiye. Har pehlu ko gehrai, hawalajaat aur wazeh dalail ke sath bayan karein. Har baar salam dohrana aur Namaste jaise alfaz bolna sakhti se mana hai."
 };
 
-// वरीयता क्रम (Preferred Groq Models Hierarchy)
-const PREFERRED_GROQ_MODELS = [
+// 2026 Official Production Active Model Pools
+const GROQ_MODELS = [
   "openai/gpt-oss-120b",
   "openai/gpt-oss-20b",
-  "qwen/qwen3.8-27b",
-  "llama-3.3-70b-versatile",
-  "llama-3.1-8b-instant"
+  "qwen/qwen3.8-27b"
 ];
 
-// Gemini Fallback Models Pool
-const GEMINI_MODELS_POOL = [
+const GEMINI_MODELS = [
   "gemini-2.5-flash",
   "gemini-2.5-flash-lite",
   "gemini-1.5-flash"
 ];
-
-// Runtime Dynamic Model Discovery
-async function getUsableGroqModels() {
-  if (!GROQ_API_KEY) return [];
-  try {
-    const res = await fetch("https://api.groq.com/openai/v1/models", {
-      headers: {
-        "Authorization": `Bearer ${GROQ_API_KEY}`,
-        "Content-Type": "application/json"
-      }
-    });
-    const data = await res.json();
-    const liveIds = (data?.data || [])
-      .map(m => m.id)
-      .filter(id => Boolean(id) && !id.includes("whisper") && !id.includes("guard"));
-
-    // वरीयता क्रम के अनुसार उपलब्ध मॉडल छांटना
-    const matched = PREFERRED_GROQ_MODELS.filter(m => liveIds.includes(m));
-    if (matched.length > 0) return matched;
-    
-    // यदि वरीयता वाले न मिलें, तो उपलब्ध अन्य चैट मॉडल रिटर्न करना
-    return liveIds;
-  } catch (err) {
-    console.error("Groq dynamic discovery failed:", err);
-    return PREFERRED_GROQ_MODELS;
-  }
-}
 
 // Multi-Model Auto-Resilient AI Engine
 async function executeAI(plan, prompt, instruction, history = []) {
@@ -130,10 +98,9 @@ async function executeAI(plan, prompt, instruction, history = []) {
 
   messages.push({ role: "user", content: prompt });
 
-  // 1. Groq Live-Discovered Candidates Execution
+  // 1. Groq Models Execution
   if (GROQ_API_KEY) {
-    const candidateModels = await getUsableGroqModels();
-    for (const modelName of candidateModels) {
+    for (const model of GROQ_MODELS) {
       try {
         const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
@@ -142,28 +109,29 @@ async function executeAI(plan, prompt, instruction, history = []) {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            model: modelName,
+            model: model,
             messages: messages,
             temperature: 0.5,
             max_tokens: 2048
           })
         });
 
-        const resData = await response.json();
-        if (resData.choices?.[0]?.message?.content) {
-          return resData.choices[0].message.content;
+        if (response.ok) {
+          const resData = await response.json();
+          if (resData.choices?.[0]?.message?.content) {
+            return resData.choices[0].message.content;
+          }
         }
-        console.warn(`Groq candidate ${modelName} call failed or rate-limited:`, resData?.error?.message || resData);
       } catch (err) {
-        console.error(`Groq network error on ${modelName}:`, err);
+        console.error(`Groq error on ${model}:`, err);
       }
     }
   }
 
-  // 2. Google Gemini Fallback Pool
+  // 2. Gemini Fallback Models Pool
   if (GEMINI_API_KEY) {
     const fullPrompt = `${instruction}\n\nSawal: ${prompt}`;
-    for (const gemModel of GEMINI_MODELS_POOL) {
+    for (const gemModel of GEMINI_MODELS) {
       try {
         const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${gemModel}:generateContent?key=${GEMINI_API_KEY}`, {
           method: "POST",
@@ -172,18 +140,20 @@ async function executeAI(plan, prompt, instruction, history = []) {
             contents: [{ parts: [{ text: fullPrompt }] }]
           })
         });
-        const gData = await geminiRes.json();
-        if (gData?.candidates?.[0]?.content?.parts?.[0]?.text) {
-          return gData.candidates[0].content.parts[0].text;
+
+        if (geminiRes.ok) {
+          const gData = await geminiRes.json();
+          if (gData?.candidates?.[0]?.content?.parts?.[0]?.text) {
+            return gData.candidates[0].content.parts[0].text;
+          }
         }
-        console.warn(`Gemini candidate ${gemModel} failed:`, gData?.error?.message || gData);
       } catch (gErr) {
-        console.error(`Gemini network error on ${gemModel}:`, gErr);
+        console.error(`Gemini candidate ${gemModel} error:`, gErr);
       }
     }
   }
 
-  return "माफ़ कीजिए, AI सर्वर पर अत्यधिक लोड है। कृपया 5 सेकंड रुककर दोबारा सवाल भेजें।";
+  return "माफ़ कीजिए, AI सर्वर पर अत्यधिक लोड है। कृपया कुछ सेकंड रुककर दोबारा सवाल भेजें।";
 }
 
 // AI Audit Report for Admin
@@ -191,8 +161,7 @@ async function generateAiAuditReport(chatLogsText) {
   const prompt = `Aap 'Suhail AI' platform ke Chief Auditor hain. Neeche tulba (students) ki ahem chats hain:\n---\n${chatLogsText}\n---\nAdmin (Suhail Husain) ke liye Urdu/Hindi me mukhtasar aur behtareen tajziya (Audit Summary) pesh karein:\n1. Tulba ne buniyadi taur par kya sawalat pooche?\n2. AI ne kaisa jawab diya aur kya koi ilmi kami thi?\n3. Poori guftagu ka mukhtasar khulasa aur platform behtar banane ke mashware.`;
 
   if (GROQ_API_KEY) {
-    const usable = await getUsableGroqModels();
-    for (const model of usable) {
+    for (const model of GROQ_MODELS) {
       try {
         const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
@@ -206,25 +175,29 @@ async function generateAiAuditReport(chatLogsText) {
             temperature: 0.3
           })
         });
-        const data = await res.json();
-        if (data?.choices?.[0]?.message?.content) {
-          return "✨ [AI मुख्य समीक्षा रिपोर्ट]:\n\n" + data.choices[0].message.content;
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.choices?.[0]?.message?.content) {
+            return "✨ [AI मुख्य समीक्षा रिपोर्ट]:\n\n" + data.choices[0].message.content;
+          }
         }
       } catch (e) {}
     }
   }
 
   if (GEMINI_API_KEY) {
-    for (const gemModel of GEMINI_MODELS_POOL) {
+    for (const gemModel of GEMINI_MODELS) {
       try {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${gemModel}:generateContent?key=${GEMINI_API_KEY}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
         });
-        const data = await res.json();
-        if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-          return "✨ [AI मुख्य समीक्षा रिपोर्ट (Gemini)]:\n\n" + data.candidates[0].content.parts[0].text;
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+            return "✨ [AI मुख्य समीक्षा रिपोर्ट (Gemini)]:\n\n" + data.candidates[0].content.parts[0].text;
+          }
         }
       } catch (e) {}
     }
