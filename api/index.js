@@ -1,10 +1,10 @@
 import fetch from "node-fetch";
 
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
-const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || process.env.FIREBASE_DB_URL || "https://ula-alif-default-rtdb.firebaseio.com";
+const FIREBASE_DB_URL = (process.env.FIREBASE_DB_URL || process.env.FIREBASE_DATABASE_URL || "https://hardrisk-default-rtdb.firebaseio.com").replace(/\/$/, "");
 const FIREBASE_AUTH = process.env.FIREBASE_AUTH || "";
 
-const GROQ_KEY = (process.env.GROQ_KEY || process.env.GROQ_API_KEY || "").trim();
+const GROQ_API_KEY = (process.env.GROQ_API_KEY || process.env.GROQ_KEY || "").trim();
 const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || "").trim();
 
 // Firebase Helper Functions
@@ -65,108 +65,169 @@ const SYSTEM_RULES = {
   ultra: "Aap Suhail AI Ultra hain. Master Academic & Islamic research assistant. Har pehlu ko nihayat gehrai, hawala-jaat aur jamia andaz me pesh karein."
 };
 
-// Stable AI Dual-Engine (Groq with Gemini Fallback)
+// वरीयता क्रम (Preferred Groq Models Hierarchy)
+const PREFERRED_GROQ_MODELS = [
+  "openai/gpt-oss-120b",
+  "openai/gpt-oss-20b",
+  "qwen/qwen3.8-27b",
+  "llama-3.3-70b-versatile",
+  "llama-3.1-8b-instant"
+];
+
+// Gemini Fallback Models Pool
+const GEMINI_MODELS_POOL = [
+  "gemini-2.5-flash",
+  "gemini-2.5-flash-lite",
+  "gemini-1.5-flash"
+];
+
+// Runtime Dynamic Model Discovery
+async function getUsableGroqModels() {
+  if (!GROQ_API_KEY) return [];
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/models", {
+      headers: {
+        "Authorization": `Bearer ${GROQ_API_KEY}`,
+        "Content-Type": "application/json"
+      }
+    });
+    const data = await res.json();
+    const liveIds = (data?.data || [])
+      .map(m => m.id)
+      .filter(id => Boolean(id) && !id.includes("whisper") && !id.includes("guard"));
+
+    // वरीयता क्रम के अनुसार उपलब्ध मॉडल छांटना
+    const matched = PREFERRED_GROQ_MODELS.filter(m => liveIds.includes(m));
+    if (matched.length > 0) return matched;
+    
+    // यदि वरीयता वाले न मिलें, तो उपलब्ध अन्य चैट मॉडल रिटर्न करना
+    return liveIds;
+  } catch (err) {
+    console.error("Groq dynamic discovery failed:", err);
+    return PREFERRED_GROQ_MODELS;
+  }
+}
+
+// Multi-Model Auto-Resilient AI Engine
 async function executeAI(plan, prompt, instruction, history = []) {
-  const fullPrompt = `${instruction}\n\nSawal: ${prompt}`;
+  if (!GROQ_API_KEY && !GEMINI_API_KEY) {
+    return "AI Service temporarily unavailable (API Key missing).";
+  }
 
-  // 1. Try Groq (Llama-3.1 8b instant / Fast & Stable)
-  if (GROQ_KEY) {
-    try {
-      const messages = [{ role: "system", content: instruction }];
-      if (Array.isArray(history)) {
-        history.slice(-6).forEach(msg => {
-          if (msg.role && msg.content) {
-            messages.push({ role: msg.role === "user" ? "user" : "assistant", content: msg.content });
-          }
+  const messages = [{ role: "system", content: instruction }];
+
+  if (Array.isArray(history)) {
+    history.slice(-6).forEach(msg => {
+      const content = msg.content || msg.text;
+      if (msg.role && content) {
+        messages.push({ role: msg.role === "user" ? "user" : "assistant", content: content });
+      }
+    });
+  }
+
+  messages.push({ role: "user", content: prompt });
+
+  // 1. Groq Live-Discovered Candidates Execution
+  if (GROQ_API_KEY) {
+    const candidateModels = await getUsableGroqModels();
+    for (const modelName of candidateModels) {
+      try {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${GROQ_API_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: modelName,
+            messages: messages,
+            temperature: 0.5,
+            max_tokens: 2048
+          })
         });
-      }
-      messages.push({ role: "user", content: prompt });
 
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${GROQ_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "llama-3.1-8b-instant",
-          messages: messages,
-          temperature: 0.4,
-          max_tokens: 2048
-        })
-      });
-
-      const resData = await response.json();
-      if (resData.choices?.[0]?.message?.content) {
-        return resData.choices[0].message.content;
+        const resData = await response.json();
+        if (resData.choices?.[0]?.message?.content) {
+          return resData.choices[0].message.content;
+        }
+        console.warn(`Groq candidate ${modelName} call failed or rate-limited:`, resData?.error?.message || resData);
+      } catch (err) {
+        console.error(`Groq network error on ${modelName}:`, err);
       }
-    } catch (err) {
-      console.error("Groq primary attempt failed, trying fallback:", err);
     }
   }
 
-  // 2. Try Gemini (Fallback)
+  // 2. Google Gemini Fallback Pool
   if (GEMINI_API_KEY) {
-    try {
-      const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: fullPrompt }] }]
-        })
-      });
-      const gData = await geminiRes.json();
-      if (gData?.candidates?.[0]?.content?.parts?.[0]?.text) {
-        return gData.candidates[0].content.parts[0].text;
+    const fullPrompt = `${instruction}\n\nSawal: ${prompt}`;
+    for (const gemModel of GEMINI_MODELS_POOL) {
+      try {
+        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${gemModel}:generateContent?key=${GEMINI_API_KEY}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: fullPrompt }] }]
+          })
+        });
+        const gData = await geminiRes.json();
+        if (gData?.candidates?.[0]?.content?.parts?.[0]?.text) {
+          return gData.candidates[0].content.parts[0].text;
+        }
+        console.warn(`Gemini candidate ${gemModel} failed:`, gData?.error?.message || gData);
+      } catch (gErr) {
+        console.error(`Gemini network error on ${gemModel}:`, gErr);
       }
-    } catch (gErr) {
-      console.error("Gemini fallback failed:", gErr);
     }
   }
 
-  return "माफ़ कीजिए, सर्वर व्यस्त है। कृपया 5 सेकंड बाद पुनः प्रयास करें।";
+  return "माफ़ कीजिए, AI सर्वर पर अत्यधिक लोड है। कृपया 5 सेकंड रुककर दोबारा सवाल भेजें।";
 }
 
 // AI Audit Report for Admin
 async function generateAiAuditReport(chatLogsText) {
-  const prompt = `Aap 'Suhail AI' platform ke Chief Auditor hain. Neeche tulba ki ahem chats hain:\n---\n${chatLogsText}\n---\nAdmin (Suhail Husain) ke liye Urdu/Hindi me mukhtasar tajziya (Audit Report) pesh karein.`;
+  const prompt = `Aap 'Suhail AI' platform ke Chief Auditor hain. Neeche tulba (students) ki ahem chats hain:\n---\n${chatLogsText}\n---\nAdmin (Suhail Husain) ke liye Urdu/Hindi me mukhtasar aur behtareen tajziya (Audit Summary) pesh karein:\n1. Tulba ne buniyadi taur par kya sawalat pooche?\n2. AI ne kaisa jawab diya aur kya koi ilmi kami thi?\n3. Poori guftagu ka mukhtasar khulasa aur platform behtar banane ke mashware.`;
 
-  if (GROQ_KEY) {
-    try {
-      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${GROQ_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "llama-3.1-8b-instant",
-          messages: [{ role: "user", content: prompt }],
-          temperature: 0.3
-        })
-      });
-      const data = await res.json();
-      if (data?.choices?.[0]?.message?.content) {
-        return "✨ [AI मुख्य समीक्षा रिपोर्ट]:\n\n" + data.choices[0].message.content;
-      }
-    } catch (e) {}
+  if (GROQ_API_KEY) {
+    const usable = await getUsableGroqModels();
+    for (const model of usable) {
+      try {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${GROQ_API_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: [{ role: "user", content: prompt }],
+            temperature: 0.3
+          })
+        });
+        const data = await res.json();
+        if (data?.choices?.[0]?.message?.content) {
+          return "✨ [AI मुख्य समीक्षा रिपोर्ट]:\n\n" + data.choices[0].message.content;
+        }
+      } catch (e) {}
+    }
   }
 
   if (GEMINI_API_KEY) {
-    try {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-      });
-      const data = await res.json();
-      if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-        return "✨ [AI मुख्य समीक्षा रिपोर्ट (Gemini)]:\n\n" + data.candidates[0].content.parts[0].text;
-      }
-    } catch (e) {}
+    for (const gemModel of GEMINI_MODELS_POOL) {
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${gemModel}:generateContent?key=${GEMINI_API_KEY}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+        const data = await res.json();
+        if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+          return "✨ [AI मुख्य समीक्षा रिपोर्ट (Gemini)]:\n\n" + data.candidates[0].content.parts[0].text;
+        }
+      } catch (e) {}
+    }
   }
 
-  return "📋 [सीधा चैट रिकॉर्ड]:\n\n" + chatLogsText;
+  return "📋 [सीधा चैट रिकॉर्ड - लाइव डेटाबेस]:\n\n" + chatLogsText;
 }
 
 // MAIN VERCEL HANDLER
