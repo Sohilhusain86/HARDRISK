@@ -996,6 +996,132 @@ html, body {
 
 <script>
 
+  // ==========================================
+// 1. STRICTLY MALE NATURAL TTS ENGINE
+// ==========================================
+let activeSpeechBtn = null;
+
+function getNaturalMaleVoice() {
+  const voices = window.speechSynthesis.getVoices();
+  const maleKeywords = ['male', 'david', 'george', 'ravi', 'guy', 'pradeep', 'man'];
+  
+  // 1. Pehle Urdu / Arabic / Hindi ki Male voice dhoondein
+  let selected = voices.find(v => {
+    const name = v.name.toLowerCase();
+    const isMale = maleKeywords.some(k => name.includes(k)) && !name.includes('female') && !name.includes('zira');
+    return isMale && (v.lang.startsWith('ur') || v.lang.startsWith('hi') || v.lang.startsWith('ar'));
+  });
+
+  // 2. Agar specific na mile toh koi bhi Natural Male Voice
+  if (!selected) {
+    selected = voices.find(v => {
+      const name = v.name.toLowerCase();
+      return maleKeywords.some(k => name.includes(k)) && !name.includes('female') && !name.includes('zira');
+    });
+  }
+
+  return selected || voices[0];
+}
+
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.onvoiceschanged = () => getNaturalMaleVoice();
+}
+
+window.toggleSpeech = function(btn) {
+  if (!('speechSynthesis' in window)) {
+    alert('Aapke browser me audio support nahi hai.');
+    return;
+  }
+
+  // Agar pehle se bol raha hai toh rokein
+  if (window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    if (activeSpeechBtn) {
+      activeSpeechBtn.innerHTML = '<i class="fas fa-volume-up"></i> Sunain';
+    }
+    if (activeSpeechBtn === btn) {
+      activeSpeechBtn = null;
+      return;
+    }
+  }
+
+  // Text nikaalna aur saaf karna
+  const bubble = btn.closest('.chat-bubble') || btn.parentElement.parentElement;
+  const contentEl = bubble.querySelector('.chat-content') || bubble;
+  const rawText = contentEl.innerText.replace(/[#*`_~\[\]]/g, '').trim();
+
+  if (!rawText) return;
+
+  const utterance = new SpeechSynthesisUtterance(rawText);
+  const maleVoice = getNaturalMaleVoice();
+  if (maleVoice) utterance.voice = maleVoice;
+
+  // Sanjeeda aur ba-waqar mardana aawaz ki settings
+  utterance.pitch = 0.85; // Heavy / Deep tone
+  utterance.rate = 0.95;  // Moderate / Natural speed
+
+  utterance.onstart = () => {
+    activeSpeechBtn = btn;
+    btn.innerHTML = '<i class="fas fa-stop"></i> Rokein';
+  };
+
+  utterance.onend = () => {
+    btn.innerHTML = '<i class="fas fa-volume-up"></i> Sunain';
+    activeSpeechBtn = null;
+  };
+
+  utterance.onerror = () => {
+    btn.innerHTML = '<i class="fas fa-volume-up"></i> Sunain';
+    activeSpeechBtn = null;
+  };
+
+  window.speechSynthesis.speak(utterance);
+};
+
+
+// ==========================================
+// 2. MOBILE PUSH NOTIFICATIONS ENGINE
+// ==========================================
+function initPushNotifications() {
+  if (!('Notification' in window)) return;
+
+  if (Notification.permission === 'default') {
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        showLocalNotification(
+          'Suhail AI',
+          'Academic notifications active ho chuke hain.'
+        );
+      }
+    });
+  }
+}
+
+function showLocalNotification(title, body) {
+  if (Notification.permission === 'granted') {
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.ready.then(reg => {
+        reg.showNotification(title, {
+          body: body,
+          icon: '/icons/icon-192.png',
+          badge: '/icons/icon-192.png',
+          vibrate: [100, 50, 100]
+        });
+      });
+    } else {
+      new Notification(title, {
+        body: body,
+        icon: '/icons/icon-192.png'
+      });
+    }
+  }
+}
+
+// Page load par notification initialize karein
+window.addEventListener('DOMContentLoaded', () => {
+  initPushNotifications();
+});
+  
   // 1. रेडीमेड प्रॉम्प्ट इनपुट में डालना
 function quickFillPrompt(text) {
   chatInput.value = text + ' ';
@@ -1053,11 +1179,12 @@ function renderAiBubble(div, text, aiName) {
       <button class="btn-copy" onclick="window.toggleBookmark(this)" title="Sabaq Mehfooz Karein"><i class="fa-regular fa-bookmark"></i> Save</button>
       <button class="btn-copy" onclick="window.copyText(this)"><i class="fa-regular fa-copy"></i> Copy Karein</button>
       <button class="btn-copy" onclick="window.exportBubbleToPdf(this)" style="color:var(--accent-yellow);"><i class="fa-solid fa-file-pdf"></i> PDF Download</button>
+      <button class="btn-copy" onclick="window.toggleSpeech(this)" title="Sabaq Sunain"><i class="fas fa-volume-up"></i> Sunain</button>
     </div>
     <div class="bubble-quick-actions">
       <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('simplify')">🧠 आसान समझाओ</button>
       <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('detail')">📚 गहराई में बताओ</button>
-    </div>
+      </div>
   `;
 }
   
