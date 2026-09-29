@@ -883,22 +883,37 @@ body.focus-reader-mode .exit-focus-btn {
       </div>
     </div>
 
-   <div class="chat-footer">
+   <!-- Deep Research Active Indicator Bar -->
+    <div id="deepResearchIndicator" style="display:none; padding: 4px 14px; text-align: left;">
+      <span class="deep-research-badge">
+        🧠 Deep Research Active (Full Session Memory)
+      </span>
+    </div>
+
+    <div class="chat-footer">
+      <!-- Naya Plus (+) Action Button -->
+      <button type="button" class="input-plus-btn" id="btnPlusActions" title="Deep Research & Tools" onclick="togglePlusMenu()">
+        +
+      </button>
+
       <textarea id="chat-input" class="chat-input" rows="1" placeholder="Padhai ka sawal ya koi bhi baat yahan likhein..."></textarea>
+      
       <!-- Hidden File Input for Image OCR -->
-        <input type="file" id="ocr-file-input" accept="image/*" style="display:none;" onchange="handleImageOcr(event)" />
+      <input type="file" id="ocr-file-input" accept="image/*" style="display:none;" onchange="handleImageOcr(event)" />
 
-        <!-- Camera / OCR Button -->
-        <button type="button" onclick="document.getElementById('ocr-file-input').click()" title="Kitaab ki Photo se Text Padhain" style="background:none; border:none; color:var(--text-muted); font-size:1.15rem; cursor:pointer; padding:6px; display:flex; align-items:center;">
-          <i class="fa-solid fa-camera"></i>
-        </button>
+      <!-- Camera / OCR Button -->
+      <button type="button" onclick="document.getElementById('ocr-file-input').click()" title="Kitaab ki Photo se Text Padhain" style="background:none; border:none; color:var(--text-muted); font-size:1.15rem; cursor:pointer; padding:6px; display:flex; align-items:center;">
+        <i class="fa-solid fa-camera"></i>
+      </button>
 
-        <!-- Voice Input Mic Button -->
-        <button type="button" id="btn-voice-input" onclick="toggleVoiceInput()">
-          <i class="fa-solid fa-microphone" id="mic-icon"></i>
-        </button>
-        <button type="button" class="btn-send" id="btn-chat-send"><i class="fa-solid fa-paper-plane"></i></button>
-   </div>
+      <!-- Voice Input Mic Button -->
+      <button type="button" id="btn-voice-input" onclick="toggleVoiceInput()">
+        <i class="fa-solid fa-microphone" id="mic-icon"></i>
+      </button>
+      
+      <!-- Send Button -->
+      <button type="button" class="btn-send" id="btn-chat-send"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
     
   </section>
 
