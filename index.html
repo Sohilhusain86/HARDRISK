@@ -1767,12 +1767,24 @@ window.toggleSpeech = function(btn) {
       content: m.text
     }));
 
+    // Density aur Deep Research ka instruction jodna
+    const density = document.getElementById('selResponseDensity')?.value || 'detailed';
+    let promptInstruction = density === 'concise' ? ' [Jawab nihayat to-the-point aur mukhtasar dein]' : '';
+
+    if (isDeepResearchEnabled) {
+      let fullContext = "";
+      document.querySelectorAll('.chat-bubble').forEach(b => {
+        fullContext += b.innerText.trim() + "\n";
+      });
+      promptInstruction += `\n[DEEP RESEARCH ACTIVE: Pichli tamaam guftagu aur nikaat ka gehri tehqeeq ke sath ihata karein: ${fullContext.substring(0, 1500)}]`;
+    }
+
     try {
       const data = await safeFetch('/api?action=ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          prompt: text,
+          prompt: text + promptInstruction,
           phone: currentUser.phone,
           history: historyContext,
           isTool: isToolCall,
