@@ -1027,57 +1027,6 @@ if ('speechSynthesis' in window) {
   window.speechSynthesis.onvoiceschanged = () => getNaturalMaleVoice();
 }
 
-window.toggleSpeech = function(btn) {
-  if (!('speechSynthesis' in window)) {
-    alert('Aapke browser me audio support nahi hai.');
-    return;
-  }
-
-  // Agar pehle se bol raha hai toh rokein
-  if (window.speechSynthesis.speaking) {
-    window.speechSynthesis.cancel();
-    if (activeSpeechBtn) {
-      activeSpeechBtn.innerHTML = '<i class="fas fa-volume-up"></i> Sunain';
-    }
-    if (activeSpeechBtn === btn) {
-      activeSpeechBtn = null;
-      return;
-    }
-  }
-
-  // Text nikaalna aur saaf karna
-  const bubble = btn.closest('.chat-bubble') || btn.parentElement.parentElement;
-  const contentEl = bubble.querySelector('.chat-content') || bubble;
-  const rawText = contentEl.innerText.replace(/[#*`_~\[\]]/g, '').trim();
-
-  if (!rawText) return;
-
-  const utterance = new SpeechSynthesisUtterance(rawText);
-  const maleVoice = getNaturalMaleVoice();
-  if (maleVoice) utterance.voice = maleVoice;
-
-  // Sanjeeda aur ba-waqar mardana aawaz ki settings
-  utterance.pitch = 0.85; // Heavy / Deep tone
-  utterance.rate = 0.95;  // Moderate / Natural speed
-
-  utterance.onstart = () => {
-    activeSpeechBtn = btn;
-    btn.innerHTML = '<i class="fas fa-stop"></i> Rokein';
-  };
-
-  utterance.onend = () => {
-    btn.innerHTML = '<i class="fas fa-volume-up"></i> Sunain';
-    activeSpeechBtn = null;
-  };
-
-  utterance.onerror = () => {
-    btn.innerHTML = '<i class="fas fa-volume-up"></i> Sunain';
-    activeSpeechBtn = null;
-  };
-
-  window.speechSynthesis.speak(utterance);
-};
-
 
 // ==========================================
 // 2. MOBILE PUSH NOTIFICATIONS ENGINE
@@ -1199,11 +1148,11 @@ function containsArabic(text) {
 // पुरुष आवाज़ के साथ ऑडियो प्लेयर फ़ंक्शन
 window.toggleSpeech = function(btn) {
   if (!('speechSynthesis' in window)) {
-    alert('आपके ब्राउज़र में आवाज़ सपोर्ट नहीं है।');
+    alert('Aapke browser me aawaz support nahi hai.');
     return;
   }
 
-  // अगर आवाज़ चल रही हो तो रोकें
+  // Agar pehle se chal raha ho toh cancel karein
   if (window.speechSynthesis.speaking) {
     window.speechSynthesis.cancel();
     document.querySelectorAll('.btn-speech').forEach(b => {
@@ -1212,25 +1161,34 @@ window.toggleSpeech = function(btn) {
     return;
   }
 
+  // Text nikalna
   const bubble = btn.closest('.chat-bubble') || btn.parentElement.parentElement;
   const contentEl = bubble.querySelector('.chat-content') || bubble;
-  const rawText = contentEl.innerText.replace(/[#*`_~\[\]]/g, '').trim();
+  const rawText = (contentEl.innerText || contentEl.textContent || '')
+    .replace(/[#*`_~\[\]]/g, '')
+    .trim();
 
   if (!rawText) return;
 
+  window.speechSynthesis.cancel();
+
   const utterance = new SpeechSynthesisUtterance(rawText);
+  const voices = window.speechSynthesis.getVoices() || [];
   
-  // केवल पुरुष आवाज़ चुनना
-  const voices = window.speechSynthesis.getVoices();
-  const maleKeywords = ['male', 'david', 'george', 'ravi', 'guy', 'pradeep', 'man'];
+  // Natural Male Voice dhoondhna
+  const maleKeywords = ['male', 'david', 'ravi', 'guy', 'pradeep', 'man', 'george'];
   const maleVoice = voices.find(v => {
     const name = v.name.toLowerCase();
     return maleKeywords.some(k => name.includes(k)) && !name.includes('female') && !name.includes('zira');
   });
 
-  if (maleVoice) utterance.voice = maleVoice;
-  utterance.pitch = 0.85; // भारी और गंभीर पुरुष आवाज़
-  utterance.rate = 0.95;  // सामान्य रफ़्तार
+  if (maleVoice) {
+    utterance.voice = maleVoice;
+  }
+
+  // Serious deep mardana tone
+  utterance.pitch = 0.85;
+  utterance.rate = 0.95;
 
   utterance.onstart = () => {
     btn.innerHTML = '⏹️ Rokein';
