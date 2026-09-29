@@ -2114,11 +2114,51 @@ if (window.visualViewport) {
   });
 }
 
-  // ==========================================
-// 1. ग्लोबल नोटिस सिस्टम (Fetch & Dismiss)
+ // ==========================================
+// BACKGROUND PUSH & SYSTEM PANEL NOTIFICATION ENGINE
 // ==========================================
 let lastSeenNoticeKey = 'suhail_last_seen_notice';
 
+// 1. सर्विस वर्कर और डिवाइस पैनल पर नोटिफिकेशन ट्रिगर करना
+async function triggerSystemTrayNotification(title, message) {
+  if (!('Notification' in window)) return;
+
+  // अगर परमिशन नहीं मिली है, तो मांगें
+  if (Notification.permission !== 'granted') {
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') return;
+  }
+
+  try {
+    // अगर सर्विस वर्कर एक्टिव है तो उसके ज़रिए सिस्टम ट्रे में भेजें
+    if ('serviceWorker' in navigator) {
+      const reg = await navigator.serviceWorker.ready;
+      reg.showNotification(title, {
+        body: message,
+        icon: '/icons/icon-192.png',
+        badge: '/icons/icon-192.png',
+        vibrate: [200, 100, 200, 100, 200],
+        tag: 'suhail-global-notice',
+        renotify: true,
+        requireInteraction: true,
+        data: { url: '/' }
+      });
+      return;
+    }
+
+    // फ़ालबैक: डायरेक्ट ब्राउज़र नोटिफिकेशन
+    new Notification(title, {
+      body: message,
+      icon: '/icons/icon-192.png',
+      badge: '/icons/icon-192.png',
+      vibrate: [200, 100, 200]
+    });
+  } catch (err) {
+    console.error("Notification panel error:", err);
+  }
+}
+
+// 2. बैकग्राउंड और लाइव नोटिस चेकर
 async function checkGlobalNotice() {
   try {
     const res = await safeFetch('/api?action=get-notice');
@@ -2126,7 +2166,12 @@ async function checkGlobalNotice() {
       const activeNotice = res.notice.trim();
       const lastSeen = localStorage.getItem(lastSeenNoticeKey);
 
+      // अगर नया नोटिस आया है
       if (lastSeen !== activeNotice) {
+        // (क) मोबाइल के नोटिफिकेशन पैनल (Status Bar) में ट्रिगर करें
+        await triggerSystemTrayNotification('📢 अहम इत्तिला (Suhail AI)', activeNotice);
+
+        // (ख) ऐप के अंदर स्क्रीन पर प्रीमियम मॉडल पॉप-अप दिखाएं
         const modal = document.getElementById('globalNoticeModal');
         const contentBox = document.getElementById('globalNoticeContent');
         if (modal && contentBox) {
@@ -2149,8 +2194,23 @@ function dismissGlobalNotice() {
   if (modal) modal.style.display = 'none';
 }
 
+// सर्विस वर्कर रजिस्टर करना और बैकग्राउंड टाइमर सेट करना
 window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(checkGlobalNotice, 1000);
+  // सर्विस वर्कर रजिस्टर
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(err => {
+      console.warn("SW registration skipped:", err);
+    });
+  }
+
+  // ऐप खुलते ही परमिशन रिक्वेस्ट और चेक
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+
+  setTimeout(checkGlobalNotice, 1500);
+  // हर 20 सेकंड में बैकग्राउंड री-चेक (ताकि एडमिन के भेजते ही पैनल में शो हो)
+  setInterval(checkGlobalNotice, 20000);
 });
 
 // ==========================================
