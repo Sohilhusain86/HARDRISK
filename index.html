@@ -1741,6 +1741,7 @@ function typeWriterEffect(bubbleElement, fullText, aiName) {
           <button class="btn-copy" onclick="window.toggleBookmark(this)" title="Sabaq Mehfooz Karein"><i class="fa-regular fa-bookmark"></i> Save</button>
           <button class="btn-copy" onclick="window.copyText(this)"><i class="fa-regular fa-copy"></i> Copy Karein</button>
           <button class="btn-copy" onclick="window.exportBubbleToPdf(this)" style="color:var(--accent-yellow);"><i class="fa-solid fa-file-pdf"></i> PDF Download</button>
+          <button class="btn-copy btn-speech" onclick="window.toggleSpeech(this)" title="Sabaq Sunain">🔊 Sunain</button>
         </div>
         <div class="bubble-quick-actions" style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
           <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('simplify')">🧠 आसान समझाओ</button>
@@ -1755,24 +1756,26 @@ function typeWriterEffect(bubbleElement, fullText, aiName) {
   }, 35);
 }
 
-  function renderAiBubble(div, text, aiName) {
-    const isAr = containsArabic(text);
-    let parsedHtml = (typeof marked !== 'undefined') ? marked.parse(text) : text;
-    parsedHtml = parsedHtml.replace(/<table>/g, '<div class="table-responsive"><table>').replace(/<\/table>/g, '</table></div>');
+function renderAiBubble(div, text, aiName) {
+  const isAr = containsArabic(text);
+  let parsedHtml = (typeof marked !== 'undefined') ? marked.parse(text) : text;
+  parsedHtml = parsedHtml.replace(/<table>/g, '<div class="table-responsive"><table>').replace(/<\/table>/g, '</table></div>');
 
-    div.innerHTML = `
-      <span class="ai-label">${aiName || 'SUHAIL AI'}</span>
-      <div class="chat-content ${isAr ? 'arabic-text' : ''}">${parsedHtml}</div>
-      <div class="bubble-actions" style="display:flex; justify-content:flex-end; gap:8px;">
-        <button class="btn-copy" onclick="window.copyText(this)"><i class="fa-regular fa-copy"></i> Copy Karein</button>
-        <button class="btn-copy" onclick="window.exportBubbleToPdf(this)" style="color:var(--accent-yellow);"><i class="fa-solid fa-file-pdf"></i> PDF Download</button>
-      </div>
-      <div class="bubble-quick-actions" style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
-        <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('simplify')">🧠 आसान समझाओ</button>
-        <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('detail')">📚 गहराई में बताओ</button>
-      </div>
-    `;
-  }
+  div.innerHTML = `
+    <span class="ai-label">${aiName || 'SUHAIL AI'}</span>
+    <div class="chat-content ${isAr ? 'arabic-text' : ''}">${parsedHtml}</div>
+    <div class="bubble-actions" style="display:flex; justify-content:flex-end; gap:8px;">
+      <button class="btn-copy" onclick="window.toggleBookmark(this)" title="Sabaq Mehfooz Karein"><i class="fa-regular fa-bookmark"></i> Save</button>
+      <button class="btn-copy" onclick="window.copyText(this)"><i class="fa-regular fa-copy"></i> Copy Karein</button>
+      <button class="btn-copy" onclick="window.exportBubbleToPdf(this)" style="color:var(--accent-yellow);"><i class="fa-solid fa-file-pdf"></i> PDF Download</button>
+      <button class="btn-copy btn-speech" onclick="window.toggleSpeech(this)" title="Sabaq Sunain">🔊 Sunain</button>
+    </div>
+    <div class="bubble-quick-actions" style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
+      <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('simplify')">🧠 आसान समझाओ</button>
+      <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('detail')">📚 गहराई में बताओ</button>
+    </div>
+  `;
+}
 
   document.getElementById('btn-submit-pay').onclick = async () => {
     const rawUtr = document.getElementById('pay-utr').value.trim();
