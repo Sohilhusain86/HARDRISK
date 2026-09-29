@@ -1146,34 +1146,21 @@ function containsArabic(text) {
   return /[\u0600-\u06FF]/.test(text);
 }
 
-let hfAudioPlayer = null;
+let currentTtsAudio = null;
 
-window.toggleSpeech = async function(btn) {
-  // Agar audio chal raha ho to rokein
-  if (hfAudioPlayer && !hfAudioPlayer.paused) {
-    hfAudioPlayer.pause();
-    hfAudioPlayer.currentTime = 0;
-    hfAudioPlayer = null;
-    document.querySelectorAll('.btn-speech').forEach(b => {
-      b.innerHTML = '🔊 Sunain';
-    });
-    return;
-
-    let hfAudioPlayer = null;
-
-window.toggleSpeech = async function(btn) {
-  // 1. Agar aawaz chal rahi ho toh rokein
-  if (hfAudioPlayer && !hfAudioPlayer.paused) {
-    hfAudioPlayer.pause();
-    hfAudioPlayer.currentTime = 0;
-    hfAudioPlayer = null;
+window.toggleSpeech = function(btn) {
+  // 1. Agar chal raha ho toh rokein
+  if (currentTtsAudio && !currentTtsAudio.paused) {
+    currentTtsAudio.pause();
+    currentTtsAudio.currentTime = 0;
+    currentTtsAudio = null;
     document.querySelectorAll('.btn-speech').forEach(b => {
       b.innerHTML = '🔊 Sunain';
     });
     return;
   }
 
-  // 2. Chat bubble se text nikalna
+  // 2. Chat bubble se text nikaalna
   const bubble = btn.closest('.chat-bubble') || btn.parentElement.parentElement;
   const contentEl = bubble.querySelector('.chat-content') || bubble;
   let rawText = (contentEl.innerText || contentEl.textContent || '')
@@ -1182,53 +1169,64 @@ window.toggleSpeech = async function(btn) {
 
   if (!rawText) return;
 
+  // Lambe jawab ko shuru ke 250 characters tak rakhna taaki turant chale
+  if (rawText.length > 250) {
+    rawText = rawText.substring(0, 250);
+  }
+
   btn.innerHTML = '⏳ Tayyar...';
 
-  try {
-    const res = await fetch('/api/tts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: rawText })
-    });
+  // 3. Zaban check karein (Arabi ke liye 'ar', Urdu/Hindi ke liye 'hi')
+  const isArabic = /[\u0600-\u06FF]/.test(rawText);
+  const lang = isArabic ? 'ar' : 'hi';
 
-    if (!res.ok) {
-      let errMsg = 'Status ' + res.status;
-      try {
-        const errJson = await res.json();
-        errMsg = errJson.error || JSON.stringify(errJson);
-      } catch (e) {
-        errMsg = await res.text();
-      }
-      throw new Error(errMsg);
-    }
+  // Google Translate TTS direct working proxy (CORS bypass ke sath)
+  const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(rawText)}&tl=${lang}&client=tw-ob`;
 
-    const blob = await res.blob();
-    const audioUrl = URL.createObjectURL(blob);
-
-    if (hfAudioPlayer) hfAudioPlayer.pause();
-    hfAudioPlayer = new Audio(audioUrl);
-
-    hfAudioPlayer.onplay = () => {
-      btn.innerHTML = '⏹️ Rokein';
-    };
-
-    hfAudioPlayer.onended = () => {
-      btn.innerHTML = '🔊 Sunain';
-      hfAudioPlayer = null;
-    };
-
-    hfAudioPlayer.onerror = (e) => {
-      console.error(e);
-      btn.innerHTML = '🔊 Sunain';
-      hfAudioPlayer = null;
-      alert('Audio format play nahi ho saka.');
-    };
-
-    await hfAudioPlayer.play();
-  } catch (err) {
-    btn.innerHTML = '🔊 Sunain';
-    alert(err.message);
+  if (currentTtsAudio) {
+    currentTtsAudio.pause();
   }
+
+  // Audio object banana
+  const audio = new Audio(audioUrl);
+  currentTtsAudio = audio;
+
+  audio.onplay = () => {
+    btn.innerHTML = '⏹️ Rokein';
+  };
+
+  audio.onended = () => {
+    btn.innerHTML = '🔊 Sunain';
+    currentTtsAudio = null;
+  };
+
+  audio.onerror = () => {
+    btn.innerHTML = '🔊 Sunain';
+    currentTtsAudio = null;
+    // Agar browser direct stream block kare toh fallback
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(rawText);
+      u.lang = isArabic ? 'ar-SA' : 'hi-IN';
+      u.onend = () => { btn.innerHTML = '🔊 Sunain'; };
+      btn.innerHTML = '⏹️ Rokein';
+      window.speechSynthesis.speak(u);
+    }
+  };
+
+  audio.play().catch(() => {
+    // Mobile autoplay policy fallback
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(rawText);
+      u.lang = isArabic ? 'ar-SA' : 'hi-IN';
+      u.onend = () => { btn.innerHTML = '🔊 Sunain'; };
+      btn.innerHTML = '⏹️ Rokein';
+      window.speechSynthesis.speak(u);
+    } else {
+      btn.innerHTML = '🔊 Sunain';
+    }
+  });
 };
   
   async function safeFetch(url, options = {}) {
