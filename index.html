@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://code.responsivevoice.org/responsivevoice.js?key=FREE_KEY"></script>
   <style>
 
     /* COMPACT MOBILE VIEW & CLEAN SCREEN */
@@ -1145,68 +1146,46 @@ function containsArabic(text) {
   return /[\u0600-\u06FF]/.test(text);
 }
 
-let currentGlobalAudio = null;
-
 window.toggleSpeech = function(btn) {
-  // Agar pehle se audio chal raha ho to rokein
-  if (currentGlobalAudio && !currentGlobalAudio.paused) {
-    currentGlobalAudio.pause();
-    currentGlobalAudio.currentTime = 0;
-    currentGlobalAudio = null;
+  if (typeof responsiveVoice === 'undefined') {
+    alert('Voice engine load ho raha hai, kripya 2 second baad dobara koshish karein.');
+    return;
+  }
+
+  // Agar aawaz chal rahi ho to rokein
+  if (responsiveVoice.isPlaying()) {
+    responsiveVoice.cancel();
     document.querySelectorAll('.btn-speech').forEach(b => {
       b.innerHTML = '🔊 Sunain';
     });
     return;
   }
 
-  // Bubble se text nikaalna
+  // Text nikaalna
   const bubble = btn.closest('.chat-bubble') || btn.parentElement.parentElement;
   const contentEl = bubble.querySelector('.chat-content') || bubble;
-  let text = (contentEl.innerText || contentEl.textContent || '')
+  let rawText = (contentEl.innerText || contentEl.textContent || '')
     .replace(/[#*`_~\[\]]/g, '')
     .trim();
 
-  if (!text) return;
+  if (!rawText) return;
 
-  // Lambe jawab ke shuruati hisse ko bolna
-  if (text.length > 250) {
-    text = text.substring(0, 250);
-  }
+  // Zaban aur male voice chunna
+  const isArabic = /[\u0600-\u06FF]/.test(rawText);
+  const voiceName = isArabic ? "Arabic Male" : "Hindi Female"; 
 
-  // Zaban ka tayyun (Arabi text ke liye alag, baaqi Urdu/Hindi ke liye)
-  const isArabic = /[\u0600-\u06FF]/.test(text);
-  const langCode = isArabic ? 'ar' : 'ur';
-
-  // Cloud Natural Audio Engine URL
-  const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${langCode}&client=tw-ob`;
-
-  btn.innerHTML = '⏳ Tayyar...';
-
-  if (currentGlobalAudio) {
-    currentGlobalAudio.pause();
-  }
-
-  const audio = new Audio(audioUrl);
-  currentGlobalAudio = audio;
-
-  audio.onplay = () => {
-    btn.innerHTML = '⏹️ Rokein';
-  };
-
-  audio.onended = () => {
-    btn.innerHTML = '🔊 Sunain';
-    currentGlobalAudio = null;
-  };
-
-  audio.onerror = () => {
-    btn.innerHTML = '🔊 Sunain';
-    currentGlobalAudio = null;
-    alert('Audio stream load nahi ho saki. Internet connection check karein.');
-  };
-
-  audio.play().catch(e => {
-    console.error("Audio Play Error:", e);
-    btn.innerHTML = '🔊 Sunain';
+  responsiveVoice.speak(rawText, voiceName, {
+    pitch: 0.85,
+    rate: 0.95,
+    onstart: () => {
+      btn.innerHTML = '⏹️ Rokein';
+    },
+    onend: () => {
+      btn.innerHTML = '🔊 Sunain';
+    },
+    onerror: () => {
+      btn.innerHTML = '🔊 Sunain';
+    }
   });
 };
   
