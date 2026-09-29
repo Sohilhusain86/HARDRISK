@@ -1158,11 +1158,25 @@ window.toggleSpeech = async function(btn) {
       b.innerHTML = '🔊 Sunain';
     });
     return;
+
+    let hfAudioPlayer = null;
+
+window.toggleSpeech = async function(btn) {
+  // 1. Agar aawaz chal rahi ho toh rokein
+  if (hfAudioPlayer && !hfAudioPlayer.paused) {
+    hfAudioPlayer.pause();
+    hfAudioPlayer.currentTime = 0;
+    hfAudioPlayer = null;
+    document.querySelectorAll('.btn-speech').forEach(b => {
+      b.innerHTML = '🔊 Sunain';
+    });
+    return;
   }
 
+  // 2. Chat bubble se text nikalna
   const bubble = btn.closest('.chat-bubble') || btn.parentElement.parentElement;
   const contentEl = bubble.querySelector('.chat-content') || bubble;
-  const rawText = (contentEl.innerText || contentEl.textContent || '')
+  let rawText = (contentEl.innerText || contentEl.textContent || '')
     .replace(/[#*`_~\[\]]/g, '')
     .trim();
 
@@ -1178,7 +1192,14 @@ window.toggleSpeech = async function(btn) {
     });
 
     if (!res.ok) {
-      throw new Error('API issue');
+      let errMsg = 'Status ' + res.status;
+      try {
+        const errJson = await res.json();
+        errMsg = errJson.error || JSON.stringify(errJson);
+      } catch (e) {
+        errMsg = await res.text();
+      }
+      throw new Error(errMsg);
     }
 
     const blob = await res.blob();
@@ -1196,15 +1217,17 @@ window.toggleSpeech = async function(btn) {
       hfAudioPlayer = null;
     };
 
-    hfAudioPlayer.onerror = () => {
+    hfAudioPlayer.onerror = (e) => {
+      console.error(e);
       btn.innerHTML = '🔊 Sunain';
       hfAudioPlayer = null;
+      alert('Audio format play nahi ho saka.');
     };
 
     await hfAudioPlayer.play();
   } catch (err) {
     btn.innerHTML = '🔊 Sunain';
-    alert('Aawaz generate nahi ho saki. Vercel deployment check karein.');
+    alert(err.message);
   }
 };
   
