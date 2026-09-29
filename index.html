@@ -1166,7 +1166,7 @@ function triggerFollowupAction(actionType) {
   sendQuestion();
 }
 
-// 4. renderAiBubble में क्विक एक्शन और बुकमार्क बटन जोड़ना
+// 4. renderAiBubble में क्विक एक्शन, ऑडियो और बुकमार्क बटन जोड़ना
 function renderAiBubble(div, text, aiName) {
   const isAr = containsArabic(text);
   let parsedHtml = (typeof marked !== 'undefined') ? marked.parse(text) : text;
@@ -1177,25 +1177,76 @@ function renderAiBubble(div, text, aiName) {
     <div class="chat-content ${isAr ? 'arabic-text' : ''}">${parsedHtml}</div>
     <div class="bubble-actions" style="display:flex; justify-content:flex-end; gap:8px;">
       <button class="btn-copy" onclick="window.toggleBookmark(this)" title="Sabaq Mehfooz Karein"><i class="fa-regular fa-bookmark"></i> Save</button>
-      <button class="btn-copy" onclick="window.copyText(this)"><i class="fa-regular fa-copy"></i> Copy Karein</button>
-      <button class="btn-copy" onclick="window.exportBubbleToPdf(this)" style="color:var(--accent-yellow);"><i class="fa-solid fa-file-pdf"></i> PDF Download</button>
-      <button class="btn-copy" onclick="window.toggleSpeech(this)" title="Sabaq Sunain"><i class="fas fa-volume-up"></i> Sunain</button>
+      <button class="btn-copy" onclick="window.copyText(this)" title="Copy Karein"><i class="fa-regular fa-copy"></i> Copy Karein</button>
+      <button class="btn-copy" onclick="window.exportBubbleToPdf(this)" style="color:var(--accent-yellow);" title="PDF Download"><i class="fa-solid fa-file-pdf"></i> PDF Download</button>
+      <button class="btn-copy btn-speech" onclick="window.toggleSpeech(this)" title="Sabaq Sunain">🔊 Sunain</button>
     </div>
     <div class="bubble-quick-actions">
       <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('simplify')">🧠 आसान समझाओ</button>
       <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('detail')">📚 गहराई में बताओ</button>
-      </div>
+    </div>
   `;
 }
-  
-  let currentUser = JSON.parse(localStorage.getItem('suhail_ai_user') || 'null');
-  let currentAdminPass = localStorage.getItem('suhail_ai_admin_pass') || 'SuhailAiJamia';
-  let activeShortcutType = null;
 
-  function containsArabic(text) {
-    return /[\u0600-\u06FF]/.test(text);
+let currentUser = JSON.parse(localStorage.getItem('suhail_ai_user') || 'null');
+let currentAdminPass = localStorage.getItem('suhail_ai_admin_pass') || 'SuhailAiJamia';
+let activeShortcutType = null;
+
+function containsArabic(text) {
+  return /[\u0600-\u06FF]/.test(text);
+}
+
+// पुरुष आवाज़ के साथ ऑडियो प्लेयर फ़ंक्शन
+window.toggleSpeech = function(btn) {
+  if (!('speechSynthesis' in window)) {
+    alert('आपके ब्राउज़र में आवाज़ सपोर्ट नहीं है।');
+    return;
   }
 
+  // अगर आवाज़ चल रही हो तो रोकें
+  if (window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    document.querySelectorAll('.btn-speech').forEach(b => {
+      b.innerHTML = '🔊 Sunain';
+    });
+    return;
+  }
+
+  const bubble = btn.closest('.chat-bubble') || btn.parentElement.parentElement;
+  const contentEl = bubble.querySelector('.chat-content') || bubble;
+  const rawText = contentEl.innerText.replace(/[#*`_~\[\]]/g, '').trim();
+
+  if (!rawText) return;
+
+  const utterance = new SpeechSynthesisUtterance(rawText);
+  
+  // केवल पुरुष आवाज़ चुनना
+  const voices = window.speechSynthesis.getVoices();
+  const maleKeywords = ['male', 'david', 'george', 'ravi', 'guy', 'pradeep', 'man'];
+  const maleVoice = voices.find(v => {
+    const name = v.name.toLowerCase();
+    return maleKeywords.some(k => name.includes(k)) && !name.includes('female') && !name.includes('zira');
+  });
+
+  if (maleVoice) utterance.voice = maleVoice;
+  utterance.pitch = 0.85; // भारी और गंभीर पुरुष आवाज़
+  utterance.rate = 0.95;  // सामान्य रफ़्तार
+
+  utterance.onstart = () => {
+    btn.innerHTML = '⏹️ Rokein';
+  };
+
+  utterance.onend = () => {
+    btn.innerHTML = '🔊 Sunain';
+  };
+
+  utterance.onerror = () => {
+    btn.innerHTML = '🔊 Sunain';
+  };
+
+  window.speechSynthesis.speak(utterance);
+};
+  
   async function safeFetch(url, options = {}) {
     const res = await fetch(url, options);
     const contentType = res.headers.get("content-type") || "";
