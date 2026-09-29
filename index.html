@@ -1146,47 +1146,66 @@ function containsArabic(text) {
   return /[\u0600-\u06FF]/.test(text);
 }
 
-window.toggleSpeech = function(btn) {
-  if (typeof responsiveVoice === 'undefined') {
-    alert('Voice engine load ho raha hai, kripya 2 second baad dobara koshish karein.');
-    return;
-  }
+let hfAudioPlayer = null;
 
-  // Agar aawaz chal rahi ho to rokein
-  if (responsiveVoice.isPlaying()) {
-    responsiveVoice.cancel();
+window.toggleSpeech = async function(btn) {
+  // Agar audio chal raha ho to rokein
+  if (hfAudioPlayer && !hfAudioPlayer.paused) {
+    hfAudioPlayer.pause();
+    hfAudioPlayer.currentTime = 0;
+    hfAudioPlayer = null;
     document.querySelectorAll('.btn-speech').forEach(b => {
       b.innerHTML = '🔊 Sunain';
     });
     return;
   }
 
-  // Text nikaalna
   const bubble = btn.closest('.chat-bubble') || btn.parentElement.parentElement;
   const contentEl = bubble.querySelector('.chat-content') || bubble;
-  let rawText = (contentEl.innerText || contentEl.textContent || '')
+  const rawText = (contentEl.innerText || contentEl.textContent || '')
     .replace(/[#*`_~\[\]]/g, '')
     .trim();
 
   if (!rawText) return;
 
-  // Zaban aur male voice chunna
-  const isArabic = /[\u0600-\u06FF]/.test(rawText);
-  const voiceName = isArabic ? "Arabic Male" : "Hindi Female"; 
+  btn.innerHTML = '⏳ Tayyar...';
 
-  responsiveVoice.speak(rawText, voiceName, {
-    pitch: 0.85,
-    rate: 0.95,
-    onstart: () => {
-      btn.innerHTML = '⏹️ Rokein';
-    },
-    onend: () => {
-      btn.innerHTML = '🔊 Sunain';
-    },
-    onerror: () => {
-      btn.innerHTML = '🔊 Sunain';
+  try {
+    const res = await fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: rawText })
+    });
+
+    if (!res.ok) {
+      throw new Error('API issue');
     }
-  });
+
+    const blob = await res.blob();
+    const audioUrl = URL.createObjectURL(blob);
+
+    if (hfAudioPlayer) hfAudioPlayer.pause();
+    hfAudioPlayer = new Audio(audioUrl);
+
+    hfAudioPlayer.onplay = () => {
+      btn.innerHTML = '⏹️ Rokein';
+    };
+
+    hfAudioPlayer.onended = () => {
+      btn.innerHTML = '🔊 Sunain';
+      hfAudioPlayer = null;
+    };
+
+    hfAudioPlayer.onerror = () => {
+      btn.innerHTML = '🔊 Sunain';
+      hfAudioPlayer = null;
+    };
+
+    await hfAudioPlayer.play();
+  } catch (err) {
+    btn.innerHTML = '🔊 Sunain';
+    alert('Aawaz generate nahi ho saki. Vercel deployment check karein.');
+  }
 };
   
   async function safeFetch(url, options = {}) {
