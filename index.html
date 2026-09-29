@@ -1145,64 +1145,69 @@ function containsArabic(text) {
   return /[\u0600-\u06FF]/.test(text);
 }
 
-// पुरुष आवाज़ के साथ ऑडियो प्लेयर फ़ंक्शन
-window.toggleSpeech = function(btn) {
-  if (!('speechSynthesis' in window)) {
-    alert('Aapke browser me aawaz support nahi hai.');
-    return;
-  }
+let currentGlobalAudio = null;
 
-  // Agar pehle se chal raha ho toh cancel karein
-  if (window.speechSynthesis.speaking) {
-    window.speechSynthesis.cancel();
+window.toggleSpeech = function(btn) {
+  // Agar pehle se audio chal raha ho to rokein
+  if (currentGlobalAudio && !currentGlobalAudio.paused) {
+    currentGlobalAudio.pause();
+    currentGlobalAudio.currentTime = 0;
+    currentGlobalAudio = null;
     document.querySelectorAll('.btn-speech').forEach(b => {
       b.innerHTML = '🔊 Sunain';
     });
     return;
   }
 
-  // Text nikalna
+  // Bubble se text nikaalna
   const bubble = btn.closest('.chat-bubble') || btn.parentElement.parentElement;
   const contentEl = bubble.querySelector('.chat-content') || bubble;
-  const rawText = (contentEl.innerText || contentEl.textContent || '')
+  let text = (contentEl.innerText || contentEl.textContent || '')
     .replace(/[#*`_~\[\]]/g, '')
     .trim();
 
-  if (!rawText) return;
+  if (!text) return;
 
-  window.speechSynthesis.cancel();
-
-  const utterance = new SpeechSynthesisUtterance(rawText);
-  const voices = window.speechSynthesis.getVoices() || [];
-  
-  // Natural Male Voice dhoondhna
-  const maleKeywords = ['male', 'david', 'ravi', 'guy', 'pradeep', 'man', 'george'];
-  const maleVoice = voices.find(v => {
-    const name = v.name.toLowerCase();
-    return maleKeywords.some(k => name.includes(k)) && !name.includes('female') && !name.includes('zira');
-  });
-
-  if (maleVoice) {
-    utterance.voice = maleVoice;
+  // Lambe jawab ke shuruati hisse ko bolna
+  if (text.length > 250) {
+    text = text.substring(0, 250);
   }
 
-  // Serious deep mardana tone
-  utterance.pitch = 0.85;
-  utterance.rate = 0.95;
+  // Zaban ka tayyun (Arabi text ke liye alag, baaqi Urdu/Hindi ke liye)
+  const isArabic = /[\u0600-\u06FF]/.test(text);
+  const langCode = isArabic ? 'ar' : 'ur';
 
-  utterance.onstart = () => {
+  // Cloud Natural Audio Engine URL
+  const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${langCode}&client=tw-ob`;
+
+  btn.innerHTML = '⏳ Tayyar...';
+
+  if (currentGlobalAudio) {
+    currentGlobalAudio.pause();
+  }
+
+  const audio = new Audio(audioUrl);
+  currentGlobalAudio = audio;
+
+  audio.onplay = () => {
     btn.innerHTML = '⏹️ Rokein';
   };
 
-  utterance.onend = () => {
+  audio.onended = () => {
     btn.innerHTML = '🔊 Sunain';
+    currentGlobalAudio = null;
   };
 
-  utterance.onerror = () => {
+  audio.onerror = () => {
     btn.innerHTML = '🔊 Sunain';
+    currentGlobalAudio = null;
+    alert('Audio stream load nahi ho saki. Internet connection check karein.');
   };
 
-  window.speechSynthesis.speak(utterance);
+  audio.play().catch(e => {
+    console.error("Audio Play Error:", e);
+    btn.innerHTML = '🔊 Sunain';
+  });
 };
   
   async function safeFetch(url, options = {}) {
