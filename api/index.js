@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import webpush from "web-push";
 
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = (process.env.FIREBASE_DB_URL || process.env.FIREBASE_DATABASE_URL || "https://hardrisk-default-rtdb.firebaseio.com").replace(/\/$/, "");
@@ -6,6 +7,19 @@ const FIREBASE_AUTH = process.env.FIREBASE_AUTH || "";
 
 const GROQ_API_KEY = (process.env.GROQ_API_KEY || process.env.GROQ_KEY || "").trim();
 const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || "").trim();
+
+// ==========================================
+// VAPID PUSH NOTIFICATION SETUP
+// ==========================================
+try {
+  webpush.setVapidDetails(
+    "mailto:sohilhusain2025@gmail.com",
+    "BIEaEfH34pN63KmeVkIqb5YxPNA5v2Md9oBz1JoDP4phkdNTNARX6dBPAFPaVZ9hPmMg43bcSpbPNZwelSoWjVo",
+    "81Aj2B9t0o4alNss2yMeoIeOJZ43Bs6LMTaRpG2zZ28"
+  );
+} catch (e) {
+  console.warn("VAPID Setup Warning:", e.message);
+}
 
 // Firebase Helper Functions
 async function dbGet(path) {
@@ -66,7 +80,7 @@ const SYSTEM_RULES = {
   ultra: "Aap 'Suhail AI Ultra' hain—Master Academic wa Islamic Research Assistant. Aapka tarz-e-kalam nihayat shaista, ba-adab, ilmi aur tehqeeqi hona chahiye. Har pehlu ko gehrai, hawalajaat aur wazeh dalail ke sath bayan karein. Har baar salam dohrana aur Namaste jaise alfaz bolna sakhti se mana hai."
 };
 
-// 2026 Official Production Active Model Pools
+// Official Production Active Model Pools
 const GROQ_MODELS = [
   "openai/gpt-oss-120b",
   "openai/gpt-oss-20b",
@@ -74,9 +88,9 @@ const GROQ_MODELS = [
 ];
 
 const GEMINI_MODELS = [
-  "gemini-3.8-flash",
-  "gemini-3.7-flash",
-  "gemini-3.5-flash-lite"
+  "gemini-2.5-flash",
+  "gemini-2.5-flash-lite",
+  "gemini-1.5-flash"
 ];
 
 // Multi-Model Auto-Resilient AI Engine
@@ -219,6 +233,24 @@ export default async function handler(req, res) {
   const action = req.query?.action || searchParams.get("action");
 
   try {
+    // 0. PWA PUSH SUBSCRIPTION SAVE (DEVICE TOKEN STORAGE)
+    if (action === "save_push_subscription" && req.method === "POST") {
+      const { subscription, phone } = req.body || {};
+      if (subscription && subscription.endpoint) {
+        const tokenKey = Buffer.from(subscription.endpoint)
+          .toString("base64")
+          .replace(/[\.\$\[\]\#\/=]/g, "_")
+          .slice(-40);
+
+        await dbPatch(`pushSubscriptions/${tokenKey}`, {
+          subscription: subscription,
+          phone: phone || "guest",
+          updatedAt: Date.now()
+        });
+      }
+      return res.status(200).json({ success: true, message: "Device registered for push" });
+    }
+
     // 1. GLOBAL NOTICE (STUDENT VIEW)
     if (action === "get-notice" || action === "get_notice") {
       const settings = (await dbGet("system_settings")) || {};
@@ -232,7 +264,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, notice: noticeText });
     }
 
-    // 2. GLOBAL NOTICE (ADMIN ACTION)
+    // 2. GLOBAL NOTICE (ADMIN ACTION + TRUE BACKGROUND PUSH)
     if (action === "set_notice" || action === "set-notice") {
       const { noticeText, notice, isActive, pass, phone } = req.body || {};
       const activeText = String(noticeText || notice || "").trim();
@@ -248,16 +280,38 @@ export default async function handler(req, res) {
         return res.status(401).json({ success: false, error: "अमान्य एडमिन पासवर्ड या अनुमति!" });
       }
 
+      const shouldBeActive = isActive !== undefined ? !!isActive : (activeText.length > 0);
+
       await dbPut("system_settings", {
         notice: activeText,
-        noticeActive: isActive !== undefined ? !!isActive : (activeText.length > 0),
+        noticeActive: shouldBeActive,
         updatedAt: Date.now()
       });
       await dbPut("globalNotice", activeText);
 
+      // Agar notice active hai toh sabhi devices par background push trigger karein
+      if (shouldBeActive && activeText.length > 0) {
+        const allSubs = (await dbGet("pushSubscriptions")) || {};
+        const payload = JSON.stringify({
+          title: "📢 Suhail AI - Ilmi Notice",
+          body: activeText
+        });
+
+        for (const key in allSubs) {
+          const subData = allSubs[key]?.subscription || allSubs[key];
+          if (subData && subData.endpoint) {
+            webpush.sendNotification(subData, payload).catch(async (err) => {
+              if (err.statusCode === 404 || err.statusCode === 410) {
+                await dbDelete(`pushSubscriptions/${key}`);
+              }
+            });
+          }
+        }
+      }
+
       return res.status(200).json({
         success: true,
-        message: activeText ? "ग्लोबल नोटिस सफलतापूर्वक प्रसारित कर दिया गया।" : "नोटिस हटा दिया गया।"
+        message: activeText ? "ग्लोबल नोटिस सफलतापूर्वक प्रसारित कर दिया गया और सभी छात्रों को पुश भेज दिया गया।" : "नोटिस हटा दिया गया।"
       });
     }
 
@@ -594,6 +648,6 @@ export default async function handler(req, res) {
     return res.status(404).json({ success: false, error: "Invalid action" });
   } catch (error) {
     console.error("Backend Error:", error);
-    return res.status(500).json({ success: false, error: "Internal Server Error" });
+    return res.status(500).json({ success: false, error: "Internal Server Error: " + error.message });
   }
 }
