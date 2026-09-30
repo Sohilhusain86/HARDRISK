@@ -1,12 +1,30 @@
-const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
-const FIREBASE_DB_URL = process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com";
+import fetch from "node-fetch";
+import webpush from "web-push";
 
-const GROQ_KEY = (process.env.GROQ_KEY || "").trim();
+const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
+const FIREBASE_DB_URL = (process.env.FIREBASE_DB_URL || process.env.FIREBASE_DATABASE_URL || "https://hardrisk-default-rtdb.firebaseio.com").replace(/\/$/, "");
+const FIREBASE_AUTH = process.env.FIREBASE_AUTH || "";
+
+const GROQ_KEY = (process.env.GROQ_KEY || process.env.GROQ_API_KEY || "").trim();
 const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || "").trim();
+
+// ==========================================
+// VAPID PUSH SETUP
+// ==========================================
+try {
+  webpush.setVapidDetails(
+    "mailto:sohilhusain2025@gmail.com",
+    "BIEaEfH34pN63KmeVkIqb5YxPNA5v2Md9oBz1JoDP4phkdNTNARX6dBPAFPaVZ9hPmMg43bcSpbPNZwelSoWjVo",
+    "81Aj2B9t0o4alNss2yMeoIeOJZ43Bs6LMTaRpG2zZ28"
+  );
+} catch (e) {
+  console.warn("VAPID Admin Setup Warning:", e.message);
+}
 
 async function dbGet(path) {
   try {
-    const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`);
+    const url = `${FIREBASE_DB_URL}/${path}.json${FIREBASE_AUTH ? `?auth=${FIREBASE_AUTH}` : ""}`;
+    const res = await fetch(url);
     if (!res.ok) return null;
     return await res.json();
   } catch (e) {
@@ -15,7 +33,8 @@ async function dbGet(path) {
 }
 
 async function dbPatch(path, data) {
-  const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`, {
+  const url = `${FIREBASE_DB_URL}/${path}.json${FIREBASE_AUTH ? `?auth=${FIREBASE_AUTH}` : ""}`;
+  const res = await fetch(url, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -24,7 +43,8 @@ async function dbPatch(path, data) {
 }
 
 async function dbPut(path, data) {
-  const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`, {
+  const url = `${FIREBASE_DB_URL}/${path}.json${FIREBASE_AUTH ? `?auth=${FIREBASE_AUTH}` : ""}`;
+  const res = await fetch(url, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -32,7 +52,13 @@ async function dbPut(path, data) {
   return await res.json();
 }
 
-// AI Summary Generator with Fallback to Direct Chat Display
+async function dbDelete(path) {
+  const url = `${FIREBASE_DB_URL}/${path}.json${FIREBASE_AUTH ? `?auth=${FIREBASE_AUTH}` : ""}`;
+  const res = await fetch(url, { method: "DELETE" });
+  return await res.json();
+}
+
+// AI Summary Generator
 async function generateAiAuditReport(chatLogsText) {
   const prompt = `Aap 'Suhail AI' platform ke Chief Auditor hain. Neeche tulba (students) ki ahem chats hain:
 ---
@@ -43,7 +69,6 @@ Admin (Suhail Husain) ke liye Urdu/Hindi me mukhtasar aur behtareen tajziya (Aud
 2. AI ne kaisa jawab diya aur kya koi ilmi kami thi?
 3. Poori guftagu ka mukhtasar khulasa aur platform behtar banane ke mashware.`;
 
-  // 1. Try Groq (Llama-3.1 8b instant - very fast and stable)
   if (GROQ_KEY) {
     try {
       const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -65,7 +90,6 @@ Admin (Suhail Husain) ke liye Urdu/Hindi me mukhtasar aur behtareen tajziya (Aud
     } catch (e) {}
   }
 
-  // 2. Try Gemini
   if (GEMINI_API_KEY) {
     try {
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
@@ -82,7 +106,6 @@ Admin (Suhail Husain) ke liye Urdu/Hindi me mukhtasar aur behtareen tajziya (Aud
     } catch (e) {}
   }
 
-  // 3. Fallback: Agar AI keys busy hon toh seedhe chat logs dikha do taaki admin ko data zaroor dikhe
   return "📋 [सीधा चैट रिकॉर्ड - लाइव डेटाबेस]:\n(नोट: AI समरी की व्यस्तता के कारण सीधा रिकॉर्ड दिखाया जा रहा है)\n\n" + chatLogsText;
 }
 
@@ -254,17 +277,42 @@ export default async function handler(req, res) {
       });
     }
 
-    // SET GLOBAL NOTICE
+    // SET GLOBAL NOTICE + BACKGROUND PUSH TO ALL DEVICES
     if (action === "set_notice") {
       const { noticeText, isActive } = req.body || {};
+      const activeText = String(noticeText || "").trim();
+      const shouldBeActive = isActive !== undefined ? !!isActive : (activeText.length > 0);
+
       await dbPut("system_settings", {
-        notice: noticeText || "",
-        noticeActive: !!isActive,
+        notice: activeText,
+        noticeActive: shouldBeActive,
         updatedAt: Date.now()
       });
+      await dbPut("globalNotice", activeText);
+
+      // Agar notice active hai toh sabhi devices par background push bhejein
+      if (shouldBeActive && activeText.length > 0) {
+        const allSubs = (await dbGet("pushSubscriptions")) || {};
+        const payload = JSON.stringify({
+          title: "📢 Suhail AI - Ilmi Notice",
+          body: activeText
+        });
+
+        for (const key in allSubs) {
+          const subData = allSubs[key]?.subscription || allSubs[key];
+          if (subData && subData.endpoint) {
+            webpush.sendNotification(subData, payload).catch(async (err) => {
+              if (err.statusCode === 404 || err.statusCode === 410) {
+                await dbDelete(`pushSubscriptions/${key}`);
+              }
+            });
+          }
+        }
+      }
+
       return res.status(200).json({
         success: true,
-        message: isActive ? "ग्लोबल नोटिस सफलतापूर्वक प्रसारित कर दिया गया।" : "नोटिस हटा दिया गया।"
+        message: shouldBeActive ? "ग्लोबल नोटिस सफलतापूर्वक प्रसारित कर दिया गया और सभी छात्रों को पुश भेज दिया गया।" : "नोटिस हटा दिया गया।"
       });
     }
 
