@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import webpush from "web-push";
 
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
-const FIREBASE_DB_URL = (process.env.FIREBASE_DB_URL || process.env.FIREBASE_DATABASE_URL || "https://hardrisk-default-rtdb.firebaseio.com").replace(/\/$/, "");
+const FIREBASE_DB_URL = (process.env.FIREBASE_DB_URL || process.env.FIREBASE_DATABASE_URL || "https://ula-alif-default-rtdb.firebaseio.com").replace(/\/$/, "");
 const FIREBASE_AUTH = process.env.FIREBASE_AUTH || "";
 
 const GROQ_KEY = (process.env.GROQ_KEY || process.env.GROQ_API_KEY || "").trim();
