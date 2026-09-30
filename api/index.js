@@ -1,5 +1,8 @@
 import fetch from "node-fetch";
-import webpush from "web-push";
+import * as webpushModule from "web-push";
+
+// Vercel ES Module safe resolver
+const webpush = webpushModule.default || webpushModule;
 
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SuhailAiJamia";
 const FIREBASE_DB_URL = (process.env.FIREBASE_DB_URL || process.env.FIREBASE_DATABASE_URL || "https://hardrisk-default-rtdb.firebaseio.com").replace(/\/$/, "");
@@ -9,13 +12,17 @@ const GROQ_API_KEY = (process.env.GROQ_API_KEY || process.env.GROQ_KEY || "").tr
 const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || "").trim();
 
 // ==========================================
-// VAPID PUSH NOTIFICATION CONFIGURATION
+// VAPID PUSH CONFIGURATION
 // ==========================================
-webpush.setVapidDetails(
-  "mailto:sohilhusain2025@gmail.com",
-  "BIEaEfH34pN63KmeVkIqb5YxPNA5v2Md9oBz1JoDP4phkdNTNARX6dBPAFPaVZ9hPmMg43bcSpbPNZwelSoWjVo",
-  "81Aj2B9t0o4alNss2yMeoIeOJZ43Bs6LMTaRpG2zZ28"
-);
+try {
+  webpush.setVapidDetails(
+    "mailto:sohilhusain2025@gmail.com",
+    "BIEaEfH34pN63KmeVkIqb5YxPNA5v2Md9oBz1JoDP4phkdNTNARX6dBPAFPaVZ9hPmMg43bcSpbPNZwelSoWjVo",
+    "81Aj2B9t0o4alNss2yMeoIeOJZ43Bs6LMTaRpG2zZ28"
+  );
+} catch (e) {
+  console.warn("VAPID Setup Warning:", e.message);
+}
 
 // Firebase Helper Functions
 async function dbGet(path) {
@@ -76,7 +83,7 @@ const SYSTEM_RULES = {
   ultra: "Aap 'Suhail AI Ultra' hain—Master Academic wa Islamic Research Assistant. Aapka tarz-e-kalam nihayat shaista, ba-adab, ilmi aur tehqeeqi hona chahiye. Har pehlu ko gehrai, hawalajaat aur wazeh dalail ke sath bayan karein. Har baar salam dohrana aur Namaste jaise alfaz bolna sakhti se mana hai."
 };
 
-// Official Production Active Model Pools
+// 2026 Production Active Model Pools
 const GROQ_MODELS = [
   "openai/gpt-oss-120b",
   "openai/gpt-oss-20b",
@@ -229,11 +236,10 @@ export default async function handler(req, res) {
   const action = req.query?.action || searchParams.get("action");
 
   try {
-    // 0. PWA PUSH SUBSCRIPTION SAVE (STUDENT TOKEN STORAGE)
+    // 0. PWA PUSH SUBSCRIPTION SAVE (DEVICE TOKEN STORAGE)
     if (action === "save_push_subscription" && req.method === "POST") {
       const { subscription, phone } = req.body || {};
       if (subscription && subscription.endpoint) {
-        // Endpoint se ek unique key banana
         const tokenKey = Buffer.from(subscription.endpoint).toString("base64").replace(/[\.\$\[\]\#\/=]/g, "_").slice(-40);
         await dbPatch(`pushSubscriptions/${tokenKey}`, {
           subscription: subscription,
@@ -282,7 +288,7 @@ export default async function handler(req, res) {
       });
       await dbPut("globalNotice", activeText);
 
-      // Agar naya notice active kiya gaya hai, toh sabhi tulba ke band phono par push bhejein
+      // Agar notice active hai toh sabhi enrolled devices par background push karein
       if (shouldBeActive && activeText.length > 0) {
         const allSubs = (await dbGet("pushSubscriptions")) || {};
         const payload = JSON.stringify({
@@ -294,7 +300,6 @@ export default async function handler(req, res) {
           const subData = allSubs[key]?.subscription || allSubs[key];
           if (subData && subData.endpoint) {
             webpush.sendNotification(subData, payload).catch(async (err) => {
-              // Agar user ne app uninstall kar di ho ya token expire ho gaya ho toh database se clean karein
               if (err.statusCode === 404 || err.statusCode === 410) {
                 await dbDelete(`pushSubscriptions/${key}`);
               }
@@ -642,6 +647,6 @@ export default async function handler(req, res) {
     return res.status(404).json({ success: false, error: "Invalid action" });
   } catch (error) {
     console.error("Backend Error:", error);
-    return res.status(500).json({ success: false, error: "Internal Server Error" });
+    return res.status(500).json({ success: false, error: "Internal Server Error: " + error.message });
   }
 }
