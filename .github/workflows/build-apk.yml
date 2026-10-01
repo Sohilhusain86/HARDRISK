@@ -1,0 +1,48 @@
+name: Build Standalone Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Set up Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Install Capacitor & Android Platform
+        run: |
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npx cap init "Suhail AI - Academic Learning Platform" "com.suhailai.app" --web-dir .
+          node -e '
+            const fs = require("fs");
+            let conf = JSON.parse(fs.readFileSync("capacitor.config.json"));
+            conf.server = { url: "https://hardrisk.vercel.app", cleartext: true };
+            fs.writeFileSync("capacitor.config.json", JSON.stringify(conf, null, 2));
+          '
+          npx cap add android
+
+      - name: Build Android Release APK
+        run: |
+          cd android
+          chmod +x ./gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload Standalone APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Suhail-AI-Academic-Learning-Platform
+          path: android/app/build/outputs/apk/debug/app-debug.apk
