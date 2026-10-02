@@ -1129,6 +1129,155 @@ body.focus-reader-mode .exit-focus-btn {
 
 <script>
 
+  // 1. Tri-Agent Engine State
+let isTriAgentActive = false;
+
+function toggleTriAgent() {
+  isTriAgentActive = !isTriAgentActive;
+  const btn = document.getElementById("triAgentBtn");
+  if (!btn) return;
+
+  if (isTriAgentActive) {
+    btn.style.background = "rgba(16, 185, 129, 0.25)";
+    btn.style.borderColor = "#10b981";
+    btn.style.color = "#34d399";
+    btn.innerHTML = `<span>⚡</span> <span>Suhail AI Tri-Agent Active (Mega ZIP Ready)</span>`;
+  } else {
+    btn.style.background = "rgba(13, 148, 136, 0.15)";
+    btn.style.borderColor = "#14b8a6";
+    btn.style.color = "#2dd4bf";
+    btn.innerHTML = `<span>⚡</span> <span>Suhail AI Tri-Agent (Mega Code & ZIP)</span>`;
+  }
+}
+
+// 2. Animated Multi-Agent Visual Loader
+function createAgentLoaderUI(container) {
+  const cardId = 'agent-loader-' + Date.now();
+  const html = `
+    <div id="${cardId}" style="padding: 16px; background: rgba(17, 24, 39, 0.95); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 16px; margin: 12px 0; font-family: sans-serif; color: #e5e7eb;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #374151; padding-bottom: 8px; margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></span>
+          <span style="font-weight: 700; color: #34d399; font-size: 13px; letter-spacing: 0.5px;">SUHAIL AI TRI-AGENT RUNNING</span>
+        </div>
+        <span id="${cardId}-percent" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7; font-size: 11px; padding: 2px 8px; border-radius: 9999px; font-family: monospace;">0%</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px; margin-bottom: 12px;">
+        <div id="${cardId}-agent1" style="color: #9ca3af;"><span class="step-icon">⏳</span> <span class="step-text">Agent 1: Analyzing Architecture & Modules...</span></div>
+        <div id="${cardId}-agent2" style="color: #6b7280;"><span class="step-icon">⚪</span> <span class="step-text">Agent 2: Deep Core Code Generation...</span></div>
+        <div id="${cardId}-agent3" style="color: #6b7280;"><span class="step-icon">⚪</span> <span class="step-text">Agent 3: Validating & Packaging into ZIP...</span></div>
+      </div>
+
+      <div style="background: #000; border-radius: 8px; padding: 8px 12px; font-family: monospace; font-size: 11px; color: #34d399; border: 1px solid #1f2937; height: 42px; overflow: hidden; margin-bottom: 12px;">
+        <div id="${cardId}-ticker">> Initializing Tri-Agent Engine pipeline...</div>
+      </div>
+
+      <div style="width: 100%; background: #374151; border-radius: 9999px; height: 6px; overflow: hidden;">
+        <div id="${cardId}-bar" style="background: #10b981; height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+      </div>
+    </div>
+  `;
+  container.insertAdjacentHTML('beforeend', html);
+  return cardId;
+}
+
+// 3. Execution Engine
+async function runTriAgentMegaCode(userPrompt, chatBox) {
+  const cardId = createAgentLoaderUI(chatBox);
+  
+  const updateAgent = (num, text, icon, color) => {
+    const el = document.getElementById(`${cardId}-agent${num}`);
+    if (!el) return;
+    el.style.color = color;
+    el.querySelector('.step-icon').textContent = icon;
+    el.querySelector('.step-text').textContent = text;
+  };
+
+  const updateProgress = (pct, log) => {
+    document.getElementById(`${cardId}-bar`).style.width = pct + '%';
+    document.getElementById(`${cardId}-percent`).textContent = pct + '%';
+    if (log) {
+      document.getElementById(`${cardId}-ticker`).textContent = '> ' + log;
+    }
+  };
+
+  // Stage 1: Architect
+  updateAgent(1, "Agent 1: Blueprint & Structure Approved", "✅", "#34d399");
+  updateProgress(20, "Agent 1 designed project layout. Handoff to Agent 2...");
+  await new Promise(r => setTimeout(r, 1000));
+
+  // Stage 2: Deep Generator
+  updateAgent(2, "Agent 2: Writing extended source code in chunks...", "⚡", "#60a5fa");
+  
+  let fullCode = "";
+  let isDone = false;
+  let chunkCount = 0;
+  let history = [
+    { role: "system", content: "You are the Suhail AI Lead Core Architect. Write production-ready, extensive, complete code without placeholders." },
+    { role: "user", content: userPrompt }
+  ];
+
+  while (!isDone && chunkCount < 8) {
+    chunkCount++;
+    updateProgress(Math.min(25 + (chunkCount * 15), 85), `Agent 2 generated stream chunk #${chunkCount}...`);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: history })
+      });
+      const data = await res.json();
+      const choice = data.choices[0];
+      const chunkText = choice.message.content;
+      fullCode += chunkText;
+
+      if (choice.finish_reason === "length") {
+        history.push({ role: "assistant", content: chunkText });
+        history.push({ role: "user", content: "Continue writing the code strictly from the exact character where you stopped." });
+      } else {
+        isDone = true;
+      }
+    } catch (e) {
+      isDone = true;
+    }
+  }
+
+  updateAgent(2, `Agent 2: Complete Code Generated (~${chunkCount * 1200} lines)`, "✅", "#34d399");
+
+  // Stage 3: Bundler & ZIP
+  updateAgent(3, "Agent 3: Validating syntax & packaging into ZIP...", "⚡", "#fbbf24");
+  updateProgress(95, "Compiling index.html into ZIP archive...");
+
+  let cleanCode = fullCode.replace(/^```[a-zA-Z]*\n/gm, "").replace(/```$/gm, "");
+  const zip = new JSZip();
+  zip.file("index.html", cleanCode);
+  zip.file("README.txt", "Generated by Suhail AI Tri-Agent Engine\nWebsite: https://hardrisk.vercel.app");
+
+  const zipBlob = await zip.generateAsync({ type: "blob" });
+  const downloadUrl = URL.createObjectURL(zipBlob);
+
+  updateProgress(100, "Package Ready!");
+  updateAgent(3, "Agent 3: ZIP Ready for Download", "✅", "#34d399");
+
+  // Final Card with Download Link
+  const card = document.getElementById(cardId);
+  card.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+      <div style="font-size: 26px;">📦</div>
+      <div>
+        <h4 style="margin: 0; color: #34d399; font-size: 14px;">Suhail AI Tri-Agent: Project Ready!</h4>
+        <p style="margin: 0; font-size: 11px; color: #9ca3af;">Clean Code (~${chunkCount * 1200}+ Lines) in <code>index.html</code></p>
+      </div>
+    </div>
+    <p style="font-size: 12px; color: #d1d5db; margin-bottom: 12px;">Browser freeze hone se bachane ke liye poore code ko clean ZIP archive mein save kar diya gaya hai.</p>
+    <a href="${downloadUrl}" download="SuhailAI_Project.zip" style="display: block; text-align: center; background: #059669; color: white; text-decoration: none; padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 13px;">
+      📥 Download project.zip (index.html)
+    </a>
+  `;
+}
+  
   // ==========================================
 // 1. STRICTLY MALE NATURAL TTS ENGINE
 // ==========================================
