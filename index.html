@@ -1806,6 +1806,13 @@ window.toggleSpeech = function(btn) {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 600);
     if (e.key === 'Enter' && !e.shiftKey && !isMobile) {
       e.preventDefault();
+      if (isTriAgentActive) {
+  e.preventDefault();
+  const chatBox = document.getElementById('chat-box') || document.body;
+  runTriAgentMegaCode(chatInput.value.trim(), chatBox);
+  chatInput.value = '';
+  return;
+      }
       sendQuestion();
     }
   });
