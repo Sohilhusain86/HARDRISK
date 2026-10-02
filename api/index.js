@@ -372,6 +372,39 @@ export default async function handler(req, res) {
       }
     }
 
+    // 3.5 TRI-AGENT CHUNK ENGINE (MEGA CODE GENERATOR)
+    if (action === "tri_chunk" && req.method === "POST") {
+      const { messages } = req.body || {};
+      if (!messages || !Array.isArray(messages)) {
+        return res.status(400).json({ success: false, error: "Messages array required" });
+      }
+
+      if (!GROQ_API_KEY) {
+        return res.status(500).json({ success: false, error: "GROQ_API_KEY missing" });
+      }
+
+      try {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${GROQ_API_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "openai/gpt-oss-120b",
+            messages: messages,
+            temperature: 0.3,
+            max_tokens: 3500
+          })
+        });
+
+        const resData = await response.json();
+        return res.status(200).json(resData);
+      } catch (err) {
+        return res.status(500).json({ success: false, error: err.message });
+      }
+    }
+
     // 4. AI CHAT DISPATCHER (STUDENT & ADMIN)
     if (action === "ai" && req.method === "POST") {
       const { prompt, phone, history, isTool, customPersona } = req.body || {};
