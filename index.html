@@ -1133,23 +1133,20 @@ body.focus-reader-mode .exit-focus-btn {
 let isTriAgentActive = false;
 
 function toggleTriAgent() {
-  isTriAgentActive = !isTriAgentActive;
-  const btn = document.getElementById("triAgentBtn");
-  if (!btn) return;
-
-  if (isTriAgentActive) {
-    btn.style.background = "rgba(16, 185, 129, 0.25)";
-    btn.style.borderColor = "#10b981";
-    btn.style.color = "#34d399";
-    btn.innerHTML = `<span>⚡</span> <span>Suhail AI Tri-Agent Active (Mega ZIP Ready)</span>`;
-  } else {
-    btn.style.background = "rgba(13, 148, 136, 0.15)";
-    btn.style.borderColor = "#14b8a6";
-    btn.style.color = "#2dd4bf";
-    btn.innerHTML = `<span>⚡</span> <span>Suhail AI Tri-Agent (Mega Code & ZIP)</span>`;
+  const toggle = document.getElementById("triAgentToggle");
+  isTriAgentActive = toggle ? toggle.checked : !isTriAgentActive;
+  
+  const deepIndicator = document.getElementById("deepResearchIndicator");
+  if (deepIndicator) {
+    deepIndicator.style.display = isTriAgentActive ? 'block' : (isDeepResearchEnabled ? 'block' : 'none');
+    if (isTriAgentActive) {
+      deepIndicator.innerHTML = `<span class="deep-research-badge" style="border-color:#10b981; color:#34d399; background:linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(20, 184, 166, 0.25));">⚡ Suhail AI Tri-Agent Engine Active (Mega ZIP Ready)</span>`;
+    } else if (isDeepResearchEnabled) {
+      deepIndicator.innerHTML = `<span class="deep-research-badge">🧠 Deep Research Active (Full Session Memory)</span>`;
+    }
   }
 }
-
+  
 // 2. Animated Multi-Agent Visual Loader
 function createAgentLoaderUI(container) {
   const cardId = 'agent-loader-' + Date.now();
@@ -3100,10 +3097,12 @@ window.addEventListener('DOMContentLoaded', () => {
   </div>
 </div>
 
-  <!-- Plus Actions Modal -->
+ <!-- Plus Actions Modal -->
 <div id="plusActionModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:999; align-items:center; justify-content:center;">
   <div style="background:#1e1e1e; border:1px solid #333; border-radius:12px; width:90%; max-width:360px; padding:18px; color:#fff;">
     <h3 style="margin-top:0; font-size:16px;">Tools & Research</h3>
+    
+    <!-- Deep Research Mode -->
     <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0;">
       <div>
         <div style="font-weight:bold;">Deep Research Mode</div>
@@ -3111,10 +3110,20 @@ window.addEventListener('DOMContentLoaded', () => {
       </div>
       <input type="checkbox" id="chkDeepResearch" onchange="toggleDeepResearch(this.checked)" style="width:20px; height:20px;">
     </div>
+
+    <!-- Tri-Agent Engine Switch -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0; border-top:1px solid #333; padding-top:12px;">
+      <div>
+        <div style="font-weight:bold; color:#2dd4bf;">⚡ Tri-Agent Engine</div>
+        <small style="color:#aaa;">5k-10k Line Mega Code & ZIP Builder</small>
+      </div>
+      <input type="checkbox" id="triAgentToggle" onchange="toggleTriAgent()" style="width:20px; height:20px; accent-color:#10b981; cursor:pointer;">
+    </div>
+
     <button onclick="togglePlusMenu()" style="width:100%; padding:8px; border:none; background:#333; color:#fff; border-radius:6px; cursor:pointer;">Band Karein</button>
   </div>
 </div>
-
+  
 <!-- Chat Settings & Export Modal -->
 <div id="chatSettingsModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:999; align-items:center; justify-content:center;">
   <div style="background:#1e1e1e; border:1px solid #333; border-radius:12px; width:90%; max-width:380px; padding:18px; color:#fff;">
