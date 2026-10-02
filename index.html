@@ -1223,7 +1223,7 @@ async function runTriAgentMegaCode(userPrompt, chatBox) {
     updateProgress(Math.min(25 + (chunkCount * 15), 85), `Agent 2 generated stream chunk #${chunkCount}...`);
 
     try {
-      const res = await fetch("/api/chat", {
+      const res = await fetch("/api?action=tri_chunk", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: history })
@@ -1913,6 +1913,12 @@ window.toggleSpeech = function(btn) {
   async function sendQuestion() {
     const text = chatInput.value.trim();
     if (!text || !currentUser) return;
+    if (isTriAgentActive) {
+      chatInput.value = '';
+      chatInput.style.height = 'auto';
+      runTriAgentMegaCode(text, chatBox);
+      return;
+    }
 
     const isToolCall = text.startsWith("[");
     chatInput.value = '';
