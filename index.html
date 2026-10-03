@@ -1129,57 +1129,7 @@ body.focus-reader-mode .exit-focus-btn {
 
 <script>
 
-  // 1. Tri-Agent Engine State
-let isTriAgentActive = false;
-
-function toggleTriAgent() {
-  const toggle = document.getElementById("triAgentToggle");
-  isTriAgentActive = toggle ? toggle.checked : !isTriAgentActive;
-  
-  const deepIndicator = document.getElementById("deepResearchIndicator");
-  if (deepIndicator) {
-    deepIndicator.style.display = isTriAgentActive ? 'block' : (isDeepResearchEnabled ? 'block' : 'none');
-    if (isTriAgentActive) {
-      deepIndicator.innerHTML = `<span class="deep-research-badge" style="border-color:#10b981; color:#34d399; background:linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(20, 184, 166, 0.25));">⚡ Suhail AI Tri-Agent Engine Active (Mega ZIP Ready)</span>`;
-    } else if (isDeepResearchEnabled) {
-      deepIndicator.innerHTML = `<span class="deep-research-badge">🧠 Deep Research Active (Full Session Memory)</span>`;
-    }
-  }
-}
-  
-// 2. Animated Multi-Agent Visual Loader
-function createAgentLoaderUI(container) {
-  const cardId = 'agent-loader-' + Date.now();
-  const html = `
-    <div id="${cardId}" style="padding: 16px; background: rgba(17, 24, 39, 0.95); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 16px; margin: 12px 0; font-family: sans-serif; color: #e5e7eb;">
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #374151; padding-bottom: 8px; margin-bottom: 12px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></span>
-          <span style="font-weight: 700; color: #34d399; font-size: 13px; letter-spacing: 0.5px;">SUHAIL AI TRI-AGENT RUNNING</span>
-        </div>
-        <span id="${cardId}-percent" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7; font-size: 11px; padding: 2px 8px; border-radius: 9999px; font-family: monospace;">0%</span>
-      </div>
-
-      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px; margin-bottom: 12px;">
-        <div id="${cardId}-agent1" style="color: #9ca3af;"><span class="step-icon">⏳</span> <span class="step-text">Agent 1: Analyzing Architecture & Modules...</span></div>
-        <div id="${cardId}-agent2" style="color: #6b7280;"><span class="step-icon">⚪</span> <span class="step-text">Agent 2: Deep Core Code Generation...</span></div>
-        <div id="${cardId}-agent3" style="color: #6b7280;"><span class="step-icon">⚪</span> <span class="step-text">Agent 3: Validating & Packaging into ZIP...</span></div>
-      </div>
-
-      <div style="background: #000; border-radius: 8px; padding: 8px 12px; font-family: monospace; font-size: 11px; color: #34d399; border: 1px solid #1f2937; height: 42px; overflow: hidden; margin-bottom: 12px;">
-        <div id="${cardId}-ticker">> Initializing Tri-Agent Engine pipeline...</div>
-      </div>
-
-      <div style="width: 100%; background: #374151; border-radius: 9999px; height: 6px; overflow: hidden;">
-        <div id="${cardId}-bar" style="background: #10b981; height: 100%; width: 0%; transition: width 0.3s ease;"></div>
-      </div>
-    </div>
-  `;
-  container.insertAdjacentHTML('beforeend', html);
-  return cardId;
-}
-
-// ============================================================================
+  // ============================================================================
 // SUHAIL AI TRI-AGENT ULTIMATE ENGINE (5 FULL-POWER ADVANCED FEATURES)
 // 1. Share API | 2. Modular Split | 3. Live Velocity | 4. Linter/Audit | 5. Auto-Cache
 // ============================================================================
@@ -1313,10 +1263,10 @@ STRICT PRODUCTION RULES:
     .replace(/^(Here is the|Continuing with|The rest of).*$/gim, "")
     .trim();
 
-  // ऑटो-सिंटैक्स हीलिंग
+  // ऑटो-सिंटैक्स हीलिंग (HTML पार्सर सुरक्षित)
   if (targetFileName.endsWith(".html")) {
-    if (cleanCode.includes("<script") && !cleanCode.includes("</script>")) cleanCode += "\n</script>";
-    if (cleanCode.includes("<style") && !cleanCode.includes("</style>")) cleanCode += "\n</style>";
+    if (cleanCode.includes("<script") && !cleanCode.includes("<" + "/script>")) cleanCode += "\n<" + "/script>";
+    if (cleanCode.includes("<style") && !cleanCode.includes("<" + "/style>")) cleanCode += "\n<" + "/style>";
     if (!cleanCode.includes("</body>")) cleanCode += "\n</body>";
     if (!cleanCode.includes("</html>")) cleanCode += "\n</html>";
   }
@@ -1329,7 +1279,6 @@ STRICT PRODUCTION RULES:
       cleanCode += "</div>".repeat(unclosedDivs);
     }
   }
-  const hasConsoleErrors = /(console\.error|throw new Error)/i.test(cleanCode);
   const auditReport = lintIssues === 0 ? "🛡️ DOM & Structure Passed" : `⚠️ ${lintIssues} Auto-Healed Nodes`;
 
   const actualLines = cleanCode.split('\n').length;
@@ -1344,15 +1293,15 @@ STRICT PRODUCTION RULES:
   let extractedJs = "";
 
   if (isMultiFileRequested && targetFileName.endsWith(".html")) {
-    const styleMatch = cleanCode.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
-    const scriptMatch = cleanCode.match(/<script[^>]*>([\s\S]*?)<\/script>/i);
+    const styleMatch = cleanCode.match(new RegExp("<style[^>]*>([\\s\\S]*?)<" + "/style>", "i"));
+    const scriptMatch = cleanCode.match(new RegExp("<script[^>]*>([\\s\\S]*?)<" + "/script>", "i"));
 
     if (styleMatch) extractedCss = styleMatch[1].trim();
     if (scriptMatch) extractedJs = scriptMatch[1].trim();
 
     let modularHtml = cleanCode
-      .replace(/<style[^>]*>[\s\S]*?<\/style>/i, '<link rel="stylesheet" href="style.css">')
-      .replace(/<script[^>]*>[\s\S]*?<\/script>/i, '<script src="app.js"></script>');
+      .replace(new RegExp("<style[^>]*>[\\s\\S]*?<" + "/style>", "i"), '<link rel="stylesheet" href="style.css">')
+      .replace(new RegExp("<script[^>]*>[\\s\\S]*?<" + "/script>", "i"), '<script src="app.js"><' + '/script>');
 
     zip.file("index.html", modularHtml);
     if (extractedCss) zip.file("style.css", extractedCss);
@@ -1463,7 +1412,7 @@ async function shareProjectZip(cardId) {
   } else {
     alert("आपका ब्राउज़र डायरेक्ट फ़ाइल शेयर सपोर्ट नहीं करता, कृपया डाउनलोड बटन का उपयोग करें।");
   }
- }
+}
       
   // ==========================================
 // 1. STRICTLY MALE NATURAL TTS ENGINE
