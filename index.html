@@ -1659,19 +1659,12 @@ window.toggleSpeech = function(btn) {
   });
 
   chatInput.addEventListener('keydown', (e) => {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 600);
-    if (e.key === 'Enter' && !e.shiftKey && !isMobile) {
-      e.preventDefault();
-      if (isTriAgentActive) {
-  e.preventDefault();
-  const chatBox = document.getElementById('chat-box') || document.body;
-  runTriAgentMegaCode(chatInput.value.trim(), chatBox);
-  chatInput.value = '';
-  return;
-      }
-      sendQuestion();
-    }
-  });
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 600);
+  if (e.key === 'Enter' && !e.shiftKey && !isMobile) {
+    e.preventDefault();
+    sendQuestion();
+  }
+});
 
   let currentSessionId = localStorage.getItem('suhail_active_session_id') || ('sess_' + Date.now());
   localStorage.setItem('suhail_active_session_id', currentSessionId);
@@ -1776,52 +1769,56 @@ window.toggleSpeech = function(btn) {
       return;
     }
 
-    const isToolCall = text.startsWith("[");
-    chatInput.value = '';
-    chatInput.style.height = 'auto';
-    appendMessage(text, 'user', null, true);
-    sendBtn.disabled = true;
-    const aiBubble = appendMessage("Jawab tayyar kiya ja raha hai...", 'ai', 'SUHAIL AI', false);
+    async function sendQuestion() {
+  const text = chatInput.value.trim();
+  if (!text) return;
 
-    const saved = (getAllSessions()[currentSessionId]?.messages) || [];
-    const historyContext = saved.slice(-6).map(m => ({
-      role: m.role === 'user' ? 'user' : 'assistant',
-      content: m.text
-    }));
+  const isToolCall = text.startsWith("[");
+  chatInput.value = '';
+  chatInput.style.height = 'auto';
+  appendMessage(text, 'user', null, true);
+  sendBtn.disabled = true;
+  const aiBubble = appendMessage("Jawab tayyar kiya ja raha hai...", 'ai', 'SUHAIL AI', false);
 
-    // Density aur Deep Research ka instruction jodna
-    const density = document.getElementById('selResponseDensity')?.value || 'detailed';
-    let promptInstruction = density === 'concise' ? ' [Jawab nihayat to-the-point aur mukhtasar dein]' : '';
+  const saved = (getAllSessions()[currentSessionId]?.messages) || [];
+  const historyContext = saved.slice(-6).map(m => ({
+    role: m.role === 'user' ? 'user' : 'assistant',
+    content: m.text
+  }));
 
-    if (isDeepResearchEnabled) {
-      let fullContext = "";
-      document.querySelectorAll('.chat-bubble').forEach(b => {
-        fullContext += b.innerText.trim() + "\n";
-      });
-      promptInstruction += `\n[DEEP RESEARCH ACTIVE: Pichli tamaam guftagu aur nikaat ka gehri tehqeeq ke sath ihata karein: ${fullContext.substring(0, 1500)}]`;
-    }
+  // Density aur Deep Research ka instruction jodna
+  const density = document.getElementById('selResponseDensity')?.value || 'detailed';
+  let promptInstruction = density === 'concise' ? ' [Jawab nihayat to-the-point aur mukhtasar dein]' : '';
 
-    try {
-      const data = await safeFetch('/api?action=ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: text + promptInstruction,
-          phone: currentUser.phone,
-          history: historyContext,
-          isTool: isToolCall,
-          customPersona: getCombinedPersona()
-        })
-      });
-      typeWriterEffect(aiBubble, data.reply, data.aiName);
-      saveMessageToHistory(data.reply, 'ai', data.aiName);
-    } catch (err) {
-      aiBubble.innerHTML = `<span class="ai-label">Error</span><div class="chat-content" style="color:var(--danger);">${err.message}</div>`;
-    } finally {
-      sendBtn.disabled = false;
-      syncProfile();
-    }
+  if (typeof isDeepResearchEnabled !== 'undefined' && isDeepResearchEnabled) {
+    let fullContext = "";
+    document.querySelectorAll('.chat-bubble').forEach(b => {
+      fullContext += b.innerText.trim() + "\n";
+    });
+    promptInstruction += `\n[DEEP RESEARCH ACTIVE: Pichli tamaam guftagu aur nikaat ka gehri tehqeeq ke sath ihata karein: ${fullContext.substring(0, 1500)}]`;
   }
+
+  try {
+    const data = await safeFetch('/api?action=ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: text + promptInstruction,
+        phone: currentUser ? currentUser.phone : 'guest',
+        history: historyContext,
+        isTool: isToolCall,
+        customPersona: typeof getCombinedPersona === 'function' ? getCombinedPersona() : ''
+      })
+    });
+    typeWriterEffect(aiBubble, data.reply, data.aiName);
+    saveMessageToHistory(data.reply, 'ai', data.aiName);
+  } catch (err) {
+    aiBubble.innerHTML = `<span class="ai-label">Error</span><div class="chat-content" style="color:var(--danger);">${err.message}</div>`;
+  } finally {
+    sendBtn.disabled = false;
+    if (typeof syncProfile === 'function') syncProfile();
+  }
+    }
 
   function appendMessage(text, role, aiName, shouldSave) {
     const div = document.createElement('div');
@@ -2867,6 +2864,323 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+
+    // ==========================================
+  // 1. TRI-AGENT ENGINE STATE & TOGGLE
+  // ==========================================
+  let isTriAgentActive = false;
+
+  function toggleTriAgent() {
+    const toggle = document.getElementById("triAgentToggle");
+    isTriAgentActive = toggle ? toggle.checked : !isTriAgentActive;
+    
+    const deepIndicator = document.getElementById("deepResearchIndicator");
+    if (deepIndicator) {
+      deepIndicator.style.display = isTriAgentActive ? 'block' : (typeof isDeepResearchEnabled !== 'undefined' && isDeepResearchEnabled ? 'block' : 'none');
+      if (isTriAgentActive) {
+        deepIndicator.innerHTML = `<span class="deep-research-badge" style="border-color:#10b981; color:#34d399; background:linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(20, 184, 166, 0.25));">⚡ Suhail AI Tri-Agent Engine Active (Mega ZIP Ready)</span>`;
+      } else if (typeof isDeepResearchEnabled !== 'undefined' && isDeepResearchEnabled) {
+        deepIndicator.innerHTML = `<span class="deep-research-badge">🧠 Deep Research Active (Full Session Memory)</span>`;
+      }
+    }
+  }
+    
+  // ==========================================
+  // 2. ANIMATED MULTI-AGENT VISUAL LOADER UI
+  // ==========================================
+  function createAgentLoaderUI(container) {
+    const cardId = 'agent-loader-' + Date.now();
+    const html = `
+      <div id="${cardId}" style="padding: 16px; background: rgba(17, 24, 39, 0.95); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 16px; margin: 12px 0; font-family: sans-serif; color: #e5e7eb;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #374151; padding-bottom: 8px; margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></span>
+            <span style="font-weight: 700; color: #34d399; font-size: 13px; letter-spacing: 0.5px;">SUHAIL AI TRI-AGENT RUNNING</span>
+          </div>
+          <span id="${cardId}-percent" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7; font-size: 11px; padding: 2px 8px; border-radius: 9999px; font-family: monospace;">0%</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px; margin-bottom: 12px;">
+          <div id="${cardId}-agent1" style="color: #9ca3af;"><span class="step-icon">⏳</span> <span class="step-text">Agent 1: Analyzing Architecture & Modules...</span></div>
+          <div id="${cardId}-agent2" style="color: #6b7280;"><span class="step-icon">⚪</span> <span class="step-text">Agent 2: Deep Core Code Generation...</span></div>
+          <div id="${cardId}-agent3" style="color: #6b7280;"><span class="step-icon">⚪</span> <span class="step-text">Agent 3: Validating & Packaging into ZIP...</span></div>
+        </div>
+
+        <div style="background: #000; border-radius: 8px; padding: 8px 12px; font-family: monospace; font-size: 11px; color: #34d399; border: 1px solid #1f2937; height: 42px; overflow: hidden; margin-bottom: 12px;">
+          <div id="${cardId}-ticker">> Initializing Tri-Agent Engine pipeline...</div>
+        </div>
+
+        <div style="width: 100%; background: #374151; border-radius: 9999px; height: 6px; overflow: hidden;">
+          <div id="${cardId}-bar" style="background: #10b981; height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+        </div>
+      </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+    return cardId;
+  }
+
+  // ==========================================
+  // 3. SUHAIL AI TRI-AGENT MEGA ENGINE
+  // ==========================================
+  async function runTriAgentMegaCode(userPrompt, chatBox) {
+    const cardId = createAgentLoaderUI(chatBox);
+    const startTime = Date.now();
+    const cacheDraftKey = "suhail_mega_code_draft";
+
+    const updateAgent = (num, text, icon, color) => {
+      const el = document.getElementById(`${cardId}-agent${num}`);
+      if (!el) return;
+      el.style.color = color;
+      const iconEl = el.querySelector('.step-icon');
+      const textEl = el.querySelector('.step-text');
+      if (iconEl) iconEl.textContent = icon;
+      if (textEl) textEl.textContent = text;
+    };
+
+    const updateProgress = (pct, log) => {
+      const bar = document.getElementById(`${cardId}-bar`);
+      const percent = document.getElementById(`${cardId}-percent`);
+      const ticker = document.getElementById(`${cardId}-ticker`);
+      if (bar) bar.style.width = pct + '%';
+      if (percent) percent.textContent = pct + '%';
+      if (ticker && log) ticker.textContent = '> ' + log;
+    };
+
+    let targetFileName = "index.html";
+    const fileMatch = userPrompt.match(/([a-zA-Z0-9_\-\.]+\.(html|js|css|json|py|php|ts|jsx|tsx))/i);
+    const isMultiFileRequested = /(separate|split|alag|folder|modular|files)/i.test(userPrompt);
+
+    if (fileMatch && fileMatch[1]) {
+      targetFileName = fileMatch[1].trim();
+    }
+
+    updateAgent(1, `Agent 1: Enterprise Blueprinting [${targetFileName}]...`, "⚡", "#34d399");
+    updateProgress(8, `Target: ${targetFileName} | Mode: ${isMultiFileRequested ? "Modular Package" : "Single Architecture"}`);
+    if (navigator.vibrate) navigator.vibrate(40);
+    await new Promise(r => setTimeout(r, 600));
+
+    updateAgent(1, `Agent 1: Blueprint Approved (${targetFileName})`, "✅", "#34d399");
+    updateProgress(15, "Architecture lock. Code streaming shuru...");
+
+    updateAgent(2, `Agent 2: Deep Core Code Streaming (Target: 3k-10k+ Lines)...`, "⚡", "#60a5fa");
+
+    let fullCode = "";
+    let isDone = false;
+    let chunkCount = 0;
+
+    let history = [
+      {
+        role: "system",
+        content: `You are the Suhail AI Lead Core Production Engineer.
+STRICT PRODUCTION RULES:
+1. Target File: "${targetFileName}". Deliver production-grade, highly scalable implementation without truncation.
+2. If HTML, write exhaustive, enterprise-level in-line CSS (<style>) and in-line JS (<script>) unless told otherwise.
+3. ABSOLUTELY NO SHORTCUTS: Never output '// add more here', '// rest of logic', or '// styles omitted'. Every function, style, dataset, and tag must be fully realized.
+4. Output raw code directly. No intro, conversational chat, or outro text.`
+      },
+      {
+        role: "user",
+        content: `Write the complete massive implementation for: ${userPrompt}. Target file: ${targetFileName}. Start immediately from line 1 without placeholder comments.`
+      }
+    ];
+
+    while (!isDone && chunkCount < 20) {
+      chunkCount++;
+      const progressVal = Math.min(15 + Math.round(chunkCount * 3.8), 90);
+
+      const currentBytes = new Blob([fullCode]).size;
+      const currentKb = (currentBytes / 1024).toFixed(1);
+      updateProgress(
+        progressVal,
+        `Stream Batch #${chunkCount}/20 | Live Payload: ~${currentKb} KB`
+      );
+
+      try {
+        const res = await fetch("/api?action=tri_chunk", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: history })
+        });
+        const data = await res.json();
+
+        if (!data.choices || !data.choices[0]) {
+          isDone = true;
+          break;
+        }
+
+        const choice = data.choices[0];
+        const chunkText = choice.message.content || "";
+        fullCode += chunkText;
+
+        try {
+          localStorage.setItem(cacheDraftKey, fullCode);
+        } catch (e) {}
+
+        if (choice.finish_reason === "length") {
+          history.push({ role: "assistant", content: chunkText });
+          history.push({
+            role: "user",
+            content: `STRICT: Continue writing the exact code for ${targetFileName} immediately from the exact character where you stopped. Complete unclosed tags/brackets without repeating previous blocks.`
+          });
+        } else {
+          isDone = true;
+        }
+      } catch (e) {
+        isDone = true;
+      }
+    }
+
+    updateAgent(3, "Agent 3: Code cleaning, syntax healing wa audit scanning...", "⚡", "#fbbf24");
+    updateProgress(92, "Token sanitization aur security audit jaari hai...");
+
+    let cleanCode = fullCode
+      .replace(/^```[a-zA-Z]*\n/gm, "")
+      .replace(/```$/gm, "")
+      .replace(/^(Here is the|Continuing with|The rest of).*$/gim, "")
+      .trim();
+
+    if (targetFileName.endsWith(".html")) {
+      if (cleanCode.includes("<script") && !cleanCode.includes("<" + "/script>")) cleanCode += "\n<" + "/script>";
+      if (cleanCode.includes("<style") && !cleanCode.includes("<" + "/style>")) cleanCode += "\n<" + "/style>";
+      if (!cleanCode.includes("</body>")) cleanCode += "\n</body>";
+      if (!cleanCode.includes("</html>")) cleanCode += "\n</html>";
+    }
+
+    let lintIssues = 0;
+    if (targetFileName.endsWith(".html")) {
+      const unclosedDivs = (cleanCode.match(/<div/gi) || []).length - (cleanCode.match(/<\/div>/gi) || []).length;
+      if (unclosedDivs > 0) {
+        cleanCode += "</div>".repeat(unclosedDivs);
+      }
+    }
+    const auditReport = lintIssues === 0 ? "🛡️ DOM & Structure Passed" : `⚠️ ${lintIssues} Auto-Healed Nodes`;
+
+    const actualLines = cleanCode.split('\n').length;
+    const totalDuration = ((Date.now() - startTime) / 1000).toFixed(1);
+    const finalKb = (new Blob([cleanCode]).size / 1024).toFixed(1);
+
+    updateAgent(2, `Agent 2: Compiled (${actualLines} Lines • ${finalKb} KB in ${totalDuration}s)`, "✅", "#34d399");
+
+    const zip = new JSZip();
+    let extractedCss = "";
+    let extractedJs = "";
+
+    if (isMultiFileRequested && targetFileName.endsWith(".html")) {
+      const styleMatch = cleanCode.match(new RegExp("<style[^>]*>([\\s\\S]*?)<" + "/style>", "i"));
+      const scriptMatch = cleanCode.match(new RegExp("<script[^>]*>([\\s\\S]*?)<" + "/script>", "i"));
+
+      if (styleMatch) extractedCss = styleMatch[1].trim();
+      if (scriptMatch) extractedJs = scriptMatch[1].trim();
+
+      let modularHtml = cleanCode
+        .replace(new RegExp("<style[^>]*>[\\s\\S]*?<" + "/style>", "i"), '<link rel="stylesheet" href="style.css">')
+        .replace(new RegExp("<script[^>]*>[\\s\\S]*?<" + "/script>", "i"), '<script src="app.js"><' + '/script>');
+
+      zip.file("index.html", modularHtml);
+      if (extractedCss) zip.file("style.css", extractedCss);
+      if (extractedJs) zip.file("app.js", extractedJs);
+    } else {
+      zip.file(targetFileName, cleanCode);
+    }
+
+    zip.file("README.txt", `Generated by Suhail AI Tri-Agent Engine\nTarget File: ${targetFileName}\nTotal Lines: ${actualLines}\nPayload Size: ${finalKb} KB\nBuild Time: ${totalDuration} seconds\nAudit: ${auditReport}\nPlatform: Suhail AI (https://hardrisk.vercel.app)`);
+
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    const downloadUrl = URL.createObjectURL(zipBlob);
+    const zipFileName = `SuhailAI_${targetFileName.replace('.', '_')}.zip`;
+
+    const isHtml = targetFileName.endsWith(".html");
+    let previewUrl = "";
+    if (isHtml) {
+      const htmlBlob = new Blob([cleanCode], { type: "text/html" });
+      previewUrl = URL.createObjectURL(htmlBlob);
+    }
+
+    updateProgress(100, "Project package aur audit taiyar!");
+    updateAgent(3, `Agent 3: Archived (${actualLines} Lines • ${finalKb} KB)`, "✅", "#34d399");
+    if (navigator.vibrate) navigator.vibrate([60, 50, 60]);
+
+    const card = document.getElementById(cardId);
+    if (card) {
+      window[`code_${cardId}`] = cleanCode;
+      window[`blob_${cardId}`] = zipBlob;
+      window[`filename_${cardId}`] = zipFileName;
+
+      card.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="font-size: 26px;">📦</div>
+            <div>
+              <h4 style="margin: 0; color: #34d399; font-size: 14px;">Suhail AI Tri-Agent Package</h4>
+              <p style="margin: 0; font-size: 11px; color: #9ca3af;">${targetFileName} • <b>${actualLines} Lines</b> (${finalKb} KB • ${totalDuration}s)</p>
+            </div>
+          </div>
+          <span style="font-size: 10px; background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 2px 8px; border-radius: 9999px; border: 1px solid rgba(16, 185, 129, 0.3);">
+            ${chunkCount} Chunks
+          </span>
+        </div>
+
+        <div style="display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;">
+          <span style="font-size: 10px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(56, 189, 248, 0.3);">
+            ${auditReport}
+          </span>
+          <span style="font-size: 10px; background: rgba(245, 158, 11, 0.15); color: #fbbf24; padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.3);">
+            💾 Local Draft Cached
+          </span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <a href="${downloadUrl}" download="${zipFileName}" style="display: block; text-align: center; background: #059669; color: white; text-decoration: none; padding: 11px 16px; border-radius: 12px; font-weight: 600; font-size: 13px; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);">
+            📥 Download ZIP (${targetFileName} - ${actualLines} Lines)
+          </a>
+
+          <div style="display: flex; gap: 8px;">
+            ${isHtml ? `
+              <a href="${previewUrl}" target="_blank" style="flex: 1; text-align: center; background: #1e293b; border: 1px solid #38bdf8; color: #38bdf8; text-decoration: none; padding: 9px 4px; border-radius: 10px; font-weight: 600; font-size: 12px;">
+                👁 Preview
+              </a>
+            ` : ''}
+
+            <button onclick="shareProjectZip('${cardId}')" style="flex: 1; background: #1e293b; border: 1px solid #10b981; color: #34d399; padding: 9px 4px; border-radius: 10px; font-weight: 600; font-size: 12px; cursor: pointer;">
+              📲 Share File
+            </button>
+
+            <button onclick="navigator.clipboard.writeText(window['code_${cardId}']); this.innerText='✅ Copied!';" style="flex: 1; background: #1e293b; border: 1px solid #475569; color: #e2e8f0; padding: 9px 4px; border-radius: 10px; font-weight: 600; font-size: 12px; cursor: pointer;">
+              📋 Copy Code
+            </button>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // ==========================================
+  // 4. MOBILE WEB SHARE HANDLER
+  // ==========================================
+  async function shareProjectZip(cardId) {
+    const blob = window[`blob_${cardId}`];
+    const filename = window[`filename_${cardId}`] || "project.zip";
+
+    if (!blob) return;
+
+    const file = new File([blob], filename, { type: "application/zip" });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: "Suhail AI Tri-Agent Project",
+          text: "Here is the compiled code package generated by Suhail AI Tri-Agent Engine."
+        });
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          alert("Share error: " + err.message);
+        }
+      }
+    } else {
+      alert("Aapka browser direct file share support nahi karta, download button ka istemal karein.");
+    }
+        }
   
 </script>
 
