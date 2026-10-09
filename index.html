@@ -1130,77 +1130,70 @@ body.focus-reader-mode .exit-focus-btn {
 <script>
 
   // ============================================================================
-// SUHAIL AI TRI-AGENT ULTRA ENGINE — LUXURY TELEMETRY + ROBUST CODE PACKAGING
-// Replaces only the Tri-Agent block. All other application code is preserved.
+// ============================================================================
+// SUHAIL AI TRI-AGENT ULTRA ENGINE (SAFE BATCHING + PREMIUM CYBER-GLASS UI)
+// Replace the existing Tri-Agent block up to, but not including,
+// "// 1. STRICTLY MALE NATURAL TTS ENGINE".
+// Requires: /api?action=tri_chunk and global JSZip.
 // ============================================================================
 let isTriAgentActive = false;
 const triAgentTelemetryTimers = new Map();
 
 function toggleTriAgent() {
   const checkbox = document.getElementById('triAgentToggle');
-  isTriAgentActive = !!(checkbox && checkbox.checked);
+  isTriAgentActive = !!checkbox?.checked;
   const input = document.getElementById('chat-input');
   if (input) input.placeholder = isTriAgentActive
-    ? '⚡ Tri-Agent ON: project/code ka task yahan likhein...'
+    ? '⚡ Tri-Agent Active: software/code task yahan likhein...'
     : 'Padhai ka sawal ya koi bhi baat yahan likhein...';
 }
 
 function createAgentLoaderUI(chatBox) {
-  const cardId = 'tri-agent-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+  const cardId = `tri-agent-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
   const card = document.createElement('div');
   card.id = cardId;
   card.className = 'chat-bubble ai';
-  card.style.cssText = 'margin:12px 0;padding:15px;border-radius:18px;background:linear-gradient(145deg,#08131a,#12212b);border:1px solid rgba(0,168,132,.55);box-shadow:0 10px 30px rgba(0,0,0,.35),0 0 18px rgba(0,168,132,.12);color:#e9edef;font-family:Poppins,monospace,sans-serif;';
+  card.style.cssText = 'margin:14px 0;padding:18px;border-radius:20px;background:linear-gradient(145deg,rgba(11,20,26,.97),rgba(18,30,39,.99));border:1px solid rgba(0,168,132,.48);box-shadow:0 16px 36px rgba(0,0,0,.55),0 0 20px rgba(0,168,132,.16);backdrop-filter:blur(12px);font-family:Poppins,system-ui,sans-serif;color:#e9edef;';
   card.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid #ffffff16;">
-      <div style="display:flex;align-items:center;gap:8px;min-width:0;">
-        <span style="width:10px;height:10px;flex:none;border-radius:50%;background:#00a884;box-shadow:0 0 12px #00a884;animation:triAgentPulse .9s infinite alternate;"></span>
-        <strong style="color:#38e0b3;font-size:12px;letter-spacing:.6px;">SUHAIL AI · TRI-AGENT PRO</strong>
-      </div>
-      <span id="${cardId}-percent" style="flex:none;font-size:11px;font-weight:800;color:#38bdf8;background:#38bdf81b;border:1px solid #38bdf84a;padding:3px 8px;border-radius:99px;">0%</span>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #ffffff18">
+      <div style="display:flex;align-items:center;gap:9px"><span style="width:10px;height:10px;border-radius:50%;background:#00a884;box-shadow:0 0 12px #00a884;animation:blinkCursor .8s infinite"></span><strong style="color:#00d6a0;font-size:13px;letter-spacing:.6px">SUHAIL AI · TRI-AGENT PRO</strong></div>
+      <span id="${cardId}-percent" style="font-size:11px;font-weight:800;color:#38bdf8;background:#38bdf81c;border:1px solid #38bdf855;padding:3px 9px;border-radius:14px">0%</span>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-      <div style="background:#182832;border:1px solid #ffffff0c;border-radius:11px;padding:9px 10px;"><div style="font-size:9px;color:#8fa3af;letter-spacing:.7px;text-transform:uppercase;">Code lines</div><div id="${cardId}-stat-lines" style="font-size:16px;font-weight:800;color:#4ade80;">0</div></div>
-      <div style="background:#182832;border:1px solid #ffffff0c;border-radius:11px;padding:9px 10px;"><div style="font-size:9px;color:#8fa3af;letter-spacing:.7px;text-transform:uppercase;">Output rate</div><div id="${cardId}-stat-speed" style="font-size:16px;font-weight:800;color:#facc15;">0 chars/s</div></div>
-      <div style="background:#182832;border:1px solid #ffffff0c;border-radius:11px;padding:9px 10px;"><div style="font-size:9px;color:#8fa3af;letter-spacing:.7px;text-transform:uppercase;">Active stage</div><div id="${cardId}-stat-stage" style="font-size:12px;font-weight:700;color:#38bdf8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Architect</div></div>
-      <div style="background:#182832;border:1px solid #ffffff0c;border-radius:11px;padding:9px 10px;"><div style="font-size:9px;color:#8fa3af;letter-spacing:.7px;text-transform:uppercase;">Elapsed time</div><div id="${cardId}-stat-time" style="font-size:16px;font-weight:800;color:#c4b5fd;">0.0s</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px">
+      <div style="background:#182229;border:1px solid #ffffff10;border-radius:12px;padding:9px 12px"><div style="font-size:10px;color:#94a3b8;text-transform:uppercase">Collected Lines</div><div id="${cardId}-stat-lines" style="font-size:16px;font-weight:800;color:#4ade80">0 lines</div></div>
+      <div style="background:#182229;border:1px solid #ffffff10;border-radius:12px;padding:9px 12px"><div style="font-size:10px;color:#94a3b8;text-transform:uppercase">UI Pulse</div><div id="${cardId}-stat-speed" style="font-size:16px;font-weight:800;color:#facc15">ACTIVE</div></div>
+      <div style="background:#182229;border:1px solid #ffffff10;border-radius:12px;padding:9px 12px"><div style="font-size:10px;color:#94a3b8;text-transform:uppercase">Pipeline Phase</div><div id="${cardId}-stat-stage" style="font-size:12px;font-weight:700;color:#38bdf8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Preparing</div></div>
+      <div style="background:#182229;border:1px solid #ffffff10;border-radius:12px;padding:9px 12px"><div style="font-size:10px;color:#94a3b8;text-transform:uppercase">Elapsed</div><div id="${cardId}-stat-time" style="font-size:12px;font-weight:700;color:#cbd5e1">0.0 s</div></div>
     </div>
-    <div style="height:7px;background:#23343e;border-radius:99px;overflow:hidden;margin-bottom:12px;border:1px solid #ffffff0c;"><div id="${cardId}-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#00a884,#38bdf8,#a78bfa);box-shadow:0 0 12px #38bdf866;transition:width .35s ease;"></div></div>
-    <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px;font-size:12px;">
-      <div id="${cardId}-agent1" style="color:#94a3b8;display:flex;gap:7px;align-items:center;"><span class="step-icon">⏳</span><span class="step-text">Agent 1 · Architecture & blueprint</span></div>
-      <div id="${cardId}-agent2" style="color:#64748b;display:flex;gap:7px;align-items:center;"><span class="step-icon">⚪</span><span class="step-text">Agent 2 · Code generation</span></div>
-      <div id="${cardId}-agent3" style="color:#64748b;display:flex;gap:7px;align-items:center;"><span class="step-icon">⚪</span><span class="step-text">Agent 3 · Cleanup & packaging</span></div>
+    <div style="height:7px;background:#182229;border-radius:10px;overflow:hidden;margin-bottom:14px;border:1px solid #ffffff10"><div id="${cardId}-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#00a884,#38bdf8,#818cf8);box-shadow:0 0 12px #38bdf880;transition:width .35s ease"></div></div>
+    <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px;font-size:12.5px">
+      <div id="${cardId}-agent1" style="color:#94a3b8;display:flex;gap:8px"><span class="step-icon">⏳</span><span class="step-text">Agent 1: Blueprint & requirements</span></div>
+      <div id="${cardId}-agent2" style="color:#64748b;display:flex;gap:8px"><span class="step-icon">⚪</span><span class="step-text">Agent 2: Code generation</span></div>
+      <div id="${cardId}-agent3" style="color:#64748b;display:flex;gap:8px"><span class="step-icon">⚪</span><span class="step-text">Agent 3: Validation & packaging</span></div>
     </div>
-    <div style="background:#050b0f;border:1px solid #00a88440;border-radius:9px;padding:9px 10px;font-family:monospace;font-size:11px;line-height:1.5;color:#4adea8;min-height:39px;display:flex;align-items:center;overflow:hidden;"><span style="color:#38bdf8;margin-right:7px;">›</span><span id="${cardId}-ticker">Booting generation pipeline…</span></div>
-    <div style="margin-top:7px;font-size:10px;color:#718693;">Live counters reflect generated output and elapsed time; decorative status text is not model telemetry.</div>
-  `;
-  if (chatBox && typeof chatBox.appendChild === 'function') {
-    chatBox.appendChild(card);
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-  const logs = [
-    'Preparing request payload…', 'Waiting for model response…', 'Checking response structure…',
-    'Appending generated source…', 'Updating line and output counters…',
-    'Preserving existing application logic…', 'Checking for conversational residue…',
-    'Preparing next continuation context…', 'Updating build timeline…'
-  ];
+    <div style="background:#070d11;border:1px solid #00a88455;border-radius:10px;padding:9px 12px;font:11px monospace;color:#00d6a0;min-height:20px;overflow-wrap:anywhere"><span style="color:#38bdf8;margin-right:6px">&gt;</span><span id="${cardId}-ticker">Starting generation pipeline...</span></div>
+    <div style="font-size:10px;color:#94a3b8;margin-top:7px">UI animation values are decorative; actual line count and elapsed time are measured.</div>`;
+  (chatBox || document.getElementById('chat-box') || document.body).appendChild(card);
+  const box = chatBox || document.getElementById('chat-box');
+  if (box) box.scrollTop = box.scrollHeight;
+
+  const logs = ['Preparing generation request…','Checking response structure…','Collecting code batch…','Updating measured line count…','Checking document boundaries…','Preparing ZIP package…'];
   let tick = 0;
-  const startedAt = Date.now();
   const timer = setInterval(() => {
     if (!document.getElementById(cardId)) { clearInterval(timer); triAgentTelemetryTimers.delete(cardId); return; }
-    const elapsed = Math.max(.5, (Date.now() - startedAt) / 1000);
-    const lines = document.getElementById(`${cardId}-stat-lines`);
     const speed = document.getElementById(`${cardId}-stat-speed`);
-    const time = document.getElementById(`${cardId}-stat-time`);
     const ticker = document.getElementById(`${cardId}-ticker`);
-    const code = window[`triAgentWorkingCode_${cardId}`] || '';
-    if (lines) lines.textContent = String(code ? code.split(/\r?\n/).length : 0);
-    if (speed) speed.textContent = `${Math.round(code.length / elapsed)} chars/s`;
-    if (time) time.textContent = `${elapsed.toFixed(1)}s`;
-    if (ticker && ticker.dataset.locked !== 'true') { tick = (tick + 1) % logs.length; ticker.textContent = logs[tick]; }
+    if (speed) speed.textContent = ['ACTIVE','SYNC','BUILD','CHECK'][Math.floor(Date.now() / 500) % 4];
+    if (ticker && ticker.dataset.locked !== 'true') ticker.textContent = logs[(tick++) % logs.length];
   }, 500);
   triAgentTelemetryTimers.set(cardId, timer);
   return cardId;
+}
+
+function triAgentStopTelemetry(cardId) {
+  const timer = triAgentTelemetryTimers.get(cardId);
+  if (timer) clearInterval(timer);
+  triAgentTelemetryTimers.delete(cardId);
 }
 
 function triAgentSetStep(cardId, n, text, icon, color) {
@@ -1219,14 +1212,40 @@ function triAgentProgress(cardId, pct, log, stageName) {
   const ticker = document.getElementById(`${cardId}-ticker`);
   const stage = document.getElementById(`${cardId}-stat-stage`);
   const value = Math.max(0, Math.min(100, Number(pct) || 0));
-  if (bar) bar.style.width = value + '%';
-  if (percent) percent.textContent = value + '%';
+  if (bar) bar.style.width = `${value}%`;
+  if (percent) percent.textContent = `${value}%`;
   if (stage && stageName) stage.textContent = stageName;
   if (ticker && log) {
     ticker.textContent = log;
     ticker.dataset.locked = 'true';
-    setTimeout(() => { if (ticker) ticker.dataset.locked = 'false'; }, 1300);
+    setTimeout(() => { if (ticker.isConnected) ticker.dataset.locked = 'false'; }, 1400);
   }
+}
+
+function triAgentExtractCode(value) {
+  let s = String(value || '').trim();
+  const fenced = s.match(/^```(?:html|javascript|js|css|json|python|php|typescript|tsx|jsx)?\s*([\s\S]*?)\s*```$/i);
+  if (fenced) s = fenced[1].trim();
+  // Remove common conversational preambles only when they occur before code.
+  s = s.replace(/^Here(?:'s| is) the (?:code|implementation)[^\n]*\n/i, '');
+  return s.trim();
+}
+
+function triAgentNormalizeHtmlChunk(chunk, isFirst) {
+  let s = String(chunk || '');
+  if (!isFirst) {
+    // Later batches must be fragments, not new full HTML documents.
+    s = s.replace(/<!doctype\s+html[^>]*>/ig, '')
+         .replace(/<html\b[^>]*>/ig, '')
+         .replace(/<head\b[^>]*>/ig, '')
+         .replace(/<\/head\s*>/ig, '')
+         .replace(/<body\b[^>]*>/ig, '')
+         .replace(/<\/body\s*>/ig, '')
+         .replace(/<\/html\s*>/ig, '');
+  }
+  // Always append final document closing tags once, at finalization.
+  s = s.replace(/<\/body\s*>/ig, '').replace(/<\/html\s*>/ig, '');
+  return s.trim();
 }
 
 async function runTriAgentMegaCode(userPrompt, chatBox) {
@@ -1236,161 +1255,164 @@ async function runTriAgentMegaCode(userPrompt, chatBox) {
   const cardId = createAgentLoaderUI(box);
   const startedAt = Date.now();
   const cacheDraftKey = 'suhail_mega_code_draft';
-  const targetMatch = text.match(/([a-zA-Z0-9_\-.]+\.(html|js|css|json|py|php|ts|jsx|tsx))/i);
+  const targetMatch = text.match(/(?:^|\s)([a-zA-Z0-9_.-]+\.(?:html|js|css|json|py|php|ts|jsx|tsx))\b/i);
   const targetFileName = targetMatch ? targetMatch[1] : 'index.html';
-  const isHtmlTarget = /\.html$/i.test(targetFileName);
-  const multiFile = /(separate|split|alag|folder|modular|multiple files|multiple file)/i.test(text);
+  const isHtmlTarget = targetFileName.toLowerCase().endsWith('.html');
+  const multiFile = /\b(separate|split|folder|modular|multiple files?)\b|alag/i.test(text);
   const TARGET_LINES = 3500;
   const MIN_CHUNKS = 8;
   const MAX_CHUNKS = 14;
+  const MAX_CONTEXT_CHARS = 9000;
   let fullCode = '';
   let chunks = 0;
+  let stoppedEarly = false;
 
-  const cleanupChunk = value => {
-    let chunk = String(value || '').trim();
-    chunk = chunk.replace(/^```(?:html|javascript|js|css|json|python|php|typescript|tsx|jsx)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
-    // Remove common conversational lead-ins, but do not strip real code comments.
-    chunk = chunk.replace(/^(?:Here(?:'s| is) the code|Sure[,!]?|Certainly[,!]?|Below is the code)\s*:?\s*/i, '');
-    if (chunks > 0) chunk = chunk.replace(/^<!doctype\s+html>\s*/i, '').replace(/^<html[^>]*>\s*/i, '').replace(/^<head[^>]*>\s*/i, '');
-    return chunk;
-  };
   const lineCount = () => fullCode ? fullCode.split(/\r?\n/).length : 0;
-  const updateLiveCode = () => { window[`triAgentWorkingCode_${cardId}`] = fullCode; };
-  const finishTimer = () => { const timer = triAgentTelemetryTimers.get(cardId); if (timer) clearInterval(timer); triAgentTelemetryTimers.delete(cardId); };
+  const updateStats = () => {
+    const lines = document.getElementById(`${cardId}-stat-lines`);
+    const elapsed = document.getElementById(`${cardId}-stat-time`);
+    if (lines) lines.textContent = `${lineCount().toLocaleString()} lines`;
+    if (elapsed) elapsed.textContent = `${((Date.now() - startedAt) / 1000).toFixed(1)} s`;
+  };
 
   try {
-    triAgentSetStep(cardId, 1, `Agent 1 · Blueprinting ${targetFileName}`, '⚡', '#38e0b3');
-    triAgentProgress(cardId, 8, `Defining architecture for ${targetFileName}…`, 'Architect');
+    triAgentSetStep(cardId, 1, `Agent 1: Planning ${targetFileName}`, '⚡', '#00a884');
+    triAgentProgress(cardId, 5, 'Preparing code-generation plan…', 'Planning');
     await new Promise(resolve => setTimeout(resolve, 250));
-    triAgentSetStep(cardId, 1, 'Agent 1 · Blueprint approved', '✅', '#4ade80');
+    triAgentSetStep(cardId, 1, 'Agent 1: Request prepared', '✅', '#00a884');
 
     while (chunks < MAX_CHUNKS) {
       const batchNumber = chunks + 1;
-      const progress = Math.min(90, 10 + Math.round((batchNumber / MAX_CHUNKS) * 78));
-      triAgentProgress(cardId, progress, `Requesting batch ${batchNumber}/${MAX_CHUNKS}…`, `Batch ${batchNumber}`);
-      triAgentSetStep(cardId, 2, `Agent 2 · Generating batch ${batchNumber}/${MAX_CHUNKS}`, '⚡', '#38bdf8');
-      const existingLines = lineCount();
-      const systemPrompt = `You are Suhail AI's senior production software engineer. Output source code only, with no preamble, markdown fences, batch summaries, or conversational sign-off. Respect the requested language and file type. Do not invent fake functionality or pad with meaningless comments. Build complete, robust, maintainable code. Target file: ${targetFileName}.`;
+      const progress = Math.min(90, 8 + Math.round((batchNumber / MAX_CHUNKS) * 80));
+      updateStats();
+      triAgentProgress(cardId, progress, `Requesting batch ${batchNumber}/${MAX_CHUNKS}…`, `Batch ${batchNumber}/${MAX_CHUNKS}`);
+      triAgentSetStep(cardId, 2, `Agent 2: Generating batch ${batchNumber}/${MAX_CHUNKS}`, '⚡', '#38bdf8');
+
+      const previousTail = fullCode.slice(-MAX_CONTEXT_CHARS);
       const batchPrompt = batchNumber === 1
-        ? `Implement this request as a complete production-ready project/file: ${text}\nTarget file: ${targetFileName}. Write substantial, coherent code with validation, error handling, accessibility, responsive styling where relevant, and clear code comments. Begin with the real first line of the file. Raw code only.`
-        : `Continue the SAME file ${targetFileName} from the end of the code excerpt below. Current accumulated size: ${existingLines} lines. Overall target: approximately ${TARGET_LINES} lines if the requested functionality genuinely warrants that size; never add filler just to hit a number. Do not repeat the file beginning. Continue directly with valid code only.\n\nLAST PART OF CURRENT FILE (context only; do not repeat):\n${fullCode.slice(-9000)}\n\nWrite the next logically necessary section now. No summaries or conversational text.`;
-      const response = await fetch('/api?action=tri_chunk', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: batchPrompt }] })
-      });
-      let data = {};
-      try { data = await response.json(); } catch (_) {}
-      if (!response.ok || data.error) {
-        const errorMessage = data && data.error ? (typeof data.error === 'string' ? data.error : data.error.message || 'API error') : `HTTP ${response.status}`;
-        if (fullCode.length > 500) { triAgentProgress(cardId, progress, `Batch ${batchNumber} failed; packaging saved output`, 'Recovering'); break; }
-        throw new Error(`Tri-Agent API error: ${errorMessage}`);
+        ? `Implement this exact requested project: ${text}\nTarget file: ${targetFileName}.\nReturn code only, no markdown fences or prose. Make the implementation functional, not placeholders or TODOs. Prefer complete, meaningful features over artificial line padding. For HTML, start with one document structure; later batches will continue it. This is batch 1 of up to ${MAX_CHUNKS}. Aim for a useful, maintainable implementation.`
+        : `Continue the SAME ${targetFileName} from the supplied existing-code tail. This is batch ${batchNumber}/${MAX_CHUNKS}.\nCurrent total is approximately ${lineCount()} lines; desired target is about ${TARGET_LINES} lines only if genuine implementation requires it.\nDo not repeat existing code, do not start a new HTML document, do not emit summaries or TODO placeholders. Continue with the next missing implementation section. Return code only.\n\nEXISTING CODE TAIL (context only; do not repeat):\n${previousTail}`;
+
+      let res;
+      try {
+        res = await fetch('/api?action=tri_chunk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: [
+            { role: 'system', content: `You are Suhail AI's code-generation engine. Output only source code for ${targetFileName}. No explanations, summaries, markdown fences, fake features, TODO placeholders, or duplicate document wrappers. Continue the existing implementation using the supplied tail context.` },
+            { role: 'user', content: batchPrompt }
+          ] })
+        });
+      } catch (networkError) {
+        throw new Error(`Network/API connection failed on batch ${batchNumber}: ${networkError.message || networkError}`);
       }
-      const choice = data && data.choices && data.choices[0];
-      if (!choice || !choice.message || typeof choice.message.content !== 'string') {
-        if (fullCode.length > 500) break;
-        throw new Error('API returned no usable code content.');
-      }
-      const chunk = cleanupChunk(choice.message.content);
-      if (!chunk) { if (fullCode.length > 500) break; throw new Error('Model returned an empty code batch.'); }
+      if (!res.ok) throw new Error(`API returned HTTP ${res.status} on batch ${batchNumber}. Existing partial code was preserved in the browser draft; ZIP not marked complete.`);
+      const data = await res.json();
+      if (data?.error) throw new Error(typeof data.error === 'object' ? (data.error.message || 'API error') : String(data.error));
+      const content = data?.choices?.[0]?.message?.content;
+      if (typeof content !== 'string' || !content.trim()) throw new Error(`Empty/invalid model response on batch ${batchNumber}.`);
+
+      let chunk = triAgentExtractCode(content);
+      if (isHtmlTarget) chunk = triAgentNormalizeHtmlChunk(chunk, batchNumber === 1);
+      if (!chunk) throw new Error(`Batch ${batchNumber} returned no usable code.`);
       fullCode += (fullCode && !fullCode.endsWith('\n') ? '\n' : '') + chunk + '\n';
       chunks++;
-      updateLiveCode();
       try { localStorage.setItem(cacheDraftKey, fullCode); } catch (_) {}
-      const liveLines = document.getElementById(`${cardId}-stat-lines`);
-      if (liveLines) liveLines.textContent = String(lineCount());
+      updateStats();
+
       if (chunks >= MIN_CHUNKS && lineCount() >= TARGET_LINES) break;
-      if (chunks < MAX_CHUNKS) await new Promise(resolve => setTimeout(resolve, 900));
+      if (batchNumber < MAX_CHUNKS) await new Promise(resolve => setTimeout(resolve, 900));
     }
 
-    if (!fullCode.trim()) throw new Error('Tri-Agent generated no code.');
-    triAgentSetStep(cardId, 3, 'Agent 3 · Cleaning and packaging', '⚡', '#facc15');
-    triAgentProgress(cardId, 94, 'Removing trailing conversational residue and building ZIP…', 'Packaging');
-    let cleanCode = fullCode
-      .replace(/\n?\*?\s*Batch\s*\d+\s*\/\s*\d+[^\n]*\n?[\s\S]*$/i, '')
-      .replace(/\n?This completes (?:the|your)[\s\S]*$/i, '')
-      .replace(/\n?Let me know if you need[\s\S]*$/i, '')
-      .replace(/^```(?:html|javascript|js|css|json|python|php|typescript|tsx|jsx)?\s*/i, '')
-      .replace(/\s*```\s*$/i, '').trim();
+    triAgentSetStep(cardId, 3, 'Agent 3: Validating document & preparing ZIP', '⚡', '#facc15');
+    triAgentProgress(cardId, 94, 'Checking structure and packaging…', 'Validation');
+    triAgentStopTelemetry(cardId);
+    if (!fullCode.trim()) throw new Error('No code was generated.');
+
+    let cleanCode = fullCode.trim();
     if (isHtmlTarget) {
-      if (/<script\b/i.test(cleanCode) && !/<\/script>/i.test(cleanCode)) cleanCode += '\n<' + '/script>';
-      if (/<style\b/i.test(cleanCode) && !/<\/style>/i.test(cleanCode)) cleanCode += '\n</style>';
-      if (!/<\/body>/i.test(cleanCode)) cleanCode += '\n</body>';
-      if (!/<\/html>/i.test(cleanCode)) cleanCode += '\n</html>';
+      cleanCode = cleanCode.replace(/<\/body\s*>/ig, '').replace(/<\/html\s*>/ig, '').trim();
+      // Do not silently fabricate missing major sections; only close the document shell.
+      if (!/<html\b/i.test(cleanCode)) cleanCode = '<!doctype html>\n<html lang="en">\n' + cleanCode;
+      if (!/<head\b/i.test(cleanCode)) cleanCode = cleanCode.replace(/<html\b[^>]*>/i, '$&\n<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>');
+      if (!/<body\b/i.test(cleanCode)) cleanCode = cleanCode.replace(/<\/head\s*>/i, '$&\n<body>') + '\n</body>';
+      else cleanCode += '\n</body>';
+      cleanCode += '\n</html>';
+      const htmlOpenCount = (cleanCode.match(/<html\b/ig) || []).length;
+      const htmlCloseCount = (cleanCode.match(/<\/html\s*>/ig) || []).length;
+      const bodyOpenCount = (cleanCode.match(/<body\b/ig) || []).length;
+      const bodyCloseCount = (cleanCode.match(/<\/body\s*>/ig) || []).length;
+      if (htmlOpenCount !== 1 || htmlCloseCount !== 1 || bodyOpenCount !== 1 || bodyCloseCount !== 1) {
+        throw new Error(`HTML validation failed: html tags ${htmlOpenCount}/${htmlCloseCount}, body tags ${bodyOpenCount}/${bodyCloseCount}. Draft is saved locally; ZIP not packaged.`);
+      }
     }
+
     const actualLines = cleanCode.split(/\r?\n/).length;
     const duration = ((Date.now() - startedAt) / 1000).toFixed(1);
     const kb = (new Blob([cleanCode]).size / 1024).toFixed(1);
-    if (typeof JSZip === 'undefined') throw new Error('JSZip did not load; cannot create ZIP.');
+    updateStats();
+    const linesEl = document.getElementById(`${cardId}-stat-lines`);
+    if (linesEl) linesEl.textContent = `${actualLines.toLocaleString()} lines`;
+    if (typeof JSZip === 'undefined') throw new Error('JSZip library is not loaded. Code draft is saved locally; ZIP could not be created.');
+
     const zip = new JSZip();
     if (multiFile && isHtmlTarget) {
-      const styleMatch = cleanCode.match(/<style\b[^>]*>([\s\S]*?)<\/style>/i);
-      const scriptMatch = cleanCode.match(/<script\b[^>]*>([\s\S]*?)<\/script>/i);
-      const css = styleMatch ? styleMatch[1].trim() : '';
-      const js = scriptMatch ? scriptMatch[1].trim() : '';
+      const styleMatch = cleanCode.match(/<style\b[^>]*>([\s\S]*?)<\/style\s*>/i);
+      const scriptMatch = cleanCode.match(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/i);
+      const css = styleMatch?.[1]?.trim() || '';
+      const scriptAttrs = scriptMatch?.[1] || '';
+      const js = scriptMatch?.[2]?.trim() || '';
       let modularHtml = cleanCode;
-      if (styleMatch) modularHtml = modularHtml.replace(styleMatch[0], '<link rel="stylesheet" href="style.css">');
-      if (scriptMatch) modularHtml = modularHtml.replace(scriptMatch[0], '<script src="app.js"><' + '/script>');
+      if (styleMatch && css) modularHtml = modularHtml.replace(styleMatch[0], '<link rel="stylesheet" href="style.css">');
+      if (scriptMatch && js && !/\bsrc\s*=/i.test(scriptAttrs)) modularHtml = modularHtml.replace(scriptMatch[0], '<script src="app.js"><' + '/script>');
       zip.file('index.html', modularHtml);
       if (css) zip.file('style.css', css);
-      if (js) zip.file('app.js', js);
-    } else zip.file(targetFileName, cleanCode);
-    zip.file('README.txt', `Generated by Suhail AI Tri-Agent\nTarget: ${targetFileName}\nBatches completed: ${chunks}\nOutput lines: ${actualLines}\nSize: ${kb} KB\nElapsed: ${duration}s\nNote: output size depends on the request and model response; a line target is not a guarantee.`);
+      if (js && !/\bsrc\s*=/i.test(scriptAttrs)) zip.file('app.js', js);
+    } else {
+      zip.file(targetFileName, cleanCode);
+    }
+    const targetReached = actualLines >= TARGET_LINES;
+    zip.file('README.txt', `Generated by Suhail AI Tri-Agent Engine\nTarget file: ${targetFileName}\nBatches received: ${chunks}/${MAX_CHUNKS}\nActual lines: ${actualLines}\nTarget lines reached: ${targetReached ? 'yes' : 'no'}\nPayload size: ${kb} KB\nBuild time: ${duration}s\nNote: Line count does not certify feature completeness or production readiness. Test the project before deployment.\n`);
     const blob = await zip.generateAsync({ type: 'blob' });
     const downloadUrl = URL.createObjectURL(blob);
-    const previewUrl = isHtmlTarget ? URL.createObjectURL(new Blob([cleanCode], { type: 'text/html' })) : '';
     const zipFileName = `SuhailAI_${targetFileName.replace(/\./g, '_')}.zip`;
+    const previewUrl = isHtmlTarget ? URL.createObjectURL(new Blob([cleanCode], { type: 'text/html' })) : '';
     window[`code_${cardId}`] = cleanCode;
     window[`blob_${cardId}`] = blob;
     window[`filename_${cardId}`] = zipFileName;
-    triAgentProgress(cardId, 100, `Complete · ${chunks} batches · ${actualLines} lines`, 'Done');
-    triAgentSetStep(cardId, 2, `Agent 2 · ${actualLines} lines assembled`, '✅', '#4ade80');
-    triAgentSetStep(cardId, 3, `Agent 3 · ZIP ready (${kb} KB)`, '✅', '#4ade80');
+
+    triAgentProgress(cardId, 100, `Packaged ${chunks} batches · ${actualLines} lines`, 'Packaged');
+    triAgentSetStep(cardId, 2, `Agent 2: Collected ${actualLines} lines`, '✅', '#00a884');
+    triAgentSetStep(cardId, 3, targetReached ? 'Agent 3: ZIP ready; verify features before deployment' : `Agent 3: ZIP ready; target ${TARGET_LINES} lines not reached`, targetReached ? '✅' : '⚠️', targetReached ? '#00a884' : '#facc15');
     const card = document.getElementById(cardId);
     if (card) {
-      finishTimer();
+      const safeName = targetFileName.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
       card.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
-          <div><strong style="color:#38e0b3;">📦 Suhail AI Tri-Agent Package</strong><div style="font-size:11px;color:#9fb0bf;margin-top:3px;">${targetFileName} · ${actualLines.toLocaleString()} lines · ${kb} KB · ${duration}s</div></div>
-          <span style="font-size:10px;background:#00a88420;color:#38e0b3;padding:4px 8px;border-radius:99px;border:1px solid #00a88455;white-space:nowrap;">${chunks} batches</span>
-        </div>
-        <a href="${downloadUrl}" download="${zipFileName}" style="display:block;text-align:center;background:linear-gradient(100deg,#059669,#00a884);color:white;text-decoration:none;padding:13px;border-radius:12px;font-weight:800;font-size:13px;box-shadow:0 5px 16px #00a88430;">📥 Download ZIP</a>
-        <div style="display:flex;gap:8px;margin-top:8px;">
-          ${isHtmlTarget ? `<a href="${previewUrl}" target="_blank" rel="noopener" style="flex:1;text-align:center;background:#182832;border:1px solid #38bdf8;color:#38bdf8;text-decoration:none;padding:9px 4px;border-radius:10px;font-size:12px;font-weight:700;">👁 Preview</a>` : ''}
-          <button type="button" onclick="shareProjectZip('${cardId}')" style="flex:1;background:#182832;border:1px solid #00a884;color:#38e0b3;padding:9px 4px;border-radius:10px;font-size:12px;font-weight:700;">📲 Share</button>
-          <button type="button" onclick="navigator.clipboard.writeText(window['code_${cardId}']).then(()=>this.textContent='✅ Copied!').catch(()=>alert('Copy unavailable; use Preview or ZIP.'))" style="flex:1;background:#182832;border:1px solid #526575;color:#e2e8f0;padding:9px 4px;border-radius:10px;font-size:12px;font-weight:700;">📋 Copy code</button>
-        </div>`;
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:12px"><div style="display:flex;gap:10px;align-items:center"><div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#00a88433,#38bdf833);border:1px solid #00a88466;display:grid;place-items:center;font-size:20px">📦</div><div><strong style="color:#00d6a0;font-size:14px">Suhail AI Tri-Agent Package</strong><div style="font-size:11px;color:#9ca3af;margin-top:3px">${safeName} · <b style="color:#4ade80">${actualLines.toLocaleString()} lines</b> · ${kb} KB · ${duration}s</div></div></div><span style="font-size:10px;color:#38bdf8;background:#38bdf81c;border:1px solid #38bdf855;padding:4px 8px;border-radius:12px">${chunks} batches</span></div>
+        <div style="font-size:11px;color:${targetReached ? '#4ade80' : '#facc15'};margin-bottom:12px">${targetReached ? 'Target line count reached; feature correctness still needs testing.' : `Generated output is shorter than the ${TARGET_LINES}-line target. Do not assume missing features exist.`}</div>
+        <a href="${downloadUrl}" download="${zipFileName}" style="display:flex;justify-content:center;align-items:center;gap:8px;background:linear-gradient(135deg,#00a884,#059669);color:#fff;text-decoration:none;padding:13px;border-radius:12px;font-weight:800;font-size:13px">📥 Download ZIP</a>
+        <div style="display:flex;gap:8px;margin-top:9px;flex-wrap:wrap">${isHtmlTarget ? `<a href="${previewUrl}" target="_blank" rel="noopener" style="flex:1;text-align:center;background:#182229;border:1px solid #38bdf8;color:#38bdf8;text-decoration:none;padding:10px 5px;border-radius:10px;font-size:12px;font-weight:700">👁 Preview</a>` : ''}<button type="button" onclick="shareProjectZip('${cardId}')" style="flex:1;background:#182229;border:1px solid #00a884;color:#00d6a0;padding:10px 5px;border-radius:10px;font-size:12px;font-weight:700">📲 Share</button><button type="button" onclick="navigator.clipboard.writeText(window['code_${cardId}']).then(()=>this.innerText='✅ Copied').catch(()=>alert('Copy failed; use Preview or ZIP.'))" style="flex:1;background:#182229;border:1px solid #475569;color:#e2e8f0;padding:10px 5px;border-radius:10px;font-size:12px;font-weight:700">📋 Copy code</button></div>`;
     }
-  } catch (error) {
-    finishTimer();
+  } catch (err) {
+    triAgentStopTelemetry(cardId);
     const card = document.getElementById(cardId);
-    if (card) {
-      const msg = String(error && error.message ? error.message : error).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-      card.innerHTML = `<div style="color:#fb7185;font-size:13px;padding:8px;"><strong>Tri-Agent Error</strong><div style="margin-top:6px;">${msg}</div><div style="margin-top:6px;color:#9fb0bf;font-size:11px;">Any partial draft may be saved in this browser under the Tri-Agent draft key.</div></div>`;
-    }
-  } finally {
-    delete window[`triAgentWorkingCode_${cardId}`];
+    const message = String(err?.message || err).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    if (card) card.innerHTML = `<div style="color:#f87171;font-size:13px;padding:8px"><strong>Tri-Agent Error — no success claimed</strong><div style="margin-top:6px">${message}</div><div style="margin-top:8px;color:#cbd5e1">Received batches: ${chunks}/${MAX_CHUNKS}. Any received draft may be saved in this browser's local storage.</div></div>`;
   }
 }
 
 async function shareProjectZip(cardId) {
   const blob = window[`blob_${cardId}`];
-  const filename = window[`filename_${cardId}`] || 'SuhailAI_Project.zip';
-  if (!blob) { alert('ZIP file is not ready yet.'); return; }
+  const filename = window[`filename_${cardId}`] || 'project.zip';
+  if (!blob) { alert('ZIP file is not available.'); return; }
+  if (typeof File === 'undefined') { alert('This browser does not support file sharing. Download the ZIP instead.'); return; }
   const file = new File([blob], filename, { type: 'application/zip' });
-  if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
-    try { await navigator.share({ files: [file], title: 'Suhail AI Tri-Agent Project' }); }
-    catch (err) { if (err && err.name !== 'AbortError') alert('Share failed: ' + err.message); }
-  } else alert('Direct file sharing is not supported in this browser. Please use Download ZIP.');
+  if (navigator.canShare?.({ files: [file] }) && navigator.share) {
+    try { await navigator.share({ files: [file], title: 'Suhail AI Tri-Agent Project', text: 'Generated by Suhail AI Tri-Agent Engine.' }); }
+    catch (err) { if (err?.name !== 'AbortError') alert(`Share error: ${err.message || err}`); }
+  } else alert('Direct file sharing is not supported in this browser. Use Download ZIP.');
 }
 
-if (!document.getElementById('tri-agent-animations')) {
-  const style = document.createElement('style');
-  style.id = 'tri-agent-animations';
-  style.textContent = '@keyframes triAgentPulse{from{opacity:.45;transform:scale(.85)}to{opacity:1;transform:scale(1.1)}}';
-  document.head.appendChild(style);
-}
-
-// ==========================================
 // 1. STRICTLY MALE NATURAL TTS ENGINE
 // ==========================================
 let activeSpeechBtn = null;
