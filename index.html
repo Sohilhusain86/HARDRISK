@@ -1193,83 +1193,173 @@ function triAgentProgress(cardId, pct, log) {
 async function runTriAgentMegaCode(userPrompt, chatBox) {
   const text = String(userPrompt || '').trim();
   if (!text) return;
+
   const box = chatBox || document.getElementById('chat-box') || document.body;
   const cardId = createAgentLoaderUI(box);
   const startTime = Date.now();
   const cacheDraftKey = 'suhail_mega_code_draft';
   const targetMatch = text.match(/([a-zA-Z0-9_\-.]+\.(html|js|css|json|py|php|ts|jsx|tsx))/i);
   const targetFileName = targetMatch ? targetMatch[1] : 'index.html';
+  const isHtmlTarget = targetFileName.toLowerCase().endsWith('.html');
   const multiFile = /(separate|split|alag|folder|modular|multiple files|multiple file)/i.test(text);
+
+  // IMPORTANT: Do not stop merely because the model returned finish_reason="stop".
+  // Tri-Agent is intentionally a multi-batch generator. It keeps requesting the
+  // next production section until the minimum batch count / requested size is met.
+  const requestedLineMatch = text.match(/(?:at least|minimum|around|about|over|more than)?\s*(\d[\d,]*)\s*\+?\s*(?:lines|line|l(?:ines)?)/i);
+  const requestedLines = requestedLineMatch ? parseInt(requestedLineMatch[1].replace(/,/g, ''), 10) : 1500;
+  const MIN_CHUNKS = 5;
+  const MAX_CHUNKS = 10;
+  const TARGET_LINES = Math.max(1000, Math.min(requestedLines || 1500, 5000));
+
   let fullCode = '';
+  let chunks = 0;
+  let lastFinishReason = '';
+
+  const cleanModelChunk = (value, finalChunk) => {
+    let chunk = String(value || '')
+      .replace(/^```(?:html|javascript|js|css|json|python|php|typescript|tsx|jsx)?\s*/i, '')
+      .replace(/\s*```\s*$/i, '')
+      .trim();
+
+    // Later batches must append to the existing document, not restart it.
+    if (chunks > 1) {
+      chunk = chunk
+        .replace(/^<!doctype\s+html>\s*/i, '')
+        .replace(/^<html[^>]*>\s*/i, '')
+        .replace(/^<head[^>]*>\s*/i, '');
+    }
+
+    // Intermediate batches must not close the document before the final batch.
+    if (isHtmlTarget && !finalChunk) {
+      chunk = chunk
+        .replace(/<\/body>\s*$/i, '')
+        .replace(/<\/html>\s*$/i, '')
+        .trim();
+    }
+    return chunk;
+  };
+
+  const currentLineCount = () => fullCode ? fullCode.split(/\r?\n/).length : 0;
+
   let history = [
     {
       role: 'system',
-      content: `You are the Suhail AI Lead Core Production Engineer. Target file: ${targetFileName}. Return only complete production code. Never use placeholders such as "rest of code", "add more here", or truncated sections. If HTML, include complete CSS and JavaScript required by the requested implementation.`
+      content: `You are the Suhail AI Tri-Agent Lead Core Production Engineer.
+TARGET: ${targetFileName}
+OUTPUT MODE: multi-batch production build.
+MANDATORY RULES:
+1. Produce real, complete, production-grade code. No placeholders, no "rest of code", no "add more", no omitted sections.
+2. The build target is approximately ${TARGET_LINES}+ lines when the requested task reasonably supports that size.
+3. Generate the project in sequential batches. Each batch must add NEW code only; never repeat earlier code.
+4. For HTML, Batch 1 starts the document and later batches continue inside it. Do NOT emit </body> or </html> until the final batch.
+5. Do not restart with a second <!DOCTYPE html>, <html>, or <head> in later batches.
+6. Do not explain the code. Output code only.
+7. Preserve all requested features and make every function actually implemented.`
     },
     {
       role: 'user',
-      content: `Create the complete implementation for: ${text}. Target file: ${targetFileName}. Start immediately with code.`
+      content: `Build this project: ${text}
+Start Batch 1 of ${MAX_CHUNKS}. Focus on the complete foundation, document structure, core UI, essential styles, and the first working code sections. Write substantial code, not a tiny example. Keep the document open for later batches.`
     }
   ];
 
   try {
     triAgentSetStep(cardId, 1, `Agent 1: Blueprinting ${targetFileName}...`, '⚡', '#34d399');
-    triAgentProgress(cardId, 8, 'Architecture analysis started');
+    triAgentProgress(cardId, 8, `Target ${targetFileName} | Goal ~${TARGET_LINES}+ lines | Minimum ${MIN_CHUNKS} batches`);
     await new Promise(resolve => setTimeout(resolve, 250));
-    triAgentSetStep(cardId, 1, `Agent 1: Blueprint approved`, '✅', '#34d399');
-    triAgentProgress(cardId, 15, 'Code streaming started');
+    triAgentSetStep(cardId, 1, 'Agent 1: Blueprint approved', '✅', '#34d399');
+    triAgentProgress(cardId, 15, 'Agent 2: Multi-batch code generation started');
+    triAgentSetStep(cardId, 2, `Agent 2: Deep code streaming (0/${MAX_CHUNKS})...`, '⚡', '#60a5fa');
 
-    triAgentSetStep(cardId, 2, 'Agent 2: Deep code streaming...', '⚡', '#60a5fa');
-    let finished = false;
-    let chunks = 0;
-    while (!finished && chunks < 20) {
-      chunks++;
-      triAgentProgress(cardId, Math.min(90, 15 + Math.round(chunks * 3.7)), `Stream batch ${chunks}/20`);
+    while (chunks < MAX_CHUNKS) {
+      const batchNumber = chunks + 1;
+      const lineCountBefore = currentLineCount();
+      const progress = Math.min(90, 15 + Math.round((batchNumber / MAX_CHUNKS) * 72));
+      triAgentProgress(cardId, progress, `Batch ${batchNumber}/${MAX_CHUNKS} | ${lineCountBefore} lines accumulated`);
+      triAgentSetStep(cardId, 2, `Agent 2: Writing batch ${batchNumber}/${MAX_CHUNKS}...`, '⚡', '#60a5fa');
+
       const res = await fetch('/api?action=tri_chunk', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: history })
       });
+
       if (!res.ok) throw new Error(`Tri-Agent API HTTP ${res.status}`);
       const data = await res.json();
       const choice = data && data.choices && data.choices[0];
-      if (!choice || !choice.message) break;
-      const chunk = String(choice.message.content || '');
-      fullCode += chunk;
-      try { localStorage.setItem(cacheDraftKey, fullCode); } catch (_) {}
-      if (choice.finish_reason === 'length') {
-        history.push({ role: 'assistant', content: chunk });
-        history.push({ role: 'user', content: `Continue ${targetFileName} exactly from the previous character. Do not repeat existing code. Finish all open tags/brackets.` });
-      } else {
-        finished = true;
+      if (!choice || !choice.message) {
+        throw new Error('Tri-Agent API ne valid choice return kiya.');
       }
+
+      const rawChunk = String(choice.message.content || '');
+      lastFinishReason = String(choice.finish_reason || 'unknown');
+      const isFinalBatch = batchNumber >= MAX_CHUNKS || (batchNumber >= MIN_CHUNKS && currentLineCount() >= TARGET_LINES && lastFinishReason === 'stop');
+      const chunk = cleanModelChunk(rawChunk, isFinalBatch);
+
+      if (chunk) {
+        fullCode += (fullCode && !fullCode.endsWith('\n') ? '\n' : '') + chunk;
+      }
+      chunks++;
+
+      try { localStorage.setItem(cacheDraftKey, fullCode); } catch (_) {}
+
+      const linesNow = currentLineCount();
+      triAgentProgress(cardId, Math.min(90, progress + 2), `Batch ${chunks}/${MAX_CHUNKS} complete | ${linesNow} lines | finish=${lastFinishReason}`);
+
+      // Continue on BOTH "length" and "stop" until the minimum build is done.
+      // This is the key fix for the 1-chunk behaviour visible in the screenshots.
+      const mustContinue = chunks < MIN_CHUNKS || (linesNow < TARGET_LINES && chunks < MAX_CHUNKS);
+      if (!mustContinue) break;
+
+      history.push({ role: 'assistant', content: rawChunk });
+
+      const remaining = Math.max(0, TARGET_LINES - linesNow);
+      const phase =
+        batchNumber === 1 ? 'UI styling, responsive layout and reusable components' :
+        batchNumber === 2 ? 'core JavaScript logic, state, events and data handling' :
+        batchNumber === 3 ? 'advanced features, integrations, validation and error handling' :
+        batchNumber === 4 ? 'production hardening, accessibility, security-conscious checks and edge cases' :
+        'missing features, refinements, test helpers and final production polish';
+
+      history.push({
+        role: 'user',
+        content: `CONTINUE BUILD — Batch ${batchNumber + 1}/${MAX_CHUNKS}.
+Do NOT stop because the previous response had finish_reason="${lastFinishReason}".
+Append NEW production code only. Never repeat or restart previous code.
+Current accumulated size: about ${linesNow} lines. Remaining target: about ${remaining} lines.
+For this batch, implement: ${phase}.
+${isHtmlTarget ? 'Keep the HTML document open. Do not output </body> or </html> until the final batch.' : 'Continue the same source file directly; do not restart it.'}
+If a requested feature is already present, deepen it with real implementation rather than duplicating it.
+Output code only and make this batch substantial.`
+      });
     }
 
     if (!fullCode.trim()) throw new Error('Tri-Agent ne koi code return nahi kiya.');
 
     triAgentSetStep(cardId, 3, 'Agent 3: Cleaning, linting & packaging...', '⚡', '#fbbf24');
-    triAgentProgress(cardId, 92, 'Sanitizing generated payload');
+    triAgentProgress(cardId, 92, `Auditing ${currentLineCount()} generated lines`);
 
     let cleanCode = fullCode
-      .replace(/^```[a-zA-Z0-9_-]*\s*/i, '')
+      .replace(/^```(?:html|javascript|js|css|json|python|php|typescript|tsx|jsx)?\s*/i, '')
       .replace(/\s*```\s*$/i, '')
       .trim();
 
-    // Protect this host page from accidental literal closing-script output.
-    if (targetFileName.toLowerCase().endsWith('.html')) {
+    // Final HTML closure is added only once, after all batches have finished.
+    if (isHtmlTarget) {
       if (/<script\b/i.test(cleanCode) && !/<\/script>/i.test(cleanCode)) cleanCode += '\n<' + '/script>';
       if (/<style\b/i.test(cleanCode) && !/<\/style>/i.test(cleanCode)) cleanCode += '\n</style>';
       if (!/<\/body>/i.test(cleanCode)) cleanCode += '\n</body>';
       if (!/<\/html>/i.test(cleanCode)) cleanCode += '\n</html>';
     }
 
-    const actualLines = cleanCode.split('\n').length;
+    const actualLines = cleanCode.split(/\r?\n/).length;
     const duration = ((Date.now() - startTime) / 1000).toFixed(1);
     const kb = (new Blob([cleanCode]).size / 1024).toFixed(1);
 
     if (typeof JSZip === 'undefined') throw new Error('JSZip library load nahi hui.');
     const zip = new JSZip();
-    if (multiFile && targetFileName.toLowerCase().endsWith('.html')) {
+    if (multiFile && isHtmlTarget) {
       const styleMatch = cleanCode.match(new RegExp('<style[^>]*>([\\s\\S]*?)<' + '/style>', 'i'));
       const scriptMatch = cleanCode.match(new RegExp('<script[^>]*>([\\s\\S]*?)<' + '/script>', 'i'));
       const css = styleMatch ? styleMatch[1].trim() : '';
@@ -1284,19 +1374,18 @@ async function runTriAgentMegaCode(userPrompt, chatBox) {
       zip.file(targetFileName, cleanCode);
     }
 
-    const readme = `Generated by Suhail AI Tri-Agent Engine\nTarget File: ${targetFileName}\nTotal Lines: ${actualLines}\nPayload Size: ${kb} KB\nBuild Time: ${duration} seconds`;
+    const readme = `Generated by Suhail AI Tri-Agent Engine\nTarget File: ${targetFileName}\nBatches: ${chunks}\nFinish Reason: ${lastFinishReason}\nTotal Lines: ${actualLines}\nPayload Size: ${kb} KB\nBuild Time: ${duration} seconds`;
     zip.file('README.txt', readme);
     const blob = await zip.generateAsync({ type: 'blob' });
     const downloadUrl = URL.createObjectURL(blob);
     const zipFileName = `SuhailAI_${targetFileName.replace(/\./g, '_')}.zip`;
-    const isHtml = targetFileName.toLowerCase().endsWith('.html');
-    const previewUrl = isHtml ? URL.createObjectURL(new Blob([cleanCode], { type: 'text/html' })) : '';
+    const previewUrl = isHtmlTarget ? URL.createObjectURL(new Blob([cleanCode], { type: 'text/html' })) : '';
 
     window[`code_${cardId}`] = cleanCode;
     window[`blob_${cardId}`] = blob;
     window[`filename_${cardId}`] = zipFileName;
 
-    triAgentProgress(cardId, 100, 'Project package ready');
+    triAgentProgress(cardId, 100, `Project ready | ${chunks} batches | ${actualLines} lines`);
     triAgentSetStep(cardId, 2, `Agent 2: Compiled ${actualLines} lines`, '✅', '#34d399');
     triAgentSetStep(cardId, 3, `Agent 3: Package ready (${kb} KB)`, '✅', '#34d399');
 
@@ -1305,12 +1394,12 @@ async function runTriAgentMegaCode(userPrompt, chatBox) {
       card.innerHTML = `
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
           <div><strong style="color:#34d399;">📦 Suhail AI Tri-Agent Package</strong><div style="font-size:11px;color:#9ca3af;">${targetFileName} • ${actualLines} lines • ${kb} KB • ${duration}s</div></div>
-          <span style="font-size:10px;color:#34d399;">${chunks} chunks</span>
+          <span style="font-size:10px;color:#34d399;">${chunks} batches</span>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           <a href="${downloadUrl}" download="${zipFileName}" style="display:block;text-align:center;background:#059669;color:#fff;text-decoration:none;padding:10px;border-radius:10px;font-weight:600;font-size:12px;">📥 Download ZIP</a>
           <div style="display:flex;gap:8px;">
-            ${isHtml ? `<a href="${previewUrl}" target="_blank" rel="noopener" style="flex:1;text-align:center;background:#1e293b;border:1px solid #38bdf8;color:#38bdf8;text-decoration:none;padding:9px 4px;border-radius:10px;font-size:12px;">👁 Preview</a>` : ''}
+            ${isHtmlTarget ? `<a href="${previewUrl}" target="_blank" rel="noopener" style="flex:1;text-align:center;background:#1e293b;border:1px solid #38bdf8;color:#38bdf8;text-decoration:none;padding:9px 4px;border-radius:10px;font-size:12px;">👁 Preview</a>` : ''}
             <button type="button" onclick="shareProjectZip('${cardId}')" style="flex:1;background:#1e293b;border:1px solid #10b981;color:#34d399;padding:9px 4px;border-radius:10px;font-size:12px;cursor:pointer;">📲 Share</button>
             <button type="button" onclick="navigator.clipboard.writeText(window['code_${cardId}']).then(()=>this.innerText='✅ Copied!')" style="flex:1;background:#1e293b;border:1px solid #475569;color:#e2e8f0;padding:9px 4px;border-radius:10px;font-size:12px;cursor:pointer;">📋 Copy</button>
           </div>
