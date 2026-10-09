@@ -372,36 +372,71 @@ export default async function handler(req, res) {
       }
     }
 
-    // 3.5 TRI-AGENT CHUNK ENGINE (MEGA CODE GENERATOR)
+    // 3.5 TRI-AGENT CHUNK ENGINE (OPENCODE MEGA CODE GENERATOR)
     if (action === "tri_chunk" && req.method === "POST") {
       const { messages } = req.body || {};
+
       if (!messages || !Array.isArray(messages)) {
-        return res.status(400).json({ success: false, error: "Messages array required" });
+        return res.status(400).json({
+          success: false,
+          error: "Messages array required"
+        });
       }
 
-      if (!GROQ_API_KEY) {
-        return res.status(500).json({ success: false, error: "GROQ_API_KEY missing" });
+      const OPENCODE_TOKEN = process.env.OPENCODE_CONSOLE_TOKEN;
+
+      if (!OPENCODE_TOKEN) {
+        return res.status(500).json({
+          success: false,
+          error: "OPENCODE_CONSOLE_TOKEN missing in Vercel Environment Variables"
+        });
       }
 
       try {
-        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${GROQ_API_KEY}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            model: "openai/gpt-oss-120b",
-            messages: messages,
-            temperature: 0.3,
-            max_tokens: 3500
-          })
-        });
+        const response = await fetch(
+          "https://opencode.ai/inference/openai/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${OPENCODE_TOKEN}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              model: process.env.OPENCODE_TRI_MODEL || "longcat-2.5-preview-free",
+              messages: messages,
+              temperature: 0.3,
+              max_tokens: 3500
+            })
+          }
+        );
 
-        const resData = await response.json();
+        const resData = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          console.error(
+            "OpenCode Tri-Agent API Error:",
+            response.status,
+            resData
+          );
+
+          return res.status(response.status).json({
+            success: false,
+            error:
+              resData?.error?.message ||
+              resData?.message ||
+              `OpenCode API failed with status ${response.status}`
+          });
+        }
+
         return res.status(200).json(resData);
+
       } catch (err) {
-        return res.status(500).json({ success: false, error: err.message });
+        console.error("OpenCode Tri-Agent Request Error:", err);
+
+        return res.status(500).json({
+          success: false,
+          error: err.message || "OpenCode request failed"
+        });
       }
     }
 
