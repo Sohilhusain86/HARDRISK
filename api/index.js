@@ -372,72 +372,330 @@ export default async function handler(req, res) {
       }
     }
 
-    // 3.5 TRI-AGENT CHUNK ENGINE (OPENCODE MEGA CODE GENERATOR)
+    // 3.5 TRI-AGENT CHUNK ENGINE
+    // MULTI-PROVIDER FALLBACK
+    // Groq primary; other configured providers tried in sequence.
+
     if (action === "tri_chunk" && req.method === "POST") {
       const { messages } = req.body || {};
 
-      if (!messages || !Array.isArray(messages)) {
+      if (!Array.isArray(messages) || messages.length === 0) {
         return res.status(400).json({
           success: false,
-          error: "Messages array required"
+          error: "A non-empty messages array is required."
         });
       }
 
-      const OPENCODE_TOKEN = process.env.OPENCODE_CONSOLE_TOKEN;
+      const keys = {
+        groq: process.env.GROQ_API_KEY || process.env.GROQ_KEY,
+        openrouter: process.env.OPENROUTER_KEY,
+        gemini: process.env.GEMINI_API_KEY,
+        cerebras: process.env.CEREBRAS_KEY,
+        sambanova: process.env.SAMBANOVA_KEY,
+        siliconflow: process.env.SILICONFLOW_KEY,
+        mistral: process.env.MISTRAL_KEY,
+        cohere: process.env.COHERE_API_KEY,
+        nvidia: process.env.NVIDIA_API_KEY
+      };
 
-      if (!OPENCODE_TOKEN) {
-        return res.status(500).json({
-          success: false,
-          error: "OPENCODE_CONSOLE_TOKEN missing in Vercel Environment Variables"
+      const attempts = [];
+
+      async function callOpenAICompatible(provider, url, model, key) {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${key}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model,
+            messages,
+            temperature: 0.3,
+            max_tokens: 3500
+          })
         });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(
+            `${provider} HTTP ${response.status}: ${
+              data?.error?.message ||
+              data?.message ||
+              "Request failed"
+            }`
+          );
+        }
+
+        const content = data?.choices?.[0]?.message?.content;
+
+        if (content == null) {
+          throw new Error(`${provider}: response contained no message content`);
+        }
+
+        return {
+          ...data,
+          tri_agent: {
+            provider,
+            model_used: model,
+            fallback_used: provider !== "Groq"
+          }
+        };
       }
 
-      try {
+      async function callGemini(key) {
+        const model =
+          process.env.GEMINI_TRI_MODEL || "gemini-2.5-flash";
+
+        const contents = messages
+          .filter(m => m && ["user", "assistant"].includes(m.role))
+          .map(m => ({
+            role: m.role === "assistant" ? "model" : "user",
+            parts: [{ text: String(m.content ?? "") }]
+          }));
+
+        const systemText = messages
+          .filter(m => m?.role === "system")
+          .map(m => String(m.content ?? ""))
+          .join("\n");
+
+        if (systemText && contents.length) {
+          contents[0].parts.unshift({
+            text: `System instructions:\n${systemText}\n\n`
+          });
+        }
+
         const response = await fetch(
-          "https://opencode.ai/inference/openai/v1/chat/completions",
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,
           {
             method: "POST",
-            headers: {
-              "Authorization": `Bearer ${OPENCODE_TOKEN}`,
-              "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              model: process.env.OPENCODE_TRI_MODEL || "longcat-2.5-preview-free",
-              messages: messages,
-              temperature: 0.3,
-              max_tokens: 3500
+              contents,
+              generationConfig: {
+                temperature: 0.3,
+                maxOutputTokens: 3500
+              }
             })
           }
         );
 
-        const resData = await response.json().catch(() => ({}));
+        const data = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-          console.error(
-            "OpenCode Tri-Agent API Error:",
-            response.status,
-            resData
+          throw new Error(
+            `Gemini HTTP ${response.status}: ${
+              data?.error?.message || "Request failed"
+            }`
           );
-
-          return res.status(response.status).json({
-            success: false,
-            error:
-              resData?.error?.message ||
-              resData?.message ||
-              `OpenCode API failed with status ${response.status}`
-          });
         }
 
-        return res.status(200).json(resData);
+        const content = (data?.candidates?.[0]?.content?.parts || [])
+          .map(part => part.text || "")
+          .join("");
 
-      } catch (err) {
-        console.error("OpenCode Tri-Agent Request Error:", err);
+        if (!content) {
+          throw new Error("Gemini returned no text");
+        }
 
-        return res.status(500).json({
-          success: false,
-          error: err.message || "OpenCode request failed"
-        });
+        return {
+          choices: [{
+            index: 0,
+            message: { role: "assistant", content },
+            finish_reason: "stop"
+          }],
+          tri_agent: {
+            provider: "Gemini",
+            model_used: model,
+            fallback_used: true
+          }
+        };
       }
+
+      async function callCohere(key) {
+        const model =
+          process.env.COHERE_TRI_MODEL || "command-r7b-12-2024";
+
+        const response = await fetch(
+          "https://api.cohere.com/v2/chat",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${key}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              model,
+              messages: messages.map(m => ({
+                role: m.role === "assistant"
+                  ? "assistant"
+                  : m.role === "system"
+                    ? "system"
+                    : "user",
+                content: String(m.content ?? "")
+              })),
+              max_tokens: 3500,
+              temperature: 0.3
+            })
+          }
+        );
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(
+            `Cohere HTTP ${response.status}: ${
+              data?.message || "Request failed"
+            }`
+          );
+        }
+
+        const content = (data?.message?.content || [])
+          .map(part => part.text || "")
+          .join("");
+
+        if (!content) {
+          throw new Error("Cohere returned no text");
+        }
+
+        return {
+          choices: [{
+            index: 0,
+            message: { role: "assistant", content },
+            finish_reason: "stop"
+          }],
+          tri_agent: {
+            provider: "Cohere",
+            model_used: model,
+            fallback_used: true
+          }
+        };
+      }
+
+      const providers = [
+        {
+          name: "Groq",
+          key: keys.groq,
+          run: key => callOpenAICompatible(
+            "Groq",
+            "https://api.groq.com/openai/v1/chat/completions",
+            process.env.GROQ_TRI_MODEL || "openai/gpt-oss-120b",
+            key
+          )
+        },
+        {
+          name: "Groq Backup",
+          key: keys.groq,
+          run: key => callOpenAICompatible(
+            "Groq Backup",
+            "https://api.groq.com/openai/v1/chat/completions",
+            process.env.GROQ_BACKUP_MODEL || "openai/gpt-oss-20b",
+            key
+          )
+        },
+        {
+          name: "OpenRouter",
+          key: keys.openrouter,
+          run: key => callOpenAICompatible(
+            "OpenRouter",
+            "https://openrouter.ai/api/v1/chat/completions",
+            process.env.OPENROUTER_TRI_MODEL || "openrouter/free",
+            key
+          )
+        },
+        {
+          name: "Gemini",
+          key: keys.gemini,
+          run: callGemini
+        },
+        {
+          name: "Cerebras",
+          key: keys.cerebras,
+          run: key => callOpenAICompatible(
+            "Cerebras",
+            "https://api.cerebras.ai/v1/chat/completions",
+            process.env.CEREBRAS_TRI_MODEL || "gpt-oss-120b",
+            key
+          )
+        },
+        {
+          name: "SambaNova",
+          key: keys.sambanova,
+          run: key => callOpenAICompatible(
+            "SambaNova",
+            "https://api.sambanova.ai/v1/chat/completions",
+            process.env.SAMBANOVA_TRI_MODEL || "DeepSeek-V3.1",
+            key
+          )
+        },
+        {
+          name: "SiliconFlow",
+          key: keys.siliconflow,
+          run: key => callOpenAICompatible(
+            "SiliconFlow",
+            "https://api.siliconflow.com/v1/chat/completions",
+            process.env.SILICONFLOW_TRI_MODEL || "Qwen/Qwen3-8B",
+            key
+          )
+        },
+        {
+          name: "Mistral",
+          key: keys.mistral,
+          run: key => callOpenAICompatible(
+            "Mistral",
+            "https://api.mistral.ai/v1/chat/completions",
+            process.env.MISTRAL_TRI_MODEL || "mistral-small-latest",
+            key
+          )
+        },
+        {
+          name: "Cohere",
+          key: keys.cohere,
+          run: callCohere
+        },
+        {
+          name: "NVIDIA",
+          key: keys.nvidia,
+          run: key => callOpenAICompatible(
+            "NVIDIA",
+            "https://integrate.api.nvidia.com/v1/chat/completions",
+            process.env.NVIDIA_TRI_MODEL ||
+              "meta/llama-3.3-70b-instruct",
+            key
+          )
+        }
+      ];
+
+      for (const provider of providers) {
+        if (!provider.key) {
+          attempts.push({
+            provider: provider.name,
+            error: "API key not configured; skipped"
+          });
+          continue;
+        }
+
+        try {
+          const result = await provider.run(provider.key);
+          return res.status(200).json(result);
+        } catch (err) {
+          console.error(
+            `Tri-Agent ${provider.name} failed:`,
+            err.message
+          );
+
+          attempts.push({
+            provider: provider.name,
+            error: err.message
+          });
+        }
+      }
+
+      return res.status(502).json({
+        success: false,
+        error: "All configured Tri-Agent providers failed.",
+        attempts
+      });
     }
 
     // 4. AI CHAT DISPATCHER (STUDENT & ADMIN)
