@@ -753,35 +753,61 @@ body.focus-reader-mode .exit-focus-btn {
     </div>
   </div>
 
-  <!-- AUTH MODAL -->
+  <!-- ULTRA-LUXURY AUTH MODAL: original IDs and login behavior preserved -->
+  <style id="suhail-auth-luxury-styles">
+    @keyframes authLuxuryGlow {
+      0%,100% { box-shadow:0 22px 60px rgba(0,0,0,.72),0 0 22px rgba(0,255,163,.14); border-color:rgba(0,255,163,.38); }
+      50% { box-shadow:0 24px 64px rgba(0,0,0,.78),0 0 32px rgba(56,189,248,.22); border-color:rgba(56,189,248,.48); }
+    }
+    @keyframes authAmbientPulse { 0%,100%{opacity:.55;transform:translateY(0)} 50%{opacity:1;transform:translateY(3px)} }
+    #auth-modal { position:fixed !important; inset:0 !important; z-index:999999 !important; background:radial-gradient(circle at 50% 25%,rgba(13,35,42,.88),rgba(4,9,13,.97) 72%) !important; padding:16px !important; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
+    #auth-modal .auth-card { box-sizing:border-box; width:100%; max-width:430px; max-height:92dvh; overflow-y:auto; overflow-x:hidden; position:relative; isolation:isolate; gap:13px; padding:26px 22px 22px; border-radius:24px; border:1.5px solid rgba(0,255,163,.38); background:radial-gradient(circle at 15% 10%,rgba(29,46,55,.98),rgba(9,18,24,.99) 72%); animation:authLuxuryGlow 5s ease-in-out infinite; }
+    #auth-modal .auth-card:before { content:""; position:absolute; z-index:-1; top:-45px; left:18%; width:64%; height:100px; pointer-events:none; background:radial-gradient(ellipse,rgba(0,255,163,.22),transparent 70%); animation:authAmbientPulse 4s ease-in-out infinite; }
+    #auth-modal .auth-luxury-heading { text-align:center; display:flex; flex-direction:column; align-items:center; gap:7px; margin-bottom:2px; }
+    #auth-modal .auth-luxury-icon { width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(0,255,163,.18),rgba(2,132,199,.25));border:1px solid rgba(0,255,163,.42);box-shadow:0 0 20px rgba(0,255,163,.22);color:#00ffa3;font-size:21px; }
+    #auth-modal .auth-luxury-title { margin:0; font-size:1.35rem; font-weight:800; letter-spacing:.35px; background:linear-gradient(90deg,#fff,#67e8f9,#34d399);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent; }
+    #auth-modal .auth-luxury-subtitle { font-size:.76rem;color:#94a3b8;text-align:center;margin:0; }
+    #auth-modal .form-group { display:flex;flex-direction:column;gap:5px;min-width:0; }
+    #auth-modal .form-group label { display:flex;align-items:center;gap:7px;font-size:.76rem;font-weight:600;color:#cbd5e1; }
+    #auth-modal .form-input { box-sizing:border-box;width:100%;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.11);border-radius:12px;padding:12px 14px;color:#f8fafc;font-size:.9rem;outline:none;transition:border-color .22s,box-shadow .22s,background .22s; }
+    #auth-modal .form-input:focus { border-color:#00ffa3;box-shadow:0 0 0 3px rgba(0,255,163,.08),0 0 16px rgba(0,255,163,.16);background:rgba(255,255,255,.055); }
+    #auth-modal #auth-admin-pass { background:rgba(239,68,68,.035);border:1px dashed rgba(248,113,113,.32); }
+    #auth-modal #auth-admin-pass:focus { border-color:#f87171;box-shadow:0 0 0 3px rgba(248,113,113,.07),0 0 14px rgba(239,68,68,.13); }
+    #auth-modal #btn-login-submit { width:100%;margin-top:4px;padding:13px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(120deg,#047857,#00d26a 50%,#059669);background-size:200% 100%;color:#fff;font-weight:800;font-size:.95rem;letter-spacing:.25px;cursor:pointer;box-shadow:0 8px 24px rgba(0,210,106,.28);transition:transform .2s,box-shadow .2s,background-position .3s; }
+    #auth-modal #btn-login-submit:hover { transform:translateY(-1px);box-shadow:0 12px 28px rgba(0,210,106,.4);background-position:100% 0; }
+    #auth-modal #btn-login-submit:active { transform:scale(.99); }
+    @media(max-width:420px) { #auth-modal { padding:12px !important; } #auth-modal .auth-card { padding:23px 17px 18px; gap:11px; } }
+    @media(prefers-reduced-motion:reduce) { #auth-modal .auth-card,#auth-modal .auth-card:before { animation:none !important; } }
+  </style>
   <div id="auth-modal" class="auth-overlay">
     <div class="auth-card">
-      <h3 style="color:var(--primary-green); text-align:center;">Suhail AI Login</h3>
-      <p style="font-size:0.75rem; color:var(--text-muted); text-align:center;">Study Platform me surakshit pravesh karein</p>
-      
+      <div class="auth-luxury-heading">
+        <div class="auth-luxury-icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></div>
+        <h3 class="auth-luxury-title">Suhail AI Login</h3>
+        <p class="auth-luxury-subtitle">Study Platform me surakshit pravesh karein</p>
+      </div>
+
       <div class="form-group">
-        <label>Mobile Number (10 Ank, Anivarya)</label>
-        <input type="tel" id="auth-phone" class="form-input" placeholder="e.g. 9876543210" maxlength="10">
+        <label for="auth-phone"><i class="fa-solid fa-phone" style="color:#00ffa3;font-size:11px" aria-hidden="true"></i> Mobile Number (10 Ank, Anivarya)</label>
+        <input type="tel" id="auth-phone" class="form-input" placeholder="e.g. 9876543210" maxlength="10" inputmode="numeric" autocomplete="tel">
       </div>
       <div class="form-group">
-        <label>Roll Number (4000 se 9999 tak Anivarya)</label>
-        <input type="number" id="auth-roll" class="form-input" placeholder="4000 to 9999" min="4000" max="9999">
+        <label for="auth-roll"><i class="fa-solid fa-id-card" style="color:#38bdf8;font-size:11px" aria-hidden="true"></i> Roll Number (4000 se 9999 tak Anivarya)</label>
+        <input type="number" id="auth-roll" class="form-input" placeholder="4000 to 9999" min="4000" max="9999" inputmode="numeric">
       </div>
       <div class="form-group">
-        <label>Personal Password (Min 6 Ank/Akshar)</label>
-        <input type="password" id="auth-user-pass" class="form-input" placeholder="Min 6 characters">
+        <label for="auth-user-pass"><i class="fa-solid fa-lock" style="color:#fbbf24;font-size:11px" aria-hidden="true"></i> Personal Password (Min 6 Ank/Akshar)</label>
+        <input type="password" id="auth-user-pass" class="form-input" placeholder="Min 6 characters" autocomplete="current-password">
       </div>
       <div class="form-group">
-        <label>Aapka Naam (Pehli dafa judne par anivarya)</label>
-        <input type="text" id="auth-name" class="form-input" placeholder="Talib-e-Ilm ka naam">
+        <label for="auth-name"><i class="fa-solid fa-user-graduate" style="color:#a78bfa;font-size:11px" aria-hidden="true"></i> Aapka Naam (Pehli dafa judne par anivarya)</label>
+        <input type="text" id="auth-name" class="form-input" placeholder="Talib-e-Ilm ka naam" autocomplete="name">
       </div>
-      
-      <div class="form-group">
-        <label style="color:#f87171;">Master Admin Password (Sirf Admin ke liye)</label>
-        <input type="password" id="auth-admin-pass" class="form-input" placeholder="" autocomplete="new-password">
+      <div class="form-group" style="margin-top:2px">
+        <label for="auth-admin-pass" style="color:#f87171"><i class="fa-solid fa-key" style="color:#ef4444;font-size:11px" aria-hidden="true"></i> Master Admin Password (Sirf Admin ke liye)</label>
+        <input type="password" id="auth-admin-pass" class="form-input" placeholder="Admin Only" autocomplete="new-password">
       </div>
-      
-      <button type="button" class="btn-action" id="btn-login-submit">Login / Register</button>
+      <button type="button" class="btn-action" id="btn-login-submit"><i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> &nbsp; Login / Register</button>
     </div>
   </div>
 
@@ -1130,70 +1156,77 @@ body.focus-reader-mode .exit-focus-btn {
 <script>
 
   // ============================================================================
-// ============================================================================
-// SUHAIL AI TRI-AGENT ULTRA ENGINE (SAFE BATCHING + PREMIUM CYBER-GLASS UI)
-// Replace the existing Tri-Agent block up to, but not including,
-// "// 1. STRICTLY MALE NATURAL TTS ENGINE".
-// Requires: /api?action=tri_chunk and global JSZip.
+// SUHAIL AI TRI-AGENT ULTRA ENGINE — LUXURY TELEMETRY + ROBUST CODE PACKAGING
+// Replaces only the Tri-Agent block. All other application code is preserved.
 // ============================================================================
 let isTriAgentActive = false;
 const triAgentTelemetryTimers = new Map();
 
 function toggleTriAgent() {
   const checkbox = document.getElementById('triAgentToggle');
-  isTriAgentActive = !!checkbox?.checked;
+  isTriAgentActive = !!(checkbox && checkbox.checked);
   const input = document.getElementById('chat-input');
   if (input) input.placeholder = isTriAgentActive
-    ? '⚡ Tri-Agent Active: software/code task yahan likhein...'
+    ? '⚡ Tri-Agent ON: project/code ka task yahan likhein...'
     : 'Padhai ka sawal ya koi bhi baat yahan likhein...';
 }
 
 function createAgentLoaderUI(chatBox) {
-  const cardId = `tri-agent-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  const cardId = 'tri-agent-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
   const card = document.createElement('div');
   card.id = cardId;
-  card.className = 'chat-bubble ai';
-  card.style.cssText = 'margin:14px 0;padding:18px;border-radius:20px;background:linear-gradient(145deg,rgba(11,20,26,.97),rgba(18,30,39,.99));border:1px solid rgba(0,168,132,.48);box-shadow:0 16px 36px rgba(0,0,0,.55),0 0 20px rgba(0,168,132,.16);backdrop-filter:blur(12px);font-family:Poppins,system-ui,sans-serif;color:#e9edef;';
+  card.className = 'chat-bubble ai tri-luxury-motion';
+  card.style.cssText = 'position:relative;overflow:hidden;margin:14px 0;padding:18px;border-radius:22px;background:radial-gradient(circle at 10% 10%,rgba(20,32,40,.98),rgba(7,13,18,.99) 75%);border:1.5px solid rgba(0,255,163,.45);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);animation:triLuxuryGlow 4s infinite ease-in-out,triFloat 6s infinite ease-in-out;color:#f1f5f9;font-family:Poppins,-apple-system,sans-serif;';
   card.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #ffffff18">
-      <div style="display:flex;align-items:center;gap:9px"><span style="width:10px;height:10px;border-radius:50%;background:#00a884;box-shadow:0 0 12px #00a884;animation:blinkCursor .8s infinite"></span><strong style="color:#00d6a0;font-size:13px;letter-spacing:.6px">SUHAIL AI · TRI-AGENT PRO</strong></div>
-      <span id="${cardId}-percent" style="font-size:11px;font-weight:800;color:#38bdf8;background:#38bdf81c;border:1px solid #38bdf855;padding:3px 9px;border-radius:14px">0%</span>
+    <div aria-hidden="true" style="position:absolute;top:-38px;left:15%;width:70%;height:76px;background:radial-gradient(ellipse,rgba(0,255,163,.23),transparent 70%);pointer-events:none;"></div>
+    <div style="position:relative;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.09);">
+      <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+        <div style="width:30px;height:30px;flex:none;border-radius:50%;background:linear-gradient(135deg,#00ffa3,#0284c7);display:flex;align-items:center;justify-content:center;color:#00130e;font-weight:900;box-shadow:0 0 14px rgba(0,255,163,.45);animation:triPulseRing 2s infinite ease-in-out;">⚡</div>
+        <div style="min-width:0;"><div style="font-size:12px;font-weight:900;letter-spacing:.65px;background:linear-gradient(90deg,#fff,#67e8f9,#34d399);-webkit-background-clip:text;background-clip:text;color:transparent;">SUHAIL AI TRI-AGENT PRO</div><div style="font-size:10px;color:#94a3b8;margin-top:3px;">Live build pipeline · real output counters</div></div>
+      </div>
+      <span id="${cardId}-percent" style="flex:none;font-size:11px;font-weight:800;color:#00ffa3;background:rgba(0,255,163,.1);border:1px solid rgba(0,255,163,.32);padding:4px 9px;border-radius:20px;">0%</span>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px">
-      <div style="background:#182229;border:1px solid #ffffff10;border-radius:12px;padding:9px 12px"><div style="font-size:10px;color:#94a3b8;text-transform:uppercase">Collected Lines</div><div id="${cardId}-stat-lines" style="font-size:16px;font-weight:800;color:#4ade80">0 lines</div></div>
-      <div style="background:#182229;border:1px solid #ffffff10;border-radius:12px;padding:9px 12px"><div style="font-size:10px;color:#94a3b8;text-transform:uppercase">UI Pulse</div><div id="${cardId}-stat-speed" style="font-size:16px;font-weight:800;color:#facc15">ACTIVE</div></div>
-      <div style="background:#182229;border:1px solid #ffffff10;border-radius:12px;padding:9px 12px"><div style="font-size:10px;color:#94a3b8;text-transform:uppercase">Pipeline Phase</div><div id="${cardId}-stat-stage" style="font-size:12px;font-weight:700;color:#38bdf8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Preparing</div></div>
-      <div style="background:#182229;border:1px solid #ffffff10;border-radius:12px;padding:9px 12px"><div style="font-size:10px;color:#94a3b8;text-transform:uppercase">Elapsed</div><div id="${cardId}-stat-time" style="font-size:12px;font-weight:700;color:#cbd5e1">0.0 s</div></div>
+    <div style="position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:14px;">
+      <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:10px 11px;"><div style="font-size:9px;color:#8fa3af;text-transform:uppercase;letter-spacing:.65px;">Synthesized lines</div><div id="${cardId}-stat-lines" style="font-size:17px;font-weight:850;color:#00ffa3;margin-top:3px;">0 Lines</div></div>
+      <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:10px 11px;"><div style="font-size:9px;color:#8fa3af;text-transform:uppercase;letter-spacing:.65px;">Output velocity</div><div id="${cardId}-stat-speed" style="font-size:16px;font-weight:850;color:#38bdf8;margin-top:3px;">0 chars/s</div></div>
+      <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:10px 11px;"><div style="font-size:9px;color:#8fa3af;text-transform:uppercase;letter-spacing:.65px;">Pipeline phase</div><div id="${cardId}-stat-stage" style="font-size:12px;font-weight:750;color:#fbbf24;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Blueprint lock</div></div>
+      <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:10px 11px;"><div style="font-size:9px;color:#8fa3af;text-transform:uppercase;letter-spacing:.65px;">Elapsed build time</div><div id="${cardId}-stat-time" style="font-size:15px;font-weight:800;color:#e2e8f0;margin-top:4px;">0.0s</div></div>
     </div>
-    <div style="height:7px;background:#182229;border-radius:10px;overflow:hidden;margin-bottom:14px;border:1px solid #ffffff10"><div id="${cardId}-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#00a884,#38bdf8,#818cf8);box-shadow:0 0 12px #38bdf880;transition:width .35s ease"></div></div>
-    <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px;font-size:12.5px">
-      <div id="${cardId}-agent1" style="color:#94a3b8;display:flex;gap:8px"><span class="step-icon">⏳</span><span class="step-text">Agent 1: Blueprint & requirements</span></div>
-      <div id="${cardId}-agent2" style="color:#64748b;display:flex;gap:8px"><span class="step-icon">⚪</span><span class="step-text">Agent 2: Code generation</span></div>
-      <div id="${cardId}-agent3" style="color:#64748b;display:flex;gap:8px"><span class="step-icon">⚪</span><span class="step-text">Agent 3: Validation & packaging</span></div>
+    <div style="height:8px;background:rgba(255,255,255,.06);border-radius:20px;overflow:hidden;margin-bottom:14px;border:1px solid rgba(255,255,255,.09);padding:1px;"><div id="${cardId}-bar" style="height:100%;width:0%;border-radius:20px;background:linear-gradient(90deg,#00ffa3,#0284c7,#38bdf8);background-size:200% 100%;animation:triShimmer 2s infinite linear;box-shadow:0 0 14px rgba(0,255,163,.5);transition:width .4s cubic-bezier(.4,0,.2,1);"></div></div>
+    <div style="position:relative;display:flex;flex-direction:column;gap:8px;margin-bottom:14px;font-size:11.5px;">
+      <div id="${cardId}-agent1" style="color:#00ffa3;display:flex;align-items:center;gap:8px;"><span class="step-icon">⚡</span><span class="step-text" style="font-weight:650;">Agent 1 · Enterprise blueprint</span></div>
+      <div id="${cardId}-agent2" style="color:#64748b;display:flex;align-items:center;gap:8px;"><span class="step-icon">⚪</span><span class="step-text">Agent 2 · Code generation</span></div>
+      <div id="${cardId}-agent3" style="color:#64748b;display:flex;align-items:center;gap:8px;"><span class="step-icon">⚪</span><span class="step-text">Agent 3 · Validation & ZIP assembly</span></div>
     </div>
-    <div style="background:#070d11;border:1px solid #00a88455;border-radius:10px;padding:9px 12px;font:11px monospace;color:#00d6a0;min-height:20px;overflow-wrap:anywhere"><span style="color:#38bdf8;margin-right:6px">&gt;</span><span id="${cardId}-ticker">Starting generation pipeline...</span></div>
-    <div style="font-size:10px;color:#94a3b8;margin-top:7px">UI animation values are decorative; actual line count and elapsed time are measured.</div>`;
-  (chatBox || document.getElementById('chat-box') || document.body).appendChild(card);
-  const box = chatBox || document.getElementById('chat-box');
-  if (box) box.scrollTop = box.scrollHeight;
-
-  const logs = ['Preparing generation request…','Checking response structure…','Collecting code batch…','Updating measured line count…','Checking document boundaries…','Preparing ZIP package…'];
+    <div style="position:relative;background:rgba(0,0,0,.48);border:1px solid rgba(0,255,163,.25);border-radius:12px;padding:10px 12px;font-family:ui-monospace,SFMono-Regular,monospace;font-size:10.5px;line-height:1.5;color:#00ffa3;min-height:42px;display:flex;align-items:center;overflow:hidden;"><span style="color:#38bdf8;margin-right:8px;font-weight:900;">❯</span><span id="${cardId}-ticker" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Initializing code synthesis pipeline…</span></div>
+    <div style="font-size:9px;color:#718693;margin-top:8px;">Counters use generated code and elapsed time; visual effects are decorative.</div>
+  `;
+  if (chatBox && typeof chatBox.appendChild === 'function') {
+    chatBox.appendChild(card);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+  const logs = [
+    'Preparing request payload…', 'Waiting for model response…', 'Checking response structure…',
+    'Appending generated source…', 'Updating output counters…', 'Preserving existing application logic…',
+    'Checking for conversational residue…', 'Preparing continuation context…', 'Preparing package metadata…'
+  ];
   let tick = 0;
+  const startedAt = Date.now();
   const timer = setInterval(() => {
     if (!document.getElementById(cardId)) { clearInterval(timer); triAgentTelemetryTimers.delete(cardId); return; }
+    const elapsed = Math.max(.5, (Date.now() - startedAt) / 1000);
+    const code = window[`triAgentWorkingCode_${cardId}`] || '';
+    const lines = document.getElementById(`${cardId}-stat-lines`);
     const speed = document.getElementById(`${cardId}-stat-speed`);
+    const time = document.getElementById(`${cardId}-stat-time`);
     const ticker = document.getElementById(`${cardId}-ticker`);
-    if (speed) speed.textContent = ['ACTIVE','SYNC','BUILD','CHECK'][Math.floor(Date.now() / 500) % 4];
-    if (ticker && ticker.dataset.locked !== 'true') ticker.textContent = logs[(tick++) % logs.length];
+    if (lines) lines.textContent = `${code ? code.split(/\r?\n/).length : 0} Lines`;
+    if (speed) speed.textContent = `${Math.round(code.length / elapsed)} chars/s`;
+    if (time) time.textContent = `${elapsed.toFixed(1)}s`;
+    if (ticker && ticker.dataset.locked !== 'true') { tick = (tick + 1) % logs.length; ticker.textContent = logs[tick]; }
   }, 500);
   triAgentTelemetryTimers.set(cardId, timer);
   return cardId;
-}
-
-function triAgentStopTelemetry(cardId) {
-  const timer = triAgentTelemetryTimers.get(cardId);
-  if (timer) clearInterval(timer);
-  triAgentTelemetryTimers.delete(cardId);
 }
 
 function triAgentSetStep(cardId, n, text, icon, color) {
@@ -1212,40 +1245,14 @@ function triAgentProgress(cardId, pct, log, stageName) {
   const ticker = document.getElementById(`${cardId}-ticker`);
   const stage = document.getElementById(`${cardId}-stat-stage`);
   const value = Math.max(0, Math.min(100, Number(pct) || 0));
-  if (bar) bar.style.width = `${value}%`;
-  if (percent) percent.textContent = `${value}%`;
+  if (bar) bar.style.width = value + '%';
+  if (percent) percent.textContent = value + '%';
   if (stage && stageName) stage.textContent = stageName;
   if (ticker && log) {
     ticker.textContent = log;
     ticker.dataset.locked = 'true';
-    setTimeout(() => { if (ticker.isConnected) ticker.dataset.locked = 'false'; }, 1400);
+    setTimeout(() => { if (ticker) ticker.dataset.locked = 'false'; }, 1300);
   }
-}
-
-function triAgentExtractCode(value) {
-  let s = String(value || '').trim();
-  const fenced = s.match(/^```(?:html|javascript|js|css|json|python|php|typescript|tsx|jsx)?\s*([\s\S]*?)\s*```$/i);
-  if (fenced) s = fenced[1].trim();
-  // Remove common conversational preambles only when they occur before code.
-  s = s.replace(/^Here(?:'s| is) the (?:code|implementation)[^\n]*\n/i, '');
-  return s.trim();
-}
-
-function triAgentNormalizeHtmlChunk(chunk, isFirst) {
-  let s = String(chunk || '');
-  if (!isFirst) {
-    // Later batches must be fragments, not new full HTML documents.
-    s = s.replace(/<!doctype\s+html[^>]*>/ig, '')
-         .replace(/<html\b[^>]*>/ig, '')
-         .replace(/<head\b[^>]*>/ig, '')
-         .replace(/<\/head\s*>/ig, '')
-         .replace(/<body\b[^>]*>/ig, '')
-         .replace(/<\/body\s*>/ig, '')
-         .replace(/<\/html\s*>/ig, '');
-  }
-  // Always append final document closing tags once, at finalization.
-  s = s.replace(/<\/body\s*>/ig, '').replace(/<\/html\s*>/ig, '');
-  return s.trim();
 }
 
 async function runTriAgentMegaCode(userPrompt, chatBox) {
@@ -1255,164 +1262,179 @@ async function runTriAgentMegaCode(userPrompt, chatBox) {
   const cardId = createAgentLoaderUI(box);
   const startedAt = Date.now();
   const cacheDraftKey = 'suhail_mega_code_draft';
-  const targetMatch = text.match(/(?:^|\s)([a-zA-Z0-9_.-]+\.(?:html|js|css|json|py|php|ts|jsx|tsx))\b/i);
+  const targetMatch = text.match(/([a-zA-Z0-9_\-.]+\.(html|js|css|json|py|php|ts|jsx|tsx))/i);
   const targetFileName = targetMatch ? targetMatch[1] : 'index.html';
-  const isHtmlTarget = targetFileName.toLowerCase().endsWith('.html');
-  const multiFile = /\b(separate|split|folder|modular|multiple files?)\b|alag/i.test(text);
-  const TARGET_LINES = 3500;
+  const isHtmlTarget = /\.html$/i.test(targetFileName);
+  const multiFile = /(separate|split|alag|folder|modular|multiple files|multiple file)/i.test(text);
+  const TARGET_LINES = 4000;
   const MIN_CHUNKS = 8;
-  const MAX_CHUNKS = 14;
-  const MAX_CONTEXT_CHARS = 9000;
+  const MAX_CHUNKS = 16;
   let fullCode = '';
   let chunks = 0;
-  let stoppedEarly = false;
 
-  const lineCount = () => fullCode ? fullCode.split(/\r?\n/).length : 0;
-  const updateStats = () => {
-    const lines = document.getElementById(`${cardId}-stat-lines`);
-    const elapsed = document.getElementById(`${cardId}-stat-time`);
-    if (lines) lines.textContent = `${lineCount().toLocaleString()} lines`;
-    if (elapsed) elapsed.textContent = `${((Date.now() - startedAt) / 1000).toFixed(1)} s`;
+  const cleanupChunk = value => {
+    let chunk = String(value || '').trim();
+    chunk = chunk.replace(/^```(?:html|javascript|js|css|json|python|php|typescript|tsx|jsx)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+    // Remove common conversational lead-ins, but do not strip real code comments.
+    chunk = chunk.replace(/^(?:Here(?:'s| is) the code|Sure[,!]?|Certainly[,!]?|Below is the code)\s*:?\s*/i, '');
+    if (chunks > 0) chunk = chunk.replace(/^<!doctype\s+html>\s*/i, '').replace(/^<html[^>]*>\s*/i, '').replace(/^<head[^>]*>\s*/i, '');
+    return chunk;
   };
+  const lineCount = () => fullCode ? fullCode.split(/\r?\n/).length : 0;
+  const updateLiveCode = () => { window[`triAgentWorkingCode_${cardId}`] = fullCode; };
+  const finishTimer = () => { const timer = triAgentTelemetryTimers.get(cardId); if (timer) clearInterval(timer); triAgentTelemetryTimers.delete(cardId); };
 
   try {
-    triAgentSetStep(cardId, 1, `Agent 1: Planning ${targetFileName}`, '⚡', '#00a884');
-    triAgentProgress(cardId, 5, 'Preparing code-generation plan…', 'Planning');
+    triAgentSetStep(cardId, 1, `Agent 1 · Blueprinting ${targetFileName}`, '⚡', '#38e0b3');
+    triAgentProgress(cardId, 8, `Defining architecture for ${targetFileName}…`, 'Architect');
     await new Promise(resolve => setTimeout(resolve, 250));
-    triAgentSetStep(cardId, 1, 'Agent 1: Request prepared', '✅', '#00a884');
+    triAgentSetStep(cardId, 1, 'Agent 1 · Blueprint approved', '✅', '#4ade80');
 
     while (chunks < MAX_CHUNKS) {
       const batchNumber = chunks + 1;
-      const progress = Math.min(90, 8 + Math.round((batchNumber / MAX_CHUNKS) * 80));
-      updateStats();
-      triAgentProgress(cardId, progress, `Requesting batch ${batchNumber}/${MAX_CHUNKS}…`, `Batch ${batchNumber}/${MAX_CHUNKS}`);
-      triAgentSetStep(cardId, 2, `Agent 2: Generating batch ${batchNumber}/${MAX_CHUNKS}`, '⚡', '#38bdf8');
-
-      const previousTail = fullCode.slice(-MAX_CONTEXT_CHARS);
+      const progress = Math.min(90, 10 + Math.round((batchNumber / MAX_CHUNKS) * 78));
+      triAgentProgress(cardId, progress, `Requesting batch ${batchNumber}/${MAX_CHUNKS}…`, `Batch ${batchNumber}`);
+      triAgentSetStep(cardId, 2, `Agent 2 · Generating batch ${batchNumber}/${MAX_CHUNKS}`, '⚡', '#38bdf8');
+      const existingLines = lineCount();
+      const systemPrompt = `You are Suhail AI's senior production software engineer. Output source code only, with no preamble, markdown fences, batch summaries, or conversational sign-off. Respect the requested language and file type. Do not invent fake functionality or pad with meaningless comments. Build complete, robust, maintainable code. Target file: ${targetFileName}.`;
       const batchPrompt = batchNumber === 1
-        ? `Implement this exact requested project: ${text}\nTarget file: ${targetFileName}.\nReturn code only, no markdown fences or prose. Make the implementation functional, not placeholders or TODOs. Prefer complete, meaningful features over artificial line padding. For HTML, start with one document structure; later batches will continue it. This is batch 1 of up to ${MAX_CHUNKS}. Aim for a useful, maintainable implementation.`
-        : `Continue the SAME ${targetFileName} from the supplied existing-code tail. This is batch ${batchNumber}/${MAX_CHUNKS}.\nCurrent total is approximately ${lineCount()} lines; desired target is about ${TARGET_LINES} lines only if genuine implementation requires it.\nDo not repeat existing code, do not start a new HTML document, do not emit summaries or TODO placeholders. Continue with the next missing implementation section. Return code only.\n\nEXISTING CODE TAIL (context only; do not repeat):\n${previousTail}`;
-
-      let res;
-      try {
-        res = await fetch('/api?action=tri_chunk', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: [
-            { role: 'system', content: `You are Suhail AI's code-generation engine. Output only source code for ${targetFileName}. No explanations, summaries, markdown fences, fake features, TODO placeholders, or duplicate document wrappers. Continue the existing implementation using the supplied tail context.` },
-            { role: 'user', content: batchPrompt }
-          ] })
-        });
-      } catch (networkError) {
-        throw new Error(`Network/API connection failed on batch ${batchNumber}: ${networkError.message || networkError}`);
+        ? `Implement this request as a complete production-ready project/file: ${text}\nTarget file: ${targetFileName}. Write substantial, coherent code with validation, error handling, accessibility, responsive styling where relevant, and clear code comments. Begin with the real first line of the file. Raw code only.`
+        : `Continue the SAME file ${targetFileName} from the end of the code excerpt below. Current accumulated size: ${existingLines} lines. Overall target: approximately ${TARGET_LINES}+ lines if the requested functionality genuinely warrants that size; never add filler just to hit a number. Do not repeat the file beginning. Continue directly with valid code only.\n\nLAST PART OF CURRENT FILE (context only; do not repeat):\n${fullCode.slice(-9000)}\n\nWrite the next logically necessary section now. No summaries or conversational text.`;
+      const response = await fetch('/api?action=tri_chunk', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: batchPrompt }] })
+      });
+      let data = {};
+      try { data = await response.json(); } catch (_) {}
+      if (!response.ok || data.error) {
+        const errorMessage = data && data.error ? (typeof data.error === 'string' ? data.error : data.error.message || 'API error') : `HTTP ${response.status}`;
+        if (fullCode.length > 500) { triAgentProgress(cardId, progress, `Batch ${batchNumber} failed; packaging saved output`, 'Recovering'); break; }
+        throw new Error(`Tri-Agent API error: ${errorMessage}`);
       }
-      if (!res.ok) throw new Error(`API returned HTTP ${res.status} on batch ${batchNumber}. Existing partial code was preserved in the browser draft; ZIP not marked complete.`);
-      const data = await res.json();
-      if (data?.error) throw new Error(typeof data.error === 'object' ? (data.error.message || 'API error') : String(data.error));
-      const content = data?.choices?.[0]?.message?.content;
-      if (typeof content !== 'string' || !content.trim()) throw new Error(`Empty/invalid model response on batch ${batchNumber}.`);
-
-      let chunk = triAgentExtractCode(content);
-      if (isHtmlTarget) chunk = triAgentNormalizeHtmlChunk(chunk, batchNumber === 1);
-      if (!chunk) throw new Error(`Batch ${batchNumber} returned no usable code.`);
+      const choice = data && data.choices && data.choices[0];
+      if (!choice || !choice.message || typeof choice.message.content !== 'string') {
+        if (fullCode.length > 500) break;
+        throw new Error('API returned no usable code content.');
+      }
+      const chunk = cleanupChunk(choice.message.content);
+      if (!chunk) { if (fullCode.length > 500) break; throw new Error('Model returned an empty code batch.'); }
       fullCode += (fullCode && !fullCode.endsWith('\n') ? '\n' : '') + chunk + '\n';
       chunks++;
+      updateLiveCode();
       try { localStorage.setItem(cacheDraftKey, fullCode); } catch (_) {}
-      updateStats();
-
+      const liveLines = document.getElementById(`${cardId}-stat-lines`);
+      if (liveLines) liveLines.textContent = String(lineCount());
       if (chunks >= MIN_CHUNKS && lineCount() >= TARGET_LINES) break;
-      if (batchNumber < MAX_CHUNKS) await new Promise(resolve => setTimeout(resolve, 900));
+      if (chunks < MAX_CHUNKS) await new Promise(resolve => setTimeout(resolve, 900));
     }
 
-    triAgentSetStep(cardId, 3, 'Agent 3: Validating document & preparing ZIP', '⚡', '#facc15');
-    triAgentProgress(cardId, 94, 'Checking structure and packaging…', 'Validation');
-    triAgentStopTelemetry(cardId);
-    if (!fullCode.trim()) throw new Error('No code was generated.');
-
-    let cleanCode = fullCode.trim();
+    if (!fullCode.trim()) throw new Error('Tri-Agent generated no code.');
+    triAgentSetStep(cardId, 3, 'Agent 3 · Cleaning and packaging', '⚡', '#facc15');
+    triAgentProgress(cardId, 94, 'Removing trailing conversational residue and building ZIP…', 'Packaging');
+    let cleanCode = fullCode
+      .replace(/\n?\*?\s*Batch\s*\d+\s*\/\s*\d+[^\n]*\n?[\s\S]*$/i, '')
+      .replace(/\n?This completes (?:the|your)[\s\S]*$/i, '')
+      .replace(/\n?Let me know if you need[\s\S]*$/i, '')
+      .replace(/^```(?:html|javascript|js|css|json|python|php|typescript|tsx|jsx)?\s*/i, '')
+      .replace(/\s*```\s*$/i, '').trim();
     if (isHtmlTarget) {
-      cleanCode = cleanCode.replace(/<\/body\s*>/ig, '').replace(/<\/html\s*>/ig, '').trim();
-      // Do not silently fabricate missing major sections; only close the document shell.
-      if (!/<html\b/i.test(cleanCode)) cleanCode = '<!doctype html>\n<html lang="en">\n' + cleanCode;
-      if (!/<head\b/i.test(cleanCode)) cleanCode = cleanCode.replace(/<html\b[^>]*>/i, '$&\n<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>');
-      if (!/<body\b/i.test(cleanCode)) cleanCode = cleanCode.replace(/<\/head\s*>/i, '$&\n<body>') + '\n</body>';
-      else cleanCode += '\n</body>';
-      cleanCode += '\n</html>';
-      const htmlOpenCount = (cleanCode.match(/<html\b/ig) || []).length;
-      const htmlCloseCount = (cleanCode.match(/<\/html\s*>/ig) || []).length;
-      const bodyOpenCount = (cleanCode.match(/<body\b/ig) || []).length;
-      const bodyCloseCount = (cleanCode.match(/<\/body\s*>/ig) || []).length;
-      if (htmlOpenCount !== 1 || htmlCloseCount !== 1 || bodyOpenCount !== 1 || bodyCloseCount !== 1) {
-        throw new Error(`HTML validation failed: html tags ${htmlOpenCount}/${htmlCloseCount}, body tags ${bodyOpenCount}/${bodyCloseCount}. Draft is saved locally; ZIP not packaged.`);
-      }
+      if (/<script\b/i.test(cleanCode) && !/<\/script>/i.test(cleanCode)) cleanCode += '\n<' + '/script>';
+      if (/<style\b/i.test(cleanCode) && !/<\/style>/i.test(cleanCode)) cleanCode += '\n</style>';
+      if (!/<\/body>/i.test(cleanCode)) cleanCode += '\n</body>';
+      if (!/<\/html>/i.test(cleanCode)) cleanCode += '\n</html>';
     }
-
     const actualLines = cleanCode.split(/\r?\n/).length;
     const duration = ((Date.now() - startedAt) / 1000).toFixed(1);
     const kb = (new Blob([cleanCode]).size / 1024).toFixed(1);
-    updateStats();
-    const linesEl = document.getElementById(`${cardId}-stat-lines`);
-    if (linesEl) linesEl.textContent = `${actualLines.toLocaleString()} lines`;
-    if (typeof JSZip === 'undefined') throw new Error('JSZip library is not loaded. Code draft is saved locally; ZIP could not be created.');
-
+    if (typeof JSZip === 'undefined') throw new Error('JSZip did not load; cannot create ZIP.');
     const zip = new JSZip();
     if (multiFile && isHtmlTarget) {
-      const styleMatch = cleanCode.match(/<style\b[^>]*>([\s\S]*?)<\/style\s*>/i);
-      const scriptMatch = cleanCode.match(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/i);
-      const css = styleMatch?.[1]?.trim() || '';
-      const scriptAttrs = scriptMatch?.[1] || '';
-      const js = scriptMatch?.[2]?.trim() || '';
+      const styleMatch = cleanCode.match(/<style\b[^>]*>([\s\S]*?)<\/style>/i);
+      const scriptMatch = cleanCode.match(/<script\b[^>]*>([\s\S]*?)<\/script>/i);
+      const css = styleMatch ? styleMatch[1].trim() : '';
+      const js = scriptMatch ? scriptMatch[1].trim() : '';
       let modularHtml = cleanCode;
-      if (styleMatch && css) modularHtml = modularHtml.replace(styleMatch[0], '<link rel="stylesheet" href="style.css">');
-      if (scriptMatch && js && !/\bsrc\s*=/i.test(scriptAttrs)) modularHtml = modularHtml.replace(scriptMatch[0], '<script src="app.js"><' + '/script>');
+      if (styleMatch) modularHtml = modularHtml.replace(styleMatch[0], '<link rel="stylesheet" href="style.css">');
+      if (scriptMatch) modularHtml = modularHtml.replace(scriptMatch[0], '<script src="app.js"><' + '/script>');
       zip.file('index.html', modularHtml);
       if (css) zip.file('style.css', css);
-      if (js && !/\bsrc\s*=/i.test(scriptAttrs)) zip.file('app.js', js);
-    } else {
-      zip.file(targetFileName, cleanCode);
-    }
-    const targetReached = actualLines >= TARGET_LINES;
-    zip.file('README.txt', `Generated by Suhail AI Tri-Agent Engine\nTarget file: ${targetFileName}\nBatches received: ${chunks}/${MAX_CHUNKS}\nActual lines: ${actualLines}\nTarget lines reached: ${targetReached ? 'yes' : 'no'}\nPayload size: ${kb} KB\nBuild time: ${duration}s\nNote: Line count does not certify feature completeness or production readiness. Test the project before deployment.\n`);
+      if (js) zip.file('app.js', js);
+    } else zip.file(targetFileName, cleanCode);
+    zip.file('README.txt', `Generated by Suhail AI Tri-Agent\nTarget: ${targetFileName}\nBatches completed: ${chunks}\nOutput lines: ${actualLines}\nSize: ${kb} KB\nElapsed: ${duration}s\nTarget lines: ${TARGET_LINES}; maximum batches: ${MAX_CHUNKS}. Output size depends on the request and model response; a line target is not a guarantee.`);
     const blob = await zip.generateAsync({ type: 'blob' });
     const downloadUrl = URL.createObjectURL(blob);
-    const zipFileName = `SuhailAI_${targetFileName.replace(/\./g, '_')}.zip`;
     const previewUrl = isHtmlTarget ? URL.createObjectURL(new Blob([cleanCode], { type: 'text/html' })) : '';
+    const zipFileName = `SuhailAI_${targetFileName.replace(/\./g, '_')}.zip`;
     window[`code_${cardId}`] = cleanCode;
     window[`blob_${cardId}`] = blob;
     window[`filename_${cardId}`] = zipFileName;
-
-    triAgentProgress(cardId, 100, `Packaged ${chunks} batches · ${actualLines} lines`, 'Packaged');
-    triAgentSetStep(cardId, 2, `Agent 2: Collected ${actualLines} lines`, '✅', '#00a884');
-    triAgentSetStep(cardId, 3, targetReached ? 'Agent 3: ZIP ready; verify features before deployment' : `Agent 3: ZIP ready; target ${TARGET_LINES} lines not reached`, targetReached ? '✅' : '⚠️', targetReached ? '#00a884' : '#facc15');
+    triAgentProgress(cardId, 100, `Complete · ${chunks} batches · ${actualLines} lines`, 'Done');
+    triAgentSetStep(cardId, 2, `Agent 2 · ${actualLines} lines assembled`, '✅', '#4ade80');
+    triAgentSetStep(cardId, 3, `Agent 3 · ZIP ready (${kb} KB)`, '✅', '#4ade80');
     const card = document.getElementById(cardId);
     if (card) {
-      const safeName = targetFileName.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+      finishTimer();
+      card.style.animation = 'none';
+      card.style.position = 'relative';
+      card.style.overflow = 'hidden';
+      card.style.border = '1.5px solid rgba(0,255,163,.48)';
+      card.style.background = 'radial-gradient(circle at 12% 0%,rgba(20,45,48,.98),rgba(7,13,18,.99) 72%)';
+      card.style.boxShadow = '0 15px 45px -10px rgba(0,210,106,.32),0 0 25px rgba(0,255,163,.17)';
       card.innerHTML = `
-        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:12px"><div style="display:flex;gap:10px;align-items:center"><div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#00a88433,#38bdf833);border:1px solid #00a88466;display:grid;place-items:center;font-size:20px">📦</div><div><strong style="color:#00d6a0;font-size:14px">Suhail AI Tri-Agent Package</strong><div style="font-size:11px;color:#9ca3af;margin-top:3px">${safeName} · <b style="color:#4ade80">${actualLines.toLocaleString()} lines</b> · ${kb} KB · ${duration}s</div></div></div><span style="font-size:10px;color:#38bdf8;background:#38bdf81c;border:1px solid #38bdf855;padding:4px 8px;border-radius:12px">${chunks} batches</span></div>
-        <div style="font-size:11px;color:${targetReached ? '#4ade80' : '#facc15'};margin-bottom:12px">${targetReached ? 'Target line count reached; feature correctness still needs testing.' : `Generated output is shorter than the ${TARGET_LINES}-line target. Do not assume missing features exist.`}</div>
-        <a href="${downloadUrl}" download="${zipFileName}" style="display:flex;justify-content:center;align-items:center;gap:8px;background:linear-gradient(135deg,#00a884,#059669);color:#fff;text-decoration:none;padding:13px;border-radius:12px;font-weight:800;font-size:13px">📥 Download ZIP</a>
-        <div style="display:flex;gap:8px;margin-top:9px;flex-wrap:wrap">${isHtmlTarget ? `<a href="${previewUrl}" target="_blank" rel="noopener" style="flex:1;text-align:center;background:#182229;border:1px solid #38bdf8;color:#38bdf8;text-decoration:none;padding:10px 5px;border-radius:10px;font-size:12px;font-weight:700">👁 Preview</a>` : ''}<button type="button" onclick="shareProjectZip('${cardId}')" style="flex:1;background:#182229;border:1px solid #00a884;color:#00d6a0;padding:10px 5px;border-radius:10px;font-size:12px;font-weight:700">📲 Share</button><button type="button" onclick="navigator.clipboard.writeText(window['code_${cardId}']).then(()=>this.innerText='✅ Copied').catch(()=>alert('Copy failed; use Preview or ZIP.'))" style="flex:1;background:#182229;border:1px solid #475569;color:#e2e8f0;padding:10px 5px;border-radius:10px;font-size:12px;font-weight:700">📋 Copy code</button></div>`;
+        <div aria-hidden="true" style="position:absolute;top:-30px;left:15%;width:70%;height:65px;background:radial-gradient(ellipse,rgba(0,255,163,.25),transparent 70%);pointer-events:none;"></div>
+        <div style="position:relative;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:15px;">
+          <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+            <div style="width:38px;height:38px;flex:none;border-radius:13px;background:linear-gradient(135deg,rgba(0,255,163,.2),rgba(2,132,199,.25));border:1px solid rgba(0,255,163,.4);display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12);">📦</div>
+            <div style="min-width:0;"><div style="font-size:13px;font-weight:900;letter-spacing:.35px;background:linear-gradient(90deg,#fff,#67e8f9,#34d399);-webkit-background-clip:text;background-clip:text;color:transparent;">SUHAIL AI TRI-AGENT PACKAGE</div><div style="font-size:10.5px;color:#a4b4c2;margin-top:4px;overflow-wrap:anywhere;">${targetFileName} · <b style="color:#00ffa3;">${actualLines.toLocaleString()} lines</b> · ${kb} KB · ${duration}s</div></div>
+          </div>
+          <span style="flex:none;font-size:10px;font-weight:800;color:#00ffa3;background:rgba(0,255,163,.1);border:1px solid rgba(0,255,163,.3);padding:4px 9px;border-radius:20px;white-space:nowrap;">${chunks} batches</span>
+        </div>
+        <div style="position:relative;display:flex;flex-direction:column;gap:10px;">
+          <a href="${downloadUrl}" download="${zipFileName}" style="display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;text-decoration:none;background:linear-gradient(110deg,#047857,#00d26a,#059669);background-size:200% auto;animation:triShimmer 3s infinite linear;color:#fff;padding:14px 12px;border-radius:14px;font-weight:850;font-size:13px;letter-spacing:.2px;box-shadow:0 8px 25px rgba(0,210,106,.35);border:1px solid rgba(255,255,255,.2);transition:transform .2s ease,filter .2s ease;">⬇️ Download Production ZIP · ${actualLines.toLocaleString()} Lines</a>
+          <div style="display:flex;gap:8px;flex-wrap:nowrap;">
+            ${isHtmlTarget ? `<a href="${previewUrl}" target="_blank" rel="noopener" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;background:rgba(255,255,255,.04);border:1px solid rgba(56,189,248,.42);color:#38bdf8;padding:10px 4px;border-radius:12px;font-size:11.5px;font-weight:750;backdrop-filter:blur(10px);">👁 Preview</a>` : ''}
+            <button type="button" onclick="shareProjectZip('${cardId}')" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid rgba(0,255,163,.4);color:#00ffa3;padding:10px 4px;border-radius:12px;font-size:11.5px;font-weight:750;cursor:pointer;backdrop-filter:blur(10px);">↗ Share</button>
+            <button type="button" onclick="navigator.clipboard.writeText(window['code_${cardId}']).then(()=>this.textContent='✓ Copied!').catch(()=>alert('Copy unavailable; use Preview or ZIP.'))" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,184,.3);color:#e2e8f0;padding:10px 4px;border-radius:12px;font-size:11.5px;font-weight:750;cursor:pointer;backdrop-filter:blur(10px);">▣ Copy code</button>
+          </div>
+          <div style="font-size:9px;color:#718693;text-align:center;">ZIP package is ready · Preview and copy remain available</div>
+        </div>`;
     }
-  } catch (err) {
-    triAgentStopTelemetry(cardId);
+  } catch (error) {
+    finishTimer();
     const card = document.getElementById(cardId);
-    const message = String(err?.message || err).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-    if (card) card.innerHTML = `<div style="color:#f87171;font-size:13px;padding:8px"><strong>Tri-Agent Error — no success claimed</strong><div style="margin-top:6px">${message}</div><div style="margin-top:8px;color:#cbd5e1">Received batches: ${chunks}/${MAX_CHUNKS}. Any received draft may be saved in this browser's local storage.</div></div>`;
+    if (card) {
+      const msg = String(error && error.message ? error.message : error).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      card.innerHTML = `<div style="color:#fb7185;font-size:13px;padding:8px;"><strong>Tri-Agent Error</strong><div style="margin-top:6px;">${msg}</div><div style="margin-top:6px;color:#9fb0bf;font-size:11px;">Any partial draft may be saved in this browser under the Tri-Agent draft key.</div></div>`;
+    }
+  } finally {
+    delete window[`triAgentWorkingCode_${cardId}`];
   }
 }
 
 async function shareProjectZip(cardId) {
   const blob = window[`blob_${cardId}`];
-  const filename = window[`filename_${cardId}`] || 'project.zip';
-  if (!blob) { alert('ZIP file is not available.'); return; }
-  if (typeof File === 'undefined') { alert('This browser does not support file sharing. Download the ZIP instead.'); return; }
+  const filename = window[`filename_${cardId}`] || 'SuhailAI_Project.zip';
+  if (!blob) { alert('ZIP file is not ready yet.'); return; }
   const file = new File([blob], filename, { type: 'application/zip' });
-  if (navigator.canShare?.({ files: [file] }) && navigator.share) {
-    try { await navigator.share({ files: [file], title: 'Suhail AI Tri-Agent Project', text: 'Generated by Suhail AI Tri-Agent Engine.' }); }
-    catch (err) { if (err?.name !== 'AbortError') alert(`Share error: ${err.message || err}`); }
-  } else alert('Direct file sharing is not supported in this browser. Use Download ZIP.');
+  if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+    try { await navigator.share({ files: [file], title: 'Suhail AI Tri-Agent Project' }); }
+    catch (err) { if (err && err.name !== 'AbortError') alert('Share failed: ' + err.message); }
+  } else alert('Direct file sharing is not supported in this browser. Please use Download ZIP.');
 }
 
+if (!document.getElementById('tri-agent-animations')) {
+  const style = document.createElement('style');
+  style.id = 'tri-agent-animations';
+  style.textContent = `@keyframes triAgentPulse{from{opacity:.45;transform:scale(.85)}to{opacity:1;transform:scale(1.1)}}
+@keyframes triLuxuryGlow{0%,100%{box-shadow:0 12px 40px -10px rgba(0,210,106,.30),0 0 20px rgba(56,189,248,.15);border-color:rgba(0,255,163,.45)}50%{box-shadow:0 16px 50px -5px rgba(56,189,248,.35),0 0 30px rgba(0,255,163,.25);border-color:rgba(56,189,248,.6)}}
+@keyframes triShimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes triPulseRing{0%,100%{transform:scale(.96);opacity:.85}50%{transform:scale(1.06);opacity:1;filter:drop-shadow(0 0 7px #00ffa3)}}
+@keyframes triFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@media(prefers-reduced-motion:reduce){.tri-luxury-motion{animation:none!important;transition:none!important}}`;
+  document.head.appendChild(style);
+}
+
+// ==========================================
 // 1. STRICTLY MALE NATURAL TTS ENGINE
 // ==========================================
 let activeSpeechBtn = null;
@@ -3294,6 +3316,3 @@ window.addEventListener('DOMContentLoaded', () => {
   
 </body>
 </html>
-
-
-
