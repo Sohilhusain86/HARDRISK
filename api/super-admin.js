@@ -1,73 +1,157 @@
-'use strict';
 const crypto = require('node:crypto');
 
-// Server-side only. Do not move this password into index.html or client JavaScript.
-const OWNER_PASSWORD = 'RfWC_N8moF%@M6pq$_2B7H';
-// Derive the session signing key server-side so a separate Vercel env var is not required.
-const SESSION_SECRET = crypto.createHash('sha256').update('SuhailAI Super Admin session:' + OWNER_PASSWORD).digest('hex');
 const COOKIE = 'suhail_sa_session';
 const SESSION_SECONDS = 10 * 60;
-const attempts = new Map();
+const MAX_BODY_BYTES = 8 * 1024;
+const attempts = new Map(); // Best-effort per-instance limiter only; use Redis/KV for production.
 
-function send(res, status, data, headers = {}) {
+function json(res, status, body, extraHeaders = {}) {
   res.statusCode = status;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.setHeader('Cache-Control', 'no-store, max-age=0');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'no-referrer');
-  for (const [k, v] of Object.entries(headers)) res.setHeader(k, v);
-  res.end(JSON.stringify(data));
+  res.setHeader('Vary', 'Cookie');
+  for (const [k, v] of Object.entries(extraHeaders)) res.setHeader(k, v);
+  res.end(JSON.stringify(body));
 }
-function safeEqual(a,b) { const x=Buffer.from(String(a)); const y=Buffer.from(String(b)); return x.length===y.length && crypto.timingSafeEqual(x,y); }
-function parseCookies(h='') { const out={}; for (const part of h.split(';')) { const i=part.indexOf('='); if(i>0) { try { out[part.slice(0,i).trim()]=decodeURIComponent(part.slice(i+1).trim()); } catch {} } } return out; }
-function sign(payload) { const body=Buffer.from(JSON.stringify(payload)).toString('base64url'); const sig=crypto.createHmac('sha256',SESSION_SECRET).update(body).digest('base64url'); return body+'.'+sig; }
-function verify(token) {
-  if(!token || typeof token!=='string' || token.length>4096) return null;
-  const parts=token.split('.'); if(parts.length!==2) return null;
-  const sig=crypto.createHmac('sha256',SESSION_SECRET).update(parts[0]).digest('base64url');
-  if(!safeEqual(parts[1],sig)) return null;
-  try { const p=JSON.parse(Buffer.from(parts[0],'base64url').toString('utf8')); return p && p.role==='owner' && Number.isFinite(p.exp) && p.exp>Math.floor(Date.now()/1000) ? p : null; } catch { return null; }
+function parseCookies(header = '') {
+  const out = {};
+  for (const item of header.split(';')) {
+    const i = item.indexOf('=');
+    if (i > 0) out[item.slice(0, i).trim()] = decodeURIComponent(item.slice(i + 1).trim());
+  }
+  return out;
 }
-function cookie(value,maxAge,secure) { return `${COOKIE}=${encodeURIComponent(value)}; Path=/api/super-admin; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${secure?'; Secure':''}`; }
-function sameOrigin(req) {
-  const origin=req.headers.origin; if(!origin) return true;
-  const host=req.headers['x-forwarded-host']||req.headers.host; if(!host) return false;
-  try { return new URL(origin).host.toLowerCase()===String(host).toLowerCase(); } catch { return false; }
+function safeEqual(a, b) {
+  const aa = Buffer.from(String(a)); const bb = Buffer.from(String(b));
+  return aa.length === bb.length && crypto.timingSafeEqual(aa, bb);
 }
-function body(req) {
-  if(req.body && typeof req.body==='object') return Promise.resolve(req.body);
-  return new Promise((resolve,reject)=>{ let raw=''; req.on('data',chunk=>{ raw+=chunk; if(raw.length>8192) reject(new Error('large')); }); req.on('end',()=>{ try { resolve(raw?JSON.parse(raw):{}); } catch { reject(new Error('json')); } }); req.on('error',reject); });
+function sign(payload, secret) {
+  const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const sig = crypto.createHmac('sha256', secret).update(body).digest('base64url');
+  return `${body}.${sig}`;
 }
-function limited(key) { const now=Date.now(); let a=attempts.get(key)||{n:0,t:now}; if(now-a.t>15*60*1000) a={n:0,t:now}; a.n++; attempts.set(key,a); return a.n>8; }
+function verify(token, secret) {
+  if (!token || typeof token !== 'string' || token.length > 4096) return null;
+  const parts = token.split('.'); if (parts.length !== 2) return null;
+  const expected = crypto.createHmac('sha256', secret).update(parts[0]).digest('base64url');
+  if (!safeEqual(parts[1], expected)) return null;
+  try {
+    const p = JSON.parse(Buffer.from(parts[0], 'base64url').toString('utf8'));
+    if (!p || p.role !== 'owner' || !Number.isFinite(p.exp) || p.exp <= Math.floor(Date.now() / 1000)) return null;
+    return p;
+  } catch { return null; }
+}
+function cookieHeader(value, maxAge, secure) {
+  return `${COOKIE}=${encodeURIComponent(value)}; Path=/api/super-admin; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${secure ? '; Secure' : ''}`;
+}
+function requestIsSameOrigin(req) {
+  const origin = req.headers.origin;
+  if (!origin) return true; // Native same-origin form/fetch clients may omit Origin.
+  const host = req.headers['x-forwarded-host'] || req.headers.host;
+  if (!host) return false;
+  try { return new URL(origin).host.toLowerCase() === String(host).toLowerCase(); } catch { return false; }
+}
+function getBody(req) {
+  if (req.body && typeof req.body === 'object') return Promise.resolve(req.body);
+  return new Promise((resolve, reject) => {
+    let data = ''; req.on('data', chunk => { data += chunk; if (data.length > MAX_BODY_BYTES) reject(new Error('Body too large')); });
+    req.on('end', () => { try { resolve(data ? JSON.parse(data) : {}); } catch { reject(new Error('Invalid JSON')); } });
+    req.on('error', reject);
+  });
+}
+function isRateLimited(key) {
+  const now = Date.now(); const prior = attempts.get(key) || { count: 0, start: now };
+  if (now - prior.start > 15 * 60 * 1000) { prior.count = 0; prior.start = now; }
+  prior.count += 1; attempts.set(key, prior);
+  return prior.count > 8;
+}
 
-module.exports = async function handler(req,res) {
-  const url = new URL(req.url,'http://local');
-  const action = String((req.query&&req.query.action)||url.searchParams.get('action')||'');
-  const secure = process.env.NODE_ENV==='production' || String(req.headers['x-forwarded-proto']||'').includes('https');
-  if(!sameOrigin(req)) return send(res,403,{ok:false,error:'Cross-origin request denied.'});
+module.exports = async function handler(req, res) {
+  const action = String((req.query && req.query.action) || new URL(req.url, 'http://local').searchParams.get('action') || '');
+  const secure = process.env.NODE_ENV === 'production' || String(req.headers['x-forwarded-proto'] || '').includes('https');
+  const expected = process.env.SUPER_ADMIN_PASSWORD;
+  if (!expected || expected.length < 16) return json(res, 503, { ok: false, error: 'Set SUPER_ADMIN_PASSWORD in Vercel Environment Variables.' });
+  // One Vercel secret only: derive a separate signing key from the password using domain separation.
+  const secret = crypto.createHash('sha256').update('SuhailAI:SuperAdmin:Session:v1:').update(expected).digest();
+  if (!requestIsSameOrigin(req)) return json(res, 403, { ok: false, error: 'Cross-origin request denied.' });
 
-  if(action==='super_admin_auth') {
-    if(req.method!=='POST') return send(res,405,{ok:false,error:'Method not allowed.'},{Allow:'POST'});
-    const ip=String(req.headers['x-forwarded-for']||req.socket?.remoteAddress||'unknown').split(',')[0].trim();
-    if(limited(ip)) return send(res,429,{ok:false,error:'Too many attempts. Try again later.'});
-    let data; try { data=await body(req); } catch { return send(res,400,{ok:false,error:'Invalid request body.'}); }
-    const supplied=typeof data.password==='string'?data.password:'';
-    if(!supplied || !safeEqual(supplied,OWNER_PASSWORD)) return send(res,401,{ok:false,error:'Owner verification failed.'});
-    const now=Math.floor(Date.now()/1000);
-    const payload={role:'owner',permissions:['super_admin:read','super_admin:manage'],iat:now,exp:now+SESSION_SECONDS,nonce:crypto.randomBytes(16).toString('hex')};
-    return send(res,200,{ok:true,role:'owner',permissions:payload.permissions,expiresAt:payload.exp*1000},{'Set-Cookie':cookie(sign(payload),SESSION_SECONDS,secure)});
+  if (action === 'super_admin_auth') {
+    if (req.method !== 'POST') return json(res, 405, { ok: false, error: 'Method not allowed.' }, { Allow: 'POST' });
+    const ip = String(req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
+    if (isRateLimited(ip)) return json(res, 429, { ok: false, error: 'Too many attempts. Try again later.' });
+    let body;
+    try { body = await getBody(req); } catch { return json(res, 400, { ok: false, error: 'Invalid request body.' }); }
+    const supplied = typeof body.password === 'string' ? body.password : '';
+    if (!supplied || !safeEqual(supplied, expected)) {
+      return json(res, 401, { ok: false, error: 'Owner verification failed.' });
+    }
+    const now = Math.floor(Date.now() / 1000);
+    const payload = { role: 'owner', permissions: ['super_admin:read', 'super_admin:manage'], iat: now, exp: now + SESSION_SECONDS, nonce: crypto.randomBytes(16).toString('hex') };
+    const token = sign(payload, secret);
+    return json(res, 200, { ok: true, role: 'owner', permissions: payload.permissions, expiresAt: payload.exp * 1000 }, { 'Set-Cookie': cookieHeader(token, SESSION_SECONDS, secure) });
   }
-  const session=verify(parseCookies(req.headers.cookie||'')[COOKIE]);
-  if(action==='super_admin_session') {
-    if(req.method!=='GET') return send(res,405,{ok:false,error:'Method not allowed.'},{Allow:'GET'});
-    if(!session) return send(res,401,{ok:false,error:'Valid Super Admin session required.'});
-    return send(res,200,{ok:true,role:session.role,permissions:session.permissions,expiresAt:session.exp*1000});
+
+  const cookies = parseCookies(req.headers.cookie || '');
+  const session = verify(cookies[COOKIE], secret);
+  if (action === 'super_admin_session') {
+    if (req.method !== 'GET') return json(res, 405, { ok: false, error: 'Method not allowed.' }, { Allow: 'GET' });
+    if (!session) return json(res, 401, { ok: false, error: 'Valid Super Admin session required.' });
+    return json(res, 200, { ok: true, role: session.role, permissions: session.permissions, expiresAt: session.exp * 1000 });
   }
-  if(action==='super_admin_logout') {
-    if(req.method!=='POST') return send(res,405,{ok:false,error:'Method not allowed.'},{Allow:'POST'});
-    return send(res,200,{ok:true},{'Set-Cookie':cookie('',0,secure)});
+  if (action === 'super_admin_logout') {
+    if (req.method !== 'POST') return json(res, 405, { ok: false, error: 'Method not allowed.' }, { Allow: 'POST' });
+    return json(res, 200, { ok: true }, { 'Set-Cookie': cookieHeader('', 0, secure) });
   }
-  if(!session) return send(res,401,{ok:false,error:'Valid Super Admin session required.'});
-  if(action==='super_admin_dashboard' && req.method==='GET') return send(res,503,{ok:false,connected:false,error:'Dashboard data provider is not configured; no live metrics are available.'});
-  return send(res,501,{ok:false,error:'This administrative action is not implemented on the server yet.'});
+  if (!session) return json(res, 401, { ok: false, error: 'Valid Super Admin session required.' });
+
+  // Securely bridge the existing admin workflows after the owner password has
+  // created a valid HttpOnly session. Only the explicitly allow-listed actions
+  // below can be proxied; the admin secret never leaves the server.
+  if (action === 'super_admin_proxy') {
+    if (req.method !== 'POST') return json(res, 405, { ok: false, error: 'Method not allowed.' }, { Allow: 'POST' });
+    let body;
+    try { body = await getBody(req); } catch { return json(res, 400, { ok: false, error: 'Invalid request body.' }); }
+    const allowed = new Set(['ai_chat_summary', 'students_summary', 'extend_plan', 'toggle_block', 'reset_daily_limit', 'set_notice']);
+    const targetAction = String(body.action || '');
+    if (!allowed.has(targetAction)) return json(res, 400, { ok: false, error: 'This action is not allow-listed for Super Admin proxy.' });
+    let adminHandler;
+    try { adminHandler = require('./admin'); } catch (_) { return json(res, 503, { ok: false, error: 'Existing api/admin.js could not be loaded.' }); }
+    const adminSecret = process.env.ADMIN_SECRET || 'SuhailAiJamia';
+    const proxiedBody = { ...((body.params && typeof body.params === 'object' && !Array.isArray(body.params)) ? body.params : {}), pass: adminSecret };
+    const mockReq = {
+      method: 'POST', url: `/api/admin?action=${encodeURIComponent(targetAction)}`,
+      query: { action: targetAction }, body: proxiedBody,
+      headers: { host: req.headers.host || '', origin: req.headers.origin || '', 'x-forwarded-proto': req.headers['x-forwarded-proto'] || '' },
+      socket: req.socket,
+      on: (...args) => req.on?.(...args)
+    };
+    let finished = false;
+    const mockRes = {
+      statusCode: 200, headers: {}, output: '',
+      setHeader(k, v) { this.headers[k] = v; },
+      getHeader(k) { return this.headers[k]; },
+      status(code) { this.statusCode = code; return this; },
+      json(value) { this.output = JSON.stringify(value); finished = true; return this; },
+      send(value) { this.output = typeof value === 'string' ? value : JSON.stringify(value); finished = true; return this; },
+      end(value='') { this.output = String(value); finished = true; },
+      write(value) { this.output += String(value); return true; }
+    };
+    try {
+      await adminHandler(mockReq, mockRes);
+      let result = {};
+      try { result = JSON.parse(mockRes.output || '{}'); } catch { result = { success: mockRes.statusCode < 400, message: mockRes.output || 'Admin action completed.' }; }
+      return json(res, mockRes.statusCode || 200, { ...result, proxied: true });
+    } catch (err) {
+      return json(res, 502, { ok: false, error: 'Existing admin action failed.', detail: String(err?.message || 'Unknown server error') });
+    }
+  }
+
+  // Fail closed until real data providers are explicitly wired in. Never return fabricated metrics.
+  if (action === 'super_admin_dashboard') {
+    if (req.method !== 'GET') return json(res, 405, { ok: false, error: 'Method not allowed.' }, { Allow: 'GET' });
+    return json(res, 503, { ok: false, connected: false, error: 'Dashboard data provider is not configured; no live metrics are available.' });
+  }
+  return json(res, 501, { ok: false, error: 'This administrative action is not implemented on the server yet.' });
 };
