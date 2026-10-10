@@ -924,24 +924,6 @@ body.focus-reader-mode .exit-focus-btn {
   .chat-bubble.ai:not(.tri-luxury-motion):not([id^="tri-agent-"]), .typing-cursor { animation: none !important; transition: none !important; }
 }
 
-
-/* RESTORE SIMPLE LEGACY AI ANSWER STYLE: no glowing cards, no floating animation */
-.chat-bubble.ai:not(.tri-luxury-motion):not([id^="tri-agent-"]) {
-  background: var(--panel-dark, #111b21) !important;
-  border: 1px solid var(--card-border, rgba(255,255,255,.08)) !important;
-  border-left: 1px solid var(--card-border, rgba(255,255,255,.08)) !important;
-  border-radius: 10px !important;
-  box-shadow: none !important;
-  animation: none !important;
-  padding: 12px 14px !important;
-  margin: 8px 0 !important;
-}
-.chat-bubble.ai:not(.tri-luxury-motion):not([id^="tri-agent-"]) .ai-label {
-  border-bottom: 0 !important; margin-bottom: 4px !important; padding-bottom: 0 !important;
-}
-.streaming-word { opacity: 1 !important; transform: none !important; animation: none !important; }
-.typing-cursor, .ink-cursor { animation: none !important; box-shadow: none !important; }
-
 </style>
 
   <link rel="manifest" href="/manifest.json">
@@ -2140,7 +2122,7 @@ window.toggleSpeech = function(btn) {
   if (superAdminToggle) superAdminToggle.onclick = () => openSuperAdminGate();
 
   // Phase 2: Super Admin access is denied unless a server verifies the current actor.
-  // Expected endpoint contract: POST /api/admin?action=super_admin_auth
+  // Expected endpoint contract: POST /api/super-admin?action=super_admin_auth
   // Body: { password: "..." }; response: { ok:true, role:"owner"|"super_admin", permissions:[...], expiresAt:<unix-ms> }
   async function openSuperAdminGate() {
     const gate = document.getElementById('sa-auth-gate');
@@ -2191,7 +2173,7 @@ window.toggleSpeech = function(btn) {
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || data.ok !== true || !['owner','super_admin'].includes(String(data.role || '').toLowerCase())) {
-        throw new Error(data.error || (response.status === 404 ? 'Secure Super Admin verification endpoint abhi configure nahi hai. Backend endpoint banne tak access band rahega.' : 'Server ne Super Admin access verify nahi kiya.'));
+        throw new Error(data.error || (response.status === 404 ? 'api/super-admin.js deploy nahi hui. Project mein api/super-admin.js add karke redeploy karein.' : 'Server ne Super Admin access verify nahi kiya.'));
       }
       const expiry = Number(data.expiresAt || (Date.now() + 10 * 60 * 1000));
       try { sessionStorage.setItem('suhail_sa_verified_until', String(Math.min(expiry, Date.now() + 10 * 60 * 1000))); } catch (_) {}
@@ -2585,23 +2567,7 @@ window.toggleSpeech = function(btn) {
       content: m.text
     }));
 
-    // Response quality: AI ko saaf, munazzam aur padhne mein aasaan jawab dene ki hidayat.
-    // Sirf aam sawalat par formatting lagayein; chhote paighamat ko bila-wajah lamba na karein.
-    const presentationInstruction = isToolCall ? '' : `
-
-[SUHAIL AI RESPONSE QUALITY RULES:
-- User ki zaban aur script ko follow karein (Urdu, Roman Urdu, Hindi ya English); bila-wajah zaban na badlein.
-- Jawab seedha aur sawal ke mutabiq shuru karein. Aam salam/short message ka jawab fitri aur mukhtasar rakhein.
-- Tafseeli jawab mein munasib Markdown formatting use karein: chhoti wazeh headings (##), bullets/numbered steps, zaroorat par table, aur aham alfaaz ko **bold** karein.
-- Ek hi baat baar-baar na dohrayein. Lambi be-rabt paragraphs ke bajaye chhote paragraphs aur logical order rakhein.
-- Misal, steps, faide-nuqsan, ya nateeja sirf jab sawal ke liye mufeed ho tab dein; har jawab ko zabardasti headings mein na baantein.
-- Code ho to valid fenced code block mein dein. Math ho to calculation ke steps saaf dikhayein.
-- Deeni/ilmiy sawalat mein adab aur istilahat ka lihaz rakhein; Qur'an, Hadith, kitab, hawala, ya quote gharr kar pesh na karein. Yaqeen na ho to wazeh batayein.
-- User ne jitni tafseel maangi hai usi ke mutabiq jawab dein: na be-wajah mukhtasar, na ghair-zaroori taur par lamba.
-- Sirf jawab ka matn dein; apni formatting ya in hidayaat ka zikr na karein.]
-`;
-
-    // Density aur Deep Research ka instruction jodna
+    // Restore the earlier simple prompt behavior; keep optional density/deep-research controls.
     const density = document.getElementById('selResponseDensity')?.value || 'detailed';
     let promptInstruction = density === 'concise' ? ' [Jawab nihayat to-the-point aur mukhtasar dein]' : '';
 
@@ -2618,7 +2584,7 @@ window.toggleSpeech = function(btn) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          prompt: text + presentationInstruction + promptInstruction,
+          prompt: text + promptInstruction,
           phone: currentUser.phone,
           history: historyContext,
           isTool: isToolCall,
@@ -2652,85 +2618,29 @@ window.toggleSpeech = function(btn) {
   }
 
 function typeWriterEffect(bubbleElement, fullText, aiName) {
-  const isAr = containsArabic(fullText);
-  let words = fullText.split(' ');
-  let currentIndex = 0;
-  let currentText = '';
-
-  let userIsScrollingUp = false;
-  const onUserScroll = () => {
-    const distanceFromBottom = chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight;
-    userIsScrollingUp = distanceFromBottom > 80;
-  };
-  chatBox.addEventListener('scroll', onUserScroll);
-
-  const typingInterval = setInterval(() => {
-    if (currentIndex < words.length) {
-      currentText += (currentIndex === 0 ? '' : ' ') + words[currentIndex];
-      currentIndex++;
-
-      let parsedHtml = (typeof marked !== 'undefined') ? marked.parse(currentText) : currentText;
-      parsedHtml = parsedHtml.replace(/<table>/g, '<div class="table-responsive"><table>').replace(/<\/table>/g, '</table></div>');
-
-      bubbleElement.innerHTML = `
-        <span class="ai-label">${aiName || 'SUHAIL AI'}</span>
-        <div class="chat-content ${isAr ? 'arabic-text' : ''}">
-          ${parsedHtml}
-          <span class="typing-cursor"></span>
-        </div>
-      `;
-
-      if (!userIsScrollingUp) {
-        chatBox.scrollTop = chatBox.scrollHeight;
-      }
-    } else {
-      clearInterval(typingInterval);
-      chatBox.removeEventListener('scroll', onUserScroll);
-
-      let finalHtml = (typeof marked !== 'undefined') ? marked.parse(fullText) : fullText;
-      finalHtml = finalHtml.replace(/<table>/g, '<div class="table-responsive"><table>').replace(/<\/table>/g, '</table></div>');
-
-      bubbleElement.innerHTML = `
-        <span class="ai-label">${aiName || 'SUHAIL AI'}</span>
-        <div class="chat-content ${isAr ? 'arabic-text' : ''}">${finalHtml}</div>
-        <div class="bubble-actions" style="display:flex; justify-content:flex-end; gap:8px;">
-          <button class="btn-copy" onclick="window.toggleBookmark(this)" title="Sabaq Mehfooz Karein"><i class="fa-regular fa-bookmark"></i> Save</button>
-          <button class="btn-copy" onclick="window.copyText(this)"><i class="fa-regular fa-copy"></i> Copy Karein</button>
-          <button class="btn-copy" onclick="window.exportBubbleToPdf(this)" style="color:var(--accent-yellow);"><i class="fa-solid fa-file-pdf"></i> PDF Download</button>
-          <button class="btn-copy btn-speech" onclick="window.toggleSpeech(this)" title="Sabaq Sunain">🔊 Sunain</button>
-        </div>
-        <div class="bubble-quick-actions" style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
-          <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('simplify')">🧠 आसान समझाओ</button>
-          <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('detail')">📚 गहराई में बताओ</button>
-        </div>
-      `;
-
-      if (!userIsScrollingUp) {
-        chatBox.scrollTop = chatBox.scrollHeight;
-      }
-    }
-  }, 35);
+  // Stable/simple response rendering: no word-by-word innerHTML rewrites.
+  const isAr = containsArabic(String(fullText || ''));
+  const safeText = String(fullText == null ? '' : fullText);
+  let finalHtml = (typeof marked !== 'undefined') ? marked.parse(safeText) : safeText.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  finalHtml = finalHtml.replace(/<table>/g, '<div class="table-responsive"><table>').replace(/<\/table>/g, '</table></div>');
+  bubbleElement.innerHTML = `
+    <span class="ai-label">${aiName || 'SUHAIL AI'}</span>
+    <div class="chat-content ${isAr ? 'arabic-text' : ''}">${finalHtml}</div>
+    <div class="bubble-actions" style="display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap">
+      <button class="btn-copy" onclick="window.toggleBookmark(this)" title="Sabaq Mehfooz Karein"><i class="fa-regular fa-bookmark"></i> Save</button>
+      <button class="btn-copy" onclick="window.copyText(this)"><i class="fa-regular fa-copy"></i> Copy Karein</button>
+      <button class="btn-copy" onclick="window.exportBubbleToPdf(this)" title="PDF Download"><i class="fa-solid fa-file-pdf"></i> PDF Download</button>
+      <button class="btn-copy btn-speech" onclick="window.toggleSpeech(this)">🔊 Sunain</button>
+    </div>`;
+  if (typeof chatBox !== 'undefined' && chatBox) chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 function renderAiBubble(div, text, aiName) {
-  const isAr = containsArabic(text);
-  let parsedHtml = (typeof marked !== 'undefined') ? marked.parse(text) : text;
+  const isAr = containsArabic(String(text || ''));
+  const safeText = String(text == null ? '' : text);
+  let parsedHtml = (typeof marked !== 'undefined') ? marked.parse(safeText) : safeText.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   parsedHtml = parsedHtml.replace(/<table>/g, '<div class="table-responsive"><table>').replace(/<\/table>/g, '</table></div>');
-
-  div.innerHTML = `
-    <span class="ai-label">${aiName || 'SUHAIL AI'}</span>
-    <div class="chat-content ${isAr ? 'arabic-text' : ''}">${parsedHtml}</div>
-    <div class="bubble-actions" style="display:flex; justify-content:flex-end; gap:8px;">
-      <button class="btn-copy" onclick="window.toggleBookmark(this)" title="Sabaq Mehfooz Karein"><i class="fa-regular fa-bookmark"></i> Save</button>
-      <button class="btn-copy" onclick="window.copyText(this)"><i class="fa-regular fa-copy"></i> Copy Karein</button>
-      <button class="btn-copy" onclick="window.exportBubbleToPdf(this)" style="color:var(--accent-yellow);"><i class="fa-solid fa-file-pdf"></i> PDF Download</button>
-      <button class="btn-copy btn-speech" onclick="window.toggleSpeech(this)" title="Sabaq Sunain">🔊 Sunain</button>
-    </div>
-    <div class="bubble-quick-actions" style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
-      <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('simplify')">🧠 आसान समझाओ</button>
-      <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('detail')">📚 गहराई में बताओ</button>
-    </div>
-  `;
+  div.innerHTML = `<span class="ai-label">${aiName || 'SUHAIL AI'}</span><div class="chat-content ${isAr ? 'arabic-text' : ''}">${parsedHtml}</div>`;
 }
 
   document.getElementById('btn-submit-pay').onclick = async () => {
