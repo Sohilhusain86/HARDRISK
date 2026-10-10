@@ -717,7 +717,7 @@ body.focus-reader-mode .exit-focus-btn {
     
   
 
-/* Restored original simple chat response styling; no dynamic bubble overrides. */
+/* Restored original simple response styling; luxury dynamic overrides removed. */
 
 </style>
 
@@ -1923,7 +1923,7 @@ window.toggleSpeech = function(btn) {
     const gate = document.getElementById('sa-auth-gate');
     const msg = document.getElementById('sa-gate-message');
     const input = document.getElementById('sa-gate-password');
-    // Super Admin access is controlled by the server-side password, not the student account role.
+    // Owner password is verified by the server endpoint; frontend account role is not used as the gate.
     // Never trust sessionStorage alone: validate the HttpOnly server session every time.
     try {
       const check = await fetch('/api/super-admin?action=super_admin_session', { method: 'GET', credentials: 'same-origin', cache: 'no-store' });
@@ -2169,7 +2169,7 @@ window.toggleSpeech = function(btn) {
 
     document.getElementById('btn-admin-toggle').style.display = isAdmin ? 'inline-block' : 'none';
     const superAdminButton = document.getElementById('btn-super-admin-toggle');
-    if (superAdminButton) superAdminButton.style.display = 'inline-block';
+    if (superAdminButton) superAdminButton.style.display = isAdmin ? 'inline-block' : 'none';
     document.getElementById('nav-item-admin').style.display = isAdmin ? 'block' : 'none';
     if (isAdmin) {
       document.getElementById('nav-item-pay').style.display = 'none';
