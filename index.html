@@ -712,104 +712,7 @@ body.focus-reader-mode .exit-focus-btn {
   display: block;
 }
     
-  
-
-/* ========================================================================
-   ROYAL EDITORIAL & OBSIDIAN CYBER GLASS RESPONSE STYLING
-   Scoped to regular AI replies so Tri-Agent loader/package cards stay intact.
-   ======================================================================== */
-@keyframes royalResponseGlow {
-  0%, 100% { filter: drop-shadow(0 0 0 rgba(0,255,163,0)); }
-  50% { filter: drop-shadow(0 0 5px rgba(0,255,163,.12)); }
-}
-.chat-bubble.ai:not(.tri-luxury-motion):not([id^="tri-agent-"]) {
-  align-self:flex-start;
-  background:radial-gradient(circle at 10% 10%,rgba(22,34,42,.97) 0%,rgba(13,20,26,.99) 100%) !important;
-  border:1.5px solid rgba(0,255,163,.28) !important;
-  border-radius:20px 20px 20px 4px !important;
-  padding:18px 22px !important;
-  box-shadow:0 16px 40px -10px rgba(0,0,0,.7),0 0 25px rgba(0,255,163,.08) !important;
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  max-width:92% !important;
-  min-width:0;
-  transition:border-color .3s ease,box-shadow .3s ease;
-  position:relative;
-  overflow:hidden;
-}
-.chat-bubble.ai:not(.tri-luxury-motion):not([id^="tri-agent-"]):hover {
-  border-color:rgba(56,189,248,.45) !important;
-  box-shadow:0 20px 50px -10px rgba(0,0,0,.8),0 0 30px rgba(56,189,248,.15) !important;
-}
-.ai-label {
-  display:inline-flex !important;align-items:center;gap:6px;font-size:.72rem !important;
-  font-weight:800 !important;letter-spacing:.8px !important;text-transform:uppercase;
-  background:linear-gradient(90deg,#00ffa3,#38bdf8) !important;
-  -webkit-background-clip:text !important;background-clip:text !important;
-  -webkit-text-fill-color:transparent !important;margin-bottom:12px !important;
-  padding-bottom:6px !important;border-bottom:1px solid rgba(255,255,255,.08) !important;width:100% !important;
-}
-.ai-label::before { content:"✦";font-size:.75rem;color:#00ffa3;-webkit-text-fill-color:#00ffa3;animation:royalResponseGlow 3s infinite alternate; }
-.chat-content {
-  min-width:0;overflow-wrap:anywhere;
-  font-family:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif !important;
-  font-size:.92rem !important;line-height:1.85 !important;color:#e2e8f0 !important;letter-spacing:.2px;
-}
-.chat-content p { margin:0 0 12px !important; }
-.chat-content p:last-child { margin-bottom:0 !important; }
-.chat-content h1,.chat-content h2,.chat-content h3 {
-  font-weight:800 !important;letter-spacing:.25px;margin:16px 0 8px !important;line-height:1.4 !important;
-  background:linear-gradient(90deg,#fff 0%,#cbd5e1 50%,#67e8f9 100%);
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-}
-.chat-content h1 { font-size:1.18rem !important; }
-.chat-content h2 { font-size:1.08rem !important; }
-.chat-content h3 { font-size:.98rem !important; }
-.chat-content strong,.chat-content b { color:#f8fafc !important;font-weight:700 !important;text-shadow:0 0 10px rgba(0,255,163,.12); }
-.chat-content ul,.chat-content ol { margin:0 0 14px 20px !important;padding-left:4px; }
-.chat-content li { margin-bottom:8px !important;padding-left:4px; }
-.chat-content ul li::marker { color:#00ffa3; }
-.chat-content ol li::marker { color:#38bdf8;font-weight:700; }
-.arabic-text,.arabic-quote-box {
-  background:radial-gradient(circle at 10% 50%,rgba(0,255,163,.07) 0%,rgba(15,23,42,.72) 100%) !important;
-  border:1px solid rgba(0,255,163,.23) !important;border-right:4px solid #00ffa3 !important;
-  border-radius:14px !important;padding:16px 20px !important;margin:14px 0 !important;
-  font-family:'Amiri','Traditional Arabic','Noto Nastaliq Urdu',serif !important;
-  font-size:1.3rem !important;line-height:2.15 !important;direction:rtl !important;text-align:right !important;
-  color:#fef08a !important;box-shadow:inset 0 0 25px rgba(0,255,163,.035),0 8px 20px rgba(0,0,0,.3) !important;
-  overflow-wrap:break-word;
-}
-.chat-content blockquote {
-  background:rgba(56,189,248,.06) !important;border:1px solid rgba(56,189,248,.2) !important;
-  border-left:4px solid #38bdf8 !important;border-radius:12px !important;padding:12px 16px !important;
-  color:#b8c7d6 !important;font-style:italic !important;margin:12px 0 !important;
-  box-shadow:0 4px 15px rgba(0,0,0,.25) !important;
-}
-.chat-content code {
-  background:rgba(0,0,0,.55) !important;border:1px solid rgba(0,255,163,.2) !important;
-  color:#67e8f9 !important;padding:3px 7px !important;border-radius:6px !important;
-  font-family:'Fira Code',ui-monospace,monospace !important;font-size:.82rem !important;
-  white-space:pre-wrap;overflow-wrap:anywhere;
-}
-.chat-content pre { max-width:100%;overflow:auto;padding:12px !important;border-radius:12px !important;border:1px solid rgba(0,255,163,.2) !important;background:rgba(0,0,0,.55) !important; }
-.chat-content pre code { border:0 !important;padding:0 !important;box-shadow:none !important; }
-.table-responsive { max-width:100%;border:1px solid rgba(0,255,163,.25) !important;border-radius:14px !important;box-shadow:0 8px 24px rgba(0,0,0,.35) !important;overflow:auto !important;margin:14px 0 !important; }
-.table-responsive table { width:100%;background:rgba(15,23,42,.8) !important;border-collapse:collapse; }
-.table-responsive th { background:linear-gradient(135deg,rgba(0,168,132,.3),rgba(15,23,42,.9)) !important;color:#00ffa3 !important;font-weight:700;padding:10px 14px !important;border-bottom:1px solid rgba(0,255,163,.2) !important; }
-.table-responsive td { padding:10px 14px !important;border:1px solid rgba(255,255,255,.06) !important;color:#cbd5e1 !important; }
-.table-responsive tr:nth-child(even) { background:rgba(255,255,255,.025); }
-.typing-cursor { display:inline-block !important;width:7px !important;height:18px !important;background:linear-gradient(180deg,#00ffa3,#38bdf8) !important;box-shadow:0 0 12px #00ffa3,0 0 20px #38bdf8 !important;border-radius:2px !important;margin-left:5px !important;vertical-align:middle !important;animation:blinkCursor .7s infinite alternate !important; }
-@media(max-width:480px) {
-  .chat-bubble.ai:not(.tri-luxury-motion):not([id^="tri-agent-"]) { max-width:96% !important;padding:15px 15px !important;border-radius:17px 17px 17px 4px !important; }
-  .chat-content { font-size:.89rem !important;line-height:1.8 !important; }
-  .arabic-text,.arabic-quote-box { font-size:1.18rem !important;padding:13px 14px !important;line-height:2.05 !important; }
-  .table-responsive th,.table-responsive td { padding:8px 9px !important; }
-}
-@media(prefers-reduced-motion:reduce) {
-  .chat-bubble.ai:not(.tri-luxury-motion):not([id^="tri-agent-"]),.ai-label::before,.typing-cursor { animation:none !important;transition:none !important; }
-}
-
-</style>
+  </style>
 
   <link rel="manifest" href="/manifest.json">
 </head>
@@ -1279,7 +1182,7 @@ function createAgentLoaderUI(chatBox) {
     <div style="position:relative;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.09);">
       <div style="display:flex;align-items:center;gap:10px;min-width:0;">
         <div style="width:30px;height:30px;flex:none;border-radius:50%;background:linear-gradient(135deg,#00ffa3,#0284c7);display:flex;align-items:center;justify-content:center;color:#00130e;font-weight:900;box-shadow:0 0 14px rgba(0,255,163,.45);animation:triPulseRing 2s infinite ease-in-out;">⚡</div>
-        <div style="min-width:0;"><div style="font-size:12px;font-weight:900;letter-spacing:.65px;background:linear-gradient(90deg,#fff,#67e8f9,#34d399);-webkit-background-clip:text;background-clip:text;color:transparent;">SUHAIL AI TRI-AGENT PRO</div><div style="font-size:10px;color:#94a3b8;margin-top:3px;">Single-response build · live status</div></div>
+        <div style="min-width:0;"><div style="font-size:12px;font-weight:900;letter-spacing:.65px;background:linear-gradient(90deg,#fff,#67e8f9,#34d399);-webkit-background-clip:text;background-clip:text;color:transparent;">SUHAIL AI TRI-AGENT PRO</div><div style="font-size:10px;color:#94a3b8;margin-top:3px;">Live build pipeline · real output counters</div></div>
       </div>
       <span id="${cardId}-percent" style="flex:none;font-size:11px;font-weight:800;color:#00ffa3;background:rgba(0,255,163,.1);border:1px solid rgba(0,255,163,.32);padding:4px 9px;border-radius:20px;">0%</span>
     </div>
@@ -1305,7 +1208,7 @@ function createAgentLoaderUI(chatBox) {
   const logs = [
     'Preparing request payload…', 'Waiting for model response…', 'Checking response structure…',
     'Appending generated source…', 'Updating output counters…', 'Preserving existing application logic…',
-    'Checking for conversational residue…', 'Waiting for complete response…', 'Preparing package metadata…'
+    'Checking for conversational residue…', 'Preparing continuation context…', 'Preparing package metadata…'
   ];
   let tick = 0;
   const startedAt = Date.now();
@@ -1355,7 +1258,6 @@ function triAgentProgress(cardId, pct, log, stageName) {
 async function runTriAgentMegaCode(userPrompt, chatBox) {
   const text = String(userPrompt || '').trim();
   if (!text) return;
-
   const box = chatBox || document.getElementById('chat-box') || document.body;
   const cardId = createAgentLoaderUI(box);
   const startedAt = Date.now();
@@ -1364,79 +1266,87 @@ async function runTriAgentMegaCode(userPrompt, chatBox) {
   const targetFileName = targetMatch ? targetMatch[1] : 'index.html';
   const isHtmlTarget = /\.html$/i.test(targetFileName);
   const multiFile = /(separate|split|alag|folder|modular|multiple files|multiple file)/i.test(text);
+  const TARGET_LINES = 4000;
+  const MIN_CHUNKS = 8;
+  const MAX_CHUNKS = 16;
   let fullCode = '';
-  let finishReason = '';
+  let chunks = 0;
 
-  const finishTimer = () => {
-    const timer = triAgentTelemetryTimers.get(cardId);
-    if (timer) clearInterval(timer);
-    triAgentTelemetryTimers.delete(cardId);
+  const cleanupChunk = value => {
+    let chunk = String(value || '').trim();
+    chunk = chunk.replace(/^```(?:html|javascript|js|css|json|python|php|typescript|tsx|jsx)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+    // Remove common conversational lead-ins, but do not strip real code comments.
+    chunk = chunk.replace(/^(?:Here(?:'s| is) the code|Sure[,!]?|Certainly[,!]?|Below is the code)\s*:?\s*/i, '');
+    if (chunks > 0) chunk = chunk.replace(/^<!doctype\s+html>\s*/i, '').replace(/^<html[^>]*>\s*/i, '').replace(/^<head[^>]*>\s*/i, '');
+    return chunk;
   };
-  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const lineCount = () => fullCode ? fullCode.split(/\r?\n/).length : 0;
+  const updateLiveCode = () => { window[`triAgentWorkingCode_${cardId}`] = fullCode; };
+  const finishTimer = () => { const timer = triAgentTelemetryTimers.get(cardId); if (timer) clearInterval(timer); triAgentTelemetryTimers.delete(cardId); };
 
   try {
-    triAgentSetStep(cardId, 1, `Agent 1 · Preparing ${targetFileName}`, '⚡', '#38e0b3');
-    triAgentProgress(cardId, 12, 'Preparing a single complete-file request…', 'Preparing');
-    await wait(180);
-    triAgentSetStep(cardId, 1, 'Agent 1 · Request ready', '✅', '#4ade80');
-    triAgentSetStep(cardId, 2, 'Agent 2 · Generating the complete file in one response…', '⚡', '#38bdf8');
-    triAgentProgress(cardId, 28, 'Sending one request · no batches or continuations', 'Generating');
+    triAgentSetStep(cardId, 1, `Agent 1 · Blueprinting ${targetFileName}`, '⚡', '#38e0b3');
+    triAgentProgress(cardId, 8, `Defining architecture for ${targetFileName}…`, 'Architect');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    triAgentSetStep(cardId, 1, 'Agent 1 · Blueprint approved', '✅', '#4ade80');
 
-    // One model request only. Ask for source code, not Markdown fences or explanations.
-    const systemPrompt = `You are Suhail AI's senior production software engineer. Return the complete requested file in ONE response. Output RAW SOURCE CODE ONLY: no Markdown code fences, no introduction, no batch labels, no summaries, and no sign-off. Do not split the answer into multiple batches and do not say that you will continue later. Include all required opening and closing tags/braces and all essential logic. Never use filler merely to inflate line count. If the user explicitly requests a single HTML file, put its CSS and JavaScript inside that one HTML file. Target file: ${targetFileName}.`;
-    const userPromptOnce = `Create the entire requested project/file now in one complete response. Request: ${text}\nTarget filename: ${targetFileName}\nRequirements: complete, coherent, production-minded implementation; handle errors and validation; responsive and accessible UI where relevant; preserve all stated constraints; no placeholders for essential features; raw code only. Do not split into batches, do not insert explanatory prose, and do not wrap the code in HTML/JS/other Markdown fences.`;
-
-    const response = await fetch('/api?action=tri_chunk', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPromptOnce }
-      ] })
-    });
-
-    let data = {};
-    try { data = await response.json(); } catch (_) {}
-    if (!response.ok || data.error) {
-      const message = data && data.error
-        ? (typeof data.error === 'string' ? data.error : data.error.message || 'API error')
-        : `HTTP ${response.status}`;
-      throw new Error(`Tri-Agent API error: ${message}`);
+    while (chunks < MAX_CHUNKS) {
+      const batchNumber = chunks + 1;
+      const progress = Math.min(90, 10 + Math.round((batchNumber / MAX_CHUNKS) * 78));
+      triAgentProgress(cardId, progress, `Requesting batch ${batchNumber}/${MAX_CHUNKS}…`, `Batch ${batchNumber}`);
+      triAgentSetStep(cardId, 2, `Agent 2 · Generating batch ${batchNumber}/${MAX_CHUNKS}`, '⚡', '#38bdf8');
+      const existingLines = lineCount();
+      const systemPrompt = `You are Suhail AI's senior production software engineer. Output source code only, with no preamble, markdown fences, batch summaries, or conversational sign-off. Respect the requested language and file type. Do not invent fake functionality or pad with meaningless comments. Build complete, robust, maintainable code. Target file: ${targetFileName}.`;
+      const batchPrompt = batchNumber === 1
+        ? `Implement this request as a complete production-ready project/file: ${text}\nTarget file: ${targetFileName}. Write substantial, coherent code with validation, error handling, accessibility, responsive styling where relevant, and clear code comments. Begin with the real first line of the file. Raw code only.`
+        : `Continue the SAME file ${targetFileName} from the end of the code excerpt below. Current accumulated size: ${existingLines} lines. Overall target: approximately ${TARGET_LINES}+ lines if the requested functionality genuinely warrants that size; never add filler just to hit a number. Do not repeat the file beginning. Continue directly with valid code only.\n\nLAST PART OF CURRENT FILE (context only; do not repeat):\n${fullCode.slice(-9000)}\n\nWrite the next logically necessary section now. No summaries or conversational text.`;
+      const response = await fetch('/api?action=tri_chunk', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: batchPrompt }] })
+      });
+      let data = {};
+      try { data = await response.json(); } catch (_) {}
+      if (!response.ok || data.error) {
+        const errorMessage = data && data.error ? (typeof data.error === 'string' ? data.error : data.error.message || 'API error') : `HTTP ${response.status}`;
+        if (fullCode.length > 500) { triAgentProgress(cardId, progress, `Batch ${batchNumber} failed; packaging saved output`, 'Recovering'); break; }
+        throw new Error(`Tri-Agent API error: ${errorMessage}`);
+      }
+      const choice = data && data.choices && data.choices[0];
+      if (!choice || !choice.message || typeof choice.message.content !== 'string') {
+        if (fullCode.length > 500) break;
+        throw new Error('API returned no usable code content.');
+      }
+      const chunk = cleanupChunk(choice.message.content);
+      if (!chunk) { if (fullCode.length > 500) break; throw new Error('Model returned an empty code batch.'); }
+      fullCode += (fullCode && !fullCode.endsWith('\n') ? '\n' : '') + chunk + '\n';
+      chunks++;
+      updateLiveCode();
+      try { localStorage.setItem(cacheDraftKey, fullCode); } catch (_) {}
+      const liveLines = document.getElementById(`${cardId}-stat-lines`);
+      if (liveLines) liveLines.textContent = String(lineCount());
+      if (chunks >= MIN_CHUNKS && lineCount() >= TARGET_LINES) break;
+      if (chunks < MAX_CHUNKS) await new Promise(resolve => setTimeout(resolve, 900));
     }
 
-    const choice = data && data.choices && data.choices[0];
-    if (!choice || !choice.message || typeof choice.message.content !== 'string' || !choice.message.content.trim()) {
-      throw new Error('Model ne ek mukammal code response nahi diya. Dobara try karein.');
-    }
-    finishReason = choice.finish_reason || '';
-    fullCode = choice.message.content.trim()
+    if (!fullCode.trim()) throw new Error('Tri-Agent generated no code.');
+    triAgentSetStep(cardId, 3, 'Agent 3 · Cleaning and packaging', '⚡', '#facc15');
+    triAgentProgress(cardId, 94, 'Removing trailing conversational residue and building ZIP…', 'Packaging');
+    let cleanCode = fullCode
+      .replace(/\n?\*?\s*Batch\s*\d+\s*\/\s*\d+[^\n]*\n?[\s\S]*$/i, '')
+      .replace(/\n?This completes (?:the|your)[\s\S]*$/i, '')
+      .replace(/\n?Let me know if you need[\s\S]*$/i, '')
       .replace(/^```(?:html|javascript|js|css|json|python|php|typescript|tsx|jsx)?\s*/i, '')
-      .replace(/\s*```\s*$/i, '')
-      .replace(/^(?:Here(?:'s| is) the code|Sure[,!]?|Certainly[,!]?|Below is the code)\s*:?\s*/i, '')
-      .trim();
-    window[`triAgentWorkingCode_${cardId}`] = fullCode;
-    try { localStorage.setItem(cacheDraftKey, fullCode); } catch (_) {}
-
-    triAgentProgress(cardId, 78, 'Complete response received · checking source and preparing preview…', 'Validating');
-    triAgentSetStep(cardId, 2, `Agent 2 · Received ${fullCode.split(/\r?\n/).length.toLocaleString()} lines`, '✅', '#4ade80');
-
-    // Keep the polished loading card visible briefly so the transition feels intentional.
-    const minimumDisplayMs = 2200;
-    const remainingDisplayMs = minimumDisplayMs - (Date.now() - startedAt);
-    if (remainingDisplayMs > 0) await wait(remainingDisplayMs);
-
-    triAgentSetStep(cardId, 3, 'Agent 3 · Validating and packaging the file', '⚡', '#facc15');
-    triAgentProgress(cardId, 91, 'Building ZIP and preparing final code card…', 'Packaging');
-
-    // Do not silently invent missing HTML/JS closers; if the model hit its output cap,
-    // warn the user that the returned file may be incomplete.
-    const possiblyTruncated = finishReason === 'length';
-    const cleanCode = fullCode;
+      .replace(/\s*```\s*$/i, '').trim();
+    if (isHtmlTarget) {
+      if (/<script\b/i.test(cleanCode) && !/<\/script>/i.test(cleanCode)) cleanCode += '\n<' + '/script>';
+      if (/<style\b/i.test(cleanCode) && !/<\/style>/i.test(cleanCode)) cleanCode += '\n</style>';
+      if (!/<\/body>/i.test(cleanCode)) cleanCode += '\n</body>';
+      if (!/<\/html>/i.test(cleanCode)) cleanCode += '\n</html>';
+    }
     const actualLines = cleanCode.split(/\r?\n/).length;
     const duration = ((Date.now() - startedAt) / 1000).toFixed(1);
     const kb = (new Blob([cleanCode]).size / 1024).toFixed(1);
     if (typeof JSZip === 'undefined') throw new Error('JSZip did not load; cannot create ZIP.');
-
     const zip = new JSZip();
     if (multiFile && isHtmlTarget) {
       const styleMatch = cleanCode.match(/<style\b[^>]*>([\s\S]*?)<\/style>/i);
@@ -1449,11 +1359,8 @@ async function runTriAgentMegaCode(userPrompt, chatBox) {
       zip.file('index.html', modularHtml);
       if (css) zip.file('style.css', css);
       if (js) zip.file('app.js', js);
-    } else {
-      zip.file(targetFileName, cleanCode);
-    }
-    zip.file('README.txt', `Generated by Suhail AI Tri-Agent\nMode: Single response (one model request)\nTarget: ${targetFileName}\nOutput lines: ${actualLines}\nSize: ${kb} KB\nElapsed: ${duration}s\nModel finish reason: ${finishReason || 'not supplied'}\n${possiblyTruncated ? 'WARNING: Model output limit was reached; inspect the source for truncation.' : 'Note: one-response generation is subject to the model/API output limit.'}`);
-
+    } else zip.file(targetFileName, cleanCode);
+    zip.file('README.txt', `Generated by Suhail AI Tri-Agent\nTarget: ${targetFileName}\nBatches completed: ${chunks}\nOutput lines: ${actualLines}\nSize: ${kb} KB\nElapsed: ${duration}s\nTarget lines: ${TARGET_LINES}; maximum batches: ${MAX_CHUNKS}. Output size depends on the request and model response; a line target is not a guarantee.`);
     const blob = await zip.generateAsync({ type: 'blob' });
     const downloadUrl = URL.createObjectURL(blob);
     const previewUrl = isHtmlTarget ? URL.createObjectURL(new Blob([cleanCode], { type: 'text/html' })) : '';
@@ -1461,11 +1368,9 @@ async function runTriAgentMegaCode(userPrompt, chatBox) {
     window[`code_${cardId}`] = cleanCode;
     window[`blob_${cardId}`] = blob;
     window[`filename_${cardId}`] = zipFileName;
-
-    triAgentProgress(cardId, 100, `Ready · one response · ${actualLines.toLocaleString()} lines`, 'Complete');
-    triAgentSetStep(cardId, 2, `Agent 2 · ${actualLines.toLocaleString()} lines assembled`, '✅', '#4ade80');
+    triAgentProgress(cardId, 100, `Complete · ${chunks} batches · ${actualLines} lines`, 'Done');
+    triAgentSetStep(cardId, 2, `Agent 2 · ${actualLines} lines assembled`, '✅', '#4ade80');
     triAgentSetStep(cardId, 3, `Agent 3 · ZIP ready (${kb} KB)`, '✅', '#4ade80');
-
     const card = document.getElementById(cardId);
     if (card) {
       finishTimer();
@@ -1479,20 +1384,19 @@ async function runTriAgentMegaCode(userPrompt, chatBox) {
         <div aria-hidden="true" style="position:absolute;top:-30px;left:15%;width:70%;height:65px;background:radial-gradient(ellipse,rgba(0,255,163,.25),transparent 70%);pointer-events:none;"></div>
         <div style="position:relative;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:15px;">
           <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-            <div style="width:38px;height:38px;flex:none;border-radius:13px;background:linear-gradient(135deg,rgba(0,255,163,.2),rgba(2,132,199,.25));border:1px solid rgba(0,255,163,.4);display:flex;align-items:center;justify-content:center;font-size:19px;">📦</div>
-            <div style="min-width:0;"><div style="font-size:13px;font-weight:900;letter-spacing:.35px;background:linear-gradient(90deg,#fff,#67e8f9,#34d399);-webkit-background-clip:text;background-clip:text;color:transparent;">SUHAIL AI · COMPLETE CODE</div><div style="font-size:10.5px;color:#a4b4c2;margin-top:4px;overflow-wrap:anywhere;">${targetFileName} · <b style="color:#00ffa3;">${actualLines.toLocaleString()} lines</b> · ${kb} KB · ${duration}s</div></div>
+            <div style="width:38px;height:38px;flex:none;border-radius:13px;background:linear-gradient(135deg,rgba(0,255,163,.2),rgba(2,132,199,.25));border:1px solid rgba(0,255,163,.4);display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12);">📦</div>
+            <div style="min-width:0;"><div style="font-size:13px;font-weight:900;letter-spacing:.35px;background:linear-gradient(90deg,#fff,#67e8f9,#34d399);-webkit-background-clip:text;background-clip:text;color:transparent;">SUHAIL AI TRI-AGENT PACKAGE</div><div style="font-size:10.5px;color:#a4b4c2;margin-top:4px;overflow-wrap:anywhere;">${targetFileName} · <b style="color:#00ffa3;">${actualLines.toLocaleString()} lines</b> · ${kb} KB · ${duration}s</div></div>
           </div>
-          <span style="flex:none;font-size:10px;font-weight:800;color:#00ffa3;background:rgba(0,255,163,.1);border:1px solid rgba(0,255,163,.3);padding:4px 9px;border-radius:20px;white-space:nowrap;">ONE PASS</span>
+          <span style="flex:none;font-size:10px;font-weight:800;color:#00ffa3;background:rgba(0,255,163,.1);border:1px solid rgba(0,255,163,.3);padding:4px 9px;border-radius:20px;white-space:nowrap;">${chunks} batches</span>
         </div>
-        ${possiblyTruncated ? '<div style="position:relative;margin:0 0 12px;padding:10px 12px;border-radius:10px;border:1px solid rgba(251,191,36,.4);background:rgba(251,191,36,.08);color:#fcd34d;font-size:11px;">⚠️ Model output limit reached. The code may be incomplete; inspect it before using it.</div>' : ''}
         <div style="position:relative;display:flex;flex-direction:column;gap:10px;">
-          <a href="${downloadUrl}" download="${zipFileName}" style="display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;text-decoration:none;background:linear-gradient(110deg,#047857,#00d26a,#059669);background-size:200% auto;animation:triShimmer 3s infinite linear;color:#fff;padding:14px 12px;border-radius:14px;font-weight:850;font-size:13px;box-shadow:0 8px 25px rgba(0,210,106,.35);border:1px solid rgba(255,255,255,.2);">⬇️ Download ZIP · ${actualLines.toLocaleString()} Lines</a>
+          <a href="${downloadUrl}" download="${zipFileName}" style="display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;text-decoration:none;background:linear-gradient(110deg,#047857,#00d26a,#059669);background-size:200% auto;animation:triShimmer 3s infinite linear;color:#fff;padding:14px 12px;border-radius:14px;font-weight:850;font-size:13px;letter-spacing:.2px;box-shadow:0 8px 25px rgba(0,210,106,.35);border:1px solid rgba(255,255,255,.2);transition:transform .2s ease,filter .2s ease;">⬇️ Download Production ZIP · ${actualLines.toLocaleString()} Lines</a>
           <div style="display:flex;gap:8px;flex-wrap:nowrap;">
-            ${isHtmlTarget ? `<a href="${previewUrl}" target="_blank" rel="noopener" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;text-decoration:none;background:rgba(255,255,255,.04);border:1px solid rgba(56,189,248,.42);color:#38bdf8;padding:10px 4px;border-radius:12px;font-size:11.5px;font-weight:750;">👁 Preview</a>` : ''}
-            <button type="button" onclick="shareProjectZip('${cardId}')" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);border:1px solid rgba(0,255,163,.4);color:#00ffa3;padding:10px 4px;border-radius:12px;font-size:11.5px;font-weight:750;cursor:pointer;">↗ Share</button>
-            <button type="button" onclick="navigator.clipboard.writeText(window['code_${cardId}']).then(()=>this.textContent='✓ Copied!').catch(()=>alert('Copy unavailable; use Preview or ZIP.'))" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,184,.3);color:#e2e8f0;padding:10px 4px;border-radius:12px;font-size:11.5px;font-weight:750;cursor:pointer;">▣ Copy code</button>
+            ${isHtmlTarget ? `<a href="${previewUrl}" target="_blank" rel="noopener" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;background:rgba(255,255,255,.04);border:1px solid rgba(56,189,248,.42);color:#38bdf8;padding:10px 4px;border-radius:12px;font-size:11.5px;font-weight:750;backdrop-filter:blur(10px);">👁 Preview</a>` : ''}
+            <button type="button" onclick="shareProjectZip('${cardId}')" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid rgba(0,255,163,.4);color:#00ffa3;padding:10px 4px;border-radius:12px;font-size:11.5px;font-weight:750;cursor:pointer;backdrop-filter:blur(10px);">↗ Share</button>
+            <button type="button" onclick="navigator.clipboard.writeText(window['code_${cardId}']).then(()=>this.textContent='✓ Copied!').catch(()=>alert('Copy unavailable; use Preview or ZIP.'))" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,184,.3);color:#e2e8f0;padding:10px 4px;border-radius:12px;font-size:11.5px;font-weight:750;cursor:pointer;backdrop-filter:blur(10px);">▣ Copy code</button>
           </div>
-          <div style="font-size:9px;color:#718693;text-align:center;">Generated in one model response · no batch continuation</div>
+          <div style="font-size:9px;color:#718693;text-align:center;">ZIP package is ready · Preview and copy remain available</div>
         </div>`;
     }
   } catch (error) {
@@ -1500,7 +1404,7 @@ async function runTriAgentMegaCode(userPrompt, chatBox) {
     const card = document.getElementById(cardId);
     if (card) {
       const msg = String(error && error.message ? error.message : error).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-      card.innerHTML = `<div style="color:#fb7185;font-size:13px;padding:8px;"><strong>Tri-Agent Error</strong><div style="margin-top:6px;">${msg}</div><div style="margin-top:6px;color:#9fb0bf;font-size:11px;">No batch fallback was used. Try a smaller scope if the model/API output limit is reached.</div></div>`;
+      card.innerHTML = `<div style="color:#fb7185;font-size:13px;padding:8px;"><strong>Tri-Agent Error</strong><div style="margin-top:6px;">${msg}</div><div style="margin-top:6px;color:#9fb0bf;font-size:11px;">Any partial draft may be saved in this browser under the Tri-Agent draft key.</div></div>`;
     }
   } finally {
     delete window[`triAgentWorkingCode_${cardId}`];
@@ -2832,116 +2736,45 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// 2. EXPORT CHAT BUBBLE TO PDF (ROYAL ACADEMIC & SAFE MARGINS)
+// 2. EXPORT CHAT BUBBLE TO PDF
 // ==========================================
 window.exportBubbleToPdf = function(btn) {
-  const bubble = btn && btn.closest('.chat-bubble');
+  const bubble = btn.closest('.chat-bubble');
   if (!bubble) return;
 
   const content = bubble.querySelector('.chat-content');
-  if (!content) {
-    console.error('PDF export: .chat-content was not found in this chat bubble.');
-    return;
-  }
   const aiLabel = bubble.querySelector('.ai-label')?.innerText || 'Suhail AI';
-  const originalButtonHtml = btn.innerHTML;
-  btn.disabled = true;
 
-  // Build an isolated print document so the live chat UI is never modified.
   const printDiv = document.createElement('div');
-  printDiv.style.cssText = 'box-sizing:border-box;width:100%;padding:24px 26px 45px;color:#1a202c;font-family:Poppins,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.85;background:#ffffff;max-width:800px;overflow-wrap:anywhere;';
-
-  const header = document.createElement('div');
-  header.style.cssText = 'border-bottom:2px solid #00a884;padding-bottom:12px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;';
-  const headerLeft = document.createElement('div');
-  const heading = document.createElement('h2');
-  heading.textContent = 'Suhail AI — Academic Learning Platform';
-  heading.style.cssText = 'color:#007a60;margin:0;font-size:20px;font-weight:800;letter-spacing:.5px;';
-  const subtitle = document.createElement('span');
-  subtitle.textContent = 'Darsi Tehqeeq wa Ilmi Mavad • ' + aiLabel;
-  subtitle.style.cssText = 'font-size:11px;color:#64748b;font-weight:600;';
-  headerLeft.append(heading, subtitle);
-  const date = document.createElement('div');
-  date.textContent = 'Tareekh: ' + new Date().toLocaleDateString('en-GB');
-  date.style.cssText = 'text-align:right;font-size:11px;color:#475569;font-weight:600;white-space:nowrap;';
-  header.append(headerLeft, date);
-
-  const body = document.createElement('div');
-  body.className = 'pdf-export-content';
-  body.innerHTML = content.innerHTML;
-  // Do not include interactive controls in the exported lesson.
-  body.querySelectorAll('button, input, textarea, select, .typing-cursor, .no-pdf').forEach(el => el.remove());
-
-  const footer = document.createElement('div');
-  footer.style.cssText = 'margin-top:35px;padding-top:10px;border-top:1px dashed #cbd5e1;display:flex;justify-content:space-between;gap:12px;font-size:10px;color:#64748b;';
-  const footerLeft = document.createElement('span');
-  footerLeft.textContent = 'Mehfooz Shuda Sabaq • Suhail AI Study Companion';
-  const footerRight = document.createElement('span');
-  footerRight.textContent = 'hardrisk.vercel.app';
-  footer.append(footerLeft, footerRight);
-
-  const style = document.createElement('style');
-  style.textContent = `
-    .pdf-export-content { color:#1a202c; font-size:12px; }
-    .pdf-export-content p, .pdf-export-content h1, .pdf-export-content h2,
-    .pdf-export-content h3, .pdf-export-content blockquote,
-    .pdf-export-content li, .pdf-export-content tr,
-    .pdf-export-content .arabic-text, .pdf-export-content .arabic-quote-box,
-    .pdf-export-content .table-responsive {
-      page-break-inside: avoid !important; break-inside: avoid !important;
-    }
-    .pdf-export-content h1, .pdf-export-content h2, .pdf-export-content h3 {
-      color:#007a60 !important; -webkit-text-fill-color:#007a60 !important;
-      background:none !important; margin:16px 0 8px !important; line-height:1.45 !important;
-      page-break-after:avoid !important; break-after:avoid-page !important;
-    }
-    .pdf-export-content p { margin:0 0 10px !important; orphans:3; widows:3; }
-    .pdf-export-content strong, .pdf-export-content b { color:#0f172a !important; -webkit-text-fill-color:#0f172a !important; }
-    .pdf-export-content .arabic-text, .pdf-export-content .arabic-quote-box {
-      background:#f8fafc !important; border:1px solid #e2e8f0 !important;
-      border-right:4px solid #00a884 !important; border-radius:8px !important;
-      padding:14px 18px !important; margin:14px 0 !important;
-      font-family:Amiri,"Traditional Arabic",serif !important; font-size:1.35rem !important;
-      line-height:2.2 !important; color:#0f172a !important; -webkit-text-fill-color:#0f172a !important;
-      direction:rtl !important; text-align:right !important; text-shadow:none !important;
-      box-shadow:none !important;
-    }
-    .pdf-export-content blockquote { border-left:3px solid #00a884 !important; padding:8px 12px !important; margin:12px 0 !important; color:#475569 !important; background:#f8fafc !important; }
-    .pdf-export-content table { width:100% !important; border-collapse:collapse !important; margin:12px 0 !important; }
-    .pdf-export-content th, .pdf-export-content td { border:1px solid #cbd5e1 !important; padding:8px 10px !important; font-size:12px !important; color:#1e293b !important; }
-    .pdf-export-content th { background:#f1f5f9 !important; color:#007a60 !important; }
-    .pdf-export-content pre, .pdf-export-content code { white-space:pre-wrap !important; overflow-wrap:anywhere !important; color:#0f172a !important; background:#f8fafc !important; }
-    .pdf-export-content img { max-width:100% !important; height:auto !important; }
-    @media print { @page { size:A4 portrait; margin:12mm 12mm 20mm 12mm; } }
+  printDiv.style.cssText = 'padding:24px; color:#111; font-family:"Poppins", "Amiri", sans-serif; line-height:1.8; background:#fff;';
+  
+  const headerHtml = `
+    <div style="border-bottom:2px solid #00a884; padding-bottom:8px; margin-bottom:16px;">
+      <h2 style="color:#00a884; margin:0; font-size:18px;">Suhail AI - Academic Learning Platform</h2>
+      <span style="font-size:12px; color:#666;">Darsi wa Ilmi Mavad | ${aiLabel} | ${new Date().toLocaleDateString('en-GB')}</span>
+    </div>
   `;
-  printDiv.append(style, header, body, footer);
+
+  printDiv.innerHTML = headerHtml + `<div>${content.innerHTML}</div>`;
 
   const opt = {
-    margin: [12, 12, 20, 12],
+    margin: [10, 10, 10, 10],
     filename: `Suhail_AI_Sabaq_${Date.now()}.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff', scrollY: 0 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['css', 'legacy'], avoid: ['p', 'h1', 'h2', 'h3', 'blockquote', 'li', 'tr', '.arabic-text', '.arabic-quote-box', '.table-responsive'] }
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> PDF ban rahi hai...';
-  if (typeof html2pdf !== 'function') {
-    console.error('PDF export error: html2pdf library is not loaded.');
-    btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> PDF library missing';
-    btn.disabled = false;
-    setTimeout(() => { btn.innerHTML = originalButtonHtml; }, 2200);
-    return;
-  }
-
+  
   html2pdf().set(opt).from(printDiv).save().then(() => {
     btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i> PDF Download';
-    btn.disabled = false;
   }).catch(err => {
-    console.error('PDF export error:', err);
+    console.error("PDF export error:", err);
     btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Error';
-    btn.disabled = false;
-    setTimeout(() => { btn.innerHTML = originalButtonHtml; }, 2200);
+    setTimeout(() => {
+      btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i> PDF Download';
+    }, 2000);
   });
 };
 
