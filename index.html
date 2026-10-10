@@ -1116,19 +1116,7 @@ body.focus-reader-mode .exit-focus-btn {
 </div>
 
 
-<!-- ================= SUPER ADMIN RE-AUTHENTICATION GATE (PHASE 2) ================= -->
-<div id="sa-auth-gate" role="dialog" aria-modal="true" aria-labelledby="sa-gate-title" style="display:none;position:fixed;inset:0;z-index:1000002;background:rgba(2,8,12,.94);align-items:center;justify-content:center;padding:18px;color:#e9edef;font-family:system-ui,sans-serif">
- <div style="width:min(440px,100%);background:#0d171d;border:1px solid #394b55;border-radius:18px;padding:24px;box-shadow:0 24px 80px #0009">
-  <div style="width:46px;height:46px;border-radius:13px;background:#2a2517;color:#f4d477;display:grid;place-items:center;font-size:20px;margin-bottom:16px"><i class="fa-solid fa-shield-halved"></i></div>
-  <h2 id="sa-gate-title" style="margin:0 0 8px;font-size:21px">Super Admin Verification</h2>
-  <p style="margin:0 0 18px;color:#9eafb8;font-size:13px;line-height:1.6">Command Center kholne se pehle server se Owner/Admin permission verify hogi. Sirf frontend role ya local password par bharosa nahi kiya jayega.</p>
-  <label for="sa-gate-password" style="display:block;font-size:12px;margin-bottom:7px">Administrator password</label>
-  <input id="sa-gate-password" type="password" autocomplete="current-password" style="width:100%;box-sizing:border-box;padding:12px;border-radius:9px;border:1px solid #354852;background:#071016;color:#fff;outline:none" placeholder="Password dobara darj karein">
-  <div id="sa-gate-message" role="status" aria-live="polite" style="margin-top:10px;color:#e6c36a;font-size:12px;line-height:1.5"></div>
-  <div style="display:flex;gap:10px;margin-top:18px"><button id="sa-gate-cancel" type="button" style="flex:1;padding:11px;border-radius:9px;border:1px solid #344650;background:#142129;color:#dbe5e9">Cancel</button><button id="sa-gate-verify" type="button" style="flex:1;padding:11px;border-radius:9px;border:1px solid #9e7d29;background:#d6b34f;color:#101418;font-weight:800">Verify & Open</button></div>
-  <p style="font-size:10px;line-height:1.5;color:#71858f;margin:16px 0 0">Agar secure server endpoint configure nahi hai, access band rahega. Yeh jaan-boojh kar fail-closed security hai.</p>
- </div>
-</div>
+<!-- Extra Super Admin re-authentication prompt removed; normal app login remains in place. -->
 
 <!-- ================= SUHAIL AI ENTERPRISE SUPER ADMIN COMMAND CENTER ================= -->
 <div id="superAdminModal" role="dialog" aria-modal="true" aria-label="Suhail AI Super Admin Command Center" style="display:none;position:fixed;inset:0;background:#080e13;z-index:1000001;color:#e9edef;overflow:hidden;">
@@ -1916,66 +1904,19 @@ window.toggleSpeech = function(btn) {
   const superAdminToggle = document.getElementById('btn-super-admin-toggle');
   if (superAdminToggle) superAdminToggle.onclick = () => openSuperAdminGate();
 
-  // Phase 2: Super Admin access is denied unless a server verifies the current actor.
-  // Expected endpoint contract: POST /api/super-admin?action=super_admin_auth
-  // Body: { password: "..." }; response: { ok:true, role:"owner"|"super_admin", permissions:[...], expiresAt:<unix-ms> }
-  async function openSuperAdminGate() {
-    const gate = document.getElementById('sa-auth-gate');
-    const msg = document.getElementById('sa-gate-message');
-    const input = document.getElementById('sa-gate-password');
-    // Owner password is verified by the server endpoint; frontend account role is not used as the gate.
-    // Never trust sessionStorage alone: validate the HttpOnly server session every time.
-    try {
-      const check = await fetch('/api/super-admin?action=super_admin_session', { method: 'GET', credentials: 'same-origin', cache: 'no-store' });
-      const session = await check.json().catch(() => ({}));
-      if (check.ok && session.ok === true && ['owner','super_admin'].includes(String(session.role || '').toLowerCase())) {
-        try { sessionStorage.setItem('suhail_sa_verified_until', String(Number(session.expiresAt || 0))); } catch (_) {}
-        showSuperAdminAfterVerification(); return;
-      }
-    } catch (_) { /* Fail closed below if the backend is unavailable. */ }
-    try { sessionStorage.removeItem('suhail_sa_verified_until'); } catch (_) {}
-    gate.style.display = 'flex'; msg.textContent = 'Server session verify nahi hui. Owner password se dobara verify karein.'; input.value = ''; input.focus();
-  }
-  function showSuperAdminAfterVerification() {
-    const gate = document.getElementById('sa-auth-gate');
-    if (gate) gate.style.display = 'none';
+  // No extra server-side password prompt. The existing Suhail Jamia AI login remains the login gate.
+  // Only an already logged-in account with the app's admin role can open this interface.
+  function openSuperAdminGate() {
+    if (!currentUser || String(currentUser.role || '').toLowerCase() !== 'admin') {
+      alert('Super Admin ke liye apne admin account se login karein.');
+      return;
+    }
     const panel = document.getElementById('superAdminModal');
     if (panel) panel.style.display = 'block';
     if (typeof saInit === 'function') saInit();
     const out = document.getElementById('superAdminOutput');
-    if (out) out.textContent = 'Verified session active. Sensitive operations still require server-side authorization.';
+    if (out) out.textContent = 'Command Center opened using the existing app admin login.';
   }
-  document.getElementById('sa-gate-cancel').addEventListener('click', () => {
-    document.getElementById('sa-auth-gate').style.display = 'none';
-    document.getElementById('sa-gate-password').value = '';
-    document.getElementById('sa-gate-message').textContent = '';
-  });
-  document.getElementById('sa-gate-verify').addEventListener('click', async () => {
-    const input = document.getElementById('sa-gate-password');
-    const msg = document.getElementById('sa-gate-message');
-    const btn = document.getElementById('sa-gate-verify');
-    const password = input.value;
-    if (!password) { msg.textContent = 'Password darj karein.'; input.focus(); return; }
-    btn.disabled = true; btn.textContent = 'Verifying…'; msg.textContent = 'Server se permission verify ki ja rahi hai…';
-    try {
-      const response = await fetch('/api/super-admin?action=super_admin_auth', {
-        method: 'POST', credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || data.ok !== true || !['owner','super_admin'].includes(String(data.role || '').toLowerCase())) {
-        throw new Error(data.error || (response.status === 404 ? 'Secure Super Admin verification endpoint abhi configure nahi hai. Backend endpoint banne tak access band rahega.' : 'Server ne Super Admin access verify nahi kiya.'));
-      }
-      const expiry = Number(data.expiresAt || (Date.now() + 10 * 60 * 1000));
-      try { sessionStorage.setItem('suhail_sa_verified_until', String(Math.min(expiry, Date.now() + 10 * 60 * 1000))); } catch (_) {}
-      input.value = ''; msg.textContent = '';
-      showSuperAdminAfterVerification();
-    } catch (error) {
-      msg.textContent = error.message || 'Verification failed. Access denied.';
-    } finally { btn.disabled = false; btn.textContent = 'Verify & Open'; }
-  });
-  document.getElementById('sa-gate-password').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('sa-gate-verify').click(); });
 
   function checkToolAccess(type) {
     const p = (currentUser?.role === 'admin') ? 'ultra' : (currentUser?.plan || 'free');
