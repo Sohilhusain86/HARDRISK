@@ -921,31 +921,6 @@ body.focus-reader-mode .exit-focus-btn {
   .chat-bubble.ai:not(.tri-luxury-motion):not([id^="tri-agent-"]), .typing-cursor { animation: none !important; transition: none !important; }
 }
 
-
-/* SUHAIL AI ADVANCED RESPONSE ADD-ON — presentation only */
-.chat-bubble.ai .chat-content { font-size:.94rem; line-height:1.85; overflow-wrap:anywhere; word-break:normal; }
-.chat-bubble.ai .chat-content > :first-child { margin-top:0 !important; }
-.chat-bubble.ai .chat-content > :last-child { margin-bottom:0 !important; }
-.chat-bubble.ai .chat-content h1,.chat-bubble.ai .chat-content h2,.chat-bubble.ai .chat-content h3,.chat-bubble.ai .chat-content h4 { line-height:1.45; margin:16px 0 8px; font-weight:800; }
-.chat-bubble.ai .chat-content h1 { font-size:1.22rem; }
-.chat-bubble.ai .chat-content h2 { font-size:1.12rem; }
-.chat-bubble.ai .chat-content h3,.chat-bubble.ai .chat-content h4 { font-size:1rem; }
-.chat-bubble.ai .chat-content p { margin:0 0 12px; }
-.chat-bubble.ai .chat-content ul,.chat-bubble.ai .chat-content ol { margin:8px 0 14px; padding-left:24px; }
-.chat-bubble.ai .chat-content li { margin:5px 0; padding-left:2px; }
-.chat-bubble.ai .chat-content hr { border:0; border-top:1px solid rgba(255,255,255,.14); margin:16px 0; }
-.chat-bubble.ai .chat-content a { color:#67e8f9; text-decoration:underline; overflow-wrap:anywhere; }
-.chat-bubble.ai .chat-content pre { max-width:100%; overflow:auto; white-space:pre; padding:12px; border-radius:10px; background:rgba(0,0,0,.48); border:1px solid rgba(0,255,163,.2); }
-.chat-bubble.ai .chat-content pre code { display:block; white-space:pre; background:transparent; border:0; padding:0; }
-.chat-bubble.ai .chat-content table { border-collapse:collapse; width:100%; }
-.chat-bubble.ai .chat-content th,.chat-bubble.ai .chat-content td { vertical-align:top; min-width:100px; }
-.chat-bubble.ai .chat-content blockquote { margin:12px 0; padding:10px 13px; border-left:3px solid #38bdf8; border-radius:8px; background:rgba(56,189,248,.07); }
-.chat-bubble.ai .arabic-text,.chat-bubble.ai .chat-content .arabic-text,.chat-bubble.ai .chat-content [dir="rtl"] { direction:rtl; text-align:right; font-family:'Amiri','Noto Nastaliq Urdu',serif; line-height:2.05; }
-.chat-bubble.ai .bubble-quick-actions { display:flex; flex-wrap:wrap; gap:7px; margin-top:12px; }
-.chat-bubble.ai .btn-action-pill:focus-visible,.chat-bubble.ai .btn-copy:focus-visible { outline:2px solid #67e8f9; outline-offset:3px; }
-@media(max-width:480px) { .chat-bubble.ai .chat-content { font-size:.9rem; line-height:1.8; } .chat-bubble.ai .chat-content th,.chat-bubble.ai .chat-content td { padding:7px; font-size:.78rem; } }
-@media(prefers-reduced-motion:reduce) { .chat-bubble.ai,.chat-bubble.ai * { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
-
 </style>
 
   <link rel="manifest" href="/manifest.json">
@@ -1066,6 +1041,7 @@ body.focus-reader-mode .exit-focus-btn {
       <button id="btn-new-chat" title="New Chat"><i class="fa-solid fa-arrows-rotate"></i></button>
       <button type="button" class="btn-action-icon" id="btnChatSettings" onclick="toggleChatSettingsMenu()" title="Chat Actions & Export" style="background:transparent; border:none; color:inherit; font-size:18px; cursor:pointer; padding:6px;">⚙️</button>
       <button id="btn-admin-toggle" title="Admin Control Center" style="display:none; color:var(--primary-green);"><i class="fa-solid fa-shield-halved"></i></button>
+      <button id="btn-super-admin-toggle" type="button" title="Super Admin Control Center" aria-label="Super Admin Control Center" style="display:none;background:none;border:0;color:#fbbf24;font-size:1.1rem;cursor:pointer;padding:6px;"><i class="fa-solid fa-crown"></i></button>
       <button id="btn-logout" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
       <button id="btn-open-persona" type="button" onclick="openPersonaModal()" title="AI Settings" style="background:none; border:none; color:#8696a0; font-size:1.1rem; cursor:pointer; padding:6px;"><i class="fa-solid fa-sliders"></i></button>
       <button id="btn-open-bookmarks" type="button" onclick="openBookmarksModal()" title="Mehfooz Sabaq (Bookmarks)" style="background:none; border:none; color:var(--vip-gold); font-size:1.1rem; cursor:pointer; padding:6px;"><i class="fa-solid fa-bookmark"></i></button>
@@ -1341,35 +1317,90 @@ body.focus-reader-mode .exit-focus-btn {
   </div>
 </div>
 
-<!-- ================= ULTRA-LUXURY ADMIN CONTROL CENTER MODAL ================= -->
-<div id="adminControlModal" style="display:none; position:fixed; inset:0; background:radial-gradient(circle at center,rgba(5,10,14,.92),rgba(2,5,8,.98)); z-index:999999; align-items:center; justify-content:center; padding:14px; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);">
-  <div style="background:radial-gradient(circle at 15% 15%,rgba(20,32,40,.97),rgba(9,15,20,.99) 72%); border:1.5px solid rgba(0,255,163,.4); border-radius:22px; max-width:580px; width:100%; max-height:92vh; display:flex; flex-direction:column; padding:18px; color:#f1f5f9; box-shadow:0 25px 70px rgba(0,0,0,.85),0 0 32px rgba(0,255,163,.12); position:relative; overflow:hidden;">
-    <div style="position:absolute; top:-35px; left:25%; width:50%; height:70px; background:radial-gradient(ellipse,rgba(0,255,163,.22),transparent 70%); pointer-events:none;"></div>
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; border-bottom:1px solid rgba(255,255,255,.09); padding-bottom:12px; margin-bottom:12px; position:relative;">
-      <div style="display:flex; align-items:center; gap:10px; min-width:0;">
-        <div style="width:36px;height:36px;flex:0 0 36px;border-radius:12px;background:linear-gradient(135deg,rgba(0,255,163,.18),rgba(2,132,199,.24));border:1px solid rgba(0,255,163,.45);display:flex;align-items:center;justify-content:center;color:#00ffa3;"><i class="fa-solid fa-shield-halved"></i></div>
-        <div><h3 style="margin:0;font-size:1.08rem;font-weight:800;color:#eafff7;">Admin Command Center</h3><div style="font-size:10px;color:#94a3b8;">Student management · Audit · Console tools</div></div>
-      </div>
-      <button type="button" aria-label="Close admin panel" onclick="document.getElementById('adminControlModal').style.display='none'" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);width:32px;height:32px;border-radius:10px;color:#cbd5e1;font-size:1.2rem;cursor:pointer;flex:0 0 32px;">&times;</button>
+
+<!-- ================= SEPARATE SUPER ADMIN CONTROL PLANE ================= -->
+<div id="superAdminModal" style="display:none;position:fixed;inset:0;background:rgba(4,8,12,.94);z-index:1000001;align-items:center;justify-content:center;padding:12px;backdrop-filter:blur(10px);">
+ <section style="width:100%;max-width:620px;max-height:92dvh;overflow:auto;background:#111b21;border:1px solid #d6a72c;border-radius:18px;padding:16px;color:#e9edef;box-shadow:0 18px 50px #000b;">
+  <header style="display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #35434b;padding-bottom:12px;margin-bottom:12px;">
+   <div><h2 style="font-size:1.12rem;color:#fbbf24;margin:0;"><i class="fa-solid fa-crown"></i> Super Admin Control Plane</h2><p style="font-size:.75rem;color:#9aaab2;margin-top:4px;">20 control tools · Server-side actions require matching API support</p></div>
+   <button type="button" onclick="document.getElementById('superAdminModal').style.display='none'" aria-label="Close Super Admin" style="background:#202c33;color:#e9edef;border:1px solid #42515a;border-radius:9px;padding:7px 11px;font-size:1.2rem;">×</button>
+  </header>
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;">
+   <button class="sa-tool" onclick="runSuperAdminTool('overview')">📊 1. System Overview</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('audit_all')">🧠 2. All-Student AI Audit</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('audit_one')">👤 3. Single-Student Audit</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('plan')">👑 4. Tier / Plan Manager</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('block')">⛔ 5. Block / Unblock Student</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('quota')">🔄 6. Reset Daily Quota</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('notice')">📢 7. Global Notice</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('accounts')">🎓 8. Student Account Tools</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('feature_flags')">🎚️ 9. Feature Flags</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('ai_provider')">🤖 10. AI Provider Check</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('prompt')">📝 11. Response Instructions</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('maintenance')">🛠️ 12. Maintenance Mode</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('backup')">💾 13. Export Local Backup</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('logs')">📥 14. Export Console Logs</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('cache')">🧹 15. Clear Local Draft Cache</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('moderation')">🛡️ 16. Moderation Queue</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('announcement')">📣 17. Announcement Composer</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('security')">🔐 18. Security Review</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('diagnostics')">🩺 19. Frontend Diagnostics</button>
+   <button class="sa-tool" onclick="runSuperAdminTool('export_chat')">🗂️ 20. Export Current Chat</button>
+  </div>
+  <div id="superAdminOutput" role="status" aria-live="polite" style="margin-top:12px;min-height:100px;max-height:26vh;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#071015;border:1px solid #31414a;border-radius:12px;padding:12px;font: .78rem/1.6 ui-monospace,monospace;color:#a7f3d0;">Super Admin panel ready. Select a tool.</div>
+  <p style="font-size:.7rem;line-height:1.5;color:#93a4ad;margin-top:9px;">Note: browser-only tools operate on this device. Student-wide changes, moderation records, provider health and maintenance state need secure server endpoints; this panel does not pretend local data is live server data.</p>
+ </section>
+</div>
+<style>
+#superAdminModal .sa-tool{min-height:48px;padding:10px 9px;text-align:left;background:#1b2930;color:#e9edef;border:1px solid #34464f;border-radius:10px;font-size:.78rem;font-weight:600;cursor:pointer;}
+#superAdminModal .sa-tool:active{transform:scale(.99);border-color:#fbbf24;}
+#superAdminModal .sa-tool:focus-visible{outline:2px solid #fbbf24;outline-offset:2px;}
+@media(max-width:380px){#superAdminModal .sa-tool{font-size:.7rem;padding:9px 6px;}}
+</style>
+
+<!-- ================= ADMIN CONTROL CENTER MODAL ================= -->
+<div id="adminControlModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; align-items:center; justify-content:center; padding:15px; backdrop-filter:blur(6px);">
+  <div style="background:#131c21; border:1px solid #00a884; border-radius:16px; max-width:520px; width:100%; max-height:88vh; display:flex; flex-direction:column; padding:18px; color:#e9edef; box-shadow:0 15px 35px rgba(0,0,0,0.7);">
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2a3942; padding-bottom:10px; margin-bottom:14px;">
+      <h3 style="margin:0; color:#00a884; font-size:1.15rem; display:flex; align-items:center; gap:8px;">
+        <i class="fa-solid fa-shield-halved"></i> Admin Control Center
+      </h3>
+      <button onclick="document.getElementById('adminControlModal').style.display='none'" style="background:transparent; border:none; color:#8696a0; font-size:1.5rem; cursor:pointer;">&times;</button>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:13px;">
-      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(0,255,163,.18);border-radius:10px;padding:8px 5px;text-align:center;"><div style="font-size:9px;color:#94a3b8;text-transform:uppercase;">Panel</div><div style="font-size:11px;font-weight:800;color:#00ffa3;">READY</div></div>
-      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(56,189,248,.18);border-radius:10px;padding:8px 5px;text-align:center;"><div style="font-size:9px;color:#94a3b8;text-transform:uppercase;">Access</div><div style="font-size:11px;font-weight:800;color:#38bdf8;">ADMIN</div></div>
-      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(245,158,11,.18);border-radius:10px;padding:8px 5px;text-align:center;"><div style="font-size:9px;color:#94a3b8;text-transform:uppercase;">Mode</div><div style="font-size:11px;font-weight:800;color:#fbbf24;">MANUAL</div></div>
+
+    <!-- 6 Admin Action Buttons -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+      <button onclick="runAudit('all')" style="background:#1f2c34; border:1px solid #00a884; color:#00a884; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+        <i class="fa-solid fa-brain"></i> All Users Chat Audit
+      </button>
+
+      <button onclick="runAudit('single')" style="background:#1f2c34; border:1px solid #25d366; color:#25d366; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+        <i class="fa-solid fa-user-check"></i> Single User Audit
+      </button>
+
+      <button onclick="triggerAdminAction('change_plan')" style="background:#1f2c34; border:1px solid #eab308; color:#facc15; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+        <i class="fa-solid fa-crown"></i> Change Plan / Upgrade
+      </button>
+
+      <button onclick="triggerAdminAction('toggle_block')" style="background:#1f2c34; border:1px solid #ef4444; color:#f87171; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+        <i class="fa-solid fa-ban"></i> Block / Unblock User
+      </button>
+
+      <button onclick="triggerAdminAction('reset_limit')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+        <i class="fa-solid fa-rotate-left"></i> Daily Limit Reset
+      </button>
+
+      <button onclick="triggerAdminAction('set_notice')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+        <i class="fa-solid fa-bullhorn"></i> Global Notice
+      </button>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:13px;">
-      <button type="button" onclick="runAudit('all')" style="background:rgba(0,255,163,.04);border:1px solid rgba(0,255,163,.3);color:#00ffa3;padding:11px 7px;border-radius:11px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-brain"></i> All Users AI Audit</button>
-      <button type="button" onclick="runAudit('single')" style="background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.3);color:#38bdf8;padding:11px 7px;border-radius:11px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-user-gear"></i> Single Student Audit</button>
-      <button type="button" onclick="triggerAdminAction('change_plan')" style="background:rgba(250,204,21,.04);border:1px solid rgba(250,204,21,.3);color:#facc15;padding:11px 7px;border-radius:11px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-crown"></i> Tier / Plan</button>
-      <button type="button" onclick="triggerAdminAction('toggle_block')" style="background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.3);color:#f87171;padding:11px 7px;border-radius:11px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-ban"></i> Block / Unblock</button>
-      <button type="button" onclick="triggerAdminAction('reset_limit')" style="background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.3);color:#c084fc;padding:11px 7px;border-radius:11px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-rotate-left"></i> Reset Daily Limit</button>
-      <button type="button" onclick="triggerAdminAction('set_notice')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.15);color:#e2e8f0;padding:11px 7px;border-radius:11px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-bullhorn"></i> Global Notice</button>
-      <button type="button" onclick="triggerAdminAction('clear_cache')" style="background:rgba(244,63,94,.04);border:1px solid rgba(244,63,94,.3);color:#fb7185;padding:11px 7px;border-radius:11px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-broom"></i> Clear Local Draft Cache</button>
-      <button type="button" onclick="triggerAdminAction('export_terminal')" style="background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.3);color:#34d399;padding:11px 7px;border-radius:11px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-download"></i> Export Console Logs</button>
+
+    <!-- Output Area -->
+    <div id="adminPanelOutput" style="flex:1; overflow-y:auto; background:#0b141a; border:1px solid #222d34; border-radius:10px; padding:12px; font-size:0.85rem; line-height:1.6; color:#d1d7db; white-space:pre-wrap; min-height:190px;">
+      ऊपर दिए गए किसी भी टूल पर टैप करें...
     </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;padding:0 3px;"><span style="font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;">Execution Output</span><div style="display:flex;gap:10px;"><button type="button" onclick="document.getElementById('adminPanelOutput').textContent='Console cleared. Ready for next action.';" style="background:transparent;border:0;color:#94a3b8;font-size:10px;font-weight:700;cursor:pointer;">Clear</button><button type="button" onclick="if(navigator.clipboard){navigator.clipboard.writeText(document.getElementById('adminPanelOutput').innerText).then(()=>alert('Console output copied.')).catch(()=>alert('Copy failed.'));}else{alert('Clipboard is not available in this browser.');}" style="background:transparent;border:0;color:#38bdf8;font-size:10px;font-weight:700;cursor:pointer;">Copy</button></div></div>
-    <div id="adminPanelOutput" style="flex:1;overflow-y:auto;background:#070d11;border:1px solid rgba(0,255,163,.22);border-radius:12px;padding:13px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.8rem;line-height:1.65;color:#a7f3d0;white-space:pre-wrap;min-height:150px;max-height:30vh;overflow-wrap:anywhere;box-shadow:inset 0 0 20px rgba(0,0,0,.7);">&gt; Admin console ready.
-&gt; Select an action above to begin.</div>
+
   </div>
 </div>
 
@@ -1790,9 +1821,6 @@ function renderAiBubble(div, text, aiName) {
     <div class="bubble-quick-actions">
       <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('simplify')">🧠 आसान समझाओ</button>
       <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('detail')">📚 गहराई में बताओ</button>
-      <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('example')">💡 मिसाल दो</button>
-      <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('summary')">📝 خلاصہ</button>
-      <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('quiz')">❓ टेस्ट लो</button>
     </div>
   `;
 }
@@ -1928,6 +1956,11 @@ window.toggleSpeech = function(btn) {
   // Header Shield Icon Click -> Opens Admin Control Center
   document.getElementById('btn-admin-toggle').onclick = () => {
     document.getElementById('adminControlModal').style.display = 'flex';
+  };
+  const superAdminToggle = document.getElementById('btn-super-admin-toggle');
+  if (superAdminToggle) superAdminToggle.onclick = () => {
+    document.getElementById('superAdminModal').style.display = 'flex';
+    document.getElementById('superAdminOutput').textContent = 'Super Admin panel ready. Choose a control tool.';
   };
 
   function checkToolAccess(type) {
@@ -2121,6 +2154,8 @@ window.toggleSpeech = function(btn) {
     });
 
     document.getElementById('btn-admin-toggle').style.display = isAdmin ? 'inline-block' : 'none';
+    const superAdminButton = document.getElementById('btn-super-admin-toggle');
+    if (superAdminButton) superAdminButton.style.display = isAdmin ? 'inline-block' : 'none';
     document.getElementById('nav-item-admin').style.display = isAdmin ? 'block' : 'none';
     if (isAdmin) {
       document.getElementById('nav-item-pay').style.display = 'none';
@@ -2327,31 +2362,16 @@ window.toggleSpeech = function(btn) {
 - Sirf jawab ka matn dein; apni formatting ya in hidayaat ka zikr na karein.]
 `;
 
-    // Response style + density + optional deep-research context
+    // Density aur Deep Research ka instruction jodna
     const density = document.getElementById('selResponseDensity')?.value || 'detailed';
-    const responseStyleInstruction = `
-[SUHAIL AI RESPONSE QUALITY RULES]
-- User ke sawal ka seedha jawab pehle dein; be-maqsad muqaddima na likhein.
-- User jis zaban aur script mein sawal kare, usi zaban/script mein jawab dein, jab tak user doosri zaban na maange.
-- Jawab ko readable Markdown mein dein: zaroorat ke mutabiq chhote headings, paragraphs, numbered steps, bullets, examples aur tables.
-- Har jawab ko zabardasti headings ya table mein na badlein. Simple sawal ka simple jawab dein.
-- Taleemi sawal mein asaan mafhoom, step-by-step tashreeh, munasib misaal aur zaroorat par short recap dein.
-- Maths mein zaroori calculation steps dikhayein; sirf final number na dein jab tak user short answer na maange.
-- Arabic grammar mein diye gaye exact lafz/harakaat ka lihaz rakhein; ghair-yaqini baat ko yaqini keh kar na likhein.
-- Deeni masail mein adab aur hawale ki durustgi ka lihaz rakhein. Qur'an/Hadith ka lafzi hawala ya number yaqeen ke baghair invent na karein.
-- Programming mein root cause samjhein; compatible code dein. Existing IDs, API routes, login aur event listeners bila-zaroorat na badlein.
-- Ghair-mutalliq lambi baat, repetition aur fake citations se bachein.
-- Agar maloomat/source access na ho to saaf bata dein; andazay ko fact na banayein.
-${density === 'concise' ? '- RESPONSE LENGTH: concise; sirf zaroori points aur direct answer.' : density === 'detailed' ? '- RESPONSE LENGTH: detailed but organized; concepts, steps aur examples ko munasib tafseel se samjhayen.' : '- RESPONSE LENGTH: balanced; direct answer ke baad zaroori explanation aur example dein.'}
-`;
-    let promptInstruction = responseStyleInstruction;
+    let promptInstruction = density === 'concise' ? ' [Jawab nihayat to-the-point aur mukhtasar dein]' : '';
 
     if (isDeepResearchEnabled) {
-      let fullContext = '';
+      let fullContext = "";
       document.querySelectorAll('.chat-bubble').forEach(b => {
-        fullContext += (b.innerText || '').trim() + '\n';
+        fullContext += b.innerText.trim() + "\n";
       });
-      promptInstruction += `\n[DEEP RESEARCH MODE] Relevant previous conversation ko context banayein. Claims, assumptions aur open questions alag rakhein. Agar browsing/source access available nahi, to web research ka jhoota dawa na karein. Relevant context:\n${fullContext.substring(0, 1500)}`;
+      promptInstruction += `\n[DEEP RESEARCH ACTIVE: Pichli tamaam guftagu aur nikaat ka gehri tehqeeq ke sath ihata karein: ${fullContext.substring(0, 1500)}]`;
     }
 
     try {
@@ -2443,9 +2463,6 @@ function typeWriterEffect(bubbleElement, fullText, aiName) {
         <div class="bubble-quick-actions" style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
           <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('simplify')">🧠 आसान समझाओ</button>
           <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('detail')">📚 गहराई में बताओ</button>
-          <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('example')">💡 मिसाल दो</button>
-          <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('summary')">📝 خلاصہ</button>
-          <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('quiz')">❓ टेस्ट लो</button>
         </div>
       `;
 
@@ -2668,31 +2685,57 @@ function renderAiBubble(div, text, aiName) {
         out.innerText = "Error: " + e.message;
       }
     }
+  }
 
 
-    if (type === 'clear_cache') {
-      if (!confirm('Sirf is browser ke local drafts/action counters clear honge. Continue?')) return;
-      localStorage.removeItem('suhail_mega_code_draft');
-      localStorage.removeItem('suhail_quick_action_count');
-      localStorage.removeItem('suhail_quick_action_date');
-      out.textContent = '[LOCAL CACHE CLEARED] Local drafts and quick-action counters removed. Server/Firebase data was not changed.';
-      return;
+  // ================= SUPER ADMIN CONTROL PLANE (20 TOOLS) =================
+  function superAdminWrite(text) {
+    const out = document.getElementById('superAdminOutput');
+    if (out) out.textContent = text;
+  }
+  function superAdminDownload(filename, content, mime='text/plain;charset=utf-8') {
+    const blob = new Blob([content], {type:mime});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download=filename;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+  async function runSuperAdminTool(tool) {
+    const out = document.getElementById('superAdminOutput');
+    const localKeys = Object.keys(localStorage);
+    if (tool === 'audit_all') { document.getElementById('superAdminModal').style.display='none'; document.getElementById('adminControlModal').style.display='flex'; return runAudit('all'); }
+    if (tool === 'audit_one') { document.getElementById('superAdminModal').style.display='none'; document.getElementById('adminControlModal').style.display='flex'; return runAudit('single'); }
+    if (tool === 'plan') { document.getElementById('superAdminModal').style.display='none'; document.getElementById('adminControlModal').style.display='flex'; return triggerAdminAction('change_plan'); }
+    if (tool === 'block') { document.getElementById('superAdminModal').style.display='none'; document.getElementById('adminControlModal').style.display='flex'; return triggerAdminAction('toggle_block'); }
+    if (tool === 'quota') { document.getElementById('superAdminModal').style.display='none'; document.getElementById('adminControlModal').style.display='flex'; return triggerAdminAction('reset_limit'); }
+    if (tool === 'notice') { document.getElementById('superAdminModal').style.display='none'; document.getElementById('adminControlModal').style.display='flex'; return triggerAdminAction('set_notice'); }
+    if (tool === 'overview') {
+      const chatCount = document.querySelectorAll('#chat-box .chat-bubble').length;
+      superAdminWrite(`LOCAL FRONTEND OVERVIEW\nTimestamp: ${new Date().toLocaleString()}\nCurrent session: ${currentUser ? 'signed in' : 'guest'}\nVisible chat bubbles: ${chatCount}\nLocalStorage keys: ${localKeys.length}\nBackend/Firebase health: not verified by this browser-only check.`); return;
     }
-
-    if (type === 'export_terminal') {
-      const content = out ? out.innerText : 'No console output';
-      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `SuhailAI_Admin_Logs_${Date.now()}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-      out.textContent += '\n[EXPORT] Console log download requested.';
-      return;
+    if (tool === 'accounts') { superAdminWrite('STUDENT ACCOUNT TOOLS\nThis UI has no verified account-creation endpoint wired into this panel. Use the existing secure Admin workflow; do not create student credentials in browser storage.'); return; }
+    if (tool === 'feature_flags') { superAdminWrite('FEATURE FLAGS\nNo server-backed feature-flag endpoint is configured in this HTML. No changes were applied. Add an authenticated API endpoint before changing global flags.'); return; }
+    if (tool === 'ai_provider') { superAdminWrite('AI PROVIDER CHECK\nThis panel cannot verify provider uptime or secret keys from the browser. Send a health-check endpoint on the server to report live provider status.'); return; }
+    if (tool === 'prompt') {
+      const current = localStorage.getItem('suhail_persona_prefs') || '';
+      const next = prompt('Personal response preference (stored only on this browser):', current);
+      if (next === null) return;
+      localStorage.setItem('suhail_persona_prefs', next.trim());
+      superAdminWrite('Saved the response preference locally on this device. This is not a global prompt change.'); return;
     }
+    if (tool === 'maintenance') { superAdminWrite('MAINTENANCE MODE\nNo secure server-side maintenance endpoint is configured here. No global setting was changed.'); return; }
+    if (tool === 'backup') {
+      const safe = {};
+      for (const k of localKeys) { if (/suhail_(persona|font_scale|bookmarks|chat_history|sessions)/i.test(k)) safe[k] = localStorage.getItem(k); }
+      superAdminDownload(`SuhailAI_Local_Backup_${Date.now()}.json`, JSON.stringify({exportedAt:new Date().toISOString(),scope:'selected local browser preferences only',data:safe},null,2),'application/json;charset=utf-8');
+      superAdminWrite('Downloaded selected local preferences. Passwords, credentials, server data and Firebase records were excluded.'); return;
+    }
+    if (tool === 'logs') { const txt = `[${new Date().toISOString()}] Super Admin requested frontend diagnostics\nUser role: ${currentUser?.role || 'unknown'}\nVisible chat bubbles: ${document.querySelectorAll('#chat-box .chat-bubble').length}\nLocalStorage keys: ${localKeys.length}\n`; superAdminDownload(`SuhailAI_Console_${Date.now()}.txt`,txt); superAdminWrite('Downloaded a small frontend diagnostic log. It does not contain server logs.'); return; }
+    if (tool === 'cache') { if (!confirm('Is browser ke selected local drafts/counters clear karein?')) return; ['suhail_mega_code_draft','suhail_quick_action_count','suhail_quick_action_date'].forEach(k=>localStorage.removeItem(k)); superAdminWrite('Selected local draft/action counters cleared. Server/Firebase data was not touched.'); return; }
+    if (tool === 'moderation') { superAdminWrite('MODERATION QUEUE\nNo moderation queue endpoint is connected. No user messages were hidden or deleted. Configure a server-side queue and permission checks to enable this.'); return; }
+    if (tool === 'announcement') { const msg = prompt('Announcement draft (local only):'); if (msg === null) return; localStorage.setItem('suhail_announcement_draft',msg); superAdminWrite('Announcement draft saved locally. It has NOT been broadcast. Use Global Notice to publish through the existing API.'); return; }
+    if (tool === 'security') { const issues=[]; if (location.protocol !== 'https:' && location.hostname !== 'localhost') issues.push('Page is not HTTPS.'); if (localStorage.getItem('suhail_ai_admin_pass')) issues.push('Admin pass is stored in browser localStorage.'); issues.push('Client-side role checks are not a security boundary; enforce authorization on the server.'); superAdminWrite('SECURITY REVIEW (browser-visible only)\n'+issues.map((x,i)=>`${i+1}. ${x}`).join('\n')); return; }
+    if (tool === 'diagnostics') { const ids=['chat-box','chat-input','btn-send','adminControlModal','superAdminModal']; superAdminWrite('FRONTEND DIAGNOSTICS\n'+ids.map(id=>`${document.getElementById(id)?'OK':'MISSING'} — #${id}`).join('\n')+`\nJS errors cannot be fully audited from inside this panel.\nViewport: ${innerWidth} × ${innerHeight}`); return; }
+    if (tool === 'export_chat') { const chat=document.getElementById('chat-box'); if (!chat) return superAdminWrite('Chat container not found.'); superAdminDownload(`SuhailAI_Current_Chat_${Date.now()}.txt`,chat.innerText || ''); superAdminWrite('Exported only the currently visible chat text.'); return; }
   }
 
   renderUserUI();
@@ -2889,16 +2932,11 @@ function triggerFollowupAction(actionType) {
 
   let promptText = '';
   if (actionType === 'simplify') {
-    promptText = 'Pichhle AI jawab ko asaan Roman Urdu/Hindi mein, chhote steps aur rozmarrah ki misaal ke saath samjhao. Agar sawal Urdu script mein tha to Urdu script hi rakho.';
+    promptText = 'ऊपर दिए गए जवाब को और अधिक आसान मिसालों और सरल भाषा में समझाएं।';
   } else if (actionType === 'detail') {
-    promptText = 'Pichhle jawab ko mazeed tafseel, bunyadi usool, step-by-step tashreeh aur relevant examples ke saath samjhao. Repetition se bacho.';
-  } else if (actionType === 'example') {
-    promptText = 'Pichhle jawab ke concept ko samjhane ke liye 3 relevant, mukhtalif aur asaan misaalein do.';
-  } else if (actionType === 'summary') {
-    promptText = 'Pichhle jawab ka mukhtasar, durust aur organized khulasa do; sirf key points rakho.';
-  } else if (actionType === 'quiz') {
-    promptText = 'Pichhle topic par 5 sawalat ka chhota test banao. Pehle sirf sawalat do, answers foran na do. User jawab de to phir check karke samjhao.';
+    promptText = 'ऊपर दिए गए जवाब को मुकम्मल गहराई, बुनियादी उसूलों और पूरी तफ़सील से बताएं।';
   }
+
   if (!promptText) return;
 
   localStorage.setItem('suhail_quick_action_count', (currentUsage + 1).toString());
