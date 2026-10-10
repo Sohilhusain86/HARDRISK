@@ -1,114 +1,58 @@
-const crypto = require('node:crypto');
+const crypto = require('crypto');
 
 const COOKIE = 'suhail_sa_session';
-const SESSION_SECONDS = 10 * 60;
-const MAX_BODY_BYTES = 8 * 1024;
-const attempts = new Map(); // Best-effort per-instance limiter only; use Redis/KV for production.
-
-function json(res, status, body, extraHeaders = {}) {
-  res.statusCode = status;
-  res.setHeader('Content-Type', 'application/json; charset=utf-8');
-  res.setHeader('Cache-Control', 'no-store, max-age=0');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('Referrer-Policy', 'no-referrer');
-  res.setHeader('Vary', 'Cookie');
-  for (const [k, v] of Object.entries(extraHeaders)) res.setHeader(k, v);
-  res.end(JSON.stringify(body));
-}
-function parseCookies(header = '') {
-  const out = {};
-  for (const item of header.split(';')) {
-    const i = item.indexOf('=');
-    if (i > 0) out[item.slice(0, i).trim()] = decodeURIComponent(item.slice(i + 1).trim());
-  }
-  return out;
-}
+const TTL_SECONDS = 10 * 60;
+function b64url(value) { return Buffer.from(value).toString('base64url'); }
 function safeEqual(a, b) {
-  const aa = Buffer.from(String(a)); const bb = Buffer.from(String(b));
+  const aa = Buffer.from(String(a || ''));
+  const bb = Buffer.from(String(b || ''));
   return aa.length === bb.length && crypto.timingSafeEqual(aa, bb);
 }
-function sign(payload, secret) {
-  const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
-  const sig = crypto.createHmac('sha256', secret).update(body).digest('base64url');
-  return `${body}.${sig}`;
+function sign(value, secret) { return crypto.createHmac('sha256', secret).update(value).digest('base64url'); }
+function parseCookies(header = '') {
+  const out = {};
+  header.split(';').forEach(part => { const i = part.indexOf('='); if (i > 0) out[part.slice(0, i).trim()] = decodeURIComponent(part.slice(i + 1).trim()); });
+  return out;
 }
-function verify(token, secret) {
-  if (!token || typeof token !== 'string' || token.length > 4096) return null;
+function makeCookie(token, maxAge) {
+  return `${COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAge}`;
+}
+function readSession(req, secret) {
+  const token = parseCookies(req.headers.cookie || '')[COOKIE];
+  if (!token) return null;
   const parts = token.split('.'); if (parts.length !== 2) return null;
-  const expected = crypto.createHmac('sha256', secret).update(parts[0]).digest('base64url');
-  if (!safeEqual(parts[1], expected)) return null;
-  try {
-    const p = JSON.parse(Buffer.from(parts[0], 'base64url').toString('utf8'));
-    if (!p || p.role !== 'owner' || !Number.isFinite(p.exp) || p.exp <= Math.floor(Date.now() / 1000)) return null;
-    return p;
-  } catch { return null; }
+  const [payload, signature] = parts;
+  if (!safeEqual(signature, sign(payload, secret))) return null;
+  let data; try { data = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')); } catch (_) { return null; }
+  if (!data || data.role !== 'owner' || !Number.isFinite(data.exp) || data.exp <= Math.floor(Date.now() / 1000)) return null;
+  return data;
 }
-function cookieHeader(value, maxAge, secure) {
-  return `${COOKIE}=${encodeURIComponent(value)}; Path=/api/admin; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${secure ? '; Secure' : ''}`;
-}
-function requestIsSameOrigin(req) {
-  const origin = req.headers.origin;
-  if (!origin) return true; // Native same-origin form/fetch clients may omit Origin.
-  const host = req.headers['x-forwarded-host'] || req.headers.host;
-  if (!host) return false;
-  try { return new URL(origin).host.toLowerCase() === String(host).toLowerCase(); } catch { return false; }
-}
-function getBody(req) {
-  if (req.body && typeof req.body === 'object') return Promise.resolve(req.body);
-  return new Promise((resolve, reject) => {
-    let data = ''; req.on('data', chunk => { data += chunk; if (data.length > MAX_BODY_BYTES) reject(new Error('Body too large')); });
-    req.on('end', () => { try { resolve(data ? JSON.parse(data) : {}); } catch { reject(new Error('Invalid JSON')); } });
-    req.on('error', reject);
-  });
-}
-function isRateLimited(key) {
-  const now = Date.now(); const prior = attempts.get(key) || { count: 0, start: now };
-  if (now - prior.start > 15 * 60 * 1000) { prior.count = 0; prior.start = now; }
-  prior.count += 1; attempts.set(key, prior);
-  return prior.count > 8;
-}
-
 module.exports = async function handler(req, res) {
-  const action = String((req.query && req.query.action) || new URL(req.url, 'http://local').searchParams.get('action') || '');
-  const secure = process.env.NODE_ENV === 'production' || String(req.headers['x-forwarded-proto'] || '').includes('https');
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  if (req.method !== 'GET' && req.method !== 'POST') return res.status(405).json({ ok: false, error: 'Method not allowed' });
+  const password = process.env.SUPER_ADMIN_PASSWORD;
   const secret = process.env.SUPER_ADMIN_SESSION_SECRET;
-  if (!secret || secret.length < 32) return json(res, 503, { ok: false, error: 'Super Admin backend is not configured.' });
-  if (!requestIsSameOrigin(req)) return json(res, 403, { ok: false, error: 'Cross-origin request denied.' });
-
-  if (action === 'super_admin_auth') {
-    if (req.method !== 'POST') return json(res, 405, { ok: false, error: 'Method not allowed.' }, { Allow: 'POST' });
-    const ip = String(req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
-    if (isRateLimited(ip)) return json(res, 429, { ok: false, error: 'Too many attempts. Try again later.' });
-    let body;
-    try { body = await getBody(req); } catch { return json(res, 400, { ok: false, error: 'Invalid request body.' }); }
-    const supplied = typeof body.password === 'string' ? body.password : '';
-    const expected = process.env.SUPER_ADMIN_PASSWORD;
-    if (!expected || expected.length < 16 || !supplied || !safeEqual(supplied, expected)) {
-      return json(res, 401, { ok: false, error: 'Owner verification failed.' });
-    }
+  if (!password || password.length < 16 || !secret || secret.length < 32) return res.status(503).json({ ok: false, error: 'Vercel mein SUPER_ADMIN_PASSWORD (16+ chars) aur SUPER_ADMIN_SESSION_SECRET (32+ chars) set karke redeploy karein.' });
+  const url = new URL(req.url, `https://${req.headers.host || 'localhost'}`);
+  const action = url.searchParams.get('action') || '';
+  if (req.method === 'POST' && action === 'super_admin_auth') {
+    const body = req.body && typeof req.body === 'object' ? req.body : {};
+    if (!safeEqual(body.password, password)) return res.status(401).json({ ok: false, error: 'Password ghalat hai.' });
     const now = Math.floor(Date.now() / 1000);
-    const payload = { role: 'owner', permissions: ['super_admin:read', 'super_admin:manage'], iat: now, exp: now + SESSION_SECONDS, nonce: crypto.randomBytes(16).toString('hex') };
-    const token = sign(payload, secret);
-    return json(res, 200, { ok: true, role: 'owner', permissions: payload.permissions, expiresAt: payload.exp * 1000 }, { 'Set-Cookie': cookieHeader(token, SESSION_SECONDS, secure) });
+    const payload = b64url(JSON.stringify({ role: 'owner', iat: now, exp: now + TTL_SECONDS, nonce: crypto.randomBytes(16).toString('hex') }));
+    const token = `${payload}.${sign(payload, secret)}`;
+    res.setHeader('Set-Cookie', makeCookie(token, TTL_SECONDS));
+    return res.status(200).json({ ok: true, role: 'owner', expiresAt: (now + TTL_SECONDS) * 1000 });
   }
-
-  const cookies = parseCookies(req.headers.cookie || '');
-  const session = verify(cookies[COOKIE], secret);
-  if (action === 'super_admin_session') {
-    if (req.method !== 'GET') return json(res, 405, { ok: false, error: 'Method not allowed.' }, { Allow: 'GET' });
-    if (!session) return json(res, 401, { ok: false, error: 'Valid Super Admin session required.' });
-    return json(res, 200, { ok: true, role: session.role, permissions: session.permissions, expiresAt: session.exp * 1000 });
+  if (req.method === 'GET' && action === 'super_admin_session') {
+    const session = readSession(req, secret);
+    if (!session) return res.status(401).json({ ok: false, error: 'Session expired or not verified.' });
+    return res.status(200).json({ ok: true, role: 'owner', expiresAt: session.exp * 1000 });
   }
-  if (action === 'super_admin_logout') {
-    if (req.method !== 'POST') return json(res, 405, { ok: false, error: 'Method not allowed.' }, { Allow: 'POST' });
-    return json(res, 200, { ok: true }, { 'Set-Cookie': cookieHeader('', 0, secure) });
+  if (req.method === 'POST' && action === 'super_admin_logout') {
+    res.setHeader('Set-Cookie', makeCookie('', 0));
+    return res.status(200).json({ ok: true });
   }
-  if (!session) return json(res, 401, { ok: false, error: 'Valid Super Admin session required.' });
-
-  // Fail closed until real data providers are explicitly wired in. Never return fabricated metrics.
-  if (action === 'super_admin_dashboard') {
-    if (req.method !== 'GET') return json(res, 405, { ok: false, error: 'Method not allowed.' }, { Allow: 'GET' });
-    return json(res, 503, { ok: false, connected: false, error: 'Dashboard data provider is not configured; no live metrics are available.' });
-  }
-  return json(res, 501, { ok: false, error: 'This administrative action is not implemented on the server yet.' });
+  return res.status(400).json({ ok: false, error: 'Unknown action.' });
 };
