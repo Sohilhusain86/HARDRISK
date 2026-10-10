@@ -1,6 +1,9 @@
 <!DOCTYPE html>
+<!-- Suhail AI Super Admin consolidated build: includes cumulative Phase 1-8 frontend modules. Backend-dependent features remain disabled until authenticated APIs are implemented. -->
+
 <html lang="en" dir="ltr">
 <head>
+<!-- Phase 3: removed embedded admin secret; legacy admin actions now require an in-memory credential from the active admin session. -->
 
   <!-- Client-side ZIP generation ke liye -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -1318,45 +1321,197 @@ body.focus-reader-mode .exit-focus-btn {
 </div>
 
 
-<!-- ================= SEPARATE SUPER ADMIN CONTROL PLANE ================= -->
-<div id="superAdminModal" style="display:none;position:fixed;inset:0;background:rgba(4,8,12,.94);z-index:1000001;align-items:center;justify-content:center;padding:12px;backdrop-filter:blur(10px);">
- <section style="width:100%;max-width:620px;max-height:92dvh;overflow:auto;background:#111b21;border:1px solid #d6a72c;border-radius:18px;padding:16px;color:#e9edef;box-shadow:0 18px 50px #000b;">
-  <header style="display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #35434b;padding-bottom:12px;margin-bottom:12px;">
-   <div><h2 style="font-size:1.12rem;color:#fbbf24;margin:0;"><i class="fa-solid fa-crown"></i> Super Admin Control Plane</h2><p style="font-size:.75rem;color:#9aaab2;margin-top:4px;">20 control tools · Server-side actions require matching API support</p></div>
-   <button type="button" onclick="document.getElementById('superAdminModal').style.display='none'" aria-label="Close Super Admin" style="background:#202c33;color:#e9edef;border:1px solid #42515a;border-radius:9px;padding:7px 11px;font-size:1.2rem;">×</button>
-  </header>
-  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;">
-   <button class="sa-tool" onclick="runSuperAdminTool('overview')">📊 1. System Overview</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('audit_all')">🧠 2. All-Student AI Audit</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('audit_one')">👤 3. Single-Student Audit</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('plan')">👑 4. Tier / Plan Manager</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('block')">⛔ 5. Block / Unblock Student</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('quota')">🔄 6. Reset Daily Quota</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('notice')">📢 7. Global Notice</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('accounts')">🎓 8. Student Account Tools</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('feature_flags')">🎚️ 9. Feature Flags</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('ai_provider')">🤖 10. AI Provider Check</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('prompt')">📝 11. Response Instructions</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('maintenance')">🛠️ 12. Maintenance Mode</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('backup')">💾 13. Export Local Backup</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('logs')">📥 14. Export Console Logs</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('cache')">🧹 15. Clear Local Draft Cache</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('moderation')">🛡️ 16. Moderation Queue</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('announcement')">📣 17. Announcement Composer</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('security')">🔐 18. Security Review</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('diagnostics')">🩺 19. Frontend Diagnostics</button>
-   <button class="sa-tool" onclick="runSuperAdminTool('export_chat')">🗂️ 20. Export Current Chat</button>
-  </div>
-  <div id="superAdminOutput" role="status" aria-live="polite" style="margin-top:12px;min-height:100px;max-height:26vh;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#071015;border:1px solid #31414a;border-radius:12px;padding:12px;font: .78rem/1.6 ui-monospace,monospace;color:#a7f3d0;">Super Admin panel ready. Select a tool.</div>
-  <p style="font-size:.7rem;line-height:1.5;color:#93a4ad;margin-top:9px;">Note: browser-only tools operate on this device. Student-wide changes, moderation records, provider health and maintenance state need secure server endpoints; this panel does not pretend local data is live server data.</p>
- </section>
+<!-- ================= SUPER ADMIN RE-AUTHENTICATION GATE (PHASE 2) ================= -->
+<div id="sa-auth-gate" role="dialog" aria-modal="true" aria-labelledby="sa-gate-title" style="display:none;position:fixed;inset:0;z-index:1000002;background:rgba(2,8,12,.94);align-items:center;justify-content:center;padding:18px;color:#e9edef;font-family:system-ui,sans-serif">
+ <div style="width:min(440px,100%);background:#0d171d;border:1px solid #394b55;border-radius:18px;padding:24px;box-shadow:0 24px 80px #0009">
+  <div style="width:46px;height:46px;border-radius:13px;background:#2a2517;color:#f4d477;display:grid;place-items:center;font-size:20px;margin-bottom:16px"><i class="fa-solid fa-shield-halved"></i></div>
+  <h2 id="sa-gate-title" style="margin:0 0 8px;font-size:21px">Super Admin Verification</h2>
+  <p style="margin:0 0 18px;color:#9eafb8;font-size:13px;line-height:1.6">Command Center kholne se pehle server se Owner/Admin permission verify hogi. Sirf frontend role ya local password par bharosa nahi kiya jayega.</p>
+  <label for="sa-gate-password" style="display:block;font-size:12px;margin-bottom:7px">Administrator password</label>
+  <input id="sa-gate-password" type="password" autocomplete="current-password" style="width:100%;box-sizing:border-box;padding:12px;border-radius:9px;border:1px solid #354852;background:#071016;color:#fff;outline:none" placeholder="Password dobara darj karein">
+  <div id="sa-gate-message" role="status" aria-live="polite" style="margin-top:10px;color:#e6c36a;font-size:12px;line-height:1.5"></div>
+  <div style="display:flex;gap:10px;margin-top:18px"><button id="sa-gate-cancel" type="button" style="flex:1;padding:11px;border-radius:9px;border:1px solid #344650;background:#142129;color:#dbe5e9">Cancel</button><button id="sa-gate-verify" type="button" style="flex:1;padding:11px;border-radius:9px;border:1px solid #9e7d29;background:#d6b34f;color:#101418;font-weight:800">Verify & Open</button></div>
+  <p style="font-size:10px;line-height:1.5;color:#71858f;margin:16px 0 0">Agar secure server endpoint configure nahi hai, access band rahega. Yeh jaan-boojh kar fail-closed security hai.</p>
+ </div>
+</div>
+
+<!-- ================= SUHAIL AI ENTERPRISE SUPER ADMIN COMMAND CENTER ================= -->
+<div id="superAdminModal" role="dialog" aria-modal="true" aria-label="Suhail AI Super Admin Command Center" style="display:none;position:fixed;inset:0;background:#080e13;z-index:1000001;color:#e9edef;overflow:hidden;">
+ <div class="sa-shell">
+  <aside class="sa-sidebar" id="sa-sidebar">
+   <div class="sa-brand"><div class="sa-brand-icon"><i class="fa-solid fa-crown"></i></div><div><b>SUHAIL AI</b><small>SUPER ADMIN</small></div><button class="sa-mobile-close" onclick="saToggleSidebar(false)" aria-label="Close menu">×</button></div>
+   <div class="sa-nav-label">COMMAND CENTER</div>
+   <button class="sa-nav active" data-sa-view="dashboard" onclick="saOpenView('dashboard',this)"><i class="fa-solid fa-chart-pie"></i><span>System Overview</span></button>
+   <div class="sa-nav-label">DEPARTMENTS</div>
+   <nav id="sa-department-nav" aria-label="Super Admin departments"></nav>
+   <div class="sa-sidebar-footer"><span class="sa-status-dot"></span><span>Local interface loaded</span><small>Backend status: unverified</small></div>
+  </aside>
+  <main class="sa-main">
+   <header class="sa-topbar">
+    <button class="sa-menu-btn" onclick="saToggleSidebar()" aria-label="Toggle navigation"><i class="fa-solid fa-bars"></i></button>
+    <div class="sa-breadcrumb"><span>SUHAIL AI</span><i class="fa-solid fa-chevron-right"></i><b id="sa-current-title">System Overview</b></div>
+    <div class="sa-top-actions"><label class="sa-search"><i class="fa-solid fa-magnifying-glass"></i><input id="sa-global-search" type="search" placeholder="Search tools and departments…" oninput="saSearch(this.value)" autocomplete="off"><kbd>⌕</kbd></label><button class="sa-icon-btn" onclick="saShowAlerts()" title="Alerts"><i class="fa-regular fa-bell"></i><span class="sa-alert-dot"></span></button><div class="sa-owner-chip"><span class="sa-owner-avatar"><i class="fa-solid fa-user-shield"></i></span><span><b>Owner / Admin</b><small>Permission must be verified</small></span></div>
+    <button class="sa-icon-btn sa-close-btn" onclick="saCloseCommandCenter()" title="Close Command Center" aria-label="Close Super Admin"><i class="fa-solid fa-xmark"></i></button></div>
+   </header>
+   <section class="sa-content" id="sa-content">
+    <div class="sa-welcome-row"><div><div class="sa-eyebrow">ENTERPRISE CONTROL PLANE</div><h1 id="sa-page-heading">System Overview</h1><p id="sa-page-subtitle">Monitor the application and open authorized control tools from one place.</p></div><div class="sa-welcome-actions"><button class="sa-secondary-btn" onclick="saRefreshOverview()"><i class="fa-solid fa-rotate"></i> Refresh overview</button><span class="sa-env-badge"><span></span> Live status not verified</span></div></div>
+    <div class="sa-notice-strip"><i class="fa-solid fa-circle-info"></i><span><b>Honest status reporting:</b> live database, provider, uptime and backup values will remain <em>Unknown</em> until authenticated backend health endpoints are connected.</span></div>
+    <div id="sa-view-content"></div>
+    <div id="superAdminOutput" class="sa-output" role="status" aria-live="polite">Command Center loaded. Select a tool to continue.</div>
+   </section>
+   <footer class="sa-footer"><span>SUHAIL AI · Enterprise Command Center</span><span>Frontend interface · Server-side authorization required for sensitive actions</span></footer>
+  </main>
+ </div>
 </div>
 <style>
-#superAdminModal .sa-tool{min-height:48px;padding:10px 9px;text-align:left;background:#1b2930;color:#e9edef;border:1px solid #34464f;border-radius:10px;font-size:.78rem;font-weight:600;cursor:pointer;}
-#superAdminModal .sa-tool:active{transform:scale(.99);border-color:#fbbf24;}
-#superAdminModal .sa-tool:focus-visible{outline:2px solid #fbbf24;outline-offset:2px;}
-@media(max-width:380px){#superAdminModal .sa-tool{font-size:.7rem;padding:9px 6px;}}
+#superAdminModal{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:dark}#superAdminModal *{box-sizing:border-box}#superAdminModal button,#superAdminModal input{font:inherit}#superAdminModal button{cursor:pointer}#superAdminModal .sa-shell{height:100%;display:flex;min-width:0;background:#080e13}#superAdminModal .sa-sidebar{width:258px;flex:0 0 258px;background:#0c151b;border-right:1px solid #23313a;display:flex;flex-direction:column;overflow-y:auto;padding:17px 12px 12px;z-index:4}#superAdminModal .sa-brand{display:flex;align-items:center;gap:10px;padding:4px 8px 22px;border-bottom:1px solid #23313a;margin-bottom:18px}#superAdminModal .sa-brand-icon{height:38px;width:38px;display:grid;place-items:center;border-radius:12px;color:#071018;background:linear-gradient(135deg,#ffe08a,#d6a72c);box-shadow:0 6px 20px #d6a72c22}#superAdminModal .sa-brand b{display:block;font-size:13px;letter-spacing:1.5px}#superAdminModal .sa-brand small{display:block;color:#c5a74d;font-size:9px;letter-spacing:2px;margin-top:4px}#superAdminModal .sa-mobile-close{display:none;margin-left:auto;border:0;background:transparent;color:#e9edef;font-size:24px}#superAdminModal .sa-nav-label{font-size:9px;letter-spacing:1.5px;font-weight:800;color:#637580;padding:8px 10px}#superAdminModal .sa-nav{width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:10px 11px;margin:2px 0;border:1px solid transparent;border-radius:9px;background:transparent;color:#aab8c0;font-size:11.5px;font-weight:600;transition:.16s}#superAdminModal .sa-nav i{width:17px;text-align:center;color:#8296a1;font-size:12px}#superAdminModal .sa-nav:hover{background:#14232b;color:#f4f7f8}#superAdminModal .sa-nav.active{background:linear-gradient(90deg,#3d3216,#1b211e);border-color:#69551f;color:#ffe39a}#superAdminModal .sa-nav.active i{color:#fbbf24}#superAdminModal .sa-sidebar-footer{margin-top:auto;border-top:1px solid #23313a;padding:15px 8px 3px;color:#94a6b0;font-size:10px;display:grid;grid-template-columns:9px 1fr;gap:5px 7px;align-items:center}#superAdminModal .sa-sidebar-footer small{grid-column:2;color:#647984;font-size:9px}#superAdminModal .sa-status-dot{height:7px;width:7px;border-radius:50%;background:#9aa7ad;box-shadow:0 0 0 3px #9aa7ad18}#superAdminModal .sa-main{display:flex;flex:1;min-width:0;flex-direction:column;overflow:hidden}#superAdminModal .sa-topbar{height:64px;flex:0 0 64px;border-bottom:1px solid #23313a;display:flex;align-items:center;justify-content:space-between;gap:15px;padding:0 24px;background:#0b1319}#superAdminModal .sa-breadcrumb{display:flex;align-items:center;gap:10px;min-width:150px;font-size:11px;color:#647985}#superAdminModal .sa-breadcrumb i{font-size:9px;color:#465862}#superAdminModal .sa-breadcrumb b{color:#e9edef;font-weight:700}#superAdminModal .sa-top-actions{display:flex;align-items:center;gap:12px;min-width:0}#superAdminModal .sa-search{display:flex;align-items:center;gap:9px;background:#101d24;border:1px solid #2a3b45;border-radius:10px;padding:0 10px;height:36px;width:min(330px,32vw);color:#7f929d}#superAdminModal .sa-search input{background:transparent;border:0;outline:0;color:#f2f5f6;width:100%;min-width:0;font-size:11px}#superAdminModal .sa-search input::placeholder{color:#657985}#superAdminModal .sa-search kbd{font-size:10px;border:1px solid #31434d;border-radius:5px;padding:2px 5px;color:#82949e}#superAdminModal .sa-icon-btn{height:35px;width:35px;flex:none;display:grid;place-items:center;position:relative;border:1px solid #2b3b44;border-radius:9px;background:#101d24;color:#c4d0d5}#superAdminModal .sa-alert-dot{position:absolute;top:7px;right:7px;width:5px;height:5px;border-radius:50%;background:#d6a72c}#superAdminModal .sa-owner-chip{display:flex;align-items:center;gap:8px;white-space:nowrap}#superAdminModal .sa-owner-avatar{width:32px;height:32px;border:1px solid #5b4b25;background:#2b2617;border-radius:10px;display:grid;place-items:center;color:#f7d575}#superAdminModal .sa-owner-chip b{display:block;font-size:10px;color:#e8edef}#superAdminModal .sa-owner-chip small{display:block;color:#6f838d;font-size:9px;margin-top:3px}#superAdminModal .sa-menu-btn{display:none;background:transparent;border:0;color:#dbe5e9;font-size:17px}#superAdminModal .sa-content{overflow:auto;padding:25px clamp(14px,2.7vw,34px) 24px;flex:1;min-height:0}#superAdminModal .sa-welcome-row{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:20px}#superAdminModal .sa-eyebrow{font-size:9px;letter-spacing:2px;color:#d5ae45;font-weight:800;margin-bottom:8px}#superAdminModal h1{font-size:clamp(22px,2.3vw,30px);letter-spacing:-.7px;margin:0;color:#f1f5f6}#superAdminModal .sa-welcome-row p{margin:8px 0 0;color:#82959f;font-size:12px;line-height:1.5}#superAdminModal .sa-welcome-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}#superAdminModal .sa-secondary-btn{border:1px solid #2e424d;background:#101d24;border-radius:9px;color:#d3dfe3;padding:9px 12px;font-size:10px;font-weight:700}#superAdminModal .sa-secondary-btn i{margin-right:6px}#superAdminModal .sa-env-badge{font-size:9px;color:#c9b77e;background:#2a2517;border:1px solid #514523;border-radius:20px;padding:7px 9px;white-space:nowrap}#superAdminModal .sa-env-badge span{display:inline-block;width:6px;height:6px;border-radius:50%;background:#d6a72c;margin-right:5px}#superAdminModal .sa-notice-strip{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:#151c20;border:1px solid #3d3724;border-radius:10px;color:#b3bfc4;font-size:10.5px;line-height:1.6;margin-bottom:20px}#superAdminModal .sa-notice-strip i{color:#e6c05b;margin-top:2px}#superAdminModal .sa-notice-strip b{color:#f1d98d}#superAdminModal .sa-kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}#superAdminModal .sa-kpi{border:1px solid #24343d;border-radius:13px;padding:16px;background:linear-gradient(145deg,#111e25,#0d171d);min-width:0}#superAdminModal .sa-kpi-top{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#9baeb7;font-size:10px}#superAdminModal .sa-kpi-icon{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#1a2a31;color:#d6b755}#superAdminModal .sa-kpi-value{font-size:22px;font-weight:800;color:#f0f4f5;margin:14px 0 5px;letter-spacing:-.5px}#superAdminModal .sa-kpi-foot{font-size:9px;color:#71858f;line-height:1.4}#superAdminModal .sa-unknown{color:#c3b47d;font-size:16px}#superAdminModal .sa-panel-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,1fr);gap:14px;margin-bottom:18px}#superAdminModal .sa-panel{background:#0e181e;border:1px solid #24343d;border-radius:13px;padding:16px;min-width:0}#superAdminModal .sa-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}#superAdminModal .sa-panel-head h3{font-size:12px;margin:0;color:#edf2f4}#superAdminModal .sa-panel-head span{font-size:9px;color:#7f929c}#superAdminModal .sa-health-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}#superAdminModal .sa-health-item{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid #253740;border-radius:9px;background:#101d23}#superAdminModal .sa-health-icon{height:30px;width:30px;flex:none;display:grid;place-items:center;border-radius:8px;background:#1a2a31;color:#a5b6be}#superAdminModal .sa-health-item b{display:block;font-size:10px;color:#dce5e8}#superAdminModal .sa-health-item small{display:block;font-size:9px;color:#c7b779;margin-top:4px}#superAdminModal .sa-activity-empty{padding:22px 12px;text-align:center;color:#758994;font-size:10px;border:1px dashed #2a3b44;border-radius:9px;line-height:1.7}#superAdminModal .sa-section-title{font-size:13px;color:#e9eff1;margin:23px 0 12px;display:flex;align-items:center;justify-content:space-between;gap:10px}#superAdminModal .sa-section-title small{font-size:9px;color:#758993;font-weight:500}#superAdminModal .sa-tool-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}#superAdminModal .sa-tool-card{min-width:0;display:flex;align-items:flex-start;gap:11px;text-align:left;padding:13px;border:1px solid #263841;border-radius:11px;background:#101c22;color:#e6edef;transition:border-color .15s,transform .15s,background .15s}#superAdminModal .sa-tool-card:hover{border-color:#826a2d;background:#17242a;transform:translateY(-1px)}#superAdminModal .sa-tool-card:focus-visible,#superAdminModal .sa-nav:focus-visible{outline:2px solid #e9c55f;outline-offset:2px}#superAdminModal .sa-tool-card .sa-card-icon{height:34px;width:34px;flex:none;display:grid;place-items:center;border-radius:9px;background:#202a28;color:#d6b755}#superAdminModal .sa-tool-card b{display:block;font-size:10.5px;line-height:1.4;margin:1px 0 5px}#superAdminModal .sa-tool-card small{display:block;font-size:9px;line-height:1.5;color:#82949d}#superAdminModal .sa-tool-card .sa-arrow{margin-left:auto;color:#536a75;font-size:10px;padding-top:3px}#superAdminModal .sa-dept-heading{display:flex;align-items:center;gap:12px;padding:17px;border:1px solid #2c3a40;background:linear-gradient(120deg,#19251f,#101b21);border-radius:13px;margin-bottom:16px}#superAdminModal .sa-dept-heading .sa-dept-big-icon{height:44px;width:44px;display:grid;place-items:center;border-radius:12px;background:#2b2a1e;color:#e4c25e;font-size:18px}#superAdminModal .sa-dept-heading h2{font-size:16px;margin:0 0 5px}#superAdminModal .sa-dept-heading p{font-size:10px;color:#91a3ac;margin:0;line-height:1.5}#superAdminModal .sa-output{display:none;margin-top:18px;padding:13px;border:1px solid #3a493c;background:#0c1714;border-radius:10px;color:#b9efce;white-space:pre-wrap;overflow-wrap:anywhere;font:11px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}#superAdminModal .sa-output:not(:empty){display:block}#superAdminModal .sa-footer{height:35px;flex:0 0 35px;display:flex;justify-content:space-between;gap:12px;align-items:center;border-top:1px solid #202e36;padding:0 24px;color:#5f737d;font-size:9px}#superAdminModal .sa-no-results{padding:28px;text-align:center;color:#90a2ab;border:1px dashed #2d3c45;border-radius:12px;font-size:12px}
+@media(max-width:1100px){#superAdminModal .sa-sidebar{width:230px;flex-basis:230px}#superAdminModal .sa-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#superAdminModal .sa-tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#superAdminModal .sa-owner-chip>span:last-child{display:none}}
+@media(max-width:760px){#superAdminModal .sa-sidebar{position:absolute;inset:0 auto 0 0;width:min(290px,86vw);transform:translateX(-105%);transition:transform .2s;box-shadow:18px 0 40px #0008}#superAdminModal .sa-sidebar.sa-open{transform:translateX(0)}#superAdminModal .sa-mobile-close{display:block}#superAdminModal .sa-menu-btn{display:block}#superAdminModal .sa-topbar{padding:0 12px;gap:9px;height:58px;flex-basis:58px}#superAdminModal .sa-breadcrumb>span,#superAdminModal .sa-breadcrumb>i{display:none}#superAdminModal .sa-breadcrumb{min-width:0;flex:1}#superAdminModal .sa-top-actions{gap:6px}#superAdminModal .sa-search{width:min(38vw,210px);height:34px;padding:0 8px}#superAdminModal .sa-search kbd{display:none}#superAdminModal .sa-owner-chip{display:none}#superAdminModal .sa-content{padding:18px 12px}#superAdminModal .sa-welcome-row{display:block}#superAdminModal .sa-welcome-actions{justify-content:flex-start;margin-top:14px}#superAdminModal .sa-panel-grid{grid-template-columns:1fr}#superAdminModal .sa-tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#superAdminModal .sa-footer{padding:0 12px}#superAdminModal .sa-footer span:last-child{display:none}}
+@media(max-width:420px){#superAdminModal .sa-kpi-grid{gap:8px}#superAdminModal .sa-kpi{padding:11px}#superAdminModal .sa-kpi-value{font-size:19px}#superAdminModal .sa-health-list{grid-template-columns:1fr}#superAdminModal .sa-tool-grid{grid-template-columns:1fr}#superAdminModal .sa-notice-strip{font-size:10px}#superAdminModal .sa-search{width:34vw}#superAdminModal .sa-icon-btn{height:32px;width:32px}}
 </style>
+<script>
+(function(){
+ const departments=[
+  ['dashboard','Executive Dashboard & Analytics','fa-chart-pie','Overview, usage analytics, KPI cards and activity timeline'],
+  ['students','Student & Account Management','fa-users','Student accounts, plans, quotas, status and bulk tools'],
+  ['ai','AI Control Room','fa-brain','Providers, models, routing, fallback and response instructions'],
+  ['security','Security & Permissions','fa-shield-halved','Owner access, admin roles, sessions and audit trails'],
+  ['database','Database, Backup & Recovery','fa-database','Backup, restore, retention and integrity checks'],
+  ['monitoring','Live Monitoring & Incident Response','fa-heart-pulse','API errors, latency, incidents and diagnostics'],
+  ['config','Global Configuration & Feature Flags','fa-sliders','Platform settings, quotas, maintenance and rollout'],
+  ['deployment','Deployment & Release Management','fa-rocket','Versions, release checks, staging and rollback'],
+  ['study','Madrasa & Study Management','fa-book-open','Subjects, materials, exams, progress and class groups'],
+  ['notifications','Notifications & Emergency Controls','fa-bell','Announcements, outages and emergency controls'],
+  ['integrations','API, Integrations & Cost Optimization','fa-plug','External services, provider spending and budgets'],
+  ['governance','Governance & Approval Center','fa-scale-balanced','Approvals, data policies, moderation and retention'],
+  ['reports','Reports & Exports','fa-file-export','Analytics, console logs and authorized exports'],
+  ['diagnostics','Help & Diagnostics','fa-stethoscope','Frontend checks, troubleshooting and recovery guidance']
+ ];
+ const tools=[
+  ['overview','System Overview','fa-gauge-high','Show truthful local diagnostics and current interface status','dashboard'],
+  ['audit_all','All-Student AI Audit','fa-brain','Review student chat summaries through the existing admin endpoint','students'],
+  ['audit_one','Single-Student Audit','fa-user-check','Inspect one student using the existing admin workflow','students'],
+  ['plan','Tier / Plan Manager','fa-crown','Manage Free, Plus, Pro or Ultra plan through existing admin API','students'],
+  ['block','Block / Unblock Student','fa-user-lock','Change student status through the existing admin workflow','students'],
+  ['quota','Daily Quota Reset','fa-rotate','Reset an individual student quota using the existing admin API','students'],
+  ['notice','Global Notice','fa-bullhorn','Publish or clear a notice through the existing admin endpoint','notifications'],
+  ['accounts','Student Account Tools','fa-user-plus','Account management status and safe workflow guidance','students'],
+  ['feature_flags','Feature Flags','fa-toggle-on','Feature rollout interface; server endpoint required for global changes','config'],
+  ['ai_provider','AI Provider Check','fa-microchip','Provider health remains unknown until backend health checks exist','ai'],
+  ['prompt','Response Instructions','fa-comment-dots','Edit a local response preference; this does not change the global prompt','ai'],
+  ['maintenance','Maintenance Mode','fa-screwdriver-wrench','Global maintenance needs an authenticated server endpoint','config'],
+  ['backup','Local Backup Export','fa-box-archive','Download selected non-secret browser preferences only','database'],
+  ['logs','Console Log Export','fa-file-lines','Export limited frontend diagnostic details, not server logs','reports'],
+  ['cache','Local Cache Clear','fa-broom','Clear selected local drafts and action counters on this device','diagnostics'],
+  ['moderation','Moderation Queue','fa-shield','Moderation queue needs a secure server-backed workflow','governance'],
+  ['announcement','Announcement Composer','fa-pen-to-square','Save a local draft; draft is not broadcast','notifications'],
+  ['security','Security Review','fa-lock','Review browser-visible security risks and required server controls','security'],
+  ['diagnostics','Frontend Diagnostics','fa-stethoscope','Check key interface elements and viewport dimensions','diagnostics'],
+  ['export_chat','Current Chat Export','fa-comments','Export the currently visible conversation from this browser','reports'],
+  ['permissions','Permission Studio','fa-user-shield','Define role and permission matrix; backend enforcement required','security'],
+  ['cost_optimizer','AI Cost Optimizer','fa-coins','Cost optimization recommendations require provider usage data','integrations'],
+  ['usage_analytics','Usage Analytics','fa-chart-line','Usage dashboards need real telemetry before showing metrics','dashboard'],
+  ['audit_explorer','Audit Explorer','fa-magnifying-glass-chart','Searchable audit explorer requires server-side audit records','security'],
+  ['notification_center','Notification Center','fa-inbox','Central notification history needs a backend feed','notifications'],
+  ['api_hub','API & Integration Hub','fa-plug','Integration status requires authenticated server checks','integrations'],
+  ['data_governance','Data Governance','fa-scale-balanced','Retention, deletion and export policies','governance'],
+  ['rollout_manager','Feature Rollout Manager','fa-sliders','Controlled rollout needs server-side feature flags','config'],
+  ['incident_center','Incident Response Center','fa-triangle-exclamation','Incident tracking needs monitoring and backend event history','monitoring'],
+  ['activity_approval','Super Admin Activity Approval','fa-clipboard-check','Critical actions require explicit approval and audit trail','governance'],
+  ['release_manager','Release & Rollback Manager','fa-code-branch','Release management requires deployment provider integration','deployment'],
+  ['study_manager','Madrasa & Study Manager','fa-book-open','Study material and exam management integration status','study'],
+  ['governance_workbench','Governance Workbench','fa-scale-balanced','Create local policy drafts, approval records and governance reports','governance'],
+  ['policy_draft','Data Policy Draft Builder','fa-file-shield','Draft retention, deletion and export rules without applying them globally','governance'],
+  ['approval_record','Approval Register','fa-clipboard-check','Record a local approval request for later server-side review','governance'],
+  ['final_verification','Final Verification Checklist','fa-list-check','Run browser-side acceptance checks and export a verification report','diagnostics']
+ ];
+ const icons={dashboard:'fa-chart-pie',students:'fa-users',ai:'fa-brain',security:'fa-shield-halved',database:'fa-database',monitoring:'fa-heart-pulse',config:'fa-sliders',deployment:'fa-rocket',study:'fa-book-open',notifications:'fa-bell',integrations:'fa-plug',governance:'fa-scale-balanced',reports:'fa-file-export',diagnostics:'fa-stethoscope'};
+ const descriptions={dashboard:'Monitor the application and open authorized control tools from one place.',students:'Manage student accounts and academic access. Actions use existing admin APIs where available.',ai:'Manage AI behavior and providers. Live health is not claimed without server verification.',security:'Review permissions and security posture. Frontend-only checks do not replace backend authorization.',database:'Manage safe local exports and review server backup integration requirements.',monitoring:'View diagnostic tools and incident workflow readiness.',config:'Configure platform behavior after secure server endpoints are available.',deployment:'Deployment operations require integration with the release platform.',study:'Academic tools and study workflows for the madrasa platform.',notifications:'Create notices and inspect notification workflow readiness.',integrations:'Review integrations and AI cost controls without inventing telemetry.',governance:'Review approval, moderation and data policy workflows.',reports:'Export permitted local diagnostics and visible chat content.',diagnostics:'Run browser-side diagnostics and local troubleshooting tools.'};
+ window.saToggleSidebar=function(force){const el=document.getElementById('sa-sidebar');if(!el)return;const open=typeof force==='boolean'?force:!el.classList.contains('sa-open');el.classList.toggle('sa-open',open)};
+ window.saCloseCommandCenter=function(){const m=document.getElementById('superAdminModal');if(m)m.style.display='none';saToggleSidebar(false)};
+ window.saOpenView=function(key,button){const dep=departments.find(d=>d[0]===key)||departments[0];document.getElementById('sa-current-title').textContent=dep[1];document.getElementById('sa-page-heading').textContent=dep[1];document.getElementById('sa-page-subtitle').textContent=descriptions[key]||dep[3];document.querySelectorAll('#superAdminModal .sa-nav').forEach(n=>n.classList.toggle('active',n.dataset.saView===key));saToggleSidebar(false);if(key==='dashboard'){renderDashboard();return}if(key==='ai'){renderAIControlRoom();return}if(key==='database'){renderDatabaseControlRoom();return}if(key==='monitoring'){renderMonitoringCenter();return}if(key==='deployment'){renderDeploymentCenter();return}renderDepartment(key)};
+ function renderAIControlRoom(){
+  const host=document.getElementById('sa-view-content');
+  const saved=(()=>{try{return JSON.parse(localStorage.getItem('suhail_ai_control_draft')||'{}')}catch(_){return {}}})();
+  const safeVal=(v,fallback)=>esc(typeof v==='string'?v:fallback);
+  host.innerHTML=`<div class="sa-dept-heading"><span class="sa-dept-big-icon"><i class="fa-solid fa-brain"></i></span><span><h2>AI Control Room</h2><p>Provider routing, fallback policy, response instructions and usage visibility.</p></span></div>
+  <div class="sa-notice-strip"><i class="fa-solid fa-shield-halved"></i><span><b>Safe configuration draft:</b> Changes on this screen are saved only in this browser as a draft. They do not change server routing. API keys must never be entered here or stored in browser storage. Live provider health and usage remain unverified until secure backend endpoints are connected.</span></div>
+  <div class="sa-kpi-grid"><div class="sa-kpi"><div class="sa-kpi-top"><span>Provider health</span><span class="sa-kpi-icon"><i class="fa-solid fa-heart-pulse"></i></span></div><div class="sa-kpi-value sa-unknown">Unverified</div><div class="sa-kpi-foot">Requires server-side health checks</div></div><div class="sa-kpi"><div class="sa-kpi-top"><span>Request volume</span><span class="sa-kpi-icon"><i class="fa-solid fa-chart-line"></i></span></div><div class="sa-kpi-value sa-unknown">Unavailable</div><div class="sa-kpi-foot">No authenticated usage feed connected</div></div><div class="sa-kpi"><div class="sa-kpi-top"><span>Fallback routing</span><span class="sa-kpi-icon"><i class="fa-solid fa-shuffle"></i></span></div><div class="sa-kpi-value sa-unknown">Draft only</div><div class="sa-kpi-foot">Not active in production</div></div><div class="sa-kpi"><div class="sa-kpi-top"><span>API secrets</span><span class="sa-kpi-icon"><i class="fa-solid fa-key"></i></span></div><div class="sa-kpi-value" style="font-size:16px">Server only</div><div class="sa-kpi-foot">Never expose keys to the browser</div></div></div>
+  <div class="sa-panel-grid"><section class="sa-panel"><div class="sa-panel-head"><h3>Provider & tier routing draft</h3><span>Local draft</span></div><form id="sa-ai-routing-form" onsubmit="saSaveAIRoutingDraft(event)" style="display:grid;gap:12px"><label style="display:grid;gap:6px;font-size:10px;color:#b8c6cc">FREE tier provider<select name="free" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef"><option ${saved.free==='Gemini'?'selected':''}>Gemini</option><option ${saved.free==='Groq'?'selected':''}>Groq</option><option ${saved.free==='Mistral'?'selected':''}>Mistral</option><option ${saved.free==='OpenRouter'?'selected':''}>OpenRouter</option></select></label><label style="display:grid;gap:6px;font-size:10px;color:#b8c6cc">PLUS tier provider<select name="plus" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef"><option ${saved.plus==='Mistral'?'selected':''}>Mistral</option><option ${saved.plus==='Gemini'?'selected':''}>Gemini</option><option ${saved.plus==='Groq'?'selected':''}>Groq</option><option ${saved.plus==='OpenRouter'?'selected':''}>OpenRouter</option></select></label><label style="display:grid;gap:6px;font-size:10px;color:#b8c6cc">PRO tier provider<select name="pro" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef"><option ${saved.pro==='Groq'?'selected':''}>Groq</option><option ${saved.pro==='Gemini'?'selected':''}>Gemini</option><option ${saved.pro==='Mistral'?'selected':''}>Mistral</option><option ${saved.pro==='OpenRouter'?'selected':''}>OpenRouter</option></select></label><label style="display:grid;gap:6px;font-size:10px;color:#b8c6cc">Fallback policy<select name="fallback" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef"><option value="next_healthy" ${saved.fallback==='next_healthy'?'selected':''}>Use next healthy configured provider</option><option value="same_provider_retry" ${saved.fallback==='same_provider_retry'?'selected':''}>Retry same provider once, then stop</option><option value="disabled" ${saved.fallback==='disabled'?'selected':''}>Disable automatic fallback</option></select></label><button class="sa-secondary-btn" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save local routing draft</button><div id="sa-ai-routing-result" class="sa-output" style="display:block">No routing draft saved in this form yet.</div></form></section>
+  <section class="sa-panel"><div class="sa-panel-head"><h3>Provider health</h3><span>Server required</span></div><div class="sa-health-list">${[['Gemini','fa-brain'],['Mistral','fa-microchip'],['Groq','fa-bolt'],['OpenRouter','fa-route']].map(x=>`<div class="sa-health-item"><span class="sa-health-icon"><i class="fa-solid ${x[1]}"></i></span><span><b>${x[0]}</b><small>Unknown · no verified health endpoint</small></span></div>`).join('')}</div><button class="sa-secondary-btn" style="margin-top:12px" type="button" onclick="saExplainProviderHealth()"><i class="fa-solid fa-stethoscope"></i> Check integration requirements</button><div id="sa-ai-health-result" class="sa-output"></div><div class="sa-section-title">Required backend capabilities</div><ul style="font-size:10px;line-height:1.8;color:#9aadb6;padding-left:18px"><li>Server-side provider secrets</li><li>Allowlisted model IDs and routing rules</li><li>Timeouts, retry limits and rate limits</li><li>Usage/cost telemetry without exposing secrets</li><li>Audit events for configuration changes</li></ul></section></div>
+  <section class="sa-panel" style="margin-top:14px"><div class="sa-panel-head"><h3>Response instructions draft</h3><span>Browser-local only</span></div><p style="font-size:10px;line-height:1.6;color:#879ba5">Use this field to prepare a proposed global system instruction. Saving stores a local draft only; it does not override production AI prompts.</p><textarea id="sa-ai-instructions" rows="5" placeholder="Draft response instructions..." style="width:100%;resize:vertical;padding:12px;border:1px solid #344750;border-radius:9px;background:#101d24;color:#e9edef;font:11px/1.6 inherit">${safeVal(saved.instructions,'')}</textarea><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" class="sa-secondary-btn" onclick="saSaveAIInstructionsDraft()"><i class="fa-solid fa-floppy-disk"></i> Save local instructions draft</button><button type="button" class="sa-secondary-btn" onclick="saExportAIConfigDraft()"><i class="fa-solid fa-download"></i> Export draft JSON</button></div><div id="sa-ai-instructions-result" class="sa-output"></div></section>`;
+ }
+ window.saSaveAIRoutingDraft=function(event){event.preventDefault();const f=new FormData(event.currentTarget);let d={};try{d=JSON.parse(localStorage.getItem('suhail_ai_control_draft')||'{}')}catch(_){}d.free=String(f.get('free')||'Gemini');d.plus=String(f.get('plus')||'Mistral');d.pro=String(f.get('pro')||'Groq');d.fallback=String(f.get('fallback')||'next_healthy');localStorage.setItem('suhail_ai_control_draft',JSON.stringify(d));const out=document.getElementById('sa-ai-routing-result');out.textContent='Local draft saved. Production provider routing was NOT changed. Configure and authorize a server endpoint before applying this policy.';out.style.display='block'};
+ window.saSaveAIInstructionsDraft=function(){let d={};try{d=JSON.parse(localStorage.getItem('suhail_ai_control_draft')||'{}')}catch(_){}d.instructions=(document.getElementById('sa-ai-instructions')?.value||'').slice(0,12000);localStorage.setItem('suhail_ai_control_draft',JSON.stringify(d));const out=document.getElementById('sa-ai-instructions-result');out.textContent='Local response-instructions draft saved on this device only. The production system prompt has not changed.';out.style.display='block'};
+ window.saExportAIConfigDraft=function(){let d={};try{d=JSON.parse(localStorage.getItem('suhail_ai_control_draft')||'{}')}catch(_){}superAdminDownload('SuhailAI_AI_Control_Draft.json',JSON.stringify({exportedAt:new Date().toISOString(),scope:'local draft only; not active production configuration',configuration:d},null,2),'application/json;charset=utf-8');const out=document.getElementById('sa-ai-instructions-result');if(out){out.textContent='Exported the local draft JSON. No API keys or provider secrets are included.';out.style.display='block'}};
+ window.saExplainProviderHealth=function(){const out=document.getElementById('sa-ai-health-result');out.textContent='To verify providers safely, the backend must call each provider using server-held credentials and return only provider name, checkedAt, status, latency and a sanitized error code. Never return API keys, authorization headers or raw provider responses.';out.style.display='block'};
+
+ function card(t){return `<button type="button" class="sa-tool-card" onclick="runSuperAdminTool('${t[0]}')"><span class="sa-card-icon"><i class="fa-solid ${t[2]}"></i></span><span><b>${esc(t[1])}</b><small>${esc(t[3])}</small></span><i class="fa-solid fa-arrow-up-right-from-square sa-arrow"></i></button>`}
+ function esc(x){return String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+ function renderDashboard(){const host=document.getElementById('sa-view-content');host.innerHTML=`<div class="sa-kpi-grid"><div class="sa-kpi"><div class="sa-kpi-top"><span>Student accounts</span><span class="sa-kpi-icon"><i class="fa-solid fa-users"></i></span></div><div class="sa-kpi-value sa-unknown">Unknown</div><div class="sa-kpi-foot">Connect authenticated student statistics API</div></div><div class="sa-kpi"><div class="sa-kpi-top"><span>AI requests</span><span class="sa-kpi-icon"><i class="fa-solid fa-brain"></i></span></div><div class="sa-kpi-value sa-unknown">Unknown</div><div class="sa-kpi-foot">No live usage telemetry connected</div></div><div class="sa-kpi"><div class="sa-kpi-top"><span>Database health</span><span class="sa-kpi-icon"><i class="fa-solid fa-database"></i></span></div><div class="sa-kpi-value sa-unknown">Unverified</div><div class="sa-kpi-foot">No live database health check in this page</div></div><div class="sa-kpi"><div class="sa-kpi-top"><span>AI provider health</span><span class="sa-kpi-icon"><i class="fa-solid fa-microchip"></i></span></div><div class="sa-kpi-value sa-unknown">Unverified</div><div class="sa-kpi-foot">Server-side provider checks required</div></div></div><div class="sa-panel-grid"><section class="sa-panel"><div class="sa-panel-head"><h3>Infrastructure health</h3><span>Connection status</span></div><div class="sa-health-list">${[['Database','fa-database'],['Admin API','fa-server'],['AI providers','fa-brain'],['Backup service','fa-box-archive'],['Authentication','fa-key'],['Deployment','fa-rocket']].map(x=>`<div class="sa-health-item"><span class="sa-health-icon"><i class="fa-solid ${x[1]}"></i></span><span><b>${x[0]}</b><small>Unknown · not verified</small></span></div>`).join('')}</div></section><section class="sa-panel"><div class="sa-panel-head"><h3>Recent activity</h3><span>Audit feed</span></div><div class="sa-activity-empty"><i class="fa-solid fa-clock-rotate-left" style="font-size:22px;display:block;margin-bottom:10px"></i>No server audit feed connected yet.<br>Real admin actions should appear here after backend audit logging is integrated.</div><div class="sa-panel-head" style="margin:17px 0 9px"><h3>Alerts & incidents</h3><span>Live feed</span></div><div class="sa-activity-empty" style="padding:13px">Alert status unavailable until monitoring endpoints are connected.</div></section></div><div class="sa-section-title">Quick actions <small>Existing local tools and supported admin workflows</small></div><div class="sa-tool-grid">${tools.filter(t=>['overview','audit_all','audit_one','plan','block','quota','notice','ai_provider','backup'].includes(t[0])).map(card).join('')}</div><div class="sa-section-title">All departments <small>14 control areas</small></div><div class="sa-tool-grid">${departments.slice(1).map(d=>`<button class="sa-tool-card" onclick="saOpenView('${d[0]}',this)"><span class="sa-card-icon"><i class="fa-solid ${d[2]}"></i></span><span><b>${esc(d[1])}</b><small>${esc(d[3])}</small></span><i class="fa-solid fa-chevron-right sa-arrow"></i></button>`).join('')}</div>`}
+
+ function renderDeploymentCenter(){
+  const host=document.getElementById('sa-view-content');
+  let d={};try{d=JSON.parse(localStorage.getItem('suhail_release_draft')||'{}')}catch(_){d={}}
+  const checks=[['source','Confirm source commit and code review'],['tests','Run automated tests and syntax checks'],['staging','Deploy and verify in staging first'],['secrets','Verify environment variables and secret rotation'],['backup','Confirm recent verified backup and restore plan'],['health','Run post-deploy health checks'],['rollback','Confirm rollback artifact and responsible operator']];
+  const done=Array.isArray(d.checks)?d.checks:[];
+  host.innerHTML=`<div class="sa-dept-heading"><span class="sa-dept-big-icon"><i class="fa-solid fa-rocket"></i></span><span><h2>Deployment & Release Management</h2><p>Release notes, preflight checks, environment separation and rollback planning.</p></span></div>
+  <div class="sa-notice-strip"><i class="fa-solid fa-shield-halved"></i><span><b>Planning workspace only.</b> This page does not deploy code, inspect your hosting provider, switch production traffic or execute a rollback. Those actions require a secured deployment backend and provider integration.</span></div>
+  <div class="sa-kpi-grid"><div class="sa-kpi"><div class="sa-kpi-top"><span>Current deployed version</span><span class="sa-kpi-icon"><i class="fa-solid fa-code-branch"></i></span></div><div class="sa-kpi-value sa-unknown">Unknown</div><div class="sa-kpi-foot">No verified deployment API connected</div></div><div class="sa-kpi"><div class="sa-kpi-top"><span>Environment</span><span class="sa-kpi-icon"><i class="fa-solid fa-server"></i></span></div><div class="sa-kpi-value" style="font-size:17px">Not detected</div><div class="sa-kpi-foot">Staging/production must be configured server-side</div></div><div class="sa-kpi"><div class="sa-kpi-top"><span>Preflight checklist</span><span class="sa-kpi-icon"><i class="fa-solid fa-list-check"></i></span></div><div class="sa-kpi-value">${done.filter(x=>checks.some(c=>c[0]===x)).length}/${checks.length}</div><div class="sa-kpi-foot">Local checklist progress only</div></div><div class="sa-kpi"><div class="sa-kpi-top"><span>Rollback readiness</span><span class="sa-kpi-icon"><i class="fa-solid fa-clock-rotate-left"></i></span></div><div class="sa-kpi-value sa-unknown">Unverified</div><div class="sa-kpi-foot">No rollback artifact has been verified here</div></div></div>
+  <div class="sa-panel-grid"><section class="sa-panel"><div class="sa-panel-head"><h3>Release draft</h3><span>Saved on this device</span></div><form id="sa-release-form" onsubmit="saSaveReleaseDraft(event)" style="display:grid;gap:10px"><label style="display:grid;gap:5px;font-size:10px;color:#b8c6cc">Release version<input name="version" required maxlength="40" placeholder="e.g. 1.2.0" value="${esc(d.version||'')}" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef"></label><label style="display:grid;gap:5px;font-size:10px;color:#b8c6cc">Target environment<select name="environment" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef"><option value="staging" ${(d.environment||'staging')==='staging'?'selected':''}>Staging</option><option value="production" ${d.environment==='production'?'selected':''}>Production (planning only)</option></select></label><label style="display:grid;gap:5px;font-size:10px;color:#b8c6cc">Source commit / build reference<input name="commit" maxlength="120" placeholder="Commit SHA or build ID" value="${esc(d.commit||'')}" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef"></label><label style="display:grid;gap:5px;font-size:10px;color:#b8c6cc">Release notes<textarea name="notes" maxlength="5000" rows="4" placeholder="Changes, fixes, known issues" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef">${esc(d.notes||'')}</textarea></label><button type="submit" class="sa-secondary-btn"><i class="fa-solid fa-floppy-disk"></i> Save release draft</button><div id="sa-release-save-result" class="sa-output"></div></form></section>
+  <section class="sa-panel"><div class="sa-panel-head"><h3>Pre-deployment checklist</h3><span>Local progress</span></div><p style="font-size:10px;line-height:1.6;color:#9aadb6">Mark items only after you have actually verified them outside this page. The checklist does not run deployment tests.</p><div style="display:grid;gap:11px">${checks.map(([id,label])=>`<label style="display:flex;gap:9px;align-items:flex-start;font-size:10px;line-height:1.5;color:#c5d0d5"><input type="checkbox" value="${id}" ${done.includes(id)?'checked':''} onchange="saToggleReleaseCheck('${id}',this.checked)" style="accent-color:#d6b755;margin-top:2px">${label}</label>`).join('')}</div><div id="sa-release-check-result" class="sa-output" style="display:block;margin-top:12px">${done.length} checklist item(s) marked. This is not a verified deployment result.</div></section></div>
+  <section class="sa-panel" style="margin-top:14px"><div class="sa-panel-head"><h3>Rollback plan</h3><span>Planning only</span></div><p style="font-size:10px;line-height:1.6;color:#9aadb6">Document the last known good release and rollback steps. Do not put secrets, tokens or credentials in this draft.</p><label style="display:grid;gap:5px;font-size:10px;color:#b8c6cc">Last known good version<input id="sa-release-lastgood" maxlength="80" value="${esc(d.lastGood||'')}" placeholder="e.g. 1.1.4" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef"></label><label style="display:grid;gap:5px;font-size:10px;color:#b8c6cc;margin-top:10px">Rollback steps<textarea id="sa-release-rollback" maxlength="5000" rows="3" placeholder="Verified steps, checks and responsible operator" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef">${esc(d.rollback||'')}</textarea></label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button type="button" class="sa-secondary-btn" onclick="saSaveRollbackDraft()"><i class="fa-solid fa-floppy-disk"></i> Save rollback plan</button><button type="button" class="sa-secondary-btn" onclick="saExportReleaseDraft()"><i class="fa-solid fa-file-export"></i> Export release bundle JSON</button><button type="button" class="sa-secondary-btn" onclick="saExplainDeploymentIntegration()"><i class="fa-solid fa-plug"></i> Backend integration requirements</button></div><div id="sa-release-export-result" class="sa-output"></div></section>`;
+ }
+ window.saGetReleaseDraft=function(){let d={};try{d=JSON.parse(localStorage.getItem('suhail_release_draft')||'{}')}catch(_){}return d&&typeof d==='object'?d:{}};
+ window.saSaveReleaseDraft=function(event){event.preventDefault();const f=new FormData(event.currentTarget);const d=saGetReleaseDraft();d.version=String(f.get('version')||'').trim().slice(0,40);d.environment=String(f.get('environment')||'staging');d.commit=String(f.get('commit')||'').trim().slice(0,120);d.notes=String(f.get('notes')||'').slice(0,5000);d.updatedAt=new Date().toISOString();try{localStorage.setItem('suhail_release_draft',JSON.stringify(d));const o=document.getElementById('sa-release-save-result');o.style.display='block';o.textContent='Release draft saved on this device. No deployment was triggered.'}catch(_){const o=document.getElementById('sa-release-save-result');o.style.display='block';o.textContent='Could not save draft; browser storage may be unavailable or full.'}};
+ window.saToggleReleaseCheck=function(id,checked){const d=saGetReleaseDraft();let list=Array.isArray(d.checks)?d.checks:[];list=checked?[...new Set([...list,id])]:list.filter(x=>x!==id);d.checks=list;d.updatedAt=new Date().toISOString();try{localStorage.setItem('suhail_release_draft',JSON.stringify(d))}catch(_){}const o=document.getElementById('sa-release-check-result');if(o)o.textContent=list.length+' checklist item(s) marked. This is not a verified deployment result.'};
+ window.saSaveRollbackDraft=function(){const d=saGetReleaseDraft();d.lastGood=(document.getElementById('sa-release-lastgood')?.value||'').trim().slice(0,80);d.rollback=(document.getElementById('sa-release-rollback')?.value||'').slice(0,5000);d.updatedAt=new Date().toISOString();try{localStorage.setItem('suhail_release_draft',JSON.stringify(d));const o=document.getElementById('sa-release-export-result');o.style.display='block';o.textContent='Rollback plan saved locally. It has not been tested or executed.'}catch(_){const o=document.getElementById('sa-release-export-result');o.style.display='block';o.textContent='Could not save rollback draft; browser storage may be unavailable or full.'}};
+ window.saExportReleaseDraft=function(){const d=saGetReleaseDraft();superAdminDownload('SuhailAI_Release_Plan_Draft.json',JSON.stringify({schemaVersion:1,exportedAt:new Date().toISOString(),scope:'local release planning draft only; no deployment or rollback executed',deploymentVerified:false,release:d},null,2),'application/json;charset=utf-8');const o=document.getElementById('sa-release-export-result');if(o){o.style.display='block';o.textContent='Release planning JSON exported. This file does not deploy code or prove that rollback is available.'}};
+ window.saExplainDeploymentIntegration=function(){const o=document.getElementById('sa-release-export-result');o.style.display='block';o.textContent='Production integration requires authenticated server-side access to the hosting provider, strict owner/admin authorization, staging/production separation, immutable release identifiers, approval gates, preflight and post-deploy health checks, protected rollback artifacts, audit logging and secrets held only in server environment variables. Never deploy by running arbitrary browser-provided commands.'};
+
+ function renderDatabaseControlRoom(){
+  const host=document.getElementById('sa-view-content');
+  let draft={};try{draft=JSON.parse(localStorage.getItem('suhail_backup_policy_draft')||'{}')}catch(_){draft={}}
+  const checked=Array.isArray(draft.checks)?draft.checks:[];
+  const tasks=[['verify','Verify authenticated backup endpoint and authorization'],['integrity','Add server-side backup integrity/checksum verification'],['restore','Test restore in isolated staging environment'],['retention','Define retention and secure deletion policy'],['alerting','Configure backup failure alerts and audit events']];
+  host.innerHTML=`<div class="sa-dept-heading"><span class="sa-dept-big-icon"><i class="fa-solid fa-database"></i></span><span><h2>Database, Backup & Recovery</h2><p>Backup policy, integrity checks, retention and recovery readiness.</p></span></div>
+  <div class="sa-notice-strip"><i class="fa-solid fa-triangle-exclamation"></i><span><b>Server backup is not connected.</b> This page does not claim that Firebase or any production database has been backed up. Restore and destructive operations remain disabled until a secured backend workflow exists.</span></div>
+  <div class="sa-kpi-grid"><div class="sa-kpi"><div class="sa-kpi-top"><span>Database health</span><span class="sa-kpi-icon"><i class="fa-solid fa-database"></i></span></div><div class="sa-kpi-value sa-unknown">Unverified</div><div class="sa-kpi-foot">Authenticated health endpoint required</div></div><div class="sa-kpi"><div class="sa-kpi-top"><span>Last server backup</span><span class="sa-kpi-icon"><i class="fa-solid fa-box-archive"></i></span></div><div class="sa-kpi-value sa-unknown">Unknown</div><div class="sa-kpi-foot">No server backup status feed</div></div><div class="sa-kpi"><div class="sa-kpi-top"><span>Integrity check</span><span class="sa-kpi-icon"><i class="fa-solid fa-fingerprint"></i></span></div><div class="sa-kpi-value sa-unknown">Not run</div><div class="sa-kpi-foot">Must be verified server-side</div></div><div class="sa-kpi"><div class="sa-kpi-top"><span>Restore readiness</span><span class="sa-kpi-icon"><i class="fa-solid fa-clock-rotate-left"></i></span></div><div class="sa-kpi-value sa-unknown">Unverified</div><div class="sa-kpi-foot">No restore test evidence connected</div></div></div>
+  <div class="sa-panel-grid"><section class="sa-panel"><div class="sa-panel-head"><h3>Local safe export</h3><span>Browser-only</span></div><p style="font-size:10px;line-height:1.7;color:#9aadb6">Export only selected non-secret browser preferences and local drafts. This is not a database backup and does not include Firebase/server records, passwords, credentials or API keys.</p><button class="sa-secondary-btn" type="button" onclick="saExportSafeLocalBackup()"><i class="fa-solid fa-download"></i> Export safe local data</button><div id="sa-db-export-result" class="sa-output"></div><div class="sa-section-title">Export contents</div><ul style="font-size:10px;line-height:1.8;color:#9aadb6;padding-left:18px"><li>Selected app preferences</li><li>AI routing draft (if present)</li><li>Backup policy draft (if present)</li><li>Export timestamp and scope metadata</li></ul></section>
+  <section class="sa-panel"><div class="sa-panel-head"><h3>Backup retention policy</h3><span>Local draft</span></div><form id="sa-backup-policy-form" onsubmit="saSaveBackupPolicy(event)" style="display:grid;gap:12px"><label style="display:grid;gap:6px;font-size:10px;color:#b8c6cc">Retention period<select name="retentionDays" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef"><option value="7" ${String(draft.retentionDays||'30')==='7'?'selected':''}>7 days</option><option value="14" ${String(draft.retentionDays||'30')==='14'?'selected':''}>14 days</option><option value="30" ${String(draft.retentionDays||'30')==='30'?'selected':''}>30 days</option><option value="90" ${String(draft.retentionDays||'30')==='90'?'selected':''}>90 days</option></select></label><label style="display:grid;gap:6px;font-size:10px;color:#b8c6cc">Proposed schedule<select name="schedule" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef"><option value="daily" ${(!draft.schedule||draft.schedule==='daily')?'selected':''}>Daily</option><option value="twice_daily" ${draft.schedule==='twice_daily'?'selected':''}>Twice daily</option><option value="weekly" ${draft.schedule==='weekly'?'selected':''}>Weekly</option></select></label><button class="sa-secondary-btn" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save policy draft</button><div id="sa-db-policy-result" class="sa-output" style="display:block">${draft.savedAt?'Local policy draft saved at '+esc(draft.savedAt):'No local policy draft saved yet.'} Production backup schedule is unchanged.</div></form></section></div>
+  <section class="sa-panel" style="margin-top:14px"><div class="sa-panel-head"><h3>Recovery readiness checklist</h3><span>Planning checklist</span></div><p style="font-size:10px;line-height:1.6;color:#9aadb6">Mark items as reviewed only after the corresponding work is actually completed. These checks are saved locally and are not evidence that server operations have passed.</p><div style="display:grid;gap:10px">${tasks.map(([id,label])=>`<label style="display:flex;align-items:flex-start;gap:9px;font-size:11px;line-height:1.5;color:#d9e2e6"><input type="checkbox" data-db-check="${id}" ${checked.includes(id)?'checked':''} onchange="saSaveBackupChecklist()" style="margin-top:2px;accent-color:#d7b45a">${label}</label>`).join('')}</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button type="button" class="sa-secondary-btn" onclick="saExportBackupChecklist()"><i class="fa-solid fa-file-export"></i> Export checklist</button><button type="button" class="sa-secondary-btn" onclick="saExplainRestoreSafety()"><i class="fa-solid fa-shield-halved"></i> Restore safety requirements</button></div><div id="sa-db-checklist-result" class="sa-output"></div></section>`;
+ }
+ window.saSaveBackupPolicy=function(event){event.preventDefault();const f=new FormData(event.currentTarget);const prev=(()=>{try{return JSON.parse(localStorage.getItem('suhail_backup_policy_draft')||'{}')}catch(_){return {}}})();prev.retentionDays=String(f.get('retentionDays')||'30');prev.schedule=String(f.get('schedule')||'daily');prev.savedAt=new Date().toISOString();localStorage.setItem('suhail_backup_policy_draft',JSON.stringify(prev));const out=document.getElementById('sa-db-policy-result');out.textContent='Policy draft saved in this browser. Production backup schedule, retention and server data were NOT changed.';out.style.display='block'};
+ window.saSaveBackupChecklist=function(){let d={};try{d=JSON.parse(localStorage.getItem('suhail_backup_policy_draft')||'{}')}catch(_){}d.checks=[...document.querySelectorAll('[data-db-check]:checked')].map(x=>x.dataset.dbCheck);localStorage.setItem('suhail_backup_policy_draft',JSON.stringify(d));const out=document.getElementById('sa-db-checklist-result');out.textContent=`Saved ${d.checks.length} of 5 checklist items locally. This is not a server verification record.`;out.style.display='block'};
+ window.saExportSafeLocalBackup=function(){const safe={};const allowed=/^(suhail_(persona|font_scale|bookmarks|chat_history|sessions|ai_control_draft|backup_policy_draft)|theme|language)$/i;for(const k of Object.keys(localStorage)){if(allowed.test(k)&&!/(pass|password|token|secret|credential|api.?key)/i.test(k)){try{safe[k]=localStorage.getItem(k)}catch(_){}}}const payload={schemaVersion:1,exportedAt:new Date().toISOString(),scope:'selected non-secret browser-local preferences only; NOT a database backup',warning:'Does not contain Firebase records, server data, passwords, credentials or API keys.',data:safe};superAdminDownload(`SuhailAI_Safe_Local_Export_${Date.now()}.json`,JSON.stringify(payload,null,2),'application/json;charset=utf-8');const out=document.getElementById('sa-db-export-result');out.textContent=`Export prepared with ${Object.keys(safe).length} allowed local keys. This is not a server/database backup.`;out.style.display='block'};
+ window.saExportBackupChecklist=function(){let d={};try{d=JSON.parse(localStorage.getItem('suhail_backup_policy_draft')||'{}')}catch(_){}const payload={exportedAt:new Date().toISOString(),scope:'local planning checklist only',policy:{retentionDays:d.retentionDays||'30',schedule:d.schedule||'daily',savedAt:d.savedAt||null},checklist:(d.checks||[]),serverVerified:false};superAdminDownload(`SuhailAI_Recovery_Checklist_${Date.now()}.json`,JSON.stringify(payload,null,2),'application/json;charset=utf-8')};
+ window.saExplainRestoreSafety=function(){const out=document.getElementById('sa-db-checklist-result');out.textContent='Restore must be implemented server-side with owner/admin authorization, re-authentication, explicit target-environment selection, backup integrity verification, pre-restore snapshot, approval for destructive changes, immutable audit log and a post-restore verification. This browser UI does not perform restore.';out.style.display='block'};
+
+ function renderMonitoringCenter(){
+  const host=document.getElementById('sa-view-content');
+  const readIncidents=()=>{try{const x=JSON.parse(localStorage.getItem('suhail_incident_register')||'[]');return Array.isArray(x)?x:[]}catch(_){return []}};
+  const incidents=readIncidents();
+  const open=incidents.filter(x=>x.status!=='Resolved').length;
+  const escText=(v)=>esc(String(v||''));
+  host.innerHTML=`<div class="sa-dept-heading"><span class="sa-dept-big-icon"><i class="fa-solid fa-heart-pulse"></i></span><span><h2>Live Monitoring & Incident Response</h2><p>Browser diagnostics and a local incident register. Server uptime, API latency and provider health are not reported without authenticated monitoring endpoints.</p></span></div>
+  <div class="sa-notice-strip"><i class="fa-solid fa-circle-info"></i><span><b>Truthful status:</b> The checks below only inspect this browser session and key page elements. They do not ping the production server or prove database/API health. Incidents created here are stored on this device only.</span></div>
+  <div class="sa-kpi-grid"><div class="sa-kpi"><div class="sa-kpi-top"><span>Server uptime</span><span class="sa-kpi-icon"><i class="fa-solid fa-server"></i></span></div><div class="sa-kpi-value sa-unknown">Unverified</div><div class="sa-kpi-foot">Monitoring backend not connected</div></div><div class="sa-kpi"><div class="sa-kpi-top"><span>Open local incidents</span><span class="sa-kpi-icon"><i class="fa-solid fa-triangle-exclamation"></i></span></div><div class="sa-kpi-value">${open}</div><div class="sa-kpi-foot">Local register only</div></div><div class="sa-kpi"><div class="sa-kpi-top"><span>Frontend checks</span><span class="sa-kpi-icon"><i class="fa-solid fa-stethoscope"></i></span></div><div class="sa-kpi-value" id="sa-mon-check-count">Not run</div><div class="sa-kpi-foot">Run browser-side checks below</div></div><div class="sa-kpi"><div class="sa-kpi-top"><span>Alert feed</span><span class="sa-kpi-icon"><i class="fa-solid fa-bell"></i></span></div><div class="sa-kpi-value sa-unknown">Not connected</div><div class="sa-kpi-foot">No server alert endpoint configured</div></div></div>
+  <div class="sa-panel-grid"><section class="sa-panel"><div class="sa-panel-head"><h3>Frontend diagnostics</h3><span>Local checks</span></div><p style="font-size:11px;line-height:1.6;color:#9aadb6">Checks whether expected UI elements exist in the current document and whether browser storage is accessible.</p><button type="button" class="sa-primary-btn" onclick="saRunMonitoringChecks()"><i class="fa-solid fa-stethoscope"></i> Run frontend checks</button><div id="sa-mon-check-results" class="sa-output" style="margin-top:12px">Checks have not been run.</div></section>
+  <section class="sa-panel"><div class="sa-panel-head"><h3>Create incident record</h3><span>Device-local</span></div><form onsubmit="saCreateLocalIncident(event)" style="display:grid;gap:10px"><label style="display:grid;gap:5px;font-size:11px;color:#b8c6cc">Incident title<input name="title" required maxlength="120" placeholder="e.g. Student chat send failure" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef"></label><label style="display:grid;gap:5px;font-size:11px;color:#b8c6cc">Severity<select name="severity" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef"><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></label><label style="display:grid;gap:5px;font-size:11px;color:#b8c6cc">Notes<textarea name="notes" maxlength="1000" rows="3" placeholder="Observed symptoms; do not enter passwords, API keys or personal data" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef"></textarea></label><button type="submit" class="sa-secondary-btn"><i class="fa-solid fa-plus"></i> Save local incident</button><div id="sa-mon-create-result" class="sa-output"></div></form></section></div>
+  <section class="sa-panel" style="margin-top:14px"><div class="sa-panel-head"><h3>Incident register</h3><span>${incidents.length} local record(s)</span></div><div id="sa-mon-incident-list">${incidents.length?incidents.slice().reverse().map(x=>`<div style="display:flex;gap:10px;align-items:flex-start;justify-content:space-between;border-bottom:1px solid #273740;padding:12px 0"><div style="min-width:0"><b style="font-size:12px">${escText(x.title)}</b><div style="font-size:10px;color:#9aadb6;margin-top:5px">${escText(x.severity)} · ${escText(x.status)} · ${escText(x.createdAt)}</div><div style="font-size:11px;color:#c5d0d5;margin-top:5px;white-space:pre-wrap">${escText(x.notes||'No notes')}</div></div>${x.status==='Resolved'?'<span class="sa-status-pill">Resolved</span>':`<button type="button" class="sa-secondary-btn" onclick="saResolveLocalIncident('${escText(x.id)}')">Resolve</button>`}</div>`).join(''):'<div class="sa-activity-empty">No local incident records. This is not a live server incident feed.</div>'}</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button type="button" class="sa-secondary-btn" onclick="saExportLocalIncidents()"><i class="fa-solid fa-file-export"></i> Export incidents</button><button type="button" class="sa-secondary-btn" onclick="saShowMonitoringIntegration()"><i class="fa-solid fa-plug"></i> Backend integration requirements</button></div><div id="sa-mon-export-result" class="sa-output"></div></section>`;
+ }
+ window.saRunMonitoringChecks=function(){const checks=[['Super Admin container',!!document.getElementById('superAdminModal')],['Dashboard content region',!!document.getElementById('sa-view-content')],['Admin control modal',!!document.getElementById('adminControlModal')],['Chat input',!!document.getElementById('chat-input')],['Send button',!!document.getElementById('btn-send')]];let storage='Available';try{const k='__suhail_mon_test__';localStorage.setItem(k,'1');localStorage.removeItem(k)}catch(_){storage='Unavailable / blocked'}const pass=checks.filter(x=>x[1]).length;const out=document.getElementById('sa-mon-check-results');out.style.display='block';out.innerHTML=checks.map(x=>`<div style="padding:5px 0;color:${x[1]?'#8de0b2':'#ff9d9d'}"><i class="fa-solid ${x[1]?'fa-circle-check':'fa-circle-xmark'}"></i> ${esc(x[0])}: ${x[1]?'Present':'Missing'}</div>`).join('')+`<div style="padding:5px 0;color:#c5d0d5">Browser local storage: ${esc(storage)}</div><div style="padding:7px 0;color:#9aadb6">${pass}/${checks.length} expected UI elements present. This does not test network, server, database, or AI provider health.</div>`;const k=document.getElementById('sa-mon-check-count');if(k)k.textContent=pass+'/'+checks.length};
+ window.saCreateLocalIncident=function(event){event.preventDefault();const f=new FormData(event.currentTarget);const title=String(f.get('title')||'').trim();if(!title)return;let items=[];try{items=JSON.parse(localStorage.getItem('suhail_incident_register')||'[]')}catch(_){}if(!Array.isArray(items))items=[];items.push({id:'local-'+Date.now().toString(36),title:title.slice(0,120),severity:String(f.get('severity')||'Low'),notes:String(f.get('notes')||'').slice(0,1000),status:'Open',createdAt:new Date().toISOString(),scope:'device-local'});try{localStorage.setItem('suhail_incident_register',JSON.stringify(items));renderMonitoringCenter()}catch(_){const o=document.getElementById('sa-mon-create-result');if(o){o.style.display='block';o.textContent='Could not save: browser storage may be unavailable or full.'}}};
+ window.saResolveLocalIncident=function(id){let items=[];try{items=JSON.parse(localStorage.getItem('suhail_incident_register')||'[]')}catch(_){}if(!Array.isArray(items))return;items=items.map(x=>x.id===id?{...x,status:'Resolved',resolvedAt:new Date().toISOString()}:x);localStorage.setItem('suhail_incident_register',JSON.stringify(items));renderMonitoringCenter()};
+ window.saExportLocalIncidents=function(){let items=[];try{items=JSON.parse(localStorage.getItem('suhail_incident_register')||'[]')}catch(_){}if(!Array.isArray(items))items=[];superAdminDownload(`SuhailAI_Local_Incidents_${Date.now()}.json`,JSON.stringify({exportedAt:new Date().toISOString(),scope:'device-local incident notes; not a server incident feed',serverVerified:false,incidents:items},null,2),'application/json;charset=utf-8');const out=document.getElementById('sa-mon-export-result');out.style.display='block';out.textContent=`Exported ${items.length} local incident record(s).`};
+ window.saShowMonitoringIntegration=function(){const out=document.getElementById('sa-mon-export-result');out.style.display='block';out.textContent='Production monitoring requires authenticated server-side endpoints for health checks, request error counts, latency, uptime, provider status and alert history. Enforce role-based authorization, rate limits, secret redaction and append-only audit logging. Never expose API keys or raw sensitive logs to this browser page.'};
+ function renderDepartment(key){const dep=departments.find(d=>d[0]===key);const host=document.getElementById('sa-view-content');const list=tools.filter(t=>t[4]===key);host.innerHTML=`<div class="sa-dept-heading"><span class="sa-dept-big-icon"><i class="fa-solid ${icons[key]||'fa-layer-group'}"></i></span><span><h2>${esc(dep?dep[1]:'Department')}</h2><p>${esc(descriptions[key]||'Department tools and operational workflows.')}</p></span></div><div class="sa-notice-strip"><i class="fa-solid fa-shield-halved"></i><span>Sensitive actions are only safe when the backend verifies the current user, permission and request. Tools without a connected endpoint will explain their current limitation and will not pretend to change server state.</span></div><div class="sa-tool-grid">${list.map(card).join('')||'<div class="sa-no-results">No tools assigned to this department yet.</div>'}</div>`}
+ window.saSearch=function(q){const val=(q||'').trim().toLowerCase();if(!val){const active=document.querySelector('#superAdminModal .sa-nav.active');saOpenView(active?active.dataset.saView:'dashboard',active);return}document.getElementById('sa-current-title').textContent='Search results';document.getElementById('sa-page-heading').textContent='Search results';document.getElementById('sa-page-subtitle').textContent='Tools and departments matching: '+q;document.querySelectorAll('#superAdminModal .sa-nav').forEach(n=>n.classList.remove('active'));const matches=tools.filter(t=>(t[1]+' '+t[3]+' '+t[4]).toLowerCase().includes(val));const deps=departments.filter(d=>(d[1]+' '+d[3]).toLowerCase().includes(val));document.getElementById('sa-view-content').innerHTML=(deps.length?`<div class="sa-section-title">Departments</div><div class="sa-tool-grid">${deps.map(d=>`<button class="sa-tool-card" onclick="saOpenView('${d[0]}',this)"><span class="sa-card-icon"><i class="fa-solid ${d[2]}"></i></span><span><b>${esc(d[1])}</b><small>${esc(d[3])}</small></span></button>`).join('')}</div>`:'')+(matches.length?`<div class="sa-section-title">Tools</div><div class="sa-tool-grid">${matches.map(card).join('')}</div>`:'')+(!deps.length&&!matches.length?'<div class="sa-no-results">No matching tools or departments found.</div>':'')};
+ window.saRefreshOverview=function(){if(typeof saOpenView==='function')saOpenView('dashboard');const out=document.getElementById('superAdminOutput');out.style.display='block';out.textContent='Overview refreshed at '+new Date().toLocaleString()+'. This refreshes the interface only; live backend metrics are not connected.'};
+ window.saShowAlerts=function(){const out=document.getElementById('superAdminOutput');out.style.display='block';out.textContent='ALERT CENTER\nNo live alert feed is connected. Database, provider, deployment and backup alerts require authenticated server-side monitoring endpoints.'};
+ window.saInit=function(){const nav=document.getElementById('sa-department-nav');if(nav&&!nav.dataset.ready){nav.innerHTML=departments.slice(1).map(d=>`<button class="sa-nav" data-sa-view="${d[0]}" onclick="saOpenView('${d[0]}',this)"><i class="fa-solid ${d[2]}"></i><span>${esc(d[1])}</span></button>`).join('');nav.dataset.ready='1'}renderDashboard()};
+})();
+</script>
 
 <!-- ================= ADMIN CONTROL CENTER MODAL ================= -->
 <div id="adminControlModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; align-items:center; justify-content:center; padding:15px; backdrop-filter:blur(6px);">
@@ -1366,7 +1521,10 @@ body.focus-reader-mode .exit-focus-btn {
       <h3 style="margin:0; color:#00a884; font-size:1.15rem; display:flex; align-items:center; gap:8px;">
         <i class="fa-solid fa-shield-halved"></i> Admin Control Center
       </h3>
-      <button onclick="document.getElementById('adminControlModal').style.display='none'" style="background:transparent; border:none; color:#8696a0; font-size:1.5rem; cursor:pointer;">&times;</button>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+        <button type="button" onclick="document.getElementById('adminControlModal').style.display='none';document.getElementById('superAdminModal').style.display='block';saInit();" style="background:linear-gradient(135deg,#f6d779,#b98a20);border:1px solid #f4d36e;color:#17130a;padding:8px 10px;border-radius:9px;font-size:.75rem;font-weight:800;cursor:pointer;"><i class="fa-solid fa-crown"></i> Open Super Admin</button>
+        <button onclick="document.getElementById('adminControlModal').style.display='none'" aria-label="Close Admin Control Center" style="background:transparent; border:none; color:#8696a0; font-size:1.5rem; cursor:pointer;">&times;</button>
+      </div>
     </div>
 
     <!-- 6 Admin Action Buttons -->
@@ -1826,7 +1984,7 @@ function renderAiBubble(div, text, aiName) {
 }
 
 let currentUser = JSON.parse(localStorage.getItem('suhail_ai_user') || 'null');
-let currentAdminPass = localStorage.getItem('suhail_ai_admin_pass') || 'SuhailAiJamia';
+let currentAdminPass = ''; // Never persist administrator secrets in browser storage.
 let activeShortcutType = null;
 
 function containsArabic(text) {
@@ -1957,11 +2115,75 @@ window.toggleSpeech = function(btn) {
   document.getElementById('btn-admin-toggle').onclick = () => {
     document.getElementById('adminControlModal').style.display = 'flex';
   };
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') { const panel = document.getElementById('superAdminModal'); if (panel && panel.style.display !== 'none') saCloseCommandCenter(); }
+  });
   const superAdminToggle = document.getElementById('btn-super-admin-toggle');
-  if (superAdminToggle) superAdminToggle.onclick = () => {
-    document.getElementById('superAdminModal').style.display = 'flex';
-    document.getElementById('superAdminOutput').textContent = 'Super Admin panel ready. Choose a control tool.';
-  };
+  if (superAdminToggle) superAdminToggle.onclick = () => openSuperAdminGate();
+
+  // Phase 2: Super Admin access is denied unless a server verifies the current actor.
+  // Expected endpoint contract: POST /api/super-admin?action=super_admin_auth
+  // Body: { password: "..." }; response: { ok:true, role:"owner"|"super_admin", permissions:[...], expiresAt:<unix-ms> }
+  async function openSuperAdminGate() {
+    const gate = document.getElementById('sa-auth-gate');
+    const msg = document.getElementById('sa-gate-message');
+    const input = document.getElementById('sa-gate-password');
+    if (!currentUser || !['admin','owner','super_admin'].includes(String(currentUser.role || '').toLowerCase())) {
+      msg.textContent = 'Access denied: is account ka verified administrator role nahi hai.';
+      gate.style.display = 'flex'; input.value = ''; return;
+    }
+    // Never trust sessionStorage alone: validate the HttpOnly server session every time.
+    try {
+      const check = await fetch('/api/super-admin?action=super_admin_session', { method: 'GET', credentials: 'same-origin', cache: 'no-store' });
+      const session = await check.json().catch(() => ({}));
+      if (check.ok && session.ok === true && ['owner','super_admin'].includes(String(session.role || '').toLowerCase())) {
+        try { sessionStorage.setItem('suhail_sa_verified_until', String(Number(session.expiresAt || 0))); } catch (_) {}
+        showSuperAdminAfterVerification(); return;
+      }
+    } catch (_) { /* Fail closed below if the backend is unavailable. */ }
+    try { sessionStorage.removeItem('suhail_sa_verified_until'); } catch (_) {}
+    gate.style.display = 'flex'; msg.textContent = 'Server session verify nahi hui. Owner password se dobara verify karein.'; input.value = ''; input.focus();
+  }
+  function showSuperAdminAfterVerification() {
+    const gate = document.getElementById('sa-auth-gate');
+    if (gate) gate.style.display = 'none';
+    const panel = document.getElementById('superAdminModal');
+    if (panel) panel.style.display = 'block';
+    if (typeof saInit === 'function') saInit();
+    const out = document.getElementById('superAdminOutput');
+    if (out) out.textContent = 'Verified session active. Sensitive operations still require server-side authorization.';
+  }
+  document.getElementById('sa-gate-cancel').addEventListener('click', () => {
+    document.getElementById('sa-auth-gate').style.display = 'none';
+    document.getElementById('sa-gate-password').value = '';
+    document.getElementById('sa-gate-message').textContent = '';
+  });
+  document.getElementById('sa-gate-verify').addEventListener('click', async () => {
+    const input = document.getElementById('sa-gate-password');
+    const msg = document.getElementById('sa-gate-message');
+    const btn = document.getElementById('sa-gate-verify');
+    const password = input.value;
+    if (!password) { msg.textContent = 'Password darj karein.'; input.focus(); return; }
+    btn.disabled = true; btn.textContent = 'Verifying…'; msg.textContent = 'Server se permission verify ki ja rahi hai…';
+    try {
+      const response = await fetch('/api/super-admin?action=super_admin_auth', {
+        method: 'POST', credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data.ok !== true || !['owner','super_admin'].includes(String(data.role || '').toLowerCase())) {
+        throw new Error(data.error || (response.status === 404 ? 'Secure Super Admin verification endpoint abhi configure nahi hai. Backend endpoint banne tak access band rahega.' : 'Server ne Super Admin access verify nahi kiya.'));
+      }
+      const expiry = Number(data.expiresAt || (Date.now() + 10 * 60 * 1000));
+      try { sessionStorage.setItem('suhail_sa_verified_until', String(Math.min(expiry, Date.now() + 10 * 60 * 1000))); } catch (_) {}
+      input.value = ''; msg.textContent = '';
+      showSuperAdminAfterVerification();
+    } catch (error) {
+      msg.textContent = error.message || 'Verification failed. Access denied.';
+    } finally { btn.disabled = false; btn.textContent = 'Verify & Open'; }
+  });
+  document.getElementById('sa-gate-password').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('sa-gate-verify').click(); });
 
   function checkToolAccess(type) {
     const p = (currentUser?.role === 'admin') ? 'ultra' : (currentUser?.plan || 'free');
@@ -2189,10 +2411,8 @@ window.toggleSpeech = function(btn) {
       });
       currentUser = data.user;
       localStorage.setItem('suhail_ai_user', JSON.stringify(currentUser));
-      if (adminPass) {
-        currentAdminPass = adminPass;
-        localStorage.setItem('suhail_ai_admin_pass', adminPass);
-      }
+      // Keep the admin credential in memory only for this page session. Never write it to localStorage.
+      currentAdminPass = adminPass || '';
       renderUserUI();
       loadChatHistory();
     } catch (e) {
@@ -2202,7 +2422,8 @@ window.toggleSpeech = function(btn) {
 
   document.getElementById('btn-logout').onclick = () => {
     localStorage.removeItem('suhail_ai_user');
-    localStorage.removeItem('suhail_ai_admin_pass');
+    currentAdminPass = '';
+    try { sessionStorage.removeItem('suhail_sa_verified_until'); } catch (_) {}
     location.reload();
   };
 
@@ -2518,6 +2739,7 @@ function renderAiBubble(div, text, aiName) {
   };
 
   async function loadAdminRequests() {
+    if (typeof currentAdminPass !== 'string' || !currentAdminPass.trim()) { alert('Admin session verify nahi hai. Pehle secure Admin login karein.'); return; }
     const list = document.getElementById('admin-requests-list');
     list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Load ho raha hai...</p>';
 
@@ -2562,6 +2784,7 @@ function renderAiBubble(div, text, aiName) {
   document.getElementById('btn-admin-refresh').onclick = loadAdminRequests;
 
   window.adminAction = async (cmd, requestId, targetPhone, targetPlan) => {
+    if (typeof currentAdminPass !== 'string' || !currentAdminPass.trim()) { alert('Admin session verify nahi hai. Pehle secure Admin login karein.'); return; }
     try {
       const data = await safeFetch('/api?action=admin', {
         method: 'POST',
@@ -2581,9 +2804,18 @@ function renderAiBubble(div, text, aiName) {
   };
 
   // ================= ADMIN CONTROL CENTER LOGIC =================
-  const SUHAIL_ADMIN_PASS = "SuhailAiJamia";
+  // Phase 3 security hardening: never ship a reusable administrator password in client code.
+  // Existing admin workflows must use the credential held in memory after the current admin login.
+  function requireCurrentAdminCredential() {
+    if (typeof currentAdminPass !== 'string' || !currentAdminPass.trim()) {
+      alert('Admin session verify nahi hai. Pehle secure Admin login karein; koi operation execute nahi hua.');
+      return false;
+    }
+    return true;
+  }
 
   async function runAudit(mode) {
+    if (!requireCurrentAdminCredential()) return;
     const out = document.getElementById('adminPanelOutput');
     let phoneParam = null;
 
@@ -2598,7 +2830,7 @@ function renderAiBubble(div, text, aiName) {
       const res = await fetch('/api/admin?action=ai_chat_summary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS, targetPhone: phoneParam ? phoneParam.trim() : null })
+        body: JSON.stringify({ pass: currentAdminPass, targetPhone: phoneParam ? phoneParam.trim() : null })
       });
       const data = await res.json();
       out.innerText = data.success ? data.insights : ("Error: " + (data.error || "Data nahi mila"));
@@ -2608,6 +2840,7 @@ function renderAiBubble(div, text, aiName) {
   }
 
   async function triggerAdminAction(type) {
+    if (!requireCurrentAdminCredential()) return;
     const out = document.getElementById('adminPanelOutput');
 
     if (type === 'change_plan') {
@@ -2623,7 +2856,7 @@ function renderAiBubble(div, text, aiName) {
         const res = await fetch('/api/admin?action=extend_plan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS, targetPhone: phone.trim(), targetPlan: plan.trim().toLowerCase(), days: days.trim() })
+          body: JSON.stringify({ pass: currentAdminPass, targetPhone: phone.trim(), targetPlan: plan.trim().toLowerCase(), days: days.trim() })
         });
         const data = await res.json();
         out.innerText = data.success ? data.message : ("Error: " + data.error);
@@ -2643,7 +2876,7 @@ function renderAiBubble(div, text, aiName) {
         const res = await fetch('/api/admin?action=toggle_block', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS, targetPhone: phone.trim(), newStatus: status.trim().toLowerCase() })
+          body: JSON.stringify({ pass: currentAdminPass, targetPhone: phone.trim(), newStatus: status.trim().toLowerCase() })
         });
         const data = await res.json();
         out.innerText = data.success ? data.message : ("Error: " + data.error);
@@ -2660,7 +2893,7 @@ function renderAiBubble(div, text, aiName) {
         const res = await fetch('/api/admin?action=reset_daily_limit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS, targetPhone: phone.trim() })
+          body: JSON.stringify({ pass: currentAdminPass, targetPhone: phone.trim() })
         });
         const data = await res.json();
         out.innerText = data.message || data.error;
@@ -2677,7 +2910,7 @@ function renderAiBubble(div, text, aiName) {
         const res = await fetch('/api/admin?action=set_notice', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pass: SUHAIL_ADMIN_PASS, noticeText: msg.trim(), isActive: msg.trim().length > 0 })
+          body: JSON.stringify({ pass: currentAdminPass, noticeText: msg.trim(), isActive: msg.trim().length > 0 })
         });
         const data = await res.json();
         out.innerText = data.message || data.error;
@@ -2736,6 +2969,53 @@ function renderAiBubble(div, text, aiName) {
     if (tool === 'security') { const issues=[]; if (location.protocol !== 'https:' && location.hostname !== 'localhost') issues.push('Page is not HTTPS.'); if (localStorage.getItem('suhail_ai_admin_pass')) issues.push('Admin pass is stored in browser localStorage.'); issues.push('Client-side role checks are not a security boundary; enforce authorization on the server.'); superAdminWrite('SECURITY REVIEW (browser-visible only)\n'+issues.map((x,i)=>`${i+1}. ${x}`).join('\n')); return; }
     if (tool === 'diagnostics') { const ids=['chat-box','chat-input','btn-send','adminControlModal','superAdminModal']; superAdminWrite('FRONTEND DIAGNOSTICS\n'+ids.map(id=>`${document.getElementById(id)?'OK':'MISSING'} — #${id}`).join('\n')+`\nJS errors cannot be fully audited from inside this panel.\nViewport: ${innerWidth} × ${innerHeight}`); return; }
     if (tool === 'export_chat') { const chat=document.getElementById('chat-box'); if (!chat) return superAdminWrite('Chat container not found.'); superAdminDownload(`SuhailAI_Current_Chat_${Date.now()}.txt`,chat.innerText || ''); superAdminWrite('Exported only the currently visible chat text.'); return; }
+    if (tool === 'policy_draft') {
+      const retention = prompt('Retention policy draft (e.g. chat logs 90 days):', 'Chat logs: 90 days\nAudit logs: 365 days\nBackups: 30 days');
+      if (retention === null) return;
+      const deletion = prompt('Deletion request handling draft:', 'Verify requester identity; check legal/academic retention; require approval; log outcome.');
+      if (deletion === null) return;
+      const exportRule = prompt('Data export rule draft:', 'Limit exports by role; exclude credentials/secrets; log every export.');
+      if (exportRule === null) return;
+      const item = {id:'POL-'+Date.now(),createdAt:new Date().toISOString(),status:'DRAFT — NOT ENFORCED',retention,deletion,exportRule};
+      let rows=[]; try { rows=JSON.parse(localStorage.getItem('suhail_governance_policy_drafts')||'[]'); if(!Array.isArray(rows)) rows=[]; } catch {}
+      rows.push(item); localStorage.setItem('suhail_governance_policy_drafts',JSON.stringify(rows));
+      superAdminWrite('DATA POLICY DRAFT SAVED LOCALLY\n'+JSON.stringify(item,null,2)+'\n\nThis policy has NOT been applied to the server.'); return;
+    }
+    if (tool === 'approval_record') {
+      const action = prompt('Critical action requiring approval (describe only; do not include secrets):'); if (action === null || !action.trim()) return;
+      const reason = prompt('Reason and expected impact:'); if (reason === null) return;
+      const item={id:'APR-'+Date.now(),createdAt:new Date().toISOString(),requestedBy:'current browser session (unverified)',action:action.trim(),reason:reason.trim(),status:'PENDING — LOCAL RECORD ONLY'};
+      let rows=[]; try { rows=JSON.parse(localStorage.getItem('suhail_governance_approval_drafts')||'[]'); if(!Array.isArray(rows)) rows=[]; } catch {}
+      rows.push(item); localStorage.setItem('suhail_governance_approval_drafts',JSON.stringify(rows));
+      superAdminWrite('APPROVAL REQUEST DRAFT RECORDED\n'+JSON.stringify(item,null,2)+'\n\nThis is not a server approval and does not authorize or execute any operation.'); return;
+    }
+    if (tool === 'governance_workbench') {
+      let policies=[], approvals=[]; try { policies=JSON.parse(localStorage.getItem('suhail_governance_policy_drafts')||'[]'); } catch {} try { approvals=JSON.parse(localStorage.getItem('suhail_governance_approval_drafts')||'[]'); } catch {}
+      const report={generatedAt:new Date().toISOString(),scope:'local browser governance drafts only',serverConnected:false,policyDraftCount:Array.isArray(policies)?policies.length:0,approvalDraftCount:Array.isArray(approvals)?approvals.length:0,policies,approvals,notes:['No policy is enforced by this report.','No approval is valid for critical actions until verified by a server-side workflow.','Moderation queue and audit trail are not connected to a backend.']};
+      superAdminWrite('GOVERNANCE WORKBENCH\n'+JSON.stringify(report,null,2));
+      if(confirm('Local governance report JSON download karein?')) superAdminDownload(`SuhailAI_Governance_Report_${Date.now()}.json`,JSON.stringify(report,null,2),'application/json;charset=utf-8'); return;
+    }
+    if (tool === 'final_verification') {
+      const checks=[['Super Admin modal',!!document.getElementById('superAdminModal')],['Admin modal',!!document.getElementById('adminControlModal')],['Chat container',!!document.getElementById('chat-box')],['Chat input',!!document.getElementById('chat-input')],['Send button',!!document.getElementById('btn-send')],['HTTPS or localhost',location.protocol==='https:'||location.hostname==='localhost'],['Server authorization',false],['Live provider health endpoint',false],['Server backup/restore endpoint',false],['Server audit log endpoint',false],['Deployment provider connected',false]];
+      const report={generatedAt:new Date().toISOString(),type:'browser-side acceptance checklist',checks:checks.map(([name,passed])=>({name,status:passed?'PASS':'NOT VERIFIED / NOT CONNECTED'})),passed:checks.filter(x=>x[1]).length,total:checks.length,warning:'This is not a penetration test. Backend controls marked not connected must be implemented and independently tested.'};
+      superAdminWrite('FINAL VERIFICATION REPORT\n'+JSON.stringify(report,null,2)); superAdminDownload(`SuhailAI_Final_Verification_${Date.now()}.json`,JSON.stringify(report,null,2),'application/json;charset=utf-8'); return;
+    }
+    const plannedTools = {
+      permissions:'PERMISSION STUDIO\nRole-based access matrix is planned. Before enabling changes, enforce every permission on the backend and record changes in an immutable audit log.',
+      cost_optimizer:'AI COST OPTIMIZER\nProvider usage and cost telemetry are not connected. No spending figures are being invented. Connect provider usage endpoints to enable budget recommendations.',
+      usage_analytics:'USAGE ANALYTICS\nLive analytics are not connected. Connect authenticated usage metrics before showing student activity, request counts or cost charts.',
+      audit_explorer:'AUDIT EXPLORER\nA searchable audit feed requires server-side audit events with actor, action, target, timestamp and result fields.',
+      notification_center:'NOTIFICATION CENTER\nNotification history is not connected. A secure backend feed is required to display delivered, pending and failed notices.',
+      api_hub:'API & INTEGRATION HUB\nIntegration health is not verified from the browser. Configure server-side health checks and never expose provider secrets to this page.',
+      data_governance:'DATA GOVERNANCE\nRetention, deletion and export policies need server-side policy enforcement, authorization and auditable approval workflows.',
+      rollout_manager:'FEATURE ROLLOUT MANAGER\nNo server-backed feature-flag endpoint is connected. No global rollout setting has been changed.',
+      incident_center:'INCIDENT RESPONSE CENTER\nNo monitoring incident feed is connected. Connect backend logs and alerting before treating incidents as live.',
+      activity_approval:'SUPER ADMIN ACTIVITY APPROVAL\nCritical operations should require re-authentication, an approval record and server-side audit logging. This screen does not approve or execute critical operations.',
+      release_manager:'RELEASE & ROLLBACK MANAGER\nNo deployment provider is connected. Releases and rollbacks must run through an authenticated deployment workflow.',
+      study_manager:'MADRASA & STUDY MANAGER\nAcademic management tools require connected, permission-checked backend endpoints. No academic records were changed.'
+    };
+    if (plannedTools[tool]) { superAdminWrite(plannedTools[tool]); return; }
+    superAdminWrite('This tool is not connected yet. No server-side change was made.');
   }
 
   renderUserUI();
@@ -2863,6 +3143,7 @@ window.addEventListener('DOMContentLoaded', () => {
 // 2. एडमिन नोटिस भेजने का फ़ंक्शन
 // ==========================================
 async function sendAdminGlobalNotice() {
+  if (typeof currentAdminPass !== 'string' || !currentAdminPass.trim()) { alert('Admin session verify nahi hai. Pehle secure Admin login karein.'); return; }
   const text = prompt("तमाम छात्रों के लिए नोटिस लिखें (हटाने के लिए खाली छोड़ें):");
   if (text === null) return;
 
@@ -2872,7 +3153,7 @@ async function sendAdminGlobalNotice() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        pass: "SuhailAiJamia",
+        pass: currentAdminPass,
         phone: currentUser?.phone,
         noticeText: text.trim(),
         isActive: isActive
