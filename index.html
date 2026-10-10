@@ -924,6 +924,24 @@ body.focus-reader-mode .exit-focus-btn {
   .chat-bubble.ai:not(.tri-luxury-motion):not([id^="tri-agent-"]), .typing-cursor { animation: none !important; transition: none !important; }
 }
 
+
+/* RESTORE SIMPLE LEGACY AI ANSWER STYLE: no glowing cards, no floating animation */
+.chat-bubble.ai:not(.tri-luxury-motion):not([id^="tri-agent-"]) {
+  background: var(--panel-dark, #111b21) !important;
+  border: 1px solid var(--card-border, rgba(255,255,255,.08)) !important;
+  border-left: 1px solid var(--card-border, rgba(255,255,255,.08)) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  animation: none !important;
+  padding: 12px 14px !important;
+  margin: 8px 0 !important;
+}
+.chat-bubble.ai:not(.tri-luxury-motion):not([id^="tri-agent-"]) .ai-label {
+  border-bottom: 0 !important; margin-bottom: 4px !important; padding-bottom: 0 !important;
+}
+.streaming-word { opacity: 1 !important; transform: none !important; animation: none !important; }
+.typing-cursor, .ink-cursor { animation: none !important; box-shadow: none !important; }
+
 </style>
 
   <link rel="manifest" href="/manifest.json">
@@ -2122,7 +2140,7 @@ window.toggleSpeech = function(btn) {
   if (superAdminToggle) superAdminToggle.onclick = () => openSuperAdminGate();
 
   // Phase 2: Super Admin access is denied unless a server verifies the current actor.
-  // Expected endpoint contract: POST /api/super-admin?action=super_admin_auth
+  // Expected endpoint contract: POST /api/admin?action=super_admin_auth
   // Body: { password: "..." }; response: { ok:true, role:"owner"|"super_admin", permissions:[...], expiresAt:<unix-ms> }
   async function openSuperAdminGate() {
     const gate = document.getElementById('sa-auth-gate');
