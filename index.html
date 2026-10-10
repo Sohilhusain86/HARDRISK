@@ -717,7 +717,7 @@ body.focus-reader-mode .exit-focus-btn {
     
   
 
-/* Restored original simple response styling; luxury dynamic overrides removed. */
+/* Restored original simple chat response styling; no dynamic bubble overrides. */
 
 </style>
 
@@ -1116,7 +1116,19 @@ body.focus-reader-mode .exit-focus-btn {
 </div>
 
 
-<!-- Extra Super Admin re-authentication prompt removed; normal app login remains in place. -->
+<!-- ================= SUPER ADMIN RE-AUTHENTICATION GATE (PHASE 2) ================= -->
+<div id="sa-auth-gate" role="dialog" aria-modal="true" aria-labelledby="sa-gate-title" style="display:none;position:fixed;inset:0;z-index:1000002;background:rgba(2,8,12,.94);align-items:center;justify-content:center;padding:18px;color:#e9edef;font-family:system-ui,sans-serif">
+ <div style="width:min(440px,100%);background:#0d171d;border:1px solid #394b55;border-radius:18px;padding:24px;box-shadow:0 24px 80px #0009">
+  <div style="width:46px;height:46px;border-radius:13px;background:#2a2517;color:#f4d477;display:grid;place-items:center;font-size:20px;margin-bottom:16px"><i class="fa-solid fa-shield-halved"></i></div>
+  <h2 id="sa-gate-title" style="margin:0 0 8px;font-size:21px">Super Admin Verification</h2>
+  <p style="margin:0 0 18px;color:#9eafb8;font-size:13px;line-height:1.6">Command Center kholne se pehle server se Owner/Admin permission verify hogi. Sirf frontend role ya local password par bharosa nahi kiya jayega.</p>
+  <label for="sa-gate-password" style="display:block;font-size:12px;margin-bottom:7px">Administrator password</label>
+  <input id="sa-gate-password" type="password" autocomplete="current-password" style="width:100%;box-sizing:border-box;padding:12px;border-radius:9px;border:1px solid #354852;background:#071016;color:#fff;outline:none" placeholder="Password dobara darj karein">
+  <div id="sa-gate-message" role="status" aria-live="polite" style="margin-top:10px;color:#e6c36a;font-size:12px;line-height:1.5"></div>
+  <div style="display:flex;gap:10px;margin-top:18px"><button id="sa-gate-cancel" type="button" style="flex:1;padding:11px;border-radius:9px;border:1px solid #344650;background:#142129;color:#dbe5e9">Cancel</button><button id="sa-gate-verify" type="button" style="flex:1;padding:11px;border-radius:9px;border:1px solid #9e7d29;background:#d6b34f;color:#101418;font-weight:800">Verify & Open</button></div>
+  <p style="font-size:10px;line-height:1.5;color:#71858f;margin:16px 0 0">Agar secure server endpoint configure nahi hai, access band rahega. Yeh jaan-boojh kar fail-closed security hai.</p>
+ </div>
+</div>
 
 <!-- ================= SUHAIL AI ENTERPRISE SUPER ADMIN COMMAND CENTER ================= -->
 <div id="superAdminModal" role="dialog" aria-modal="true" aria-label="Suhail AI Super Admin Command Center" style="display:none;position:fixed;inset:0;background:#080e13;z-index:1000001;color:#e9edef;overflow:hidden;">
@@ -1767,7 +1779,7 @@ function renderAiBubble(div, text, aiName) {
 }
 
 let currentUser = JSON.parse(localStorage.getItem('suhail_ai_user') || 'null');
-let currentAdminPass = "SuhailAiJamia"; // Uses the existing Suhail Jamia AI admin pass for legacy admin API actions.
+let currentAdminPass = ''; // Never persist administrator secrets in browser storage.
 let activeShortcutType = null;
 
 function containsArabic(text) {
@@ -1904,19 +1916,66 @@ window.toggleSpeech = function(btn) {
   const superAdminToggle = document.getElementById('btn-super-admin-toggle');
   if (superAdminToggle) superAdminToggle.onclick = () => openSuperAdminGate();
 
-  // No extra server-side password prompt. The existing Suhail Jamia AI login remains the login gate.
-  // Only an already logged-in account with the app's admin role can open this interface.
-  function openSuperAdminGate() {
-    if (!currentUser || String(currentUser.role || '').toLowerCase() !== 'admin') {
-      alert('Super Admin ke liye apne admin account se login karein.');
-      return;
-    }
+  // Phase 2: Super Admin access is denied unless a server verifies the current actor.
+  // Expected endpoint contract: POST /api/super-admin?action=super_admin_auth
+  // Body: { password: "..." }; response: { ok:true, role:"owner"|"super_admin", permissions:[...], expiresAt:<unix-ms> }
+  async function openSuperAdminGate() {
+    const gate = document.getElementById('sa-auth-gate');
+    const msg = document.getElementById('sa-gate-message');
+    const input = document.getElementById('sa-gate-password');
+    // Super Admin access is controlled by the server-side password, not the student account role.
+    // Never trust sessionStorage alone: validate the HttpOnly server session every time.
+    try {
+      const check = await fetch('/api/super-admin?action=super_admin_session', { method: 'GET', credentials: 'same-origin', cache: 'no-store' });
+      const session = await check.json().catch(() => ({}));
+      if (check.ok && session.ok === true && ['owner','super_admin'].includes(String(session.role || '').toLowerCase())) {
+        try { sessionStorage.setItem('suhail_sa_verified_until', String(Number(session.expiresAt || 0))); } catch (_) {}
+        showSuperAdminAfterVerification(); return;
+      }
+    } catch (_) { /* Fail closed below if the backend is unavailable. */ }
+    try { sessionStorage.removeItem('suhail_sa_verified_until'); } catch (_) {}
+    gate.style.display = 'flex'; msg.textContent = 'Server session verify nahi hui. Owner password se dobara verify karein.'; input.value = ''; input.focus();
+  }
+  function showSuperAdminAfterVerification() {
+    const gate = document.getElementById('sa-auth-gate');
+    if (gate) gate.style.display = 'none';
     const panel = document.getElementById('superAdminModal');
     if (panel) panel.style.display = 'block';
     if (typeof saInit === 'function') saInit();
     const out = document.getElementById('superAdminOutput');
-    if (out) out.textContent = 'Command Center opened using the existing app admin login.';
+    if (out) out.textContent = 'Verified session active. Sensitive operations still require server-side authorization.';
   }
+  document.getElementById('sa-gate-cancel').addEventListener('click', () => {
+    document.getElementById('sa-auth-gate').style.display = 'none';
+    document.getElementById('sa-gate-password').value = '';
+    document.getElementById('sa-gate-message').textContent = '';
+  });
+  document.getElementById('sa-gate-verify').addEventListener('click', async () => {
+    const input = document.getElementById('sa-gate-password');
+    const msg = document.getElementById('sa-gate-message');
+    const btn = document.getElementById('sa-gate-verify');
+    const password = input.value;
+    if (!password) { msg.textContent = 'Password darj karein.'; input.focus(); return; }
+    btn.disabled = true; btn.textContent = 'Verifying…'; msg.textContent = 'Server se permission verify ki ja rahi hai…';
+    try {
+      const response = await fetch('/api/super-admin?action=super_admin_auth', {
+        method: 'POST', credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data.ok !== true || !['owner','super_admin'].includes(String(data.role || '').toLowerCase())) {
+        throw new Error(data.error || (response.status === 404 ? 'Secure Super Admin verification endpoint abhi configure nahi hai. Backend endpoint banne tak access band rahega.' : 'Server ne Super Admin access verify nahi kiya.'));
+      }
+      const expiry = Number(data.expiresAt || (Date.now() + 10 * 60 * 1000));
+      try { sessionStorage.setItem('suhail_sa_verified_until', String(Math.min(expiry, Date.now() + 10 * 60 * 1000))); } catch (_) {}
+      input.value = ''; msg.textContent = '';
+      showSuperAdminAfterVerification();
+    } catch (error) {
+      msg.textContent = error.message || 'Verification failed. Access denied.';
+    } finally { btn.disabled = false; btn.textContent = 'Verify & Open'; }
+  });
+  document.getElementById('sa-gate-password').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('sa-gate-verify').click(); });
 
   function checkToolAccess(type) {
     const p = (currentUser?.role === 'admin') ? 'ultra' : (currentUser?.plan || 'free');
@@ -2110,7 +2169,7 @@ window.toggleSpeech = function(btn) {
 
     document.getElementById('btn-admin-toggle').style.display = isAdmin ? 'inline-block' : 'none';
     const superAdminButton = document.getElementById('btn-super-admin-toggle');
-    if (superAdminButton) superAdminButton.style.display = isAdmin ? 'inline-block' : 'none';
+    if (superAdminButton) superAdminButton.style.display = 'inline-block';
     document.getElementById('nav-item-admin').style.display = isAdmin ? 'block' : 'none';
     if (isAdmin) {
       document.getElementById('nav-item-pay').style.display = 'none';
@@ -2472,7 +2531,7 @@ function renderAiBubble(div, text, aiName) {
   };
 
   async function loadAdminRequests() {
-    if (!currentAdminPass) { alert('Admin password configure nahi hai.'); return; }
+    if (typeof currentAdminPass !== 'string' || !currentAdminPass.trim()) { alert('Admin session verify nahi hai. Pehle secure Admin login karein.'); return; }
     const list = document.getElementById('admin-requests-list');
     list.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted); text-align:center;">Load ho raha hai...</p>';
 
@@ -2517,7 +2576,7 @@ function renderAiBubble(div, text, aiName) {
   document.getElementById('btn-admin-refresh').onclick = loadAdminRequests;
 
   window.adminAction = async (cmd, requestId, targetPhone, targetPlan) => {
-    if (!currentAdminPass) { alert('Admin password configure nahi hai.'); return; }
+    if (typeof currentAdminPass !== 'string' || !currentAdminPass.trim()) { alert('Admin session verify nahi hai. Pehle secure Admin login karein.'); return; }
     try {
       const data = await safeFetch('/api?action=admin', {
         method: 'POST',
@@ -2537,10 +2596,14 @@ function renderAiBubble(div, text, aiName) {
   };
 
   // ================= ADMIN CONTROL CENTER LOGIC =================
-  // Legacy Suhail Jamia AI admin actions use the existing configured admin password.
-  // The extra session-required popup is removed; backend endpoints still validate the pass.
+  // Phase 3 security hardening: never ship a reusable administrator password in client code.
+  // Existing admin workflows must use the credential held in memory after the current admin login.
   function requireCurrentAdminCredential() {
-    return typeof currentAdminPass === 'string' && currentAdminPass.length > 0;
+    if (typeof currentAdminPass !== 'string' || !currentAdminPass.trim()) {
+      alert('Admin session verify nahi hai. Pehle secure Admin login karein; koi operation execute nahi hua.');
+      return false;
+    }
+    return true;
   }
 
   async function runAudit(mode) {
@@ -2651,6 +2714,25 @@ function renderAiBubble(div, text, aiName) {
 
 
   // ================= SUPER ADMIN CONTROL PLANE (20 TOOLS) =================
+  async function superAdminAdminAction(action, params = {}) {
+    const out = document.getElementById('superAdminOutput');
+    if (out) out.textContent = 'Server par authorized operation chal raha hai…';
+    try {
+      const response = await fetch('/api/super-admin?action=super_admin_proxy', {
+        method: 'POST', credentials: 'same-origin', cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, params })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || `Server error (${response.status})`);
+      const detail = data.insights || data.message || data.error || JSON.stringify(data, null, 2);
+      if (out) out.textContent = `${action.toUpperCase()}\n${detail}`;
+      return data;
+    } catch (e) {
+      if (out) out.textContent = `${action.toUpperCase()} FAILED\n${e.message || 'Connection error'}`;
+      return null;
+    }
+  }
   function superAdminWrite(text) {
     const out = document.getElementById('superAdminOutput');
     if (out) out.textContent = text;
@@ -2664,12 +2746,12 @@ function renderAiBubble(div, text, aiName) {
   async function runSuperAdminTool(tool) {
     const out = document.getElementById('superAdminOutput');
     const localKeys = Object.keys(localStorage);
-    if (tool === 'audit_all') { document.getElementById('superAdminModal').style.display='none'; document.getElementById('adminControlModal').style.display='flex'; return runAudit('all'); }
-    if (tool === 'audit_one') { document.getElementById('superAdminModal').style.display='none'; document.getElementById('adminControlModal').style.display='flex'; return runAudit('single'); }
-    if (tool === 'plan') { document.getElementById('superAdminModal').style.display='none'; document.getElementById('adminControlModal').style.display='flex'; return triggerAdminAction('change_plan'); }
-    if (tool === 'block') { document.getElementById('superAdminModal').style.display='none'; document.getElementById('adminControlModal').style.display='flex'; return triggerAdminAction('toggle_block'); }
-    if (tool === 'quota') { document.getElementById('superAdminModal').style.display='none'; document.getElementById('adminControlModal').style.display='flex'; return triggerAdminAction('reset_limit'); }
-    if (tool === 'notice') { document.getElementById('superAdminModal').style.display='none'; document.getElementById('adminControlModal').style.display='flex'; return triggerAdminAction('set_notice'); }
+    if (tool === 'audit_all') { return superAdminAdminAction('ai_chat_summary', { targetPhone: null }); }
+    if (tool === 'audit_one') { const phone = prompt('Jis student ka AI audit dekhna hai, phone number daalein:'); if (!phone) return; return superAdminAdminAction('ai_chat_summary', { targetPhone: phone.trim() }); }
+    if (tool === 'plan') { const phone = prompt('Student ka phone number:'); if (!phone) return; const plan = prompt('Plan (free / plus / pro / ultra):', 'pro'); if (!plan) return; const days = prompt('Kitne din ke liye?', '30'); if (!days) return; return superAdminAdminAction('extend_plan', { targetPhone: phone.trim(), targetPlan: plan.trim().toLowerCase(), days: days.trim() }); }
+    if (tool === 'block') { const phone = prompt('Student ka phone number:'); if (!phone) return; const status = prompt('Status (active / blocked):', 'blocked'); if (!status) return; return superAdminAdminAction('toggle_block', { targetPhone: phone.trim(), newStatus: status.trim().toLowerCase() }); }
+    if (tool === 'quota') { const phone = prompt('Student ka phone number:'); if (!phone) return; return superAdminAdminAction('reset_daily_limit', { targetPhone: phone.trim() }); }
+    if (tool === 'notice') { const noticeText = prompt('Tamam students ke liye notice (clear karne ke liye blank):'); if (noticeText === null) return; return superAdminAdminAction('set_notice', { noticeText: noticeText.trim(), isActive: noticeText.trim().length > 0 }); }
     if (tool === 'overview') {
       const chatCount = document.querySelectorAll('#chat-box .chat-bubble').length;
       superAdminWrite(`LOCAL FRONTEND OVERVIEW\nTimestamp: ${new Date().toLocaleString()}\nCurrent session: ${currentUser ? 'signed in' : 'guest'}\nVisible chat bubbles: ${chatCount}\nLocalStorage keys: ${localKeys.length}\nBackend/Firebase health: not verified by this browser-only check.`); return;
@@ -2872,7 +2954,7 @@ window.addEventListener('DOMContentLoaded', () => {
 // 2. एडमिन नोटिस भेजने का फ़ंक्शन
 // ==========================================
 async function sendAdminGlobalNotice() {
-  if (!currentAdminPass) { alert('Admin password configure nahi hai.'); return; }
+  if (typeof currentAdminPass !== 'string' || !currentAdminPass.trim()) { alert('Admin session verify nahi hai. Pehle secure Admin login karein.'); return; }
   const text = prompt("तमाम छात्रों के लिए नोटिस लिखें (हटाने के लिए खाली छोड़ें):");
   if (text === null) return;
 
