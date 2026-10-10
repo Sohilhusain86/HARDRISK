@@ -712,7 +712,241 @@ body.focus-reader-mode .exit-focus-btn {
   display: block;
 }
     
-  </style>
+  
+
+/* ========================================================================
+   SUHAIL AI RESPONSE BUBBLES — VISIBILITY-SAFE LUXURY STYLE
+   Scoped to real AI replies. Loader/package cards and application logic are untouched.
+   ======================================================================== */
+@keyframes royalResponseGlow {
+  0%, 100% { box-shadow: 0 10px 28px rgba(0,0,0,.42), 0 0 12px rgba(0,255,163,.04); }
+  50% { box-shadow: 0 12px 32px rgba(0,0,0,.48), 0 0 18px rgba(0,255,163,.09); }
+}
+.chat-bubble.ai:not(.tri-luxury-motion):not([id^="tri-agent-"]) {
+  align-self: flex-start !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  width: fit-content !important;
+  min-width: 0 !important;
+  max-width: 92% !important;
+  flex: 0 1 auto !important;
+  padding: 16px 18px !important;
+  margin: 10px 0 14px !important;
+  overflow: visible !important;
+  white-space: normal !important;
+  color: #f1f5f9 !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+  background: radial-gradient(circle at 10% 15%, #16242b 0%, #0c1419 100%) !important;
+  border: 1.5px solid rgba(0,255,163,.32) !important;
+  border-left: 3px solid #00ffa3 !important;
+  border-radius: 18px 18px 18px 4px !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,.55), 0 0 18px rgba(0,255,163,.06) !important;
+  animation: royalResponseGlow 5s ease-in-out infinite !important;
+}
+.chat-bubble.ai:not(.tri-luxury-motion):not([id^="tri-agent-"]) * {
+  max-height: none;
+}
+.ai-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 0 10px !important;
+  padding: 0 0 7px !important;
+  border-bottom: 1px solid rgba(255,255,255,.09) !important;
+  font-size: .72rem !important;
+  line-height: 1.4 !important;
+  font-weight: 800 !important;
+  letter-spacing: .7px !important;
+  text-transform: uppercase !important;
+  color: #00ffa3 !important;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: #00ffa3 !important;
+}
+.ai-label::before {
+  content: "✦";
+  display: inline-block;
+  color: #38bdf8 !important;
+  -webkit-text-fill-color: #38bdf8 !important;
+  flex: 0 0 auto;
+}
+.chat-content {
+  display: block !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 20px !important;
+  max-height: none !important;
+  overflow: visible !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  color: #f1f5f9 !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: .92rem !important;
+  line-height: 1.8 !important;
+  letter-spacing: .15px !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+}
+.chat-content p,
+.chat-content span,
+.chat-content div,
+.chat-content li {
+  color: #f1f5f9 !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+}
+.chat-content p { margin: 0 0 10px !important; }
+.chat-content p:last-child { margin-bottom: 0 !important; }
+.chat-content h1, .chat-content h2, .chat-content h3 {
+  color: #38bdf8 !important;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: #38bdf8 !important;
+  font-weight: 800 !important;
+  line-height: 1.4 !important;
+  margin: 12px 0 7px !important;
+}
+.chat-content strong, .chat-content b {
+  color: #00ffa3 !important;
+  -webkit-text-fill-color: #00ffa3 !important;
+  font-weight: 700 !important;
+}
+.chat-content ul, .chat-content ol { margin: 0 0 12px 20px !important; padding-left: 4px !important; }
+.chat-content li { margin-bottom: 6px !important; padding-left: 3px !important; }
+.chat-content ul li::marker { color: #00ffa3 !important; }
+.chat-content ol li::marker { color: #38bdf8 !important; }
+.arabic-text, .arabic-quote-box {
+  display: block !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  margin: 12px 0 !important;
+  padding: 12px 15px !important;
+  background: rgba(0,255,163,.05) !important;
+  border: 1px solid rgba(0,255,163,.24) !important;
+  border-right: 4px solid #00ffa3 !important;
+  border-radius: 12px !important;
+  color: #fef08a !important;
+  -webkit-text-fill-color: #fef08a !important;
+  font-family: 'Amiri', 'Traditional Arabic', 'Noto Nastaliq Urdu', serif !important;
+  font-size: 1.28rem !important;
+  line-height: 2.1 !important;
+  direction: rtl !important;
+  text-align: right !important;
+  overflow-wrap: break-word !important;
+}
+.chat-content blockquote {
+  margin: 12px 0 !important;
+  padding: 10px 14px !important;
+  background: rgba(56,189,248,.06) !important;
+  border: 1px solid rgba(56,189,248,.2) !important;
+  border-left: 4px solid #38bdf8 !important;
+  border-radius: 10px !important;
+  color: #cbd5e1 !important;
+  -webkit-text-fill-color: #cbd5e1 !important;
+}
+.chat-content code {
+  color: #67e8f9 !important;
+  -webkit-text-fill-color: #67e8f9 !important;
+  background: rgba(0,0,0,.5) !important;
+  border: 1px solid rgba(0,255,163,.18) !important;
+  border-radius: 5px !important;
+  padding: 2px 5px !important;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace !important;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.chat-content pre {
+  max-width: 100% !important;
+  overflow: auto !important;
+  padding: 12px !important;
+  border-radius: 10px !important;
+  background: rgba(0,0,0,.55) !important;
+  border: 1px solid rgba(0,255,163,.2) !important;
+}
+.chat-content pre code { border: 0 !important; padding: 0 !important; }
+.table-responsive {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  margin: 12px 0 !important;
+  border: 1px solid rgba(0,255,163,.22) !important;
+  border-radius: 10px !important;
+}
+.table-responsive table { width: 100% !important; border-collapse: collapse !important; background: rgba(15,23,42,.65) !important; }
+.table-responsive th, .table-responsive td { padding: 8px 10px !important; border: 1px solid rgba(255,255,255,.08) !important; color: #e2e8f0 !important; -webkit-text-fill-color: #e2e8f0 !important; white-space: normal !important; }
+.table-responsive th { background: rgba(0,168,132,.2) !important; color: #00ffa3 !important; -webkit-text-fill-color: #00ffa3 !important; }
+.bubble-actions, .bubble-quick-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 6px !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+.bubble-actions { justify-content: flex-end !important; margin-top: 10px !important; padding-top: 8px !important; border-top: 1px solid rgba(255,255,255,.08) !important; }
+.bubble-actions .btn-copy, .btn-action-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: 5px 9px !important;
+  border-radius: 9px !important;
+  background: rgba(255,255,255,.04) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  color: #cbd5e1 !important;
+  -webkit-text-fill-color: #cbd5e1 !important;
+  font-size: .72rem !important;
+}
+.bubble-actions .btn-copy:hover, .btn-action-pill:hover { border-color: #00ffa3 !important; color: #00ffa3 !important; -webkit-text-fill-color: #00ffa3 !important; }
+.typing-cursor { display: inline-block !important; width: 6px !important; height: 15px !important; background: #00ffa3 !important; margin-left: 4px !important; vertical-align: middle !important; animation: blinkCursor .7s infinite alternate !important; }
+@media(max-width:480px) {
+  .chat-bubble.ai:not(.tri-luxury-motion):not([id^="tri-agent-"]) { max-width: 96% !important; padding: 14px 14px !important; }
+  .chat-content { font-size: .89rem !important; line-height: 1.8 !important; }
+  .arabic-text, .arabic-quote-box { font-size: 1.16rem !important; padding: 11px 12px !important; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .chat-bubble.ai:not(.tri-luxury-motion):not([id^="tri-agent-"]), .typing-cursor { animation: none !important; transition: none !important; }
+}
+
+
+/* SUHAIL AI ADVANCED RESPONSE ADD-ON — presentation only */
+.chat-bubble.ai .chat-content { font-size:.94rem; line-height:1.85; overflow-wrap:anywhere; word-break:normal; }
+.chat-bubble.ai .chat-content > :first-child { margin-top:0 !important; }
+.chat-bubble.ai .chat-content > :last-child { margin-bottom:0 !important; }
+.chat-bubble.ai .chat-content h1,.chat-bubble.ai .chat-content h2,.chat-bubble.ai .chat-content h3,.chat-bubble.ai .chat-content h4 { line-height:1.45; margin:16px 0 8px; font-weight:800; }
+.chat-bubble.ai .chat-content h1 { font-size:1.22rem; }
+.chat-bubble.ai .chat-content h2 { font-size:1.12rem; }
+.chat-bubble.ai .chat-content h3,.chat-bubble.ai .chat-content h4 { font-size:1rem; }
+.chat-bubble.ai .chat-content p { margin:0 0 12px; }
+.chat-bubble.ai .chat-content ul,.chat-bubble.ai .chat-content ol { margin:8px 0 14px; padding-left:24px; }
+.chat-bubble.ai .chat-content li { margin:5px 0; padding-left:2px; }
+.chat-bubble.ai .chat-content hr { border:0; border-top:1px solid rgba(255,255,255,.14); margin:16px 0; }
+.chat-bubble.ai .chat-content a { color:#67e8f9; text-decoration:underline; overflow-wrap:anywhere; }
+.chat-bubble.ai .chat-content pre { max-width:100%; overflow:auto; white-space:pre; padding:12px; border-radius:10px; background:rgba(0,0,0,.48); border:1px solid rgba(0,255,163,.2); }
+.chat-bubble.ai .chat-content pre code { display:block; white-space:pre; background:transparent; border:0; padding:0; }
+.chat-bubble.ai .chat-content table { border-collapse:collapse; width:100%; }
+.chat-bubble.ai .chat-content th,.chat-bubble.ai .chat-content td { vertical-align:top; min-width:100px; }
+.chat-bubble.ai .chat-content blockquote { margin:12px 0; padding:10px 13px; border-left:3px solid #38bdf8; border-radius:8px; background:rgba(56,189,248,.07); }
+.chat-bubble.ai .arabic-text,.chat-bubble.ai .chat-content .arabic-text,.chat-bubble.ai .chat-content [dir="rtl"] { direction:rtl; text-align:right; font-family:'Amiri','Noto Nastaliq Urdu',serif; line-height:2.05; }
+.chat-bubble.ai .bubble-quick-actions { display:flex; flex-wrap:wrap; gap:7px; margin-top:12px; }
+.chat-bubble.ai .btn-action-pill:focus-visible,.chat-bubble.ai .btn-copy:focus-visible { outline:2px solid #67e8f9; outline-offset:3px; }
+@media(max-width:480px) { .chat-bubble.ai .chat-content { font-size:.9rem; line-height:1.8; } .chat-bubble.ai .chat-content th,.chat-bubble.ai .chat-content td { padding:7px; font-size:.78rem; } }
+@media(prefers-reduced-motion:reduce) { .chat-bubble.ai,.chat-bubble.ai * { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+
+</style>
 
   <link rel="manifest" href="/manifest.json">
 </head>
@@ -1107,49 +1341,35 @@ body.focus-reader-mode .exit-focus-btn {
   </div>
 </div>
 
-<!-- ================= ADMIN CONTROL CENTER MODAL ================= -->
-<div id="adminControlModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; align-items:center; justify-content:center; padding:15px; backdrop-filter:blur(6px);">
-  <div style="background:#131c21; border:1px solid #00a884; border-radius:16px; max-width:520px; width:100%; max-height:88vh; display:flex; flex-direction:column; padding:18px; color:#e9edef; box-shadow:0 15px 35px rgba(0,0,0,0.7);">
-    
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2a3942; padding-bottom:10px; margin-bottom:14px;">
-      <h3 style="margin:0; color:#00a884; font-size:1.15rem; display:flex; align-items:center; gap:8px;">
-        <i class="fa-solid fa-shield-halved"></i> Admin Control Center
-      </h3>
-      <button onclick="document.getElementById('adminControlModal').style.display='none'" style="background:transparent; border:none; color:#8696a0; font-size:1.5rem; cursor:pointer;">&times;</button>
+<!-- ================= ULTRA-LUXURY ADMIN CONTROL CENTER MODAL ================= -->
+<div id="adminControlModal" style="display:none; position:fixed; inset:0; background:radial-gradient(circle at center,rgba(5,10,14,.92),rgba(2,5,8,.98)); z-index:999999; align-items:center; justify-content:center; padding:14px; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);">
+  <div style="background:radial-gradient(circle at 15% 15%,rgba(20,32,40,.97),rgba(9,15,20,.99) 72%); border:1.5px solid rgba(0,255,163,.4); border-radius:22px; max-width:580px; width:100%; max-height:92vh; display:flex; flex-direction:column; padding:18px; color:#f1f5f9; box-shadow:0 25px 70px rgba(0,0,0,.85),0 0 32px rgba(0,255,163,.12); position:relative; overflow:hidden;">
+    <div style="position:absolute; top:-35px; left:25%; width:50%; height:70px; background:radial-gradient(ellipse,rgba(0,255,163,.22),transparent 70%); pointer-events:none;"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; border-bottom:1px solid rgba(255,255,255,.09); padding-bottom:12px; margin-bottom:12px; position:relative;">
+      <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+        <div style="width:36px;height:36px;flex:0 0 36px;border-radius:12px;background:linear-gradient(135deg,rgba(0,255,163,.18),rgba(2,132,199,.24));border:1px solid rgba(0,255,163,.45);display:flex;align-items:center;justify-content:center;color:#00ffa3;"><i class="fa-solid fa-shield-halved"></i></div>
+        <div><h3 style="margin:0;font-size:1.08rem;font-weight:800;color:#eafff7;">Admin Command Center</h3><div style="font-size:10px;color:#94a3b8;">Student management · Audit · Console tools</div></div>
+      </div>
+      <button type="button" aria-label="Close admin panel" onclick="document.getElementById('adminControlModal').style.display='none'" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);width:32px;height:32px;border-radius:10px;color:#cbd5e1;font-size:1.2rem;cursor:pointer;flex:0 0 32px;">&times;</button>
     </div>
-
-    <!-- 6 Admin Action Buttons -->
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
-      <button onclick="runAudit('all')" style="background:#1f2c34; border:1px solid #00a884; color:#00a884; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
-        <i class="fa-solid fa-brain"></i> All Users Chat Audit
-      </button>
-
-      <button onclick="runAudit('single')" style="background:#1f2c34; border:1px solid #25d366; color:#25d366; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
-        <i class="fa-solid fa-user-check"></i> Single User Audit
-      </button>
-
-      <button onclick="triggerAdminAction('change_plan')" style="background:#1f2c34; border:1px solid #eab308; color:#facc15; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
-        <i class="fa-solid fa-crown"></i> Change Plan / Upgrade
-      </button>
-
-      <button onclick="triggerAdminAction('toggle_block')" style="background:#1f2c34; border:1px solid #ef4444; color:#f87171; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
-        <i class="fa-solid fa-ban"></i> Block / Unblock User
-      </button>
-
-      <button onclick="triggerAdminAction('reset_limit')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
-        <i class="fa-solid fa-rotate-left"></i> Daily Limit Reset
-      </button>
-
-      <button onclick="triggerAdminAction('set_notice')" style="background:#1f2c34; border:1px solid #2a3942; color:#e9edef; padding:10px 6px; border-radius:10px; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
-        <i class="fa-solid fa-bullhorn"></i> Global Notice
-      </button>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:13px;">
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(0,255,163,.18);border-radius:10px;padding:8px 5px;text-align:center;"><div style="font-size:9px;color:#94a3b8;text-transform:uppercase;">Panel</div><div style="font-size:11px;font-weight:800;color:#00ffa3;">READY</div></div>
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(56,189,248,.18);border-radius:10px;padding:8px 5px;text-align:center;"><div style="font-size:9px;color:#94a3b8;text-transform:uppercase;">Access</div><div style="font-size:11px;font-weight:800;color:#38bdf8;">ADMIN</div></div>
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(245,158,11,.18);border-radius:10px;padding:8px 5px;text-align:center;"><div style="font-size:9px;color:#94a3b8;text-transform:uppercase;">Mode</div><div style="font-size:11px;font-weight:800;color:#fbbf24;">MANUAL</div></div>
     </div>
-
-    <!-- Output Area -->
-    <div id="adminPanelOutput" style="flex:1; overflow-y:auto; background:#0b141a; border:1px solid #222d34; border-radius:10px; padding:12px; font-size:0.85rem; line-height:1.6; color:#d1d7db; white-space:pre-wrap; min-height:190px;">
-      ऊपर दिए गए किसी भी टूल पर टैप करें...
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:13px;">
+      <button type="button" onclick="runAudit('all')" style="background:rgba(0,255,163,.04);border:1px solid rgba(0,255,163,.3);color:#00ffa3;padding:11px 7px;border-radius:11px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-brain"></i> All Users AI Audit</button>
+      <button type="button" onclick="runAudit('single')" style="background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.3);color:#38bdf8;padding:11px 7px;border-radius:11px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-user-gear"></i> Single Student Audit</button>
+      <button type="button" onclick="triggerAdminAction('change_plan')" style="background:rgba(250,204,21,.04);border:1px solid rgba(250,204,21,.3);color:#facc15;padding:11px 7px;border-radius:11px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-crown"></i> Tier / Plan</button>
+      <button type="button" onclick="triggerAdminAction('toggle_block')" style="background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.3);color:#f87171;padding:11px 7px;border-radius:11px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-ban"></i> Block / Unblock</button>
+      <button type="button" onclick="triggerAdminAction('reset_limit')" style="background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.3);color:#c084fc;padding:11px 7px;border-radius:11px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-rotate-left"></i> Reset Daily Limit</button>
+      <button type="button" onclick="triggerAdminAction('set_notice')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.15);color:#e2e8f0;padding:11px 7px;border-radius:11px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-bullhorn"></i> Global Notice</button>
+      <button type="button" onclick="triggerAdminAction('clear_cache')" style="background:rgba(244,63,94,.04);border:1px solid rgba(244,63,94,.3);color:#fb7185;padding:11px 7px;border-radius:11px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-broom"></i> Clear Local Draft Cache</button>
+      <button type="button" onclick="triggerAdminAction('export_terminal')" style="background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.3);color:#34d399;padding:11px 7px;border-radius:11px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-download"></i> Export Console Logs</button>
     </div>
-
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;padding:0 3px;"><span style="font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;">Execution Output</span><div style="display:flex;gap:10px;"><button type="button" onclick="document.getElementById('adminPanelOutput').textContent='Console cleared. Ready for next action.';" style="background:transparent;border:0;color:#94a3b8;font-size:10px;font-weight:700;cursor:pointer;">Clear</button><button type="button" onclick="if(navigator.clipboard){navigator.clipboard.writeText(document.getElementById('adminPanelOutput').innerText).then(()=>alert('Console output copied.')).catch(()=>alert('Copy failed.'));}else{alert('Clipboard is not available in this browser.');}" style="background:transparent;border:0;color:#38bdf8;font-size:10px;font-weight:700;cursor:pointer;">Copy</button></div></div>
+    <div id="adminPanelOutput" style="flex:1;overflow-y:auto;background:#070d11;border:1px solid rgba(0,255,163,.22);border-radius:12px;padding:13px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.8rem;line-height:1.65;color:#a7f3d0;white-space:pre-wrap;min-height:150px;max-height:30vh;overflow-wrap:anywhere;box-shadow:inset 0 0 20px rgba(0,0,0,.7);">&gt; Admin console ready.
+&gt; Select an action above to begin.</div>
   </div>
 </div>
 
@@ -1182,7 +1402,7 @@ function createAgentLoaderUI(chatBox) {
     <div style="position:relative;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.09);">
       <div style="display:flex;align-items:center;gap:10px;min-width:0;">
         <div style="width:30px;height:30px;flex:none;border-radius:50%;background:linear-gradient(135deg,#00ffa3,#0284c7);display:flex;align-items:center;justify-content:center;color:#00130e;font-weight:900;box-shadow:0 0 14px rgba(0,255,163,.45);animation:triPulseRing 2s infinite ease-in-out;">⚡</div>
-        <div style="min-width:0;"><div style="font-size:12px;font-weight:900;letter-spacing:.65px;background:linear-gradient(90deg,#fff,#67e8f9,#34d399);-webkit-background-clip:text;background-clip:text;color:transparent;">SUHAIL AI TRI-AGENT PRO</div><div style="font-size:10px;color:#94a3b8;margin-top:3px;">Live build pipeline · real output counters</div></div>
+        <div style="min-width:0;"><div style="font-size:12px;font-weight:900;letter-spacing:.65px;background:linear-gradient(90deg,#fff,#67e8f9,#34d399);-webkit-background-clip:text;background-clip:text;color:transparent;">SUHAIL AI TRI-AGENT PRO</div><div style="font-size:10px;color:#94a3b8;margin-top:3px;">Single-response build · live status</div></div>
       </div>
       <span id="${cardId}-percent" style="flex:none;font-size:11px;font-weight:800;color:#00ffa3;background:rgba(0,255,163,.1);border:1px solid rgba(0,255,163,.32);padding:4px 9px;border-radius:20px;">0%</span>
     </div>
@@ -1208,7 +1428,7 @@ function createAgentLoaderUI(chatBox) {
   const logs = [
     'Preparing request payload…', 'Waiting for model response…', 'Checking response structure…',
     'Appending generated source…', 'Updating output counters…', 'Preserving existing application logic…',
-    'Checking for conversational residue…', 'Preparing continuation context…', 'Preparing package metadata…'
+    'Checking for conversational residue…', 'Waiting for complete response…', 'Preparing package metadata…'
   ];
   let tick = 0;
   const startedAt = Date.now();
@@ -1258,6 +1478,7 @@ function triAgentProgress(cardId, pct, log, stageName) {
 async function runTriAgentMegaCode(userPrompt, chatBox) {
   const text = String(userPrompt || '').trim();
   if (!text) return;
+
   const box = chatBox || document.getElementById('chat-box') || document.body;
   const cardId = createAgentLoaderUI(box);
   const startedAt = Date.now();
@@ -1266,87 +1487,79 @@ async function runTriAgentMegaCode(userPrompt, chatBox) {
   const targetFileName = targetMatch ? targetMatch[1] : 'index.html';
   const isHtmlTarget = /\.html$/i.test(targetFileName);
   const multiFile = /(separate|split|alag|folder|modular|multiple files|multiple file)/i.test(text);
-  const TARGET_LINES = 4000;
-  const MIN_CHUNKS = 8;
-  const MAX_CHUNKS = 16;
   let fullCode = '';
-  let chunks = 0;
+  let finishReason = '';
 
-  const cleanupChunk = value => {
-    let chunk = String(value || '').trim();
-    chunk = chunk.replace(/^```(?:html|javascript|js|css|json|python|php|typescript|tsx|jsx)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
-    // Remove common conversational lead-ins, but do not strip real code comments.
-    chunk = chunk.replace(/^(?:Here(?:'s| is) the code|Sure[,!]?|Certainly[,!]?|Below is the code)\s*:?\s*/i, '');
-    if (chunks > 0) chunk = chunk.replace(/^<!doctype\s+html>\s*/i, '').replace(/^<html[^>]*>\s*/i, '').replace(/^<head[^>]*>\s*/i, '');
-    return chunk;
+  const finishTimer = () => {
+    const timer = triAgentTelemetryTimers.get(cardId);
+    if (timer) clearInterval(timer);
+    triAgentTelemetryTimers.delete(cardId);
   };
-  const lineCount = () => fullCode ? fullCode.split(/\r?\n/).length : 0;
-  const updateLiveCode = () => { window[`triAgentWorkingCode_${cardId}`] = fullCode; };
-  const finishTimer = () => { const timer = triAgentTelemetryTimers.get(cardId); if (timer) clearInterval(timer); triAgentTelemetryTimers.delete(cardId); };
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
   try {
-    triAgentSetStep(cardId, 1, `Agent 1 · Blueprinting ${targetFileName}`, '⚡', '#38e0b3');
-    triAgentProgress(cardId, 8, `Defining architecture for ${targetFileName}…`, 'Architect');
-    await new Promise(resolve => setTimeout(resolve, 250));
-    triAgentSetStep(cardId, 1, 'Agent 1 · Blueprint approved', '✅', '#4ade80');
+    triAgentSetStep(cardId, 1, `Agent 1 · Preparing ${targetFileName}`, '⚡', '#38e0b3');
+    triAgentProgress(cardId, 12, 'Preparing a single complete-file request…', 'Preparing');
+    await wait(180);
+    triAgentSetStep(cardId, 1, 'Agent 1 · Request ready', '✅', '#4ade80');
+    triAgentSetStep(cardId, 2, 'Agent 2 · Generating the complete file in one response…', '⚡', '#38bdf8');
+    triAgentProgress(cardId, 28, 'Sending one request · no batches or continuations', 'Generating');
 
-    while (chunks < MAX_CHUNKS) {
-      const batchNumber = chunks + 1;
-      const progress = Math.min(90, 10 + Math.round((batchNumber / MAX_CHUNKS) * 78));
-      triAgentProgress(cardId, progress, `Requesting batch ${batchNumber}/${MAX_CHUNKS}…`, `Batch ${batchNumber}`);
-      triAgentSetStep(cardId, 2, `Agent 2 · Generating batch ${batchNumber}/${MAX_CHUNKS}`, '⚡', '#38bdf8');
-      const existingLines = lineCount();
-      const systemPrompt = `You are Suhail AI's senior production software engineer. Output source code only, with no preamble, markdown fences, batch summaries, or conversational sign-off. Respect the requested language and file type. Do not invent fake functionality or pad with meaningless comments. Build complete, robust, maintainable code. Target file: ${targetFileName}.`;
-      const batchPrompt = batchNumber === 1
-        ? `Implement this request as a complete production-ready project/file: ${text}\nTarget file: ${targetFileName}. Write substantial, coherent code with validation, error handling, accessibility, responsive styling where relevant, and clear code comments. Begin with the real first line of the file. Raw code only.`
-        : `Continue the SAME file ${targetFileName} from the end of the code excerpt below. Current accumulated size: ${existingLines} lines. Overall target: approximately ${TARGET_LINES}+ lines if the requested functionality genuinely warrants that size; never add filler just to hit a number. Do not repeat the file beginning. Continue directly with valid code only.\n\nLAST PART OF CURRENT FILE (context only; do not repeat):\n${fullCode.slice(-9000)}\n\nWrite the next logically necessary section now. No summaries or conversational text.`;
-      const response = await fetch('/api?action=tri_chunk', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: batchPrompt }] })
-      });
-      let data = {};
-      try { data = await response.json(); } catch (_) {}
-      if (!response.ok || data.error) {
-        const errorMessage = data && data.error ? (typeof data.error === 'string' ? data.error : data.error.message || 'API error') : `HTTP ${response.status}`;
-        if (fullCode.length > 500) { triAgentProgress(cardId, progress, `Batch ${batchNumber} failed; packaging saved output`, 'Recovering'); break; }
-        throw new Error(`Tri-Agent API error: ${errorMessage}`);
-      }
-      const choice = data && data.choices && data.choices[0];
-      if (!choice || !choice.message || typeof choice.message.content !== 'string') {
-        if (fullCode.length > 500) break;
-        throw new Error('API returned no usable code content.');
-      }
-      const chunk = cleanupChunk(choice.message.content);
-      if (!chunk) { if (fullCode.length > 500) break; throw new Error('Model returned an empty code batch.'); }
-      fullCode += (fullCode && !fullCode.endsWith('\n') ? '\n' : '') + chunk + '\n';
-      chunks++;
-      updateLiveCode();
-      try { localStorage.setItem(cacheDraftKey, fullCode); } catch (_) {}
-      const liveLines = document.getElementById(`${cardId}-stat-lines`);
-      if (liveLines) liveLines.textContent = String(lineCount());
-      if (chunks >= MIN_CHUNKS && lineCount() >= TARGET_LINES) break;
-      if (chunks < MAX_CHUNKS) await new Promise(resolve => setTimeout(resolve, 900));
+    // One model request only. Ask for source code, not Markdown fences or explanations.
+    const systemPrompt = `You are Suhail AI's senior production software engineer. Return the complete requested file in ONE response. Output RAW SOURCE CODE ONLY: no Markdown code fences, no introduction, no batch labels, no summaries, and no sign-off. Do not split the answer into multiple batches and do not say that you will continue later. Include all required opening and closing tags/braces and all essential logic. Never use filler merely to inflate line count. If the user explicitly requests a single HTML file, put its CSS and JavaScript inside that one HTML file. Target file: ${targetFileName}.`;
+    const userPromptOnce = `Create the entire requested project/file now in one complete response. Request: ${text}\nTarget filename: ${targetFileName}\nRequirements: complete, coherent, production-minded implementation; handle errors and validation; responsive and accessible UI where relevant; preserve all stated constraints; no placeholders for essential features; raw code only. Do not split into batches, do not insert explanatory prose, and do not wrap the code in HTML/JS/other Markdown fences.`;
+
+    const response = await fetch('/api?action=tri_chunk', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPromptOnce }
+      ] })
+    });
+
+    let data = {};
+    try { data = await response.json(); } catch (_) {}
+    if (!response.ok || data.error) {
+      const message = data && data.error
+        ? (typeof data.error === 'string' ? data.error : data.error.message || 'API error')
+        : `HTTP ${response.status}`;
+      throw new Error(`Tri-Agent API error: ${message}`);
     }
 
-    if (!fullCode.trim()) throw new Error('Tri-Agent generated no code.');
-    triAgentSetStep(cardId, 3, 'Agent 3 · Cleaning and packaging', '⚡', '#facc15');
-    triAgentProgress(cardId, 94, 'Removing trailing conversational residue and building ZIP…', 'Packaging');
-    let cleanCode = fullCode
-      .replace(/\n?\*?\s*Batch\s*\d+\s*\/\s*\d+[^\n]*\n?[\s\S]*$/i, '')
-      .replace(/\n?This completes (?:the|your)[\s\S]*$/i, '')
-      .replace(/\n?Let me know if you need[\s\S]*$/i, '')
+    const choice = data && data.choices && data.choices[0];
+    if (!choice || !choice.message || typeof choice.message.content !== 'string' || !choice.message.content.trim()) {
+      throw new Error('Model ne ek mukammal code response nahi diya. Dobara try karein.');
+    }
+    finishReason = choice.finish_reason || '';
+    fullCode = choice.message.content.trim()
       .replace(/^```(?:html|javascript|js|css|json|python|php|typescript|tsx|jsx)?\s*/i, '')
-      .replace(/\s*```\s*$/i, '').trim();
-    if (isHtmlTarget) {
-      if (/<script\b/i.test(cleanCode) && !/<\/script>/i.test(cleanCode)) cleanCode += '\n<' + '/script>';
-      if (/<style\b/i.test(cleanCode) && !/<\/style>/i.test(cleanCode)) cleanCode += '\n</style>';
-      if (!/<\/body>/i.test(cleanCode)) cleanCode += '\n</body>';
-      if (!/<\/html>/i.test(cleanCode)) cleanCode += '\n</html>';
-    }
+      .replace(/\s*```\s*$/i, '')
+      .replace(/^(?:Here(?:'s| is) the code|Sure[,!]?|Certainly[,!]?|Below is the code)\s*:?\s*/i, '')
+      .trim();
+    window[`triAgentWorkingCode_${cardId}`] = fullCode;
+    try { localStorage.setItem(cacheDraftKey, fullCode); } catch (_) {}
+
+    triAgentProgress(cardId, 78, 'Complete response received · checking source and preparing preview…', 'Validating');
+    triAgentSetStep(cardId, 2, `Agent 2 · Received ${fullCode.split(/\r?\n/).length.toLocaleString()} lines`, '✅', '#4ade80');
+
+    // Keep the polished loading card visible briefly so the transition feels intentional.
+    const minimumDisplayMs = 2200;
+    const remainingDisplayMs = minimumDisplayMs - (Date.now() - startedAt);
+    if (remainingDisplayMs > 0) await wait(remainingDisplayMs);
+
+    triAgentSetStep(cardId, 3, 'Agent 3 · Validating and packaging the file', '⚡', '#facc15');
+    triAgentProgress(cardId, 91, 'Building ZIP and preparing final code card…', 'Packaging');
+
+    // Do not silently invent missing HTML/JS closers; if the model hit its output cap,
+    // warn the user that the returned file may be incomplete.
+    const possiblyTruncated = finishReason === 'length';
+    const cleanCode = fullCode;
     const actualLines = cleanCode.split(/\r?\n/).length;
     const duration = ((Date.now() - startedAt) / 1000).toFixed(1);
     const kb = (new Blob([cleanCode]).size / 1024).toFixed(1);
     if (typeof JSZip === 'undefined') throw new Error('JSZip did not load; cannot create ZIP.');
+
     const zip = new JSZip();
     if (multiFile && isHtmlTarget) {
       const styleMatch = cleanCode.match(/<style\b[^>]*>([\s\S]*?)<\/style>/i);
@@ -1359,8 +1572,11 @@ async function runTriAgentMegaCode(userPrompt, chatBox) {
       zip.file('index.html', modularHtml);
       if (css) zip.file('style.css', css);
       if (js) zip.file('app.js', js);
-    } else zip.file(targetFileName, cleanCode);
-    zip.file('README.txt', `Generated by Suhail AI Tri-Agent\nTarget: ${targetFileName}\nBatches completed: ${chunks}\nOutput lines: ${actualLines}\nSize: ${kb} KB\nElapsed: ${duration}s\nTarget lines: ${TARGET_LINES}; maximum batches: ${MAX_CHUNKS}. Output size depends on the request and model response; a line target is not a guarantee.`);
+    } else {
+      zip.file(targetFileName, cleanCode);
+    }
+    zip.file('README.txt', `Generated by Suhail AI Tri-Agent\nMode: Single response (one model request)\nTarget: ${targetFileName}\nOutput lines: ${actualLines}\nSize: ${kb} KB\nElapsed: ${duration}s\nModel finish reason: ${finishReason || 'not supplied'}\n${possiblyTruncated ? 'WARNING: Model output limit was reached; inspect the source for truncation.' : 'Note: one-response generation is subject to the model/API output limit.'}`);
+
     const blob = await zip.generateAsync({ type: 'blob' });
     const downloadUrl = URL.createObjectURL(blob);
     const previewUrl = isHtmlTarget ? URL.createObjectURL(new Blob([cleanCode], { type: 'text/html' })) : '';
@@ -1368,9 +1584,11 @@ async function runTriAgentMegaCode(userPrompt, chatBox) {
     window[`code_${cardId}`] = cleanCode;
     window[`blob_${cardId}`] = blob;
     window[`filename_${cardId}`] = zipFileName;
-    triAgentProgress(cardId, 100, `Complete · ${chunks} batches · ${actualLines} lines`, 'Done');
-    triAgentSetStep(cardId, 2, `Agent 2 · ${actualLines} lines assembled`, '✅', '#4ade80');
+
+    triAgentProgress(cardId, 100, `Ready · one response · ${actualLines.toLocaleString()} lines`, 'Complete');
+    triAgentSetStep(cardId, 2, `Agent 2 · ${actualLines.toLocaleString()} lines assembled`, '✅', '#4ade80');
     triAgentSetStep(cardId, 3, `Agent 3 · ZIP ready (${kb} KB)`, '✅', '#4ade80');
+
     const card = document.getElementById(cardId);
     if (card) {
       finishTimer();
@@ -1384,19 +1602,20 @@ async function runTriAgentMegaCode(userPrompt, chatBox) {
         <div aria-hidden="true" style="position:absolute;top:-30px;left:15%;width:70%;height:65px;background:radial-gradient(ellipse,rgba(0,255,163,.25),transparent 70%);pointer-events:none;"></div>
         <div style="position:relative;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:15px;">
           <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-            <div style="width:38px;height:38px;flex:none;border-radius:13px;background:linear-gradient(135deg,rgba(0,255,163,.2),rgba(2,132,199,.25));border:1px solid rgba(0,255,163,.4);display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12);">📦</div>
-            <div style="min-width:0;"><div style="font-size:13px;font-weight:900;letter-spacing:.35px;background:linear-gradient(90deg,#fff,#67e8f9,#34d399);-webkit-background-clip:text;background-clip:text;color:transparent;">SUHAIL AI TRI-AGENT PACKAGE</div><div style="font-size:10.5px;color:#a4b4c2;margin-top:4px;overflow-wrap:anywhere;">${targetFileName} · <b style="color:#00ffa3;">${actualLines.toLocaleString()} lines</b> · ${kb} KB · ${duration}s</div></div>
+            <div style="width:38px;height:38px;flex:none;border-radius:13px;background:linear-gradient(135deg,rgba(0,255,163,.2),rgba(2,132,199,.25));border:1px solid rgba(0,255,163,.4);display:flex;align-items:center;justify-content:center;font-size:19px;">📦</div>
+            <div style="min-width:0;"><div style="font-size:13px;font-weight:900;letter-spacing:.35px;background:linear-gradient(90deg,#fff,#67e8f9,#34d399);-webkit-background-clip:text;background-clip:text;color:transparent;">SUHAIL AI · COMPLETE CODE</div><div style="font-size:10.5px;color:#a4b4c2;margin-top:4px;overflow-wrap:anywhere;">${targetFileName} · <b style="color:#00ffa3;">${actualLines.toLocaleString()} lines</b> · ${kb} KB · ${duration}s</div></div>
           </div>
-          <span style="flex:none;font-size:10px;font-weight:800;color:#00ffa3;background:rgba(0,255,163,.1);border:1px solid rgba(0,255,163,.3);padding:4px 9px;border-radius:20px;white-space:nowrap;">${chunks} batches</span>
+          <span style="flex:none;font-size:10px;font-weight:800;color:#00ffa3;background:rgba(0,255,163,.1);border:1px solid rgba(0,255,163,.3);padding:4px 9px;border-radius:20px;white-space:nowrap;">ONE PASS</span>
         </div>
+        ${possiblyTruncated ? '<div style="position:relative;margin:0 0 12px;padding:10px 12px;border-radius:10px;border:1px solid rgba(251,191,36,.4);background:rgba(251,191,36,.08);color:#fcd34d;font-size:11px;">⚠️ Model output limit reached. The code may be incomplete; inspect it before using it.</div>' : ''}
         <div style="position:relative;display:flex;flex-direction:column;gap:10px;">
-          <a href="${downloadUrl}" download="${zipFileName}" style="display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;text-decoration:none;background:linear-gradient(110deg,#047857,#00d26a,#059669);background-size:200% auto;animation:triShimmer 3s infinite linear;color:#fff;padding:14px 12px;border-radius:14px;font-weight:850;font-size:13px;letter-spacing:.2px;box-shadow:0 8px 25px rgba(0,210,106,.35);border:1px solid rgba(255,255,255,.2);transition:transform .2s ease,filter .2s ease;">⬇️ Download Production ZIP · ${actualLines.toLocaleString()} Lines</a>
+          <a href="${downloadUrl}" download="${zipFileName}" style="display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;text-decoration:none;background:linear-gradient(110deg,#047857,#00d26a,#059669);background-size:200% auto;animation:triShimmer 3s infinite linear;color:#fff;padding:14px 12px;border-radius:14px;font-weight:850;font-size:13px;box-shadow:0 8px 25px rgba(0,210,106,.35);border:1px solid rgba(255,255,255,.2);">⬇️ Download ZIP · ${actualLines.toLocaleString()} Lines</a>
           <div style="display:flex;gap:8px;flex-wrap:nowrap;">
-            ${isHtmlTarget ? `<a href="${previewUrl}" target="_blank" rel="noopener" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;background:rgba(255,255,255,.04);border:1px solid rgba(56,189,248,.42);color:#38bdf8;padding:10px 4px;border-radius:12px;font-size:11.5px;font-weight:750;backdrop-filter:blur(10px);">👁 Preview</a>` : ''}
-            <button type="button" onclick="shareProjectZip('${cardId}')" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid rgba(0,255,163,.4);color:#00ffa3;padding:10px 4px;border-radius:12px;font-size:11.5px;font-weight:750;cursor:pointer;backdrop-filter:blur(10px);">↗ Share</button>
-            <button type="button" onclick="navigator.clipboard.writeText(window['code_${cardId}']).then(()=>this.textContent='✓ Copied!').catch(()=>alert('Copy unavailable; use Preview or ZIP.'))" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,184,.3);color:#e2e8f0;padding:10px 4px;border-radius:12px;font-size:11.5px;font-weight:750;cursor:pointer;backdrop-filter:blur(10px);">▣ Copy code</button>
+            ${isHtmlTarget ? `<a href="${previewUrl}" target="_blank" rel="noopener" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;text-decoration:none;background:rgba(255,255,255,.04);border:1px solid rgba(56,189,248,.42);color:#38bdf8;padding:10px 4px;border-radius:12px;font-size:11.5px;font-weight:750;">👁 Preview</a>` : ''}
+            <button type="button" onclick="shareProjectZip('${cardId}')" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);border:1px solid rgba(0,255,163,.4);color:#00ffa3;padding:10px 4px;border-radius:12px;font-size:11.5px;font-weight:750;cursor:pointer;">↗ Share</button>
+            <button type="button" onclick="navigator.clipboard.writeText(window['code_${cardId}']).then(()=>this.textContent='✓ Copied!').catch(()=>alert('Copy unavailable; use Preview or ZIP.'))" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,184,.3);color:#e2e8f0;padding:10px 4px;border-radius:12px;font-size:11.5px;font-weight:750;cursor:pointer;">▣ Copy code</button>
           </div>
-          <div style="font-size:9px;color:#718693;text-align:center;">ZIP package is ready · Preview and copy remain available</div>
+          <div style="font-size:9px;color:#718693;text-align:center;">Generated in one model response · no batch continuation</div>
         </div>`;
     }
   } catch (error) {
@@ -1404,7 +1623,7 @@ async function runTriAgentMegaCode(userPrompt, chatBox) {
     const card = document.getElementById(cardId);
     if (card) {
       const msg = String(error && error.message ? error.message : error).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-      card.innerHTML = `<div style="color:#fb7185;font-size:13px;padding:8px;"><strong>Tri-Agent Error</strong><div style="margin-top:6px;">${msg}</div><div style="margin-top:6px;color:#9fb0bf;font-size:11px;">Any partial draft may be saved in this browser under the Tri-Agent draft key.</div></div>`;
+      card.innerHTML = `<div style="color:#fb7185;font-size:13px;padding:8px;"><strong>Tri-Agent Error</strong><div style="margin-top:6px;">${msg}</div><div style="margin-top:6px;color:#9fb0bf;font-size:11px;">No batch fallback was used. Try a smaller scope if the model/API output limit is reached.</div></div>`;
     }
   } finally {
     delete window[`triAgentWorkingCode_${cardId}`];
@@ -1571,6 +1790,9 @@ function renderAiBubble(div, text, aiName) {
     <div class="bubble-quick-actions">
       <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('simplify')">🧠 आसान समझाओ</button>
       <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('detail')">📚 गहराई में बताओ</button>
+      <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('example')">💡 मिसाल दो</button>
+      <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('summary')">📝 خلاصہ</button>
+      <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('quiz')">❓ टेस्ट लो</button>
     </div>
   `;
 }
@@ -2089,16 +2311,47 @@ window.toggleSpeech = function(btn) {
       content: m.text
     }));
 
-    // Density aur Deep Research ka instruction jodna
+    // Response quality: AI ko saaf, munazzam aur padhne mein aasaan jawab dene ki hidayat.
+    // Sirf aam sawalat par formatting lagayein; chhote paighamat ko bila-wajah lamba na karein.
+    const presentationInstruction = isToolCall ? '' : `
+
+[SUHAIL AI RESPONSE QUALITY RULES:
+- User ki zaban aur script ko follow karein (Urdu, Roman Urdu, Hindi ya English); bila-wajah zaban na badlein.
+- Jawab seedha aur sawal ke mutabiq shuru karein. Aam salam/short message ka jawab fitri aur mukhtasar rakhein.
+- Tafseeli jawab mein munasib Markdown formatting use karein: chhoti wazeh headings (##), bullets/numbered steps, zaroorat par table, aur aham alfaaz ko **bold** karein.
+- Ek hi baat baar-baar na dohrayein. Lambi be-rabt paragraphs ke bajaye chhote paragraphs aur logical order rakhein.
+- Misal, steps, faide-nuqsan, ya nateeja sirf jab sawal ke liye mufeed ho tab dein; har jawab ko zabardasti headings mein na baantein.
+- Code ho to valid fenced code block mein dein. Math ho to calculation ke steps saaf dikhayein.
+- Deeni/ilmiy sawalat mein adab aur istilahat ka lihaz rakhein; Qur'an, Hadith, kitab, hawala, ya quote gharr kar pesh na karein. Yaqeen na ho to wazeh batayein.
+- User ne jitni tafseel maangi hai usi ke mutabiq jawab dein: na be-wajah mukhtasar, na ghair-zaroori taur par lamba.
+- Sirf jawab ka matn dein; apni formatting ya in hidayaat ka zikr na karein.]
+`;
+
+    // Response style + density + optional deep-research context
     const density = document.getElementById('selResponseDensity')?.value || 'detailed';
-    let promptInstruction = density === 'concise' ? ' [Jawab nihayat to-the-point aur mukhtasar dein]' : '';
+    const responseStyleInstruction = `
+[SUHAIL AI RESPONSE QUALITY RULES]
+- User ke sawal ka seedha jawab pehle dein; be-maqsad muqaddima na likhein.
+- User jis zaban aur script mein sawal kare, usi zaban/script mein jawab dein, jab tak user doosri zaban na maange.
+- Jawab ko readable Markdown mein dein: zaroorat ke mutabiq chhote headings, paragraphs, numbered steps, bullets, examples aur tables.
+- Har jawab ko zabardasti headings ya table mein na badlein. Simple sawal ka simple jawab dein.
+- Taleemi sawal mein asaan mafhoom, step-by-step tashreeh, munasib misaal aur zaroorat par short recap dein.
+- Maths mein zaroori calculation steps dikhayein; sirf final number na dein jab tak user short answer na maange.
+- Arabic grammar mein diye gaye exact lafz/harakaat ka lihaz rakhein; ghair-yaqini baat ko yaqini keh kar na likhein.
+- Deeni masail mein adab aur hawale ki durustgi ka lihaz rakhein. Qur'an/Hadith ka lafzi hawala ya number yaqeen ke baghair invent na karein.
+- Programming mein root cause samjhein; compatible code dein. Existing IDs, API routes, login aur event listeners bila-zaroorat na badlein.
+- Ghair-mutalliq lambi baat, repetition aur fake citations se bachein.
+- Agar maloomat/source access na ho to saaf bata dein; andazay ko fact na banayein.
+${density === 'concise' ? '- RESPONSE LENGTH: concise; sirf zaroori points aur direct answer.' : density === 'detailed' ? '- RESPONSE LENGTH: detailed but organized; concepts, steps aur examples ko munasib tafseel se samjhayen.' : '- RESPONSE LENGTH: balanced; direct answer ke baad zaroori explanation aur example dein.'}
+`;
+    let promptInstruction = responseStyleInstruction;
 
     if (isDeepResearchEnabled) {
-      let fullContext = "";
+      let fullContext = '';
       document.querySelectorAll('.chat-bubble').forEach(b => {
-        fullContext += b.innerText.trim() + "\n";
+        fullContext += (b.innerText || '').trim() + '\n';
       });
-      promptInstruction += `\n[DEEP RESEARCH ACTIVE: Pichli tamaam guftagu aur nikaat ka gehri tehqeeq ke sath ihata karein: ${fullContext.substring(0, 1500)}]`;
+      promptInstruction += `\n[DEEP RESEARCH MODE] Relevant previous conversation ko context banayein. Claims, assumptions aur open questions alag rakhein. Agar browsing/source access available nahi, to web research ka jhoota dawa na karein. Relevant context:\n${fullContext.substring(0, 1500)}`;
     }
 
     try {
@@ -2106,7 +2359,7 @@ window.toggleSpeech = function(btn) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          prompt: text + promptInstruction,
+          prompt: text + presentationInstruction + promptInstruction,
           phone: currentUser.phone,
           history: historyContext,
           isTool: isToolCall,
@@ -2190,6 +2443,9 @@ function typeWriterEffect(bubbleElement, fullText, aiName) {
         <div class="bubble-quick-actions" style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
           <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('simplify')">🧠 आसान समझाओ</button>
           <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('detail')">📚 गहराई में बताओ</button>
+          <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('example')">💡 मिसाल दो</button>
+          <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('summary')">📝 خلاصہ</button>
+          <button type="button" class="btn-action-pill" onclick="triggerFollowupAction('quiz')">❓ टेस्ट लो</button>
         </div>
       `;
 
@@ -2412,6 +2668,31 @@ function renderAiBubble(div, text, aiName) {
         out.innerText = "Error: " + e.message;
       }
     }
+
+
+    if (type === 'clear_cache') {
+      if (!confirm('Sirf is browser ke local drafts/action counters clear honge. Continue?')) return;
+      localStorage.removeItem('suhail_mega_code_draft');
+      localStorage.removeItem('suhail_quick_action_count');
+      localStorage.removeItem('suhail_quick_action_date');
+      out.textContent = '[LOCAL CACHE CLEARED] Local drafts and quick-action counters removed. Server/Firebase data was not changed.';
+      return;
+    }
+
+    if (type === 'export_terminal') {
+      const content = out ? out.innerText : 'No console output';
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `SuhailAI_Admin_Logs_${Date.now()}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      out.textContent += '\n[EXPORT] Console log download requested.';
+      return;
+    }
   }
 
   renderUserUI();
@@ -2608,11 +2889,16 @@ function triggerFollowupAction(actionType) {
 
   let promptText = '';
   if (actionType === 'simplify') {
-    promptText = 'ऊपर दिए गए जवाब को और अधिक आसान मिसालों और सरल भाषा में समझाएं।';
+    promptText = 'Pichhle AI jawab ko asaan Roman Urdu/Hindi mein, chhote steps aur rozmarrah ki misaal ke saath samjhao. Agar sawal Urdu script mein tha to Urdu script hi rakho.';
   } else if (actionType === 'detail') {
-    promptText = 'ऊपर दिए गए जवाब को मुकम्मल गहराई, बुनियादी उसूलों और पूरी तफ़सील से बताएं।';
+    promptText = 'Pichhle jawab ko mazeed tafseel, bunyadi usool, step-by-step tashreeh aur relevant examples ke saath samjhao. Repetition se bacho.';
+  } else if (actionType === 'example') {
+    promptText = 'Pichhle jawab ke concept ko samjhane ke liye 3 relevant, mukhtalif aur asaan misaalein do.';
+  } else if (actionType === 'summary') {
+    promptText = 'Pichhle jawab ka mukhtasar, durust aur organized khulasa do; sirf key points rakho.';
+  } else if (actionType === 'quiz') {
+    promptText = 'Pichhle topic par 5 sawalat ka chhota test banao. Pehle sirf sawalat do, answers foran na do. User jawab de to phir check karke samjhao.';
   }
-
   if (!promptText) return;
 
   localStorage.setItem('suhail_quick_action_count', (currentUsage + 1).toString());
