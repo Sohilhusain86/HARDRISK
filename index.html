@@ -1571,7 +1571,7 @@ async function runTriAgentMegaCode(userPrompt, chatBox) {
       const js = scriptMatch ? scriptMatch[1].trim() : '';
       let modularHtml = cleanCode;
       if (styleMatch) modularHtml = modularHtml.replace(styleMatch[0], '<link rel="stylesheet" href="style.css">');
-      if (scriptMatch) modularHtml = modularHtml.replace(scriptMatch[0], '<script src="app.js"><' + '/script>');
+      if (scriptMatch) modularHtml = modularHtml.replace(scriptMatch[0], '<script src="app.js"></script><' + '/script>');
       zip.file('index.html', modularHtml);
       if (css) zip.file('style.css', css);
       if (js) zip.file('app.js', js);
@@ -3574,6 +3574,8 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
   
+]
+}
 </script>
 
 <script src="/admin-dashboard.js"></script>
@@ -3720,5 +3722,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
 <button class="exit-focus-btn" onclick="toggleFocusMode()">✕ Exit Reader Mode</button>
   
+</script>
 </body>
 </html>
