@@ -347,8 +347,6 @@ html.screen-condensed {
     .arabic-text { font-family: 'Amiri', 'Noto Nastaliq Urdu', serif !important; font-size: 1.15rem; line-height: 1.8; direction: rtl; text-align: right; display: block; }
 
     .bubble-actions { display: flex; justify-content: flex-end; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 4px; }
-    /* Simple chat response mode: message text stays clean; utility buttons remain available elsewhere. */
-    /* Action buttons restored */
     .btn-copy { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 3px 6px; border-radius: 4px; }
     .btn-copy:hover { color: var(--primary-green); background: rgba(255,255,255,0.05); }
 
@@ -769,7 +767,7 @@ body.focus-reader-mode .exit-focus-btn {
       50% { box-shadow:0 24px 64px rgba(0,0,0,.78),0 0 32px rgba(56,189,248,.22); border-color:rgba(56,189,248,.48); }
     }
     @keyframes authAmbientPulse { 0%,100%{opacity:.55;transform:translateY(0)} 50%{opacity:1;transform:translateY(3px)} }
-    #auth-modal { position:fixed; inset:0; z-index:999999; background:radial-gradient(circle at 50% 25%,rgba(13,35,42,.88),rgba(4,9,13,.97) 72%) !important; padding:16px !important; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
+    #auth-modal { position:fixed !important; inset:0 !important; z-index:999999 !important; background:radial-gradient(circle at 50% 25%,rgba(13,35,42,.88),rgba(4,9,13,.97) 72%) !important; padding:16px !important; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
     #auth-modal .auth-card { box-sizing:border-box; width:100%; max-width:430px; max-height:92dvh; overflow-y:auto; overflow-x:hidden; position:relative; isolation:isolate; gap:13px; padding:26px 22px 22px; border-radius:24px; border:1.5px solid rgba(0,255,163,.38); background:radial-gradient(circle at 15% 10%,rgba(29,46,55,.98),rgba(9,18,24,.99) 72%); animation:authLuxuryGlow 5s ease-in-out infinite; }
     #auth-modal .auth-card:before { content:""; position:absolute; z-index:-1; top:-45px; left:18%; width:64%; height:100px; pointer-events:none; background:radial-gradient(ellipse,rgba(0,255,163,.22),transparent 70%); animation:authAmbientPulse 4s ease-in-out infinite; }
     #auth-modal .auth-luxury-heading { text-align:center; display:flex; flex-direction:column; align-items:center; gap:7px; margin-bottom:2px; }
@@ -1120,12 +1118,15 @@ body.focus-reader-mode .exit-focus-btn {
 
 <!-- ================= SUPER ADMIN RE-AUTHENTICATION GATE (PHASE 2) ================= -->
 <div id="sa-auth-gate" role="dialog" aria-modal="true" aria-labelledby="sa-gate-title" style="display:none;position:fixed;inset:0;z-index:1000002;background:rgba(2,8,12,.94);align-items:center;justify-content:center;padding:18px;color:#e9edef;font-family:system-ui,sans-serif">
- <div style="width:min(440px,100%);background:#0d171d;border:1px solid #394b55;border-radius:18px;padding:24px;box-shadow:0 24px 80px #0009;text-align:center">
-  <div style="width:46px;height:46px;border-radius:13px;background:#2a2517;color:#f4d477;display:grid;place-items:center;font-size:20px;margin:0 auto 16px"><i class="fa-solid fa-shield-halved"></i></div>
+ <div style="width:min(440px,100%);background:#0d171d;border:1px solid #394b55;border-radius:18px;padding:24px;box-shadow:0 24px 80px #0009">
+  <div style="width:46px;height:46px;border-radius:13px;background:#2a2517;color:#f4d477;display:grid;place-items:center;font-size:20px;margin-bottom:16px"><i class="fa-solid fa-shield-halved"></i></div>
   <h2 id="sa-gate-title" style="margin:0 0 8px;font-size:21px">Super Admin Verification</h2>
-  <p id="sa-gate-message" role="status" aria-live="polite" style="margin:0;color:#b9c7cd;font-size:13px;line-height:1.6">Admin session verify ki ja rahi hai…</p>
-  <div style="display:flex;gap:10px;margin-top:18px"><button id="sa-gate-cancel" type="button" style="flex:1;padding:11px;border-radius:9px;border:1px solid #344650;background:#142129;color:#dbe5e9">Cancel</button></div>
-  <p style="font-size:10px;line-height:1.5;color:#71858f;margin:16px 0 0">Koi alag Super Admin password nahi manga jayega. Sirf logged-in Admin session ki server verification hogi.</p>
+  <p style="margin:0 0 18px;color:#9eafb8;font-size:13px;line-height:1.6">Command Center kholne se pehle server se Owner/Admin permission verify hogi. Sirf frontend role ya local password par bharosa nahi kiya jayega.</p>
+  <label for="sa-gate-password" style="display:block;font-size:12px;margin-bottom:7px">Administrator password</label>
+  <input id="sa-gate-password" type="password" autocomplete="current-password" style="width:100%;box-sizing:border-box;padding:12px;border-radius:9px;border:1px solid #354852;background:#071016;color:#fff;outline:none" placeholder="Password dobara darj karein">
+  <div id="sa-gate-message" role="status" aria-live="polite" style="margin-top:10px;color:#e6c36a;font-size:12px;line-height:1.5"></div>
+  <div style="display:flex;gap:10px;margin-top:18px"><button id="sa-gate-cancel" type="button" style="flex:1;padding:11px;border-radius:9px;border:1px solid #344650;background:#142129;color:#dbe5e9">Cancel</button><button id="sa-gate-verify" type="button" style="flex:1;padding:11px;border-radius:9px;border:1px solid #9e7d29;background:#d6b34f;color:#101418;font-weight:800">Verify & Open</button></div>
+  <p style="font-size:10px;line-height:1.5;color:#71858f;margin:16px 0 0">Agar secure server endpoint configure nahi hai, access band rahega. Yeh jaan-boojh kar fail-closed security hai.</p>
  </div>
 </div>
 
@@ -1294,36 +1295,16 @@ body.focus-reader-mode .exit-focus-btn {
   <section class="sa-panel"><div class="sa-panel-head"><h3>Create incident record</h3><span>Device-local</span></div><form onsubmit="saCreateLocalIncident(event)" style="display:grid;gap:10px"><label style="display:grid;gap:5px;font-size:11px;color:#b8c6cc">Incident title<input name="title" required maxlength="120" placeholder="e.g. Student chat send failure" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef"></label><label style="display:grid;gap:5px;font-size:11px;color:#b8c6cc">Severity<select name="severity" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef"><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></label><label style="display:grid;gap:5px;font-size:11px;color:#b8c6cc">Notes<textarea name="notes" maxlength="1000" rows="3" placeholder="Observed symptoms; do not enter passwords, API keys or personal data" style="padding:10px;border-radius:8px;border:1px solid #344750;background:#101d24;color:#e9edef"></textarea></label><button type="submit" class="sa-secondary-btn"><i class="fa-solid fa-plus"></i> Save local incident</button><div id="sa-mon-create-result" class="sa-output"></div></form></section></div>
   <section class="sa-panel" style="margin-top:14px"><div class="sa-panel-head"><h3>Incident register</h3><span>${incidents.length} local record(s)</span></div><div id="sa-mon-incident-list">${incidents.length?incidents.slice().reverse().map(x=>`<div style="display:flex;gap:10px;align-items:flex-start;justify-content:space-between;border-bottom:1px solid #273740;padding:12px 0"><div style="min-width:0"><b style="font-size:12px">${escText(x.title)}</b><div style="font-size:10px;color:#9aadb6;margin-top:5px">${escText(x.severity)} · ${escText(x.status)} · ${escText(x.createdAt)}</div><div style="font-size:11px;color:#c5d0d5;margin-top:5px;white-space:pre-wrap">${escText(x.notes||'No notes')}</div></div>${x.status==='Resolved'?'<span class="sa-status-pill">Resolved</span>':`<button type="button" class="sa-secondary-btn" onclick="saResolveLocalIncident('${escText(x.id)}')">Resolve</button>`}</div>`).join(''):'<div class="sa-activity-empty">No local incident records. This is not a live server incident feed.</div>'}</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button type="button" class="sa-secondary-btn" onclick="saExportLocalIncidents()"><i class="fa-solid fa-file-export"></i> Export incidents</button><button type="button" class="sa-secondary-btn" onclick="saShowMonitoringIntegration()"><i class="fa-solid fa-plug"></i> Backend integration requirements</button></div><div id="sa-mon-export-result" class="sa-output"></div></section>`;
  }
- window.saRunMonitoringChecks=function(){const checks=[['Super Admin container',!!document.getElementById('superAdminModal')],['Dashboard content region',!!document.getElementById('sa-view-content')],['Admin control modal',!!document.getElementById('adminControlModal')],['Chat input',!!document.getElementById('chat-input')],['Send button',!!document.getElementById('btn-chat-send')]];let storage='Available';try{const k='__suhail_mon_test__';localStorage.setItem(k,'1');localStorage.removeItem(k)}catch(_){storage='Unavailable / blocked'}const pass=checks.filter(x=>x[1]).length;const out=document.getElementById('sa-mon-check-results');out.style.display='block';out.innerHTML=checks.map(x=>`<div style="padding:5px 0;color:${x[1]?'#8de0b2':'#ff9d9d'}"><i class="fa-solid ${x[1]?'fa-circle-check':'fa-circle-xmark'}"></i> ${esc(x[0])}: ${x[1]?'Present':'Missing'}</div>`).join('')+`<div style="padding:5px 0;color:#c5d0d5">Browser local storage: ${esc(storage)}</div><div style="padding:7px 0;color:#9aadb6">${pass}/${checks.length} expected UI elements present. This does not test network, server, database, or AI provider health.</div>`;const k=document.getElementById('sa-mon-check-count');if(k)k.textContent=pass+'/'+checks.length};
+ window.saRunMonitoringChecks=function(){const checks=[['Super Admin container',!!document.getElementById('superAdminModal')],['Dashboard content region',!!document.getElementById('sa-view-content')],['Admin control modal',!!document.getElementById('adminControlModal')],['Chat input',!!document.getElementById('chat-input')],['Send button',!!document.getElementById('btn-send')]];let storage='Available';try{const k='__suhail_mon_test__';localStorage.setItem(k,'1');localStorage.removeItem(k)}catch(_){storage='Unavailable / blocked'}const pass=checks.filter(x=>x[1]).length;const out=document.getElementById('sa-mon-check-results');out.style.display='block';out.innerHTML=checks.map(x=>`<div style="padding:5px 0;color:${x[1]?'#8de0b2':'#ff9d9d'}"><i class="fa-solid ${x[1]?'fa-circle-check':'fa-circle-xmark'}"></i> ${esc(x[0])}: ${x[1]?'Present':'Missing'}</div>`).join('')+`<div style="padding:5px 0;color:#c5d0d5">Browser local storage: ${esc(storage)}</div><div style="padding:7px 0;color:#9aadb6">${pass}/${checks.length} expected UI elements present. This does not test network, server, database, or AI provider health.</div>`;const k=document.getElementById('sa-mon-check-count');if(k)k.textContent=pass+'/'+checks.length};
  window.saCreateLocalIncident=function(event){event.preventDefault();const f=new FormData(event.currentTarget);const title=String(f.get('title')||'').trim();if(!title)return;let items=[];try{items=JSON.parse(localStorage.getItem('suhail_incident_register')||'[]')}catch(_){}if(!Array.isArray(items))items=[];items.push({id:'local-'+Date.now().toString(36),title:title.slice(0,120),severity:String(f.get('severity')||'Low'),notes:String(f.get('notes')||'').slice(0,1000),status:'Open',createdAt:new Date().toISOString(),scope:'device-local'});try{localStorage.setItem('suhail_incident_register',JSON.stringify(items));renderMonitoringCenter()}catch(_){const o=document.getElementById('sa-mon-create-result');if(o){o.style.display='block';o.textContent='Could not save: browser storage may be unavailable or full.'}}};
  window.saResolveLocalIncident=function(id){let items=[];try{items=JSON.parse(localStorage.getItem('suhail_incident_register')||'[]')}catch(_){}if(!Array.isArray(items))return;items=items.map(x=>x.id===id?{...x,status:'Resolved',resolvedAt:new Date().toISOString()}:x);localStorage.setItem('suhail_incident_register',JSON.stringify(items));renderMonitoringCenter()};
  window.saExportLocalIncidents=function(){let items=[];try{items=JSON.parse(localStorage.getItem('suhail_incident_register')||'[]')}catch(_){}if(!Array.isArray(items))items=[];superAdminDownload(`SuhailAI_Local_Incidents_${Date.now()}.json`,JSON.stringify({exportedAt:new Date().toISOString(),scope:'device-local incident notes; not a server incident feed',serverVerified:false,incidents:items},null,2),'application/json;charset=utf-8');const out=document.getElementById('sa-mon-export-result');out.style.display='block';out.textContent=`Exported ${items.length} local incident record(s).`};
  window.saShowMonitoringIntegration=function(){const out=document.getElementById('sa-mon-export-result');out.style.display='block';out.textContent='Production monitoring requires authenticated server-side endpoints for health checks, request error counts, latency, uptime, provider status and alert history. Enforce role-based authorization, rate limits, secret redaction and append-only audit logging. Never expose API keys or raw sensitive logs to this browser page.'};
  function renderDepartment(key){const dep=departments.find(d=>d[0]===key);const host=document.getElementById('sa-view-content');const list=tools.filter(t=>t[4]===key);host.innerHTML=`<div class="sa-dept-heading"><span class="sa-dept-big-icon"><i class="fa-solid ${icons[key]||'fa-layer-group'}"></i></span><span><h2>${esc(dep?dep[1]:'Department')}</h2><p>${esc(descriptions[key]||'Department tools and operational workflows.')}</p></span></div><div class="sa-notice-strip"><i class="fa-solid fa-shield-halved"></i><span>Sensitive actions are only safe when the backend verifies the current user, permission and request. Tools without a connected endpoint will explain their current limitation and will not pretend to change server state.</span></div><div class="sa-tool-grid">${list.map(card).join('')||'<div class="sa-no-results">No tools assigned to this department yet.</div>'}</div>`}
  window.saSearch=function(q){const val=(q||'').trim().toLowerCase();if(!val){const active=document.querySelector('#superAdminModal .sa-nav.active');saOpenView(active?active.dataset.saView:'dashboard',active);return}document.getElementById('sa-current-title').textContent='Search results';document.getElementById('sa-page-heading').textContent='Search results';document.getElementById('sa-page-subtitle').textContent='Tools and departments matching: '+q;document.querySelectorAll('#superAdminModal .sa-nav').forEach(n=>n.classList.remove('active'));const matches=tools.filter(t=>(t[1]+' '+t[3]+' '+t[4]).toLowerCase().includes(val));const deps=departments.filter(d=>(d[1]+' '+d[3]).toLowerCase().includes(val));document.getElementById('sa-view-content').innerHTML=(deps.length?`<div class="sa-section-title">Departments</div><div class="sa-tool-grid">${deps.map(d=>`<button class="sa-tool-card" onclick="saOpenView('${d[0]}',this)"><span class="sa-card-icon"><i class="fa-solid ${d[2]}"></i></span><span><b>${esc(d[1])}</b><small>${esc(d[3])}</small></span></button>`).join('')}</div>`:'')+(matches.length?`<div class="sa-section-title">Tools</div><div class="sa-tool-grid">${matches.map(card).join('')}</div>`:'')+(!deps.length&&!matches.length?'<div class="sa-no-results">No matching tools or departments found.</div>':'')};
- window.saRefreshOverview=async function(){
-  if(typeof saOpenView==='function')saOpenView('dashboard');
-  const out=document.getElementById('superAdminOutput');
-  if(out){out.style.display='block';out.textContent='Live server telemetry fetch ki ja rahi hai...';}
-  try{
-    const res=await fetch('/api/super-admin?action=super_admin_dashboard',{method:'GET',credentials:'same-origin',cache:'no-store'});
-    const data=await res.json().catch(()=>({}));
-    if(!res.ok||!data.ok||!data.metrics)throw new Error(data.error||'Telemetry unavailable');
-    const m=data.metrics;
-    const kpis=document.querySelectorAll('#sa-view-content .sa-kpi-value');
-    if(kpis[0]){kpis[0].textContent=String(m.totalStudents);kpis[0].classList.remove('sa-unknown');}
-    if(kpis[1]){kpis[1].textContent=String(m.totalQuestions);kpis[1].classList.remove('sa-unknown');}
-    if(kpis[2]){kpis[2].textContent=m.dbConnected?`Online (${m.dbLatencyMs}ms)`:'Error';kpis[2].classList.remove('sa-unknown');}
-    if(kpis[3]){kpis[3].textContent=`${m.configuredProvidersCount} Active`;kpis[3].classList.remove('sa-unknown');}
-    const badge=document.querySelector('#superAdminModal .sa-env-badge');
-    if(badge)badge.innerHTML='<span style="background:#22c55e"></span> Live Connected';
-    if(out)out.textContent=`LIVE TELEMETRY VERIFIED (${new Date().toLocaleTimeString()})\n• Total Students: ${m.totalStudents} (Blocked: ${m.blockedStudents})\n• Plans: FREE(${m.planBreakdown.free}) | PLUS(${m.planBreakdown.plus}) | PRO(${m.planBreakdown.pro}) | ULTRA(${m.planBreakdown.ultra})\n• Pending Payments: ${m.pendingPayments}\n• Active AI Providers: ${m.configuredProviders.join(', ')||'None'}`;
-  }catch(e){
-   if(out)out.textContent='Telemetry fetch error: '+e.message;
-  }
-};
+ window.saRefreshOverview=function(){if(typeof saOpenView==='function')saOpenView('dashboard');const out=document.getElementById('superAdminOutput');out.style.display='block';out.textContent='Overview refreshed at '+new Date().toLocaleString()+'. This refreshes the interface only; live backend metrics are not connected.'};
  window.saShowAlerts=function(){const out=document.getElementById('superAdminOutput');out.style.display='block';out.textContent='ALERT CENTER\nNo live alert feed is connected. Database, provider, deployment and backup alerts require authenticated server-side monitoring endpoints.'};
- window.saInit=function(){const nav=document.getElementById('sa-department-nav');if(nav&&!nav.dataset.ready){nav.innerHTML=departments.slice(1).map(d=>`<button class="sa-nav" data-sa-view="${d[0]}" onclick="saOpenView('${d[0]}',this)"><i class="fa-solid ${d[2]}"></i><span>${esc(d[1])}</span></button>`).join('');nav.dataset.ready='1'}renderDashboard();saRefreshOverview()};
+ window.saInit=function(){const nav=document.getElementById('sa-department-nav');if(nav&&!nav.dataset.ready){nav.innerHTML=departments.slice(1).map(d=>`<button class="sa-nav" data-sa-view="${d[0]}" onclick="saOpenView('${d[0]}',this)"><i class="fa-solid ${d[2]}"></i><span>${esc(d[1])}</span></button>`).join('');nav.dataset.ready='1'}renderDashboard()};
 })();
 </script>
 
@@ -1336,7 +1317,7 @@ body.focus-reader-mode .exit-focus-btn {
         <i class="fa-solid fa-shield-halved"></i> Admin Control Center
       </h3>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
-        <button type="button" onclick="document.getElementById('adminControlModal').style.display='none';openSuperAdminGate();" style="background:linear-gradient(135deg,#f6d779,#b98a20);border:1px solid #f4d36e;color:#17130a;padding:8px 10px;border-radius:9px;font-size:.75rem;font-weight:800;cursor:pointer;"><i class="fa-solid fa-crown"></i> Open Super Admin</button>
+        <button type="button" onclick="document.getElementById('adminControlModal').style.display='none';document.getElementById('superAdminModal').style.display='block';saInit();" style="background:linear-gradient(135deg,#f6d779,#b98a20);border:1px solid #f4d36e;color:#17130a;padding:8px 10px;border-radius:9px;font-size:.75rem;font-weight:800;cursor:pointer;"><i class="fa-solid fa-crown"></i> Open Super Admin</button>
         <button onclick="document.getElementById('adminControlModal').style.display='none'" aria-label="Close Admin Control Center" style="background:transparent; border:none; color:#8696a0; font-size:1.5rem; cursor:pointer;">&times;</button>
       </div>
     </div>
@@ -1571,7 +1552,7 @@ async function runTriAgentMegaCode(userPrompt, chatBox) {
       const js = scriptMatch ? scriptMatch[1].trim() : '';
       let modularHtml = cleanCode;
       if (styleMatch) modularHtml = modularHtml.replace(styleMatch[0], '<link rel="stylesheet" href="style.css">');
-      if (scriptMatch) modularHtml = modularHtml.replace(scriptMatch[0], '<script src="app.js"></script><' + '/script>');
+      if (scriptMatch) modularHtml = modularHtml.replace(scriptMatch[0], '<script src="app.js"><' + '/script>');
       zip.file('index.html', modularHtml);
       if (css) zip.file('style.css', css);
       if (js) zip.file('app.js', js);
@@ -1798,7 +1779,7 @@ function renderAiBubble(div, text, aiName) {
 }
 
 let currentUser = JSON.parse(localStorage.getItem('suhail_ai_user') || 'null');
-let currentAdminPass = localStorage.getItem('suhail_ai_admin_pass') || 'SuhailAiJamia';
+let currentAdminPass = ''; // Never persist administrator secrets in browser storage.
 let activeShortcutType = null;
 
 function containsArabic(text) {
@@ -1935,14 +1916,66 @@ window.toggleSpeech = function(btn) {
   const superAdminToggle = document.getElementById('btn-super-admin-toggle');
   if (superAdminToggle) superAdminToggle.onclick = () => openSuperAdminGate();
 
-  // Super Admin: no second password prompt. Reuse the already-authenticated Admin page session.
-  function openSuperAdminGate() {
-    showSuperAdminAfterVerification(Date.now() + 86400000);
+  // Phase 2: Super Admin access is denied unless a server verifies the current actor.
+  // Expected endpoint contract: POST /api/super-admin?action=super_admin_auth
+  // Body: { password: "..." }; response: { ok:true, role:"owner"|"super_admin", permissions:[...], expiresAt:<unix-ms> }
+  async function openSuperAdminGate() {
+    const gate = document.getElementById('sa-auth-gate');
+    const msg = document.getElementById('sa-gate-message');
+    const input = document.getElementById('sa-gate-password');
+    // Super Admin access is controlled by the server-side password, not the student account role.
+    // Never trust sessionStorage alone: validate the HttpOnly server session every time.
+    try {
+      const check = await fetch('/api/super-admin?action=super_admin_session', { method: 'GET', credentials: 'same-origin', cache: 'no-store' });
+      const session = await check.json().catch(() => ({}));
+      if (check.ok && session.ok === true && ['owner','super_admin'].includes(String(session.role || '').toLowerCase())) {
+        try { sessionStorage.setItem('suhail_sa_verified_until', String(Number(session.expiresAt || 0))); } catch (_) {}
+        showSuperAdminAfterVerification(); return;
+      }
+    } catch (_) { /* Fail closed below if the backend is unavailable. */ }
+    try { sessionStorage.removeItem('suhail_sa_verified_until'); } catch (_) {}
+    gate.style.display = 'flex'; msg.textContent = 'Server session verify nahi hui. Owner password se dobara verify karein.'; input.value = ''; input.focus();
   }
-  function _disabled_gate() {document.getElementById('sa-gate-cancel').addEventListener('click', () => {
+  function showSuperAdminAfterVerification() {
+    const gate = document.getElementById('sa-auth-gate');
+    if (gate) gate.style.display = 'none';
+    const panel = document.getElementById('superAdminModal');
+    if (panel) panel.style.display = 'block';
+    if (typeof saInit === 'function') saInit();
+    const out = document.getElementById('superAdminOutput');
+    if (out) out.textContent = 'Verified session active. Sensitive operations still require server-side authorization.';
+  }
+  document.getElementById('sa-gate-cancel').addEventListener('click', () => {
     document.getElementById('sa-auth-gate').style.display = 'none';
+    document.getElementById('sa-gate-password').value = '';
     document.getElementById('sa-gate-message').textContent = '';
   });
+  document.getElementById('sa-gate-verify').addEventListener('click', async () => {
+    const input = document.getElementById('sa-gate-password');
+    const msg = document.getElementById('sa-gate-message');
+    const btn = document.getElementById('sa-gate-verify');
+    const password = input.value;
+    if (!password) { msg.textContent = 'Password darj karein.'; input.focus(); return; }
+    btn.disabled = true; btn.textContent = 'Verifying…'; msg.textContent = 'Server se permission verify ki ja rahi hai…';
+    try {
+      const response = await fetch('/api/super-admin?action=super_admin_auth', {
+        method: 'POST', credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data.ok !== true || !['owner','super_admin'].includes(String(data.role || '').toLowerCase())) {
+        throw new Error(data.error || (response.status === 404 ? 'Secure Super Admin verification endpoint abhi configure nahi hai. Backend endpoint banne tak access band rahega.' : 'Server ne Super Admin access verify nahi kiya.'));
+      }
+      const expiry = Number(data.expiresAt || (Date.now() + 10 * 60 * 1000));
+      try { sessionStorage.setItem('suhail_sa_verified_until', String(Math.min(expiry, Date.now() + 10 * 60 * 1000))); } catch (_) {}
+      input.value = ''; msg.textContent = '';
+      showSuperAdminAfterVerification();
+    } catch (error) {
+      msg.textContent = error.message || 'Verification failed. Access denied.';
+    } finally { btn.disabled = false; btn.textContent = 'Verify & Open'; }
+  });
+  document.getElementById('sa-gate-password').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('sa-gate-verify').click(); });
 
   function checkToolAccess(type) {
     const p = (currentUser?.role === 'admin') ? 'ultra' : (currentUser?.plan || 'free');
@@ -2049,14 +2082,9 @@ window.toggleSpeech = function(btn) {
   }
 
   function renderUserUI() {
-    const modalEl = document.getElementById("auth-modal");
     if (!currentUser) {
-      if (modalEl) modalEl.style.display = "flex";
+      document.getElementById('auth-modal').style.display = 'flex';
       return;
-    }
-    if (modalEl) {
-      modalEl.style.setProperty("display", "none", "important");
-      modalEl.remove();
     }
     document.getElementById('auth-modal').style.display = 'none';
     document.getElementById('u-name').textContent = currentUser.name || "Talib-e-Ilm";
@@ -2141,7 +2169,7 @@ window.toggleSpeech = function(btn) {
 
     document.getElementById('btn-admin-toggle').style.display = isAdmin ? 'inline-block' : 'none';
     const superAdminButton = document.getElementById('btn-super-admin-toggle');
-    if (superAdminButton) superAdminButton.style.display = isAdmin ? 'inline-block' : 'none';
+    if (superAdminButton) superAdminButton.style.display = 'inline-block';
     document.getElementById('nav-item-admin').style.display = isAdmin ? 'block' : 'none';
     if (isAdmin) {
       document.getElementById('nav-item-pay').style.display = 'none';
@@ -2152,53 +2180,35 @@ window.toggleSpeech = function(btn) {
     }
   }
 
-  document.getElementById("btn-login-submit").addEventListener("click", async () => {
-    const phone = (document.getElementById("auth-phone")?.value || "").trim();
-    const roll = (document.getElementById("auth-roll")?.value || "").trim();
-    const userPass = (document.getElementById("auth-user-pass")?.value || "").trim();
-    const name = (document.getElementById("auth-name")?.value || "").trim();
-    const adminPass = (document.getElementById("auth-admin-pass")?.value || "").trim();
+  document.getElementById('btn-login-submit').addEventListener('click', async () => {
+    const phone = document.getElementById('auth-phone').value.trim();
+    const roll = document.getElementById('auth-roll').value.trim();
+    const userPass = document.getElementById('auth-user-pass').value.trim();
+    const name = document.getElementById('auth-name').value.trim();
+    const adminPass = document.getElementById('auth-admin-pass').value.trim();
 
     if (phone.length !== 10) return alert("10 ankon ka mobile number darj karein.");
-
-    const btn = document.getElementById("btn-login-submit");
-    if (btn) { btn.disabled = true; btn.innerText = "Dakhil ho rahe hain..."; }
+    
+    if (!adminPass) {
+      const rollNum = parseInt(roll, 10);
+      if (isNaN(rollNum) || rollNum < 4000 || rollNum > 9999) return alert("Roll number 4000 se 9999 tak hona lazmi hai.");
+      if (!userPass || userPass.length < 6) return alert("Password kam se kam 6 ankon ka hona anivarya hai.");
+    }
 
     try {
-      try {
-        const data = await safeFetch("/api?action=auth", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone, roll, userPass, name, adminPass })
-        });
-        if (data && data.user) currentUser = data.user;
-      } catch (srvErr) {
-        console.warn("Server fallback active:", srvErr);
-        currentUser = {
-          phone: phone,
-          name: name || "Talib-e-Ilm",
-          role: (adminPass && adminPass.length > 3) ? "admin" : "student",
-          plan: (adminPass && adminPass.length > 3) ? "ultra" : "free",
-          roll: roll || "4000"
-        };
-      }
-
-      localStorage.setItem("suhail_ai_user", JSON.stringify(currentUser));
-      currentAdminPass = adminPass || "SuhailAiJamia";
-      if (adminPass) localStorage.setItem("suhail_ai_admin_pass", adminPass);
-
-      const m = document.getElementById("auth-modal");
-      if (m) {
-        m.style.setProperty("display", "none", "important");
-        m.remove();
-      }
-
-      try { renderUserUI(); } catch (_) {}
-      try { loadChatHistory(); } catch (_) {}
-    } catch (finalErr) {
-      alert("Error: " + finalErr.message);
-    } finally {
-      if (btn) { btn.disabled = false; btn.innerText = "Login / Register"; }
+      const data = await safeFetch('/api?action=auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, roll, userPass, name, adminPass })
+      });
+      currentUser = data.user;
+      localStorage.setItem('suhail_ai_user', JSON.stringify(currentUser));
+      // Keep the admin credential in memory only for this page session. Never write it to localStorage.
+      currentAdminPass = adminPass || '';
+      renderUserUI();
+      loadChatHistory();
+    } catch (e) {
+      alert(e.message);
     }
   });
 
@@ -2797,7 +2807,7 @@ function renderAiBubble(div, text, aiName) {
       if(confirm('Local governance report JSON download karein?')) superAdminDownload(`SuhailAI_Governance_Report_${Date.now()}.json`,JSON.stringify(report,null,2),'application/json;charset=utf-8'); return;
     }
     if (tool === 'final_verification') {
-      const checks=[['Super Admin modal',!!document.getElementById('superAdminModal')],['Admin modal',!!document.getElementById('adminControlModal')],['Chat container',!!document.getElementById('chat-box')],['Chat input',!!document.getElementById('chat-input')],['Send button',!!document.getElementById('btn-chat-send')],['HTTPS or localhost',location.protocol==='https:'||location.hostname==='localhost'],['Server authorization',false],['Live provider health endpoint',false],['Server backup/restore endpoint',false],['Server audit log endpoint',false],['Deployment provider connected',false]];
+      const checks=[['Super Admin modal',!!document.getElementById('superAdminModal')],['Admin modal',!!document.getElementById('adminControlModal')],['Chat container',!!document.getElementById('chat-box')],['Chat input',!!document.getElementById('chat-input')],['Send button',!!document.getElementById('btn-send')],['HTTPS or localhost',location.protocol==='https:'||location.hostname==='localhost'],['Server authorization',false],['Live provider health endpoint',false],['Server backup/restore endpoint',false],['Server audit log endpoint',false],['Deployment provider connected',false]];
       const report={generatedAt:new Date().toISOString(),type:'browser-side acceptance checklist',checks:checks.map(([name,passed])=>({name,status:passed?'PASS':'NOT VERIFIED / NOT CONNECTED'})),passed:checks.filter(x=>x[1]).length,total:checks.length,warning:'This is not a penetration test. Backend controls marked not connected must be implemented and independently tested.'};
       superAdminWrite('FINAL VERIFICATION REPORT\n'+JSON.stringify(report,null,2)); superAdminDownload(`SuhailAI_Final_Verification_${Date.now()}.json`,JSON.stringify(report,null,2),'application/json;charset=utf-8'); return;
     }
@@ -3574,8 +3584,6 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
   
-]
-}
 </script>
 
 <script src="/admin-dashboard.js"></script>
@@ -3722,6 +3730,5 @@ window.addEventListener('DOMContentLoaded', () => {
 
 <button class="exit-focus-btn" onclick="toggleFocusMode()">✕ Exit Reader Mode</button>
   
-</script>
 </body>
 </html>
