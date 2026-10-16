@@ -3,6 +3,60 @@ const FIREBASE_DB_URL = (process.env.FIREBASE_DB_URL || process.env.FIREBASE_DAT
 const FIREBASE_AUTH = process.env.FIREBASE_AUTH || "";
 const authParam = FIREBASE_AUTH ? `?auth=${FIREBASE_AUTH}` : "";
 
+// AI API Keys
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
+const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
+
+async function callAiService(userPrompt, history = []) {
+  // 1. Agar Groq Key maujood ho
+  if (GROQ_API_KEY) {
+    try {
+      const messages = [
+        { role: "system", content: "Aap Suhail AI hain - Dars-e-Nizami, Arabic, Urdu, Fiqh aur Taleemi masail ke liye ek ba-adab, sanjeeda aur mufeed AI companion. User ki zaban (Urdu, Roman Urdu, Hindi ya English) me behtareen aur wazeh jawab dein." },
+        ...history.slice(-4),
+        { role: "user", content: userPrompt }
+      ];
+      const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${GROQ_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages,
+          temperature: 0.6
+        })
+      });
+      const d = await r.json();
+      if (d.choices && d.choices[0] && d.choices[0].message) {
+        return d.choices[0].message.content;
+      }
+    } catch (_) {}
+  }
+
+  // 2. Agar Gemini Key maujood ho
+  if (GEMINI_API_KEY) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+      const r = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: userPrompt }] }]
+        })
+      });
+      const d = await r.json();
+      if (d.candidates && d.candidates[0]?.content?.parts?.[0]?.text) {
+        return d.candidates[0].content.parts[0].text;
+      }
+    } catch (_) {}
+  }
+
+  // 3. Fallback Clean Response agar key na ho
+  return "Assalamu Alaikum wa Rahmatullahi wa Barakatuh! Main aapka Suhail AI Study Partner hoon. Padhai, Dars-e-Nizami ya kisi bhi mas'ale par apna sawal poochein.";
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
@@ -29,20 +83,13 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, error: "10 ankon ka mobile number darj karein." });
       }
 
-      // Admin Login Check
       if (adminPass && adminPass === ADMIN_SECRET) {
-        const adminUser = {
-          phone,
-          name: name || "Master Admin",
-          role: "admin",
-          plan: "ultra",
-          roll: roll || "9999",
-          planExpiry: null
-        };
-        return res.status(200).json({ success: true, user: adminUser });
+        return res.status(200).json({
+          success: true,
+          user: { phone, name: name || "Master Admin", role: "admin", plan: "ultra", roll: roll || "9999", planExpiry: null }
+        });
       }
 
-      // Student Account in Firebase
       let existingUser = null;
       try {
         const r = await fetch(`${FIREBASE_DB_URL}/users/${phone}.json${authParam}`);
@@ -58,7 +105,6 @@ export default async function handler(req, res) {
         }
         return res.status(200).json({ success: true, user: existingUser });
       } else {
-        // Naya Registration
         const newUser = {
           phone,
           roll: roll || "4000",
@@ -106,10 +152,11 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, notice: "" });
     }
 
-    // 4. AI CHAT HANDLER
+    // 4. REAL AI CHAT
     if (action === "ai") {
       const prompt = body.prompt || "";
-      const reply = `Assalamu Alaikum! Aapka sawal mila: "${prompt.slice(0, 80)}..."\n\nAlhamdulillah, Suhail AI system theek taur par muttasil hai.`;
+      const history = body.history || [];
+      const reply = await callAiService(prompt, history);
       return res.status(200).json({ success: true, reply, aiName: "SUHAIL AI" });
     }
 
