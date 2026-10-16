@@ -2388,14 +2388,9 @@ window.toggleSpeech = function(btn) {
     }
 
     try {
-      const data = await safeFetch('/api?action=ai&_=' + Date.now(), {
+      const data = await safeFetch('/api?action=ai', {
         method: 'POST',
-        cache: 'no-store',
-        credentials: 'same-origin',
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           prompt: text + presentationInstruction + promptInstruction,
           phone: currentUser.phone,
