@@ -1,58 +1,57 @@
 <!DOCTYPE html>
-<html lang="ur" dir="ltr">
+<html lang="ur" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Urs-e-Siddiqi & Islamic Calendar Portal</title>
+  <title>عرسِ حامدی مبارک | Urs-e-Hamidi Mubarak</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <style>
     :root {
-      --bg-dark: #05130d;
-      --card-bg: #092016;
+      --bg-dark: #040f0a;
+      --card-bg: #091f15;
+      --card-inner: #0f2c1f;
       --gold-primary: #d4af37;
-      --gold-light: #fdedad;
+      --gold-light: #fef0b8;
       --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-      --emerald-accent: #10b981;
-      --border-gold: rgba(212, 175, 55, 0.35);
-      --text-muted: #a3b8af;
+      --border-gold: rgba(212, 175, 55, 0.45);
+      --text-muted: #b0c4ba;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       background-color: var(--bg-dark);
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Poppins', 'Noto Nastaliq Urdu', sans-serif;
       color: #ffffff;
       min-height: 100vh;
       background-image: 
-        radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.12), transparent 50%),
-        radial-gradient(circle at 10% 40%, rgba(16, 185, 129, 0.08), transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(212, 175, 55, 0.1), transparent 50%);
-      padding: 20px 12px 60px 12px;
+        radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.18), transparent 50%),
+        radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.1), transparent 40%),
+        radial-gradient(circle at 80% 90%, rgba(212, 175, 55, 0.15), transparent 50%);
+      padding: 16px 12px 60px 12px;
     }
 
     .container {
-      max-width: 640px;
+      max-width: 680px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 22px;
     }
 
-    /* Top Decorative Arch Header */
+    /* Top Arch Banner */
     .hero-banner {
       background: var(--card-bg);
       border: 2px solid var(--gold-primary);
       border-radius: 28px;
-      padding: 32px 20px 24px 20px;
+      padding: 30px 18px 25px 18px;
       text-align: center;
       position: relative;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 0 0 30px rgba(16, 185, 129, 0.15);
-      overflow: hidden;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 35px rgba(16, 185, 129, 0.2);
     }
 
     .hero-banner::after {
@@ -66,147 +65,148 @@
 
     .bismillah {
       font-family: 'Amiri', serif;
-      font-size: 1.8rem;
+      font-size: 1.9rem;
       color: var(--gold-light);
       margin-bottom: 6px;
     }
 
-    .top-pill {
+    .top-badge {
       display: inline-block;
       background: rgba(212, 175, 55, 0.15);
       border: 1px solid var(--gold-primary);
       color: var(--gold-light);
-      padding: 4px 16px;
+      padding: 5px 20px;
       border-radius: 50px;
-      font-size: 0.8rem;
-      letter-spacing: 1px;
-      margin-bottom: 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 12px;
     }
 
     .title-ur {
       font-family: 'Noto Nastaliq Urdu', serif;
-      font-size: 2.3rem;
-      line-height: 1.8;
+      font-size: 2.8rem;
+      line-height: 2;
       background: var(--gold-gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
     }
 
     .title-hi {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: 700;
       color: #ffffff;
-      margin-top: 4px;
+      letter-spacing: 0.5px;
     }
 
-    /* Live Countdown */
-    .timer-card {
-      background: rgba(0, 0, 0, 0.5);
+    .tagline {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 6px;
+    }
+
+    /* Live Countdown Box */
+    .countdown-card {
+      background: rgba(0, 0, 0, 0.55);
       border: 1px solid var(--border-gold);
-      border-radius: 20px;
-      padding: 18px 12px;
+      border-radius: 22px;
+      padding: 18px 14px;
       text-align: center;
     }
 
-    .timer-title {
-      font-size: 0.85rem;
+    .countdown-title {
+      font-size: 0.9rem;
       color: var(--gold-light);
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
       margin-bottom: 12px;
+      font-weight: 600;
     }
 
     .timer-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 10px;
+      direction: ltr;
     }
 
-    .timer-box {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(212, 175, 55, 0.25);
+    .time-slot {
+      background: var(--card-inner);
+      border: 1px solid rgba(212, 175, 55, 0.3);
       border-radius: 14px;
       padding: 10px 4px;
     }
 
-    .timer-box span {
-      display: block;
-      font-size: 1.6rem;
+    .time-val {
+      font-size: 1.7rem;
       font-weight: 700;
       color: var(--gold-light);
+      display: block;
       line-height: 1.1;
     }
 
-    .timer-box small {
-      font-size: 0.65rem;
+    .time-lbl {
+      font-size: 0.7rem;
       color: var(--text-muted);
       text-transform: uppercase;
+      margin-top: 4px;
+      display: block;
     }
 
-    /* Picture Gallery Section */
-    .gallery-card {
+    /* Large Images & Cards Showcase */
+    .showcase-card {
       background: var(--card-bg);
       border: 1px solid var(--border-gold);
       border-radius: 24px;
-      padding: 22px 18px;
-    }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-      padding-bottom: 8px;
-    }
-
-    .section-header i {
-      color: var(--gold-primary);
-      font-size: 1.2rem;
-    }
-
-    .section-header h3 {
-      font-size: 1.15rem;
-      color: var(--gold-light);
-    }
-
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-
-    .gallery-item {
-      position: relative;
-      border-radius: 16px;
       overflow: hidden;
-      border: 1px solid rgba(212, 175, 55, 0.3);
-      aspect-ratio: 4/3;
-      background: #000;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
     }
 
-    .gallery-item img {
+    .big-image-frame {
+      position: relative;
+      width: 100%;
+      height: 260px;
+      background: #000;
+      overflow: hidden;
+    }
+
+    .big-image-frame img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.3s ease;
+      transition: transform 0.4s ease;
     }
 
-    .gallery-item:hover img {
-      transform: scale(1.05);
+    .big-image-frame:hover img {
+      transform: scale(1.04);
     }
 
-    .gallery-item .overlay-caption {
+    .image-tag {
       position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(transparent, rgba(0,0,0,0.85));
-      padding: 8px 10px;
-      font-size: 0.75rem;
+      top: 14px;
+      right: 14px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid var(--gold-primary);
+      color: var(--gold-light);
+      padding: 4px 14px;
+      border-radius: 30px;
+      font-size: 0.8rem;
       font-weight: 600;
-      color: #fff;
-      text-align: center;
+    }
+
+    .card-details {
+      padding: 18px;
+      text-align: right;
+    }
+
+    .card-details h3 {
+      font-size: 1.25rem;
+      color: var(--gold-light);
+      margin-bottom: 6px;
+    }
+
+    .card-details p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
     }
 
     /* Program Schedule */
@@ -217,55 +217,66 @@
       padding: 22px 18px;
     }
 
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+      padding-bottom: 8px;
+      color: var(--gold-light);
+      font-size: 1.25rem;
+    }
+
     .schedule-row {
       display: flex;
       align-items: flex-start;
       gap: 14px;
-      padding: 12px;
       background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(212, 175, 55, 0.15);
       border-radius: 14px;
-      margin-bottom: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 14px;
+      margin-bottom: 12px;
     }
 
-    .schedule-time {
-      background: rgba(212, 175, 55, 0.15);
+    .schedule-badge {
+      background: rgba(212, 175, 55, 0.18);
       color: var(--gold-light);
-      padding: 6px 10px;
+      border: 1px solid var(--gold-primary);
+      padding: 6px 12px;
       border-radius: 10px;
-      font-size: 0.78rem;
+      font-size: 0.82rem;
       font-weight: 600;
       white-space: nowrap;
-      border: 1px solid rgba(212, 175, 55, 0.25);
     }
 
-    .schedule-desc h4 {
-      font-size: 0.95rem;
+    .schedule-text h4 {
+      font-size: 1rem;
       color: #ffffff;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
     }
 
-    .schedule-desc p {
-      font-size: 0.8rem;
+    .schedule-text p {
+      font-size: 0.82rem;
       color: var(--text-muted);
     }
 
-    /* Action Buttons */
+    /* Action Share Button */
     .btn-share {
       width: 100%;
-      padding: 15px;
+      padding: 16px;
       background: linear-gradient(135deg, #10b981, #047857);
-      color: #fff;
+      color: #ffffff;
       border: none;
-      border-radius: 16px;
-      font-size: 1rem;
+      border-radius: 18px;
+      font-size: 1.05rem;
       font-weight: 700;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      cursor: pointer;
-      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.35);
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
       transition: all 0.2s ease;
     }
 
@@ -277,92 +288,89 @@
 <body>
 
   <div class="container">
-    <!-- Hero Banner with Arch Border -->
+    <!-- Hero Banner Frame -->
     <div class="hero-banner">
       <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
-      <div class="top-pill">🌙 साला-ए-उर्स • मुबारक तक़रीब</div>
-      <h1 class="title-ur">عرسِ صدیقی مبارک</h1>
-      <h2 class="title-hi">उर्स-ए-सिद्दीकी मुबारक</h2>
-      <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 6px;">फैज़ान-ए-औलिया व रहमतों की रूहानी महफ़िल</p>
+      <div class="top-badge">🌙 سالانہ عرسِ مبارک • 29 تا 30 اکتوبر 2026</div>
+      <h1 class="title-ur">عرسِ حامدی مبارک</h1>
+      <h2 class="title-hi">उर्स-ए-हामिदी मुबारक</h2>
+      <p class="tagline">فیضانِ اولیاء، محفلِ نعت و منقبت اور دعائیہ تقریب</p>
     </div>
 
-    <!-- Live Timer Card -->
-    <div class="timer-card">
-      <div class="timer-title" id="timer-status">⏳ उर्स-ए-पाक में बाक़ी वक़्त</div>
+    <!-- Live Timer -->
+    <div class="countdown-card">
+      <div class="countdown-title" id="timer-status">⏳ عرسِ حامدی پاک میں باقی وقت</div>
       <div class="timer-grid">
-        <div class="timer-box"><span id="days">00</span><small>दिन</small></div>
-        <div class="timer-box"><span id="hours">00</span><small>घंटे</small></div>
-        <div class="timer-box"><span id="minutes">00</span><small>मिनट</small></div>
-        <div class="timer-box"><span id="seconds">00</span><small>सेकंड</small></div>
+        <div class="time-slot"><span class="time-val" id="days">00</span><span class="time-lbl">Days / دن</span></div>
+        <div class="time-slot"><span class="time-val" id="hours">00</span><span class="time-lbl">Hours / گھنٹے</span></div>
+        <div class="time-slot"><span class="time-val" id="minutes">00</span><span class="time-lbl">Mins / منٹ</span></div>
+        <div class="time-slot"><span class="time-val" id="seconds">00</span><span class="time-lbl">Secs / سیکنڈ</span></div>
       </div>
     </div>
 
-    <!-- Architectural Gallery with Pictures -->
-    <div class="gallery-card">
-      <div class="section-header">
-        <i class="fa-solid fa-mosque"></i>
-        <h3>मुबारक मक़ामात व ज़ियारत</h3>
+    <!-- Big Image 1: Madina Munawwara -->
+    <div class="showcase-card">
+      <div class="big-image-frame">
+        <img src="https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=1000&auto=format&fit=crop&q=80" alt="مدینہ منورہ">
+        <div class="image-tag">روضہ رسول ﷺ</div>
       </div>
-      <div class="gallery-grid">
-        <div class="gallery-item">
-          <img src="https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=600&auto=format&fit=crop&q=80" alt="मस्जिद-ए-नबवी">
-          <div class="overlay-caption">मदीना मुनव्वरा</div>
-        </div>
-        <div class="gallery-item">
-          <img src="https://images.unsplash.com/photo-1564769625905-50e93615e769?w=600&auto=format&fit=crop&q=80" alt="मक्का शरीफ़">
-          <div class="overlay-caption">ख़ाना-ए-काबा</div>
-        </div>
-        <div class="gallery-item">
-          <img src="https://images.unsplash.com/photo-1542816417-0983c9c9ad53?w=600&auto=format&fit=crop&q=80" alt="इस्लामिक आर्किटेक्चर">
-          <div class="overlay-caption">रूहानी दरगाह</div>
-        </div>
-        <div class="gallery-item">
-          <img src="https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?w=600&auto=format&fit=crop&q=80" alt="आस्ताना-ए-आलिया">
-          <div class="overlay-caption">फैज़ान-ए-औलिया</div>
-        </div>
+      <div class="card-details">
+        <h3>مدینہ منورہ و فیضانِ رسالت ﷺ</h3>
+        <p>تمام برکات و انوار کا سرچشمہ دربارِ رسالت مآب ﷺ ہے، جہاں سے اولیائے کرام کو فیض عطا ہوتا ہے۔</p>
       </div>
     </div>
 
-    <!-- Detailed Schedule Program -->
+    <!-- Big Image 2: Spiritual Arch & Dargah -->
+    <div class="showcase-card">
+      <div class="big-image-frame">
+        <img src="https://images.unsplash.com/photo-1542816417-0983c9c9ad53?w=1000&auto=format&fit=crop&q=80" alt="دربار عالیہ">
+        <div class="image-tag">آستانہ عالیہ</div>
+      </div>
+      <div class="card-details">
+        <h3>زیارت و روحانی محفل</h3>
+        <p>عرسِ حامدی کے مبارک موقع پر نذر و نیاز، قرآن خوانی اور محفلِ سماع و دعا کا خصوصی اہتمام۔</p>
+      </div>
+    </div>
+
+    <!-- Program Schedule -->
     <div class="schedule-card">
-      <div class="section-header">
-        <i class="fa-solid fa-calendar-days"></i>
-        <h3>प्रोग्राम व तक़रीबात</h3>
+      <div class="section-title">
+        <i class="fa-solid fa-clock"></i>
+        <span>پروگرام و تقاریب</span>
       </div>
 
       <div class="schedule-row">
-        <div class="schedule-time">29 अक्टूबर • शाम</div>
-        <div class="schedule-desc">
-          <h4>ग़ुस्ल व संदल शरीफ़</h4>
-          <p>परचम कुशाई व चादर पोशी की रूहानी तक़रीब</p>
+        <div class="schedule-badge">29 اکتوبر • شام</div>
+        <div class="schedule-text">
+          <h4>پرچم کشائی و غسل شریف</h4>
+          <p>صندل پیشی اور چادر مبارک کی پروقار تقریب</p>
         </div>
       </div>
 
       <div class="schedule-row">
-        <div class="schedule-time">30 अक्टूबर • रात</div>
-        <div class="schedule-desc">
-          <h4>महफ़िल-ए-नात व मनक़बत</h4>
-          <p>उलमा-ए-किराम के नूरानी बयानात व लंगर-ए-आम</p>
+        <div class="schedule-badge">30 اکتوبر • رات</div>
+        <div class="schedule-text">
+          <h4>محفلِ نعت و بیانات</h4>
+          <p>علمائے کرام کے پرمغز خطابات اور لنگرِ عام کی تقسیم</p>
         </div>
       </div>
 
       <div class="schedule-row">
-        <div class="schedule-time">30 अक्टूबर • देर रात</div>
-        <div class="schedule-desc">
-          <h4>कुल शरीफ़ व ख़ुसूसी दुआ</h4>
-          <p>मुल्क-ओ-मिल्लत की सलामती व तरक़्क़ी के लिए ख़ास दुआ</p>
+        <div class="schedule-badge">30 اکتوبر • اختتام</div>
+        <div class="schedule-text">
+          <h4>قل شریف و اجتماعی دعا</h4>
+          <p>ملک و ملت کی سلامتی اور تمام زائرین و محبین کے لیے خصوصی دعا</p>
         </div>
       </div>
     </div>
 
-    <!-- WhatsApp Share Button -->
+    <!-- Share Button -->
     <button class="btn-share" onclick="shareWebsite()">
-      <i class="fa-brands fa-whatsapp"></i> दावतनामा WhatsApp पर शेयर करें
+      <i class="fa-brands fa-whatsapp"></i> عرسِ حامدی کا دعوتی کارڈ WhatsApp پر شیئر کریں
     </button>
   </div>
 
   <script>
-    // Target: 29 October 2026, 09:00 PM
     const eventTime = new Date("October 29, 2026 21:00:00").getTime();
 
     function refreshTimer() {
@@ -370,7 +378,7 @@
       const diff = eventTime - now;
 
       if (diff <= 0) {
-        document.getElementById("timer-status").innerText = "✨ मुबारक उर्स जारी है! ✨";
+        document.getElementById("timer-status").innerText = "✨ عرسِ حامدی مبارک جاری ہے! ✨";
         document.getElementById("days").innerText = "00";
         document.getElementById("hours").innerText = "00";
         document.getElementById("minutes").innerText = "00";
@@ -393,9 +401,9 @@
     refreshTimer();
 
     function shareWebsite() {
-      const text = "🌙 *उर्स-ए-सिद्दीकी मुबारक* 🌙\n\nसालाना उर्स पाक 29-30 अक्टूबर 2026 को बड़ी अक़ीदत के साथ मनाया जा रहा है।\n\nलाइव काउंटडाउन, प्रोग्राम और तफ़सीलात देखने के लिए यहाँ क्लिक करें:\n👉 " + window.location.href;
+      const text = "🌙 *عرسِ حامدی مبارک* 🌙\n\nسالانہ عرسِ حامدی پاک 29 تا 30 اکتوبر 2026 کو عقیدت و احترام کے ساتھ منایا جا رہا ہے۔\n\nلائیو کاؤنٹ ڈاؤن اور مکمل شیڈول دیکھنے کے لیے لنک پر کلک کریں:\n👉 " + window.location.href;
       if (navigator.share) {
-        navigator.share({ title: 'उर्स-ए-सिद्दीकी', text: text, url: window.location.href }).catch(() => {});
+        navigator.share({ title: 'عرسِ حامدی مبارک', text: text, url: window.location.href }).catch(() => {});
       } else {
         window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), "_blank");
       }
