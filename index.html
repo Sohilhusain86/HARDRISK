@@ -2,7 +2,7 @@
 <html lang="ur" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <title>جامعۃ الرضا - اختصاصی تعلیمی پورٹل (Ula Alif)</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -51,7 +51,7 @@
       border-radius: 24px;
       padding: 24px 18px;
       width: 100%;
-      max-width: 480px;
+      max-width: 520px;
       animation: luxuryGlow 5s infinite ease-in-out;
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -177,7 +177,7 @@
     .books-container {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
       margin-top: 14px;
       text-align: right;
       direction: rtl;
@@ -195,8 +195,8 @@
     }
 
     .book-cover {
-      width: 82px;
-      height: 110px;
+      width: 78px;
+      height: 105px;
       border-radius: 8px;
       flex-shrink: 0;
       display: flex;
@@ -204,7 +204,7 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 8px 4px;
+      padding: 6px 4px;
       box-shadow: -4px 6px 15px rgba(0,0,0,0.7), inset 2px 0 4px rgba(255,255,255,0.25);
     }
     .cover-bahar {
@@ -215,26 +215,29 @@
       background: linear-gradient(135deg, #1e293b 0%, #0f766e 50%, #042f2e 100%);
       border: 1.5px solid #38bdf8;
     }
-    .book-cover i { font-size: 22px; margin-bottom: 6px; }
+    .cover-math {
+      background: linear-gradient(135deg, #431407 0%, #c2410c 50%, #7c2d12 100%);
+      border: 1.5px solid #fb923c;
+    }
+    .book-cover i { font-size: 20px; margin-bottom: 5px; }
     .book-cover-title {
       font-size: 0.65rem;
       font-weight: 700;
       line-height: 1.2;
       color: #fff;
-      font-family: 'Noto Nastaliq Urdu', 'Amiri', serif;
     }
 
     .book-details {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 4px;
     }
     .book-title {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 700;
       color: #f1f5f9;
-      line-height: 1.4;
+      line-height: 1.35;
     }
     .book-sub {
       font-size: 0.72rem;
@@ -249,9 +252,9 @@
     }
     .btn-card {
       flex: 1;
-      padding: 9px 10px;
+      padding: 8px 10px;
       border-radius: 8px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 600;
       border: none;
       cursor: pointer;
@@ -280,6 +283,7 @@
       text-decoration: underline;
     }
 
+    /* FULLSCREEN INTERACTIVE ZOOM VIEWER */
     #pdf-viewer-overlay {
       display: none;
       position: fixed;
@@ -290,22 +294,76 @@
     }
     .viewer-header {
       background: #0f172a;
-      padding: 12px 16px;
+      padding: 10px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #1e293b;
-      direction: rtl;
+      direction: ltr;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .viewer-title-box {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: 50%;
+    }
+    .viewer-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-ctrl {
+      background: #1e293b;
+      color: #00ffa3;
+      border: 1px solid rgba(0, 255, 163, 0.3);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      cursor: pointer;
     }
     .btn-close-viewer {
       background: #ef4444;
       color: #fff;
       border: none;
-      padding: 6px 14px;
-      border-radius: 8px;
+      padding: 6px 12px;
+      border-radius: 6px;
       font-size: 0.8rem;
       font-weight: 700;
       cursor: pointer;
+    }
+
+    /* Scrollable Container with Zoom transform */
+    #zoom-container {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background: #12181f;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pinch-zoom;
+    }
+    #frame-wrapper {
+      width: 100%;
+      height: 100%;
+      transition: transform 0.2s ease;
+      transform-origin: top center;
+    }
+    #fullscreen-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
     }
   </style>
 </head>
@@ -319,13 +377,13 @@
     </div>
 
     <div class="icon-seal">
-      <i class="fa-solid fa-book-quran"></i>
+      <i class="fa-solid fa-graduation-cap"></i>
     </div>
 
     <h2>محفوظ تعلیمی پورٹل</h2>
 
     <div class="urdu-banner">
-      یہ پورٹل <b>جامعۃ الرضا</b> کے درجہ <b>اولیٰ الف</b> کے طلبہ کے لیے مختص ہے۔ مطالعہ کے لیے اپنا نام اور خفیہ پاس ورڈ درج کریں۔
+      یہ پورٹل <b>جامعۃ الرضا</b> کے درجہ <b>اولیٰ الف</b> کے طلبہ کے لیے مختص ہے۔ متعلقہ درسی کتب کھولنے کے لیے اپنا نام اور مخصوص خفیہ کوڈ درج کریں۔
     </div>
 
     <div class="form-group">
@@ -345,7 +403,7 @@
     </div>
 
     <button type="button" class="btn-submit" onclick="verifyAccess()">
-      <i class="fa-solid fa-arrow-right-to-bracket"></i> &nbsp; تصدیق کریں اور کتاب کھولیں (Open)
+      <i class="fa-solid fa-arrow-right-to-bracket"></i> &nbsp; تصدیق کریں اور داخل ہوں (Open)
     </button>
 
     <div id="error-alert" class="error-msg">درج شدہ معلومات غلط ہیں! درست پاس ورڈ درج کریں۔</div>
@@ -362,8 +420,71 @@
 
     <div class="books-container">
       
-      <!-- ITEM 1: بہار شریعت (पासवर्ड: 92) -->
-      <div class="book-card" id="card-bahar" style="display:none;">
+      <!-- SECTION MATHEMATICS (Password: 786786) -->
+      <div id="group-math" style="display:none; flex-direction:column; gap:12px;">
+        <!-- Chapter 8 -->
+        <div class="book-card">
+          <div class="book-cover cover-math">
+            <i class="fa-solid fa-calculator" style="color:#fed7aa;"></i>
+            <span class="book-cover-title">Math<br>Ch. 8</span>
+          </div>
+          <div class="book-details">
+            <div class="book-title">Class 4 Mathematics Chapter 8 Solved Q...</div>
+            <div class="book-sub">اولیٰ الف ریاضی | حل شدہ امتحانی مشقیں و سوالات</div>
+            <div class="book-actions">
+              <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1e_f_rYoIiaPs4F7PMJlOIc4SrNPIV28m', 'Math Ch. 8 Solved Questions')">
+                <i class="fa-solid fa-book-open"></i> پڑھیں
+              </button>
+              <button class="btn-card btn-card-down" onclick="startDirectDownload('1e_f_rYoIiaPs4F7PMJlOIc4SrNPIV28m', 'Class_4_Mathematics_Chapter_8_Solved.pdf')">
+                <i class="fa-solid fa-download"></i> ڈاؤنلوڈ
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chapter 9 -->
+        <div class="book-card">
+          <div class="book-cover cover-math">
+            <i class="fa-solid fa-chart-pie" style="color:#fed7aa;"></i>
+            <span class="book-cover-title">Math<br>Ch. 9</span>
+          </div>
+          <div class="book-details">
+            <div class="book-title">Class 4 Mathematics Chapter 9 Solved Q...</div>
+            <div class="book-sub">اولیٰ الف ریاضی | حل شدہ سوالات مع تفصیلی جوابات</div>
+            <div class="book-actions">
+              <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1cSJrtV8o8YQjTqlo-APAx3G8NohDrfSn', 'Math Ch. 9 Solved Questions')">
+                <i class="fa-solid fa-book-open"></i> پڑھیں
+              </button>
+              <button class="btn-card btn-card-down" onclick="startDirectDownload('1cSJrtV8o8YQjTqlo-APAx3G8NohDrfSn', 'Class_4_Mathematics_Chapter_9_Solved.pdf')">
+                <i class="fa-solid fa-download"></i> ڈاؤنلوڈ
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chapter 10 -->
+        <div class="book-card">
+          <div class="book-cover cover-math">
+            <i class="fa-solid fa-shapes" style="color:#fed7aa;"></i>
+            <span class="book-cover-title">Math<br>Ch. 10</span>
+          </div>
+          <div class="book-details">
+            <div class="book-title">Class 4 Mathematics Chapter 10 Solved ...</div>
+            <div class="book-sub">اولیٰ الف ریاضی | تفصیلی سوالات مع حل (مکمل مشق)</div>
+            <div class="book-actions">
+              <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1KClLGIym2oblPYmCJ7oW_3A30Lj01twq', 'Math Ch. 10 Solved Questions')">
+                <i class="fa-solid fa-book-open"></i> پڑھیں
+              </button>
+              <button class="btn-card btn-card-down" onclick="startDirectDownload('1KClLGIym2oblPYmCJ7oW_3A30Lj01twq', 'Class_4_Mathematics_Chapter_10_Solved.pdf')">
+                <i class="fa-solid fa-download"></i> ڈاؤنلوڈ
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION BAHAR-E-SHARIAT (Password: 92) -->
+      <div id="card-bahar" class="book-card" style="display:none;">
         <div class="book-cover cover-bahar">
           <i class="fa-solid fa-quran" style="color:#f59e0b;"></i>
           <span class="book-cover-title">بہارِ شریعت<br><small style="color:#fde68a;">حصہ اول</small></span>
@@ -382,8 +503,8 @@
         </div>
       </div>
 
-      <!-- ITEM 2: कक्षा 4 हिंदी (पासवर्ड: 786) -->
-      <div class="book-card" id="card-hindi" style="display:none;">
+      <!-- SECTION HINDI (Password: 786) -->
+      <div id="card-hindi" class="book-card" style="display:none;">
         <div class="book-cover cover-hindi">
           <i class="fa-solid fa-book" style="color:#38bdf8;"></i>
           <span class="book-cover-title">درسی ہندی<br><small style="color:#bae6fd;">کلاس 4</small></span>
@@ -409,23 +530,37 @@
     </button>
   </div>
 
-  <!-- 3. FULLSCREEN VIEWER -->
+  <!-- 3. FULLSCREEN VIEWER WITH INTERACTIVE ZOOM -->
   <div id="pdf-viewer-overlay">
     <div class="viewer-header">
-      <span id="viewer-title" style="color:#fff; font-size:0.88rem; font-weight:700;">
-        <i class="fa-solid fa-file-pdf" style="color:#ef4444; margin-left:6px;"></i> پی ڈی ایف ریڈر
-      </span>
-      <button type="button" class="btn-close-viewer" onclick="closeFullscreenPdf()">✕ بند کریں (Close)</button>
+      <div class="viewer-title-box">
+        <i class="fa-solid fa-file-pdf" style="color:#ef4444;"></i>
+        <span id="viewer-title">PDF Reader</span>
+      </div>
+      
+      <!-- Interactive Zoom Toolbar -->
+      <div class="viewer-controls">
+        <button type="button" class="btn-ctrl" onclick="zoomIn()"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+        <button type="button" class="btn-ctrl" onclick="zoomReset()"><span id="zoom-val">100%</span></button>
+        <button type="button" class="btn-ctrl" onclick="zoomOut()"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+        <button type="button" class="btn-close-viewer" onclick="closeFullscreenPdf()">✕ بند کریں</button>
+      </div>
     </div>
-    <iframe id="fullscreen-frame" src="" style="width:100%; height:100%; border:none;"></iframe>
+    
+    <div id="zoom-container">
+      <div id="frame-wrapper">
+        <iframe id="fullscreen-frame" src=""></iframe>
+      </div>
+    </div>
   </div>
 
   <script>
-    // आसान और छोटे पासवर्ड
     const PASS_HINDI = "786";
     const PASS_BAHAR = "92";
+    const PASS_MATH = "786786"; // 2 baar 786
 
     const SESSION_EXPIRY_MS = 5 * 60 * 60 * 1000;
+    let currentZoom = 1.0;
 
     function checkActiveSession() {
       try {
@@ -449,14 +584,19 @@
       document.getElementById('content-section').style.display = 'block';
       document.getElementById('welcome-user').innerHTML = `خوش آمدید، عزیزم <b>${name}</b> (اولیٰ الف)`;
 
+      document.getElementById('card-hindi').style.display = 'none';
+      document.getElementById('card-bahar').style.display = 'none';
+      document.getElementById('group-math').style.display = 'none';
+
       if (bookType === 'hindi') {
         document.getElementById('card-hindi').style.display = 'flex';
-        document.getElementById('card-bahar').style.display = 'none';
         document.getElementById('portal-title').innerText = "دستیاب درسی مواد: کلاس 4 ہندی";
       } else if (bookType === 'bahar') {
         document.getElementById('card-bahar').style.display = 'flex';
-        document.getElementById('card-hindi').style.display = 'none';
         document.getElementById('portal-title').innerText = "دستیاب درسی مواد: بہارِ شریعت";
+      } else if (bookType === 'math') {
+        document.getElementById('group-math').style.display = 'flex';
+        document.getElementById('portal-title').innerText = "دستیاب درسی مواد: کلاس 4 ریاضی (Mathematics)";
       }
     }
 
@@ -476,6 +616,8 @@
         bookType = 'hindi';
       } else if (pass === PASS_BAHAR) {
         bookType = 'bahar';
+      } else if (pass === PASS_MATH) {
+        bookType = 'math';
       } else {
         err.innerText = "غلط پاس ورڈ! رسائی نامنظور ہے۔";
         err.style.display = 'block';
@@ -493,10 +635,39 @@
       showDashboard(name, bookType);
     }
 
+    // ZOOM FUNCTIONS
+    function applyZoom() {
+      const wrapper = document.getElementById('frame-wrapper');
+      wrapper.style.transform = `scale(${currentZoom})`;
+      wrapper.style.width = `${100 / currentZoom}%`;
+      wrapper.style.height = `${100 / currentZoom}%`;
+      document.getElementById('zoom-val').innerText = `${Math.round(currentZoom * 100)}%`;
+    }
+
+    function zoomIn() {
+      if (currentZoom < 2.5) {
+        currentZoom += 0.25;
+        applyZoom();
+      }
+    }
+
+    function zoomOut() {
+      if (currentZoom > 0.75) {
+        currentZoom -= 0.25;
+        applyZoom();
+      }
+    }
+
+    function zoomReset() {
+      currentZoom = 1.0;
+      applyZoom();
+    }
+
     function openFullscreenPdf(fileId, title) {
       const viewer = document.getElementById('pdf-viewer-overlay');
       const frame = document.getElementById('fullscreen-frame');
-      document.getElementById('viewer-title').innerHTML = `<i class="fa-solid fa-file-pdf" style="color:#ef4444; margin-left:6px;"></i> ${title}`;
+      document.getElementById('viewer-title').innerText = title;
+      zoomReset();
       frame.src = `https://drive.google.com/file/d/${fileId}/preview`;
       viewer.style.display = 'flex';
     }
@@ -506,6 +677,7 @@
       const frame = document.getElementById('fullscreen-frame');
       frame.src = "";
       viewer.style.display = 'none';
+      zoomReset();
     }
 
     function startDirectDownload(fileId, filename) {
