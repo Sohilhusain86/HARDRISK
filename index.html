@@ -600,7 +600,42 @@
       }
     }
 
+    
+    let failedAttempts = parseInt(localStorage.getItem("jamia_failed_attempts") || "0", 10);
+    let lockUntil = parseInt(localStorage.getItem("jamia_lock_until") || "0", 10);
+
+    function checkLockTimer() {
+      const now = Date.now();
+      const lockUntil = parseInt(localStorage.getItem("jamia_lock_until") || "0", 10);
+      const btn = document.querySelector(".btn-submit");
+      const err = document.getElementById("error-alert");
+
+      if (now < lockUntil) {
+        btn.disabled = true;
+        btn.style.opacity = "0.6";
+        btn.style.cursor = "not-allowed";
+        const remSec = Math.ceil((lockUntil - now) / 1000);
+        const m = Math.floor(remSec / 60);
+        const s = remSec % 60;
+        err.style.display = "block";
+        err.innerHTML = `<i class="fa-solid fa-lock"></i> 5 بار غلط پاس ورڈ درج کیا گیا! براہِ کرم <b>${m}:${s < 10 ? "0" : ""}${s}</b> منٹ انتظار کریں۔`;
+        setTimeout(checkLockTimer, 1000);
+        return true;
+      } else {
+        if (lockUntil > 0) {
+          localStorage.removeItem("jamia_lock_until");
+          localStorage.setItem("jamia_failed_attempts", "0");
+        }
+        btn.disabled = false;
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+        return false;
+      }
+    }
+
     function verifyAccess() {
+      if (checkLockTimer()) return;
+
       const name = document.getElementById('user-name').value.trim();
       const pass = document.getElementById('user-pass').value.trim();
       const err = document.getElementById('error-alert');
@@ -619,10 +654,18 @@
       } else if (pass === PASS_MATH) {
         bookType = 'math';
       } else {
-        err.innerText = "غلط پاس ورڈ! رسائی نامنظور ہے۔";
-        err.style.display = 'block';
+        failedAttempts++;
+        localStorage.setItem("jamia_failed_attempts", failedAttempts.toString());
+        if (failedAttempts >= 5) {
+          localStorage.setItem("jamia_lock_until", (Date.now() + 2 * 60 * 1000).toString());
+          checkLockTimer();
+          return;
+        }
+        err.innerHTML = `غلط پاس ورڈ! رسائی نامنظور ہے۔ (باقی کوششیں: ${5 - failedAttempts})`;
+        err.style.display = "block";
         return;
       }
+      localStorage.setItem("jamia_failed_attempts", "0");
 
       err.style.display = 'none';
 
@@ -681,6 +724,13 @@
     }
 
     function startDirectDownload(fileId, filename) {
+      const activeBtn = event ? (event.currentTarget || event.target) : null;
+      let origText = "";
+      if (activeBtn) {
+        origText = activeBtn.innerHTML;
+        activeBtn.innerHTML = "<i class="fa-solid fa-spinner fa-spin"></i> ڈاؤنلوڈ ہو رہا ہے...";
+        activeBtn.style.pointerEvents = "none";
+      }
       const directUrl = `https://drive.usercontent.google.com/download?id=${fileId}&export=download&authuser=0`;
       const a = document.createElement('a');
       a.href = directUrl;
@@ -689,6 +739,12 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      if (activeBtn) {
+        setTimeout(() => {
+          activeBtn.innerHTML = origText;
+          activeBtn.style.pointerEvents = "auto";
+        }, 3000);
+      }
     }
 
     function manualLogout() {
