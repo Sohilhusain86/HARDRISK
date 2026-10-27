@@ -107,23 +107,16 @@
       line-height: 2;
       color: #fef08a;
       direction: rtl;
-      margin: 8px 0 12px;
-      padding: 8px 12px;
+      margin: 8px 0 16px;
+      padding: 10px 14px;
       background: rgba(255, 255, 255, 0.035);
       border: 1px dashed rgba(245, 158, 11, 0.35);
       border-radius: 12px;
     }
 
-    .notice-text {
-      font-size: 0.76rem;
-      color: #94a3b8;
-      line-height: 1.4;
-      margin-bottom: 16px;
-    }
-
     .form-group {
       text-align: left;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
     .form-group label {
       display: flex;
@@ -131,17 +124,17 @@
       gap: 7px;
       font-size: 0.78rem;
       color: #cbd5e1;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
       font-weight: 600;
     }
     .form-input {
       width: 100%;
-      padding: 12px 14px;
+      padding: 13px 14px;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 12px;
       color: #fff;
-      font-size: 0.9rem;
+      font-size: 0.92rem;
       outline: none;
       transition: all 0.25s ease;
     }
@@ -153,16 +146,16 @@
 
     .btn-submit {
       width: 100%;
-      padding: 13px;
+      padding: 14px;
       background: linear-gradient(120deg, #047857, #00d26a 50%, #059669);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 14px;
       color: #fff;
-      font-size: 0.95rem;
+      font-size: 0.96rem;
       font-weight: 800;
       letter-spacing: 0.4px;
       cursor: pointer;
-      margin-top: 6px;
+      margin-top: 8px;
       box-shadow: 0 8px 24px rgba(0, 210, 106, 0.35);
       transition: transform 0.2s;
     }
@@ -172,10 +165,10 @@
       color: #f87171;
       background: rgba(239, 68, 68, 0.1);
       border: 1px solid rgba(239, 68, 68, 0.3);
-      padding: 8px;
-      border-radius: 8px;
-      font-size: 0.76rem;
-      margin-top: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      margin-top: 12px;
       display: none;
     }
 
@@ -256,9 +249,9 @@
     }
     .btn-card {
       flex: 1;
-      padding: 8px 10px;
+      padding: 9px 10px;
       border-radius: 8px;
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       font-weight: 600;
       border: none;
       cursor: pointer;
@@ -281,7 +274,7 @@
       background: transparent;
       color: #8696a0;
       border: none;
-      font-size: 0.76rem;
+      font-size: 0.78rem;
       cursor: pointer;
       margin-top: 14px;
       text-decoration: underline;
@@ -332,12 +325,8 @@
     <h2>محفوظ تعلیمی پورٹل</h2>
 
     <div class="urdu-banner">
-      یہ پورٹل <b>جامعۃ الرضا</b> کے درجہ <b>اولیٰ الف</b> کے طلبہ کے لیے ہے۔ مطلوبہ کتاب کھولنے کے لیے متعلقہ پاس ورڈ درج کریں۔
+      یہ پورٹل <b>جامعۃ الرضا</b> کے درجہ <b>اولیٰ الف</b> کے طلبہ کے لیے مختص ہے۔ مطالعہ کے لیے اپنا نام اور خفیہ پاس ورڈ درج کریں۔
     </div>
-
-    <p class="notice-text">
-      <b>ہندی کلاس 4:</b> 5 مرتبہ 786 کوڈ | <b>بہار شریعت:</b> 5 مرتبہ 7877 کوڈ
-    </p>
 
     <div class="form-group">
       <label for="user-name">
@@ -352,14 +341,14 @@
         <i class="fa-solid fa-key" style="color:#fbbf24;"></i> 
         خفیہ پاس ورڈ (Security Password)
       </label>
-      <input type="password" id="user-pass" class="form-input" placeholder="مخصوص 5 بار کوڈ درج کریں" autocomplete="current-password">
+      <input type="password" id="user-pass" class="form-input" placeholder="پاس ورڈ درج کریں" autocomplete="current-password">
     </div>
 
     <button type="button" class="btn-submit" onclick="verifyAccess()">
       <i class="fa-solid fa-arrow-right-to-bracket"></i> &nbsp; تصدیق کریں اور کتاب کھولیں (Open)
     </button>
 
-    <div id="error-alert" class="error-msg">غلط پاس ورڈ یا نام درج نہیں کیا گیا!</div>
+    <div id="error-alert" class="error-msg">درج شدہ معلومات غلط ہیں! درست پاس ورڈ درج کریں۔</div>
   </div>
 
   <!-- 2. VERIFIED CONTENT -->
@@ -373,7 +362,7 @@
 
     <div class="books-container">
       
-      <!-- ITEM 1: بہار شریعت (पासवर्ड: 5 बार 7877) -->
+      <!-- ITEM 1: بہار شریعت (पासवर्ड: 92) -->
       <div class="book-card" id="card-bahar" style="display:none;">
         <div class="book-cover cover-bahar">
           <i class="fa-solid fa-quran" style="color:#f59e0b;"></i>
@@ -381,7 +370,7 @@
         </div>
         <div class="book-details">
           <div class="book-title">بہار شریعت حصہ اول (150 سوالات مع جوابات)</div>
-          <div class="book-sub">جامعۃ الرضا - فقہی و عقائدی سوالات | مروجہ امتحانی تیاری</div>
+          <div class="book-sub">جامعۃ الرضا - فقہی و عقائدی سوالات | امتحانی تیاری</div>
           <div class="book-actions">
             <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1RkoRNX0nAeQLA5e8QsWKrcX_RfVcudG2', 'بہار شریعت حصہ اول (150 سوالات مع جوابات)')">
               <i class="fa-solid fa-book-open"></i> پڑھیں
@@ -393,7 +382,7 @@
         </div>
       </div>
 
-      <!-- ITEM 2: कक्षा 4 हिंदी (पासवर्ड: 5 बार 786) -->
+      <!-- ITEM 2: कक्षा 4 हिंदी (पासवर्ड: 786) -->
       <div class="book-card" id="card-hindi" style="display:none;">
         <div class="book-cover cover-hindi">
           <i class="fa-solid fa-book" style="color:#38bdf8;"></i>
@@ -401,7 +390,7 @@
         </div>
         <div class="book-details">
           <div class="book-title">कक्षा 4 हिंदी पाठ 7: नकली हीरे (50 प्रश्नोत्तरी)</div>
-          <div class="book-sub">اولیٰ الف تدریسی مواد | تمام تفصیلی سوال و جواب</div>
+          <div class="book-sub">اولیٰ الف تدریسی مواد | تفصیلی سوال و جواب</div>
           <div class="book-actions">
             <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1xSLxk3toreZoU5vlI_SzVUq93nzzMRnv', 'कक्षा 4 हिंदी पाठ 7: नकली हीरे')">
               <i class="fa-solid fa-book-open"></i> پڑھیں
@@ -432,12 +421,11 @@
   </div>
 
   <script>
-    // 1. कक्षा 4 हिंदी का पासवर्ड (5 बार 786)
-    const PASS_HINDI = "786786786786786";
-    // 2. बहारे शरीअत का पासवर्ड (5 बार 7877)
-    const PASS_BAHAR = "78777877787778777877";
+    // आसान और छोटे पासवर्ड
+    const PASS_HINDI = "786";
+    const PASS_BAHAR = "92";
 
-    const SESSION_EXPIRY_MS = 5 * 60 * 60 * 1000; // 5 گھنٹے
+    const SESSION_EXPIRY_MS = 5 * 60 * 60 * 1000;
 
     function checkActiveSession() {
       try {
@@ -489,7 +477,7 @@
       } else if (pass === PASS_BAHAR) {
         bookType = 'bahar';
       } else {
-        err.innerText = "غلط پاس ورڈ! 5 بار 786 یا 5 بار 7877 درج کریں۔";
+        err.innerText = "غلط پاس ورڈ! رسائی نامنظور ہے۔";
         err.style.display = 'block';
         return;
       }
