@@ -183,6 +183,16 @@
       direction: rtl;
     }
 
+    .section-heading {
+      font-size: 0.88rem;
+      color: #38bdf8;
+      font-weight: 700;
+      text-align: right;
+      margin-top: 6px;
+      border-bottom: 1px dashed rgba(56, 189, 248, 0.3);
+      padding-bottom: 4px;
+    }
+
     .book-card {
       background: rgba(8, 18, 25, 0.85);
       border: 1.2px solid rgba(255, 255, 255, 0.12);
@@ -341,7 +351,6 @@
       cursor: pointer;
     }
 
-    /* Scrollable Container with Zoom transform */
     #zoom-container {
       flex: 1;
       width: 100%;
@@ -383,7 +392,7 @@
     <h2>محفوظ تعلیمی پورٹل</h2>
 
     <div class="urdu-banner">
-      یہ پورٹل <b>جامعۃ الرضا</b> کے درجہ <b>اولیٰ الف</b> کے طلبہ کے لیے مختص ہے۔ متعلقہ درسی کتب کھولنے کے لیے اپنا نام اور مخصوص خفیہ کوڈ درج کریں۔
+      یہ پورٹل <b>جامعۃ الرضا</b> کے درجہ <b>اولیٰ الف</b> کے طلبہ کے لیے مختص ہے۔ مطالعہ کے لیے اپنا نام اور مخصوص خفیہ کوڈ درج کریں۔
     </div>
 
     <div class="form-group">
@@ -402,89 +411,27 @@
       <input type="password" id="user-pass" class="form-input" placeholder="پاس ورڈ درج کریں" autocomplete="current-password">
     </div>
 
-    <button type="button" class="btn-submit" onclick="verifyAccess()">
+    <button type="button" class="btn-submit" id="btn-login" onclick="verifyAccess()">
       <i class="fa-solid fa-arrow-right-to-bracket"></i> &nbsp; تصدیق کریں اور داخل ہوں (Open)
     </button>
 
-    <div id="error-alert" class="error-msg">درج شدہ معلومات غلط ہیں! درست پاس ورڈ درج کریں۔</div>
+    <div id="error-alert" class="error-msg">درج شدہ معلومات غلط ہیں!</div>
   </div>
 
-  <!-- 2. VERIFIED CONTENT -->
+  <!-- 2. ALL BOOKS DASHBOARD (TOGETHER) -->
   <div class="card" id="content-section">
     <div class="exclusive-badge" style="border-color:#00ffa3; color:#00ffa3;">
       <i class="fa-solid fa-circle-check"></i>
       <span id="welcome-user">خوش آمدید طالب علم!</span>
     </div>
 
-    <h3 id="portal-title" style="color:#f8fafc; font-size:1.05rem; margin-bottom:10px; font-weight:700;">دستیاب درسی مواد</h3>
+    <h3 style="color:#f8fafc; font-size:1.05rem; margin-bottom:8px; font-weight:700;">تمام درسی و تعلیمی کتب</h3>
 
     <div class="books-container">
-      
-      <!-- SECTION MATHEMATICS (Password: 786786) -->
-      <div id="group-math" style="display:none; flex-direction:column; gap:12px;">
-        <!-- Chapter 8 -->
-        <div class="book-card">
-          <div class="book-cover cover-math">
-            <i class="fa-solid fa-calculator" style="color:#fed7aa;"></i>
-            <span class="book-cover-title">Math<br>Ch. 8</span>
-          </div>
-          <div class="book-details">
-            <div class="book-title">Class 4 Mathematics Chapter 8 Solved Q...</div>
-            <div class="book-sub">اولیٰ الف ریاضی | حل شدہ امتحانی مشقیں و سوالات</div>
-            <div class="book-actions">
-              <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1e_f_rYoIiaPs4F7PMJlOIc4SrNPIV28m', 'Math Ch. 8 Solved Questions')">
-                <i class="fa-solid fa-book-open"></i> پڑھیں
-              </button>
-              <button class="btn-card btn-card-down" onclick="startDirectDownload('1e_f_rYoIiaPs4F7PMJlOIc4SrNPIV28m', 'Class_4_Mathematics_Chapter_8_Solved.pdf')">
-                <i class="fa-solid fa-download"></i> ڈاؤنلوڈ
-              </button>
-            </div>
-          </div>
-        </div>
 
-        <!-- Chapter 9 -->
-        <div class="book-card">
-          <div class="book-cover cover-math">
-            <i class="fa-solid fa-chart-pie" style="color:#fed7aa;"></i>
-            <span class="book-cover-title">Math<br>Ch. 9</span>
-          </div>
-          <div class="book-details">
-            <div class="book-title">Class 4 Mathematics Chapter 9 Solved Q...</div>
-            <div class="book-sub">اولیٰ الف ریاضی | حل شدہ سوالات مع تفصیلی جوابات</div>
-            <div class="book-actions">
-              <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1cSJrtV8o8YQjTqlo-APAx3G8NohDrfSn', 'Math Ch. 9 Solved Questions')">
-                <i class="fa-solid fa-book-open"></i> پڑھیں
-              </button>
-              <button class="btn-card btn-card-down" onclick="startDirectDownload('1cSJrtV8o8YQjTqlo-APAx3G8NohDrfSn', 'Class_4_Mathematics_Chapter_9_Solved.pdf')">
-                <i class="fa-solid fa-download"></i> ڈاؤنلوڈ
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Chapter 10 -->
-        <div class="book-card">
-          <div class="book-cover cover-math">
-            <i class="fa-solid fa-shapes" style="color:#fed7aa;"></i>
-            <span class="book-cover-title">Math<br>Ch. 10</span>
-          </div>
-          <div class="book-details">
-            <div class="book-title">Class 4 Mathematics Chapter 10 Solved ...</div>
-            <div class="book-sub">اولیٰ الف ریاضی | تفصیلی سوالات مع حل (مکمل مشق)</div>
-            <div class="book-actions">
-              <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1KClLGIym2oblPYmCJ7oW_3A30Lj01twq', 'Math Ch. 10 Solved Questions')">
-                <i class="fa-solid fa-book-open"></i> پڑھیں
-              </button>
-              <button class="btn-card btn-card-down" onclick="startDirectDownload('1KClLGIym2oblPYmCJ7oW_3A30Lj01twq', 'Class_4_Mathematics_Chapter_10_Solved.pdf')">
-                <i class="fa-solid fa-download"></i> ڈاؤنلوڈ
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SECTION BAHAR-E-SHARIAT (Password: 92) -->
-      <div id="card-bahar" class="book-card" style="display:none;">
+      <!-- SECTION 1: BAHAR-E-SHARIAT -->
+      <div class="section-heading"><i class="fa-solid fa-book-quran"></i> دینی و فقہی کتب</div>
+      <div class="book-card">
         <div class="book-cover cover-bahar">
           <i class="fa-solid fa-quran" style="color:#f59e0b;"></i>
           <span class="book-cover-title">بہارِ شریعت<br><small style="color:#fde68a;">حصہ اول</small></span>
@@ -496,15 +443,16 @@
             <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1RkoRNX0nAeQLA5e8QsWKrcX_RfVcudG2', 'بہار شریعت حصہ اول (150 سوالات مع جوابات)')">
               <i class="fa-solid fa-book-open"></i> پڑھیں
             </button>
-            <button class="btn-card btn-card-down" onclick="startDirectDownload('1RkoRNX0nAeQLA5e8QsWKrcX_RfVcudG2', 'Bahar_e_Shariat_Hissa_Awwal_150_QnA.pdf')">
+            <button class="btn-card btn-card-down" onclick="startDirectDownload(event, '1RkoRNX0nAeQLA5e8QsWKrcX_RfVcudG2', 'Bahar_e_Shariat_Hissa_Awwal_150_QnA.pdf')">
               <i class="fa-solid fa-download"></i> ڈاؤنلوڈ
             </button>
           </div>
         </div>
       </div>
 
-      <!-- SECTION HINDI (Password: 786) -->
-      <div id="card-hindi" class="book-card" style="display:none;">
+      <!-- SECTION 2: HINDI -->
+      <div class="section-heading"><i class="fa-solid fa-book"></i> درسی ہندی</div>
+      <div class="book-card">
         <div class="book-cover cover-hindi">
           <i class="fa-solid fa-book" style="color:#38bdf8;"></i>
           <span class="book-cover-title">درسی ہندی<br><small style="color:#bae6fd;">کلاس 4</small></span>
@@ -516,7 +464,70 @@
             <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1xSLxk3toreZoU5vlI_SzVUq93nzzMRnv', 'कक्षा 4 हिंदी पाठ 7: नकली हीरे')">
               <i class="fa-solid fa-book-open"></i> پڑھیں
             </button>
-            <button class="btn-card btn-card-down" onclick="startDirectDownload('1xSLxk3toreZoU5vlI_SzVUq93nzzMRnv', 'Kaksha_4_Hindi_Nakli_Heere.pdf')">
+            <button class="btn-card btn-card-down" onclick="startDirectDownload(event, '1xSLxk3toreZoU5vlI_SzVUq93nzzMRnv', 'Kaksha_4_Hindi_Nakli_Heere.pdf')">
+              <i class="fa-solid fa-download"></i> ڈاؤنلوڈ
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: MATHEMATICS CHAPTERS -->
+      <div class="section-heading"><i class="fa-solid fa-calculator"></i> ریاضی (Mathematics)</div>
+      
+      <!-- Chapter 8 -->
+      <div class="book-card">
+        <div class="book-cover cover-math">
+          <i class="fa-solid fa-calculator" style="color:#fed7aa;"></i>
+          <span class="book-cover-title">Math<br>Ch. 8</span>
+        </div>
+        <div class="book-details">
+          <div class="book-title">Class 4 Mathematics Chapter 8 Solved Q...</div>
+          <div class="book-sub">اولیٰ الف ریاضی | حل شدہ امتحانی مشقیں و سوالات</div>
+          <div class="book-actions">
+            <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1e_f_rYoIiaPs4F7PMJlOIc4SrNPIV28m', 'Math Ch. 8 Solved Questions')">
+              <i class="fa-solid fa-book-open"></i> پڑھیں
+            </button>
+            <button class="btn-card btn-card-down" onclick="startDirectDownload(event, '1e_f_rYoIiaPs4F7PMJlOIc4SrNPIV28m', 'Class_4_Mathematics_Chapter_8_Solved.pdf')">
+              <i class="fa-solid fa-download"></i> ڈاؤنلوڈ
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chapter 9 -->
+      <div class="book-card">
+        <div class="book-cover cover-math">
+          <i class="fa-solid fa-chart-pie" style="color:#fed7aa;"></i>
+          <span class="book-cover-title">Math<br>Ch. 9</span>
+        </div>
+        <div class="book-details">
+          <div class="book-title">Class 4 Mathematics Chapter 9 Solved Q...</div>
+          <div class="book-sub">اولیٰ الف ریاضی | حل شدہ سوالات مع تفصیلی جوابات</div>
+          <div class="book-actions">
+            <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1cSJrtV8o8YQjTqlo-APAx3G8NohDrfSn', 'Math Ch. 9 Solved Questions')">
+              <i class="fa-solid fa-book-open"></i> پڑھیں
+            </button>
+            <button class="btn-card btn-card-down" onclick="startDirectDownload(event, '1cSJrtV8o8YQjTqlo-APAx3G8NohDrfSn', 'Class_4_Mathematics_Chapter_9_Solved.pdf')">
+              <i class="fa-solid fa-download"></i> ڈاؤنلوڈ
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chapter 10 -->
+      <div class="book-card">
+        <div class="book-cover cover-math">
+          <i class="fa-solid fa-shapes" style="color:#fed7aa;"></i>
+          <span class="book-cover-title">Math<br>Ch. 10</span>
+        </div>
+        <div class="book-details">
+          <div class="book-title">Class 4 Mathematics Chapter 10 Solved ...</div>
+          <div class="book-sub">اولیٰ الف ریاضی | تفصیلی سوالات مع حل (مکمل مشق)</div>
+          <div class="book-actions">
+            <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1KClLGIym2oblPYmCJ7oW_3A30Lj01twq', 'Math Ch. 10 Solved Questions')">
+              <i class="fa-solid fa-book-open"></i> پڑھیں
+            </button>
+            <button class="btn-card btn-card-down" onclick="startDirectDownload(event, '1KClLGIym2oblPYmCJ7oW_3A30Lj01twq', 'Class_4_Mathematics_Chapter_10_Solved.pdf')">
               <i class="fa-solid fa-download"></i> ڈاؤنلوڈ
             </button>
           </div>
@@ -538,7 +549,6 @@
         <span id="viewer-title">PDF Reader</span>
       </div>
       
-      <!-- Interactive Zoom Toolbar -->
       <div class="viewer-controls">
         <button type="button" class="btn-ctrl" onclick="zoomIn()"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
         <button type="button" class="btn-ctrl" onclick="zoomReset()"><span id="zoom-val">100%</span></button>
@@ -555,59 +565,15 @@
   </div>
 
   <script>
-    const PASS_HINDI = "786";
-    const PASS_BAHAR = "92";
-    const PASS_MATH = "786786"; // 2 baar 786
-
+    // एकल मास्टर पासवर्ड: 78692
+    const MASTER_PASSWORD = "78692";
     const SESSION_EXPIRY_MS = 5 * 60 * 60 * 1000;
     let currentZoom = 1.0;
-
-    function checkActiveSession() {
-      try {
-        const savedName = localStorage.getItem('jamia_ula_name');
-        const savedBook = localStorage.getItem('jamia_ula_book');
-        const savedExpiry = localStorage.getItem('jamia_ula_expiry');
-        const now = Date.now();
-
-        if (savedName && savedBook && savedExpiry && now < parseInt(savedExpiry, 10)) {
-          showDashboard(savedName, savedBook);
-        } else {
-          localStorage.removeItem('jamia_ula_name');
-          localStorage.removeItem('jamia_ula_book');
-          localStorage.removeItem('jamia_ula_expiry');
-        }
-      } catch (_) {}
-    }
-
-    function showDashboard(name, bookType) {
-      document.getElementById('auth-section').style.display = 'none';
-      document.getElementById('content-section').style.display = 'block';
-      document.getElementById('welcome-user').innerHTML = `خوش آمدید، عزیزم <b>${name}</b> (اولیٰ الف)`;
-
-      document.getElementById('card-hindi').style.display = 'none';
-      document.getElementById('card-bahar').style.display = 'none';
-      document.getElementById('group-math').style.display = 'none';
-
-      if (bookType === 'hindi') {
-        document.getElementById('card-hindi').style.display = 'flex';
-        document.getElementById('portal-title').innerText = "دستیاب درسی مواد: کلاس 4 ہندی";
-      } else if (bookType === 'bahar') {
-        document.getElementById('card-bahar').style.display = 'flex';
-        document.getElementById('portal-title').innerText = "دستیاب درسی مواد: بہارِ شریعت";
-      } else if (bookType === 'math') {
-        document.getElementById('group-math').style.display = 'flex';
-        document.getElementById('portal-title').innerText = "دستیاب درسی مواد: کلاس 4 ریاضی (Mathematics)";
-      }
-    }
-
-    
-    let failedAttempts = parseInt(localStorage.getItem("jamia_failed_attempts") || "0", 10);
-    let lockUntil = parseInt(localStorage.getItem("jamia_lock_until") || "0", 10);
 
     function checkLockTimer() {
       const now = Date.now();
       const lockUntil = parseInt(localStorage.getItem("jamia_lock_until") || "0", 10);
-      const btn = document.querySelector(".btn-submit");
+      const btn = document.getElementById("btn-login");
       const err = document.getElementById("error-alert");
 
       if (now < lockUntil) {
@@ -633,6 +599,27 @@
       }
     }
 
+    function checkActiveSession() {
+      try {
+        const savedName = localStorage.getItem('jamia_ula_name');
+        const savedExpiry = localStorage.getItem('jamia_ula_expiry');
+        const now = Date.now();
+
+        if (savedName && savedExpiry && now < parseInt(savedExpiry, 10)) {
+          showDashboard(savedName);
+        } else {
+          localStorage.removeItem('jamia_ula_name');
+          localStorage.removeItem('jamia_ula_expiry');
+        }
+      } catch (_) {}
+    }
+
+    function showDashboard(name) {
+      document.getElementById('auth-section').style.display = 'none';
+      document.getElementById('content-section').style.display = 'block';
+      document.getElementById('welcome-user').innerHTML = `خوش آمدید، عزیزم <b>${name}</b> (اولیٰ الف)`;
+    }
+
     function verifyAccess() {
       if (checkLockTimer()) return;
 
@@ -646,14 +633,9 @@
         return;
       }
 
-      let bookType = null;
-      if (pass === PASS_HINDI) {
-        bookType = 'hindi';
-      } else if (pass === PASS_BAHAR) {
-        bookType = 'bahar';
-      } else if (pass === PASS_MATH) {
-        bookType = 'math';
-      } else {
+      let failedAttempts = parseInt(localStorage.getItem("jamia_failed_attempts") || "0", 10);
+
+      if (pass !== MASTER_PASSWORD) {
         failedAttempts++;
         localStorage.setItem("jamia_failed_attempts", failedAttempts.toString());
         if (failedAttempts >= 5) {
@@ -665,17 +647,17 @@
         err.style.display = "block";
         return;
       }
-      localStorage.setItem("jamia_failed_attempts", "0");
 
+      // सफलता पर काउंटर रीसेट
+      localStorage.setItem("jamia_failed_attempts", "0");
       err.style.display = 'none';
 
       try {
         localStorage.setItem('jamia_ula_name', name);
-        localStorage.setItem('jamia_ula_book', bookType);
         localStorage.setItem('jamia_ula_expiry', (Date.now() + SESSION_EXPIRY_MS).toString());
       } catch (_) {}
 
-      showDashboard(name, bookType);
+      showDashboard(name);
     }
 
     // ZOOM FUNCTIONS
@@ -723,14 +705,12 @@
       zoomReset();
     }
 
-    function startDirectDownload(fileId, filename) {
-      const activeBtn = event ? (event.currentTarget || event.target) : null;
-      let origText = "";
-      if (activeBtn) {
-        origText = activeBtn.innerHTML;
-        activeBtn.innerHTML = "<i class="fa-solid fa-spinner fa-spin"></i> ڈاؤنلوڈ ہو رہا ہے...";
-        activeBtn.style.pointerEvents = "none";
-      }
+    function startDirectDownload(e, fileId, filename) {
+      const btn = e.currentTarget;
+      const origText = btn.innerHTML;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ڈاؤنلوڈ...`;
+      btn.style.pointerEvents = "none";
+
       const directUrl = `https://drive.usercontent.google.com/download?id=${fileId}&export=download&authuser=0`;
       const a = document.createElement('a');
       a.href = directUrl;
@@ -739,19 +719,17 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      if (activeBtn) {
-        setTimeout(() => {
-          activeBtn.innerHTML = origText;
-          activeBtn.style.pointerEvents = "auto";
-        }, 3000);
-      }
+
+      setTimeout(() => {
+        btn.innerHTML = origText;
+        btn.style.pointerEvents = "auto";
+      }, 3000);
     }
 
     function manualLogout() {
       closeFullscreenPdf();
       try {
         localStorage.removeItem('jamia_ula_name');
-        localStorage.removeItem('jamia_ula_book');
         localStorage.removeItem('jamia_ula_expiry');
       } catch (_) {}
       document.getElementById('user-name').value = '';
@@ -761,6 +739,7 @@
     }
 
     checkActiveSession();
+    checkLockTimer();
   </script>
 </body>
 </html>
