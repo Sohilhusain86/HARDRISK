@@ -15,8 +15,6 @@
       --primary-emerald: #00ffa3;
       --deep-bg: #04090d;
       --card-bg: radial-gradient(circle at 15% 15%, rgba(20, 35, 45, 0.98), rgba(7, 14, 19, 0.99) 75%);
-      --gold-accent: #f59e0b;
-      --cyan-accent: #38bdf8;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', 'Noto Nastaliq Urdu', sans-serif; }
@@ -32,7 +30,6 @@
       overflow-x: hidden;
     }
 
-    /* लक्ज़री ग्लोइंग कार्ड एनिमेशन */
     @keyframes luxuryGlow {
       0%, 100% {
         box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 255, 163, 0.2);
@@ -64,7 +61,6 @@
       direction: ltr;
     }
 
-    /* जामेअतुर रज़ा का स्पेशल क्राउन बैज */
     .exclusive-badge {
       display: inline-flex;
       align-items: center;
@@ -184,7 +180,6 @@
       display: none;
     }
 
-    /* Content Area */
     #content-section { display: none; }
     .file-box {
       background: rgba(0, 0, 0, 0.45);
@@ -213,7 +208,6 @@
     .btn-download { background: #131d24; color: #38bdf8; border: 1.5px solid rgba(56, 189, 248, 0.45); }
     .btn-lock-again { background: transparent; color: #8696a0; border: none; font-size: 0.76rem; cursor: pointer; margin-top: 10px; text-decoration: underline; }
 
-    /* Fullscreen Overlay */
     #pdf-viewer-overlay {
       display: none;
       position: fixed;
@@ -262,7 +256,7 @@
     </div>
 
     <p class="notice-text">
-      दस्तावेज़ खोलने के लिए अपना नाम और मख़सूस 10-डिजिट कोड (पासवर्ड) दर्ज करें।
+      दस्तावेज़ खोलने के लिए अपना नाम और मख़सूस पासवर्ड दर्ज करें (लॉगिन 5 घंटे तक मान्य रहेगा)।
     </p>
 
     <div class="form-group">
@@ -311,8 +305,8 @@
       <i class="fa-solid fa-file-arrow-down"></i> براؤزر سے ڈائریکٹ ڈاؤنلوڈ کریں (Download)
     </button>
 
-    <button type="button" class="btn-lock-again" onclick="lockAgain()">
-      <i class="fa-solid fa-arrow-right-from-bracket"></i> دوبارہ محفوظ / لاک کریں (Lock Again)
+    <button type="button" class="btn-lock-again" onclick="manualLogout()">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i> لاگ آؤٹ کریں (Logout)
     </button>
   </div>
 
@@ -330,6 +324,28 @@
   <script>
     const SECRET_KEY = "786786786786786786786786786786";
     const FILE_ID = "1xSLxk3toreZoU5vlI_SzVUq93nzzMRnv";
+    const SESSION_EXPIRY_MS = 5 * 60 * 60 * 1000; // 5 Ghante (5 hours in milliseconds)
+
+    function checkActiveSession() {
+      try {
+        const savedName = localStorage.getItem('jamia_ula_name');
+        const savedExpiry = localStorage.getItem('jamia_ula_expiry');
+        const now = Date.now();
+
+        if (savedName && savedExpiry && now < parseInt(savedExpiry, 10)) {
+          showDashboard(savedName);
+        } else {
+          localStorage.removeItem('jamia_ula_name');
+          localStorage.removeItem('jamia_ula_expiry');
+        }
+      } catch (_) {}
+    }
+
+    function showDashboard(name) {
+      document.getElementById('auth-section').style.display = 'none';
+      document.getElementById('content-section').style.display = 'block';
+      document.getElementById('welcome-user').innerHTML = `خوش آمدید، عزیزم <b>${name}</b> (اولیٰ الف)`;
+    }
 
     function verifyAccess() {
       const name = document.getElementById('user-name').value.trim();
@@ -348,9 +364,14 @@
       }
 
       err.style.display = 'none';
-      document.getElementById('auth-section').style.display = 'none';
-      document.getElementById('content-section').style.display = 'block';
-      document.getElementById('welcome-user').innerHTML = `خوش آمدید، عزیزم <b>${name}</b> (اولیٰ الف)`;
+
+      // 5 Ghante ke liye session save karein
+      try {
+        localStorage.setItem('jamia_ula_name', name);
+        localStorage.setItem('jamia_ula_expiry', (Date.now() + SESSION_EXPIRY_MS).toString());
+      } catch (_) {}
+
+      showDashboard(name);
     }
 
     function openFullscreenPdf() {
@@ -378,13 +399,20 @@
       document.body.removeChild(a);
     }
 
-    function lockAgain() {
+    function manualLogout() {
       closeFullscreenPdf();
+      try {
+        localStorage.removeItem('jamia_ula_name');
+        localStorage.removeItem('jamia_ula_expiry');
+      } catch (_) {}
       document.getElementById('user-name').value = '';
       document.getElementById('user-pass').value = '';
       document.getElementById('content-section').style.display = 'none';
       document.getElementById('auth-section').style.display = 'block';
     }
+
+    // Page khulte hi session check
+    checkActiveSession();
   </script>
 </body>
 </html>
