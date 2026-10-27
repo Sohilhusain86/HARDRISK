@@ -1,412 +1,102 @@
 <!DOCTYPE html>
-<html lang="ur" dir="rtl">
+<html lang="hi" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>عرسِ حامدی مبارک | Urs-e-Hamidi Mubarak</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>محفوظ دستاویز / सुरक्षित दस्तावेज़</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #040f0a;
-      --card-bg: #091f15;
-      --card-inner: #0f2c1f;
-      --gold-primary: #d4af37;
-      --gold-light: #fef0b8;
-      --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-      --border-gold: rgba(212, 175, 55, 0.45);
-      --text-muted: #b0c4ba;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background-color: var(--bg-dark);
-      font-family: 'Poppins', 'Noto Nastaliq Urdu', sans-serif;
-      color: #ffffff;
-      min-height: 100vh;
-      background-image: 
-        radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.18), transparent 50%),
-        radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.1), transparent 40%),
-        radial-gradient(circle at 80% 90%, rgba(212, 175, 55, 0.15), transparent 50%);
-      padding: 16px 12px 60px 12px;
-    }
-
-    .container {
-      max-width: 680px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 22px;
-    }
-
-    /* Top Arch Banner */
-    .hero-banner {
-      background: var(--card-bg);
-      border: 2px solid var(--gold-primary);
-      border-radius: 28px;
-      padding: 30px 18px 25px 18px;
-      text-align: center;
-      position: relative;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 35px rgba(16, 185, 129, 0.2);
-    }
-
-    .hero-banner::after {
-      content: '';
-      position: absolute;
-      top: 6px; left: 6px; right: 6px; bottom: 6px;
-      border: 1px dashed rgba(212, 175, 55, 0.4);
-      border-radius: 22px;
-      pointer-events: none;
-    }
-
-    .bismillah {
-      font-family: 'Amiri', serif;
-      font-size: 1.9rem;
-      color: var(--gold-light);
-      margin-bottom: 6px;
-    }
-
-    .top-badge {
-      display: inline-block;
-      background: rgba(212, 175, 55, 0.15);
-      border: 1px solid var(--gold-primary);
-      color: var(--gold-light);
-      padding: 5px 20px;
-      border-radius: 50px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 12px;
-    }
-
-    .title-ur {
-      font-family: 'Noto Nastaliq Urdu', serif;
-      font-size: 2.8rem;
-      line-height: 2;
-      background: var(--gold-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 4px;
-    }
-
-    .title-hi {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: 0.5px;
-    }
-
-    .tagline {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-top: 6px;
-    }
-
-    /* Live Countdown Box */
-    .countdown-card {
-      background: rgba(0, 0, 0, 0.55);
-      border: 1px solid var(--border-gold);
-      border-radius: 22px;
-      padding: 18px 14px;
-      text-align: center;
-    }
-
-    .countdown-title {
-      font-size: 0.9rem;
-      color: var(--gold-light);
-      margin-bottom: 12px;
-      font-weight: 600;
-    }
-
-    .timer-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      direction: ltr;
-    }
-
-    .time-slot {
-      background: var(--card-inner);
-      border: 1px solid rgba(212, 175, 55, 0.3);
-      border-radius: 14px;
-      padding: 10px 4px;
-    }
-
-    .time-val {
-      font-size: 1.7rem;
-      font-weight: 700;
-      color: var(--gold-light);
-      display: block;
-      line-height: 1.1;
-    }
-
-    .time-lbl {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      margin-top: 4px;
-      display: block;
-    }
-
-    /* Large Images & Cards Showcase */
-    .showcase-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-gold);
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-    }
-
-    .big-image-frame {
-      position: relative;
-      width: 100%;
-      height: 260px;
-      background: #000;
-      overflow: hidden;
-    }
-
-    .big-image-frame img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.4s ease;
-    }
-
-    .big-image-frame:hover img {
-      transform: scale(1.04);
-    }
-
-    .image-tag {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      background: rgba(0, 0, 0, 0.75);
-      border: 1px solid var(--gold-primary);
-      color: var(--gold-light);
-      padding: 4px 14px;
-      border-radius: 30px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    .card-details {
-      padding: 18px;
-      text-align: right;
-    }
-
-    .card-details h3 {
-      font-size: 1.25rem;
-      color: var(--gold-light);
-      margin-bottom: 6px;
-    }
-
-    .card-details p {
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-
-    /* Program Schedule */
-    .schedule-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-gold);
-      border-radius: 24px;
-      padding: 22px 18px;
-    }
-
-    .section-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 18px;
-      border-bottom: 1px solid rgba(212, 175, 55, 0.25);
-      padding-bottom: 8px;
-      color: var(--gold-light);
-      font-size: 1.25rem;
-    }
-
-    .schedule-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(212, 175, 55, 0.15);
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-
-    .schedule-badge {
-      background: rgba(212, 175, 55, 0.18);
-      color: var(--gold-light);
-      border: 1px solid var(--gold-primary);
-      padding: 6px 12px;
-      border-radius: 10px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .schedule-text h4 {
-      font-size: 1rem;
-      color: #ffffff;
-      margin-bottom: 3px;
-    }
-
-    .schedule-text p {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-    }
-
-    /* Action Share Button */
-    .btn-share {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, #10b981, #047857);
-      color: #ffffff;
-      border: none;
-      border-radius: 18px;
-      font-size: 1.05rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
-      transition: all 0.2s ease;
-    }
-
-    .btn-share:hover {
-      transform: translateY(-2px);
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+    body { background: radial-gradient(circle at 50% 20%, #111b21, #080e13 80%); color: #e9edef; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .card { background: #182229; border: 1px solid rgba(0, 168, 132, 0.35); border-radius: 18px; padding: 24px; width: 100%; max-width: 440px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7); text-align: center; }
+    .icon-lock { width: 60px; height: 60px; background: rgba(0, 168, 132, 0.15); border: 1px solid #00a884; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 26px; color: #00a884; }
+    h2 { font-size: 1.25rem; margin-bottom: 6px; color: #fff; }
+    p.subtitle { font-size: 0.82rem; color: #8696a0; margin-bottom: 20px; line-height: 1.5; }
+    .form-group { text-align: left; margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.8rem; color: #cbd5e1; margin-bottom: 6px; font-weight: 500; }
+    .form-input { width: 100%; padding: 12px 14px; background: #0b141a; border: 1px solid #2a3942; border-radius: 10px; color: #fff; font-size: 0.9rem; outline: none; }
+    .form-input:focus { border-color: #00a884; }
+    .btn-submit { width: 100%; padding: 12px; background: #00a884; border: none; border-radius: 10px; color: #fff; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 6px; }
+    .btn-submit:hover { background: #029474; }
+    .error-msg { color: #ef4444; font-size: 0.8rem; margin-top: 10px; display: none; }
+    #content-section { display: none; text-align: center; }
+    .welcome-badge { display: inline-block; background: rgba(0, 168, 132, 0.15); border: 1px solid #00a884; color: #00ffa3; padding: 4px 14px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 14px; }
+    .file-box { background: #0b141a; border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 16px; margin-bottom: 18px; text-align: left; }
+    .file-box h4 { font-size: 0.95rem; color: #fff; margin-bottom: 4px; }
+    .file-box p { font-size: 0.75rem; color: #8696a0; }
+    .btn-action { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; border-radius: 10px; text-decoration: none; font-size: 0.9rem; font-weight: 600; margin-bottom: 10px; cursor: pointer; }
+    .btn-open { background: #00a884; color: #fff; border: none; }
+    .btn-download { background: #1f2c34; color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
+    .btn-lock-again { background: transparent; color: #8696a0; border: none; font-size: 0.75rem; cursor: pointer; margin-top: 10px; text-decoration: underline; }
+    #pdf-preview-box { display: none; margin-top: 15px; width: 100%; height: 480px; border-radius: 10px; overflow: hidden; border: 1px solid #2a3942; }
+    #pdf-preview-box iframe { width: 100%; height: 100%; border: none; }
   </style>
 </head>
 <body>
-
-  <div class="container">
-    <!-- Hero Banner Frame -->
-    <div class="hero-banner">
-      <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
-      <div class="top-badge">🌙 سالانہ عرسِ مبارک • 29 تا 30 اکتوبر 2026</div>
-      <h1 class="title-ur">عرسِ حامدی مبارک</h1>
-      <h2 class="title-hi">उर्स-ए-हामिदी मुबारक</h2>
-      <p class="tagline">فیضانِ اولیاء، محفلِ نعت و منقبت اور دعائیہ تقریب</p>
+  <div class="card" id="auth-section">
+    <div class="icon-lock"><i class="fa-solid fa-file-shield"></i></div>
+    <h2>محفوظ پی ڈی ایف (Protected PDF)</h2>
+    <p class="subtitle">दस्तावेज़ खोलने के लिए अपना नाम और पासवर्ड दर्ज करें।</p>
+    <div class="form-group">
+      <label for="user-name"><i class="fa-solid fa-user"></i> आपका नाम (Naam)</label>
+      <input type="text" id="user-name" class="form-input" placeholder="नाम लिखें">
     </div>
-
-    <!-- Live Timer -->
-    <div class="countdown-card">
-      <div class="countdown-title" id="timer-status">⏳ عرسِ حامدی پاک میں باقی وقت</div>
-      <div class="timer-grid">
-        <div class="time-slot"><span class="time-val" id="days">00</span><span class="time-lbl">Days / دن</span></div>
-        <div class="time-slot"><span class="time-val" id="hours">00</span><span class="time-lbl">Hours / گھنٹے</span></div>
-        <div class="time-slot"><span class="time-val" id="minutes">00</span><span class="time-lbl">Mins / منٹ</span></div>
-        <div class="time-slot"><span class="time-val" id="seconds">00</span><span class="time-lbl">Secs / سیکنڈ</span></div>
-      </div>
+    <div class="form-group">
+      <label for="user-pass"><i class="fa-solid fa-key"></i> पासवर्ड (Password)</label>
+      <input type="password" id="user-pass" class="form-input" placeholder="पासवर्ड दर्ज करें">
     </div>
+    <button type="button" class="btn-submit" onclick="verifyAccess()"><i class="fa-solid fa-lock-open"></i> दाखिल हों (Open)</button>
+    <div id="error-alert" class="error-msg">गलत पासवर्ड या नाम खाली है!</div>
+  </div>
 
-    <!-- Big Image 1: Madina Munawwara -->
-    <div class="showcase-card">
-      <div class="big-image-frame">
-        <img src="https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=1000&auto=format&fit=crop&q=80" alt="مدینہ منورہ">
-        <div class="image-tag">روضہ رسول ﷺ</div>
-      </div>
-      <div class="card-details">
-        <h3>مدینہ منورہ و فیضانِ رسالت ﷺ</h3>
-        <p>تمام برکات و انوار کا سرچشمہ دربارِ رسالت مآب ﷺ ہے، جہاں سے اولیائے کرام کو فیض عطا ہوتا ہے۔</p>
-      </div>
+  <div class="card" id="content-section" style="max-width: 580px;">
+    <span class="welcome-badge" id="welcome-user">خوش آمدید!</span>
+    <div class="file-box">
+      <h4><i class="fa-solid fa-file-pdf" style="color:#ef4444; margin-right:6px;"></i> कक्षा 4 हिंदी पाठ 7: नकली हीरे (50 प्रश्नोत्तरी)</h4>
+      <p>محفوظ دستاویز | Darsi wa Ilmi Mavad (PDF Document)</p>
     </div>
-
-    <!-- Big Image 2: Spiritual Arch & Dargah -->
-    <div class="showcase-card">
-      <div class="big-image-frame">
-        <img src="https://images.unsplash.com/photo-1542816417-0983c9c9ad53?w=1000&auto=format&fit=crop&q=80" alt="دربار عالیہ">
-        <div class="image-tag">آستانہ عالیہ</div>
-      </div>
-      <div class="card-details">
-        <h3>زیارت و روحانی محفل</h3>
-        <p>عرسِ حامدی کے مبارک موقع پر نذر و نیاز، قرآن خوانی اور محفلِ سماع و دعا کا خصوصی اہتمام۔</p>
-      </div>
-    </div>
-
-    <!-- Program Schedule -->
-    <div class="schedule-card">
-      <div class="section-title">
-        <i class="fa-solid fa-clock"></i>
-        <span>پروگرام و تقاریب</span>
-      </div>
-
-      <div class="schedule-row">
-        <div class="schedule-badge">29 اکتوبر • شام</div>
-        <div class="schedule-text">
-          <h4>پرچم کشائی و غسل شریف</h4>
-          <p>صندل پیشی اور چادر مبارک کی پروقار تقریب</p>
-        </div>
-      </div>
-
-      <div class="schedule-row">
-        <div class="schedule-badge">30 اکتوبر • رات</div>
-        <div class="schedule-text">
-          <h4>محفلِ نعت و بیانات</h4>
-          <p>علمائے کرام کے پرمغز خطابات اور لنگرِ عام کی تقسیم</p>
-        </div>
-      </div>
-
-      <div class="schedule-row">
-        <div class="schedule-badge">30 اکتوبر • اختتام</div>
-        <div class="schedule-text">
-          <h4>قل شریف و اجتماعی دعا</h4>
-          <p>ملک و ملت کی سلامتی اور تمام زائرین و محبین کے لیے خصوصی دعا</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Share Button -->
-    <button class="btn-share" onclick="shareWebsite()">
-      <i class="fa-brands fa-whatsapp"></i> عرسِ حامدی کا دعوتی کارڈ WhatsApp پر شیئر کریں
-    </button>
+    <button type="button" class="btn-action btn-open" onclick="togglePdfPreview()"><i class="fa-solid fa-eye"></i> यहीं पढ़ें (Read Online)</button>
+    <a id="btn-download-link" href="#" class="btn-action btn-download" target="_blank"><i class="fa-solid fa-download"></i> डाउनलोड करें (Download PDF)</a>
+    <a id="btn-drive-link" href="#" class="btn-action btn-download" style="color:#facc15; border-color:rgba(250,204,21,0.4);" target="_blank"><i class="fa-brands fa-google-drive"></i> गूगल ड्राइव में देखें (Open in Drive)</a>
+    <div id="pdf-preview-box"><iframe id="pdf-frame" src=""></iframe></div>
+    <button type="button" class="btn-lock-again" onclick="lockAgain()"><i class="fa-solid fa-arrow-right-from-bracket"></i> दोबारा लॉक करें (Lock Again)</button>
   </div>
 
   <script>
-    const eventTime = new Date("October 29, 2026 21:00:00").getTime();
+    const SECRET_KEY = "786786786786786786786786786786";
+    const PREVIEW_URL = "https://drive.google.com/file/d/1xSLxk3toreZoU5vlI_SzVUq93nzzMRnv/preview";
+    const DOWNLOAD_URL = "https://drive.google.com/uc?export=download&id=1xSLxk3toreZoU5vlI_SzVUq93nzzMRnv";
+    const DRIVE_VIEW_URL = "https://drive.google.com/file/d/1xSLxk3toreZoU5vlI_SzVUq93nzzMRnv/view?usp=drivesdk";
 
-    function refreshTimer() {
-      const now = new Date().getTime();
-      const diff = eventTime - now;
-
-      if (diff <= 0) {
-        document.getElementById("timer-status").innerText = "✨ عرسِ حامدی مبارک جاری ہے! ✨";
-        document.getElementById("days").innerText = "00";
-        document.getElementById("hours").innerText = "00";
-        document.getElementById("minutes").innerText = "00";
-        document.getElementById("seconds").innerText = "00";
-        return;
-      }
-
-      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-      document.getElementById("days").innerText = d < 10 ? "0" + d : d;
-      document.getElementById("hours").innerText = h < 10 ? "0" + h : h;
-      document.getElementById("minutes").innerText = m < 10 ? "0" + m : m;
-      document.getElementById("seconds").innerText = s < 10 ? "0" + s : s;
+    function verifyAccess() {
+      const name = document.getElementById('user-name').value.trim();
+      const pass = document.getElementById('user-pass').value.trim();
+      const err = document.getElementById('error-alert');
+      if (!name) { err.innerText = "कृपया अपना नाम लिखें!"; err.style.display = 'block'; return; }
+      if (pass !== SECRET_KEY) { err.innerText = "गलत पासवर्ड! एक्सेस नामंज़ूर।"; err.style.display = 'block'; return; }
+      err.style.display = 'none';
+      document.getElementById('auth-section').style.display = 'none';
+      document.getElementById('content-section').style.display = 'block';
+      document.getElementById('welcome-user').innerHTML = `<i class="fa-solid fa-circle-check"></i> स्वागत है, <b>${name}</b>`;
+      document.getElementById('btn-download-link').href = DOWNLOAD_URL;
+      document.getElementById('btn-drive-link').href = DRIVE_VIEW_URL;
     }
 
-    setInterval(refreshTimer, 1000);
-    refreshTimer();
+    function togglePdfPreview() {
+      const box = document.getElementById('pdf-preview-box');
+      const frame = document.getElementById('pdf-frame');
+      if (box.style.display === 'block') { box.style.display = 'none'; frame.src = ""; }
+      else { frame.src = PREVIEW_URL; box.style.display = 'block'; }
+    }
 
-    function shareWebsite() {
-      const text = "🌙 *عرسِ حامدی مبارک* 🌙\n\nسالانہ عرسِ حامدی پاک 29 تا 30 اکتوبر 2026 کو عقیدت و احترام کے ساتھ منایا جا رہا ہے۔\n\nلائیو کاؤنٹ ڈاؤن اور مکمل شیڈول دیکھنے کے لیے لنک پر کلک کریں:\n👉 " + window.location.href;
-      if (navigator.share) {
-        navigator.share({ title: 'عرسِ حامدی مبارک', text: text, url: window.location.href }).catch(() => {});
-      } else {
-        window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), "_blank");
-      }
+    function lockAgain() {
+      document.getElementById('user-name').value = '';
+      document.getElementById('user-pass').value = '';
+      document.getElementById('pdf-frame').src = '';
+      document.getElementById('pdf-preview-box').style.display = 'none';
+      document.getElementById('content-section').style.display = 'none';
+      document.getElementById('auth-section').style.display = 'block';
     }
   </script>
 </body>
