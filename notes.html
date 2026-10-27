@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="hi" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>محفوظ دستاویز / सुरक्षित दस्तावेज़</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+    body { background: radial-gradient(circle at 50% 20%, #111b21, #080e13 80%); color: #e9edef; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .card { background: #182229; border: 1px solid rgba(0, 168, 132, 0.35); border-radius: 18px; padding: 24px; width: 100%; max-width: 440px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7); text-align: center; }
+    .icon-lock { width: 60px; height: 60px; background: rgba(0, 168, 132, 0.15); border: 1px solid #00a884; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 26px; color: #00a884; }
+    h2 { font-size: 1.25rem; margin-bottom: 6px; color: #fff; }
+    p.subtitle { font-size: 0.82rem; color: #8696a0; margin-bottom: 20px; line-height: 1.5; }
+    .form-group { text-align: left; margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.8rem; color: #cbd5e1; margin-bottom: 6px; font-weight: 500; }
+    .form-input { width: 100%; padding: 12px 14px; background: #0b141a; border: 1px solid #2a3942; border-radius: 10px; color: #fff; font-size: 0.9rem; outline: none; }
+    .form-input:focus { border-color: #00a884; }
+    .btn-submit { width: 100%; padding: 12px; background: #00a884; border: none; border-radius: 10px; color: #fff; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 6px; }
+    .btn-submit:hover { background: #029474; }
+    .error-msg { color: #ef4444; font-size: 0.8rem; margin-top: 10px; display: none; }
+    #content-section { display: none; text-align: center; }
+    .welcome-badge { display: inline-block; background: rgba(0, 168, 132, 0.15); border: 1px solid #00a884; color: #00ffa3; padding: 4px 14px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 14px; }
+    .file-box { background: #0b141a; border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 16px; margin-bottom: 18px; text-align: left; }
+    .file-box h4 { font-size: 0.95rem; color: #fff; margin-bottom: 4px; }
+    .file-box p { font-size: 0.75rem; color: #8696a0; }
+    .btn-action { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; border-radius: 10px; text-decoration: none; font-size: 0.9rem; font-weight: 600; margin-bottom: 10px; cursor: pointer; }
+    .btn-open { background: #00a884; color: #fff; border: none; }
+    .btn-download { background: #1f2c34; color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
+    .btn-lock-again { background: transparent; color: #8696a0; border: none; font-size: 0.75rem; cursor: pointer; margin-top: 10px; text-decoration: underline; }
+    #pdf-preview-box { display: none; margin-top: 15px; width: 100%; height: 480px; border-radius: 10px; overflow: hidden; border: 1px solid #2a3942; }
+    #pdf-preview-box iframe { width: 100%; height: 100%; border: none; }
+  </style>
+</head>
+<body>
+  <div class="card" id="auth-section">
+    <div class="icon-lock"><i class="fa-solid fa-file-shield"></i></div>
+    <h2>محفوظ پی ڈی ایف (Protected PDF)</h2>
+    <p class="subtitle">दस्तावेज़ खोलने के लिए अपना नाम और पासवर्ड दर्ज करें।</p>
+    <div class="form-group">
+      <label for="user-name"><i class="fa-solid fa-user"></i> आपका नाम (Naam)</label>
+      <input type="text" id="user-name" class="form-input" placeholder="नाम लिखें">
+    </div>
+    <div class="form-group">
+      <label for="user-pass"><i class="fa-solid fa-key"></i> पासवर्ड (Password)</label>
+      <input type="password" id="user-pass" class="form-input" placeholder="पासवर्ड दर्ज करें">
+    </div>
+    <button type="button" class="btn-submit" onclick="verifyAccess()"><i class="fa-solid fa-lock-open"></i> दाखिल हों (Open)</button>
+    <div id="error-alert" class="error-msg">गलत पासवर्ड या नाम खाली है!</div>
+  </div>
+
+  <div class="card" id="content-section" style="max-width: 580px;">
+    <span class="welcome-badge" id="welcome-user">خوش آمدید!</span>
+    <div class="file-box">
+      <h4><i class="fa-solid fa-file-pdf" style="color:#ef4444; margin-right:6px;"></i> कक्षा 4 हिंदी पाठ 7: नकली हीरे (50 प्रश्नोत्तरी)</h4>
+      <p>محفوظ دستاویز | Darsi wa Ilmi Mavad (PDF Document)</p>
+    </div>
+    <button type="button" class="btn-action btn-open" onclick="togglePdfPreview()"><i class="fa-solid fa-eye"></i> यहीं पढ़ें (Read Online)</button>
+    <a id="btn-download-link" href="#" class="btn-action btn-download" target="_blank"><i class="fa-solid fa-download"></i> डाउनलोड करें (Download PDF)</a>
+    <a id="btn-drive-link" href="#" class="btn-action btn-download" style="color:#facc15; border-color:rgba(250,204,21,0.4);" target="_blank"><i class="fa-brands fa-google-drive"></i> गूगल ड्राइव में देखें (Open in Drive)</a>
+    <div id="pdf-preview-box"><iframe id="pdf-frame" src=""></iframe></div>
+    <button type="button" class="btn-lock-again" onclick="lockAgain()"><i class="fa-solid fa-arrow-right-from-bracket"></i> दोबारा लॉक करें (Lock Again)</button>
+  </div>
+
+  <script>
+    const SECRET_KEY = "786786786786786786786786786786";
+    const PREVIEW_URL = "https://drive.google.com/file/d/1xSLxk3toreZoU5vlI_SzVUq93nzzMRnv/preview";
+    const DOWNLOAD_URL = "https://drive.google.com/uc?export=download&id=1xSLxk3toreZoU5vlI_SzVUq93nzzMRnv";
+    const DRIVE_VIEW_URL = "https://drive.google.com/file/d/1xSLxk3toreZoU5vlI_SzVUq93nzzMRnv/view?usp=drivesdk";
+
+    function verifyAccess() {
+      const name = document.getElementById('user-name').value.trim();
+      const pass = document.getElementById('user-pass').value.trim();
+      const err = document.getElementById('error-alert');
+      if (!name) { err.innerText = "कृपया अपना नाम लिखें!"; err.style.display = 'block'; return; }
+      if (pass !== SECRET_KEY) { err.innerText = "गलत पासवर्ड! एक्सेस नामंज़ूर।"; err.style.display = 'block'; return; }
+      err.style.display = 'none';
+      document.getElementById('auth-section').style.display = 'none';
+      document.getElementById('content-section').style.display = 'block';
+      document.getElementById('welcome-user').innerHTML = `<i class="fa-solid fa-circle-check"></i> स्वागत है, <b>${name}</b>`;
+      document.getElementById('btn-download-link').href = DOWNLOAD_URL;
+      document.getElementById('btn-drive-link').href = DRIVE_VIEW_URL;
+    }
+
+    function togglePdfPreview() {
+      const box = document.getElementById('pdf-preview-box');
+      const frame = document.getElementById('pdf-frame');
+      if (box.style.display === 'block') { box.style.display = 'none'; frame.src = ""; }
+      else { frame.src = PREVIEW_URL; box.style.display = 'block'; }
+    }
+
+    function lockAgain() {
+      document.getElementById('user-name').value = '';
+      document.getElementById('user-pass').value = '';
+      document.getElementById('pdf-frame').src = '';
+      document.getElementById('pdf-preview-box').style.display = 'none';
+      document.getElementById('content-section').style.display = 'none';
+      document.getElementById('auth-section').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
