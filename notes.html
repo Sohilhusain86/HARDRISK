@@ -1,107 +1,330 @@
 <!DOCTYPE html>
-<html lang="hi" dir="ltr">
+<html lang="ur" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>محفوظ دستاویز / सुरक्षित दस्तावेज़</title>
+  <title>جامعۃ الرضا - اختصاصی دستاویز (Ula Alif)</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
-    body { background: radial-gradient(circle at 50% 20%, #111b21, #080e13 80%); color: #e9edef; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 14px; }
-    .card { background: #182229; border: 1px solid rgba(0, 168, 132, 0.35); border-radius: 18px; padding: 22px; width: 100%; max-width: 440px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7); text-align: center; }
-    .icon-lock { width: 56px; height: 56px; background: rgba(0, 168, 132, 0.15); border: 1px solid #00a884; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 24px; color: #00a884; }
-    h2 { font-size: 1.2rem; margin-bottom: 6px; color: #fff; }
-    p.subtitle { font-size: 0.8rem; color: #8696a0; margin-bottom: 18px; line-height: 1.5; }
-    .form-group { text-align: left; margin-bottom: 14px; }
-    .form-group label { display: block; font-size: 0.78rem; color: #cbd5e1; margin-bottom: 6px; font-weight: 500; }
-    .form-input { width: 100%; padding: 12px 14px; background: #0b141a; border: 1px solid #2a3942; border-radius: 10px; color: #fff; font-size: 0.9rem; outline: none; }
-    .form-input:focus { border-color: #00a884; }
-    .btn-submit { width: 100%; padding: 12px; background: #00a884; border: none; border-radius: 10px; color: #fff; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 6px; }
-    .error-msg { color: #ef4444; font-size: 0.8rem; margin-top: 10px; display: none; }
+    :root {
+      --primary-emerald: #00ffa3;
+      --deep-bg: #04090d;
+      --card-bg: radial-gradient(circle at 15% 15%, rgba(20, 35, 45, 0.98), rgba(7, 14, 19, 0.99) 75%);
+      --gold-accent: #f59e0b;
+      --cyan-accent: #38bdf8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', 'Noto Nastaliq Urdu', sans-serif; }
     
-    #content-section { display: none; text-align: center; }
-    .welcome-badge { display: inline-block; background: rgba(0, 168, 132, 0.15); border: 1px solid #00a884; color: #00ffa3; padding: 4px 14px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 14px; }
-    .file-box { background: #0b141a; border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 16px; margin-bottom: 18px; text-align: left; }
-    .file-box h4 { font-size: 0.95rem; color: #fff; margin-bottom: 4px; }
-    .file-box p { font-size: 0.75rem; color: #8696a0; }
-    
-    .btn-action { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 13px; border-radius: 10px; font-size: 0.92rem; font-weight: 600; margin-bottom: 10px; cursor: pointer; border: none; }
-    .btn-read { background: #00a884; color: #fff; }
-    .btn-download { background: #1f2c34; color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
-    .btn-lock-again { background: transparent; color: #8696a0; border: none; font-size: 0.78rem; cursor: pointer; margin-top: 12px; text-decoration: underline; }
-    
-    /* फुल स्क्रीन रीडर */
+    body {
+      background: radial-gradient(circle at 50% 25%, #0d232a 0%, #04090d 80%);
+      color: #e9edef;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    /* लक्ज़री ग्लोइंग कार्ड एनिमेशन */
+    @keyframes luxuryGlow {
+      0%, 100% {
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 255, 163, 0.2);
+        border-color: rgba(0, 255, 163, 0.4);
+      }
+      50% {
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(56, 189, 248, 0.3);
+        border-color: rgba(56, 189, 248, 0.55);
+      }
+    }
+
+    @keyframes badgePulse {
+      0%, 100% { transform: scale(1); opacity: 0.95; }
+      50% { transform: scale(1.02); opacity: 1; filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.5)); }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1.5px solid rgba(0, 255, 163, 0.4);
+      border-radius: 24px;
+      padding: 26px 20px;
+      width: 100%;
+      max-width: 440px;
+      animation: luxuryGlow 5s infinite ease-in-out;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      position: relative;
+      text-align: center;
+      direction: ltr;
+    }
+
+    /* जामेअतुर रज़ा का स्पेशल क्राउन बैज */
+    .exclusive-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.25));
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      color: #fef08a;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      animation: badgePulse 3s infinite ease-in-out;
+      letter-spacing: 0.3px;
+    }
+
+    .icon-seal {
+      width: 62px;
+      height: 62px;
+      background: linear-gradient(135deg, rgba(0, 255, 163, 0.18), rgba(2, 132, 199, 0.25));
+      border: 1.5px solid var(--primary-emerald);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      font-size: 26px;
+      color: var(--primary-emerald);
+      box-shadow: 0 0 20px rgba(0, 255, 163, 0.3);
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #fff, #67e8f9, #34d399);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .urdu-banner {
+      font-family: 'Noto Nastaliq Urdu', 'Amiri', serif;
+      font-size: 0.95rem;
+      line-height: 2;
+      color: #fef08a;
+      direction: rtl;
+      margin: 8px 0 14px;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px dashed rgba(245, 158, 11, 0.35);
+      border-radius: 12px;
+    }
+
+    .notice-text {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    .form-group {
+      text-align: left;
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .form-input {
+      width: 100%;
+      padding: 13px 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.92rem;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+    .form-input:focus {
+      border-color: var(--primary-emerald);
+      background: rgba(255, 255, 255, 0.07);
+      box-shadow: 0 0 15px rgba(0, 255, 163, 0.25);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(120deg, #047857, #00d26a 50%, #059669);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
+      color: #fff;
+      font-size: 0.98rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      cursor: pointer;
+      margin-top: 8px;
+      box-shadow: 0 8px 24px rgba(0, 210, 106, 0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-submit:active { transform: scale(0.98); }
+
+    .error-msg {
+      color: #f87171;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      margin-top: 12px;
+      display: none;
+    }
+
+    /* Content Area */
+    #content-section { display: none; }
+    .file-box {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(0, 255, 163, 0.25);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 18px;
+      text-align: left;
+    }
+    .btn-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+    }
+    .btn-read { background: linear-gradient(110deg, #047857, #00d26a); color: #fff; box-shadow: 0 6px 20px rgba(0, 210, 106, 0.3); }
+    .btn-download { background: #131d24; color: #38bdf8; border: 1.5px solid rgba(56, 189, 248, 0.45); }
+    .btn-lock-again { background: transparent; color: #8696a0; border: none; font-size: 0.76rem; cursor: pointer; margin-top: 10px; text-decoration: underline; }
+
+    /* Fullscreen Overlay */
     #pdf-viewer-overlay {
       display: none;
       position: fixed;
       inset: 0;
       background: #000;
-      z-index: 999999;
+      z-index: 9999999;
       flex-direction: column;
     }
     .viewer-header {
-      background: #111b21;
-      padding: 10px 14px;
+      background: #0f172a;
+      padding: 12px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #2a3942;
+      border-bottom: 1px solid #1e293b;
     }
-    .viewer-header span { font-size: 0.85rem; color: #e9edef; font-weight: 600; }
-    .btn-close-viewer { background: #ef4444; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
-    #pdf-viewer-overlay iframe { width: 100%; height: 100%; flex: 1; border: none; }
+    .btn-close-viewer {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
 
-  <!-- LOGIN SECTION -->
+  <!-- 1. LOGIN SCREEN -->
   <div class="card" id="auth-section">
-    <div class="icon-lock"><i class="fa-solid fa-file-shield"></i></div>
-    <h2>محفوظ پی ڈی ایف (Protected PDF)</h2>
-    <p class="subtitle">दस्तावेज़ खोलने के लिए नाम और पासवर्ड दर्ज करें।</p>
-    <div class="form-group">
-      <label for="user-name"><i class="fa-solid fa-user"></i> आपका नाम</label>
-      <input type="text" id="user-name" class="form-input" placeholder="नाम दर्ज करें">
-    </div>
-    <div class="form-group">
-      <label for="user-pass"><i class="fa-solid fa-key"></i> पासवर्ड</label>
-      <input type="password" id="user-pass" class="form-input" placeholder="पासवर्ड दर्ज करें">
-    </div>
-    <button type="button" class="btn-submit" onclick="verifyAccess()"><i class="fa-solid fa-lock-open"></i> दाखिल हों (Open)</button>
-    <div id="error-alert" class="error-msg">गलत पासवर्ड या नाम खाली है!</div>
-  </div>
-
-  <!-- OPTIONS SECTION -->
-  <div class="card" id="content-section">
-    <span class="welcome-badge" id="welcome-user">خوش آمدید!</span>
-    <div class="file-box">
-      <h4><i class="fa-solid fa-file-pdf" style="color:#ef4444; margin-right:6px;"></i> कक्षा 4 हिंदी पाठ 7: नकली हीरे</h4>
-      <p>محفوظ دستاویز | Darsi wa Ilmi Mavad (50 प्रश्नोत्तरी)</p>
+    <div class="exclusive-badge">
+      <i class="fa-solid fa-crown" style="color:#f59e0b;"></i>
+      <span>جامعۃ الرضا • درجہ اولیٰ الف (Ula Alif)</span>
     </div>
 
-    <!-- 1. फुल स्क्रीन रीडर बटन (बिना छोटे बॉक्स के) -->
-    <button type="button" class="btn-action btn-read" onclick="openFullscreenPdf()">
-      <i class="fa-solid fa-book-open-reader"></i> फुल स्क्रीन में साफ़ पढ़ें (Read Fullscreen)
+    <div class="icon-seal">
+      <i class="fa-solid fa-shield-halved"></i>
+    </div>
+
+    <h2>محفوظ تعلیمی دستاویز</h2>
+
+    <div class="urdu-banner">
+      یہ تعلیمی پی ڈی ایف خصوصاً <b>جامعۃ الرضا (مرکز التربیۃ الاسلامیۃ)</b> کے درجہ <b>اولیٰ الف (Ula Alif)</b> کے طلبہ کرام کے لیے مختص ہے۔
+    </div>
+
+    <p class="notice-text">
+      दस्तावेज़ खोलने के लिए अपना नाम और मख़सूस 10-डिजिट कोड (पासवर्ड) दर्ज करें।
+    </p>
+
+    <div class="form-group">
+      <label for="user-name">
+        <i class="fa-solid fa-user-graduate" style="color:var(--primary-emerald);"></i> 
+        طالب علم کا نام (Aapka Naam)
+      </label>
+      <input type="text" id="user-name" class="form-input" placeholder="e.g. सोहिल / ज़ैद / ख़ालिद" autocomplete="name">
+    </div>
+
+    <div class="form-group">
+      <label for="user-pass">
+        <i class="fa-solid fa-key" style="color:#fbbf24;"></i> 
+        خفیہ پاس ورڈ (Security Password)
+      </label>
+      <input type="password" id="user-pass" class="form-input" placeholder="10 Martaba Khufya Password" autocomplete="current-password">
+    </div>
+
+    <button type="button" class="btn-submit" onclick="verifyAccess()">
+      <i class="fa-solid fa-arrow-right-to-bracket"></i> &nbsp; تصدیق کریں اور داخل ہوں (Open)
     </button>
 
-    <!-- 2. डायरेक्ट ब्राउज़र डाउनलोड (बिना ड्राइव ऐप खोले) -->
+    <div id="error-alert" class="error-msg">غلط پاس ورڈ یا نام درج نہیں کیا گیا! رسائی صرف اولیٰ الف کے طلبہ کے لیے ہے۔</div>
+  </div>
+
+  <!-- 2. VERIFIED CONTENT -->
+  <div class="card" id="content-section">
+    <div class="exclusive-badge" style="border-color:#00ffa3; color:#00ffa3;">
+      <i class="fa-solid fa-circle-check"></i>
+      <span id="welcome-user">خوش آمدید طالب علم!</span>
+    </div>
+
+    <div class="file-box">
+      <h4 style="color:#fff; font-size:1rem; margin-bottom:6px;">
+        <i class="fa-solid fa-file-pdf" style="color:#ef4444; margin-right:6px;"></i> 
+        कक्षा 4 हिंदी पाठ 7: नकली हीरे (50 प्रश्नोत्तरी)
+      </h4>
+      <p style="font-size:0.78rem; color:#94a3b8;">جامعۃ الرضا - اولیٰ الف تدریسی مواد | Verified PDF</p>
+    </div>
+
+    <button type="button" class="btn-action btn-read" onclick="openFullscreenPdf()">
+      <i class="fa-solid fa-book-open-reader"></i> فل اسکرین میں صاف پڑھیں (Read Fullscreen)
+    </button>
+
     <button type="button" class="btn-action btn-download" onclick="startDirectDownload()">
-      <i class="fa-solid fa-file-arrow-down"></i> सीधे मोबाइल में डाउनलोड करें (Direct Download)
+      <i class="fa-solid fa-file-arrow-down"></i> براؤزر سے ڈائریکٹ ڈاؤنلوڈ کریں (Download)
     </button>
 
     <button type="button" class="btn-lock-again" onclick="lockAgain()">
-      <i class="fa-solid fa-arrow-right-from-bracket"></i> दोबारा लॉक करें (Lock Again)
+      <i class="fa-solid fa-arrow-right-from-bracket"></i> دوبارہ محفوظ / لاک کریں (Lock Again)
     </button>
   </div>
 
-  <!-- FULLSCREEN VIEWER -->
+  <!-- 3. FULLSCREEN VIEWER -->
   <div id="pdf-viewer-overlay">
     <div class="viewer-header">
-      <span><i class="fa-solid fa-file-pdf" style="color:#ef4444;"></i> कक्षा 4 हिंदी: नकली हीरे</span>
-      <button type="button" class="btn-close-viewer" onclick="closeFullscreenPdf()">✕ बंद करें (Close)</button>
+      <span style="color:#fff; font-size:0.88rem; font-weight:700;">
+        <i class="fa-solid fa-file-pdf" style="color:#ef4444;"></i> جامعۃ الرضا - اولیٰ الف اسٹڈی میٹیریل
+      </span>
+      <button type="button" class="btn-close-viewer" onclick="closeFullscreenPdf()">✕ بند کریں (Close)</button>
     </div>
-    <iframe id="fullscreen-frame" src=""></iframe>
+    <iframe id="fullscreen-frame" src="" style="width:100%; height:100%; border:none;"></iframe>
   </div>
 
   <script>
@@ -112,19 +335,27 @@
       const name = document.getElementById('user-name').value.trim();
       const pass = document.getElementById('user-pass').value.trim();
       const err = document.getElementById('error-alert');
-      if (!name) { err.innerText = "कृपया अपना नाम लिखें!"; err.style.display = 'block'; return; }
-      if (pass !== SECRET_KEY) { err.innerText = "गलत पासवर्ड! एक्सेस नामंज़ूर।"; err.style.display = 'block'; return; }
+
+      if (!name) {
+        err.innerText = "براہِ کرم اپنا نام درج کریں۔ (Aapka Naam zaroori hai)";
+        err.style.display = 'block';
+        return;
+      }
+      if (pass !== SECRET_KEY) {
+        err.innerText = "غلط پاس ورڈ! یہ فائل صرف جامعۃ الرضا اولیٰ الف کے بچوں کے لیے ہے۔";
+        err.style.display = 'block';
+        return;
+      }
+
       err.style.display = 'none';
       document.getElementById('auth-section').style.display = 'none';
       document.getElementById('content-section').style.display = 'block';
-      document.getElementById('welcome-user').innerHTML = `<i class="fa-solid fa-circle-check"></i> स्वागत है, <b>${name}</b>`;
+      document.getElementById('welcome-user').innerHTML = `خوش آمدید، عزیزم <b>${name}</b> (اولیٰ الف)`;
     }
 
-    // मोबाइल के पूरे स्क्रीन पर साफ़ रीडर खोलना
     function openFullscreenPdf() {
       const viewer = document.getElementById('pdf-viewer-overlay');
       const frame = document.getElementById('fullscreen-frame');
-      // Google docs viewer mobile me zoom aur swipe ke sath behtareen chalta hai
       frame.src = `https://drive.google.com/file/d/${FILE_ID}/preview`;
       viewer.style.display = 'flex';
     }
@@ -136,10 +367,8 @@
       viewer.style.display = 'none';
     }
 
-    // बिना Google Drive ऐप को ट्रिगर किए डायरेक्ट ब्राउज़र डाउनलोड
     function startDirectDownload() {
       const directUrl = `https://drive.usercontent.google.com/download?id=${FILE_ID}&export=download&authuser=0`;
-      
       const a = document.createElement('a');
       a.href = directUrl;
       a.setAttribute('download', 'Kaksha_4_Hindi_Nakli_Heere.pdf');
