@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>جامعۃ الرضا - اختصاصی تعلیمی پورٹل (Ula Alif)</title>
+  <title>جامعۃ الرضا - اختصاصی تعلیمی و امتحانی کتب خانہ</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,10 +13,18 @@
   <style>
     :root {
       --primary-emerald: #00ffa3;
+      --deep-bg: #04090d;
       --card-bg: radial-gradient(circle at 15% 15%, rgba(20, 35, 45, 0.98), rgba(7, 14, 19, 0.99) 75%);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', 'Noto Nastaliq Urdu', sans-serif; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Poppins', 'Noto Nastaliq Urdu', sans-serif;
+      -webkit-user-select: none;
+      user-select: none;
+    }
     
     body {
       background: radial-gradient(circle at 50% 20%, #0d232a 0%, #04090d 85%);
@@ -29,15 +37,38 @@
       overflow-x: hidden;
     }
 
-    
+    .card {
+      position: relative;
+      background: var(--card-bg);
+      border: 1.5px solid rgba(0, 255, 163, 0.45);
+      border-radius: 24px;
+      padding: 24px 18px;
+      width: 100%;
+      max-width: 540px;
+      text-align: center;
+      direction: ltr;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7);
+      transform: translateZ(0);
     }
 
-    @keyframes badgePulse {
-      0%, 100% { transform: scale(1); opacity: 0.95; }
-      50% { transform: scale(1.02); opacity: 1; filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.5)); }
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: 26px;
+      background: linear-gradient(135deg, rgba(0, 255, 163, 0.35), rgba(56, 189, 248, 0.3));
+      filter: blur(14px);
+      z-index: -1;
+      opacity: 0.6;
+      animation: smoothGlowPulse 4s infinite ease-in-out alternate;
+      will-change: opacity;
+      transform: translateZ(0);
     }
 
-    
+    @keyframes smoothGlowPulse {
+      0% { opacity: 0.3; }
+      100% { opacity: 0.8; }
+    }
 
     .exclusive-badge {
       display: inline-flex;
@@ -51,7 +82,6 @@
       font-size: 0.78rem;
       font-weight: 700;
       margin-bottom: 14px;
-      animation: badgePulse 3s infinite ease-in-out;
       letter-spacing: 0.3px;
     }
 
@@ -116,6 +146,8 @@
       font-size: 0.92rem;
       outline: none;
       transition: all 0.25s ease;
+      -webkit-user-select: text;
+      user-select: text;
     }
     .form-input:focus {
       border-color: var(--primary-emerald);
@@ -136,9 +168,7 @@
       cursor: pointer;
       margin-top: 8px;
       box-shadow: 0 8px 24px rgba(0, 210, 106, 0.35);
-      transition: transform 0.2s;
     }
-    .btn-submit:active { transform: scale(0.98); }
 
     .error-msg {
       color: #f87171;
@@ -152,40 +182,85 @@
     }
 
     #content-section { display: none; }
-    
+
+    /* SEARCH & FILTER BAR */
+    .search-box {
+      position: relative;
+      margin-bottom: 12px;
+      direction: rtl;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 11px 40px 11px 14px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.88rem;
+      outline: none;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+    .search-box i {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #38bdf8;
+      font-size: 0.9rem;
+    }
+    .filter-tags {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      direction: rtl;
+    }
+    .filter-tag {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 0.74rem;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .filter-tag.active {
+      background: rgba(0, 255, 163, 0.2);
+      border-color: #00ffa3;
+      color: #00ffa3;
+      font-weight: 700;
+    }
+
     .books-container {
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      margin-top: 14px;
+      gap: 12px;
       text-align: right;
       direction: rtl;
-    }
-
-    .section-heading {
-      font-size: 0.88rem;
-      color: #38bdf8;
-      font-weight: 700;
-      text-align: right;
-      margin-top: 6px;
-      border-bottom: 1px dashed rgba(56, 189, 248, 0.3);
-      padding-bottom: 4px;
+      max-height: 60vh;
+      overflow-y: auto;
+      padding-right: 4px;
     }
 
     .book-card {
       background: rgba(8, 18, 25, 0.85);
       border: 1.2px solid rgba(255, 255, 255, 0.12);
       border-radius: 16px;
-      padding: 14px;
+      padding: 12px;
       display: flex;
-      gap: 14px;
+      gap: 12px;
       align-items: center;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+      contain: content;
     }
 
     .book-cover {
-      width: 78px;
-      height: 105px;
+      width: 72px;
+      height: 96px;
       border-radius: 8px;
       flex-shrink: 0;
       display: flex;
@@ -193,8 +268,12 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 6px 4px;
-      box-shadow: -4px 6px 15px rgba(0,0,0,0.7), inset 2px 0 4px rgba(255,255,255,0.25);
+      padding: 4px;
+      box-shadow: -3px 4px 12px rgba(0,0,0,0.6);
+    }
+    .cover-saniya {
+      background: linear-gradient(135deg, #311042 0%, #6b21a8 50%, #4c1d95 100%);
+      border: 1.5px solid #d8b4fe;
     }
     .cover-bahar {
       background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #022c22 100%);
@@ -208,9 +287,9 @@
       background: linear-gradient(135deg, #431407 0%, #c2410c 50%, #7c2d12 100%);
       border: 1.5px solid #fb923c;
     }
-    .book-cover i { font-size: 20px; margin-bottom: 5px; }
+    .book-cover i { font-size: 18px; margin-bottom: 4px; }
     .book-cover-title {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       font-weight: 700;
       line-height: 1.2;
       color: #fff;
@@ -220,37 +299,37 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 3px;
     }
     .book-title {
-      font-size: 0.92rem;
+      font-size: 0.88rem;
       font-weight: 700;
       color: #f1f5f9;
-      line-height: 1.35;
+      line-height: 1.3;
     }
     .book-sub {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: #94a3b8;
     }
 
     .book-actions {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       margin-top: 6px;
       direction: ltr;
     }
     .btn-card {
       flex: 1;
-      padding: 8px 10px;
+      padding: 7px 10px;
       border-radius: 8px;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 600;
       border: none;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 5px;
     }
     .btn-card-read {
       background: linear-gradient(120deg, #059669, #10b981);
@@ -260,6 +339,14 @@
       background: #1e293b;
       color: #38bdf8;
       border: 1px solid rgba(56, 189, 248, 0.4);
+    }
+    .btn-card-secure {
+      background: rgba(220, 38, 38, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      font-size: 0.7rem;
+      padding: 6px;
+      cursor: default;
     }
 
     .btn-lock-again {
@@ -290,7 +377,6 @@
       border-bottom: 1px solid #1e293b;
       direction: ltr;
       gap: 8px;
-      flex-wrap: wrap;
     }
     .viewer-title-box {
       font-size: 0.85rem;
@@ -353,56 +439,25 @@
       height: 100%;
       border: none;
     }
-  
-    /* GPU-Accelerated Lag-Free Glow */
-    .card {
-      position: relative;
-      background: var(--card-bg);
-      border: 1.5px solid rgba(0, 255, 163, 0.45);
-      border-radius: 24px;
-      padding: 24px 18px;
-      width: 100%;
-      max-width: 520px;
-      text-align: center;
-      direction: ltr;
-      transform: translateZ(0);
-      backface-visibility: hidden;
-      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7);
-    }
-
-    .card::after {
-      content: "";
-      position: absolute;
-      inset: -2px;
-      border-radius: 26px;
-      background: linear-gradient(135deg, rgba(0, 255, 163, 0.4), rgba(56, 189, 248, 0.35));
-      filter: blur(14px);
-      z-index: -1;
-      opacity: 0.6;
-      animation: smoothGlowPulse 4s infinite ease-in-out alternate;
-      will-change: opacity;
-      transform: translateZ(0);
-    }
-
-    @keyframes smoothGlowPulse {
-      0% { opacity: 0.35; }
-      100% { opacity: 0.85; }
-    }
-
-    /* Lag-free Book Cards with Hardware Acceleration */
-    .book-card {
-      transform: translateZ(0);
-      will-change: transform;
-      contain: content;
-    }
     
-    html {
-      scroll-behavior: smooth;
+    /* ANTI-SCREENSHOT SECURITY BLANK LAYER */
+    #security-blanket {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 10000000;
+      color: #ef4444;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      font-size: 1.1rem;
+      font-weight: 800;
     }
-
   </style>
 </head>
-<body>
+<body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
   <!-- 1. LOGIN SCREEN -->
   <div class="card" id="auth-section">
@@ -418,7 +473,7 @@
     <h2>محفوظ تعلیمی پورٹل</h2>
 
     <div class="urdu-banner">
-      یہ پورٹل <b>جامعۃ الرضا</b> کے درجہ <b>اولیٰ الف</b> کے طلبہ کے لیے مختص ہے۔ مطالعہ کے لیے اپنا نام اور مخصوص خفیہ کوڈ درج کریں۔
+      یہ پورٹل <b>جامعۃ الرضا</b> کے طلبہ کے لیے مختص ہے۔ کتب و امتحانی پرچہ جات کے مطالعہ کے لیے اپنا نام اور پاس ورڈ درج کریں۔
     </div>
 
     <div class="form-group">
@@ -444,135 +499,43 @@
     <div id="error-alert" class="error-msg">درج شدہ معلومات غلط ہیں!</div>
   </div>
 
-  <!-- 2. ALL BOOKS DASHBOARD (TOGETHER) -->
+  <!-- 2. SCALABLE LIBRARY DASHBOARD -->
   <div class="card" id="content-section">
     <div class="exclusive-badge" style="border-color:#00ffa3; color:#00ffa3;">
       <i class="fa-solid fa-circle-check"></i>
-      <span id="welcome-user">خوش آمدید طالب علم!</span>
+      <span id="welcome-user">خوش آمدید!</span>
     </div>
 
-    <h3 style="color:#f8fafc; font-size:1.05rem; margin-bottom:8px; font-weight:700;">تمام درسی و تعلیمی کتب</h3>
+    <h3 style="color:#f8fafc; font-size:1.05rem; margin-bottom:8px; font-weight:700;">جامعۃ الرضا ڈیجیٹل کتب خانہ</h3>
 
-    <div class="books-container">
-
-      <!-- SECTION 1: BAHAR-E-SHARIAT -->
-      <div class="section-heading"><i class="fa-solid fa-book-quran"></i> دینی و فقہی کتب</div>
-      <div class="book-card">
-        <div class="book-cover cover-bahar">
-          <i class="fa-solid fa-quran" style="color:#f59e0b;"></i>
-          <span class="book-cover-title">بہارِ شریعت<br><small style="color:#fde68a;">حصہ اول</small></span>
-        </div>
-        <div class="book-details">
-          <div class="book-title">بہار شریعت حصہ اول (150 سوالات مع جوابات)</div>
-          <div class="book-sub">جامعۃ الرضا - فقہی و عقائدی سوالات | امتحانی تیاری</div>
-          <div class="book-actions">
-            <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1RkoRNX0nAeQLA5e8QsWKrcX_RfVcudG2', 'بہار شریعت حصہ اول (150 سوالات مع جوابات)')">
-              <i class="fa-solid fa-book-open"></i> پڑھیں
-            </button>
-            <button class="btn-card btn-card-down" onclick="startDirectDownload(event, '1RkoRNX0nAeQLA5e8QsWKrcX_RfVcudG2', 'Bahar_e_Shariat_Hissa_Awwal_150_QnA.pdf')">
-              <i class="fa-solid fa-download"></i> ڈاؤنلوڈ
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- SECTION 2: HINDI -->
-      <div class="section-heading"><i class="fa-solid fa-book"></i> درسی ہندی</div>
-      <div class="book-card">
-        <div class="book-cover cover-hindi">
-          <i class="fa-solid fa-book" style="color:#38bdf8;"></i>
-          <span class="book-cover-title">درسی ہندی<br><small style="color:#bae6fd;">کلاس 4</small></span>
-        </div>
-        <div class="book-details">
-          <div class="book-title">कक्षा 4 हिंदी पाठ 7: नकली हीरे (50 प्रश्नोत्तरी)</div>
-          <div class="book-sub">اولیٰ الف تدریسی مواد | تفصیلی سوال و جواب</div>
-          <div class="book-actions">
-            <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1xSLxk3toreZoU5vlI_SzVUq93nzzMRnv', 'कक्षा 4 हिंदी पाठ 7: नकली हीरे')">
-              <i class="fa-solid fa-book-open"></i> پڑھیں
-            </button>
-            <button class="btn-card btn-card-down" onclick="startDirectDownload(event, '1xSLxk3toreZoU5vlI_SzVUq93nzzMRnv', 'Kaksha_4_Hindi_Nakli_Heere.pdf')">
-              <i class="fa-solid fa-download"></i> ڈاؤنلوڈ
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- SECTION 3: MATHEMATICS CHAPTERS -->
-      <div class="section-heading"><i class="fa-solid fa-calculator"></i> ریاضی (Mathematics)</div>
-      
-      <!-- Chapter 8 -->
-      <div class="book-card">
-        <div class="book-cover cover-math">
-          <i class="fa-solid fa-calculator" style="color:#fed7aa;"></i>
-          <span class="book-cover-title">Math<br>Ch. 8</span>
-        </div>
-        <div class="book-details">
-          <div class="book-title">Class 4 Mathematics Chapter 8 Solved Q...</div>
-          <div class="book-sub">اولیٰ الف ریاضی | حل شدہ امتحانی مشقیں و سوالات</div>
-          <div class="book-actions">
-            <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1e_f_rYoIiaPs4F7PMJlOIc4SrNPIV28m', 'Math Ch. 8 Solved Questions')">
-              <i class="fa-solid fa-book-open"></i> پڑھیں
-            </button>
-            <button class="btn-card btn-card-down" onclick="startDirectDownload(event, '1e_f_rYoIiaPs4F7PMJlOIc4SrNPIV28m', 'Class_4_Mathematics_Chapter_8_Solved.pdf')">
-              <i class="fa-solid fa-download"></i> ڈاؤنلوڈ
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Chapter 9 -->
-      <div class="book-card">
-        <div class="book-cover cover-math">
-          <i class="fa-solid fa-chart-pie" style="color:#fed7aa;"></i>
-          <span class="book-cover-title">Math<br>Ch. 9</span>
-        </div>
-        <div class="book-details">
-          <div class="book-title">Class 4 Mathematics Chapter 9 Solved Q...</div>
-          <div class="book-sub">اولیٰ الف ریاضی | حل شدہ سوالات مع تفصیلی جوابات</div>
-          <div class="book-actions">
-            <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1cSJrtV8o8YQjTqlo-APAx3G8NohDrfSn', 'Math Ch. 9 Solved Questions')">
-              <i class="fa-solid fa-book-open"></i> پڑھیں
-            </button>
-            <button class="btn-card btn-card-down" onclick="startDirectDownload(event, '1cSJrtV8o8YQjTqlo-APAx3G8NohDrfSn', 'Class_4_Mathematics_Chapter_9_Solved.pdf')">
-              <i class="fa-solid fa-download"></i> ڈاؤنلوڈ
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Chapter 10 -->
-      <div class="book-card">
-        <div class="book-cover cover-math">
-          <i class="fa-solid fa-shapes" style="color:#fed7aa;"></i>
-          <span class="book-cover-title">Math<br>Ch. 10</span>
-        </div>
-        <div class="book-details">
-          <div class="book-title">Class 4 Mathematics Chapter 10 Solved ...</div>
-          <div class="book-sub">اولیٰ الف ریاضی | تفصیلی سوالات مع حل (مکمل مشق)</div>
-          <div class="book-actions">
-            <button class="btn-card btn-card-read" onclick="openFullscreenPdf('1KClLGIym2oblPYmCJ7oW_3A30Lj01twq', 'Math Ch. 10 Solved Questions')">
-              <i class="fa-solid fa-book-open"></i> پڑھیں
-            </button>
-            <button class="btn-card btn-card-down" onclick="startDirectDownload(event, '1KClLGIym2oblPYmCJ7oW_3A30Lj01twq', 'Class_4_Mathematics_Chapter_10_Solved.pdf')">
-              <i class="fa-solid fa-download"></i> ڈاؤنلوڈ
-            </button>
-          </div>
-        </div>
-      </div>
-
+    <!-- Search & Filter Controls -->
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="lib-search" placeholder="کتاب یا پرچہ تلاش کریں (Search)..." oninput="filterLibrary()">
     </div>
+
+    <div class="filter-tags">
+      <div class="filter-tag active" onclick="setFilter('all', this)">تمام کتب</div>
+      <div class="filter-tag" onclick="setFilter('papers', this)">امتحانی پرچے</div>
+      <div class="filter-tag" onclick="setFilter('islamic', this)">دینی و فقہی</div>
+      <div class="filter-tag" onclick="setFilter('math', this)">ریاضی (Math)</div>
+      <div class="filter-tag" onclick="setFilter('hindi', this)">درسی ہندی</div>
+    </div>
+
+    <!-- Scalable Book Container -->
+    <div class="books-container" id="books-list"></div>
 
     <button type="button" class="btn-lock-again" onclick="manualLogout()">
       <i class="fa-solid fa-arrow-right-from-bracket"></i> لاگ آؤٹ کریں (Logout)
     </button>
   </div>
 
-  <!-- 3. FULLSCREEN VIEWER WITH INTERACTIVE ZOOM -->
+  <!-- 3. FULLSCREEN VIEWER WITH INTERACTIVE ZOOM & ANTI-SCREENSHOT GUARD -->
   <div id="pdf-viewer-overlay">
     <div class="viewer-header">
       <div class="viewer-title-box">
-        <i class="fa-solid fa-file-pdf" style="color:#ef4444;"></i>
-        <span id="viewer-title">PDF Reader</span>
+        <i class="fa-solid fa-file-shield" style="color:#ef4444;"></i>
+        <span id="viewer-title">Reader</span>
       </div>
       
       <div class="viewer-controls">
@@ -590,12 +553,150 @@
     </div>
   </div>
 
+  <!-- Anti-Screenshot Black Screen Overlay -->
+  <div id="security-blanket">
+    <div>
+      <i class="fa-solid fa-triangle-exclamation" style="font-size:3rem; margin-bottom:12px;"></i><br>
+      محفوظ دستاویز! اسکرین شاٹ یا کاپی کرنا ممنوع ہے۔<br>
+      <small style="color:#94a3b8; font-size:0.8rem; font-weight:normal;">Screen capture is protected</small>
+    </div>
+  </div>
+
   <script>
-    // एकल मास्टर पासवर्ड: 78692
     const MASTER_PASSWORD = "78692";
     const SESSION_EXPIRY_MS = 5 * 60 * 60 * 1000;
     let currentZoom = 1.0;
+    let currentCategory = 'all';
 
+    // ==========================================
+    // 📚 SCALABLE LIBRARY REPOSITORY (ADD 1000s OF BOOKS HERE)
+    // ==========================================
+    const LIBRARY_DATA = [
+      {
+        id: "1eMaQt7OezK-E-oDp974hlisCXL1whqBV",
+        title: "درجہ ثانیہ سالانہ امتحانی پرچہ (جامعۃ الرضا)",
+        subtitle: "محفوظ امتحانی دستاویز | صرف آن لائن مطالعہ",
+        category: "papers",
+        coverClass: "cover-saniya",
+        icon: "fa-solid fa-file-circle-question",
+        coverTitle: "امتحانی پرچہ<br><small style=\"color:#e9d5ff;\">درجہ ثانیہ</small>",
+        allowDownload: false // पर्चे का डाउनलोड पूरी तरह बंद
+      },
+      {
+        id: "1RkoRNX0nAeQLA5e8QsWKrcX_RfVcudG2",
+        title: "بہار شریعت حصہ اول (150 سوالات مع جوابات)",
+        subtitle: "جامعۃ الرضا - فقہی و عقائدی سوالات | امتحانی تیاری",
+        category: "islamic",
+        coverClass: "cover-bahar",
+        icon: "fa-solid fa-quran",
+        coverTitle: "بہارِ شریعت<br><small style=\"color:#fde68a;\">حصہ اول</small>",
+        allowDownload: true,
+        downloadName: "Bahar_e_Shariat_Hissa_Awwal_150_QnA.pdf"
+      },
+      {
+        id: "1xSLxk3toreZoU5vlI_SzVUq93nzzMRnv",
+        title: "کक्षा 4 हिंदी पाठ 7: नकली हीरे (50 प्रश्नोत्तरी)",
+        subtitle: "اولیٰ الف تدریسی مواد | تفصیلی سوال و جواب",
+        category: "hindi",
+        coverClass: "cover-hindi",
+        icon: "fa-solid fa-book",
+        coverTitle: "درسی ہندی<br><small style=\"color:#bae6fd;\">کلاس 4</small>",
+        allowDownload: true,
+        downloadName: "Kaksha_4_Hindi_Nakli_Heere.pdf"
+      },
+      {
+        id: "1e_f_rYoIiaPs4F7PMJlOIc4SrNPIV28m",
+        title: "Class 4 Mathematics Chapter 8 Solved Questions",
+        subtitle: "اولیٰ الف ریاضی | حل شدہ امتحانی مشقیں و سوالات",
+        category: "math",
+        coverClass: "cover-math",
+        icon: "fa-solid fa-calculator",
+        coverTitle: "Math<br>Ch. 8",
+        allowDownload: true,
+        downloadName: "Class_4_Mathematics_Chapter_8_Solved.pdf"
+      },
+      {
+        id: "1cSJrtV8o8YQjTqlo-APAx3G8NohDrfSn",
+        title: "Class 4 Mathematics Chapter 9 Solved Questions",
+        subtitle: "اولیٰ الف ریاضی | حل شدہ سوالات مع تفصیلی جوابات",
+        category: "math",
+        coverClass: "cover-math",
+        icon: "fa-solid fa-chart-pie",
+        coverTitle: "Math<br>Ch. 9",
+        allowDownload: true,
+        downloadName: "Class_4_Mathematics_Chapter_9_Solved.pdf"
+      },
+      {
+        id: "1KClLGIym2oblPYmCJ7oW_3A30Lj01twq",
+        title: "Class 4 Mathematics Chapter 10 Solved Questions",
+        subtitle: "اولیٰ الف ریاضی | تفصیلی سوالات مع حل (مکمل مشق)",
+        category: "math",
+        coverClass: "cover-math",
+        icon: "fa-solid fa-shapes",
+        coverTitle: "Math<br>Ch. 10",
+        allowDownload: true,
+        downloadName: "Class_4_Mathematics_Chapter_10_Solved.pdf"
+      }
+    ];
+
+    // ==========================================
+    // RENDER BOOKS DYNAMICALLY
+    // ==========================================
+    function renderBooks(list) {
+      const container = document.getElementById("books-list");
+      if (list.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:30px; color:#94a3b8; font-size:0.85rem;">کوئی کتاب یا پرچہ نہیں ملا!</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(b => `
+        <div class="book-card">
+          <div class="book-cover ${b.coverClass}">
+            <i class="${b.icon}" style="color:#fed7aa;"></i>
+            <span class="book-cover-title">${b.coverTitle}</span>
+          </div>
+          <div class="book-details">
+            <div class="book-title">${b.title}</div>
+            <div class="book-sub">${b.subtitle}</div>
+            <div class="book-actions">
+              <button class="btn-card btn-card-read" onclick="openFullscreenPdf('${b.id}', '${b.title}')">
+                <i class="fa-solid fa-book-open"></i> پڑھیں
+              </button>
+              ${b.allowDownload ? `
+                <button class="btn-card btn-card-down" onclick="startDirectDownload(event, '${b.id}', '${b.downloadName}')">
+                  <i class="fa-solid fa-download"></i> ڈاؤنلوڈ
+                </button>
+              ` : `
+                <div class="btn-card btn-card-secure">
+                  <i class="fa-solid fa-lock"></i> ڈاؤنلوڈ ممنوع
+                </div>
+              `}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterLibrary() {
+      const q = document.getElementById("lib-search").value.toLowerCase().trim();
+      const filtered = LIBRARY_DATA.filter(b => {
+        const matchesCategory = (currentCategory === 'all' || b.category === currentCategory);
+        const matchesSearch = b.title.toLowerCase().includes(q) || b.subtitle.toLowerCase().includes(q);
+        return matchesCategory && matchesSearch;
+      });
+      renderBooks(filtered);
+    }
+
+    function setFilter(cat, elem) {
+      currentCategory = cat;
+      document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+      elem.classList.add('active');
+      filterLibrary();
+    }
+
+    // ==========================================
+    // SECURITY & ACCESS
+    // ==========================================
     function checkLockTimer() {
       const now = Date.now();
       const lockUntil = parseInt(localStorage.getItem("jamia_lock_until") || "0", 10);
@@ -610,7 +711,7 @@
         const m = Math.floor(remSec / 60);
         const s = remSec % 60;
         err.style.display = "block";
-        err.innerHTML = `<i class="fa-solid fa-lock"></i> 5 بار غلط پاس ورڈ درج کیا گیا! براہِ کرم <b>${m}:${s < 10 ? "0" : ""}${s}</b> منٹ انتظار کریں۔`;
+        err.innerHTML = `<i class=\"fa-solid fa-lock\"></i> 5 بار غلط پاس ورڈ درج کیا گیا! براہِ کرم <b>${m}:${s < 10 ? "0" : ""}${s}</b> منٹ انتظار کریں۔`;
         setTimeout(checkLockTimer, 1000);
         return true;
       } else {
@@ -643,7 +744,8 @@
     function showDashboard(name) {
       document.getElementById('auth-section').style.display = 'none';
       document.getElementById('content-section').style.display = 'block';
-      document.getElementById('welcome-user').innerHTML = `خوش آمدید، عزیزم <b>${name}</b> (اولیٰ الف)`;
+      document.getElementById('welcome-user').innerHTML = `خوش آمدید، عزیزم <b>${name}</b>`;
+      renderBooks(LIBRARY_DATA);
     }
 
     function verifyAccess() {
@@ -654,7 +756,7 @@
       const err = document.getElementById('error-alert');
 
       if (!name) {
-        err.innerText = "براہِ کرم اپنا نام درج کریں۔ (Aapka Naam zaroori hai)";
+        err.innerText = "براہِ کرم اپنا نام درج کریں۔";
         err.style.display = 'block';
         return;
       }
@@ -669,12 +771,11 @@
           checkLockTimer();
           return;
         }
-        err.innerHTML = `غلط پاس ورڈ! رسائی نامنظور ہے۔ (باقی کوششیں: ${5 - failedAttempts})`;
+        err.innerHTML = `غلط پاس ورڈ! (باقی کوششیں: ${5 - failedAttempts})`;
         err.style.display = "block";
         return;
       }
 
-      // सफलता पर काउंटर रीसेट
       localStorage.setItem("jamia_failed_attempts", "0");
       err.style.display = 'none';
 
@@ -686,7 +787,9 @@
       showDashboard(name);
     }
 
-    // ZOOM FUNCTIONS
+    // ==========================================
+    // VIEWER & ZOOM
+    // ==========================================
     function applyZoom() {
       const wrapper = document.getElementById('frame-wrapper');
       wrapper.style.transform = `scale(${currentZoom})`;
@@ -763,6 +866,37 @@
       document.getElementById('content-section').style.display = 'none';
       document.getElementById('auth-section').style.display = 'block';
     }
+
+    // ==========================================
+    // ANTI-SCREENSHOT & ANTI-CAPTURE LOGIC
+    // ==========================================
+    const blanket = document.getElementById("security-blanket");
+
+    // PrintScreen Key / Shortcut Trap
+    window.addEventListener("keyup", function(e) {
+      if (e.key === "PrintScreen" || e.keyCode === 44) {
+        blanket.style.display = "flex";
+        setTimeout(() => { blanket.style.display = "none"; }, 3000);
+      }
+    });
+
+    window.addEventListener("keydown", function(e) {
+      if ((e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'u')) || e.key === 'F12') {
+        e.preventDefault();
+        blanket.style.display = "flex";
+        setTimeout(() => { blanket.style.display = "none"; }, 2500);
+        return false;
+      }
+    });
+
+    // Mobile App-Switch / Visibility Blindfold
+    document.addEventListener("visibilitychange", function() {
+      if (document.hidden) {
+        blanket.style.display = "flex";
+      } else {
+        setTimeout(() => { blanket.style.display = "none"; }, 800);
+      }
+    });
 
     checkActiveSession();
     checkLockTimer();
