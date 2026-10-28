@@ -677,20 +677,31 @@
       `).join('');
     }
 
+    function getActiveLibrary() {
+      return (window.ALL_BOOKS_CACHE && window.ALL_BOOKS_CACHE.length > 0) 
+        ? window.ALL_BOOKS_CACHE 
+        : LIBRARY_DATA;
+    }
+
     function filterLibrary() {
       const q = document.getElementById("lib-search").value.toLowerCase().trim();
-      const filtered = LIBRARY_DATA.filter(b => {
+      const currentList = getActiveLibrary();
+
+      const filtered = currentList.filter(b => {
         const matchesCategory = (currentCategory === 'all' || b.category === currentCategory);
-        const matchesSearch = b.title.toLowerCase().includes(q) || b.subtitle.toLowerCase().includes(q);
+        const titleText = (b.title || "").toLowerCase();
+        const subText = (b.subtitle || "").toLowerCase();
+        const matchesSearch = !q || titleText.includes(q) || subText.includes(q);
         return matchesCategory && matchesSearch;
       });
+
       renderBooks(filtered);
     }
 
     function setFilter(cat, elem) {
       currentCategory = cat;
       document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
-      elem.classList.add('active');
+      if (elem) elem.classList.add('active');
       filterLibrary();
     }
 
@@ -741,11 +752,60 @@
       } catch (_) {}
     }
 
+    
+    const DRIVE_API_URL = "https://script.google.com/macros/s/AKfycbxlxUIrFPytt9CAkJxUxKuls6Lq8_yL5dq1rac_hOpp-GOYzFIntmoQB-q5u1npyWVw_w/exec";
+
+    async function loadDynamicBooks() {
+      const container = document.getElementById("books-list");
+      container.innerHTML = `<div style="text-align:center; padding:20px; color:#38bdf8;"><i class="fa-solid fa-spinner fa-spin"></i> کتب خانہ اپڈیٹ ہو رہا ہے...</div>`;
+
+      try {
+        const res = await fetch(DRIVE_API_URL);
+        const dynamicBooks = await res.json();
+
+        const combined = [...LIBRARY_DATA];
+        dynamicBooks.forEach(db => {
+          if (!combined.some(b => b.id === db.id)) {
+            let coverClass = "cover-bahar";
+            let icon = "fa-solid fa-book-quran";
+            if (db.category === "papers") {
+              coverClass = "cover-saniya";
+              icon = "fa-solid fa-file-circle-question";
+            } else if (db.category === "math") {
+              coverClass = "cover-math";
+              icon = "fa-solid fa-calculator";
+            } else if (db.category === "hindi") {
+              coverClass = "cover-hindi";
+              icon = "fa-solid fa-book";
+            }
+
+            combined.push({
+              id: db.id,
+              title: db.title,
+              subtitle: "جامعۃ الرضا ڈیجیٹل کتب خانہ",
+              category: db.category,
+              coverClass: coverClass,
+              icon: icon,
+              coverTitle: db.title.substring(0, 18),
+              allowDownload: db.allowDownload,
+              downloadName: db.title + ".pdf"
+            });
+          }
+        });
+
+        window.ALL_BOOKS_CACHE = combined;
+        renderBooks(combined);
+      } catch (err) {
+        console.error("Fetch error:", err);
+        loadDynamicBooks();
+      }
+    }
+
     function showDashboard(name) {
       document.getElementById('auth-section').style.display = 'none';
       document.getElementById('content-section').style.display = 'block';
       document.getElementById('welcome-user').innerHTML = `خوش آمدید، عزیزم <b>${name}</b>`;
-      renderBooks(LIBRARY_DATA);
+      loadDynamicBooks();
     }
 
     function verifyAccess() {
