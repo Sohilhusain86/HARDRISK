@@ -1154,6 +1154,17 @@
     function renderBooks(customList) {
       const booksToRender = customList || (typeof allBooks !== 'undefined' ? allBooks : (typeof books !== 'undefined' ? books : defaultBooks));
       const grid = document.getElementById("booksGrid");
+
+      // Auto-hide any loading indicator
+      const allLoaders = document.querySelectorAll("[id*='load'], [id*='sync'], [class*='load'], [class*='spin']");
+      allLoaders.forEach(el => {
+        if (el.innerText && el.innerText.includes("اپڈیٹ")) {
+          el.style.display = "none";
+        }
+      });
+      const directLoader = document.getElementById("loadingStatus") || document.getElementById("syncStatus") || document.getElementById("loader");
+      if (directLoader) directLoader.style.display = "none";
+
       if (!grid) return;
       grid.innerHTML = "";
 
@@ -1464,7 +1475,7 @@
       a.click();
       document.body.removeChild(a);
 
-      setTimeout(() => {
+      setTimeout(() => { renderBooks(); const ld = document.querySelector('[id*="load"], [id*="sync"]'); if(ld) ld.style.display="none"; 
         btn.innerHTML = origText;
         btn.style.pointerEvents = "auto";
       }, 3000);
