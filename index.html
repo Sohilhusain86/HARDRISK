@@ -580,7 +580,9 @@
         coverClass: "cover-saniya",
         icon: "fa-solid fa-file-circle-question",
         coverTitle: "امتحانی پرچہ<br><small style=\"color:#e9d5ff;\">درجہ ثانیہ</small>",
-        allowDownload: false // पर्चे का डाउनलोड पूरी तरह बंद
+        allowDownload: true,
+        category: "papers",
+        downloadName: "Darja_Saniya_Salana_Exam_Paper.pdf"
       },
       {
         id: "1RkoRNX0nAeQLA5e8QsWKrcX_RfVcudG2",
@@ -787,7 +789,9 @@
               coverClass: coverClass,
               icon: icon,
               coverTitle: db.title.substring(0, 18),
-              allowDownload: db.allowDownload,
+              let isPaper = db.title.toLowerCase().includes("paper") || db.title.includes("پرچہ");
+              category: isPaper ? "papers" : (db.category || "islamic"),
+              allowDownload: true,
               downloadName: db.title + ".pdf"
             });
           }
@@ -895,6 +899,16 @@
     }
 
     function startDirectDownload(e, fileId, filename) {
+      const isPaper = filename.toLowerCase().includes("paper") || filename.includes("پرچہ") || filename.toLowerCase().includes("sania") || filename.toLowerCase().includes("rabia") || filename.toLowerCase().includes("salisa") || filename.toLowerCase().includes("ula");
+      if (isPaper) {
+        const pwd = prompt("امتحانی پرچہ ڈاؤنلوڈ کرنے کے لیے پاس ورڈ درج کریں:");
+        if (!pwd) return;
+        if (pwd !== "Jamia") {
+          alert("غلط پاس ورڈ! پرچہ ڈاؤنلوڈ کرنے کی اجازت نہیں ہے۔");
+          return;
+        }
+      }
+
       const btn = e.currentTarget;
       const origText = btn.innerHTML;
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ڈاؤنلوڈ...`;
