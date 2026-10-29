@@ -455,7 +455,107 @@
       font-size: 1.1rem;
       font-weight: 800;
     }
-  </style>
+  
+  /* Custom Animated Security Modal */
+  .custom-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .custom-modal-overlay.active {
+    display: flex;
+    opacity: 1;
+  }
+  .custom-modal-box {
+    background: #061913;
+    border: 1px solid rgba(0, 255, 163, 0.35);
+    box-shadow: 0 0 25px rgba(0, 255, 163, 0.2), 0 20px 40px rgba(0,0,0,0.8);
+    border-radius: 18px;
+    width: 90%;
+    max-width: 360px;
+    padding: 22px 20px;
+    text-align: center;
+    transform: scale(0.85);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .custom-modal-overlay.active .custom-modal-box {
+    transform: scale(1);
+  }
+  .modal-icon-badge {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    background: rgba(0, 255, 163, 0.12);
+    border: 1px solid rgba(0, 255, 163, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #00ffa3;
+    font-size: 1.25rem;
+  }
+  .modal-input-field {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 255, 163, 0.3);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: #fff;
+    font-size: 0.95rem;
+    text-align: center;
+    outline: none;
+    margin-top: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .modal-input-field:focus {
+    border-color: #00ffa3;
+    box-shadow: 0 0 10px rgba(0, 255, 163, 0.3);
+  }
+  .modal-btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .modal-btn {
+    flex: 1;
+    padding: 10px 0;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.15s, opacity 0.15s;
+  }
+  .modal-btn:active {
+    transform: scale(0.96);
+  }
+  .modal-btn-confirm {
+    background: linear-gradient(135deg, #00ffa3, #00b875);
+    color: #04120e;
+  }
+  .modal-btn-cancel {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ccc;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .shake-anim {
+    animation: modalShake 0.35s ease;
+  }
+  @keyframes modalShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+</style>
+
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -897,16 +997,66 @@
       zoomReset();
     }
 
+    
+    let pendingDownload = null;
+
+    function promptSecurityPassword(onSuccess) {
+      pendingDownload = onSuccess;
+      const modal = document.getElementById("securityModal");
+      const box = document.getElementById("securityModalBox");
+      const input = document.getElementById("modalPwdInput");
+      const err = document.getElementById("modalErrorMsg");
+
+      input.value = "";
+      err.style.display = "none";
+      box.classList.remove("shake-anim");
+
+      modal.classList.add("active");
+      setTimeout(() => input.focus(), 150);
+
+      input.onkeydown = function(e) {
+        if (e.key === "Enter") verifySecurityModal();
+        if (e.key === "Escape") closeSecurityModal();
+      };
+    }
+
+    function closeSecurityModal() {
+      const modal = document.getElementById("securityModal");
+      modal.classList.remove("active");
+      pendingDownload = null;
+    }
+
+    function verifySecurityModal() {
+      const input = document.getElementById("modalPwdInput");
+      const box = document.getElementById("securityModalBox");
+      const err = document.getElementById("modalErrorMsg");
+
+      if (input.value === "Jamia") {
+        const action = pendingDownload;
+        closeSecurityModal();
+        if (action) action();
+      } else {
+        err.style.display = "block";
+        box.classList.remove("shake-anim");
+        void box.offsetWidth;
+        box.classList.add("shake-anim");
+        input.value = "";
+        input.focus();
+      }
+    }
+
     function startDirectDownload(e, fileId, filename) {
       const isPaper = filename.toLowerCase().includes("paper") || filename.includes("پرچہ") || filename.toLowerCase().includes("sania") || filename.toLowerCase().includes("rabia") || filename.toLowerCase().includes("salisa") || filename.toLowerCase().includes("ula");
       if (isPaper) {
-        const pwd = prompt("امتحانی پرچہ ڈاؤنلوڈ کرنے کے لیے پاس ورڈ درج کریں:");
-        if (!pwd) return;
-        if (pwd !== "Jamia") {
-          alert("غلط پاس ورڈ! پرچہ ڈاؤنلوڈ کرنے کی اجازت نہیں ہے۔");
-          return;
-        }
+        promptSecurityPassword(() => {
+          proceedDownload(btn, origText, fileId, filename);
+        });
+        return;
       }
+      proceedDownload(btn, origText, fileId, filename);
+    }
+
+    function proceedDownload(btn, origText, fileId, filename) {
 
       const btn = e.currentTarget;
       const origText = btn.innerHTML;
@@ -974,5 +1124,23 @@
     checkActiveSession();
     checkLockTimer();
   </script>
+
+  <!-- Custom Password Modal -->
+  <div id="securityModal" class="custom-modal-overlay">
+    <div class="custom-modal-box" id="securityModalBox">
+      <div class="modal-icon-badge">
+        <i class="fa-solid fa-lock"></i>
+      </div>
+      <div style="font-size:1.05rem; font-weight:bold; color:#00ffa3; margin-bottom:6px;">تصدیق برائے ڈاؤنلوڈ</div>
+      <div style="font-size:0.85rem; color:#d1fae5; line-height:1.5;">امتحانی پرچہ ڈاؤنلوڈ کرنے کے لیے پاس ورڈ درج کریں:</div>
+      <input type="password" id="modalPwdInput" class="modal-input-field" placeholder="پاس ورڈ..." autocomplete="off">
+      <div id="modalErrorMsg" style="color:#ff6b6b; font-size:0.78rem; margin-top:6px; display:none;">غلط پاس ورڈ! دوبارہ کوشش کریں۔</div>
+      <div class="modal-btn-row">
+        <button type="button" class="modal-btn modal-btn-cancel" onclick="closeSecurityModal()">منسوخ (Cancel)</button>
+        <button type="button" class="modal-btn modal-btn-confirm" onclick="verifySecurityModal()">تصدیق (OK)</button>
+      </div>
+    </div>
+  </div>
 </body>
+
 </html>
