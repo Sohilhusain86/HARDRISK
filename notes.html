@@ -763,187 +763,201 @@
 
 
 <style id="custom3dCardStyles">
-  #books-list, .books-container, #booksGrid, .books-grid {
+  /* Scrollable Container taaki cards pichke nahi */
+  #books-list, .books-container {
     display: flex !important;
     flex-direction: column !important;
     gap: 16px !important;
-    padding: 10px 4px 80px 4px !important;
     width: 100% !important;
-    max-width: 650px !important;
-    margin: 0 auto !important;
+    max-height: 65vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 8px 4px 35px 4px !important;
+    box-sizing: border-box !important;
   }
+  #books-list::-webkit-scrollbar {
+    width: 4px;
+  }
+  #books-list::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 163, 0.35);
+    border-radius: 4px;
+  }
+
+  /* 3D Horizontal Card */
   .j-book-card {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    direction: rtl;
-    background: #111714;
-    border: 1px solid rgba(0, 255, 163, 0.22);
-    border-radius: 14px;
-    padding: 12px 10px;
-    gap: 12px;
-    overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: row !important;
+    direction: rtl !important;
+    background: #111714 !important;
+    border: 1px solid rgba(0, 255, 163, 0.25) !important;
+    border-radius: 14px !important;
+    padding: 12px 10px !important;
+    gap: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7) !important;
+    flex-shrink: 0 !important;
+    min-height: 142px !important;
+    box-sizing: border-box !important;
   }
-  .j-book-card:active {
-    transform: scale(0.99);
-    border-color: rgba(0, 255, 163, 0.45);
-  }
-  /* Right 3D Book Spine */
+
+  /* Right Side 3D Book */
   .j-book-3d-wrap {
-    flex-shrink: 0;
-    width: 86px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    perspective: 500px;
+    flex-shrink: 0 !important;
+    width: 86px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    perspective: 500px !important;
   }
   .j-book-3d {
-    width: 80px;
-    height: 120px;
-    position: relative;
-    background: linear-gradient(135deg, #0e3b2e 0%, #061c15 100%);
-    border-radius: 3px 6px 6px 3px;
-    box-shadow: -4px 6px 14px rgba(0,0,0,0.85), inset 2px 0 3px rgba(255,255,255,0.18), inset -2px 0 3px rgba(0,0,0,0.4);
-    border: 1px solid rgba(0, 255, 163, 0.35);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 5px;
-    text-align: center;
-    transform: rotateY(-8deg);
+    width: 80px !important;
+    height: 118px !important;
+    position: relative !important;
+    background: linear-gradient(135deg, #0e3b2e 0%, #061c15 100%) !important;
+    border-radius: 3px 6px 6px 3px !important;
+    box-shadow: -4px 6px 14px rgba(0,0,0,0.85), inset 2px 0 3px rgba(255,255,255,0.18), inset -2px 0 3px rgba(0,0,0,0.4) !important;
+    border: 1px solid rgba(0, 255, 163, 0.35) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 8px 5px !important;
+    text-align: center !important;
+    transform: rotateY(-8deg) !important;
+    box-sizing: border-box !important;
   }
   .j-book-3d::before {
-    content: '';
-    position: absolute;
-    left: 3px; top: 0; bottom: 0; width: 3.5px;
-    background: rgba(255, 255, 255, 0.2);
-    box-shadow: 1px 0 2px rgba(0,0,0,0.4);
+    content: "" !important;
+    position: absolute !important;
+    left: 3px !important; top: 0 !important; bottom: 0 !important; width: 3.5px !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 1px 0 2px rgba(0,0,0,0.4) !important;
   }
   .j-book-3d i {
-    font-size: 1.45rem;
-    color: #00ffa3;
-    margin-bottom: 6px;
-    filter: drop-shadow(0 0 6px rgba(0,255,163,0.5));
+    font-size: 1.45rem !important;
+    color: #00ffa3 !important;
+    margin-bottom: 6px !important;
+    filter: drop-shadow(0 0 6px rgba(0,255,163,0.5)) !important;
   }
   .j-book-3d span {
-    font-size: 0.7rem;
-    font-weight: bold;
-    color: #f1f5f9;
-    line-height: 1.25;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    font-size: 0.7rem !important;
+    font-weight: bold !important;
+    color: #f1f5f9 !important;
+    line-height: 1.25 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
   }
+
   /* Left Details */
   .j-book-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-width: 0;
-    position: relative;
-    z-index: 1;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    min-width: 0 !important;
+    position: relative !important;
+    z-index: 1 !important;
   }
   .j-watermark-num {
-    position: absolute;
-    top: -12px;
-    left: 0;
-    font-size: 3.6rem;
-    font-weight: 900;
-    color: rgba(255, 255, 255, 0.05);
-    font-family: Arial, sans-serif;
-    line-height: 1;
-    pointer-events: none;
-    z-index: 0;
+    position: absolute !important;
+    top: -12px !important;
+    left: 0 !important;
+    font-size: 3.6rem !important;
+    font-weight: 900 !important;
+    color: rgba(255, 255, 255, 0.05) !important;
+    font-family: Arial, sans-serif !important;
+    line-height: 1 !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
   }
   .j-book-title {
-    font-size: 1.02rem;
-    font-weight: bold;
-    color: #ffffff;
-    margin-bottom: 3px;
-    line-height: 1.35;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-    text-align: right;
+    font-size: 1.02rem !important;
+    font-weight: bold !important;
+    color: #ffffff !important;
+    margin-bottom: 3px !important;
+    line-height: 1.35 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    text-align: right !important;
   }
   .j-book-author {
-    font-size: 0.76rem;
-    color: #94a3b8;
-    margin-bottom: 7px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: right;
+    font-size: 0.76rem !important;
+    color: #94a3b8 !important;
+    margin-bottom: 7px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    text-align: right !important;
   }
-  /* Metadata Divider Strip */
+
+  /* Meta Divider Strip */
   .j-meta-strip {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(0, 0, 0, 0.45);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 6px;
-    padding: 3px 6px;
-    font-size: 0.66rem;
-    color: #94a3b8;
-    margin-bottom: 9px;
-    direction: rtl;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    background: rgba(0, 0, 0, 0.45) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 6px !important;
+    padding: 3px 6px !important;
+    font-size: 0.66rem !important;
+    color: #94a3b8 !important;
+    margin-bottom: 9px !important;
+    direction: rtl !important;
   }
   .j-meta-sep {
-    color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.15) !important;
   }
-  /* Button Row */
+
+  /* Buttons Row matching Screenshot */
   .j-btn-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    direction: ltr;
-  }
-  .j-btn-share {
-    width: 33px; height: 30px;
-    background: rgba(168, 85, 247, 0.12);
-    border: 1px solid #a855f7;
-    color: #c084fc;
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; flex-shrink: 0; font-size: 0.82rem;
-  }
-  .j-btn-down {
-    width: 33px; height: 30px;
-    background: rgba(0, 255, 163, 0.1);
-    border: 1px solid #00ffa3;
-    color: #00ffa3;
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; flex-shrink: 0; font-size: 0.82rem;
-  }
-  .j-btn-intro {
-    flex: 1.1; height: 30px;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid #d4a373;
-    color: #faedcd;
-    border-radius: 6px;
-    font-size: 0.76rem;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    direction: rtl !important;
   }
   .j-btn-read {
-    flex: 2; height: 30px;
-    background: #0f3d4a;
-    border: 1px solid #00b4d8;
-    color: #caf0f8;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
+    flex: 2 !important; height: 30px !important;
+    background: #0f3d4a !important;
+    border: 1px solid #00b4d8 !important;
+    color: #caf0f8 !important;
+    border-radius: 6px !important;
+    font-size: 0.8rem !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    display: flex !important; align-items: center !important; justify-content: center !important;
+  }
+  .j-btn-intro {
+    flex: 1.1 !important; height: 30px !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid #d4a373 !important;
+    color: #faedcd !important;
+    border-radius: 6px !important;
+    font-size: 0.76rem !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    display: flex !important; align-items: center !important; justify-content: center !important;
+  }
+  .j-btn-down {
+    width: 33px !important; height: 30px !important;
+    background: rgba(0, 255, 163, 0.1) !important;
+    border: 1px solid #00ffa3 !important;
+    color: #00ffa3 !important;
+    border-radius: 6px !important;
+    display: flex !important; align-items: center !important; justify-content: center !important;
+    cursor: pointer !important; flex-shrink: 0 !important; font-size: 0.82rem !important;
+  }
+  .j-btn-share {
+    width: 33px !important; height: 30px !important;
+    background: rgba(168, 85, 247, 0.12) !important;
+    border: 1px solid #a855f7 !important;
+    color: #c084fc !important;
+    border-radius: 6px !important;
+    display: flex !important; align-items: center !important; justify-content: center !important;
+    cursor: pointer !important; flex-shrink: 0 !important; font-size: 0.82rem !important;
   }
 </style>
 
@@ -1217,14 +1231,10 @@
 
             <!-- Action Buttons -->
             <div class="j-btn-row">
-              <button type="button" class="j-btn-share" title="شیئر" onclick="shareBookItem('${safeTitle}', '${safeId}')">
-                <i class="fa-solid fa-share-nodes"></i>
-              </button>
-              <button type="button" class="j-btn-down" title="ڈاؤنلوڈ" onclick="startDirectDownload(event, '${safeId}', '${safeDownloadName}')">
-                <i class="fa-solid fa-download"></i>
-              </button>
-              <button type="button" class="j-btn-intro" onclick="showBookIntro('${safeTitle}', '${b.category || ''}')">تعارف</button>
               <button type="button" class="j-btn-read" onclick="openFullscreenPdf('${safeId}', '${safeTitle}')">مطالعہ کریں</button>
+              <button type="button" class="j-btn-intro" onclick="showBookIntro('${safeTitle}', '${b.category || ''}')">تعارف</button>
+              <button type="button" class="j-btn-down" title="ڈاؤنلوڈ" onclick="startDirectDownload(event, '${safeId}', '${safeDownloadName}')"><i class="fa-solid fa-download"></i></button>
+              <button type="button" class="j-btn-share" title="شیئر" onclick="shareBookItem('${safeTitle}', '${safeId}')"><i class="fa-solid fa-share-nodes"></i></button>
             </div>
           </div>
         `;
