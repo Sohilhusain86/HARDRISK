@@ -789,8 +789,7 @@
               coverClass: coverClass,
               icon: icon,
               coverTitle: db.title.substring(0, 18),
-              let isPaper = db.title.toLowerCase().includes("paper") || db.title.includes("پرچہ");
-              category: isPaper ? "papers" : (db.category || "islamic"),
+              category: (db.title.toLowerCase().includes("paper") || db.title.includes("پرچہ")) ? "papers" : (db.category || "islamic"),
               allowDownload: true,
               downloadName: db.title + ".pdf"
             });
