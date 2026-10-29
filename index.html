@@ -763,7 +763,7 @@
 
 
 <style id="custom3dCardStyles">
-  #booksGrid, .books-grid {
+  #books-list, .books-container, #booksGrid, .books-grid {
     display: flex !important;
     flex-direction: column !important;
     gap: 16px !important;
@@ -1153,7 +1153,7 @@
 
     function renderBooks(customList) {
       const booksToRender = customList || (typeof allBooks !== 'undefined' ? allBooks : (typeof books !== 'undefined' ? books : defaultBooks));
-      const grid = document.getElementById("booksGrid");
+      const grid = document.getElementById("books-list") || document.getElementById("booksGrid");
 
       // Auto-hide any loading indicator
       const allLoaders = document.querySelectorAll("[id*='load'], [id*='sync'], [class*='load'], [class*='spin']");
@@ -1312,7 +1312,12 @@
 
     async function loadDynamicBooks() {
       const container = document.getElementById("books-list");
-      container.innerHTML = `<div style="text-align:center; padding:20px; color:#38bdf8;"><i class="fa-solid fa-spinner fa-spin"></i> کتب خانہ اپڈیٹ ہو رہا ہے...</div>`;
+      // Pehle maujuda library data render karein taaki spinner par atke na rahein
+      if (typeof LIBRARY_DATA !== 'undefined' && LIBRARY_DATA.length > 0) {
+        renderBooks(LIBRARY_DATA);
+      } else {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:#38bdf8;"><i class="fa-solid fa-spinner fa-spin"></i> کتب خانہ اپڈیٹ ہو رہا ہے...</div>`;
+      }
 
       try {
         const res = await fetch(DRIVE_API_URL);
@@ -1353,6 +1358,7 @@
         renderBooks(combined);
       } catch (err) {
         console.error("Fetch error:", err);
+        if (typeof LIBRARY_DATA !== 'undefined') renderBooks(LIBRARY_DATA);
         loadDynamicBooks();
       }
     }
