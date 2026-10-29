@@ -566,6 +566,201 @@
   }
 </style>
 
+
+<style id="hzCardStyles">
+  .books-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-width: 600px !important;
+    margin: 0 auto !important;
+    padding: 10px 4px !important;
+  }
+  .hz-card {
+    position: relative;
+    display: flex;
+    flex-direction: row-reverse;
+    background: linear-gradient(145deg, #121815, #0a0f0d);
+    border: 1px solid rgba(0, 255, 163, 0.18);
+    border-radius: 14px;
+    padding: 14px 12px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    gap: 14px;
+    align-items: stretch;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .hz-card:active {
+    transform: scale(0.99);
+    border-color: rgba(0, 255, 163, 0.4);
+  }
+  /* 3D Book Mockup on Right */
+  .hz-3d-book-wrap {
+    flex-shrink: 0;
+    width: 95px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 600px;
+  }
+  .hz-3d-book {
+    width: 86px;
+    height: 124px;
+    position: relative;
+    background: linear-gradient(135deg, #0e3d2f, #051a14);
+    border-radius: 3px 6px 6px 3px;
+    box-shadow: -4px 6px 14px rgba(0, 0, 0, 0.8), 2px 0 4px rgba(255, 255, 255, 0.12) inset;
+    border: 1px solid rgba(0, 255, 163, 0.35);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 6px;
+    text-align: center;
+    transform: rotateY(-8deg);
+  }
+  .hz-3d-book::before {
+    content: '';
+    position: absolute;
+    left: 4px; top: 0; bottom: 0;
+    width: 3px;
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow: 1px 0 3px rgba(0, 0, 0, 0.4);
+  }
+  .hz-book-icon {
+    font-size: 1.5rem;
+    color: #00ffa3;
+    margin-bottom: 6px;
+    filter: drop-shadow(0 0 6px rgba(0, 255, 163, 0.4));
+  }
+  .hz-book-cover-title {
+    font-size: 0.72rem;
+    color: #f1f5f9;
+    font-weight: bold;
+    line-height: 1.25;
+    word-break: break-word;
+  }
+  /* Details Section on Left */
+  .hz-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+    min-width: 0;
+  }
+  .hz-watermark {
+    position: absolute;
+    top: -12px;
+    right: 4px;
+    font-size: 3.8rem;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.04);
+    font-family: Arial, sans-serif;
+    pointer-events: none;
+    z-index: 0;
+    line-height: 1;
+  }
+  .hz-title {
+    font-size: 1.05rem;
+    font-weight: bold;
+    color: #ffffff;
+    line-height: 1.35;
+    margin-bottom: 3px;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hz-author {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    text-align: right;
+    margin-bottom: 7px;
+  }
+  /* Metadata Divider Strip */
+  .hz-meta-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 6px;
+    padding: 3px 6px;
+    font-size: 0.68rem;
+    color: #94a3b8;
+    margin-bottom: 10px;
+    direction: rtl;
+  }
+  .hz-meta-sep {
+    color: rgba(255, 255, 255, 0.15);
+  }
+  .hz-badge-status {
+    color: #00ffa3;
+    font-weight: bold;
+  }
+  /* Buttons Row */
+  .hz-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    direction: ltr;
+  }
+  .hz-btn-read {
+    flex: 2;
+    background: #0f3d4a;
+    border: 1px solid #00b4d8;
+    color: #caf0f8;
+    border-radius: 6px;
+    padding: 6px 0;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+  }
+  .hz-btn-intro {
+    flex: 1.2;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid #d4a373;
+    color: #faedcd;
+    border-radius: 6px;
+    padding: 6px 0;
+    font-size: 0.78rem;
+    cursor: pointer;
+    text-align: center;
+  }
+  .hz-btn-down {
+    width: 34px;
+    height: 31px;
+    background: rgba(0, 255, 163, 0.08);
+    border: 1px solid #00ffa3;
+    color: #00ffa3;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .hz-btn-share {
+    width: 34px;
+    height: 31px;
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid #a855f7;
+    color: #c084fc;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+</style>
+
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -754,6 +949,22 @@
     // ==========================================
     // RENDER BOOKS DYNAMICALLY
     // ==========================================
+    
+    function shareBookItem(title, id) {
+      const shareUrl = window.location.origin + window.location.pathname + "#book=" + id;
+      if (navigator.share) {
+        navigator.share({ title: title, url: shareUrl }).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          alert("لنک کاپی ہو گیا: " + title);
+        });
+      }
+    }
+
+    function showBookIntro(title, category) {
+      alert("کتاب: " + title + "\nشعبہ: " + (category || "جامعۃ الرضا لائبریری") + "\nمطالعہ کے لیے 'مطالعہ کریں' پر کلک فرمائیں۔");
+    }
+
     function renderBooks(list) {
       const container = document.getElementById("books-list");
       if (list.length === 0) {
