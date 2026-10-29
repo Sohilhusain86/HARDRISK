@@ -507,6 +507,65 @@
     40%, 80% { transform: translateX(8px); }
   }
 </style>
+
+<style id="secModalStyle">
+  #secModalOverlay {
+    position: fixed; inset: 0;
+    background: rgba(3, 14, 10, 0.78);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 999999; opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  #secModalOverlay.active { display: flex; opacity: 1; }
+  #secModalCard {
+    background: radial-gradient(circle at top, #0d3326 0%, #04140e 100%);
+    border: 1px solid rgba(0, 255, 163, 0.45);
+    box-shadow: 0 0 30px rgba(0, 255, 163, 0.25), 0 20px 45px rgba(0,0,0,0.85);
+    border-radius: 20px; width: 88%; max-width: 340px;
+    padding: 24px 20px; text-align: center;
+    transform: scale(0.82) translateY(10px);
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  #secModalOverlay.active #secModalCard { transform: scale(1) translateY(0); }
+  .sec-icon-glow {
+    width: 52px; height: 52px; margin: 0 auto 14px;
+    border-radius: 50%; background: rgba(0, 255, 163, 0.12);
+    border: 1.5px solid rgba(0, 255, 163, 0.45);
+    display: flex; align-items: center; justify-content: center;
+    color: #00ffa3; font-size: 1.35rem;
+    box-shadow: 0 0 15px rgba(0, 255, 163, 0.3);
+  }
+  .sec-input {
+    width: 100%; background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(0, 255, 163, 0.35);
+    border-radius: 12px; padding: 11px 14px;
+    color: #fff; font-size: 1rem; text-align: center;
+    outline: none; margin-top: 15px; box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .sec-input:focus {
+    border-color: #00ffa3;
+    box-shadow: 0 0 14px rgba(0, 255, 163, 0.4);
+  }
+  .sec-btn-row { display: flex; gap: 10px; margin-top: 20px; }
+  .sec-btn {
+    flex: 1; padding: 11px 0; border-radius: 12px;
+    font-size: 0.9rem; font-weight: bold; cursor: pointer; border: none;
+    transition: transform 0.15s, opacity 0.15s;
+  }
+  .sec-btn:active { transform: scale(0.96); }
+  .sec-btn-ok { background: linear-gradient(135deg, #00ffa3, #00b875); color: #03140e; }
+  .sec-btn-cancel { background: rgba(255, 255, 255, 0.08); color: #c4d7cf; border: 1px solid rgba(255, 255, 255, 0.15); }
+  .sec-shake { animation: secModalShake 0.38s ease; }
+  @keyframes secModalShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-9px); }
+    40%, 80% { transform: translateX(9px); }
+  }
+</style>
+
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -1039,5 +1098,20 @@
       </div>
     </div>
   </div>
+
+  <div id="secModalOverlay">
+    <div id="secModalCard">
+      <div class="sec-icon-glow"><i class="fa-solid fa-file-shield"></i></div>
+      <div style="font-size:1.1rem; font-weight:bold; color:#00ffa3; margin-bottom:6px;">تصدیق برائے ڈاؤنلوڈ</div>
+      <div style="font-size:0.86rem; color:#d1fae5; line-height:1.5;">امتحانی پرچہ ڈاؤنلوڈ کرنے کے لیے پاس ورڈ درج کریں:</div>
+      <input type="password" id="secModalInput" class="sec-input" placeholder="پاس ورڈ لکھیں..." autocomplete="off">
+      <div id="secModalError" style="color:#ff6b6b; font-size:0.8rem; margin-top:8px; display:none;">غلط پاس ورڈ! دوبارہ کوشش کریں۔</div>
+      <div class="sec-btn-row">
+        <button type="button" class="sec-btn sec-btn-cancel" onclick="closeSecModal()">منسوخ (Cancel)</button>
+        <button type="button" class="sec-btn sec-btn-ok" onclick="confirmSecModal()">تصدیق (OK)</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
