@@ -1334,35 +1334,36 @@
       openCustomAlert("کتاب کا تعارف", "کتاب: " + title + "\nشعبہ: " + (category || "جامعۃ الرضا لائبریری") + "\n\nمطالعہ کے لیے 'مطالعہ کریں' پر کلک فرمائیں۔", "fa-solid fa-book-open-reader");
     }
 
+    
+
+    
+
     function runFileDownload(btn, origText, fileId, filename) {
       if (btn) {
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ڈاؤنلوڈ...';
         btn.style.pointerEvents = "none";
       }
 
-      var directUrl = "https://drive.usercontent.google.com/download?id=" + fileId + "&export=download&authuser=0";
-      
-      // Mobile direct download
-      var iframe = document.createElement("iframe");
-      iframe.style.display = "none";
-      iframe.src = directUrl;
-      document.body.appendChild(iframe);
+      var directUrl = "https://drive.google.com/uc?export=download&id=" + fileId;
 
-      // Backup direct link trigger
-      var a = document.createElement("a");
-      a.href = directUrl;
-      a.setAttribute("download", filename);
-      document.body.appendChild(a);
-      a.click();
+      // Android/Mobile direct trigger
+      try {
+        var link = document.createElement("a");
+        link.href = directUrl;
+        link.setAttribute("download", filename || "document.pdf");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch(e) {
+        window.location.href = directUrl;
+      }
 
       setTimeout(function() {
         if (btn) {
           btn.innerHTML = origText;
           btn.style.pointerEvents = "auto";
         }
-        try { document.body.removeChild(iframe); } catch(e){}
-        try { document.body.removeChild(a); } catch(e){}
-      }, 3500);
+      }, 3000);
     }
 
     function startDirectDownload(e, fileId, filename) {
@@ -1408,7 +1409,7 @@
         const statusText = isExamPaper ? "امتحانی پرچہ" : "مکمل کتاب";
         const statusColor = isExamPaper ? "color:#fca5a5;" : "color:#00ffa3;";
         const catLabel = isExamPaper ? "امتحان" : (b.category === "math" ? "حساب" : (b.category === "hindi" ? "ہندی" : "دینیات"));
-        const pagesCount = isExamPaper ? "12" : (b.category === "math" ? "35" : (b.category === "hindi" ? "50" : "150"));
+        const pagesCount = b.pages || b.totalPages || b.pageCount || b.safhat || (isExamPaper ? "12" : "—");
         const authorText = isExamPaper ? "شعبۂ امتحانات • جامعۃ الرضا" : (b.author || "جامعۃ الرضا اسلامک ریسرچ سینٹر");
         const safeTitle = (b.title || "").replace(/'/g, "\\'");
         const safeId = b.id || "";
@@ -1681,59 +1682,7 @@
       zoomReset();
     }
 
-    function startDirectDownload(e, fileId, filename) {
-      const isPaper = filename.toLowerCase().includes("paper") || filename.includes("پرچہ") || filename.toLowerCase().includes("sania") || filename.toLowerCase().includes("rabia") || filename.toLowerCase().includes("salisa") || filename.toLowerCase().includes("ula");
-      if (isPaper) {
-        openCustomPrompt("تصدیق برائے ڈاؤنلوڈ", "امتحانی پرچہ ڈاؤنلوڈ کرنے کے لیے پاس ورڈ درج کریں:", "Jamia", function() {
-          runFileDownload(btn, origText, fileId, filename);
-        });
-        return;
-      }
-
-      const btn = e.currentTarget;
-      const origText = btn.innerHTML;
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ڈاؤنلوڈ...`;
-      btn.style.pointerEvents = "none";
-
-      const directUrl = `https://drive.usercontent.google.com/download?id=${fileId}&export=download&authuser=0`;
-      const a = document.createElement('a');
-      a.href = directUrl;
-      a.setAttribute('download', filename);
-      a.target = '_blank';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-
-      setTimeout(() => { renderBooks(); const ld = document.querySelector('[id*="load"], [id*="sync"]'); if(ld) ld.style.display="none"; 
-        btn.innerHTML = origText;
-        btn.style.pointerEvents = "auto";
-      }, 3000);
-    }
-
-    function manualLogout() {
-      closeFullscreenPdf();
-      try {
-        localStorage.removeItem('jamia_ula_name');
-        localStorage.removeItem('jamia_ula_expiry');
-      } catch (_) {}
-      document.getElementById('user-name').value = '';
-      document.getElementById('user-pass').value = '';
-      document.getElementById('content-section').style.display = 'none';
-      document.getElementById('auth-section').style.display = 'block';
-    }
-
-    // ==========================================
-    // ANTI-SCREENSHOT & ANTI-CAPTURE LOGIC
-    // ==========================================
-    const blanket = document.getElementById("security-blanket");
-
-    // PrintScreen Key / Shortcut Trap
-    window.addEventListener("keyup", function(e) {
-      if (e.key === "PrintScreen" || e.keyCode === 44) {
-        blanket.style.display = "flex";
-        setTimeout(() => { blanket.style.display = "none"; }, 3000);
-      }
-    });
+    );
 
     window.addEventListener("keydown", function(e) {
       if ((e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'u')) || e.key === 'F12') {
