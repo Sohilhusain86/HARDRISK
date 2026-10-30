@@ -1145,10 +1145,6 @@
       <div class="filter-tag" onclick="setFilter('papers', this)">امتحانی پرچے</div>
       <div class="filter-tag" onclick="setFilter('islamic', this)">دینی و فقہی</div>
       <div class="filter-tag" onclick="setFilter('math', this)">
-      <button type="button" onclick="filterBooks('all_naats')" class="filter-btn">تمام نعتیں</button>
-      <button type="button" onclick="filterBooks('asjad')" class="filter-btn">حضور عسجد رضا</button>
-      <button type="button" onclick="filterBooks('sabira')" class="filter-btn">صابر رضا ازہری</button>
-      <button type="button" onclick="filterBooks('rafiq')" class="filter-btn">رفیق رضا قادری</button>
 ریاضی (Math)</div>
       <div class="filter-tag" onclick="setFilter('hindi', this)">درسی ہندی</div>
     </div>
@@ -1935,6 +1931,104 @@
     <input type="range" id="audioProgressBar" min="0" max="100" value="0" oninput="seekAudio(this.value)" style="width: 100%; height: 4px; accent-color: #00ffa3; cursor: pointer; margin: 4px 0 0 0;">
     <audio id="globalHtmlAudio" preload="none"></audio>
   </div>
+
+
+<script>
+  const NAATS_API_ENDPOINT = "https://script.google.com/macros/s/AKfycbwi02ykZWWmq3nedwL0ULzk730QAJbwo7E_saM0hM32DOBI7ATrdWijHxvKfTZeY95-Ug/exec";
+  window.LOADED_NAATS_LIST = [];
+
+  async function fetchAllJamiaNaats() {
+    try {
+      const res = await fetch(NAATS_API_ENDPOINT);
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        window.LOADED_NAATS_LIST = data.map((nt, idx) => ({
+          id: nt.id,
+          title: nt.title || "نعت شریف",
+          subtitle: "آڈیو نعت شریف • " + (nt.size || "MP3"),
+          author: "جامعۃ الرضا آڈیو لائبریری",
+          category: "naat",
+          type: "audio",
+          language: "Urdu",
+          pages: nt.size || "Audio",
+          coverClass: "cover-bahar",
+          icon: "fa-solid fa-headphones",
+          coverTitle: (nt.title || "نعت شریف").substring(0, 20),
+          audioUrl: "https://docs.google.com/uc?export=download&id=" + nt.id,
+          downloadName: nt.downloadName || ((nt.title || "naat") + ".mp3"),
+          allowDownload: true
+        }));
+        console.log("Loaded Naats:", window.LOADED_NAATS_LIST.length);
+      }
+    } catch (e) {
+      console.error("Naat load error:", e);
+    }
+  }
+
+  // Page khulte hi Naats load karein
+  fetchAllJamiaNaats();
+
+  // Filter function ko poori tarah override karna
+  window.filterBooks = async function(cat) {
+    window.currentFilter = cat;
+
+    // Button active highlight theek karna
+    document.querySelectorAll("[onclick*='filterBooks']").forEach(el => {
+      el.classList.remove("active");
+      const oc = el.getAttribute("onclick") || "";
+      if (oc.includes("'" + cat + "'") || oc.includes('"' + cat + '"')) {
+        el.classList.add("active");
+      }
+    });
+
+    // Agar naat tab dabaya aur abhi tak load nahi hui to turant load karein
+    if (["all_naats", "naat", "asjad", "sabira", "rafiq"].includes(cat) && window.LOADED_NAATS_LIST.length === 0) {
+      await fetchAllJamiaNaats();
+    }
+
+    // Kitabon ka data nikalna
+    let baseBooks = [];
+    if (typeof ALL_BOOKS_CACHE !== "undefined" && ALL_BOOKS_CACHE.length > 0) {
+      baseBooks = ALL_BOOKS_CACHE;
+    } else if (typeof LIBRARY_DATA !== "undefined" && LIBRARY_DATA.length > 0) {
+      baseBooks = LIBRARY_DATA;
+    } else if (typeof books !== "undefined" && books.length > 0) {
+      baseBooks = books;
+    }
+
+    // Kitabon me se audio alag rakhna
+    let onlyBooks = baseBooks.filter(b => b.type !== "audio" && b.category !== "naat");
+    let onlyNaats = window.LOADED_NAATS_LIST;
+
+    let result = [];
+    if (cat === "all") {
+      result = onlyBooks;
+    } else if (cat === "all_naats" || cat === "naat") {
+      result = onlyNaats;
+    } else if (cat === "asjad") {
+      result = onlyNaats.filter(n => {
+        let t = (n.title || "").toLowerCase();
+        return t.includes("asjad") || t.includes("عسجد") || t.includes("اسجد");
+      });
+    } else if (cat === "sabira") {
+      result = onlyNaats.filter(n => {
+        let t = (n.title || "").toLowerCase();
+        return t.includes("sabir") || t.includes("صابر") || t.includes("azhari") || t.includes("ازہری") || t.includes("zahri");
+      });
+    } else if (cat === "rafiq") {
+      result = onlyNaats.filter(n => {
+        let t = (n.title || "").toLowerCase();
+        return t.includes("rafiq") || t.includes("rafeeq") || t.includes("رفیق") || t.includes("qadri") || t.includes("قادری");
+      });
+    } else {
+      result = onlyBooks.filter(b => b.category === cat);
+    }
+
+    if (typeof renderBooks === "function") {
+      renderBooks(result);
+    }
+  };
+</script>
 
 </body>
 </html>
