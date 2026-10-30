@@ -1787,7 +1787,28 @@
       applyZoom();
     }
 
-    function openFullscreenPdf(fileId, title) {
+    
+  function openFullscreenPdf(fileId, title) {
+    // Agar direct URL ho ya ID ho
+    let cleanId = fileId;
+    if (fileId.includes("id=")) {
+      const m = fileId.match(/id=([^&]+)/);
+      if (m) cleanId = m[1];
+    } else if (fileId.includes("/d/")) {
+      const m = fileId.match(/\/d\/([^\/]+)/);
+      if (m) cleanId = m[1];
+    }
+    const viewerUrl = "https://drive.google.com/file/d/" + cleanId + "/preview";
+    
+    // Naye tab me ya modal me kholna taaki "Document look-up failed" na aaye
+    const win = window.open(viewerUrl, '_blank');
+    if (!win) {
+      window.location.href = viewerUrl;
+    }
+  }
+
+  function _old_openFullscreenPdf
+(fileId, title) {
       const tLower = (title || "").toLowerCase();
       const isPaper = tLower.includes("paper") || (title || "").includes("پرچہ") || (title || "").includes("امتحان") || tLower.includes("sania") || tLower.includes("rabia") || tLower.includes("salisa") || tLower.includes("ula");
 
@@ -2345,6 +2366,42 @@
   setTimeout(buildNaatTabsInBar, 300);
   fetchNaatsFromDrive();
 })();
+</script>
+
+
+<script>
+  // Instant Naat Player Fix
+  window.playAudio = function(audioUrl, title) {
+    const bar = document.getElementById("emeraldAudioBar");
+    const audio = document.getElementById("globalHtmlAudio");
+    const titleEl = document.getElementById("audioPlayerTitle");
+    const timeEl = document.getElementById("audioPlayerTime");
+    const icon = document.getElementById("audioPlayIcon");
+
+    if (titleEl) titleEl.innerText = title || "نعت شریف";
+    if (timeEl) timeEl.innerText = "پلے ہو رہی ہے...";
+    if (bar) bar.style.display = "block";
+
+    let fileId = audioUrl;
+    const idMatch = (audioUrl || "").match(/id=([^&]+)/) || (audioUrl || "").match(/\/d\/([^\/]+)/);
+    if (idMatch) fileId = idMatch[1];
+
+    // Direct Google Drive download stream jo bina ruke bajti hai
+    const directUrl = "https://drive.usercontent.google.com/download?id=" + fileId + "&export=download";
+
+    audio.pause();
+    audio.src = directUrl;
+    audio.load();
+
+    audio.play().then(() => {
+      if (icon) icon.className = "fa-solid fa-pause";
+      if (timeEl) timeEl.innerText = "لائیو پلےबैक";
+    }).catch(err => {
+      console.log("Autoplay prevented, trying direct usercontent:", err);
+      if (timeEl) timeEl.innerText = "پلے بٹن دبائیں";
+      if (icon) icon.className = "fa-solid fa-play";
+    });
+  };
 </script>
 
 </body>
