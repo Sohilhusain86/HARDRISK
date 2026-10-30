@@ -1949,24 +1949,48 @@
 
 
 
+
+
+<!-- DD Music Style Sleep Timer Bottom Sheet -->
+<div id="ddMusicSleepModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999999; align-items:flex-end; justify-content:center; backdrop-filter:blur(4px);">
+  <div style="width:100%; max-width:480px; background:#1c1d22; border-radius:24px 24px 0 0; padding:24px; box-sizing:border-box; color:#fff; font-family:sans-serif; text-align:left; direction:ltr;">
+    <h3 style="margin:0 0 20px 0; font-size:1.15rem; font-weight:600; color:#f1f5f9;">Stop music after</h3>
+    
+    <!-- Time Inputs -->
+    <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:20px;">
+      <input type="number" id="ddHours" min="0" max="23" value="00" style="width:70px; height:50px; background:#2a2b32; border:1px solid #3f404d; border-radius:10px; color:#fff; font-size:1.4rem; text-align:center; font-weight:bold;">
+      <span style="font-size:1.4rem; font-weight:bold; color:#888;">:</span>
+      <input type="number" id="ddMinutes" min="0" max="59" value="10" style="width:70px; height:50px; background:#2a2b32; border:1px solid #3f404d; border-radius:10px; color:#fff; font-size:1.4rem; text-align:center; font-weight:bold;">
+      <span style="font-size:1.4rem; font-weight:bold; color:#888;">:</span>
+      <input type="number" id="ddSeconds" min="0" max="59" value="00" style="width:70px; height:50px; background:#2a2b32; border:1px solid #3f404d; border-radius:10px; color:#fff; font-size:1.4rem; text-align:center; font-weight:bold;">
+    </div>
+
+    <!-- Quick Chips -->
+    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:24px;">
+      <button type="button" onclick="setDdQuickTime(0, 15, 0)" style="background:#2a2b32; border:none; padding:10px; border-radius:20px; color:#cbd5e1; font-weight:600; font-size:0.85rem; cursor:pointer;">15m</button>
+      <button type="button" onclick="setDdQuickTime(0, 30, 0)" style="background:#2a2b32; border:none; padding:10px; border-radius:20px; color:#cbd5e1; font-weight:600; font-size:0.85rem; cursor:pointer;">30m</button>
+      <button type="button" onclick="setDdQuickTime(0, 45, 0)" style="background:#2a2b32; border:none; padding:10px; border-radius:20px; color:#cbd5e1; font-weight:600; font-size:0.85rem; cursor:pointer;">45m</button>
+      <button type="button" onclick="setDdQuickTime(1, 0, 0)" style="background:#2a2b32; border:none; padding:10px; border-radius:20px; color:#cbd5e1; font-weight:600; font-size:0.85rem; cursor:pointer;">60m</button>
+    </div>
+
+    <!-- Actions -->
+    <div style="display:flex; gap:12px;">
+      <button type="button" onclick="closeDdTimerModal()" style="flex:1; height:46px; background:#2a2b32; border:none; border-radius:25px; color:#cbd5e1; font-weight:bold; cursor:pointer;">CANCEL</button>
+      <button type="button" onclick="startDdTimer()" style="flex:1; height:46px; background:#e11d48; border:none; border-radius:25px; color:#fff; font-weight:bold; cursor:pointer;">START</button>
+    </div>
+  </div>
+</div>
+
 <script id="jamia-naats-master">
 (function() {
   const NAATS_API_URL = "https://script.google.com/macros/s/AKfycbwi02ykZWWmq3nedwL0ULzk730QAJbwo7E_saM0hM32DOBI7ATrdWijHxvKfTZeY95-Ug/exec";
   window.JAMIA_NAATS_LIST = [];
-  window.CURRENT_NAAT_INDEX = -1;
   let sleepIntervalId = null;
-  let sleepTotalSeconds = 0;
+  let sleepTotalSecs = 0;
 
   function cleanNaatTitle(raw) {
     if (!raw) return "نعت شریف";
-    return raw
-      .replace(/\[.*?\]/g, "")
-      .replace(/\(\s*MP3[^)]*\)/gi, "")
-      .replace(/\(\s*\d+\s*K\s*\)/gi, "")
-      .replace(/\.(mp3|m4a|wav|aac|ogg)$/i, "")
-      .replace(/[-_]+/g, " ")
-      .replace(/\s{2,}/g, " ")
-      .trim();
+    return raw.replace(/\[.*?\]/g, "").replace(/\(\s*MP3[^)]*\)/gi, "").replace(/\(\s*\d+\s*K\s*\)/gi, "").replace(/\.(mp3|m4a|wav|aac|ogg)$/i, "").replace(/[-_]+/g, " ").replace(/\s{2,}/g, " ").trim();
   }
 
   function detectNaatKhwan(title) {
@@ -2056,7 +2080,7 @@
     return window.JAMIA_NAATS_LIST;
   }
 
-  // 1 Single Bada Box jisme agar ek url fail ho to usi box ke andar dusra/teesra fallback khule
+  // 1. Play Audio with Working Close Button Fix
   window.playAudio = function(audioUrlOrId, title) {
     const bar = document.getElementById("emeraldAudioBar");
     const titleEl = document.getElementById("audioPlayerTitle");
@@ -2075,88 +2099,94 @@
     const idMatch = (audioUrlOrId || "").match(/id=([^&]+)/) || (audioUrlOrId || "").match(/\/d\/([^\/]+)/);
     if (idMatch) fileId = idMatch[1];
 
-    window.CURRENT_NAAT_INDEX = window.JAMIA_NAATS_LIST.findIndex(n => n.id === fileId || n.title === cleanT);
+    // Close button (Cross X) ko 100% active karna
+    const closeBtn = bar.querySelector(".fa-xmark, .fa-times")?.closest("button, div") || bar.firstElementChild?.querySelector("button, span, i");
+    if (closeBtn) {
+      closeBtn.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.closeAudioPlayerFully();
+      };
+    }
 
-    // Purane sabhi boxes hatana
     document.querySelectorAll(".driveEmbedBoxClass").forEach(el => el.remove());
 
-    // Single bada box
     const embedWrap = document.createElement("div");
     embedWrap.className = "driveEmbedBoxClass";
     embedWrap.style.cssText = "width:100%; height:140px; overflow:hidden; border-radius:12px; margin-top:10px; border:2px solid #00ffa3; background:#031810;";
 
-    const fallbackSources = [
-      "https://drive.google.com/file/d/" + fileId + "/preview",
-      "https://docs.google.com/file/d/" + fileId + "/preview",
-      "https://drive.usercontent.google.com/download?id=" + fileId + "&export=download"
-    ];
-
-    let currentSrcIndex = 0;
     const iframe = document.createElement("iframe");
-    iframe.src = fallbackSources[currentSrcIndex];
+    iframe.src = "https://drive.google.com/file/d/" + fileId + "/preview";
     iframe.allow = "autoplay";
     iframe.style.cssText = "width:100%; height:200px; border:none; margin-top:-30px;";
-
-    // Fallback logic: Agar load na ho to usi iframe ke andar dusra source lagana
-    iframe.onerror = function() {
-      currentSrcIndex++;
-      if (currentSrcIndex < fallbackSources.length) {
-        iframe.src = fallbackSources[currentSrcIndex];
-      }
-    };
 
     embedWrap.appendChild(iframe);
     bar.appendChild(embedWrap);
   };
 
-  // Custom User Choice Sleep Timer (Minute aur Second)
+  // 2. Cross button Dabate hi Player hatana
+  window.closeAudioPlayerFully = function() {
+    const bar = document.getElementById("emeraldAudioBar");
+    if (bar) bar.style.display = "none";
+    const audio = document.getElementById("globalHtmlAudio");
+    if (audio) { audio.pause(); audio.src = ""; }
+    document.querySelectorAll(".driveEmbedBoxClass").forEach(el => el.remove());
+  };
+
+  // 3. DD Music Style Timer Modal Handlers
   window.cycleSleepTimer = function() {
-    const userTime = prompt("سونے کا ٹائمر سیٹ کریں:\nمنٹس اور سیکنڈز درج کریں (مثلاً: 10:30 یا صرف 5):", "10:00");
-    if (!userTime) return;
+    const m = document.getElementById("ddMusicSleepModal");
+    if (m) m.style.display = "flex";
+  };
 
-    let mins = 0;
-    let secs = 0;
+  window.closeDdTimerModal = function() {
+    const m = document.getElementById("ddMusicSleepModal");
+    if (m) m.style.display = "none";
+  };
 
-    if (userTime.includes(":")) {
-      const parts = userTime.split(":");
-      mins = parseInt(parts[0], 10) || 0;
-      secs = parseInt(parts[1], 10) || 0;
-    } else {
-      mins = parseInt(userTime, 10) || 0;
-    }
+  window.setDdQuickTime = function(h, m, s) {
+    document.getElementById("ddHours").value = (h < 10 ? "0" : "") + h;
+    document.getElementById("ddMinutes").value = (m < 10 ? "0" : "") + m;
+    document.getElementById("ddSeconds").value = (s < 10 ? "0" : "") + s;
+  };
 
-    sleepTotalSeconds = (mins * 60) + secs;
+  window.startDdTimer = function() {
+    const h = parseInt(document.getElementById("ddHours").value, 10) || 0;
+    const m = parseInt(document.getElementById("ddMinutes").value, 10) || 0;
+    const s = parseInt(document.getElementById("ddSeconds").value, 10) || 0;
+
+    sleepTotalSecs = (h * 3600) + (m * 60) + s;
+    closeDdTimerModal();
 
     const txtEl = document.getElementById("sleepTimerText");
     const badgeEl = document.getElementById("sleepTimerBadge");
 
     if (sleepIntervalId) clearInterval(sleepIntervalId);
 
-    if (sleepTotalSeconds <= 0) {
+    if (sleepTotalSecs <= 0) {
       if (txtEl) txtEl.innerText = "ٹائمر";
       if (badgeEl) badgeEl.style.display = "none";
       return;
     }
 
-    if (txtEl) txtEl.innerText = (mins > 0 ? mins + "m " : "") + (secs > 0 ? secs + "s" : "");
+    if (txtEl) txtEl.innerText = (h > 0 ? h + "h " : "") + (m > 0 ? m + "m" : s + "s");
     if (badgeEl) {
       badgeEl.style.display = "block";
-      badgeEl.innerText = "🌙 ٹائمر سیٹ: " + mins + " منٹ " + secs + " سیکنڈ بعد بند ہو جائے گی";
+      badgeEl.innerText = "🌙 سونے کا ٹائمر سیٹ ہو گیا ہے";
     }
 
     sleepIntervalId = setInterval(() => {
-      sleepTotalSeconds--;
-      if (sleepTotalSeconds <= 0) {
+      sleepTotalSecs--;
+      if (sleepTotalSecs <= 0) {
         clearInterval(sleepIntervalId);
-        const bar = document.getElementById("emeraldAudioBar");
-        if (bar) bar.style.display = "none";
-        document.querySelectorAll(".driveEmbedBoxClass").forEach(el => el.remove());
+        window.closeAudioPlayerFully();
         if (txtEl) txtEl.innerText = "ٹائمر";
         if (badgeEl) badgeEl.style.display = "none";
       } else if (badgeEl) {
-        const m = Math.floor(sleepTotalSeconds / 60);
-        const s = sleepTotalSeconds % 60;
-        badgeEl.innerText = "🌙 ٹائمر باقی: " + m + ":" + (s < 10 ? "0" + s : s);
+        const rh = Math.floor(sleepTotalSecs / 3600);
+        const rm = Math.floor((sleepTotalSecs % 3600) / 60);
+        const rs = sleepTotalSecs % 60;
+        badgeEl.innerText = "🌙 ٹائمر باقی: " + (rh > 0 ? rh + ":" : "") + (rm < 10 ? "0" + rm : rm) + ":" + (rs < 10 ? "0" + rs : rs);
       }
     }, 1000);
   };
@@ -2211,5 +2241,6 @@
   fetchNaatsFromDrive();
 })();
 </script>
+
 </body>
 </html>
