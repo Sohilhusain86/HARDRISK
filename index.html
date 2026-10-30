@@ -2054,6 +2054,10 @@
       const res = await fetch(NAATS_API_URL);
       const data = await res.json();
       if (Array.isArray(data)) {
+
+      const blinker = document.getElementById("jamiaSyncBlinker");
+      if (blinker) blinker.style.display = "none";
+
         window.JAMIA_NAATS_LIST = data.map(nt => {
           const neatTitle = cleanNaatTitle(nt.title);
           return {

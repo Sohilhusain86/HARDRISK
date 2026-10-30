@@ -1,0 +1,2246 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>جامعۃ الرضا - اختصاصی تعلیمی و امتحانی کتب خانہ</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --primary-emerald: #00ffa3;
+      --deep-bg: #04090d;
+      --card-bg: radial-gradient(circle at 15% 15%, rgba(20, 35, 45, 0.98), rgba(7, 14, 19, 0.99) 75%);
+    }
+
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Poppins', 'Noto Nastaliq Urdu', sans-serif;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    
+    body {
+      background: radial-gradient(circle at 50% 20%, #0d232a 0%, #04090d 85%);
+      color: #e9edef;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    .card {
+      position: relative;
+      background: var(--card-bg);
+      border: 1.5px solid rgba(0, 255, 163, 0.45);
+      border-radius: 24px;
+      padding: 24px 18px;
+      width: 100%;
+      max-width: 540px;
+      text-align: center;
+      direction: ltr;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7);
+      transform: translateZ(0);
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: 26px;
+      background: linear-gradient(135deg, rgba(0, 255, 163, 0.35), rgba(56, 189, 248, 0.3));
+      filter: blur(14px);
+      z-index: -1;
+      opacity: 0.6;
+      animation: smoothGlowPulse 4s infinite ease-in-out alternate;
+      will-change: opacity;
+      transform: translateZ(0);
+    }
+
+    @keyframes smoothGlowPulse {
+      0% { opacity: 0.3; }
+      100% { opacity: 0.8; }
+    }
+
+    .exclusive-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.25));
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      color: #fef08a;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      letter-spacing: 0.3px;
+    }
+
+    .icon-seal {
+      width: 58px;
+      height: 58px;
+      background: linear-gradient(135deg, rgba(0, 255, 163, 0.18), rgba(2, 132, 199, 0.25));
+      border: 1.5px solid var(--primary-emerald);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      font-size: 24px;
+      color: var(--primary-emerald);
+      box-shadow: 0 0 20px rgba(0, 255, 163, 0.3);
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #fff, #67e8f9, #34d399);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .urdu-banner {
+      font-family: 'Noto Nastaliq Urdu', 'Amiri', serif;
+      font-size: 0.92rem;
+      line-height: 2;
+      color: #fef08a;
+      direction: rtl;
+      margin: 8px 0 16px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px dashed rgba(245, 158, 11, 0.35);
+      border-radius: 12px;
+    }
+
+    .form-group {
+      text-align: left;
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .form-input {
+      width: 100%;
+      padding: 13px 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.92rem;
+      outline: none;
+      transition: all 0.25s ease;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+    .form-input:focus {
+      border-color: var(--primary-emerald);
+      background: rgba(255, 255, 255, 0.07);
+      box-shadow: 0 0 15px rgba(0, 255, 163, 0.25);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(120deg, #047857, #00d26a 50%, #059669);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
+      color: #fff;
+      font-size: 0.96rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      cursor: pointer;
+      margin-top: 8px;
+      box-shadow: 0 8px 24px rgba(0, 210, 106, 0.35);
+    }
+
+    .error-msg {
+      color: #f87171;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      margin-top: 12px;
+      display: none;
+    }
+
+    #content-section { display: none; }
+
+    /* SEARCH & FILTER BAR */
+    .search-box {
+      position: relative;
+      margin-bottom: 12px;
+      direction: rtl;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 11px 40px 11px 14px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.88rem;
+      outline: none;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+    .search-box i {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #38bdf8;
+      font-size: 0.9rem;
+    }
+    .filter-tags {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      direction: rtl;
+    }
+    .filter-tag {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 0.74rem;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .filter-tag.active {
+      background: rgba(0, 255, 163, 0.2);
+      border-color: #00ffa3;
+      color: #00ffa3;
+      font-weight: 700;
+    }
+
+    .books-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: right;
+      direction: rtl;
+      max-height: 60vh;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .book-card {
+      background: rgba(8, 18, 25, 0.85);
+      border: 1.2px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+      contain: content;
+    }
+
+    .book-cover {
+      width: 72px;
+      height: 96px;
+      border-radius: 8px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 4px;
+      box-shadow: -3px 4px 12px rgba(0,0,0,0.6);
+    }
+    .cover-saniya {
+      background: linear-gradient(135deg, #311042 0%, #6b21a8 50%, #4c1d95 100%);
+      border: 1.5px solid #d8b4fe;
+    }
+    .cover-bahar {
+      background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #022c22 100%);
+      border: 1.5px solid #f59e0b;
+    }
+    .cover-hindi {
+      background: linear-gradient(135deg, #1e293b 0%, #0f766e 50%, #042f2e 100%);
+      border: 1.5px solid #38bdf8;
+    }
+    .cover-math {
+      background: linear-gradient(135deg, #431407 0%, #c2410c 50%, #7c2d12 100%);
+      border: 1.5px solid #fb923c;
+    }
+    .book-cover i { font-size: 18px; margin-bottom: 4px; }
+    .book-cover-title {
+      font-size: 0.62rem;
+      font-weight: 700;
+      line-height: 1.2;
+      color: #fff;
+    }
+
+    .book-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .book-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      line-height: 1.3;
+    }
+    .book-sub {
+      font-size: 0.7rem;
+      color: #94a3b8;
+    }
+
+    .book-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+      direction: ltr;
+    }
+    .btn-card {
+      flex: 1;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .btn-card-read {
+      background: linear-gradient(120deg, #059669, #10b981);
+      color: #fff;
+    }
+    .btn-card-down {
+      background: #1e293b;
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+    }
+    .btn-card-secure {
+      background: rgba(220, 38, 38, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      font-size: 0.7rem;
+      padding: 6px;
+      cursor: default;
+    }
+
+    .btn-lock-again {
+      background: transparent;
+      color: #8696a0;
+      border: none;
+      font-size: 0.78rem;
+      cursor: pointer;
+      margin-top: 14px;
+      text-decoration: underline;
+    }
+
+    /* FULLSCREEN INTERACTIVE ZOOM VIEWER */
+    #pdf-viewer-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 9999999;
+      flex-direction: column;
+    }
+    .viewer-header {
+      background: #0f172a;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #1e293b;
+      direction: ltr;
+      gap: 8px;
+    }
+    .viewer-title-box {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: 50%;
+    }
+    .viewer-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-ctrl {
+      background: #1e293b;
+      color: #00ffa3;
+      border: 1px solid rgba(0, 255, 163, 0.3);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-close-viewer {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    #zoom-container {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background: #12181f;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pinch-zoom;
+    }
+    #frame-wrapper {
+      width: 100%;
+      height: 100%;
+      transition: transform 0.2s ease;
+      transform-origin: top center;
+    }
+    #fullscreen-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    /* ANTI-SCREENSHOT SECURITY BLANK LAYER */
+    #security-blanket {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 10000000;
+      color: #ef4444;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+  
+  /* Emerald Security Modal */
+  .custom-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(6px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 99999; opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .custom-modal-overlay.active { display: flex; opacity: 1; }
+  .custom-modal-box {
+    background: #061913;
+    border: 1px solid rgba(0, 255, 163, 0.4);
+    box-shadow: 0 0 25px rgba(0, 255, 163, 0.2), 0 20px 40px rgba(0,0,0,0.8);
+    border-radius: 18px; width: 90%; max-width: 350px;
+    padding: 22px 20px; text-align: center;
+    transform: scale(0.85);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .custom-modal-overlay.active .custom-modal-box { transform: scale(1); }
+  .modal-icon-badge {
+    width: 46px; height: 46px; margin: 0 auto 12px;
+    border-radius: 50%; background: rgba(0, 255, 163, 0.12);
+    border: 1px solid rgba(0, 255, 163, 0.4);
+    display: flex; align-items: center; justify-content: center;
+    color: #00ffa3; font-size: 1.2rem;
+  }
+  .modal-input-field {
+    width: 100%; background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 255, 163, 0.3);
+    border-radius: 10px; padding: 10px 14px;
+    color: #fff; font-size: 0.95rem; text-align: center;
+    outline: none; margin-top: 14px; box-sizing: border-box;
+  }
+  .modal-input-field:focus {
+    border-color: #00ffa3; box-shadow: 0 0 10px rgba(0, 255, 163, 0.3);
+  }
+  .modal-btn-row { display: flex; gap: 10px; margin-top: 18px; }
+  .modal-btn {
+    flex: 1; padding: 10px 0; border-radius: 10px;
+    font-size: 0.88rem; font-weight: bold; cursor: pointer; border: none;
+  }
+  .modal-btn-confirm { background: linear-gradient(135deg, #00ffa3, #00b875); color: #04120e; }
+  .modal-btn-cancel { background: rgba(255, 255, 255, 0.08); color: #ccc; border: 1px solid rgba(255, 255, 255, 0.15); }
+  .shake-anim { animation: modalShake 0.35s ease; }
+  @keyframes modalShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+
+  /* 3D Book Cover Text wrap and fit */
+  .j-book-3d span {
+    font-size: 0.65rem !important;
+    font-weight: bold !important;
+    color: #f1f5f9 !important;
+    line-height: 1.2 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    text-align: center !important;
+    width: 100% !important;
+    padding: 0 2px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Main Book Title: Dono Urdu aur English shuru se poora dikhe, 2 lines me wrap ho */
+  .j-book-title {
+    font-size: 0.95rem !important;
+    font-weight: bold !important;
+    color: #ffffff !important;
+    margin-bottom: 4px !important;
+    line-height: 1.3 !important;
+    text-align: right !important;
+    unicode-bidi: plaintext !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+  }
+
+  .j-book-author {
+    font-size: 0.74rem !important;
+    color: #94a3b8 !important;
+    margin-bottom: 7px !important;
+    text-align: right !important;
+    unicode-bidi: plaintext !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+</style>
+
+<style id="secModalStyle">
+  #secModalOverlay {
+    position: fixed; inset: 0;
+    background: rgba(3, 14, 10, 0.78);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 999999; opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  #secModalOverlay.active { display: flex; opacity: 1; }
+  #secModalCard {
+    background: radial-gradient(circle at top, #0d3326 0%, #04140e 100%);
+    border: 1px solid rgba(0, 255, 163, 0.45);
+    box-shadow: 0 0 30px rgba(0, 255, 163, 0.25), 0 20px 45px rgba(0,0,0,0.85);
+    border-radius: 20px; width: 88%; max-width: 340px;
+    padding: 24px 20px; text-align: center;
+    transform: scale(0.82) translateY(10px);
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  #secModalOverlay.active #secModalCard { transform: scale(1) translateY(0); }
+  .sec-icon-glow {
+    width: 52px; height: 160px; margin: 0 auto 14px;
+    border-radius: 50%; background: rgba(0, 255, 163, 0.12);
+    border: 1.5px solid rgba(0, 255, 163, 0.45);
+    display: flex; align-items: center; justify-content: center;
+    color: #00ffa3; font-size: 1.35rem;
+    box-shadow: 0 0 15px rgba(0, 255, 163, 0.3);
+  }
+  .sec-input {
+    width: 100%; background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(0, 255, 163, 0.35);
+    border-radius: 12px; padding: 11px 14px;
+    color: #fff; font-size: 1rem; text-align: center;
+    outline: none; margin-top: 15px; box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .sec-input:focus {
+    border-color: #00ffa3;
+    box-shadow: 0 0 14px rgba(0, 255, 163, 0.4);
+  }
+  .sec-btn-row { display: flex; gap: 10px; margin-top: 20px; }
+  .sec-btn {
+    flex: 1; padding: 11px 0; border-radius: 12px;
+    font-size: 0.9rem; font-weight: bold; cursor: pointer; border: none;
+    transition: transform 0.15s, opacity 0.15s;
+  }
+  .sec-btn:active { transform: scale(0.96); }
+  .sec-btn-ok { background: linear-gradient(135deg, #00ffa3, #00b875); color: #03140e; }
+  .sec-btn-cancel { background: rgba(255, 255, 255, 0.08); color: #c4d7cf; border: 1px solid rgba(255, 255, 255, 0.15); }
+  .sec-shake { animation: secModalShake 0.38s ease; }
+  @keyframes secModalShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-9px); }
+    40%, 80% { transform: translateX(9px); }
+  }
+</style>
+
+
+<style id="hzCardStyles">
+  .books-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-width: 600px !important;
+    margin: 0 auto !important;
+    padding: 10px 4px !important;
+  }
+  .hz-card {
+    position: relative;
+    display: flex;
+    flex-direction: row-reverse;
+    background: linear-gradient(145deg, #121815, #0a0f0d);
+    border: 1px solid rgba(0, 255, 163, 0.18);
+    border-radius: 14px;
+    padding: 14px 12px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    gap: 14px;
+    align-items: stretch;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .hz-card:active {
+    transform: scale(0.99);
+    border-color: rgba(0, 255, 163, 0.4);
+  }
+  /* 3D Book Mockup on Right */
+  .hz-3d-book-wrap {
+    flex-shrink: 0;
+    width: 95px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 600px;
+  }
+  .hz-3d-book {
+    width: 86px;
+    height: 124px;
+    position: relative;
+    background: linear-gradient(135deg, #0e3d2f, #051a14);
+    border-radius: 3px 6px 6px 3px;
+    box-shadow: -4px 6px 14px rgba(0, 0, 0, 0.8), 2px 0 4px rgba(255, 255, 255, 0.12) inset;
+    border: 1px solid rgba(0, 255, 163, 0.35);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 6px;
+    text-align: center;
+    transform: rotateY(-8deg);
+  }
+  .hz-3d-book::before {
+    content: '';
+    position: absolute;
+    left: 4px; top: 0; bottom: 0;
+    width: 3px;
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow: 1px 0 3px rgba(0, 0, 0, 0.4);
+  }
+  .hz-book-icon {
+    font-size: 1.5rem;
+    color: #00ffa3;
+    margin-bottom: 6px;
+    filter: drop-shadow(0 0 6px rgba(0, 255, 163, 0.4));
+  }
+  .hz-book-cover-title {
+    font-size: 0.72rem;
+    color: #f1f5f9;
+    font-weight: bold;
+    line-height: 1.25;
+    word-break: break-word;
+  }
+  /* Details Section on Left */
+  .hz-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+    min-width: 0;
+  }
+  .hz-watermark {
+    position: absolute;
+    top: -12px;
+    right: 4px;
+    font-size: 3.8rem;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.04);
+    font-family: Arial, sans-serif;
+    pointer-events: none;
+    z-index: 0;
+    line-height: 1;
+  }
+  .hz-title {
+    font-size: 1.05rem;
+    font-weight: bold;
+    color: #ffffff;
+    line-height: 1.35;
+    margin-bottom: 3px;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hz-author {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    text-align: right;
+    margin-bottom: 7px;
+  }
+  /* Metadata Divider Strip */
+  .hz-meta-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 6px;
+    padding: 3px 6px;
+    font-size: 0.68rem;
+    color: #94a3b8;
+    margin-bottom: 10px;
+    direction: rtl;
+  }
+  .hz-meta-sep {
+    color: rgba(255, 255, 255, 0.15);
+  }
+  .hz-badge-status {
+    color: #00ffa3;
+    font-weight: bold;
+  }
+  /* Buttons Row */
+  .hz-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    direction: ltr;
+  }
+  .hz-btn-read {
+    flex: 2;
+    background: #0f3d4a;
+    border: 1px solid #00b4d8;
+    color: #caf0f8;
+    border-radius: 6px;
+    padding: 6px 0;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+  }
+  .hz-btn-intro {
+    flex: 1.2;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid #d4a373;
+    color: #faedcd;
+    border-radius: 6px;
+    padding: 6px 0;
+    font-size: 0.78rem;
+    cursor: pointer;
+    text-align: center;
+  }
+  .hz-btn-down {
+    width: 34px;
+    height: 31px;
+    background: rgba(0, 255, 163, 0.08);
+    border: 1px solid #00ffa3;
+    color: #00ffa3;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .hz-btn-share {
+    width: 34px;
+    height: 31px;
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid #a855f7;
+    color: #c084fc;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+</style>
+
+
+<style id="custom3dCardStyles">
+  /* Scrollable Container taaki cards pichke nahi */
+  #books-list, .books-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-height: 65vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 8px 4px 35px 4px !important;
+    box-sizing: border-box !important;
+  }
+  #books-list::-webkit-scrollbar {
+    width: 4px;
+  }
+  #books-list::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 163, 0.35);
+    border-radius: 4px;
+  }
+
+  /* 3D Horizontal Card */
+  .j-book-card {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: row !important;
+    direction: rtl !important;
+    background: #111714 !important;
+    border: 1px solid rgba(0, 255, 163, 0.25) !important;
+    border-radius: 14px !important;
+    padding: 12px 10px !important;
+    gap: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7) !important;
+    flex-shrink: 0 !important;
+    min-height: 142px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Right Side 3D Book */
+  .j-book-3d-wrap {
+    flex-shrink: 0 !important;
+    width: 86px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    perspective: 500px !important;
+  }
+  .j-book-3d {
+    width: 80px !important;
+    height: 118px !important;
+    position: relative !important;
+    background: linear-gradient(135deg, #0e3b2e 0%, #061c15 100%) !important;
+    border-radius: 3px 6px 6px 3px !important;
+    box-shadow: -4px 6px 14px rgba(0,0,0,0.85), inset 2px 0 3px rgba(255,255,255,0.18), inset -2px 0 3px rgba(0,0,0,0.4) !important;
+    border: 1px solid rgba(0, 255, 163, 0.35) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 8px 5px !important;
+    text-align: center !important;
+    transform: rotateY(-8deg) !important;
+    box-sizing: border-box !important;
+  }
+  .j-book-3d::before {
+    content: "" !important;
+    position: absolute !important;
+    left: 3px !important; top: 0 !important; bottom: 0 !important; width: 3.5px !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 1px 0 2px rgba(0,0,0,0.4) !important;
+  }
+  .j-book-3d i {
+    font-size: 1.45rem !important;
+    color: #00ffa3 !important;
+    margin-bottom: 6px !important;
+    filter: drop-shadow(0 0 6px rgba(0,255,163,0.5)) !important;
+  }
+  .j-book-3d span {
+    font-size: 0.7rem !important;
+    font-weight: bold !important;
+    color: #f1f5f9 !important;
+    line-height: 1.25 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+
+  /* Left Details */
+  .j-book-info {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    min-width: 0 !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+  .j-watermark-num {
+    position: absolute !important;
+    top: -12px !important;
+    left: 0 !important;
+    font-size: 3.6rem !important;
+    font-weight: 900 !important;
+    color: rgba(255, 255, 255, 0.05) !important;
+    font-family: Arial, sans-serif !important;
+    line-height: 1 !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+  .j-book-title {
+    font-size: 1.02rem !important;
+    font-weight: bold !important;
+    color: #ffffff !important;
+    margin-bottom: 3px !important;
+    line-height: 1.35 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    text-align: right !important;
+  }
+  .j-book-author {
+    font-size: 0.76rem !important;
+    color: #94a3b8 !important;
+    margin-bottom: 7px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    text-align: right !important;
+  }
+
+  /* Meta Divider Strip */
+  .j-meta-strip {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    background: rgba(0, 0, 0, 0.45) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 6px !important;
+    padding: 3px 6px !important;
+    font-size: 0.66rem !important;
+    color: #94a3b8 !important;
+    margin-bottom: 9px !important;
+    direction: rtl !important;
+  }
+  .j-meta-sep {
+    color: rgba(255, 255, 255, 0.15) !important;
+  }
+
+  /* Buttons Row matching Screenshot */
+  .j-btn-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    direction: rtl !important;
+  }
+  .j-btn-read {
+    flex: 2 !important; height: 30px !important;
+    background: #0f3d4a !important;
+    border: 1px solid #00b4d8 !important;
+    color: #caf0f8 !important;
+    border-radius: 6px !important;
+    font-size: 0.8rem !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    display: flex !important; align-items: center !important; justify-content: center !important;
+  }
+  .j-btn-intro {
+    flex: 1.1 !important; height: 30px !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid #d4a373 !important;
+    color: #faedcd !important;
+    border-radius: 6px !important;
+    font-size: 0.76rem !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    display: flex !important; align-items: center !important; justify-content: center !important;
+  }
+  .j-btn-down {
+    width: 33px !important; height: 30px !important;
+    background: rgba(0, 255, 163, 0.1) !important;
+    border: 1px solid #00ffa3 !important;
+    color: #00ffa3 !important;
+    border-radius: 6px !important;
+    display: flex !important; align-items: center !important; justify-content: center !important;
+    cursor: pointer !important; flex-shrink: 0 !important; font-size: 0.82rem !important;
+  }
+  .j-btn-share {
+    width: 33px !important; height: 30px !important;
+    background: rgba(168, 85, 247, 0.12) !important;
+    border: 1px solid #a855f7 !important;
+    color: #c084fc !important;
+    border-radius: 6px !important;
+    display: flex !important; align-items: center !important; justify-content: center !important;
+    cursor: pointer !important; flex-shrink: 0 !important; font-size: 0.82rem !important;
+  }
+</style>
+
+<style id="portalModalStyles">
+  #portalModalOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 12, 8, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 999999;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  #portalModalOverlay.active {
+    display: flex;
+    opacity: 1;
+  }
+  #portalModalCard {
+    background: radial-gradient(circle at top, #0f382a 0%, #061913 100%);
+    border: 1px solid rgba(0, 255, 163, 0.4);
+    box-shadow: 0 0 30px rgba(0, 255, 163, 0.25), 0 20px 45px rgba(0,0,0,0.85);
+    border-radius: 18px;
+    width: 88%;
+    max-width: 340px;
+    padding: 22px 18px;
+    text-align: center;
+    transform: scale(0.85);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-sizing: border-box;
+  }
+  #portalModalOverlay.active #portalModalCard {
+    transform: scale(1);
+  }
+  @keyframes pShakeAnim {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+  .p-shake {
+    animation: pShakeAnim 0.35s ease !important;
+  }
+</style>
+<style>
+  /* Floating Emerald Audio Player */
+  #emeraldAudioBar {
+    display: none;
+    position: fixed;
+    bottom: 12px;
+    left: 5%;
+    width: 90%;
+    max-width: 480px;
+    background: radial-gradient(circle at top, #0d3326 0%, #051a13 100%);
+    border: 1px solid rgba(0, 255, 163, 0.45);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85), 0 0 18px rgba(0, 255, 163, 0.2);
+    border-radius: 14px;
+    padding: 10px 14px;
+    z-index: 99999;
+    direction: rtl;
+    box-sizing: border-box;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  #emeraldAudioBar.active {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    animation: slideUpAudio 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes slideUpAudio {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+</style>
+</head>
+<body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
+
+  <!-- 1. LOGIN SCREEN -->
+  <div class="card" id="auth-section">
+    <div class="exclusive-badge">
+      <i class="fa-solid fa-crown" style="color:#f59e0b;"></i>
+      <span>جامعۃ الرضا • درجہ اولیٰ الف (Ula Alif)</span>
+    </div>
+
+    <div class="icon-seal">
+      <i class="fa-solid fa-graduation-cap"></i>
+    </div>
+
+    <h2>محفوظ تعلیمی پورٹل</h2>
+
+    <div class="urdu-banner">
+      یہ پورٹل <b>جامعۃ الرضا</b> کے طلبہ کے لیے مختص ہے۔ کتب و امتحانی پرچہ جات کے مطالعہ کے لیے اپنا نام اور پاس ورڈ درج کریں۔
+    </div>
+
+    <div class="form-group">
+      <label for="user-name">
+        <i class="fa-solid fa-user-graduate" style="color:var(--primary-emerald);"></i> 
+        طالب علم کا نام (Aapka Naam)
+      </label>
+      <input type="text" id="user-name" class="form-input" placeholder="e.g. سوہیل / زید / خالد" autocomplete="name">
+    </div>
+
+    <div class="form-group">
+      <label for="user-pass">
+        <i class="fa-solid fa-key" style="color:#fbbf24;"></i> 
+        خفیہ پاس ورڈ (Security Password)
+      </label>
+      <input type="password" id="user-pass" class="form-input" placeholder="پاس ورڈ درج کریں" autocomplete="current-password">
+    </div>
+
+    <button type="button" class="btn-submit" id="btn-login" onclick="verifyAccess()">
+      <i class="fa-solid fa-arrow-right-to-bracket"></i> &nbsp; تصدیق کریں اور داخل ہوں (Open)
+    </button>
+
+    <div id="error-alert" class="error-msg">درج شدہ معلومات غلط ہیں!</div>
+  </div>
+
+  <!-- 2. SCALABLE LIBRARY DASHBOARD -->
+  <div class="card" id="content-section">
+    <div class="exclusive-badge" style="border-color:#00ffa3; color:#00ffa3;">
+      <i class="fa-solid fa-circle-check"></i>
+      <span id="welcome-user">خوش آمدید!</span>
+    </div>
+
+    <h3 style="color:#f8fafc; font-size:1.05rem; margin-bottom:8px; font-weight:700;">جامعۃ الرضا ڈیجیٹل کتب خانہ</h3>
+
+    <!-- Search & Filter Controls -->
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="lib-search" placeholder="کتاب یا پرچہ تلاش کریں (Search)..." oninput="filterLibrary()">
+    </div>
+
+    <div class="filter-tags">
+      <div class="filter-tag active" onclick="setFilter('all', this)">تمام کتب</div>
+      <div class="filter-tag" onclick="setFilter('papers', this)">امتحانی پرچے</div>
+      <div class="filter-tag" onclick="setFilter('islamic', this)">دینی و فقہی</div>
+      <div class="filter-tag" onclick="setFilter('math', this)">
+ریاضی (Math)</div>
+      <div class="filter-tag" onclick="setFilter('hindi', this)">درسی ہندی</div>
+    </div>
+
+    <!-- Scalable Book Container -->
+    <div class="books-container" id="books-list"></div>
+
+    <button type="button" class="btn-lock-again" onclick="manualLogout()">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i> لاگ آؤٹ کریں (Logout)
+    </button>
+  </div>
+
+  <!-- 3. FULLSCREEN VIEWER WITH INTERACTIVE ZOOM & ANTI-SCREENSHOT GUARD -->
+  <div id="pdf-viewer-overlay">
+    <div class="viewer-header">
+      <div class="viewer-title-box">
+        <i class="fa-solid fa-file-shield" style="color:#ef4444;"></i>
+        <span id="viewer-title">Reader</span>
+      </div>
+      
+      <div class="viewer-controls">
+        <button type="button" class="btn-ctrl" onclick="zoomIn()"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+        <button type="button" class="btn-ctrl" onclick="zoomReset()"><span id="zoom-val">100%</span></button>
+        <button type="button" class="btn-ctrl" onclick="zoomOut()"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+        <button type="button" class="btn-close-viewer" onclick="closeFullscreenPdf()">✕ بند کریں</button>
+      </div>
+    </div>
+    
+    <div id="zoom-container">
+      <div id="frame-wrapper">
+        <iframe id="fullscreen-frame" src=""></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Anti-Screenshot Black Screen Overlay -->
+  <div id="security-blanket">
+    <div>
+      <i class="fa-solid fa-triangle-exclamation" style="font-size:3rem; margin-bottom:12px;"></i><br>
+      محفوظ دستاویز! اسکرین شاٹ یا کاپی کرنا ممنوع ہے۔<br>
+      <small style="color:#94a3b8; font-size:0.8rem; font-weight:normal;">Screen capture is protected</small>
+    </div>
+  </div>
+
+  <script>
+    const MASTER_PASSWORD = "78692";
+    const SESSION_EXPIRY_MS = 5 * 60 * 60 * 1000;
+    let currentZoom = 1.0;
+    let currentCategory = 'all';
+
+    // ==========================================
+    // 📚 SCALABLE LIBRARY REPOSITORY (ADD 1000s OF BOOKS HERE)
+    // ==========================================
+    const LIBRARY_DATA = [
+      {
+        id: "1eMaQt7OezK-E-oDp974hlisCXL1whqBV",
+        title: "درجہ ثانیہ سالانہ امتحانی پرچہ (جامعۃ الرضا)",
+        subtitle: "محفوظ امتحانی دستاویز | صرف آن لائن مطالعہ",
+        category: "papers",
+        coverClass: "cover-saniya",
+        icon: "fa-solid fa-file-circle-question",
+        coverTitle: "امتحانی پرچہ<br><small style=\"color:#e9d5ff;\">درجہ ثانیہ</small>",
+        allowDownload: true,
+        category: "papers",
+        downloadName: "Darja_Saniya_Salana_Exam_Paper.pdf"
+      },
+      {
+        id: "1RkoRNX0nAeQLA5e8QsWKrcX_RfVcudG2",
+        title: "بہار شریعت حصہ اول (150 سوالات مع جوابات)",
+        subtitle: "جامعۃ الرضا - فقہی و عقائدی سوالات | امتحانی تیاری",
+        category: "islamic",
+        coverClass: "cover-bahar",
+        icon: "fa-solid fa-quran",
+        coverTitle: "بہارِ شریعت<br><small style=\"color:#fde68a;\">حصہ اول</small>",
+        allowDownload: true,
+        downloadName: "Bahar_e_Shariat_Hissa_Awwal_150_QnA.pdf"
+      },
+      {
+        id: "1xSLxk3toreZoU5vlI_SzVUq93nzzMRnv",
+        title: "کक्षा 4 हिंदी पाठ 7: नकली हीरे (50 प्रश्नोत्तरी)",
+        subtitle: "اولیٰ الف تدریسی مواد | تفصیلی سوال و جواب",
+        category: "hindi",
+        coverClass: "cover-hindi",
+        icon: "fa-solid fa-book",
+        coverTitle: "درسی ہندی<br><small style=\"color:#bae6fd;\">کلاس 4</small>",
+        allowDownload: true,
+        downloadName: "Kaksha_4_Hindi_Nakli_Heere.pdf"
+      },
+      {
+        id: "1e_f_rYoIiaPs4F7PMJlOIc4SrNPIV28m",
+        title: "Class 4 Mathematics Chapter 8 Solved Questions",
+        subtitle: "اولیٰ الف ریاضی | حل شدہ امتحانی مشقیں و سوالات",
+        category: "math",
+        coverClass: "cover-math",
+        icon: "fa-solid fa-calculator",
+        coverTitle: "Math<br>Ch. 8",
+        allowDownload: true,
+        downloadName: "Class_4_Mathematics_Chapter_8_Solved.pdf"
+      },
+      {
+        id: "1cSJrtV8o8YQjTqlo-APAx3G8NohDrfSn",
+        title: "Class 4 Mathematics Chapter 9 Solved Questions",
+        subtitle: "اولیٰ الف ریاضی | حل شدہ سوالات مع تفصیلی جوابات",
+        category: "math",
+        coverClass: "cover-math",
+        icon: "fa-solid fa-chart-pie",
+        coverTitle: "Math<br>Ch. 9",
+        allowDownload: true,
+        downloadName: "Class_4_Mathematics_Chapter_9_Solved.pdf"
+      },
+      {
+        id: "1KClLGIym2oblPYmCJ7oW_3A30Lj01twq",
+        title: "Class 4 Mathematics Chapter 10 Solved Questions",
+        subtitle: "اولیٰ الف ریاضی | تفصیلی سوالات مع حل (مکمل مشق)",
+        category: "math",
+        coverClass: "cover-math",
+        icon: "fa-solid fa-shapes",
+        coverTitle: "Math<br>Ch. 10",
+        allowDownload: true,
+        downloadName: "Class_4_Mathematics_Chapter_10_Solved.pdf"
+      }
+    ];
+
+    // ==========================================
+    // RENDER BOOKS DYNAMICALLY
+    // ==========================================
+    
+    function shareBookItem(title, id) {
+      const shareUrl = window.location.origin + window.location.pathname + "#book=" + id;
+      if (navigator.share) {
+        navigator.share({ title: title, url: shareUrl }).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          alert("لنک کاپی ہو گیا: " + title);
+        });
+      }
+    }
+
+    
+
+    function openCustomAlert(title, message, iconClass) {
+      var modal = document.getElementById("portalModalOverlay");
+      var card = document.getElementById("portalModalCard");
+      var icon = document.getElementById("pModalIcon");
+      var titleEl = document.getElementById("pModalTitle");
+      var bodyEl = document.getElementById("pModalBody");
+      var input = document.getElementById("pModalInput");
+      var cancelBtn = document.getElementById("pModalCancelBtn");
+      var errEl = document.getElementById("pModalError");
+      var okBtn = document.getElementById("pModalOkBtn");
+
+      icon.innerHTML = '<i class="' + (iconClass || 'fa-solid fa-circle-info') + '"></i>';
+      titleEl.innerText = title;
+      bodyEl.innerText = message;
+      input.style.display = "none";
+      cancelBtn.style.display = "none";
+      errEl.style.display = "none";
+      card.classList.remove("p-shake");
+
+      modal.classList.add("active");
+
+      okBtn.onclick = function() {
+        closeCustomModal();
+      };
+    }
+
+    function openCustomPrompt(title, message, expectedPwd, onSuccess) {
+      var modal = document.getElementById("portalModalOverlay");
+      var card = document.getElementById("portalModalCard");
+      var icon = document.getElementById("pModalIcon");
+      var titleEl = document.getElementById("pModalTitle");
+      var bodyEl = document.getElementById("pModalBody");
+      var input = document.getElementById("pModalInput");
+      var cancelBtn = document.getElementById("pModalCancelBtn");
+      var errEl = document.getElementById("pModalError");
+      var okBtn = document.getElementById("pModalOkBtn");
+
+      icon.innerHTML = '<i class="fa-solid fa-file-shield"></i>';
+      titleEl.innerText = title;
+      bodyEl.innerText = message;
+      input.style.display = "block";
+      input.value = "";
+      cancelBtn.style.display = "block";
+      errEl.style.display = "none";
+      card.classList.remove("p-shake");
+
+      modal.classList.add("active");
+      setTimeout(function() { input.focus(); }, 120);
+
+      function verify() {
+        if (input.value === expectedPwd) {
+          closeCustomModal();
+          if (onSuccess) onSuccess();
+        } else {
+          errEl.style.display = "block";
+          card.classList.remove("p-shake");
+          void card.offsetWidth;
+          card.classList.add("p-shake");
+          input.value = "";
+          input.focus();
+        }
+      }
+
+      okBtn.onclick = verify;
+      cancelBtn.onclick = closeCustomModal;
+
+      input.onkeydown = function(e) {
+        if (e.key === "Enter") verify();
+        if (e.key === "Escape") closeCustomModal();
+      };
+    }
+
+    function closeCustomModal() {
+      var modal = document.getElementById("portalModalOverlay");
+      if (modal) modal.classList.remove("active");
+    }
+
+    function showBookIntro(title, category) {
+      openCustomAlert("کتاب کا تعارف", "کتاب: " + title + "\nشعبہ: " + (category || "جامعۃ الرضا لائبریری") + "\n\nمطالعہ کے لیے 'مطالعہ کریں' پر کلک فرمائیں۔", "fa-solid fa-book-open-reader");
+    }
+
+    function runFileDownload(btn, origText, fileId, filename) {
+      if (btn) {
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ڈاؤنلوڈ...';
+        btn.style.pointerEvents = "none";
+      }
+
+      var directUrl = "https://drive.usercontent.google.com/download?id=" + fileId + "&export=download";
+      var a = document.createElement("a");
+      a.href = directUrl;
+      a.setAttribute("download", filename || "document.pdf");
+      document.body.appendChild(a);
+      a.click();
+
+      setTimeout(function() {
+        try { document.body.removeChild(a); } catch(e){}
+        if (btn) {
+          btn.innerHTML = origText;
+          btn.style.pointerEvents = "auto";
+        }
+      }, 3000);
+    }
+
+    function startDirectDownload(e, fileId, filename) {
+      var btn = e ? (e.currentTarget || e.target) : null;
+      var origText = btn ? btn.innerHTML : '<i class="fa-solid fa-download"></i>';
+      var fnLower = (filename || "").toLowerCase();
+      var isPaper = fnLower.includes("paper") || (filename || "").includes("پرچہ") || fnLower.includes("sania") || fnLower.includes("rabia") || fnLower.includes("salisa") || fnLower.includes("ula");
+
+      if (isPaper) {
+        openCustomPrompt("تصدیق برائے ڈاؤنلوڈ", "امتحانی پرچہ ڈاؤنلوڈ کرنے کے لیے پاس ورڈ درج کریں:", "Jamia", function() {
+          runFileDownload(btn, origText, fileId, filename);
+        });
+      } else {
+        runFileDownload(btn, origText, fileId, filename);
+      }
+    }
+
+    function renderBooks(customList) {
+      const booksToRender = customList || (typeof allBooks !== 'undefined' ? allBooks : (typeof books !== 'undefined' ? books : defaultBooks));
+      const grid = document.getElementById("books-list") || document.getElementById("booksGrid");
+
+      // Auto-hide any loading indicator
+      const allLoaders = document.querySelectorAll("[id*='load'], [id*='sync'], [class*='load'], [class*='spin']");
+      allLoaders.forEach(el => {
+        if (el.innerText && el.innerText.includes("اپڈیٹ")) {
+          el.style.display = "none";
+        }
+      });
+      const directLoader = document.getElementById("loadingStatus") || document.getElementById("syncStatus") || document.getElementById("loader");
+      if (directLoader) directLoader.style.display = "none";
+
+      if (!grid) return;
+      grid.innerHTML = "";
+
+      if (!booksToRender || booksToRender.length === 0) {
+        grid.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:30px; font-size:0.95rem;">کوئی کتاب یا پرچہ نہیں ملا</div>`;
+        return;
+      }
+
+      booksToRender.forEach((b, index) => {
+        const itemNumber = index + 1;
+        const isExamPaper = (b.category === "papers") || b.title.toLowerCase().includes("paper") || b.title.includes("پرچہ");
+        const statusText = isExamPaper ? "امتحانی پرچہ" : "مکمل کتاب";
+        const statusColor = isExamPaper ? "color:#fca5a5;" : "color:#00ffa3;";
+        const catLabel = isExamPaper ? "امتحان" : (b.category === "math" ? "حساب" : (b.category === "hindi" ? "ہندی" : "دینیات"));
+        const pagesCount = (b.pages || b.totalPages || b.pageCount || b.safhat) ? (b.pages || b.totalPages || b.pageCount || b.safhat) : (isExamPaper ? "12" : "—");
+        const authorText = isExamPaper ? "شعبۂ امتحانات • جامعۃ الرضا" : (b.author || "جامعۃ الرضا اسلامک ریسرچ سینٹر");
+        const safeTitle = (b.title || "").replace(/'/g, "\\'");
+        const safeId = b.id || "";
+        const safeDownloadName = ((b.downloadName || b.title || "book") + ".pdf").replace(/'/g, "\\'");
+
+        const card = document.createElement("div");
+        card.className = "j-book-card";
+        card.innerHTML = `
+          <!-- Right 3D Book Cover -->
+          <div class="j-book-3d-wrap">
+            <div class="j-book-3d">
+              <i class="${b.icon || (isExamPaper ? 'fa-solid fa-file-shield' : 'fa-solid fa-book-quran')}"></i>
+              <span>${b.coverTitle || b.title}</span>
+            </div>
+          </div>
+
+          <!-- Left Details -->
+          <div class="j-book-info">
+            <div class="j-watermark-num">${itemNumber}</div>
+            <div>
+              <div class="j-book-title" title="${safeTitle}">${b.title}</div>
+              <div class="j-book-author">مؤلف: ${authorText}</div>
+            </div>
+
+            <!-- Meta Strip -->
+            <div class="j-meta-strip">
+              <span style="${statusColor} font-weight:bold;">${statusText}</span>
+              <span class="j-meta-sep">|</span>
+              <span>${catLabel}</span>
+              <span class="j-meta-sep">|</span>
+              <span>زبان: Urdu</span>
+              <span class="j-meta-sep">|</span>
+              <span>صفحات: ${pagesCount}</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="j-btn-row">
+              ${b.type === 'audio' || b.category === 'naat' ? `<button type="button" class="j-btn-read" style="background:#0e4429 !important; border-color:#00ffa3 !important; color:#00ffa3 !important;" onclick="playAudio('${b.audioUrl}', '${safeTitle}')"><i class="fa-solid fa-play" style="margin-left:5px;"></i> سنیں</button>` : `<button type="button" class="j-btn-read" onclick="openFullscreenPdf('${safeId}', '${safeTitle}')">مطالعہ کریں</button>`}
+              <button type="button" class="j-btn-intro" onclick="showBookIntro('${safeTitle}', '${b.category || ''}')">تعارف</button>
+              <button type="button" class="j-btn-down" title="ڈاؤنلوڈ" onclick="startDirectDownload(event, '${safeId}', '${safeDownloadName}')"><i class="fa-solid fa-download"></i></button>
+              <button type="button" class="j-btn-share" title="شیئر" onclick="shareBookItem('${safeTitle}', '${safeId}')"><i class="fa-solid fa-share-nodes"></i></button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function getActiveLibrary() {
+      return (window.ALL_BOOKS_CACHE && window.ALL_BOOKS_CACHE.length > 0) 
+        ? window.ALL_BOOKS_CACHE 
+        : LIBRARY_DATA;
+    }
+
+    function filterLibrary() {
+      const q = document.getElementById("lib-search").value.toLowerCase().trim();
+      const currentList = getActiveLibrary();
+
+      const filtered = currentList.filter(b => {
+        const matchesCategory = (currentCategory === 'all' || b.category === currentCategory);
+        const titleText = (b.title || "").toLowerCase();
+        const subText = (b.subtitle || "").toLowerCase();
+        const matchesSearch = !q || titleText.includes(q) || subText.includes(q);
+        return matchesCategory && matchesSearch;
+      });
+
+      renderBooks(filtered);
+    }
+
+    function setFilter(cat, elem) {
+      currentCategory = cat;
+      document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+      if (elem) elem.classList.add('active');
+      filterLibrary();
+    }
+
+    // ==========================================
+    // SECURITY & ACCESS
+    // ==========================================
+    function checkLockTimer() {
+      const now = Date.now();
+      const lockUntil = parseInt(localStorage.getItem("jamia_lock_until") || "0", 10);
+      const btn = document.getElementById("btn-login");
+      const err = document.getElementById("error-alert");
+
+      if (now < lockUntil) {
+        btn.disabled = true;
+        btn.style.opacity = "0.6";
+        btn.style.cursor = "not-allowed";
+        const remSec = Math.ceil((lockUntil - now) / 1000);
+        const m = Math.floor(remSec / 60);
+        const s = remSec % 60;
+        err.style.display = "block";
+        err.innerHTML = `<i class=\"fa-solid fa-lock\"></i> 5 بار غلط پاس ورڈ درج کیا گیا! براہِ کرم <b>${m}:${s < 10 ? "0" : ""}${s}</b> منٹ انتظار کریں۔`;
+        setTimeout(checkLockTimer, 1000);
+        return true;
+      } else {
+        if (lockUntil > 0) {
+          localStorage.removeItem("jamia_lock_until");
+          localStorage.setItem("jamia_failed_attempts", "0");
+        }
+        btn.disabled = false;
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+        return false;
+      }
+    }
+
+    function checkActiveSession() {
+      try {
+        const savedName = localStorage.getItem('jamia_ula_name');
+        const savedExpiry = localStorage.getItem('jamia_ula_expiry');
+        const now = Date.now();
+
+        if (savedName && savedExpiry && now < parseInt(savedExpiry, 10)) {
+          showDashboard(savedName);
+        } else {
+          localStorage.removeItem('jamia_ula_name');
+          localStorage.removeItem('jamia_ula_expiry');
+        }
+      } catch (_) {}
+    }
+
+    
+    
+    const NAATS_API_URL = "https://script.google.com/macros/s/AKfycbwi02ykZWWmq3nedwL0ULzk730QAJbwo7E_saM0hM32DOBI7ATrdWijHxvKfTZeY95-Ug/exec";
+
+    function playAudio(audioUrl, title) {
+      const bar = document.getElementById("emeraldAudioBar");
+      const audio = document.getElementById("globalHtmlAudio");
+      const titleEl = document.getElementById("audioPlayerTitle");
+      const icon = document.getElementById("audioPlayIcon");
+
+      titleEl.innerText = title;
+      if (audio.src !== audioUrl) {
+        audio.src = audioUrl;
+      }
+
+      bar.classList.add("active");
+      audio.play().then(() => {
+        icon.className = "fa-solid fa-pause";
+      }).catch(err => {
+        console.log("Audio play error:", err);
+      });
+    }
+
+    function togglePlayPauseAudio() {
+      const audio = document.getElementById("globalHtmlAudio");
+      const icon = document.getElementById("audioPlayIcon");
+      if (audio.paused) {
+        audio.play();
+        icon.className = "fa-solid fa-pause";
+      } else {
+        audio.pause();
+        icon.className = "fa-solid fa-play";
+      }
+    }
+
+    function closeAudioPlayer() {
+      const bar = document.getElementById("emeraldAudioBar");
+      const audio = document.getElementById("globalHtmlAudio");
+      audio.pause();
+      bar.classList.remove("active");
+    }
+
+    function seekAudio(percent) {
+      const audio = document.getElementById("globalHtmlAudio");
+      if (audio.duration) {
+        audio.currentTime = (percent / 100) * audio.duration;
+      }
+    }
+
+    // Progress aur timer update
+    document.addEventListener("DOMContentLoaded", function() {
+      const audio = document.getElementById("globalHtmlAudio");
+      const bar = document.getElementById("audioProgressBar");
+      const timeEl = document.getElementById("audioPlayerTime");
+      const icon = document.getElementById("audioPlayIcon");
+
+      if (!audio) return;
+
+      audio.ontimeupdate = function() {
+        if (audio.duration) {
+          bar.value = (audio.currentTime / audio.duration) * 100;
+          let curM = Math.floor(audio.currentTime / 60);
+          let curS = Math.floor(audio.currentTime % 60);
+          let durM = Math.floor(audio.duration / 60);
+          let durS = Math.floor(audio.duration % 60);
+          timeEl.innerText = (curM < 10 ? "0"+curM : curM) + ":" + (curS < 10 ? "0"+curS : curS) + " / " + (durM < 10 ? "0"+durM : durM) + ":" + (durS < 10 ? "0"+durS : durS);
+        }
+      };
+
+      audio.onended = function() {
+        icon.className = "fa-solid fa-play";
+        bar.value = 0;
+      };
+    });
+
+    const DRIVE_API_URL = "https://script.google.com/macros/s/AKfycbxlxUIrFPytt9CAkJxUxKuls6Lq8_yL5dq1rac_hOpp-GOYzFIntmoQB-q5u1npyWVw_w/exec";
+
+    async function loadDynamicBooks() {
+      const container = document.getElementById("books-list");
+      // Pehle maujuda library data render karein taaki spinner par atke na rahein
+      if (typeof LIBRARY_DATA !== 'undefined' && LIBRARY_DATA.length > 0) {
+        renderBooks(LIBRARY_DATA);
+      } else {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:#38bdf8;"><i class="fa-solid fa-spinner fa-spin"></i> کتب خانہ اپڈیٹ ہو رہا ہے...</div>`;
+      }
+
+      try {
+        const res = await fetch(DRIVE_API_URL);
+        const dynamicBooks = await res.json();
+        try {
+          const nRes = await fetch(NAATS_API_URL);
+          const naats = await nRes.json();
+          if (Array.isArray(naats)) {
+            naats.forEach(nt => {
+              dynamicBooks.push({
+                id: nt.id,
+                title: nt.title,
+                subtitle: "آڈیو نعت شریف",
+                category: "naat",
+                type: "audio",
+                coverClass: "cover-bahar",
+                icon: "fa-solid fa-music",
+                coverTitle: nt.title.substring(0, 18),
+                size: nt.size || "Audio",
+                audioUrl: nt.audioUrl || ("https://docs.google.com/uc?export=download&id=" + nt.id),
+                downloadName: (nt.downloadName || nt.title) + ".mp3",
+                allowDownload: true
+              });
+            });
+          }
+        } catch(nErr) { console.log("Naats fetch skipped:", nErr); }
+
+        const combined = [...LIBRARY_DATA];
+        dynamicBooks.forEach(db => {
+          if (!combined.some(b => b.id === db.id)) {
+            let coverClass = "cover-bahar";
+            let icon = "fa-solid fa-book-quran";
+            if (db.category === "papers") {
+              coverClass = "cover-saniya";
+              icon = "fa-solid fa-file-circle-question";
+            } else if (db.category === "math") {
+              coverClass = "cover-math";
+              icon = "fa-solid fa-calculator";
+            } else if (db.category === "hindi") {
+              coverClass = "cover-hindi";
+              icon = "fa-solid fa-book";
+            }
+
+            combined.push({
+              id: db.id,
+              title: db.title,
+              subtitle: "جامعۃ الرضا ڈیجیٹل کتب خانہ",
+              category: db.category,
+              coverClass: coverClass,
+              icon: icon,
+              coverTitle: db.title.substring(0, 18),
+              category: (db.title.toLowerCase().includes("paper") || db.title.includes("پرچہ")) ? "papers" : (db.category || "islamic"),
+              allowDownload: true,
+              downloadName: db.title + ".pdf"
+            });
+          }
+        });
+
+        window.ALL_BOOKS_CACHE = combined;
+        renderBooks(combined.filter(b => b.type !== "audio" && b.category !== "naat"));
+      } catch (err) {
+        console.error("Fetch error:", err);
+        if (typeof LIBRARY_DATA !== 'undefined') renderBooks(LIBRARY_DATA);
+        loadDynamicBooks();
+      }
+    }
+
+    function showDashboard(name) {
+      document.getElementById('auth-section').style.display = 'none';
+      document.getElementById('content-section').style.display = 'block';
+      document.getElementById('welcome-user').innerHTML = `خوش آمدید، عزیزم <b>${name}</b>`;
+      loadDynamicBooks();
+    }
+
+    function verifyAccess() {
+      if (checkLockTimer()) return;
+
+      const name = document.getElementById('user-name').value.trim();
+      const pass = document.getElementById('user-pass').value.trim();
+      const err = document.getElementById('error-alert');
+
+      if (!name) {
+        err.innerText = "براہِ کرم اپنا نام درج کریں۔";
+        err.style.display = 'block';
+        return;
+      }
+
+      let failedAttempts = parseInt(localStorage.getItem("jamia_failed_attempts") || "0", 10);
+
+      if (pass !== MASTER_PASSWORD) {
+        failedAttempts++;
+        localStorage.setItem("jamia_failed_attempts", failedAttempts.toString());
+        if (failedAttempts >= 5) {
+          localStorage.setItem("jamia_lock_until", (Date.now() + 2 * 60 * 1000).toString());
+          checkLockTimer();
+          return;
+        }
+        err.innerHTML = `غلط پاس ورڈ! (باقی کوششیں: ${5 - failedAttempts})`;
+        err.style.display = "block";
+        return;
+      }
+
+      localStorage.setItem("jamia_failed_attempts", "0");
+      err.style.display = 'none';
+
+      try {
+        localStorage.setItem('jamia_ula_name', name);
+        localStorage.setItem('jamia_ula_expiry', (Date.now() + SESSION_EXPIRY_MS).toString());
+      } catch (_) {}
+
+      showDashboard(name);
+    }
+
+    // ==========================================
+    // VIEWER & ZOOM
+    // ==========================================
+    function applyZoom() {
+      const wrapper = document.getElementById('frame-wrapper');
+      wrapper.style.transform = `scale(${currentZoom})`;
+      wrapper.style.width = `${100 / currentZoom}%`;
+      wrapper.style.height = `${100 / currentZoom}%`;
+      document.getElementById('zoom-val').innerText = `${Math.round(currentZoom * 100)}%`;
+    }
+
+    function zoomIn() {
+      if (currentZoom < 2.5) {
+        currentZoom += 0.25;
+        applyZoom();
+      }
+    }
+
+    function zoomOut() {
+      if (currentZoom > 0.75) {
+        currentZoom -= 0.25;
+        applyZoom();
+      }
+    }
+
+    function zoomReset() {
+      currentZoom = 1.0;
+      applyZoom();
+    }
+
+    function openFullscreenPdf(fileId, title) {
+      const tLower = (title || "").toLowerCase();
+      const isPaper = tLower.includes("paper") || (title || "").includes("پرچہ") || (title || "").includes("امتحان") || tLower.includes("sania") || tLower.includes("rabia") || tLower.includes("salisa") || tLower.includes("ula");
+
+      // Sirf parchhon ke liye direct Drive app viewer kholna
+      if (isPaper) {
+        const a = document.createElement("a");
+        a.href = "https://drive.google.com/file/d/" + fileId + "/view?usp=drivesdk";
+        a.target = "_blank";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        return;
+      }
+      const viewer = document.getElementById('pdf-viewer-overlay');
+      const frame = document.getElementById('fullscreen-frame');
+      document.getElementById('viewer-title').innerText = title;
+      zoomReset();
+      frame.src = `https://drive.google.com/file/d/${fileId}/preview`;
+      viewer.style.display = 'flex';
+    }
+
+    function closeFullscreenPdf() {
+      const viewer = document.getElementById('pdf-viewer-overlay');
+      const frame = document.getElementById('fullscreen-frame');
+      frame.src = "";
+      viewer.style.display = 'none';
+      zoomReset();
+    }
+
+    
+
+    function manualLogout() {
+      closeFullscreenPdf();
+      try {
+        localStorage.removeItem('jamia_ula_name');
+        localStorage.removeItem('jamia_ula_expiry');
+      } catch (_) {}
+      document.getElementById('user-name').value = '';
+      document.getElementById('user-pass').value = '';
+      document.getElementById('content-section').style.display = 'none';
+      document.getElementById('auth-section').style.display = 'block';
+    }
+
+    // ==========================================
+    // ANTI-SCREENSHOT & ANTI-CAPTURE LOGIC
+    // ==========================================
+    const blanket = document.getElementById("security-blanket");
+
+    // PrintScreen Key / Shortcut Trap
+    window.addEventListener("keyup", function(e) {
+      if (e.key === "PrintScreen" || e.keyCode === 44) {
+        blanket.style.display = "flex";
+        setTimeout(() => { blanket.style.display = "none"; }, 3000);
+      }
+    });
+
+    window.addEventListener("keydown", function(e) {
+      if ((e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'u')) || e.key === 'F12') {
+        e.preventDefault();
+        blanket.style.display = "flex";
+        setTimeout(() => { blanket.style.display = "none"; }, 2500);
+        return false;
+      }
+    });
+
+    // Mobile App-Switch / Visibility Blindfold
+    document.addEventListener("visibilitychange", function() {
+      if (document.hidden) {
+        blanket.style.display = "flex";
+      } else {
+        setTimeout(() => { blanket.style.display = "none"; }, 800);
+      }
+    });
+
+    checkActiveSession();
+    checkLockTimer();
+  </script>
+
+  <div id="securityModal" class="custom-modal-overlay">
+    <div class="custom-modal-box" id="securityModalBox">
+      <div class="modal-icon-badge"><i class="fa-solid fa-lock"></i></div>
+      <div style="font-size:1.05rem; font-weight:bold; color:#00ffa3; margin-bottom:6px;">تصدیق برائے ڈاؤنلوڈ</div>
+      <div style="font-size:0.85rem; color:#d1fae5;">امتحانی پرچہ ڈاؤنلوڈ کرنے کے لیے پاس ورڈ درج کریں:</div>
+      <input type="password" id="modalPwdInput" class="modal-input-field" placeholder="پاس ورڈ..." autocomplete="off">
+      <div id="modalErrorMsg" style="color:#ff6b6b; font-size:0.78rem; margin-top:6px; display:none;">غلط پاس ورڈ! دوبارہ کوشش کریں۔</div>
+      <div class="modal-btn-row">
+        <button type="button" class="modal-btn modal-btn-cancel" onclick="closeSecurityModal()">منسوخ (Cancel)</button>
+        <button type="button" class="modal-btn modal-btn-confirm" onclick="verifySecurityModal()">تصدیق (OK)</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="secModalOverlay">
+    <div id="secModalCard">
+      <div class="sec-icon-glow"><i class="fa-solid fa-file-shield"></i></div>
+      <div style="font-size:1.1rem; font-weight:bold; color:#00ffa3; margin-bottom:6px;">تصدیق برائے ڈاؤنلوڈ</div>
+      <div style="font-size:0.86rem; color:#d1fae5; line-height:1.5;">امتحانی پرچہ ڈاؤنلوڈ کرنے کے لیے پاس ورڈ درج کریں:</div>
+      <input type="password" id="secModalInput" class="sec-input" placeholder="پاس ورڈ لکھیں..." autocomplete="off">
+      <div id="secModalError" style="color:#ff6b6b; font-size:0.8rem; margin-top:8px; display:none;">غلط پاس ورڈ! دوبارہ کوشش کریں۔</div>
+      <div class="sec-btn-row">
+        <button type="button" class="sec-btn sec-btn-cancel" onclick="closeSecModal()">منسوخ (Cancel)</button>
+        <button type="button" class="sec-btn sec-btn-ok" onclick="confirmSecModal()">تصدیق (OK)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unified Emerald Modal for Password & Intro -->
+  <div id="portalModalOverlay">
+    <div id="portalModalCard">
+      <div id="pModalIcon" style="width:48px; height:48px; margin:0 auto 12px; border-radius:50%; background:rgba(0,255,163,0.12); border:1px solid rgba(0,255,163,0.4); display:flex; align-items:center; justify-content:center; color:#00ffa3; font-size:1.3rem;">
+        <i class="fa-solid fa-file-shield"></i>
+      </div>
+      <div id="pModalTitle" style="font-size:1.05rem; font-weight:bold; color:#00ffa3; margin-bottom:6px;"></div>
+      <div id="pModalBody" style="font-size:0.86rem; color:#d1fae5; line-height:1.6; white-space:pre-line;"></div>
+      <input type="password" id="pModalInput" style="display:none; width:100%; background:rgba(0,0,0,0.55); border:1px solid rgba(0,255,163,0.35); border-radius:10px; padding:10px 12px; color:#fff; font-size:0.95rem; text-align:center; outline:none; margin-top:14px; box-sizing:border-box;" placeholder="پاس ورڈ درج کریں...">
+      <div id="pModalError" style="color:#ff6b6b; font-size:0.78rem; margin-top:6px; display:none;">غلط پاس ورڈ! دوبارہ کوشش کریں۔</div>
+      <div style="display:flex; gap:10px; margin-top:18px; direction:rtl;">
+        <button id="pModalOkBtn" type="button" style="flex:1; padding:10px 0; border-radius:10px; font-size:0.88rem; font-weight:bold; cursor:pointer; border:none; background:linear-gradient(135deg, #00ffa3, #00b875); color:#03140e;">ٹھیک ہے (OK)</button>
+        <button id="pModalCancelBtn" type="button" style="display:none; flex:1; padding:10px 0; border-radius:10px; font-size:0.88rem; font-weight:bold; cursor:pointer; background:rgba(255,255,255,0.08); color:#ccc; border:1px solid rgba(255,255,255,0.15);">منسوخ (Cancel)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Bottom Emerald Audio Player -->
+  <div id="emeraldAudioBar">
+    <div id="sleepTimerBadge" style="display:none; font-size:0.7rem; color:#00ffa3; text-align:center; background:rgba(0,255,163,0.1); border-radius:6px; padding:2px 6px; margin-bottom:4px;"></div>
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;">
+        <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(0,255,163,0.15); border: 1px solid rgba(0,255,163,0.4); display: flex; align-items: center; justify-content: center; color: #00ffa3; flex-shrink: 0;">
+          <i class="fa-solid fa-music"></i>
+        </div>
+        <div style="min-width: 0;">
+          <div id="audioPlayerTitle" style="font-size: 0.82rem; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right;">نعت شریف</div>
+          <div id="audioPlayerTime" style="font-size: 0.68rem; color: #94a3b8; direction: ltr; text-align: right;">0:00 / 0:00</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button id="audioPlayPauseBtn" onclick="togglePlayPauseAudio()" type="button" style="width: 34px; height: 34px; border-radius: 50%; background: #00ffa3; color: #031810; border: none; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+          <i id="audioPlayIcon" class="fa-solid fa-play"></i>
+        </button>
+        <button id="sleepTimerBtn" onclick="cycleSleepTimer()" type="button" title="سونے کا ٹائمر (Sleep Timer)" style="background: rgba(0,255,163,0.12); border: 1px solid rgba(0,255,163,0.35); color: #00ffa3; border-radius: 8px; padding: 4px 8px; font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+          <i class="fa-solid fa-moon"></i> <span id="sleepTimerText">ٹائمر</span>
+        </button>
+        <button onclick="closeAudioPlayer()" type="button" style="background: transparent; border: none; color: #94a3b8; font-size: 1rem; cursor: pointer; padding: 4px;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+    <input type="range" id="audioProgressBar" min="0" max="100" value="0" oninput="seekAudio(this.value)" style="width: 100%; height: 4px; accent-color: #00ffa3; cursor: pointer; margin: 4px 0 0 0;">
+    <audio id="globalHtmlAudio" preload="none"></audio>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- DD Music Style Sleep Timer Bottom Sheet -->
+<div id="ddMusicSleepModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999999; align-items:flex-end; justify-content:center; backdrop-filter:blur(4px);">
+  <div style="width:100%; max-width:480px; background:#1c1d22; border-radius:24px 24px 0 0; padding:24px; box-sizing:border-box; color:#fff; font-family:sans-serif; text-align:left; direction:ltr;">
+    <h3 style="margin:0 0 20px 0; font-size:1.15rem; font-weight:600; color:#f1f5f9;">Stop music after</h3>
+    
+    <!-- Time Inputs -->
+    <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:20px;">
+      <input type="number" id="ddHours" min="0" max="23" value="00" style="width:70px; height:50px; background:#2a2b32; border:1px solid #3f404d; border-radius:10px; color:#fff; font-size:1.4rem; text-align:center; font-weight:bold;">
+      <span style="font-size:1.4rem; font-weight:bold; color:#888;">:</span>
+      <input type="number" id="ddMinutes" min="0" max="59" value="10" style="width:70px; height:50px; background:#2a2b32; border:1px solid #3f404d; border-radius:10px; color:#fff; font-size:1.4rem; text-align:center; font-weight:bold;">
+      <span style="font-size:1.4rem; font-weight:bold; color:#888;">:</span>
+      <input type="number" id="ddSeconds" min="0" max="59" value="00" style="width:70px; height:50px; background:#2a2b32; border:1px solid #3f404d; border-radius:10px; color:#fff; font-size:1.4rem; text-align:center; font-weight:bold;">
+    </div>
+
+    <!-- Quick Chips -->
+    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:24px;">
+      <button type="button" onclick="setDdQuickTime(0, 15, 0)" style="background:#2a2b32; border:none; padding:10px; border-radius:20px; color:#cbd5e1; font-weight:600; font-size:0.85rem; cursor:pointer;">15m</button>
+      <button type="button" onclick="setDdQuickTime(0, 30, 0)" style="background:#2a2b32; border:none; padding:10px; border-radius:20px; color:#cbd5e1; font-weight:600; font-size:0.85rem; cursor:pointer;">30m</button>
+      <button type="button" onclick="setDdQuickTime(0, 45, 0)" style="background:#2a2b32; border:none; padding:10px; border-radius:20px; color:#cbd5e1; font-weight:600; font-size:0.85rem; cursor:pointer;">45m</button>
+      <button type="button" onclick="setDdQuickTime(1, 0, 0)" style="background:#2a2b32; border:none; padding:10px; border-radius:20px; color:#cbd5e1; font-weight:600; font-size:0.85rem; cursor:pointer;">60m</button>
+    </div>
+
+    <!-- Actions -->
+    <div style="display:flex; gap:12px;">
+      <button type="button" onclick="closeDdTimerModal()" style="flex:1; height:46px; background:#2a2b32; border:none; border-radius:25px; color:#cbd5e1; font-weight:bold; cursor:pointer;">CANCEL</button>
+      <button type="button" onclick="startDdTimer()" style="flex:1; height:46px; background:#e11d48; border:none; border-radius:25px; color:#fff; font-weight:bold; cursor:pointer;">START</button>
+    </div>
+  </div>
+</div>
+
+<script id="jamia-naats-master">
+(function() {
+  const NAATS_API_URL = "https://script.google.com/macros/s/AKfycbwi02ykZWWmq3nedwL0ULzk730QAJbwo7E_saM0hM32DOBI7ATrdWijHxvKfTZeY95-Ug/exec";
+  window.JAMIA_NAATS_LIST = [];
+  let sleepIntervalId = null;
+  let sleepTotalSecs = 0;
+
+  function cleanNaatTitle(raw) {
+    if (!raw) return "نعت شریف";
+    return raw.replace(/\[.*?\]/g, "").replace(/\(\s*MP3[^)]*\)/gi, "").replace(/\(\s*\d+\s*K\s*\)/gi, "").replace(/\.(mp3|m4a|wav|aac|ogg)$/i, "").replace(/[-_]+/g, " ").replace(/\s{2,}/g, " ").trim();
+  }
+
+  function detectNaatKhwan(title) {
+    const t = (title || "").toLowerCase();
+    if (t.includes("sabir") || t.includes("صابر") || t.includes("azhari") || t.includes("ازہری") || t.includes("साबिर")) return "sabira";
+    if (t.includes("rafiq") || t.includes("rafeeq") || t.includes("رفیق") || t.includes("रफ़ीक़")) return "rafiq";
+    if (t.includes("asjad") || t.includes("عسجد") || t.includes("اسجد") || t.includes("असजद")) return "asjad";
+    return "other";
+  }
+
+  function buildNaatTabsInBar() {
+    if (document.getElementById("tab-all-naats")) return;
+    const allEls = Array.from(document.querySelectorAll("button, div, span, a"));
+    const refTab = allEls.find(el => {
+      const txt = (el.innerText || "").trim();
+      return (txt === "امتحانی پرچے" || txt === "تمام کتب" || txt.includes("Math")) && el.children.length === 0;
+    });
+    if (!refTab || !refTab.parentElement) return;
+
+    const parentBar = refTab.parentElement;
+    const tabsToCreate = [
+      { id: "tab-all-naats", key: "all_naats", label: "تمام نعتیں" },
+      { id: "tab-asjad", key: "asjad", label: "حضور عسجد رضا" },
+      { id: "tab-sabira", key: "sabira", label: "صابر رضا ازہری" },
+      { id: "tab-rafiq", key: "rafiq", label: "رفیق رضا قادری" }
+    ];
+
+    tabsToCreate.reverse().forEach(item => {
+      const clone = refTab.cloneNode(true);
+      clone.id = item.id;
+      clone.classList.remove("active");
+      clone.innerText = item.label;
+      clone.removeAttribute("onclick");
+      clone.addEventListener("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.runJamiaFilter(item.key, clone);
+      });
+      if (parentBar.firstElementChild) {
+        parentBar.insertBefore(clone, parentBar.firstElementChild.nextSibling);
+      } else {
+        parentBar.appendChild(clone);
+      }
+    });
+
+    Array.from(parentBar.children).forEach(child => {
+      if (!child.id || !child.id.startsWith("tab-")) {
+        child.addEventListener("click", function() {
+          tabsToCreate.forEach(t => {
+            const el = document.getElementById(t.id);
+            if (el) el.classList.remove("active");
+          });
+        });
+      }
+    });
+  }
+
+  async function fetchNaatsFromDrive() {
+    if (window.JAMIA_NAATS_LIST.length > 0) return window.JAMIA_NAATS_LIST;
+    try {
+      const res = await fetch(NAATS_API_URL);
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        window.JAMIA_NAATS_LIST = data.map(nt => {
+          const neatTitle = cleanNaatTitle(nt.title);
+          return {
+            id: nt.id,
+            title: neatTitle,
+            naatKhwan: detectNaatKhwan(neatTitle),
+            subtitle: "آڈیو نعت شریف • " + (nt.size || "MP3"),
+            author: "جامعۃ الرضا آڈیو لائبریری",
+            category: "naat",
+            type: "audio",
+            language: "Urdu",
+            size: nt.size || "MP3",
+            pages: nt.size || "MP3",
+            coverClass: "cover-bahar",
+            icon: "fa-solid fa-music",
+            coverTitle: neatTitle.substring(0, 18),
+            audioUrl: "https://drive.google.com/file/d/" + nt.id + "/preview",
+            downloadName: neatTitle + ".mp3",
+            allowDownload: true
+          };
+        });
+      }
+    } catch (err) {}
+    return window.JAMIA_NAATS_LIST;
+  }
+
+  // 1. Play Audio with Working Close Button Fix
+  window.playAudio = function(audioUrlOrId, title) {
+    const bar = document.getElementById("emeraldAudioBar");
+    const titleEl = document.getElementById("audioPlayerTitle");
+    const timeEl = document.getElementById("audioPlayerTime");
+    const icon = document.getElementById("audioPlayIcon");
+    const prog = document.getElementById("audioProgressBar");
+
+    const cleanT = cleanNaatTitle(title);
+    if (titleEl) titleEl.innerText = cleanT;
+    if (timeEl) timeEl.innerText = "نیچے پلے بٹن دبائیں 👇";
+    if (icon) icon.className = "fa-solid fa-music";
+    if (prog) prog.style.display = "none";
+    if (bar) bar.style.display = "block";
+
+    let fileId = audioUrlOrId;
+    const idMatch = (audioUrlOrId || "").match(/id=([^&]+)/) || (audioUrlOrId || "").match(/\/d\/([^\/]+)/);
+    if (idMatch) fileId = idMatch[1];
+
+    // Close button (Cross X) ko 100% active karna
+    const closeBtn = bar.querySelector(".fa-xmark, .fa-times")?.closest("button, div") || bar.firstElementChild?.querySelector("button, span, i");
+    if (closeBtn) {
+      closeBtn.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.closeAudioPlayerFully();
+      };
+    }
+
+    document.querySelectorAll(".driveEmbedBoxClass").forEach(el => el.remove());
+
+    const embedWrap = document.createElement("div");
+    embedWrap.className = "driveEmbedBoxClass";
+    embedWrap.style.cssText = "width:100%; height:140px; overflow:hidden; border-radius:12px; margin-top:10px; border:2px solid #00ffa3; background:#031810;";
+
+    const iframe = document.createElement("iframe");
+    iframe.src = "https://drive.google.com/file/d/" + fileId + "/preview";
+    iframe.allow = "autoplay";
+    iframe.style.cssText = "width:100%; height:200px; border:none; margin-top:-30px;";
+
+    embedWrap.appendChild(iframe);
+    bar.appendChild(embedWrap);
+  };
+
+  // 2. Cross button Dabate hi Player hatana
+  window.closeAudioPlayerFully = function() {
+    const bar = document.getElementById("emeraldAudioBar");
+    if (bar) bar.style.display = "none";
+    const audio = document.getElementById("globalHtmlAudio");
+    if (audio) { audio.pause(); audio.src = ""; }
+    document.querySelectorAll(".driveEmbedBoxClass").forEach(el => el.remove());
+  };
+
+  // 3. DD Music Style Timer Modal Handlers
+  window.cycleSleepTimer = function() {
+    const m = document.getElementById("ddMusicSleepModal");
+    if (m) m.style.display = "flex";
+  };
+
+  window.closeDdTimerModal = function() {
+    const m = document.getElementById("ddMusicSleepModal");
+    if (m) m.style.display = "none";
+  };
+
+  window.setDdQuickTime = function(h, m, s) {
+    document.getElementById("ddHours").value = (h < 10 ? "0" : "") + h;
+    document.getElementById("ddMinutes").value = (m < 10 ? "0" : "") + m;
+    document.getElementById("ddSeconds").value = (s < 10 ? "0" : "") + s;
+  };
+
+  window.startDdTimer = function() {
+    const h = parseInt(document.getElementById("ddHours").value, 10) || 0;
+    const m = parseInt(document.getElementById("ddMinutes").value, 10) || 0;
+    const s = parseInt(document.getElementById("ddSeconds").value, 10) || 0;
+
+    sleepTotalSecs = (h * 3600) + (m * 60) + s;
+    closeDdTimerModal();
+
+    const txtEl = document.getElementById("sleepTimerText");
+    const badgeEl = document.getElementById("sleepTimerBadge");
+
+    if (sleepIntervalId) clearInterval(sleepIntervalId);
+
+    if (sleepTotalSecs <= 0) {
+      if (txtEl) txtEl.innerText = "ٹائمر";
+      if (badgeEl) badgeEl.style.display = "none";
+      return;
+    }
+
+    if (txtEl) txtEl.innerText = (h > 0 ? h + "h " : "") + (m > 0 ? m + "m" : s + "s");
+    if (badgeEl) {
+      badgeEl.style.display = "block";
+      badgeEl.innerText = "🌙 سونے کا ٹائمر سیٹ ہو گیا ہے";
+    }
+
+    sleepIntervalId = setInterval(() => {
+      sleepTotalSecs--;
+      if (sleepTotalSecs <= 0) {
+        clearInterval(sleepIntervalId);
+        window.closeAudioPlayerFully();
+        if (txtEl) txtEl.innerText = "ٹائمر";
+        if (badgeEl) badgeEl.style.display = "none";
+      } else if (badgeEl) {
+        const rh = Math.floor(sleepTotalSecs / 3600);
+        const rm = Math.floor((sleepTotalSecs % 3600) / 60);
+        const rs = sleepTotalSecs % 60;
+        badgeEl.innerText = "🌙 ٹائمر باقی: " + (rh > 0 ? rh + ":" : "") + (rm < 10 ? "0" + rm : rm) + ":" + (rs < 10 ? "0" + rs : rs);
+      }
+    }, 1000);
+  };
+
+  function cleanRenderedNaatCards() {
+    document.querySelectorAll("button[onclick*='playAudio']").forEach(btn => {
+      const card = btn.closest(".book-card") || btn.parentElement.parentElement;
+      if (!card) return;
+      const walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT, null, false);
+      let node;
+      while ((node = walker.nextNode())) {
+        let val = node.nodeValue;
+        if (val.includes("b.type") || val.includes("مکمل کتاب")) {
+          val = val.replace(/\$\{.*?\}/g, "آڈیو نعت").replace(/b\.type.*?\}/g, "آڈیو نعت").replace("مکمل کتاب", "آڈیو نعت");
+        }
+        val = val.replace("دینیات", "نعت شریف").replace("صفحات:", "سائز:").replace("مؤلف:", "پیشکش:");
+        node.nodeValue = val;
+      }
+    });
+  }
+
+  window.runJamiaFilter = async function(catKey, clickedEl) {
+    if (clickedEl && clickedEl.parentElement) {
+      Array.from(clickedEl.parentElement.children).forEach(c => c.classList.remove("active"));
+      clickedEl.classList.add("active");
+    }
+
+    const allNaats = await fetchNaatsFromDrive();
+    let filtered = [];
+
+    if (catKey === "all_naats") {
+      filtered = allNaats;
+    } else {
+      filtered = allNaats.filter(n => n.naatKhwan === catKey);
+    }
+
+    if (typeof renderBooks === "function") {
+      renderBooks(filtered);
+      setTimeout(cleanRenderedNaatCards, 40);
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", function() {
+    buildNaatTabsInBar();
+    fetchNaatsFromDrive();
+    setInterval(() => {
+      buildNaatTabsInBar();
+      cleanRenderedNaatCards();
+    }, 800);
+  });
+  setTimeout(buildNaatTabsInBar, 300);
+  fetchNaatsFromDrive();
+})();
+</script>
+
+</body>
+</html>
