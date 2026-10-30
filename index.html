@@ -1051,6 +1051,37 @@
     animation: pShakeAnim 0.35s ease !important;
   }
 </style>
+<style>
+  /* Floating Emerald Audio Player */
+  #emeraldAudioBar {
+    display: none;
+    position: fixed;
+    bottom: 12px;
+    left: 5%;
+    width: 90%;
+    max-width: 480px;
+    background: radial-gradient(circle at top, #0d3326 0%, #051a13 100%);
+    border: 1px solid rgba(0, 255, 163, 0.45);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85), 0 0 18px rgba(0, 255, 163, 0.2);
+    border-radius: 14px;
+    padding: 10px 14px;
+    z-index: 99999;
+    direction: rtl;
+    box-sizing: border-box;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  #emeraldAudioBar.active {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    animation: slideUpAudio 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes slideUpAudio {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+</style>
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -1437,7 +1468,7 @@
 
             <!-- Action Buttons -->
             <div class="j-btn-row">
-              <button type="button" class="j-btn-read" onclick="openFullscreenPdf('${safeId}', '${safeTitle}')">مطالعہ کریں</button>
+              ${b.type === 'audio' || b.category === 'naat' ? `<button type="button" class="j-btn-read" style="background:#0e4429 !important; border-color:#00ffa3 !important; color:#00ffa3 !important;" onclick="playAudio('${b.audioUrl}', '${safeTitle}')"><i class="fa-solid fa-play" style="margin-left:5px;"></i> سنیں</button>` : `<button type="button" class="j-btn-read" onclick="openFullscreenPdf('${safeId}', '${safeTitle}')">مطالعہ کریں</button>`}
               <button type="button" class="j-btn-intro" onclick="showBookIntro('${safeTitle}', '${b.category || ''}')">تعارف</button>
               <button type="button" class="j-btn-down" title="ڈاؤنلوڈ" onclick="startDirectDownload(event, '${safeId}', '${safeDownloadName}')"><i class="fa-solid fa-download"></i></button>
               <button type="button" class="j-btn-share" title="شیئر" onclick="shareBookItem('${safeTitle}', '${safeId}')"><i class="fa-solid fa-share-nodes"></i></button>
@@ -1524,6 +1555,80 @@
     }
 
     
+    
+    const NAATS_API_URL = "https://script.google.com/macros/s/AKfycbwi02ykZWWmq3nedwL0ULzk730QAJbwo7E_saM0hM32DOBI7ATrdWijHxvKfTZeY95-Ug/exec";
+
+    function playAudio(audioUrl, title) {
+      const bar = document.getElementById("emeraldAudioBar");
+      const audio = document.getElementById("globalHtmlAudio");
+      const titleEl = document.getElementById("audioPlayerTitle");
+      const icon = document.getElementById("audioPlayIcon");
+
+      titleEl.innerText = title;
+      if (audio.src !== audioUrl) {
+        audio.src = audioUrl;
+      }
+
+      bar.classList.add("active");
+      audio.play().then(() => {
+        icon.className = "fa-solid fa-pause";
+      }).catch(err => {
+        console.log("Audio play error:", err);
+      });
+    }
+
+    function togglePlayPauseAudio() {
+      const audio = document.getElementById("globalHtmlAudio");
+      const icon = document.getElementById("audioPlayIcon");
+      if (audio.paused) {
+        audio.play();
+        icon.className = "fa-solid fa-pause";
+      } else {
+        audio.pause();
+        icon.className = "fa-solid fa-play";
+      }
+    }
+
+    function closeAudioPlayer() {
+      const bar = document.getElementById("emeraldAudioBar");
+      const audio = document.getElementById("globalHtmlAudio");
+      audio.pause();
+      bar.classList.remove("active");
+    }
+
+    function seekAudio(percent) {
+      const audio = document.getElementById("globalHtmlAudio");
+      if (audio.duration) {
+        audio.currentTime = (percent / 100) * audio.duration;
+      }
+    }
+
+    // Progress aur timer update
+    document.addEventListener("DOMContentLoaded", function() {
+      const audio = document.getElementById("globalHtmlAudio");
+      const bar = document.getElementById("audioProgressBar");
+      const timeEl = document.getElementById("audioPlayerTime");
+      const icon = document.getElementById("audioPlayIcon");
+
+      if (!audio) return;
+
+      audio.ontimeupdate = function() {
+        if (audio.duration) {
+          bar.value = (audio.currentTime / audio.duration) * 100;
+          let curM = Math.floor(audio.currentTime / 60);
+          let curS = Math.floor(audio.currentTime % 60);
+          let durM = Math.floor(audio.duration / 60);
+          let durS = Math.floor(audio.duration % 60);
+          timeEl.innerText = (curM < 10 ? "0"+curM : curM) + ":" + (curS < 10 ? "0"+curS : curS) + " / " + (durM < 10 ? "0"+durM : durM) + ":" + (durS < 10 ? "0"+durS : durS);
+        }
+      };
+
+      audio.onended = function() {
+        icon.className = "fa-solid fa-play";
+        bar.value = 0;
+      };
+    });
+
     const DRIVE_API_URL = "https://script.google.com/macros/s/AKfycbxlxUIrFPytt9CAkJxUxKuls6Lq8_yL5dq1rac_hOpp-GOYzFIntmoQB-q5u1npyWVw_w/exec";
 
     async function loadDynamicBooks() {
@@ -1538,6 +1643,28 @@
       try {
         const res = await fetch(DRIVE_API_URL);
         const dynamicBooks = await res.json();
+        try {
+          const nRes = await fetch(NAATS_API_URL);
+          const naats = await nRes.json();
+          if (Array.isArray(naats)) {
+            naats.forEach(nt => {
+              dynamicBooks.push({
+                id: nt.id,
+                title: nt.title,
+                subtitle: "آڈیو نعت شریف",
+                category: "naat",
+                type: "audio",
+                coverClass: "cover-bahar",
+                icon: "fa-solid fa-music",
+                coverTitle: nt.title.substring(0, 18),
+                size: nt.size || "Audio",
+                audioUrl: nt.audioUrl || ("https://docs.google.com/uc?export=download&id=" + nt.id),
+                downloadName: (nt.downloadName || nt.title) + ".mp3",
+                allowDownload: true
+              });
+            });
+          }
+        } catch(nErr) { console.log("Naats fetch skipped:", nErr); }
 
         const combined = [...LIBRARY_DATA];
         dynamicBooks.forEach(db => {
@@ -1778,5 +1905,31 @@
       </div>
     </div>
   </div>
+
+  <!-- Floating Bottom Emerald Audio Player -->
+  <div id="emeraldAudioBar">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;">
+        <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(0,255,163,0.15); border: 1px solid rgba(0,255,163,0.4); display: flex; align-items: center; justify-content: center; color: #00ffa3; flex-shrink: 0;">
+          <i class="fa-solid fa-music"></i>
+        </div>
+        <div style="min-width: 0;">
+          <div id="audioPlayerTitle" style="font-size: 0.82rem; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right;">نعت شریف</div>
+          <div id="audioPlayerTime" style="font-size: 0.68rem; color: #94a3b8; direction: ltr; text-align: right;">0:00 / 0:00</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button id="audioPlayPauseBtn" onclick="togglePlayPauseAudio()" type="button" style="width: 34px; height: 34px; border-radius: 50%; background: #00ffa3; color: #031810; border: none; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+          <i id="audioPlayIcon" class="fa-solid fa-play"></i>
+        </button>
+        <button onclick="closeAudioPlayer()" type="button" style="background: transparent; border: none; color: #94a3b8; font-size: 1rem; cursor: pointer; padding: 4px;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+    <input type="range" id="audioProgressBar" min="0" max="100" value="0" oninput="seekAudio(this.value)" style="width: 100%; height: 4px; accent-color: #00ffa3; cursor: pointer; margin: 4px 0 0 0;">
+    <audio id="globalHtmlAudio" preload="none"></audio>
+  </div>
+
 </body>
 </html>
