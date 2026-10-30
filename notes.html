@@ -3,11 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Jamia Al-Raza Digital Library - جامعۃ الرضا ڈیجیٹل کتب خانہ | Suhail Husain</title>
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Jamia Al-Raza Digital Library for students featuring books, Naats, and papers by Suhail Husain.">
-    <meta name="author" content="Suhail Husain">
-    <!-- Original Title tag was: --> <title style="display:none">جامعۃ الرضا - اختصاصی تعلیمی و امتحانی کتب خانہ</title>
+  <title>جامعۃ الرضا - اختصاصی تعلیمی و امتحانی کتب خانہ</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1432,7 +1428,7 @@
       booksToRender.forEach((b, index) => {
         const itemNumber = index + 1;
         const isExamPaper = (b.category === "papers") || b.title.toLowerCase().includes("paper") || b.title.includes("پرچہ");
-        const statusText = isExamPaper ? "امتحانی پرچہ" : "مکمل کتاب";
+        const statusText = isExamPaper ? "امتحانی پرچہ" : "${(b.type === 'audio' || b.category === 'naat') ? 'آڈیو نعت' : 'مکمل کتاب'}";
         const statusColor = isExamPaper ? "color:#fca5a5;" : "color:#00ffa3;";
         const catLabel = isExamPaper ? "امتحان" : (b.category === "math" ? "حساب" : (b.category === "hindi" ? "ہندی" : "دینیات"));
         const pagesCount = (b.pages || b.totalPages || b.pageCount || b.safhat) ? (b.pages || b.totalPages || b.pageCount || b.safhat) : (isExamPaper ? "12" : "—");
@@ -1468,7 +1464,7 @@
               <span class="j-meta-sep">|</span>
               <span>زبان: Urdu</span>
               <span class="j-meta-sep">|</span>
-              <span>صفحات: ${pagesCount}</span>
+              <span>${(b.type === 'audio' || b.category === 'naat') ? 'سائز: ' + (b.size || b.pages || 'MP3') : 'صفحات: ' + pagesCount}</span>
             </div>
 
             <!-- Action Buttons -->
@@ -1787,28 +1783,7 @@
       applyZoom();
     }
 
-    
-  function openFullscreenPdf(fileId, title) {
-    // Agar direct URL ho ya ID ho
-    let cleanId = fileId;
-    if (fileId.includes("id=")) {
-      const m = fileId.match(/id=([^&]+)/);
-      if (m) cleanId = m[1];
-    } else if (fileId.includes("/d/")) {
-      const m = fileId.match(/\/d\/([^\/]+)/);
-      if (m) cleanId = m[1];
-    }
-    const viewerUrl = "https://drive.google.com/file/d/" + cleanId + "/preview";
-    
-    // Naye tab me ya modal me kholna taaki "Document look-up failed" na aaye
-    const win = window.open(viewerUrl, '_blank');
-    if (!win) {
-      window.location.href = viewerUrl;
-    }
-  }
-
-  function _old_openFullscreenPdf
-(fileId, title) {
+    function openFullscreenPdf(fileId, title) {
       const tLower = (title || "").toLowerCase();
       const isPaper = tLower.includes("paper") || (title || "").includes("پرچہ") || (title || "").includes("امتحان") || tLower.includes("sania") || tLower.includes("rabia") || tLower.includes("salisa") || tLower.includes("ula");
 
@@ -1968,268 +1943,317 @@
 
 
 
-
-
-
-
-
-
-<!-- FLOATING EMERALD AUDIO PLAYER -->
-<div id="emeraldAudioBar" style="display: none; position: fixed; bottom: 12px; left: 5%; width: 90%; max-width: 480px; background: radial-gradient(circle at top, #0d3326 0%, #051a13 100%); border: 1px solid rgba(0, 255, 163, 0.45); box-shadow: 0 10px 30px rgba(0,0,0,0.85); border-radius: 14px; padding: 12px 16px; z-index: 99999; direction: rtl; box-sizing: border-box; backdrop-filter: blur(8px);">
-  
-  <div id="sleepTimerBadge" style="display:none; font-size:0.7rem; color:#00ffa3; text-align:center; background:rgba(0,255,163,0.1); border-radius:6px; padding:2px 6px; margin-bottom:6px;"></div>
-
-  <div style="display: flex; align-items: center; justify-content: space-between;">
-    <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
-      <div style="width:36px; height:36px; border-radius:10px; background:rgba(0,255,163,0.15); border:1px solid rgba(0,255,163,0.3); display:flex; align-items:center; justify-content:center; color:#00ffa3; flex-shrink:0;">
-        <i class="fa-solid fa-music"></i>
-      </div>
-      <div style="min-width: 0;">
-        <div id="audioPlayerTitle" style="font-size: 0.85rem; font-weight: bold; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">نعت شریف</div>
-        <div id="audioPlayerTime" style="font-size: 0.7rem; color: #94a3b8; direction: ltr; text-align:right;">0:00 / 0:00</div>
-      </div>
-    </div>
-    
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <!-- Sleep Timer Button -->
-      <button id="sleepTimerBtn" onclick="cycleSleepTimer()" type="button" title="سونے کا ٹائمر" style="background: rgba(0,255,163,0.12); border: 1px solid rgba(0,255,163,0.35); color: #00ffa3; border-radius: 8px; padding: 4px 8px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 4px;">
-        <i class="fa-solid fa-moon"></i> <span id="sleepTimerText">ٹائمر</span>
-      </button>
-
-      <!-- Full Screen Toggle Button -->
-      <button onclick="togglePlayerFullScreen()" type="button" title="فُل سکرین" style="background: rgba(0,255,163,0.12); border: 1px solid rgba(0,255,163,0.35); color: #00ffa3; border-radius: 8px; padding: 6px 9px; font-size: 0.8rem; cursor: pointer;">
-        <i id="fsIcon" class="fa-solid fa-expand"></i>
-      </button>
-
-      <!-- Play / Pause Button -->
-      <button onclick="toggleAudio()" style="width:36px; height:36px; border-radius:50%; background:#00ffa3; color:#031810; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;">
-        <i id="audioPlayIcon" class="fa-solid fa-pause"></i>
-      </button>
-
-      <!-- Close Player -->
-      <button onclick="closeAudioPlayer()" style="background:transparent; border:none; color:#94a3b8; font-size:1.1rem; cursor:pointer; padding:4px;"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-  </div>
-
-  <input type="range" id="audioProgressBar" min="0" max="100" value="0" style="width:100%; height:5px; accent-color:#00ffa3; margin-top:10px; cursor:pointer;">
-  <audio id="globalHtmlAudio" preload="auto"></audio>
-</div>
-
-<!-- MASTER LOGIC & STABLE FILTERS -->
-
-
-
-<script>
-  // Instant Naat Player Fix
-  window.playAudio = function(audioUrl, title) {
-    const bar = document.getElementById("emeraldAudioBar");
-    const audio = document.getElementById("globalHtmlAudio");
-    const titleEl = document.getElementById("audioPlayerTitle");
-    const timeEl = document.getElementById("audioPlayerTime");
-    const icon = document.getElementById("audioPlayIcon");
-
-    if (titleEl) titleEl.innerText = title || "نعت شریف";
-    if (timeEl) timeEl.innerText = "پلے ہو رہی ہے...";
-    if (bar) bar.style.display = "block";
-
-    let fileId = audioUrl;
-    const idMatch = (audioUrl || "").match(/id=([^&]+)/) || (audioUrl || "").match(/\/d\/([^\/]+)/);
-    if (idMatch) fileId = idMatch[1];
-
-    // Direct Google Drive download stream jo bina ruke bajti hai
-    const directUrl = "https://drive.usercontent.google.com/download?id=" + fileId + "&export=download";
-
-    audio.pause();
-    audio.src = directUrl;
-    audio.load();
-
-    audio.play().then(() => {
-      if (icon) icon.className = "fa-solid fa-pause";
-      if (timeEl) timeEl.innerText = "لائیو پلےबैक";
-    }).catch(err => {
-      console.log("Autoplay prevented, trying direct usercontent:", err);
-      if (timeEl) timeEl.innerText = "پلے بٹن دبائیں";
-      if (icon) icon.className = "fa-solid fa-play";
-    });
-  };
-</script>
-
-
-<script>
-  window.playAudio = function(audioUrl, title) {
-    const bar = document.getElementById("emeraldAudioBar");
-    const audio = document.getElementById("globalHtmlAudio");
-    const titleEl = document.getElementById("audioPlayerTitle");
-    const timeEl = document.getElementById("audioPlayerTime");
-    const icon = document.getElementById("audioPlayIcon");
-
-    if (titleEl) titleEl.innerText = title || "نعت شریف";
-    if (timeEl) timeEl.innerText = "بج رہی ہے...";
-    if (bar) bar.style.display = "block";
-
-    let fileId = audioUrl;
-    const idMatch = (audioUrl || "").match(/id=([^&]+)/) || (audioUrl || "").match(/\/d\/([^\/]+)/);
-    if (idMatch) fileId = idMatch[1];
-
-    // Google Drive direct download link
-    audio.pause();
-    audio.src = "https://drive.usercontent.google.com/download?id=" + fileId + "&export=download";
-    audio.load();
-
-    audio.play().then(() => {
-      if (icon) icon.className = "fa-solid fa-pause";
-      if (timeEl) timeEl.innerText = "پلے ہو رہی ہے";
-    }).catch(err => {
-      console.log("Play error:", err);
-      // Agar autoplay block ho to user ko play icon dabane ko kahein
-      if (timeEl) timeEl.innerText = "پلے بٹن دبا کر چلائیں";
-      if (icon) icon.className = "fa-solid fa-play";
-    });
-  };
-</script>
-
-
-<script>
-  window.playAudio = function(audioUrl, title) {
-    let fileId = audioUrl;
-    const idMatch = (audioUrl || "").match(/id=([^&]+)/) || (audioUrl || "").match(/\\/d\\/([^\\/]+)/);
-    if (idMatch) fileId = idMatch[1];
-
-    const directStream = "https://drive.google.com/uc?export=open&id=" + fileId;
-    
-    // Naye tab me audio player kholna ya play karna taki bina kisi rukawat ke baje
-    const playerWindow = window.open(directStream, "_blank");
-    if (!playerWindow) {
-      window.location.href = directStream;
-    }
-  };
-</script>
-\n
-<div id="jamiaAudioModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(2,15,11,0.92); z-index:999999; backdrop-filter:blur(10px); direction:rtl; box-sizing:border-box; padding:20px; flex-direction:column; align-items:center; justify-content:center;">
-  <div style="width:100%; max-width:500px; background:#07261d; border:1px solid rgba(0,255,163,0.4); border-radius:16px; padding:20px; box-shadow:0 15px 40px rgba(0,0,0,0.9); text-align:center; position:relative;">
-    <button onclick="closeJamiaAudioModal()" style="position:absolute; top:15px; left:15px; background:transparent; border:none; color:#00ffa3; font-size:1.4rem; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
-    <div style="width:60px; height:60px; margin:0 auto 15px auto; border-radius:50%; background:rgba(0,255,163,0.15); display:flex; align-items:center; justify-content:center; color:#00ffa3; font-size:1.5rem;">
-      <i class="fa-solid fa-headphones-simple"></i>
-    </div>
-    <h3 id="modalNaatTitle" style="color:#fff; font-size:1.1rem; margin-bottom:15px;">نعت شریف</h3>
-    <div id="modalAudioContainer" style="width:100%; margin-bottom:15px;"></div>
-    <p style="color:#94a3b8; font-size:0.75rem;">جامعۃ الرضا آڈیو لائبریری</p>
-  </div>
-</div>
-
 <script id="jamia-naats-master">
 (function() {
-  const API_URL = "https://script.google.com/macros/s/AKfycbwi02ykZWWmq3nedwL0ULzk730QAJbwo7E_saM0hM32DOBI7ATrdWijHxvKfTZeY95-Ug/exec";
+  const NAATS_API_URL = "https://script.google.com/macros/s/AKfycbwi02ykZWWmq3nedwL0ULzk730QAJbwo7E_saM0hM32DOBI7ATrdWijHxvKfTZeY95-Ug/exec";
   window.JAMIA_NAATS_LIST = [];
+  window.CURRENT_NAAT_INDEX = -1;
+  let sleepTimeoutId = null;
+  let sleepIntervalId = null;
+  let sleepMinutesLeft = 0;
 
-  function cleanTitle(raw) {
-    return (raw || "نعت شریف").replace(/\[.*?\]/g, "").replace(/\(.*?MP3.*?\)/gi, "").replace(/\.(mp3|m4a)$/i, "").replace(/[-_]+/g, " ").trim();
+  // Title me se faltu tags jaise (MP3 160K), [@bot] wagaira saaf karna
+  function cleanNaatTitle(raw) {
+    if (!raw) return "نعت شریف";
+    return raw
+      .replace(/\[.*?\]/g, "")
+      .replace(/\(\s*MP3[^)]*\)/gi, "")
+      .replace(/\(\s*\d+\s*K\s*\)/gi, "")
+      .replace(/[-_]+/g, " ")
+      .replace(/\s{2,}/g, " ")
+      .trim();
   }
 
-  function detectNaatKhwan(title) {
-    const t = (title || "").toLowerCase();
-    if (t.includes("sabir") || t.includes("صابر") || t.includes("azhari") || t.includes("ازہری") || t.includes("साबिर")) return "sabira";
-    if (t.includes("rafiq") || t.includes("rafeeq") || t.includes("رفیق") || t.includes("रफ़ीक़")) return "rafiq";
-    if (t.includes("asjad") || t.includes("عسجد") || t.includes("اسجد") || t.includes("असजद")) return "asjad";
-    return "other";
-  }
-
-  function buildTabs() {
+  // 1. Category Bar me 4 Naat Tabs lagana
+  function buildNaatTabsInBar() {
     if (document.getElementById("tab-all-naats")) return;
-    const ref = Array.from(document.querySelectorAll("button")).find(b => b.innerText.includes("تمام کتب") || b.innerText.includes("امتحانی پرچے"));
-    if (!ref || !ref.parentElement) return;
-    const parent = ref.parentElement;
-    const cls = ref.className.replace("active", "").trim();
+    const allEls = Array.from(document.querySelectorAll("button, div, span, a"));
+    const refTab = allEls.find(el => {
+      const txt = (el.innerText || "").trim();
+      return (txt === "امتحانی پرچے" || txt === "تمام کتب" || txt.includes("Math")) && el.children.length === 0;
+    });
+    if (!refTab || !refTab.parentElement) return;
 
-    const tabs = [
-      { id: "all_naats", label: "تمام نعتیں" },
-      { id: "asjad", label: "حضور عسجد رضا" },
-      { id: "sabira", label: "صابر رضا ازہری" },
-      { id: "rafiq", label: "رفیق رضا قادری" }
+    const parentBar = refTab.parentElement;
+    const tabsToCreate = [
+      { id: "tab-all-naats", key: "all_naats", label: "تمام نعتیں" },
+      { id: "tab-asjad", key: "asjad", label: "حضور عسجد رضا" },
+      { id: "tab-sabira", key: "sabira", label: "صابر رضا ازہری" },
+      { id: "tab-rafiq", key: "rafiq", label: "رفیق رضا قادری" }
     ];
 
-    tabs.reverse().forEach(t => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.id = "tab-" + t.id;
-      btn.className = cls;
-      btn.innerText = t.label;
-      btn.onclick = (e) => { e.preventDefault(); runFilter(t.id, btn); };
-      parent.insertBefore(btn, parent.firstChild.nextSibling);
+    tabsToCreate.reverse().forEach(item => {
+      const clone = refTab.cloneNode(true);
+      clone.id = item.id;
+      clone.classList.remove("active");
+      clone.innerText = item.label;
+      clone.removeAttribute("onclick");
+      clone.addEventListener("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.runJamiaFilter(item.key, clone);
+      });
+      if (parentBar.firstElementChild) {
+        parentBar.insertBefore(clone, parentBar.firstElementChild.nextSibling);
+      } else {
+        parentBar.appendChild(clone);
+      }
+    });
+
+    Array.from(parentBar.children).forEach(child => {
+      if (!child.id || !child.id.startsWith("tab-")) {
+        child.addEventListener("click", function() {
+          tabsToCreate.forEach(t => {
+            const el = document.getElementById(t.id);
+            if (el) el.classList.remove("active");
+          });
+        });
+      }
     });
   }
 
-  async function fetchNaats() {
+  // 2. Drive se Naats load karna aur sahi stream URL lagana
+  async function fetchNaatsFromDrive() {
     if (window.JAMIA_NAATS_LIST.length > 0) return window.JAMIA_NAATS_LIST;
     try {
-      const res = await fetch(API_URL);
+      const res = await fetch(NAATS_API_URL);
       const data = await res.json();
       if (Array.isArray(data)) {
-        window.JAMIA_NAATS_LIST = data.map(n => {
-          const ct = cleanTitle(n.title);
+        window.JAMIA_NAATS_LIST = data.map(nt => {
+          const neatTitle = cleanNaatTitle(nt.title);
           return {
-            id: n.id, title: ct, naatKhwan: detectNaatKhwan(ct),
-            subtitle: "آڈیو نعت شریف", author: "جامعۃ الرضا", category: "naat", type: "audio",
-            language: "Urdu", pages: n.size || "MP3", coverClass: "cover-bahar",
-            icon: "fa-solid fa-music", coverTitle: ct.substring(0, 18),
-            downloadName: ct + ".mp3", allowDownload: true,
-            audioUrl: "https://drive.google.com/file/d/" + n.id + "/preview"
+            id: nt.id,
+            title: neatTitle,
+            subtitle: "آڈیو نعت شریف • " + (nt.size || "MP3"),
+            author: "جامعۃ الرضا آڈیو لائبریری",
+            category: "naat",
+            subCategory: "نعت شریف",
+            type: "audio",
+            language: "Urdu",
+            size: nt.size || "MP3",
+            pages: nt.size || "MP3",
+            coverClass: "cover-bahar",
+            icon: "fa-solid fa-music",
+            coverTitle: neatTitle.substring(0, 18),
+            // Direct Google CDN URL jo bina ruke stream hota hai
+            audioUrl: "https://drive.usercontent.google.com/download?id=" + nt.id + "&export=download",
+            downloadName: nt.downloadName || (neatTitle + ".mp3"),
+            allowDownload: true
           };
         });
       }
-    } catch(e) { console.error(e); }
+    } catch (err) {
+      console.error("Naats API Error:", err);
+    }
     return window.JAMIA_NAATS_LIST;
   }
 
-  window.playAudio = function(url, title) {
-    let fileId = url;
-    const m = (url || "").match(/id=([^&]+)/) || (url || "").match(/\/d\/([^\/]+)/);
-    if (m) fileId = m[1];
+  // 3. Working Audio Player + Background MediaSession + Auto-Next
+  window.playAudio = function(audioUrl, title) {
+    const bar = document.getElementById("emeraldAudioBar");
+    const audio = document.getElementById("globalHtmlAudio");
+    const titleEl = document.getElementById("audioPlayerTitle");
+    const timeEl = document.getElementById("audioPlayerTime");
+    const icon = document.getElementById("audioPlayIcon");
 
-    const modal = document.getElementById("jamiaAudioModal");
-    const titleEl = document.getElementById("modalNaatTitle");
-    const container = document.getElementById("modalAudioContainer");
+    const cleanT = cleanNaatTitle(title);
+    if (titleEl) titleEl.innerText = cleanT;
+    if (timeEl) timeEl.innerText = "لوڈ ہو رہی ہے...";
+    if (bar) bar.classList.add("active");
 
-    if (titleEl) titleEl.innerText = cleanTitle(title);
-    if (container) {
-      container.innerHTML = '<iframe src="https://drive.google.com/file/d/' + fileId + '/preview" width="100%" height="80" style="border:none; border-radius:8px;" allow="autoplay"></iframe>';
+    // File ID nikal kar direct usercontent CDN stream banana
+    let fileId = "";
+    const idMatch = (audioUrl || "").match(/id=([^&]+)/) || (audioUrl || "").match(/\/d\/([^\/]+)/);
+    if (idMatch) fileId = idMatch[1];
+
+    const streamUrl = fileId
+      ? "https://drive.usercontent.google.com/download?id=" + fileId + "&export=download"
+      : audioUrl;
+
+    window.CURRENT_NAAT_INDEX = window.JAMIA_NAATS_LIST.findIndex(n => n.id === fileId || n.title === cleanT);
+
+    // Purana fallback iframe agar ho to hatana
+    const oldFrame = document.getElementById("driveAudioFallbackFrame");
+    if (oldFrame) oldFrame.remove();
+
+    audio.pause();
+    audio.src = streamUrl;
+    audio.load();
+
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        if (icon) icon.className = "fa-solid fa-pause";
+        setupBackgroundMediaSession(cleanT);
+      }).catch(err => {
+        console.warn("Direct audio tag blocked, using Drive stream embed:", err);
+        if (timeEl) timeEl.innerText = "پلے ہو رہی ہے (اسٹریم)";
+        if (icon) icon.className = "fa-solid fa-pause";
+        if (fileId) {
+          const iframe = document.createElement("iframe");
+          iframe.id = "driveAudioFallbackFrame";
+          iframe.src = "https://drive.google.com/file/d/" + fileId + "/preview";
+          iframe.allow = "autoplay";
+          iframe.style.cssText = "width:100%; height:48px; border:none; border-radius:8px; margin-top:4px;";
+          bar.appendChild(iframe);
+        }
+      });
     }
-    if (modal) {
-      modal.style.display = "flex";
-    }
+
+    // Jab ek naat khatam ho to agli naat khud chal pade (Background Continuous Play)
+    audio.onended = function() {
+      if (window.CURRENT_NAAT_INDEX >= 0 && window.CURRENT_NAAT_INDEX + 1 < window.JAMIA_NAATS_LIST.length) {
+        const nextNaat = window.JAMIA_NAATS_LIST[window.CURRENT_NAAT_INDEX + 1];
+        window.playAudio(nextNaat.audioUrl, nextNaat.title);
+      } else {
+        if (icon) icon.className = "fa-solid fa-play";
+      }
+    };
   };
 
-  window.closeJamiaAudioModal = function() {
-    const modal = document.getElementById("jamiaAudioModal");
-    const container = document.getElementById("modalAudioContainer");
-    if (container) container.innerHTML = "";
-    if (modal) modal.style.display = "none";
+  // Lock screen aur Notification bar controls (Background Playback)
+  function setupBackgroundMediaSession(title) {
+    if ("mediaSession" in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: title,
+        artist: "جامعۃ الرضا آڈیو لائبریری",
+        album: "نعت شریف"
+      });
+      const audio = document.getElementById("globalHtmlAudio");
+      navigator.mediaSession.setActionHandler("play", () => { audio.play(); });
+      navigator.mediaSession.setActionHandler("pause", () => { audio.pause(); });
+      navigator.mediaSession.setActionHandler("previoustrack", () => {
+        if (window.CURRENT_NAAT_INDEX > 0) {
+          const prev = window.JAMIA_NAATS_LIST[window.CURRENT_NAAT_INDEX - 1];
+          window.playAudio(prev.audioUrl, prev.title);
+        }
+      });
+      navigator.mediaSession.setActionHandler("nexttrack", () => {
+        if (window.CURRENT_NAAT_INDEX >= 0 && window.CURRENT_NAAT_INDEX + 1 < window.JAMIA_NAATS_LIST.length) {
+          const next = window.JAMIA_NAATS_LIST[window.CURRENT_NAAT_INDEX + 1];
+          window.playAudio(next.audioUrl, next.title);
+        }
+      });
+    }
+  }
+
+  // 4. Sleep Timer (15m -> 30m -> 45m -> 60m -> Off)
+  const timerSteps = [0, 15, 30, 45, 60];
+  let currentStepIdx = 0;
+
+  window.cycleSleepTimer = function() {
+    currentStepIdx = (currentStepIdx + 1) % timerSteps.length;
+    const mins = timerSteps[currentStepIdx];
+    const txtEl = document.getElementById("sleepTimerText");
+    const badgeEl = document.getElementById("sleepTimerBadge");
+
+    if (sleepTimeoutId) clearTimeout(sleepTimeoutId);
+    if (sleepIntervalId) clearInterval(sleepIntervalId);
+
+    if (mins === 0) {
+      if (txtEl) txtEl.innerText = "ٹائمر";
+      if (badgeEl) badgeEl.style.display = "none";
+      return;
+    }
+
+    sleepMinutesLeft = mins * 60;
+    if (txtEl) txtEl.innerText = mins + "m";
+    if (badgeEl) {
+      badgeEl.style.display = "block";
+      badgeEl.innerText = "🌙 سونے کا ٹائمر فعال: " + mins + " منٹ بعد نعت خود بند ہو جائے گی";
+    }
+
+    sleepIntervalId = setInterval(() => {
+      sleepMinutesLeft--;
+      if (sleepMinutesLeft <= 0) {
+        clearInterval(sleepIntervalId);
+        if (typeof closeAudioPlayer === "function") closeAudioPlayer();
+        if (txtEl) txtEl.innerText = "ٹائمر";
+        if (badgeEl) badgeEl.style.display = "none";
+        currentStepIdx = 0;
+      } else if (badgeEl) {
+        const m = Math.floor(sleepMinutesLeft / 60);
+        const s = sleepMinutesLeft % 60;
+        badgeEl.innerText = "🌙 ٹائمر باقی: " + m + " منٹ " + (s < 10 ? "0" + s : s) + " سیکنڈ";
+      }
+    }, 1000);
   };
 
-  window.runFilter = async function(cat, btn) {
-    if (btn && btn.parentElement) {
-      Array.from(btn.parentElement.children).forEach(c => c.classList.remove("active"));
-      btn.classList.add("active");
+  // 5. Taaruf Popup ko Naat ke mutabiq banana (کتاب کا تعارف -> نعت شریف کا تعارف)
+  document.addEventListener("click", function(e) {
+    setTimeout(() => {
+      const modals = document.querySelectorAll("div, h2, h3, p, span");
+      modals.forEach(el => {
+        if (el.children.length === 0 && el.innerText) {
+          if (el.innerText.includes("شعبہ: naat")) {
+            el.innerText = el.innerText.replace("کتاب:", "نعت شریف:").replace("شعبہ: naat", "شعبہ: آڈیو نعت شریف");
+            const parentModal = el.closest("div");
+            if (parentModal && parentModal.parentElement) {
+              parentModal.parentElement.innerHTML = parentModal.parentElement.innerHTML
+                .replace("کتاب کا تعارف", "نعت شریف کا تعارف")
+                .replace("مطالعہ کے لیے 'مطالعہ کریں' پر کلک فرمائیں۔", "سماعت کے لیے 'سنیں' بٹن پر کلک فرمائیں۔");
+            }
+          }
+        }
+      });
+    }, 50);
+  });
+
+  // 6. Filter Logic + Fix Card Badges after render
+  function fixRenderedNaatCards() {
+    document.querySelectorAll(".book-card, [class*='card']").forEach(card => {
+      if (card.innerHTML.includes("playAudio(")) {
+        card.innerHTML = card.innerHTML
+          .replace(/مکمل کتاب/g, "آڈیو نعت")
+          .replace(/دینیات/g, "نعت شریف")
+          .replace(/صفحات:\s*—/g, "آڈیو MP3")
+          .replace(/صفحات:/g, "سائز:")
+          .replace(/مؤلف:/g, "پیشکش:");
+      }
+    });
+  }
+
+  window.runJamiaFilter = async function(catKey, clickedEl) {
+    if (clickedEl && clickedEl.parentElement) {
+      Array.from(clickedEl.parentElement.children).forEach(c => c.classList.remove("active"));
+      clickedEl.classList.add("active");
     }
-    const all = await fetchNaats();
-    let res = (cat === "all_naats") ? all : all.filter(n => n.naatKhwan === cat);
+
+    const allNaats = await fetchNaatsFromDrive();
+    let filtered = [];
+
+    if (catKey === "all_naats") {
+      filtered = allNaats;
+    } else if (catKey === "asjad") {
+      filtered = allNaats.filter(n => {
+        const t = (n.title || "").toLowerCase();
+        return t.includes("asjad") || t.includes("عسجد") || t.includes("اسجد") || t.includes("असजद");
+      });
+    } else if (catKey === "sabira") {
+      filtered = allNaats.filter(n => {
+        const t = (n.title || "").toLowerCase();
+        return t.includes("sabir") || t.includes("صابر") || t.includes("azhari") || t.includes("ازہری") || t.includes("साबिर");
+      });
+    } else if (catKey === "rafiq") {
+      filtered = allNaats.filter(n => {
+        const t = (n.title || "").toLowerCase();
+        return t.includes("rafiq") || t.includes("rafeeq") || t.includes("رفیق") || t.includes("qadri") || t.includes("قادری") || t.includes("रफ़ीक़") || t.includes("रफीक");
+      });
+    }
 
     if (typeof renderBooks === "function") {
-      renderBooks(res);
-      setTimeout(() => {
-        document.querySelectorAll("button[onclick*='playAudio']").forEach(b => {
-          const c = b.closest(".book-card") || b.parentElement.parentElement;
-          if(c) c.innerHTML = c.innerHTML.replace(/مکمل کتاب/g, "آڈیو نعت").replace(/دینیات/g, "نعت شریف").replace(/صفحات:/g, "سائز:").replace(/مؤلف:/g, "پیشکش:");
-        });
-      }, 40);
+      renderBooks(filtered);
+      setTimeout(fixRenderedNaatCards, 60);
     }
   };
 
-  document.addEventListener("DOMContentLoaded", () => {
-    buildTabs();
-    fetchNaats();
+  document.addEventListener("DOMContentLoaded", function() {
+    buildNaatTabsInBar();
+    fetchNaatsFromDrive();
+    setInterval(buildNaatTabsInBar, 1000);
   });
-  setTimeout(buildTabs, 300);
+  setTimeout(buildNaatTabsInBar, 300);
+  fetchNaatsFromDrive();
 })();
 </script>
 
