@@ -1088,6 +1088,18 @@
     to { transform: translateY(0); opacity: 1; }
   }
 </style>
+
+  <!-- OneSignal Push Notification SDK -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "a4d0bc8e-b2ad-484a-ad60-3f68f99bce44",
+      });
+    });
+  </script>
+
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
