@@ -1449,7 +1449,7 @@
         const statusText = isExamPaper ? "امتحانی پرچہ" : "مکمل کتاب";
         const statusColor = isExamPaper ? "color:#fca5a5;" : "color:#00ffa3;";
         const catLabel = isExamPaper ? "امتحان" : (b.category === "math" ? "حساب" : (b.category === "hindi" ? "ہندی" : "دینیات"));
-        const pagesCount = (b.pages || b.totalPages || b.pageCount || b.safhat) ? (b.pages || b.totalPages || b.pageCount || b.safhat) : (isExamPaper ? "12" : "—");
+        const pagesCount = (!b.pages || b.pages === "-" || b.pages === "—") ? "مفصل" : b.pages;
         const authorText = isExamPaper ? "شعبۂ امتحانات • جامعۃ الرضا" : (b.author || "جامعۃ الرضا اسلامک ریسرچ سینٹر");
         const safeTitle = (b.title || "").replace(/'/g, "\\'");
         const safeId = b.id || "";
@@ -2006,6 +2006,23 @@
   let sleepIntervalId = null;
   let sleepTotalSecs = 0;
 
+  
+  function formatExactSize(sz) {
+    if (!sz) return "MP3";
+    if (typeof sz === "number") {
+      return (sz / (1024 * 1024)).toFixed(1) + " MB";
+    }
+    var str = String(sz).trim();
+    var match = str.match(/([0-9.]+)\s*(MB|KB|GB)?/i);
+    if (match) {
+      var num = parseFloat(match[1]);
+      var unit = (match[2] || "MB").toUpperCase();
+      // Agar browser 15.6 ko 14.9 kar raha tha toh accurate decimal format
+      return num.toFixed(1) + " " + unit;
+    }
+    return str;
+  }
+
   function cleanNaatTitle(raw) {
     if (!raw) return "نعت شریف";
     return raw.replace(/\[.*?\]/g, "").replace(/\(\s*MP3[^)]*\)/gi, "").replace(/\(\s*\d+\s*K\s*\)/gi, "").replace(/\.(mp3|m4a|wav|aac|ogg)$/i, "").replace(/[-_]+/g, " ").replace(/\s{2,}/g, " ").trim();
@@ -2088,8 +2105,8 @@
             category: "naat",
             type: "audio",
             language: "Urdu",
-            size: nt.size || "MP3",
-            pages: nt.size || "MP3",
+            size: (typeof formatExactSize === "function" ? formatExactSize(nt.size) : (nt.size || "MP3")),
+            pages: (typeof formatExactSize === "function" ? formatExactSize(nt.size) : (nt.size || "MP3")),
             coverClass: "cover-bahar",
             icon: "fa-solid fa-music",
             coverTitle: neatTitle.substring(0, 18),
