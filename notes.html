@@ -2076,6 +2076,7 @@
       const blinker = document.getElementById("jamiaSyncBlinker");
       if (blinker) blinker.style.display = "none";
 
+        if (window.hideJamiaBlinker) window.hideJamiaBlinker();
         window.JAMIA_NAATS_LIST = data.map(nt => {
           const neatTitle = cleanNaatTitle(nt.title);
           return {
@@ -2265,12 +2266,23 @@
 </script>
 
 
+
+
+
 <script>
-  // 5 second ke andar ya data aate hi laal light ko gayab karna
-  setTimeout(function() {
+  window.hideJamiaBlinker = function() {
     var b = document.getElementById("jamiaSyncBlinker");
-    if (b) { b.style.transition = "opacity 0.5s ease"; b.style.opacity = "0"; setTimeout(() => b.remove(), 500); }
-  }, 5000);
+    if (b) {
+      b.style.transition = "opacity 0.6s ease";
+      b.style.opacity = "0";
+      setTimeout(function() { if (b) b.remove(); }, 600);
+    }
+  };
+
+  // Jab pura data load ho jaye tab hide karein, ya max 7 second tak wait karein
+  window.addEventListener("load", function() {
+    setTimeout(window.hideJamiaBlinker, 6500);
+  });
 </script>
 
 </body>
