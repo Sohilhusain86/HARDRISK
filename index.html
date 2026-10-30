@@ -1698,7 +1698,7 @@
         });
 
         window.ALL_BOOKS_CACHE = combined;
-        renderBooks(combined);
+        renderBooks(combined.filter(b => b.type !== "audio" && b.category !== "naat"));
       } catch (err) {
         console.error("Fetch error:", err);
         if (typeof LIBRARY_DATA !== 'undefined') renderBooks(LIBRARY_DATA);
