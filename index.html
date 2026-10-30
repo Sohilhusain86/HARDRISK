@@ -1140,6 +1140,18 @@
       <input type="text" id="lib-search" placeholder="کتاب یا پرچہ تلاش کریں (Search)..." oninput="filterLibrary()">
     </div>
 
+<div id="jamiaSyncBlinker" style="display:flex; align-items:center; justify-content:center; gap:8px; margin:12px auto; padding:6px 14px; background:rgba(225,29,72,0.15); border:1px solid #e11d48; border-radius:20px; width:fit-content; direction:rtl; z-index:99;">
+  <span style="width:10px; height:10px; background:#e11d48; border-radius:50%; display:inline-block; box-shadow:0 0 10px #e11d48; animation:redPulseJamia 0.8s infinite alternate;"></span>
+  <span style="color:#fda4af; font-size:0.8rem; font-weight:600;">مزید کتب و نعتیں لوڈ ہو رہی ہیں...</span>
+</div>
+<style>
+@keyframes redPulseJamia {
+  0% { opacity: 0.2; transform: scale(0.8); box-shadow: 0 0 2px #e11d48; }
+  100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 14px #e11d48; }
+}
+</style>
+
+
     <div class="filter-tags">
       <div class="filter-tag active" onclick="setFilter('all', this)">تمام کتب</div>
       <div class="filter-tag" onclick="setFilter('papers', this)">امتحانی پرچے</div>
@@ -2244,6 +2256,15 @@
   setTimeout(buildNaatTabsInBar, 300);
   fetchNaatsFromDrive();
 })();
+</script>
+
+
+<script>
+  // 5 second ke andar ya data aate hi laal light ko gayab karna
+  setTimeout(function() {
+    var b = document.getElementById("jamiaSyncBlinker");
+    if (b) { b.style.transition = "opacity 0.5s ease"; b.style.opacity = "0"; setTimeout(() => b.remove(), 500); }
+  }, 5000);
 </script>
 
 </body>
