@@ -1933,16 +1933,76 @@
   </div>
 
 
-<script>
-  const NAATS_API_ENDPOINT = "https://script.google.com/macros/s/AKfycbwi02ykZWWmq3nedwL0ULzk730QAJbwo7E_saM0hM32DOBI7ATrdWijHxvKfTZeY95-Ug/exec";
-  window.LOADED_NAATS_LIST = [];
 
-  async function fetchAllJamiaNaats() {
+
+
+<script id="jamia-naats-master">
+(function() {
+  const NAATS_API_URL = "https://script.google.com/macros/s/AKfycbwi02ykZWWmq3nedwL0ULzk730QAJbwo7E_saM0hM32DOBI7ATrdWijHxvKfTZeY95-Ug/exec";
+  window.JAMIA_NAATS_LIST = [];
+
+  // 1. Page par maujood asli button ko clone karke 4 Naat tabs banana
+  function buildNaatTabsInBar() {
+    if (document.getElementById("tab-all-naats")) return;
+
+    // Kisi bhi existing category tab ko dhoondna (jaise امتحانی پرچے ya Math)
+    const allEls = Array.from(document.querySelectorAll("button, div, span, a"));
+    const refTab = allEls.find(el => {
+      const txt = (el.innerText || "").trim();
+      return (txt === "امتحانی پرچے" || txt === "تمام کتب" || txt.includes("Math")) && el.children.length === 0;
+    });
+
+    if (!refTab || !refTab.parentElement) return;
+
+    const parentBar = refTab.parentElement;
+    const tabsToCreate = [
+      { id: "tab-all-naats", key: "all_naats", label: "تمام نعتیں" },
+      { id: "tab-asjad", key: "asjad", label: "حضور عسجد رضا" },
+      { id: "tab-sabira", key: "sabira", label: "صابر رضا ازہری" },
+      { id: "tab-rafiq", key: "rafiq", label: "رفیق رضا قادری" }
+    ];
+
+    // Reference tab ka exact design copy karna
+    tabsToCreate.reverse().forEach(item => {
+      const clone = refTab.cloneNode(true);
+      clone.id = item.id;
+      clone.classList.remove("active");
+      clone.innerText = item.label;
+      clone.removeAttribute("onclick");
+      clone.addEventListener("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.runJamiaFilter(item.key, clone);
+      });
+      // Tamam Kutub ke baad ya sabse shuru me lagana
+      if (parentBar.firstElementChild) {
+        parentBar.insertBefore(clone, parentBar.firstElementChild.nextSibling);
+      } else {
+        parentBar.appendChild(clone);
+      }
+    });
+
+    // Purane tabs par click hone par active state sync rakhna
+    Array.from(parentBar.children).forEach(child => {
+      if (!child.id || !child.id.startsWith("tab-")) {
+        child.addEventListener("click", function() {
+          tabsToCreate.forEach(t => {
+            const el = document.getElementById(t.id);
+            if (el) el.classList.remove("active");
+          });
+        });
+      }
+    });
+  }
+
+  // 2. Google Drive se 25 Naatein load karna
+  async function fetchNaatsFromDrive() {
+    if (window.JAMIA_NAATS_LIST.length > 0) return window.JAMIA_NAATS_LIST;
     try {
-      const res = await fetch(NAATS_API_ENDPOINT);
+      const res = await fetch(NAATS_API_URL);
       const data = await res.json();
       if (Array.isArray(data)) {
-        window.LOADED_NAATS_LIST = data.map((nt, idx) => ({
+        window.JAMIA_NAATS_LIST = data.map(nt => ({
           id: nt.id,
           title: nt.title || "نعت شریف",
           subtitle: "آڈیو نعت شریف • " + (nt.size || "MP3"),
@@ -1952,82 +2012,68 @@
           language: "Urdu",
           pages: nt.size || "Audio",
           coverClass: "cover-bahar",
-          icon: "fa-solid fa-headphones",
-          coverTitle: (nt.title || "نعت شریف").substring(0, 20),
+          icon: "fa-solid fa-music",
+          coverTitle: (nt.title || "نعت شریف").substring(0, 18),
           audioUrl: "https://docs.google.com/uc?export=download&id=" + nt.id,
           downloadName: nt.downloadName || ((nt.title || "naat") + ".mp3"),
           allowDownload: true
         }));
-        console.log("Loaded Naats:", window.LOADED_NAATS_LIST.length);
       }
-    } catch (e) {
-      console.error("Naat load error:", e);
+    } catch (err) {
+      console.error("Naats API Error:", err);
     }
+    return window.JAMIA_NAATS_LIST;
   }
 
-  // Page khulte hi Naats load karein
-  fetchAllJamiaNaats();
-
-  // Filter function ko poori tarah override karna
-  window.filterBooks = async function(cat) {
-    window.currentFilter = cat;
-
-    // Button active highlight theek karna
-    document.querySelectorAll("[onclick*='filterBooks']").forEach(el => {
-      el.classList.remove("active");
-      const oc = el.getAttribute("onclick") || "";
-      if (oc.includes("'" + cat + "'") || oc.includes('"' + cat + '"')) {
-        el.classList.add("active");
-      }
-    });
-
-    // Agar naat tab dabaya aur abhi tak load nahi hui to turant load karein
-    if (["all_naats", "naat", "asjad", "sabira", "rafiq"].includes(cat) && window.LOADED_NAATS_LIST.length === 0) {
-      await fetchAllJamiaNaats();
+  // 3. Naat Tabs par click hone par filter chalana
+  window.runJamiaFilter = async function(catKey, clickedEl) {
+    // Sabhi buttons se active class hata kar clicked button ko active karna
+    if (clickedEl && clickedEl.parentElement) {
+      Array.from(clickedEl.parentElement.children).forEach(c => c.classList.remove("active"));
+      clickedEl.classList.add("active");
     }
 
-    // Kitabon ka data nikalna
-    let baseBooks = [];
-    if (typeof ALL_BOOKS_CACHE !== "undefined" && ALL_BOOKS_CACHE.length > 0) {
-      baseBooks = ALL_BOOKS_CACHE;
-    } else if (typeof LIBRARY_DATA !== "undefined" && LIBRARY_DATA.length > 0) {
-      baseBooks = LIBRARY_DATA;
-    } else if (typeof books !== "undefined" && books.length > 0) {
-      baseBooks = books;
+    const container = document.getElementById("books-grid") || document.getElementById("library-grid") || document.querySelector(".books-grid");
+    if (container && window.JAMIA_NAATS_LIST.length === 0) {
+      container.innerHTML = '<div style="color:#00ffa3; text-align:center; padding:30px; grid-column:1/-1; font-size:1.1rem;"><i class="fa-solid fa-spinner fa-spin"></i> نعتیں لوڈ ہو رہی ہیں...</div>';
     }
 
-    // Kitabon me se audio alag rakhna
-    let onlyBooks = baseBooks.filter(b => b.type !== "audio" && b.category !== "naat");
-    let onlyNaats = window.LOADED_NAATS_LIST;
+    const allNaats = await fetchNaatsFromDrive();
+    let filtered = [];
 
-    let result = [];
-    if (cat === "all") {
-      result = onlyBooks;
-    } else if (cat === "all_naats" || cat === "naat") {
-      result = onlyNaats;
-    } else if (cat === "asjad") {
-      result = onlyNaats.filter(n => {
-        let t = (n.title || "").toLowerCase();
+    if (catKey === "all_naats") {
+      filtered = allNaats;
+    } else if (catKey === "asjad") {
+      filtered = allNaats.filter(n => {
+        const t = (n.title || "").toLowerCase();
         return t.includes("asjad") || t.includes("عسجد") || t.includes("اسجد");
       });
-    } else if (cat === "sabira") {
-      result = onlyNaats.filter(n => {
-        let t = (n.title || "").toLowerCase();
-        return t.includes("sabir") || t.includes("صابر") || t.includes("azhari") || t.includes("ازہری") || t.includes("zahri");
+    } else if (catKey === "sabira") {
+      filtered = allNaats.filter(n => {
+        const t = (n.title || "").toLowerCase();
+        return t.includes("sabir") || t.includes("صابر") || t.includes("azhari") || t.includes("ازہری") || t.includes("zahri") || t.includes("zehri");
       });
-    } else if (cat === "rafiq") {
-      result = onlyNaats.filter(n => {
-        let t = (n.title || "").toLowerCase();
+    } else if (catKey === "rafiq") {
+      filtered = allNaats.filter(n => {
+        const t = (n.title || "").toLowerCase();
         return t.includes("rafiq") || t.includes("rafeeq") || t.includes("رفیق") || t.includes("qadri") || t.includes("قادری");
       });
-    } else {
-      result = onlyBooks.filter(b => b.category === cat);
     }
 
     if (typeof renderBooks === "function") {
-      renderBooks(result);
+      renderBooks(filtered);
     }
   };
+
+  // Har 500ms par check karke bar me buttons lagana aur background me naats mangwana
+  document.addEventListener("DOMContentLoaded", function() {
+    buildNaatTabsInBar();
+    fetchNaatsFromDrive();
+    setInterval(buildNaatTabsInBar, 800);
+  });
+  setTimeout(buildNaatTabsInBar, 300);
+  fetchNaatsFromDrive();
+})();
 </script>
 
 </body>
