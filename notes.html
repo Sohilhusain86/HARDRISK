@@ -2438,5 +2438,21 @@
   };
 </script>
 
-</body>
+
+<script>
+  window.playAudio = function(audioUrl, title) {
+    let fileId = audioUrl;
+    const idMatch = (audioUrl || "").match(/id=([^&]+)/) || (audioUrl || "").match(/\\/d\\/([^\\/]+)/);
+    if (idMatch) fileId = idMatch[1];
+
+    const directStream = "https://drive.google.com/uc?export=open&id=" + fileId;
+    
+    // Naye tab me audio player kholna ya play karna taki bina kisi rukawat ke baje
+    const playerWindow = window.open(directStream, "_blank");
+    if (!playerWindow) {
+      window.location.href = directStream;
+    }
+  };
+</script>
+\n</body>
 </html>
