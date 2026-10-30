@@ -1335,26 +1335,39 @@
     }
 
     function runFileDownload(btn, origText, fileId, filename) {
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ڈاؤنلوڈ...';
-      btn.style.pointerEvents = "none";
+      if (btn) {
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ڈاؤنلوڈ...';
+        btn.style.pointerEvents = "none";
+      }
 
       var directUrl = "https://drive.usercontent.google.com/download?id=" + fileId + "&export=download&authuser=0";
+      
+      // Mobile direct download
+      var iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.src = directUrl;
+      document.body.appendChild(iframe);
+
+      // Backup direct link trigger
       var a = document.createElement("a");
       a.href = directUrl;
       a.setAttribute("download", filename);
-      a.target = "_blank";
       document.body.appendChild(a);
       a.click();
 
       setTimeout(function() {
-        btn.innerHTML = origText;
-        btn.style.pointerEvents = "auto";
+        if (btn) {
+          btn.innerHTML = origText;
+          btn.style.pointerEvents = "auto";
+        }
+        try { document.body.removeChild(iframe); } catch(e){}
+        try { document.body.removeChild(a); } catch(e){}
       }, 3500);
     }
 
     function startDirectDownload(e, fileId, filename) {
-      var btn = e.currentTarget;
-      var origText = btn.innerHTML;
+      var btn = e ? (e.currentTarget || e.target) : null;
+      var origText = btn ? btn.innerHTML : '<i class="fa-solid fa-download"></i>';
       var fnLower = (filename || "").toLowerCase();
       var isPaper = fnLower.includes("paper") || (filename || "").includes("پرچہ") || fnLower.includes("sania") || fnLower.includes("rabia") || fnLower.includes("salisa") || fnLower.includes("ula");
 
