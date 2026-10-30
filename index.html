@@ -1656,6 +1656,19 @@
     }
 
     function openFullscreenPdf(fileId, title) {
+      const tLower = (title || "").toLowerCase();
+      const isPaper = tLower.includes("paper") || (title || "").includes("پرچہ") || (title || "").includes("امتحان") || tLower.includes("sania") || tLower.includes("rabia") || tLower.includes("salisa") || tLower.includes("ula");
+
+      // Sirf parchhon ke liye direct Drive app viewer kholna
+      if (isPaper) {
+        const a = document.createElement("a");
+        a.href = "https://drive.google.com/file/d/" + fileId + "/view?usp=drivesdk";
+        a.target = "_blank";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        return;
+      }
       const viewer = document.getElementById('pdf-viewer-overlay');
       const frame = document.getElementById('fullscreen-frame');
       document.getElementById('viewer-title').innerText = title;
