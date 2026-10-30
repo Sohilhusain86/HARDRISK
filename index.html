@@ -1948,13 +1948,14 @@
 
 
 
+
 <script id="jamia-naats-master">
 (function() {
   const NAATS_API_URL = "https://script.google.com/macros/s/AKfycbwi02ykZWWmq3nedwL0ULzk730QAJbwo7E_saM0hM32DOBI7ATrdWijHxvKfTZeY95-Ug/exec";
   window.JAMIA_NAATS_LIST = [];
   window.CURRENT_NAAT_INDEX = -1;
   let sleepIntervalId = null;
-  let sleepSecondsLeft = 0;
+  let sleepTotalSeconds = 0;
 
   function cleanNaatTitle(raw) {
     if (!raw) return "نعت شریف";
@@ -2045,7 +2046,7 @@
             coverClass: "cover-bahar",
             icon: "fa-solid fa-music",
             coverTitle: neatTitle.substring(0, 18),
-            audioUrl: "https://drive.usercontent.google.com/download?id=" + nt.id + "&export=download",
+            audioUrl: "https://drive.google.com/file/d/" + nt.id + "/preview",
             downloadName: neatTitle + ".mp3",
             allowDownload: true
           };
@@ -2055,9 +2056,9 @@
     return window.JAMIA_NAATS_LIST;
   }
 
+  // 1 Single Bada Box jisme agar ek url fail ho to usi box ke andar dusra/teesra fallback khule
   window.playAudio = function(audioUrlOrId, title) {
     const bar = document.getElementById("emeraldAudioBar");
-    const audio = document.getElementById("globalHtmlAudio");
     const titleEl = document.getElementById("audioPlayerTitle");
     const timeEl = document.getElementById("audioPlayerTime");
     const icon = document.getElementById("audioPlayIcon");
@@ -2076,53 +2077,86 @@
 
     window.CURRENT_NAAT_INDEX = window.JAMIA_NAATS_LIST.findIndex(n => n.id === fileId || n.title === cleanT);
 
-    // Purane embed boxes hatana taaki nayi naat aane par naye 3 boxes banein
+    // Purane sabhi boxes hatana
     document.querySelectorAll(".driveEmbedBoxClass").forEach(el => el.remove());
 
-    // Wahi 3 boxes lekin ab height 95px aur iframe 160px taaki play button aur wave poori tarah dikhe
-    for (let i = 0; i < 3; i++) {
-      const embedWrap = document.createElement("div");
-      embedWrap.className = "driveEmbedBoxClass";
-      embedWrap.style.cssText = "width:100%; height:95px; overflow:hidden; border-radius:12px; margin-top:8px; border:1px solid #00ffa3; background:#051a13;";
-      embedWrap.innerHTML = '<iframe src="https://drive.google.com/file/d/' + fileId + '/preview" allow="autoplay" style="width:100%; height:160px; border:none; margin-top:-38px;"></iframe>';
-      bar.appendChild(embedWrap);
-    }
+    // Single bada box
+    const embedWrap = document.createElement("div");
+    embedWrap.className = "driveEmbedBoxClass";
+    embedWrap.style.cssText = "width:100%; height:140px; overflow:hidden; border-radius:12px; margin-top:10px; border:2px solid #00ffa3; background:#031810;";
+
+    const fallbackSources = [
+      "https://drive.google.com/file/d/" + fileId + "/preview",
+      "https://docs.google.com/file/d/" + fileId + "/preview",
+      "https://drive.usercontent.google.com/download?id=" + fileId + "&export=download"
+    ];
+
+    let currentSrcIndex = 0;
+    const iframe = document.createElement("iframe");
+    iframe.src = fallbackSources[currentSrcIndex];
+    iframe.allow = "autoplay";
+    iframe.style.cssText = "width:100%; height:200px; border:none; margin-top:-30px;";
+
+    // Fallback logic: Agar load na ho to usi iframe ke andar dusra source lagana
+    iframe.onerror = function() {
+      currentSrcIndex++;
+      if (currentSrcIndex < fallbackSources.length) {
+        iframe.src = fallbackSources[currentSrcIndex];
+      }
+    };
+
+    embedWrap.appendChild(iframe);
+    bar.appendChild(embedWrap);
   };
 
-  const timerSteps = [0, 15, 30, 45, 60];
-  let currentStepIdx = 0;
-
+  // Custom User Choice Sleep Timer (Minute aur Second)
   window.cycleSleepTimer = function() {
-    currentStepIdx = (currentStepIdx + 1) % timerSteps.length;
-    const mins = timerSteps[currentStepIdx];
+    const userTime = prompt("سونے کا ٹائمر سیٹ کریں:\nمنٹس اور سیکنڈز درج کریں (مثلاً: 10:30 یا صرف 5):", "10:00");
+    if (!userTime) return;
+
+    let mins = 0;
+    let secs = 0;
+
+    if (userTime.includes(":")) {
+      const parts = userTime.split(":");
+      mins = parseInt(parts[0], 10) || 0;
+      secs = parseInt(parts[1], 10) || 0;
+    } else {
+      mins = parseInt(userTime, 10) || 0;
+    }
+
+    sleepTotalSeconds = (mins * 60) + secs;
+
     const txtEl = document.getElementById("sleepTimerText");
     const badgeEl = document.getElementById("sleepTimerBadge");
 
     if (sleepIntervalId) clearInterval(sleepIntervalId);
 
-    if (mins === 0) {
+    if (sleepTotalSeconds <= 0) {
       if (txtEl) txtEl.innerText = "ٹائمر";
       if (badgeEl) badgeEl.style.display = "none";
       return;
     }
 
-    sleepSecondsLeft = mins * 60;
-    if (txtEl) txtEl.innerText = mins + "m";
+    if (txtEl) txtEl.innerText = (mins > 0 ? mins + "m " : "") + (secs > 0 ? secs + "s" : "");
     if (badgeEl) {
       badgeEl.style.display = "block";
-      badgeEl.innerText = "🌙 سونے کا ٹائمر: " + mins + " منٹ بعد نعت خود بند ہو جائے گی";
+      badgeEl.innerText = "🌙 ٹائمر سیٹ: " + mins + " منٹ " + secs + " سیکنڈ بعد بند ہو جائے گی";
     }
 
     sleepIntervalId = setInterval(() => {
-      sleepSecondsLeft--;
-      if (sleepSecondsLeft <= 0) {
+      sleepTotalSeconds--;
+      if (sleepTotalSeconds <= 0) {
         clearInterval(sleepIntervalId);
         const bar = document.getElementById("emeraldAudioBar");
         if (bar) bar.style.display = "none";
         document.querySelectorAll(".driveEmbedBoxClass").forEach(el => el.remove());
         if (txtEl) txtEl.innerText = "ٹائمر";
         if (badgeEl) badgeEl.style.display = "none";
-        currentStepIdx = 0;
+      } else if (badgeEl) {
+        const m = Math.floor(sleepTotalSeconds / 60);
+        const s = sleepTotalSeconds % 60;
+        badgeEl.innerText = "🌙 ٹائمر باقی: " + m + ":" + (s < 10 ? "0" + s : s);
       }
     }, 1000);
   };
