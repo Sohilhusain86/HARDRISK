@@ -2404,5 +2404,39 @@
   };
 </script>
 
+
+<script>
+  window.playAudio = function(audioUrl, title) {
+    const bar = document.getElementById("emeraldAudioBar");
+    const audio = document.getElementById("globalHtmlAudio");
+    const titleEl = document.getElementById("audioPlayerTitle");
+    const timeEl = document.getElementById("audioPlayerTime");
+    const icon = document.getElementById("audioPlayIcon");
+
+    if (titleEl) titleEl.innerText = title || "نعت شریف";
+    if (timeEl) timeEl.innerText = "بج رہی ہے...";
+    if (bar) bar.style.display = "block";
+
+    let fileId = audioUrl;
+    const idMatch = (audioUrl || "").match(/id=([^&]+)/) || (audioUrl || "").match(/\/d\/([^\/]+)/);
+    if (idMatch) fileId = idMatch[1];
+
+    // Google Drive direct download link
+    audio.pause();
+    audio.src = "https://drive.usercontent.google.com/download?id=" + fileId + "&export=download";
+    audio.load();
+
+    audio.play().then(() => {
+      if (icon) icon.className = "fa-solid fa-pause";
+      if (timeEl) timeEl.innerText = "پلے ہو رہی ہے";
+    }).catch(err => {
+      console.log("Play error:", err);
+      // Agar autoplay block ho to user ko play icon dabane ko kahein
+      if (timeEl) timeEl.innerText = "پلے بٹن دبا کر چلائیں";
+      if (icon) icon.className = "fa-solid fa-play";
+    });
+  };
+</script>
+
 </body>
 </html>
