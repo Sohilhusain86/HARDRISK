@@ -1,15 +1,9 @@
 <!DOCTYPE html>
 <html lang="ur" dir="rtl">
 <head>
-  <meta name="google-site-verification" content="YwNhHzAItEsJgBEWbSSmvZK2QNyGF1WmkDrqADIRREA" />
-
-  <meta name="description" content="جامعۃ الرضا ڈیجیٹل کتب خانہ - اسلامی کتب، درسی کتب، امتحانی پرچے اور آڈیو نعت شریف کا آن لائن پورٹل۔">
-  <meta name="keywords" content="Jamia Al-Raza Digital Maktaba, Jamia Al Raza Library, امتحانی پرچے, نعت شریف, جامعۃ الرضا">
-  <meta name="author" content="Suhail Husain">
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>جامعۃ الرضا ڈیجیٹل کتب خانہ | Jamia Al-Raza Digital Maktaba</title>
+  <title>جامعۃ الرضا - اختصاصی تعلیمی و امتحانی کتب خانہ</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1089,60 +1083,11 @@
   }
 </style>
 
-  <!-- OneSignal Push Notification SDK -->
-  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-  <script>
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    OneSignalDeferred.push(async function(OneSignal) {
-      await OneSignal.init({
-        appId: "a4d0bc8e-b2ad-484a-ad60-3f68f99bce44",
-      });
-    });
-  </script>
-
-
-<style id="audio-modes-timer-style">
-  .audio-controls-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 6px;
-    flex-wrap: wrap;
-  }
-  .player-mode-btn, .track-timer-btn {
-    background: rgba(16, 185, 129, 0.15);
-    border: 1px solid rgba(16, 185, 129, 0.4);
-    color: #10b981;
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 12px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    transition: all 0.2s ease;
-  }
-  .player-mode-btn:active, .track-timer-btn:active {
-    transform: scale(0.95);
-    background: rgba(16, 185, 129, 0.3);
-  }
-</style>
-
-
-
-
-
-
-
-
-
-
-
-<style id="jamia-clean-styles">
-  .jamia-mode-btn {
+<style id="audio-features-style">
+  .jamia-play-mode-btn {
     background: rgba(16, 185, 129, 0.2) !important;
     border: 1px solid #10b981 !important;
-    color: #fff !important;
+    color: #ffffff !important;
     border-radius: 8px !important;
     padding: 3px 8px !important;
     font-size: 11px !important;
@@ -1223,18 +1168,6 @@
       <i class="fa-solid fa-magnifying-glass"></i>
       <input type="text" id="lib-search" placeholder="کتاب یا پرچہ تلاش کریں (Search)..." oninput="filterLibrary()">
     </div>
-
-<div id="jamiaSyncBlinker" style="display:flex; align-items:center; justify-content:center; gap:8px; margin:12px auto; padding:6px 14px; background:rgba(225,29,72,0.15); border:1px solid #e11d48; border-radius:20px; width:fit-content; direction:rtl; z-index:99;">
-  <span style="width:10px; height:10px; background:#e11d48; border-radius:50%; display:inline-block; box-shadow:0 0 10px #e11d48; animation:redPulseJamia 0.8s infinite alternate;"></span>
-  <span style="color:#fda4af; font-size:0.8rem; font-weight:600;">مزید کتب و نعتیں لوڈ ہو رہی ہیں...</span>
-</div>
-<style>
-@keyframes redPulseJamia {
-  0% { opacity: 0.2; transform: scale(0.8); box-shadow: 0 0 2px #e11d48; }
-  100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 14px #e11d48; }
-}
-</style>
-
 
     <div class="filter-tags">
       <div class="filter-tag active" onclick="setFilter('all', this)">تمام کتب</div>
@@ -1527,7 +1460,7 @@
         const statusText = isExamPaper ? "امتحانی پرچہ" : "مکمل کتاب";
         const statusColor = isExamPaper ? "color:#fca5a5;" : "color:#00ffa3;";
         const catLabel = isExamPaper ? "امتحان" : (b.category === "math" ? "حساب" : (b.category === "hindi" ? "ہندی" : "دینیات"));
-        const pagesCount = (!b.pages || b.pages === "-" || b.pages === "—") ? "مفصل" : b.pages;
+        const pagesCount = (b.pages || b.totalPages || b.pageCount || b.safhat) ? (b.pages || b.totalPages || b.pageCount || b.safhat) : (isExamPaper ? "12" : "—");
         const authorText = isExamPaper ? "شعبۂ امتحانات • جامعۃ الرضا" : (b.author || "جامعۃ الرضا اسلامک ریسرچ سینٹر");
         const safeTitle = (b.title || "").replace(/'/g, "\\'");
         const safeId = b.id || "";
@@ -2020,8 +1953,8 @@
         <button id="audioPlayPauseBtn" onclick="togglePlayPauseAudio()" type="button" style="width: 34px; height: 34px; border-radius: 50%; background: #00ffa3; color: #031810; border: none; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; cursor: pointer;">
           <i id="audioPlayIcon" class="fa-solid fa-play"></i>
         </button>
-        <button id="sleepTimerBtn" onclick="cycleSleepTimer()" type="button" title="سونے کا ٹائمر</button><button type="button" id="audioModeBtn" class="mode-toggle-btn" onclick="cycleAudioPlayMode()" title="پلے انداز">⏭️ خودکار اگلی</button><button style="display:none" (Sleep Timer)" style="background: rgba(0,255,163,0.12); border: 1px solid rgba(0,255,163,0.35); color: #00ffa3; border-radius: 8px; padding: 4px 8px; font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; gap: 4px;">
-          <i class="fa-solid fa-moon"></i> <span id="sleepTimerText">ٹائمر</button><button type="button" id="audioModeBtn" class="mode-toggle-btn" onclick="cycleAudioPlayMode()" title="پلے انداز">⏭️ خودکار اگلی</button><button style="display:none"</span>
+        <button id="sleepTimerBtn" onclick="cycleSleepTimer()" type="button" title="سونے کا ٹائمر (Sleep Timer)" style="background: rgba(0,255,163,0.12); border: 1px solid rgba(0,255,163,0.35); color: #00ffa3; border-radius: 8px; padding: 4px 8px; font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+          <i class="fa-solid fa-moon"></i> <span id="sleepTimerText">ٹائمر</span>
         </button>
         <button onclick="closeAudioPlayer()" type="button" style="background: transparent; border: none; color: #94a3b8; font-size: 1rem; cursor: pointer; padding: 4px;">
           <i class="fa-solid fa-xmark"></i>
@@ -2067,7 +2000,6 @@
       <button type="button" onclick="setDdQuickTime(0, 30, 0)" style="background:#2a2b32; border:none; padding:10px; border-radius:20px; color:#cbd5e1; font-weight:600; font-size:0.85rem; cursor:pointer;">30m</button>
       <button type="button" onclick="setDdQuickTime(0, 45, 0)" style="background:#2a2b32; border:none; padding:10px; border-radius:20px; color:#cbd5e1; font-weight:600; font-size:0.85rem; cursor:pointer;">45m</button>
       <button type="button" onclick="setDdQuickTime(1, 0, 0)" style="background:#2a2b32; border:none; padding:10px; border-radius:20px; color:#cbd5e1; font-weight:600; font-size:0.85rem; cursor:pointer;">60m</button>
-        <button type="button" class="end-track-chip" onclick="setTimerToEndOfTrack()" style="grid-column: span 2; padding: 8px; border-radius: 8px; cursor: pointer;">⏳ نعت کا بقیہ وقت (End of track)</button>
     </div>
 
     <!-- Actions -->
@@ -2084,23 +2016,6 @@
   window.JAMIA_NAATS_LIST = [];
   let sleepIntervalId = null;
   let sleepTotalSecs = 0;
-
-  
-  function formatExactSize(sz) {
-    if (!sz) return "MP3";
-    if (typeof sz === "number") {
-      return (sz / (1024 * 1024)).toFixed(1) + " MB";
-    }
-    var str = String(sz).trim();
-    var match = str.match(/([0-9.]+)\s*(MB|KB|GB)?/i);
-    if (match) {
-      var num = parseFloat(match[1]);
-      var unit = (match[2] || "MB").toUpperCase();
-      // Agar browser 15.6 ko 14.9 kar raha tha toh accurate decimal format
-      return num.toFixed(1) + " " + unit;
-    }
-    return str;
-  }
 
   function cleanNaatTitle(raw) {
     if (!raw) return "نعت شریف";
@@ -2172,7 +2087,6 @@
       const blinker = document.getElementById("jamiaSyncBlinker");
       if (blinker) blinker.style.display = "none";
 
-        if (window.hideJamiaBlinker) window.hideJamiaBlinker();
         window.JAMIA_NAATS_LIST = data.map(nt => {
           const neatTitle = cleanNaatTitle(nt.title);
           return {
@@ -2184,8 +2098,8 @@
             category: "naat",
             type: "audio",
             language: "Urdu",
-            size: (typeof formatExactSize === "function" ? formatExactSize(nt.size) : (nt.size || "MP3")),
-            pages: (typeof formatExactSize === "function" ? formatExactSize(nt.size) : (nt.size || "MP3")),
+            size: nt.size || "MP3",
+            pages: nt.size || "MP3",
             coverClass: "cover-bahar",
             icon: "fa-solid fa-music",
             coverTitle: neatTitle.substring(0, 18),
@@ -2283,7 +2197,7 @@
     if (sleepIntervalId) clearInterval(sleepIntervalId);
 
     if (sleepTotalSecs <= 0) {
-      if (txtEl) txtEl.innerText = "ٹائمر</button><button type="button" id="audioModeBtn" class="mode-toggle-btn" onclick="cycleAudioPlayMode()" title="پلے انداز">⏭️ خودکار اگلی</button><button style="display:none"";
+      if (txtEl) txtEl.innerText = "ٹائمر";
       if (badgeEl) badgeEl.style.display = "none";
       return;
     }
@@ -2291,7 +2205,7 @@
     if (txtEl) txtEl.innerText = (h > 0 ? h + "h " : "") + (m > 0 ? m + "m" : s + "s");
     if (badgeEl) {
       badgeEl.style.display = "block";
-      badgeEl.innerText = "🌙 سونے کا ٹائمر</button><button type="button" id="audioModeBtn" class="mode-toggle-btn" onclick="cycleAudioPlayMode()" title="پلے انداز">⏭️ خودکار اگلی</button><button style="display:none" سیٹ ہو گیا ہے";
+      badgeEl.innerText = "🌙 سونے کا ٹائمر سیٹ ہو گیا ہے";
     }
 
     sleepIntervalId = setInterval(() => {
@@ -2299,13 +2213,13 @@
       if (sleepTotalSecs <= 0) {
         clearInterval(sleepIntervalId);
         window.closeAudioPlayerFully();
-        if (txtEl) txtEl.innerText = "ٹائمر</button><button type="button" id="audioModeBtn" class="mode-toggle-btn" onclick="cycleAudioPlayMode()" title="پلے انداز">⏭️ خودکار اگلی</button><button style="display:none"";
+        if (txtEl) txtEl.innerText = "ٹائمر";
         if (badgeEl) badgeEl.style.display = "none";
       } else if (badgeEl) {
         const rh = Math.floor(sleepTotalSecs / 3600);
         const rm = Math.floor((sleepTotalSecs % 3600) / 60);
         const rs = sleepTotalSecs % 60;
-        badgeEl.innerText = "🌙 ٹائمر</button><button type="button" id="audioModeBtn" class="mode-toggle-btn" onclick="cycleAudioPlayMode()" title="پلے انداز">⏭️ خودکار اگلی</button><button style="display:none" باقی: " + (rh > 0 ? rh + ":" : "") + (rm < 10 ? "0" + rm : rm) + ":" + (rs < 10 ? "0" + rs : rs);
+        badgeEl.innerText = "🌙 ٹائمر باقی: " + (rh > 0 ? rh + ":" : "") + (rm < 10 ? "0" + rm : rm) + ":" + (rs < 10 ? "0" + rs : rs);
       }
     }, 1000);
   };
@@ -2362,125 +2276,10 @@
 </script>
 
 
-
-
-
-<script>
-  window.hideJamiaBlinker = function() {
-    var b = document.getElementById("jamiaSyncBlinker");
-    if (b) {
-      b.style.transition = "opacity 0.6s ease";
-      b.style.opacity = "0";
-      setTimeout(function() { if (b) b.remove(); }, 600);
-    }
-  };
-
-  // Jab pura data load ho jaye tab hide karein, ya max 7 second tak wait karein
-  window.addEventListener("load", function() {
-    setTimeout(window.hideJamiaBlinker, 6500);
-  });
-</script>
-
-
-<script id="audio-advanced-features">
-  // Modes: 'next' (Auto Next), 'repeat' (Repeat Current), 'shuffle' (Random)
-  window.currentPlayMode = window.currentPlayMode || 'next';
-  window.jamiaSleepTimer = window.jamiaSleepTimer || null;
-
-  // Mode cycle function
-  window.cyclePlayMode = function() {
-    var btn = document.getElementById("jamiaPlayModeBtn");
-    if (!btn) return;
-    if (window.currentPlayMode === 'next') {
-      window.currentPlayMode = 'repeat';
-      btn.innerHTML = '🔁 نعت بار بار';
-      btn.title = 'ایک ہی نعت بار بار چلے گی';
-    } else if (window.currentPlayMode === 'repeat') {
-      window.currentPlayMode = 'shuffle';
-      btn.innerHTML = '🔀 بے ترتیب';
-      btn.title = 'بے ترتیب نعتیں چلیں گی';
-    } else {
-      window.currentPlayMode = 'next';
-      btn.innerHTML = '⏭️ اگلی نعت';
-      btn.title = 'نعت ختم ہونے پر اگلی چلے گی';
-    }
-  };
-
-  // Set Sleep Timer to remaining track duration
-  window.setRemainingTrackTimer = function() {
-    var audio = document.getElementById("jamiaAudioPlayer") || document.querySelector("audio");
-    if (!audio || isNaN(audio.duration)) {
-      alert("پہلے کوئی نعت پلے کریں!");
-      return;
-    }
-    var remainingSeconds = Math.max(1, Math.floor(audio.duration - audio.currentTime));
-    if (window.startCustomSleepTimer) {
-      window.startCustomSleepTimer(remainingSeconds);
-    } else {
-      clearTimeout(window.jamiaSleepTimer);
-      var display = document.getElementById("timerDisplay") || document.querySelector(".timer-badge");
-      window.jamiaSleepTimer = setTimeout(function() {
-        if (audio) { audio.pause(); audio.currentTime = 0; }
-        if (display) display.innerText = "ٹائمر</button><button type="button" id="audioModeBtn" class="mode-toggle-btn" onclick="cycleAudioPlayMode()" title="پلے انداز">⏭️ خودکار اگلی</button><button style="display:none" ختم";
-      }, remainingSeconds * 1000);
-      if (display) {
-        var mins = Math.floor(remainingSeconds / 60);
-        var secs = remainingSeconds % 60;
-        display.innerText = "🌙 بقیہ وقت: " + mins + "m " + (secs < 10 ? '0' : '') + secs + "s";
-      }
-    }
-  };
-
-  // Audio track ended event handler
-  window.handleAudioEnded = function() {
-    var audio = document.getElementById("jamiaAudioPlayer") || document.querySelector("audio");
-    if (!audio) return;
-
-    if (window.currentPlayMode === 'repeat') {
-      audio.currentTime = 0;
-      audio.play().catch(function(e){ console.log(e); });
-    } else if (window.currentPlayMode === 'shuffle') {
-      if (window.playRandomNaat) {
-        window.playRandomNaat();
-      } else if (window.JAMIA_NAATS_LIST && window.JAMIA_NAATS_LIST.length > 0) {
-        var randIndex = Math.floor(Math.random() * window.JAMIA_NAATS_LIST.length);
-        if (window.playNaatByIndex) window.playNaatByIndex(randIndex);
-      }
-    } else {
-      // Default: Next track
-      if (window.playNextNaat) {
-        window.playNextNaat();
-      }
-    }
-  };
-
-  // Attach 'ended' listener to audio player once DOM loads
-  function attachAudioPlayerListeners() {
-    var audio = document.getElementById("jamiaAudioPlayer") || document.querySelector("audio");
-    if (audio && !audio.hasAttribute("data-mode-attached")) {
-      audio.setAttribute("data-mode-attached", "true");
-      audio.addEventListener("ended", window.handleAudioEnded);
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", attachAudioPlayerListeners);
-  setInterval(attachAudioPlayerListeners, 2000);
-</script>
-
-
-
-
-
-
-
-
-
-
-
-<script id="jamia-clean-logic">
+<script id="audio-features-script">
 (function() {
-  // 1. RED DOT (5 SECONDS DISPLAY ON LOAD & LOGIN)
-  function triggerRedDot() {
+  // 1. RED DOT (5 SECONDS ON REFRESH & ON LOGIN)
+  function startRedDot5s() {
     var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"], #recDot, #liveDot');
     if (dots.length > 0) {
       dots.forEach(function(d) {
@@ -2499,11 +2298,11 @@
     }
   }
 
-  // 2. PLAY MODES: NEXT / REPEAT / SHUFFLE
+  // 2. MODES: NEXT / REPEAT / SHUFFLE
   window.jamiaPlayMode = localStorage.getItem("jamia_play_mode") || "next";
 
-  function updateModeUI() {
-    var btn = document.getElementById("jamiaModeBtn");
+  function refreshModeBtn() {
+    var btn = document.getElementById("jamiaPlayModeBtn");
     if (!btn) return;
     if (window.jamiaPlayMode === "repeat") {
       btn.innerHTML = "🔁 وہی نعت بار بار";
@@ -2520,15 +2319,15 @@
     }
   }
 
-  window.toggleAudioMode = function() {
+  window.cycleJamiaPlayMode = function() {
     if (window.jamiaPlayMode === "next") window.jamiaPlayMode = "repeat";
     else if (window.jamiaPlayMode === "repeat") window.jamiaPlayMode = "shuffle";
     else window.jamiaPlayMode = "next";
     localStorage.setItem("jamia_play_mode", window.jamiaPlayMode);
-    updateModeUI();
+    refreshModeBtn();
   };
 
-  // 3. SLEEP TIMER FOR REMAINING NAAT DURATION
+  // 3. END-OF-TRACK SLEEP TIMER
   window.setRemainingSleepTimer = function() {
     var audio = document.querySelector("audio");
     if (!audio || isNaN(audio.duration) || audio.duration === 0) {
@@ -2561,20 +2360,20 @@
     alert("ٹائمر سیٹ ہو گیا: " + (hrs > 0 ? hrs + " گھنٹہ " : "") + mins + " منٹ " + secs + " سیکنڈ (نعت کے اختتام تک)");
   };
 
-  // DOM INJECTION & EVENT HOOKS
-  function setupUIEnhancements() {
+  // DOM INJECTION
+  function injectControls() {
     // Mode button next to moon/timer button
     var timerBtn = Array.from(document.querySelectorAll("button")).find(function(b) {
       return b.innerText && b.innerText.includes("ٹائمر");
     });
-    if (timerBtn && !document.getElementById("jamiaModeBtn")) {
+    if (timerBtn && !document.getElementById("jamiaPlayModeBtn")) {
       var mBtn = document.createElement("button");
-      mBtn.id = "jamiaModeBtn";
+      mBtn.id = "jamiaPlayModeBtn";
       mBtn.type = "button";
-      mBtn.className = "jamia-mode-btn";
-      mBtn.onclick = window.toggleAudioMode;
+      mBtn.className = "jamia-play-mode-btn";
+      mBtn.onclick = window.cycleJamiaPlayMode;
       timerBtn.parentNode.insertBefore(mBtn, timerBtn.nextSibling);
-      updateModeUI();
+      refreshModeBtn();
     }
 
     // End-of-track button inside sleep timer modal
@@ -2589,10 +2388,10 @@
       modal.appendChild(eBtn);
     }
 
-    // Audio onEnded event
+    // Audio onEnded event listener
     var audio = document.querySelector("audio");
-    if (audio && !audio.dataset.cleanBound) {
-      audio.dataset.cleanBound = "true";
+    if (audio && !audio.dataset.modeAttached) {
+      audio.dataset.modeAttached = "true";
       audio.addEventListener("ended", function() {
         if (window.jamiaPlayMode === "repeat") {
           audio.currentTime = 0;
@@ -2621,15 +2420,15 @@
   }
 
   document.addEventListener("DOMContentLoaded", function() {
-    triggerRedDot();
-    setupUIEnhancements();
+    startRedDot5s();
+    injectControls();
   });
-  setInterval(setupUIEnhancements, 1200);
+  setInterval(injectControls, 1200);
 
-  // Trigger red dot on login
+  // Trigger red dot on login button click
   document.addEventListener("click", function(e) {
     if (e.target && e.target.innerText && (e.target.innerText.includes("تصدیق") || e.target.innerText.includes("داخل"))) {
-      setTimeout(triggerRedDot, 500);
+      setTimeout(startRedDot5s, 500);
     }
   });
 })();
