@@ -2326,5 +2326,63 @@
 })();
 </script>
 
+
+<script id="jamia-reddot-5s-engine">
+(function() {
+  function activateRedDot5s() {
+    var targets = [];
+    
+    // 1. "مزید کتب و نعتیں" wala loading badge dhoondhna
+    var allElements = document.querySelectorAll("div, p, span");
+    allElements.forEach(function(el) {
+      if (el.children.length === 0 && el.innerText && el.innerText.includes("مزید کتب و نعتیں")) {
+        var box = el.closest("div") || el;
+        if (!targets.includes(box)) targets.push(box);
+      }
+    });
+
+    // 2. Red dot elements dhoondhna
+    var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"], #recDot, #liveDot');
+    dots.forEach(function(d) {
+      if (!targets.includes(d)) targets.push(d);
+    });
+
+    if (targets.length === 0) return;
+
+    // Show elements
+    targets.forEach(function(t) {
+      t.style.display = 'inline-flex';
+      t.style.visibility = 'visible';
+      t.style.opacity = '1';
+    });
+
+    // 5 Second ke baad fade out karna
+    if (window.jamiaRedTimer) clearTimeout(window.jamiaRedTimer);
+    window.jamiaRedTimer = setTimeout(function() {
+      targets.forEach(function(t) {
+        t.style.transition = 'opacity 0.6s ease';
+        t.style.opacity = '0';
+        setTimeout(function() {
+          if (t.style.opacity === '0') t.style.display = 'none';
+        }, 600);
+      });
+    }, 5000); // 5000ms = Poore 5 Seconds
+  }
+
+  // Page load par chalana
+  document.addEventListener("DOMContentLoaded", function() {
+    activateRedDot5s();
+  });
+  setTimeout(activateRedDot5s, 400);
+
+  // Login button click hone par chalana
+  document.addEventListener("click", function(e) {
+    if (e.target && (e.target.id === "btn-login" || e.target.closest("#btn-login") || (e.target.innerText && e.target.innerText.includes("داخل")))) {
+      setTimeout(activateRedDot5s, 300);
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
