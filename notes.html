@@ -1104,8 +1104,11 @@
 
 
 
-<style id="jamia-scoped-title-fix">
-  .j-card h3, .j-card .card-title, .j-card [class*="title"] {
+
+
+
+<style id="jamia-title-reddot-fix">
+  .j-card h3, .j-card .card-title, .book-card h3 {
     white-space: normal !important;
     word-break: break-word !important;
     display: -webkit-box !important;
@@ -2333,6 +2336,59 @@
 
 
 
+
+
+<script id="jamia-reddot-script">
+(function() {
+  function activateRedDot5s() {
+    var targets = [];
+    var allEls = document.querySelectorAll("div, p, span");
+    allEls.forEach(function(el) {
+      if (el.children.length === 0 && el.innerText && el.innerText.includes("مزید کتب و نعتیں")) {
+        var box = el.closest("div") || el;
+        if (!targets.includes(box)) targets.push(box);
+      }
+    });
+
+    var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"]');
+    dots.forEach(function(d) {
+      if (!targets.includes(d)) targets.push(d);
+    });
+
+    if (targets.length === 0) return;
+
+    targets.forEach(function(t) {
+      t.style.display = 'inline-flex';
+      t.style.visibility = 'visible';
+      t.style.opacity = '1';
+    });
+
+    if (window.jamiaRedDotTimer) clearTimeout(window.jamiaRedDotTimer);
+    window.jamiaRedDotTimer = setTimeout(function() {
+      targets.forEach(function(t) {
+        t.style.transition = 'opacity 0.5s ease';
+        t.style.opacity = '0';
+        setTimeout(function() {
+          if (t.style.opacity === '0') t.style.display = 'none';
+        }, 500);
+      });
+    }, 5000); // 5 Seconds poore
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    activateRedDot5s();
+  });
+  setTimeout(activateRedDot5s, 300);
+
+  // Login button par click hote hi 5s red dot dobara chalega
+  var loginBtn = document.getElementById("btn-login");
+  if (loginBtn) {
+    loginBtn.addEventListener("click", function() {
+      setTimeout(activateRedDot5s, 400);
+    });
+  }
+})();
+</script>
 
 </body>
 </html>
