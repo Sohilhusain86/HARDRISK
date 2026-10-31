@@ -2238,5 +2238,147 @@
 })();
 </script>
 
+
+<script id="jamia-perfect-engine">
+(function() {
+  // 1. RED DOT & LOADING BADGE (5 SECONDS ON REFRESH & LOGIN)
+  function triggerRedDot5s() {
+    // Dhundo red dot ya "مزید کتب و نعتیں" wala banner
+    var badges = Array.from(document.querySelectorAll("div, p, span, button")).filter(function(el) {
+      return el.innerText && el.innerText.includes("مزید کتب و نعتیں");
+    });
+    var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"]');
+
+    var elementsToToggle = badges.concat(Array.from(dots));
+    elementsToToggle.forEach(function(el) {
+      el.style.display = 'inline-block';
+      el.style.visibility = 'visible';
+      el.style.opacity = '1';
+    });
+
+    if (window.redDotTimer) clearTimeout(window.redDotTimer);
+    window.redDotTimer = setTimeout(function() {
+      elementsToToggle.forEach(function(el) {
+        el.style.opacity = '0';
+        setTimeout(function() {
+          if (el.style.opacity === '0') el.style.display = 'none';
+        }, 400);
+      });
+    }, 5000); // Poore 5 seconds
+  }
+
+  // 2. PLAY MODES LOGIC
+  window.jamiaPlayMode = localStorage.getItem("jamia_play_mode") || "next"; // next, repeat, shuffle
+  window.currentPlayingIndex = 0;
+
+  function updateModeUI() {
+    var btn = document.getElementById("jamiaPlayModeBtn");
+    if (!btn) return;
+    if (window.jamiaPlayMode === "repeat") {
+      btn.innerHTML = "🔁 وہی نعت بار بار";
+      btn.style.borderColor = "#f59e0b";
+      btn.style.color = "#f59e0b";
+    } else if (window.jamiaPlayMode === "shuffle") {
+      btn.innerHTML = "🔀 بے ترتیب";
+      btn.style.borderColor = "#38bdf8";
+      btn.style.color = "#38bdf8";
+    } else {
+      btn.innerHTML = "⏭️ اگلی نعت";
+      btn.style.borderColor = "#10b981";
+      btn.style.color = "#10b981";
+    }
+  }
+
+  window.cycleJamiaPlayMode = function() {
+    if (window.jamiaPlayMode === "next") window.jamiaPlayMode = "repeat";
+    else if (window.jamiaPlayMode === "repeat") window.jamiaPlayMode = "shuffle";
+    else window.jamiaPlayMode = "next";
+    localStorage.setItem("jamia_play_mode", window.jamiaPlayMode);
+    updateModeUI();
+  };
+
+  // 3. TRACK NAAT SELECTION & AUTO-PLAY
+  function getSunenButtons() {
+    return Array.from(document.querySelectorAll("button")).filter(function(b) {
+      return b.innerText && b.innerText.includes("سنیں");
+    });
+  }
+
+  function bindSunenButtons() {
+    var buttons = getSunenButtons();
+    buttons.forEach(function(btn, idx) {
+      if (!btn.dataset.indexBound) {
+        btn.dataset.indexBound = "true";
+        btn.addEventListener("click", function() {
+          window.currentPlayingIndex = idx;
+        });
+      }
+    });
+  }
+
+  function playNextTrack() {
+    var buttons = getSunenButtons();
+    if (buttons.length === 0) return;
+
+    if (window.jamiaPlayMode === "repeat") {
+      var audio = document.querySelector("audio");
+      if (audio) { audio.currentTime = 0; audio.play(); }
+    } else if (window.jamiaPlayMode === "shuffle") {
+      var randIdx = Math.floor(Math.random() * buttons.length);
+      window.currentPlayingIndex = randIdx;
+      buttons[randIdx].click();
+    } else {
+      // Auto Next
+      var nextIdx = window.currentPlayingIndex + 1;
+      if (nextIdx >= buttons.length) nextIdx = 0; // wapas pehli naat par
+      window.currentPlayingIndex = nextIdx;
+      buttons[nextIdx].click();
+    }
+  }
+
+  // 4. ATTACH TO AUDIO PLAYER
+  function bindAudioPlayer() {
+    var audio = document.querySelector("audio");
+    if (audio && !audio.dataset.perfectBound) {
+      audio.dataset.perfectBound = "true";
+      audio.addEventListener("ended", function() {
+        playNextTrack();
+      });
+      // Safety check agar ended event miss ho jaye
+      audio.addEventListener("timeupdate", function() {
+        if (audio.duration && audio.currentTime >= audio.duration - 0.3) {
+          if (!audio.dataset.endedTriggered) {
+            audio.dataset.endedTriggered = "true";
+            playNextTrack();
+            setTimeout(function(){ audio.dataset.endedTriggered = ""; }, 2000);
+          }
+        }
+      });
+    }
+  }
+
+  // Hook everything
+  document.addEventListener("DOMContentLoaded", function() {
+    triggerRedDot5s();
+    updateModeUI();
+    bindSunenButtons();
+    bindAudioPlayer();
+  });
+
+  setInterval(function() {
+    updateModeUI();
+    bindSunenButtons();
+    bindAudioPlayer();
+  }, 1000);
+
+  // Hook Login button
+  document.addEventListener("click", function(e) {
+    if (e.target && e.target.innerText && (e.target.innerText.includes("تصدیق") || e.target.innerText.includes("داخل"))) {
+      setTimeout(triggerRedDot5s, 400);
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
