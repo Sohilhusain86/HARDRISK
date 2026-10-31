@@ -1124,6 +1124,58 @@
   }
 </style>
 
+
+<style id="jamia-remaining-styles">
+  .j-book-title {
+    white-space: normal !important;
+    word-break: break-word !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    line-height: 1.4 !important;
+    font-size: 0.95rem !important;
+  }
+  #jamiaSafeLoadMoreBox {
+    text-align: center;
+    margin: 25px auto 40px auto;
+    width: 100%;
+    display: block;
+  }
+  .jamia-loadmore-btn {
+    background: linear-gradient(135deg, #0e4429, #10b981) !important;
+    color: #ffffff !important;
+    border: 1px solid #00ffa3 !important;
+    padding: 10px 26px !important;
+    border-radius: 25px !important;
+    font-size: 13px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 15px rgba(0, 255, 163, 0.25) !important;
+    transition: transform 0.2s ease !important;
+  }
+  .jamia-loadmore-btn:active {
+    transform: scale(0.95) !important;
+  }
+  .j-extra-tab {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border: 1px solid rgba(16, 185, 129, 0.4) !important;
+    color: #d1fae5 !important;
+    padding: 6px 14px !important;
+    border-radius: 20px !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+    cursor: pointer !important;
+    margin: 0 4px !important;
+    transition: all 0.2s ease !important;
+  }
+  .j-extra-tab.active, .j-extra-tab:hover {
+    background: #10b981 !important;
+    color: #ffffff !important;
+    border-color: #00ffa3 !important;
+  }
+</style>
+
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -2064,9 +2116,12 @@
 
 
 
+
+
+
 <script id="jamia-drive-cleaner-engine">
 (function() {
-  // Title replacements map
+  // --- A. DATA MAPPINGS ---
   var cleanTitlesMap = {
     "00458 Lataef-Asharif-3-ur-LQ (1)": "لطائفِ اشرفی (جلد سوم)",
     "00458 Lataef-Asharif-3-ur-LQ": "لطائفِ اشرفی (جلد سوم)",
@@ -2082,27 +2137,65 @@
     "ٹی وی اور آئینہ کی": "ٹی وی اور آئینہ کی تصویر میں فرق"
   };
 
+  var classicalAuthorsMap = [
+    { key: "احیاء العلوم", author: "امام محمد غزالی علیہ الرحمہ" },
+    { key: "مکتوبات", author: "مجدد الف ثانی شیخ احمد سرہندی" },
+    { key: "غنیۃ الطالبین", author: "سیدنا غوثِ اعظم شیخ عبد القادر جیلانی" },
+    { key: "بہارِ شریعت", author: "صدر الشریعہ علامہ مفتی امجد علی اعظمی" },
+    { key: "لطائفِ اشرفی", author: "سلطان سید اشرف جہانگیر سمنانی" },
+    { key: "فتاویٰ رضویہ", author: "اعلیٰ حضرت امام احمد رضا خان فاضلِ بریلوی" },
+    { key: "حدائقِ بخشش", author: "اعلیٰ حضرت امام احمد رضا خان فاضلِ بریلوی" },
+    { key: "تجلیاتِ تاج الشریعہ", author: "مفتی محمد اختر رضا خان قادری (تاج الشریعہ)" },
+    { key: "بیٹے کو نصیحت", author: "امام محمد غزالی علیہ الرحمہ" }
+  ];
+
+  var knownPagesMap = {
+    "بہارِ شریعت": "1250",
+    "لطائفِ اشرفی": "650",
+    "مکتوبات": "980",
+    "احیاء العلوم": "1400",
+    "تجلیاتِ تاج الشریعہ": "320",
+    "بیٹے کو نصیحت": "64"
+  };
+
+  // --- B. LIVE DRIVE DATA SANITIZER ---
   function sanitizeBookData(b) {
     if (!b) return b;
     var rawTitle = (b.title || "").trim();
 
-    // Direct mapping check
+    // 1. Title clean
     if (cleanTitlesMap[rawTitle]) {
       b.title = cleanTitlesMap[rawTitle];
     } else {
-      // General clean: remove trailing '(1)', file extensions, clean dashes
       var cleaned = rawTitle.replace(/\s*\(\d+\)$/, "")
                             .replace(/\.pdf$/i, "")
                             .replace(/^\d+[-_\s]+/, "")
                             .replace(/[-_]+/g, " ");
-      if (cleanTitlesMap[cleaned]) {
-        b.title = cleanTitlesMap[cleaned];
+      if (cleanTitlesMap[cleaned]) b.title = cleanTitlesMap[cleaned];
+    }
+
+    // 2. Language Tag
+    if (/[\u0900-\u097F]/.test(b.title)) {
+      b.language = "Hindi";
+    }
+
+    // 3. Authors Attribution
+    for (var i = 0; i < classicalAuthorsMap.length; i++) {
+      if (b.title.includes(classicalAuthorsMap[i].key)) {
+        b.author = classicalAuthorsMap[i].author;
+        break;
       }
     }
 
-    // Auto-detect Hindi script for Language Tag
-    if (/[ऀ-ॿ]/.test(b.title)) {
-      b.language = "Hindi";
+    // 4. Page numbers fix (Empty / Dash -> Real or 'مفصل')
+    for (var pKey in knownPagesMap) {
+      if (b.title.includes(pKey)) {
+        b.pages = knownPagesMap[pKey];
+        break;
+      }
+    }
+    if (!b.pages || b.pages === "-" || b.pages === "—" || b.pages === "") {
+      b.pages = "مفصل";
     }
 
     return b;
@@ -2126,49 +2219,110 @@
     return response;
   };
 
-  // Red Dot & Loading Badge: 5 Seconds duration
-  function triggerRedDot5s() {
-    var targets = [];
-    var allEls = document.querySelectorAll("div, p, span");
-    allEls.forEach(function(el) {
-      if (el.children.length === 0 && el.innerText && el.innerText.includes("مزید کتب و نعتیں")) {
-        var box = el.closest("div") || el;
-        if (!targets.includes(box)) targets.push(box);
+  // --- C. EXPANDED CATEGORY TABS (سیرت، وظائف، تصوف) ---
+  function setupExpandedTabs() {
+    var tabBar = document.querySelector(".category-bar, .filter-tabs, [class*='tabs']");
+    if (!tabBar || document.getElementById("tab-ext-seerat")) return;
+
+    var extraTabs = [
+      { id: "tab-ext-seerat", label: "سیرت و سوانح", query: "سیرت" },
+      { id: "tab-ext-wazaif", label: "اوراد و وظائف", query: "وظائف" },
+      { id: "tab-ext-tasawwuf", label: "تصوف و اخلاق", query: "تصوف" }
+    ];
+
+    extraTabs.forEach(function(t) {
+      var btn = document.createElement("button");
+      btn.id = t.id;
+      btn.type = "button";
+      btn.className = "j-extra-tab";
+      btn.innerText = t.label;
+      btn.onclick = function() {
+        document.querySelectorAll(".j-extra-tab").forEach(function(b){ b.classList.remove("active"); });
+        btn.classList.add("active");
+        var sInput = document.querySelector("input[type='text'], input[type='search'], #searchInput");
+        if (sInput) {
+          sInput.value = t.query;
+          sInput.dispatchEvent(new Event('input', { bubbles: true }));
+          sInput.dispatchEvent(new Event('keyup', { bubbles: true }));
+        }
+      };
+      tabBar.appendChild(btn);
+    });
+  }
+
+  // --- D. STRICT SAFE LOAD MORE (Sirf .j-book-card ko target karega) ---
+  var PAGE_CHUNK = 14;
+  var visibleBookLimit = PAGE_CHUNK;
+
+  function refreshBookVisibility() {
+    // SIRF .j-book-card ko uthana hai, modal ya login screen ko hargiz nahi!
+    var bookCards = Array.from(document.querySelectorAll(".j-book-card"));
+    if (bookCards.length === 0) return;
+
+    var loadMoreContainer = document.getElementById("jamiaSafeLoadMoreBox");
+    if (!loadMoreContainer) {
+      loadMoreContainer = document.createElement("div");
+      loadMoreContainer.id = "jamiaSafeLoadMoreBox";
+      loadMoreContainer.innerHTML = '<button type="button" class="jamia-loadmore-btn" id="jamiaSafeLoadMoreBtn">مزید کتب دیکھیں (Load More) <i class="fa-solid fa-angles-down" style="margin-right:6px;"></i></button>';
+      var parent = bookCards[0].parentElement;
+      parent.parentNode.insertBefore(loadMoreContainer, parent.nextSibling);
+
+      document.getElementById("jamiaSafeLoadMoreBtn").onclick = function() {
+        visibleBookLimit += PAGE_CHUNK;
+        refreshBookVisibility();
+      };
+    }
+
+    var visibleCount = 0;
+    var totalEligible = 0;
+
+    bookCards.forEach(function(card) {
+      // Agar search filter se pehle se chupa hua na ho
+      if (card.style.display !== "none" || card.dataset.pagedHidden === "true") {
+        totalEligible++;
+        if (visibleCount < visibleBookLimit) {
+          card.style.display = "";
+          card.dataset.pagedHidden = "false";
+          visibleCount++;
+        } else {
+          card.style.display = "none";
+          card.dataset.pagedHidden = "true";
+        }
       }
     });
 
-    var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"]');
-    dots.forEach(function(d) {
-      if (!targets.includes(d)) targets.push(d);
-    });
-
-    targets.forEach(function(t) {
-      t.style.display = 'inline-flex';
-      t.style.visibility = 'visible';
-      t.style.opacity = '1';
-    });
-
-    if (window.jamiaRedTimer) clearTimeout(window.jamiaRedTimer);
-    window.jamiaRedTimer = setTimeout(function() {
-      targets.forEach(function(t) {
-        t.style.transition = 'opacity 0.5s ease';
-        t.style.opacity = '0';
-        setTimeout(function() {
-          if (t.style.opacity === '0') t.style.display = 'none';
-        }, 500);
-      });
-    }, 5000);
+    var loadBtn = document.getElementById("jamiaSafeLoadMoreBtn");
+    if (loadBtn) {
+      loadBtn.style.display = visibleCount >= totalEligible ? "none" : "inline-block";
+    }
   }
 
-  document.addEventListener("DOMContentLoaded", function() {
-    triggerRedDot5s();
-    var loginBtn = document.getElementById("btn-login");
-    if (loginBtn) {
-      loginBtn.addEventListener("click", function() {
-        setTimeout(triggerRedDot5s, 400);
-      });
+  // Reset pagination on search
+  document.addEventListener("input", function(e) {
+    if (e.target && (e.target.type === "text" || e.target.type === "search")) {
+      visibleBookLimit = PAGE_CHUNK;
     }
   });
+
+  // --- E. BLANK LINK PROTECTION ---
+  var origOpenPdf = window.openFullscreenPdf;
+  window.openFullscreenPdf = function(fileId, title) {
+    if (!fileId || fileId === "undefined" || fileId.trim() === "") {
+      alert("معذرت! اس کتاب کی پی ڈی ایف فائل فی الوقت دستیاب نہیں ہے۔");
+      return;
+    }
+    if (origOpenPdf) origOpenPdf(fileId, title);
+  };
+
+  // --- F. INITIALIZE ---
+  document.addEventListener("DOMContentLoaded", function() {
+    setupExpandedTabs();
+    setTimeout(refreshBookVisibility, 700);
+  });
+  setInterval(function() {
+    setupExpandedTabs();
+    refreshBookVisibility();
+  }, 1500);
 })();
 </script>
 
