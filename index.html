@@ -2390,5 +2390,57 @@ function toggleFilterRows() {
   fetchNaatsFromDrive();
 })();
 </script>
+
+<script id="jamia-clean-search-audio">
+(function() {
+  // Clean telegram bot tags & .opus/.mp3 extensions from titles
+  function cleanNaatTitle(t) {
+    if (!t) return "";
+    return t.replace(/\[@download\s*it\s*bot\s*mp3\]/gi, "")
+            .replace(/\(MP3[\s_]*\d+K\)/gi, "")
+            .replace(/\.(opus|mp3|m4a|wav)$/gi, "")
+            .trim();
+  }
+
+  // Hook into getActiveLibrary or filterLibrary to remove broken duplicates & clean titles
+  var origGetActive = window.getActiveLibrary;
+  if (typeof origGetActive === "function") {
+    window.getActiveLibrary = function() {
+      var list = origGetActive.apply(this, arguments) || [];
+      var seenAudioTitles = new Set();
+      var cleanList = [];
+
+      // Pehle asli audio naatein (jinme size MB me hai ya audioUrl hai) rakhein
+      list.forEach(function(item) {
+        if (!item) return;
+        var rawT = item.title || "";
+        if (rawT.includes("@download it bot") || rawT.toLowerCase().endsWith(".opus") || item.type === "audio" || item.category === "naat") {
+          item.title = cleanNaatTitle(rawT);
+          item.category = "naat";
+          item.type = "audio";
+          if (!item.audioUrl && item.id) {
+            item.audioUrl = "https://docs.google.com/uc?export=download&id=" + item.id;
+          }
+        }
+
+        // Broken duplicate filter: agar wahi naat bina valid ID ke dobara aaye to skip karein
+        var normKey = (item.title || "").toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]/g, "");
+        if (item.category === "naat" || item.type === "audio") {
+          if (!item.id || item.id.length < 15) return; // Skip invalid Drive IDs
+          if (seenAudioTitles.has(normKey) && (!item.size || item.size === "-" || item.size === "مفصل")) {
+            return; // Skip broken duplicate entry from general Drive list
+          }
+          seenAudioTitles.add(normKey);
+        }
+
+        cleanList.push(item);
+      });
+
+      return cleanList;
+    };
+  }
+})();
+</script>
+
 </body>
 </html>
