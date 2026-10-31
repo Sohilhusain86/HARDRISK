@@ -1100,6 +1100,34 @@
     });
   </script>
 
+
+<style id="audio-modes-timer-style">
+  .audio-controls-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+  .player-mode-btn, .track-timer-btn {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: #10b981;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+  }
+  .player-mode-btn:active, .track-timer-btn:active {
+    transform: scale(0.95);
+    background: rgba(16, 185, 129, 0.3);
+  }
+</style>
+
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -2312,6 +2340,92 @@
   window.addEventListener("load", function() {
     setTimeout(window.hideJamiaBlinker, 6500);
   });
+</script>
+
+
+<script id="audio-advanced-features">
+  // Modes: 'next' (Auto Next), 'repeat' (Repeat Current), 'shuffle' (Random)
+  window.currentPlayMode = window.currentPlayMode || 'next';
+  window.jamiaSleepTimer = window.jamiaSleepTimer || null;
+
+  // Mode cycle function
+  window.cyclePlayMode = function() {
+    var btn = document.getElementById("jamiaPlayModeBtn");
+    if (!btn) return;
+    if (window.currentPlayMode === 'next') {
+      window.currentPlayMode = 'repeat';
+      btn.innerHTML = '🔁 نعت بار بار';
+      btn.title = 'ایک ہی نعت بار بار چلے گی';
+    } else if (window.currentPlayMode === 'repeat') {
+      window.currentPlayMode = 'shuffle';
+      btn.innerHTML = '🔀 بے ترتیب';
+      btn.title = 'بے ترتیب نعتیں چلیں گی';
+    } else {
+      window.currentPlayMode = 'next';
+      btn.innerHTML = '⏭️ اگلی نعت';
+      btn.title = 'نعت ختم ہونے پر اگلی چلے گی';
+    }
+  };
+
+  // Set Sleep Timer to remaining track duration
+  window.setRemainingTrackTimer = function() {
+    var audio = document.getElementById("jamiaAudioPlayer") || document.querySelector("audio");
+    if (!audio || isNaN(audio.duration)) {
+      alert("پہلے کوئی نعت پلے کریں!");
+      return;
+    }
+    var remainingSeconds = Math.max(1, Math.floor(audio.duration - audio.currentTime));
+    if (window.startCustomSleepTimer) {
+      window.startCustomSleepTimer(remainingSeconds);
+    } else {
+      clearTimeout(window.jamiaSleepTimer);
+      var display = document.getElementById("timerDisplay") || document.querySelector(".timer-badge");
+      window.jamiaSleepTimer = setTimeout(function() {
+        if (audio) { audio.pause(); audio.currentTime = 0; }
+        if (display) display.innerText = "ٹائمر ختم";
+      }, remainingSeconds * 1000);
+      if (display) {
+        var mins = Math.floor(remainingSeconds / 60);
+        var secs = remainingSeconds % 60;
+        display.innerText = "🌙 بقیہ وقت: " + mins + "m " + (secs < 10 ? '0' : '') + secs + "s";
+      }
+    }
+  };
+
+  // Audio track ended event handler
+  window.handleAudioEnded = function() {
+    var audio = document.getElementById("jamiaAudioPlayer") || document.querySelector("audio");
+    if (!audio) return;
+
+    if (window.currentPlayMode === 'repeat') {
+      audio.currentTime = 0;
+      audio.play().catch(function(e){ console.log(e); });
+    } else if (window.currentPlayMode === 'shuffle') {
+      if (window.playRandomNaat) {
+        window.playRandomNaat();
+      } else if (window.JAMIA_NAATS_LIST && window.JAMIA_NAATS_LIST.length > 0) {
+        var randIndex = Math.floor(Math.random() * window.JAMIA_NAATS_LIST.length);
+        if (window.playNaatByIndex) window.playNaatByIndex(randIndex);
+      }
+    } else {
+      // Default: Next track
+      if (window.playNextNaat) {
+        window.playNextNaat();
+      }
+    }
+  };
+
+  // Attach 'ended' listener to audio player once DOM loads
+  function attachAudioPlayerListeners() {
+    var audio = document.getElementById("jamiaAudioPlayer") || document.querySelector("audio");
+    if (audio && !audio.hasAttribute("data-mode-attached")) {
+      audio.setAttribute("data-mode-attached", "true");
+      audio.addEventListener("ended", window.handleAudioEnded);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", attachAudioPlayerListeners);
+  setInterval(attachAudioPlayerListeners, 2000);
 </script>
 
 </body>
