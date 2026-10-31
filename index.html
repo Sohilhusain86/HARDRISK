@@ -1083,9 +1083,12 @@
   }
 </style>
 
-<style id="audio-features-style">
-  .jamia-play-mode-btn {
-    background: rgba(16, 185, 129, 0.2) !important;
+
+
+
+<style id="jamia-root-styles">
+  .jamia-playmode-btn {
+    background: rgba(16, 185, 129, 0.25) !important;
     border: 1px solid #10b981 !important;
     color: #ffffff !important;
     border-radius: 8px !important;
@@ -1094,13 +1097,16 @@
     cursor: pointer !important;
     margin-right: 6px !important;
     vertical-align: middle !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
   }
   .jamia-endtrack-btn {
     background: rgba(16, 185, 129, 0.15) !important;
     border: 1px solid #10b981 !important;
     color: #10b981 !important;
     border-radius: 8px !important;
-    padding: 8px !important;
+    padding: 9px !important;
     font-size: 12px !important;
     font-weight: bold !important;
     cursor: pointer !important;
@@ -2010,298 +2016,71 @@
   </div>
 </div>
 
-<script id="jamia-naats-master">
+
+
+
+
+
+
+<script id="jamia-root-logic">
 (function() {
-  const NAATS_API_URL = "https://script.google.com/macros/s/AKfycbwi02ykZWWmq3nedwL0ULzk730QAJbwo7E_saM0hM32DOBI7ATrdWijHxvKfTZeY95-Ug/exec";
-  window.JAMIA_NAATS_LIST = [];
-  let sleepIntervalId = null;
-  let sleepTotalSecs = 0;
-
-  function cleanNaatTitle(raw) {
-    if (!raw) return "نعت شریف";
-    return raw.replace(/\[.*?\]/g, "").replace(/\(\s*MP3[^)]*\)/gi, "").replace(/\(\s*\d+\s*K\s*\)/gi, "").replace(/\.(mp3|m4a|wav|aac|ogg)$/i, "").replace(/[-_]+/g, " ").replace(/\s{2,}/g, " ").trim();
-  }
-
-  function detectNaatKhwan(title) {
-    const t = (title || "").toLowerCase();
-    if (t.includes("sabir") || t.includes("صابر") || t.includes("azhari") || t.includes("ازہری") || t.includes("साबिर")) return "sabira";
-    if (t.includes("rafiq") || t.includes("rafeeq") || t.includes("رفیق") || t.includes("रफ़ीक़")) return "rafiq";
-    if (t.includes("asjad") || t.includes("عسجد") || t.includes("اسجد") || t.includes("असजद")) return "asjad";
-    return "other";
-  }
-
-  function buildNaatTabsInBar() {
-    if (document.getElementById("tab-all-naats")) return;
-    const allEls = Array.from(document.querySelectorAll("button, div, span, a"));
-    const refTab = allEls.find(el => {
-      const txt = (el.innerText || "").trim();
-      return (txt === "امتحانی پرچے" || txt === "تمام کتب" || txt.includes("Math")) && el.children.length === 0;
-    });
-    if (!refTab || !refTab.parentElement) return;
-
-    const parentBar = refTab.parentElement;
-    const tabsToCreate = [
-      { id: "tab-all-naats", key: "all_naats", label: "تمام نعتیں" },
-      { id: "tab-asjad", key: "asjad", label: "حضور عسجد رضا" },
-      { id: "tab-sabira", key: "sabira", label: "صابر رضا ازہری" },
-      { id: "tab-rafiq", key: "rafiq", label: "رفیق رضا قادری" }
-    ];
-
-    tabsToCreate.reverse().forEach(item => {
-      const clone = refTab.cloneNode(true);
-      clone.id = item.id;
-      clone.classList.remove("active");
-      clone.innerText = item.label;
-      clone.removeAttribute("onclick");
-      clone.addEventListener("click", function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        window.runJamiaFilter(item.key, clone);
-      });
-      if (parentBar.firstElementChild) {
-        parentBar.insertBefore(clone, parentBar.firstElementChild.nextSibling);
-      } else {
-        parentBar.appendChild(clone);
-      }
-    });
-
-    Array.from(parentBar.children).forEach(child => {
-      if (!child.id || !child.id.startsWith("tab-")) {
-        child.addEventListener("click", function() {
-          tabsToCreate.forEach(t => {
-            const el = document.getElementById(t.id);
-            if (el) el.classList.remove("active");
-          });
-        });
-      }
-    });
-  }
-
-  async function fetchNaatsFromDrive() {
-    if (window.JAMIA_NAATS_LIST.length > 0) return window.JAMIA_NAATS_LIST;
+  // -------------------------------------------------------------
+  // A. ONESIGNAL LOGIN PUSH PROMPT (Har naye phone par maangega)
+  // -------------------------------------------------------------
+  function triggerOneSignalPush() {
     try {
-      const res = await fetch(NAATS_API_URL);
-      const data = await res.json();
-      if (Array.isArray(data)) {
-
-      const blinker = document.getElementById("jamiaSyncBlinker");
-      if (blinker) blinker.style.display = "none";
-
-        window.JAMIA_NAATS_LIST = data.map(nt => {
-          const neatTitle = cleanNaatTitle(nt.title);
-          return {
-            id: nt.id,
-            title: neatTitle,
-            naatKhwan: detectNaatKhwan(neatTitle),
-            subtitle: "آڈیو نعت شریف • " + (nt.size || "MP3"),
-            author: "جامعۃ الرضا آڈیو لائبریری",
-            category: "naat",
-            type: "audio",
-            language: "Urdu",
-            size: nt.size || "MP3",
-            pages: nt.size || "MP3",
-            coverClass: "cover-bahar",
-            icon: "fa-solid fa-music",
-            coverTitle: neatTitle.substring(0, 18),
-            audioUrl: "https://drive.google.com/file/d/" + nt.id + "/preview",
-            downloadName: neatTitle + ".mp3",
-            allowDownload: true
-          };
+      if (window.OneSignalDeferred) {
+        window.OneSignalDeferred.push(async function(OneSignal) {
+          await OneSignal.Slidedown.promptPush();
         });
+      } else if (window.OneSignal && window.OneSignal.Slidedown) {
+        window.OneSignal.Slidedown.promptPush();
       }
-    } catch (err) {}
-    return window.JAMIA_NAATS_LIST;
+    } catch(err) {
+      console.log("OneSignal push trigger error:", err);
+    }
   }
 
-  // 1. Play Audio with Working Close Button Fix
-  window.playAudio = function(audioUrlOrId, title) {
-    const bar = document.getElementById("emeraldAudioBar");
-    const titleEl = document.getElementById("audioPlayerTitle");
-    const timeEl = document.getElementById("audioPlayerTime");
-    const icon = document.getElementById("audioPlayIcon");
-    const prog = document.getElementById("audioProgressBar");
+  // -------------------------------------------------------------
+  // B. RED DOT & BADGE 5 SECONDS (Refresh par bhi, Login par bhi)
+  // -------------------------------------------------------------
+  function showRedIndicator5s() {
+    var targets = [];
+    var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"]');
+    dots.forEach(function(d){ targets.push(d); });
 
-    const cleanT = cleanNaatTitle(title);
-    if (titleEl) titleEl.innerText = cleanT;
-    if (timeEl) timeEl.innerText = "نیچے پلے بٹن دبائیں 👇";
-    if (icon) icon.className = "fa-solid fa-music";
-    if (prog) prog.style.display = "none";
-    if (bar) bar.style.display = "block";
-
-    let fileId = audioUrlOrId;
-    const idMatch = (audioUrlOrId || "").match(/id=([^&]+)/) || (audioUrlOrId || "").match(/\/d\/([^\/]+)/);
-    if (idMatch) fileId = idMatch[1];
-
-    // Close button (Cross X) ko 100% active karna
-    const closeBtn = bar.querySelector(".fa-xmark, .fa-times")?.closest("button, div") || bar.firstElementChild?.querySelector("button, span, i");
-    if (closeBtn) {
-      closeBtn.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        window.closeAudioPlayerFully();
-      };
-    }
-
-    document.querySelectorAll(".driveEmbedBoxClass").forEach(el => el.remove());
-
-    const embedWrap = document.createElement("div");
-    embedWrap.className = "driveEmbedBoxClass";
-    embedWrap.style.cssText = "width:100%; height:140px; overflow:hidden; border-radius:12px; margin-top:10px; border:2px solid #00ffa3; background:#031810;";
-
-    const iframe = document.createElement("iframe");
-    iframe.src = "https://drive.google.com/file/d/" + fileId + "/preview";
-    iframe.allow = "autoplay";
-    iframe.style.cssText = "width:100%; height:200px; border:none; margin-top:-30px;";
-
-    embedWrap.appendChild(iframe);
-    bar.appendChild(embedWrap);
-  };
-
-  // 2. Cross button Dabate hi Player hatana
-  window.closeAudioPlayerFully = function() {
-    const bar = document.getElementById("emeraldAudioBar");
-    if (bar) bar.style.display = "none";
-    const audio = document.getElementById("globalHtmlAudio");
-    if (audio) { audio.pause(); audio.src = ""; }
-    document.querySelectorAll(".driveEmbedBoxClass").forEach(el => el.remove());
-  };
-
-  // 3. DD Music Style Timer Modal Handlers
-  window.cycleSleepTimer = function() {
-    const m = document.getElementById("ddMusicSleepModal");
-    if (m) m.style.display = "flex";
-  };
-
-  window.closeDdTimerModal = function() {
-    const m = document.getElementById("ddMusicSleepModal");
-    if (m) m.style.display = "none";
-  };
-
-  window.setDdQuickTime = function(h, m, s) {
-    document.getElementById("ddHours").value = (h < 10 ? "0" : "") + h;
-    document.getElementById("ddMinutes").value = (m < 10 ? "0" : "") + m;
-    document.getElementById("ddSeconds").value = (s < 10 ? "0" : "") + s;
-  };
-
-  window.startDdTimer = function() {
-    const h = parseInt(document.getElementById("ddHours").value, 10) || 0;
-    const m = parseInt(document.getElementById("ddMinutes").value, 10) || 0;
-    const s = parseInt(document.getElementById("ddSeconds").value, 10) || 0;
-
-    sleepTotalSecs = (h * 3600) + (m * 60) + s;
-    closeDdTimerModal();
-
-    const txtEl = document.getElementById("sleepTimerText");
-    const badgeEl = document.getElementById("sleepTimerBadge");
-
-    if (sleepIntervalId) clearInterval(sleepIntervalId);
-
-    if (sleepTotalSecs <= 0) {
-      if (txtEl) txtEl.innerText = "ٹائمر";
-      if (badgeEl) badgeEl.style.display = "none";
-      return;
-    }
-
-    if (txtEl) txtEl.innerText = (h > 0 ? h + "h " : "") + (m > 0 ? m + "m" : s + "s");
-    if (badgeEl) {
-      badgeEl.style.display = "block";
-      badgeEl.innerText = "🌙 سونے کا ٹائمر سیٹ ہو گیا ہے";
-    }
-
-    sleepIntervalId = setInterval(() => {
-      sleepTotalSecs--;
-      if (sleepTotalSecs <= 0) {
-        clearInterval(sleepIntervalId);
-        window.closeAudioPlayerFully();
-        if (txtEl) txtEl.innerText = "ٹائمر";
-        if (badgeEl) badgeEl.style.display = "none";
-      } else if (badgeEl) {
-        const rh = Math.floor(sleepTotalSecs / 3600);
-        const rm = Math.floor((sleepTotalSecs % 3600) / 60);
-        const rs = sleepTotalSecs % 60;
-        badgeEl.innerText = "🌙 ٹائمر باقی: " + (rh > 0 ? rh + ":" : "") + (rm < 10 ? "0" + rm : rm) + ":" + (rs < 10 ? "0" + rs : rs);
-      }
-    }, 1000);
-  };
-
-  function cleanRenderedNaatCards() {
-    document.querySelectorAll("button[onclick*='playAudio']").forEach(btn => {
-      const card = btn.closest(".book-card") || btn.parentElement.parentElement;
-      if (!card) return;
-      const walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT, null, false);
-      let node;
-      while ((node = walker.nextNode())) {
-        let val = node.nodeValue;
-        if (val.includes("b.type") || val.includes("مکمل کتاب")) {
-          val = val.replace(/\$\{.*?\}/g, "آڈیو نعت").replace(/b\.type.*?\}/g, "آڈیو نعت").replace("مکمل کتاب", "آڈیو نعت");
-        }
-        val = val.replace("دینیات", "نعت شریف").replace("صفحات:", "سائز:").replace("مؤلف:", "پیشکش:");
-        node.nodeValue = val;
+    var allElements = document.querySelectorAll("div, p, span");
+    allElements.forEach(function(el) {
+      if (el.children.length === 0 && el.innerText && el.innerText.includes("مزید کتب و نعتیں")) {
+        var parentBox = el.closest("div") || el;
+        if (!targets.includes(parentBox)) targets.push(parentBox);
       }
     });
-  }
 
-  window.runJamiaFilter = async function(catKey, clickedEl) {
-    if (clickedEl && clickedEl.parentElement) {
-      Array.from(clickedEl.parentElement.children).forEach(c => c.classList.remove("active"));
-      clickedEl.classList.add("active");
-    }
+    targets.forEach(function(t) {
+      t.style.display = 'inline-flex';
+      t.style.visibility = 'visible';
+      t.style.opacity = '1';
+    });
 
-    const allNaats = await fetchNaatsFromDrive();
-    let filtered = [];
-
-    if (catKey === "all_naats") {
-      filtered = allNaats;
-    } else {
-      filtered = allNaats.filter(n => n.naatKhwan === catKey);
-    }
-
-    if (typeof renderBooks === "function") {
-      renderBooks(filtered);
-      setTimeout(cleanRenderedNaatCards, 40);
-    }
-  };
-
-  document.addEventListener("DOMContentLoaded", function() {
-    buildNaatTabsInBar();
-    fetchNaatsFromDrive();
-    setInterval(() => {
-      buildNaatTabsInBar();
-      cleanRenderedNaatCards();
-    }, 800);
-  });
-  setTimeout(buildNaatTabsInBar, 300);
-  fetchNaatsFromDrive();
-})();
-</script>
-
-
-<script id="audio-features-script">
-(function() {
-  // 1. RED DOT (5 SECONDS ON REFRESH & ON LOGIN)
-  function startRedDot5s() {
-    var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"], #recDot, #liveDot');
-    if (dots.length > 0) {
-      dots.forEach(function(d) {
-        d.style.display = 'inline-block';
-        d.style.visibility = 'visible';
-        d.style.opacity = '1';
+    if (window.redDotTimeoutRef) clearTimeout(window.redDotTimeoutRef);
+    window.redDotTimeoutRef = setTimeout(function() {
+      targets.forEach(function(t) {
+        t.style.opacity = '0';
+        setTimeout(function() {
+          if (t.style.opacity === '0') t.style.display = 'none';
+        }, 500);
       });
-      setTimeout(function() {
-        dots.forEach(function(d) {
-          d.style.opacity = '0';
-          setTimeout(function() {
-            if (d.style.opacity === '0') d.style.display = 'none';
-          }, 400);
-        });
-      }, 5000);
-    }
+    }, 5000);
   }
 
-  // 2. MODES: NEXT / REPEAT / SHUFFLE
+  // -------------------------------------------------------------
+  // C. AUDIO MODES (Next / Repeat / Shuffle) & AUTO-PLAY
+  // -------------------------------------------------------------
   window.jamiaPlayMode = localStorage.getItem("jamia_play_mode") || "next";
+  window.activeNaatIndex = 0;
 
-  function refreshModeBtn() {
+  function updateModeButtonUI() {
     var btn = document.getElementById("jamiaPlayModeBtn");
     if (!btn) return;
     if (window.jamiaPlayMode === "repeat") {
@@ -2319,24 +2098,61 @@
     }
   }
 
-  window.cycleJamiaPlayMode = function() {
+  window.toggleJamiaPlayMode = function() {
     if (window.jamiaPlayMode === "next") window.jamiaPlayMode = "repeat";
     else if (window.jamiaPlayMode === "repeat") window.jamiaPlayMode = "shuffle";
     else window.jamiaPlayMode = "next";
     localStorage.setItem("jamia_play_mode", window.jamiaPlayMode);
-    refreshModeBtn();
+    updateModeButtonUI();
   };
 
-  // 3. END-OF-TRACK SLEEP TIMER
+  function getAllSunenButtons() {
+    return Array.from(document.querySelectorAll("button")).filter(function(b) {
+      return b.innerText && b.innerText.includes("سنیں");
+    });
+  }
+
+  function trackNaatButtons() {
+    var btns = getAllSunenButtons();
+    btns.forEach(function(btn, idx) {
+      if (!btn.dataset.trackerBound) {
+        btn.dataset.trackerBound = "true";
+        btn.addEventListener("click", function() {
+          window.activeNaatIndex = idx;
+        });
+      }
+    });
+  }
+
+  window.playNextTrackInQueue = function() {
+    var btns = getAllSunenButtons();
+    if (btns.length === 0) return;
+
+    if (window.jamiaPlayMode === "repeat") {
+      if (btns[window.activeNaatIndex]) btns[window.activeNaatIndex].click();
+    } else if (window.jamiaPlayMode === "shuffle") {
+      var rand = Math.floor(Math.random() * btns.length);
+      window.activeNaatIndex = rand;
+      btns[rand].click();
+    } else {
+      var next = window.activeNaatIndex + 1;
+      if (next >= btns.length) next = 0;
+      window.activeNaatIndex = next;
+      btns[next].click();
+    }
+  };
+
+  // -------------------------------------------------------------
+  // D. REMAINING TRACK SLEEP TIMER
+  // -------------------------------------------------------------
   window.setRemainingSleepTimer = function() {
     var audio = document.querySelector("audio");
-    if (!audio || isNaN(audio.duration) || audio.duration === 0) {
-      alert("پہلے کوئی نعت پلے کریں!");
-      return;
+    var remainingSeconds = 300; // default 5 min fallback
+    if (audio && audio.duration && !isNaN(audio.duration)) {
+      remainingSeconds = Math.max(1, Math.floor(audio.duration - audio.currentTime));
     }
-    var remaining = Math.max(1, Math.floor(audio.duration - audio.currentTime));
-    var mins = Math.floor(remaining / 60);
-    var secs = remaining % 60;
+    var mins = Math.floor(remainingSeconds / 60);
+    var secs = remainingSeconds % 60;
     var hrs = Math.floor(mins / 60);
     mins = mins % 60;
 
@@ -2354,14 +2170,21 @@
 
     if (window.jamiaSleepTimerTimeout) clearTimeout(window.jamiaSleepTimerTimeout);
     window.jamiaSleepTimerTimeout = setTimeout(function() {
-      if (audio) audio.pause();
-    }, remaining * 1000);
+      var aud = document.querySelector("audio");
+      if (aud) aud.pause();
+      var iframe = document.querySelector("iframe");
+      if (iframe) iframe.src = "";
+    }, remainingSeconds * 1000);
 
-    alert("ٹائمر سیٹ ہو گیا: " + (hrs > 0 ? hrs + " گھنٹہ " : "") + mins + " منٹ " + secs + " سیکنڈ (نعت کے اختتام تک)");
+    alert("ٹائمر سیٹ ہو گیا: " + (hrs > 0 ? hrs + " گھنٹہ " : "") + mins + " منٹ " + secs + " سیکنڈ");
   };
 
-  // DOM INJECTION
-  function injectControls() {
+  // -------------------------------------------------------------
+  // E. ATTACH UI CONTROLS DYNAMICALLY
+  // -------------------------------------------------------------
+  function attachUIEnhancements() {
+    trackNaatButtons();
+
     // Mode button next to moon/timer button
     var timerBtn = Array.from(document.querySelectorAll("button")).find(function(b) {
       return b.innerText && b.innerText.includes("ٹائمر");
@@ -2370,13 +2193,13 @@
       var mBtn = document.createElement("button");
       mBtn.id = "jamiaPlayModeBtn";
       mBtn.type = "button";
-      mBtn.className = "jamia-play-mode-btn";
-      mBtn.onclick = window.cycleJamiaPlayMode;
+      mBtn.className = "jamia-playmode-btn";
+      mBtn.onclick = window.toggleJamiaPlayMode;
       timerBtn.parentNode.insertBefore(mBtn, timerBtn.nextSibling);
-      refreshModeBtn();
+      updateModeButtonUI();
     }
 
-    // End-of-track button inside sleep timer modal
+    // End of track button inside sleep timer modal
     var modal = document.querySelector(".stop-music-modal, .timer-modal, [class*='modal']:has(input)");
     if (modal && !document.getElementById("jamiaEndTrackBtn")) {
       var eBtn = document.createElement("button");
@@ -2388,47 +2211,28 @@
       modal.appendChild(eBtn);
     }
 
-    // Audio onEnded event listener
+    // Native audio listener if audio element exists
     var audio = document.querySelector("audio");
-    if (audio && !audio.dataset.modeAttached) {
-      audio.dataset.modeAttached = "true";
-      audio.addEventListener("ended", function() {
-        if (window.jamiaPlayMode === "repeat") {
-          audio.currentTime = 0;
-          audio.play();
-        } else if (window.jamiaPlayMode === "shuffle") {
-          var btns = Array.from(document.querySelectorAll("button")).filter(function(b) {
-            return b.innerText && b.innerText.includes("سنیں");
-          });
-          if (btns.length > 0) {
-            var rand = btns[Math.floor(Math.random() * btns.length)];
-            rand.click();
-          }
-        } else {
-          var btns = Array.from(document.querySelectorAll("button")).filter(function(b) {
-            return b.innerText && b.innerText.includes("سنیں");
-          });
-          for (var i = 0; i < btns.length - 1; i++) {
-            if (btns[i].dataset.playing === "true" || btns[i].classList.contains("active")) {
-              btns[i + 1].click();
-              return;
-            }
-          }
-        }
-      });
+    if (audio && !audio.dataset.trackBound) {
+      audio.dataset.trackBound = "true";
+      audio.addEventListener("ended", window.playNextTrackInQueue);
     }
   }
 
+  // -------------------------------------------------------------
+  // F. GLOBAL TRIGGERS (Load & Login)
+  // -------------------------------------------------------------
   document.addEventListener("DOMContentLoaded", function() {
-    startRedDot5s();
-    injectControls();
+    showRedIndicator5s();
+    attachUIEnhancements();
   });
-  setInterval(injectControls, 1200);
+  setInterval(attachUIEnhancements, 1200);
 
-  // Trigger red dot on login button click
+  // Login click / submit hook
   document.addEventListener("click", function(e) {
     if (e.target && e.target.innerText && (e.target.innerText.includes("تصدیق") || e.target.innerText.includes("داخل"))) {
-      setTimeout(startRedDot5s, 500);
+      showRedIndicator5s();
+      triggerOneSignalPush();
     }
   });
 })();
