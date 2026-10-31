@@ -1110,25 +1110,16 @@
 
 
 
-<style id="jamia-book-title-style">
-  .j-book-title {
-    white-space: normal !important;
-    word-break: break-word !important;
-    display: -webkit-box !important;
-    -webkit-line-clamp: 2 !important;
-    -webkit-box-orient: vertical !important;
-    overflow: hidden !important;
-    line-height: 1.4 !important;
-    font-size: 0.95rem !important;
-    text-overflow: ellipsis !important;
-  }
-</style>
 
 
 
 
 
-<style id="jamia-safe-title-css">
+
+
+
+
+<style id="jamia-permanent-title-css">
   .j-book-title {
     white-space: normal !important;
     word-break: break-word !important;
@@ -1217,7 +1208,10 @@
       <div class="filter-tag" onclick="setFilter('islamic', this)">دینی و فقہی</div>
       <div class="filter-tag" onclick="setFilter('math', this)">
 ریاضی (Math)</div>
-      <div class="filter-tag" onclick="setFilter('hindi', this)">درسی ہندی</div>
+            <div class="filter-tag" onclick="setFilter('hindi', this)">درسی ہندی</div>
+      <div class="filter-tag" onclick="setFilter('naat', this)">تمام نعتیں</div>
+      <div class="filter-tag" onclick="setFilter('asjad', this)">حضور عسجد رضا</div>
+      <div class="filter-tag" onclick="setFilter('sabir', this)">صابر رضا ازہری</div>
     </div>
 
     <!-- Scalable Book Container -->
@@ -2090,32 +2084,105 @@
 
 
 
-<script id="jamia-isolated-reddot">
-(function() {
-  function startDot5s() {
-    var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"]');
-    var badge = document.querySelector(".rec-badge, [class*='badge']");
-    var items = Array.from(dots);
-    if (badge) items.push(badge);
 
-    items.forEach(function(el) {
-      el.style.display = 'inline-flex';
-      el.style.opacity = '1';
+
+
+<script id="jamia-permanent-filter-engine">
+(function() {
+  // A. RED DOT & BADGE: EXACT 5 SECONDS ON REFRESH & LOGIN
+  function triggerRedDot5s() {
+    var targets = [];
+    var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"], #recDot, #liveDot');
+    dots.forEach(function(d) { targets.push(d); });
+
+    var badges = document.querySelectorAll('.rec-badge, [class*="badge"]');
+    badges.forEach(function(b) { targets.push(b); });
+
+    var allEls = document.querySelectorAll("div, p, span");
+    allEls.forEach(function(el) {
+      if (el.children.length === 0 && el.innerText && el.innerText.includes("مزید کتب و نعتیں")) {
+        var box = el.closest("div") || el;
+        if (!targets.includes(box)) targets.push(box);
+      }
     });
 
-    setTimeout(function() {
-      items.forEach(function(el) {
-        el.style.transition = 'opacity 0.5s ease';
-        el.style.opacity = '0';
-        setTimeout(function() { el.style.display = 'none'; }, 500);
+    targets.forEach(function(t) {
+      t.style.display = 'inline-flex';
+      t.style.visibility = 'visible';
+      t.style.opacity = '1';
+    });
+
+    if (window.jamiaRedTimer) clearTimeout(window.jamiaRedTimer);
+    window.jamiaRedTimer = setTimeout(function() {
+      targets.forEach(function(t) {
+        t.style.transition = 'opacity 0.5s ease';
+        t.style.opacity = '0';
+        setTimeout(function() {
+          if (t.style.opacity === '0') t.style.display = 'none';
+        }, 500);
       });
     }, 5000);
   }
 
-  window.addEventListener("load", startDot5s);
+  // B. SOLID FILTER CONTROLLER FOR ALL TABS
+  var origSetFilter = window.setFilter;
+  window.setFilter = function(category, element) {
+    // Active class toggle
+    document.querySelectorAll('.filter-tag').forEach(function(el) {
+      el.classList.remove('active');
+    });
+    if (element) element.classList.add('active');
+
+    // Naats specific filters
+    if (category === 'naat' || category === 'asjad' || category === 'sabir') {
+      if (origSetFilter) {
+        origSetFilter('all');
+        document.querySelectorAll('.filter-tag').forEach(function(el) {
+          el.classList.remove('active');
+        });
+        if (element) element.classList.add('active');
+      }
+
+      var cards = document.querySelectorAll('.j-book-card');
+      cards.forEach(function(card) {
+        var text = (card.innerText || "").toLowerCase();
+        var hasPlay = card.querySelector("button[onclick*='playAudio']") !== null;
+        var isAudioNaat = hasPlay || text.includes("سنیں") || text.includes("نعت") || text.includes("audio");
+
+        if (!isAudioNaat) {
+          card.style.display = 'none';
+          return;
+        }
+
+        if (category === 'naat') {
+          card.style.display = '';
+        } else if (category === 'asjad') {
+          card.style.display = (text.includes("عسجد") || text.includes("asjad")) ? '' : 'none';
+        } else if (category === 'sabir') {
+          card.style.display = (text.includes("صابر") || text.includes("sabir")) ? '' : 'none';
+        }
+      });
+      return;
+    }
+
+    // Default book filters
+    if (origSetFilter) {
+      origSetFilter(category, element);
+    }
+  };
+
+  // C. EVENT LISTENERS
+  document.addEventListener("DOMContentLoaded", function() {
+    triggerRedDot5s();
+  });
+  window.addEventListener("load", function() {
+    triggerRedDot5s();
+  });
+
+  // Login hook
   document.addEventListener("click", function(e) {
-    if (e.target && (e.target.id === "btn-login" || e.target.closest("#btn-login"))) {
-      setTimeout(startDot5s, 400);
+    if (e.target && (e.target.id === "btn-login" || e.target.closest("#btn-login") || (e.target.innerText && e.target.innerText.includes("داخل")))) {
+      setTimeout(triggerRedDot5s, 300);
     }
   });
 })();
