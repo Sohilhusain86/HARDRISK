@@ -1152,18 +1152,35 @@
 </style>
 
 
-<style id="red-dot-custom-5s">
-  .rec-dot, .red-dot, [class*="red-dot"], [class*="recording-dot"] {
-    animation-duration: 1s !important;
+<style id="custom-safe-enhancements">
+  /* Mode Button styling */
+  .mode-switch-btn {
+    background: rgba(16, 185, 129, 0.2) !important;
+    border: 1px solid #10b981 !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    padding: 2px 7px !important;
+    font-size: 11px !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    margin-right: 5px !important;
   }
-  .rec-dot-active {
-    display: inline-block !important;
-    opacity: 1 !important;
-    transition: opacity 0.5s ease !important;
-  }
-  .rec-dot-hidden {
-    opacity: 0 !important;
-    pointer-events: none !important;
+  /* End of Track Timer Button */
+  .end-track-btn {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border: 1px solid #10b981 !important;
+    color: #10b981 !important;
+    border-radius: 8px !important;
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    margin-top: 8px !important;
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
   }
 </style>
 
@@ -2595,58 +2612,182 @@
 </script>
 
 
-<script id="red-dot-5s-logic">
-  window.triggerRedDot5s = function() {
-    var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="red-dot"], [class*="recording-dot"], #recDot, #liveDot');
+<script id="custom-safe-logic">
+  // ==========================================
+  // 1. Red Dot (5 Seconds on Load & Login)
+  // ==========================================
+  function activateRedDot5s() {
+    var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"], #recDot, #liveDot');
     if (!dots || dots.length === 0) return;
-
-    dots.forEach(function(dot) {
-      dot.classList.remove('rec-dot-hidden');
-      dot.classList.add('rec-dot-active');
-      dot.style.display = 'inline-block';
-      dot.style.visibility = 'visible';
-      dot.style.opacity = '1';
+    dots.forEach(function(d) {
+      d.style.display = 'inline-block';
+      d.style.visibility = 'visible';
+      d.style.opacity = '1';
     });
-
-    if (window.redDotTimeout) clearTimeout(window.redDotTimeout);
-    window.redDotTimeout = setTimeout(function() {
-      dots.forEach(function(dot) {
-        dot.classList.add('rec-dot-hidden');
-        dot.classList.remove('rec-dot-active');
-        setTimeout(function() {
-          if (dot.classList.contains('rec-dot-hidden')) {
-            dot.style.display = 'none';
-          }
-        }, 500);
+    setTimeout(function() {
+      dots.forEach(function(d) {
+        d.style.opacity = '0';
+        setTimeout(function(){ if(d.style.opacity === '0') d.style.display = 'none'; }, 400);
       });
-    }, 5000); // 5 seconds
-  };
-
-  // Run on initial page load / refresh
-  document.addEventListener("DOMContentLoaded", function() {
-    setTimeout(window.triggerRedDot5s, 400);
-  });
-
-  // Attach to login submit button / form
-  function attachLoginDotTrigger() {
-    var loginBtns = document.querySelectorAll("button, input[type='submit']");
-    loginBtns.forEach(function(btn) {
-      if (btn.innerText && (btn.innerText.includes("تصدیق") || btn.innerText.includes("داخل") || btn.innerText.includes("Login"))) {
-        if (!btn.dataset.dotBound) {
-          btn.dataset.dotBound = "true";
-          btn.addEventListener("click", function() {
-            setTimeout(window.triggerRedDot5s, 600);
-          });
-        }
-      }
-    });
+    }, 5000);
   }
 
-  // Monitor DOM for login modal disappearance
-  var observer = new MutationObserver(function(mutations) {
-    attachLoginDotTrigger();
+  // ==========================================
+  // 2. Play Modes (Next / Repeat / Shuffle)
+  // ==========================================
+  window.currentTrackMode = localStorage.getItem("jamia_track_mode") || "next";
+
+  window.cycleTrackMode = function() {
+    var btn = document.getElementById("trackModeToggleBtn");
+    if (window.currentTrackMode === "next") {
+      window.currentTrackMode = "repeat";
+    } else if (window.currentTrackMode === "repeat") {
+      window.currentTrackMode = "shuffle";
+    } else {
+      window.currentTrackMode = "next";
+    }
+    localStorage.setItem("jamia_track_mode", window.currentTrackMode);
+    updateTrackModeBtnUI();
+  };
+
+  function updateTrackModeBtnUI() {
+    var btn = document.getElementById("trackModeToggleBtn");
+    if (!btn) return;
+    if (window.currentTrackMode === "repeat") {
+      btn.innerHTML = "🔁 وہی نعت";
+      btn.style.borderColor = "#f59e0b";
+      btn.style.color = "#f59e0b";
+    } else if (window.currentTrackMode === "shuffle") {
+      btn.innerHTML = "🔀 بے ترتیب";
+      btn.style.borderColor = "#38bdf8";
+      btn.style.color = "#38bdf8";
+    } else {
+      btn.innerHTML = "⏭️ اگلی نعت";
+      btn.style.borderColor = "#10b981";
+      btn.style.color = "#10b981";
+    }
+  }
+
+  // ==========================================
+  // 3. Dynamic End of Track Sleep Timer
+  // ==========================================
+  window.setRemainingSleepTimer = function() {
+    var audio = document.querySelector("audio");
+    if (!audio || isNaN(audio.duration) || audio.duration === 0) {
+      alert("پہلے کوئی نعت پلے کریں!");
+      return;
+    }
+    var remaining = Math.max(1, Math.floor(audio.duration - audio.currentTime));
+    var mins = Math.floor(remaining / 60);
+    var secs = remaining % 60;
+    var hrs = Math.floor(mins / 60);
+    mins = mins % 60;
+
+    // Fill timer boxes if found
+    var inputs = document.querySelectorAll("input[type='number'], .stop-music-modal input, .timer-modal input");
+    if (inputs.length >= 2) {
+      if (inputs.length >= 3) {
+        inputs[0].value = hrs < 10 ? "0" + hrs : hrs;
+        inputs[1].value = mins < 10 ? "0" + mins : mins;
+        inputs[2].value = secs < 10 ? "0" + secs : secs;
+      } else {
+        inputs[0].value = mins < 10 ? "0" + mins : mins;
+        inputs[1].value = secs < 10 ? "0" + secs : secs;
+      }
+    }
+
+    if (window.jamiaSleepTimerID) clearTimeout(window.jamiaSleepTimerID);
+    window.jamiaSleepTimerID = setTimeout(function() {
+      if (audio) audio.pause();
+    }, remaining * 1000);
+
+    alert("ٹائمر سیٹ ہو گیا: " + (hrs > 0 ? hrs + " گھنٹہ " : "") + mins + " منٹ " + secs + " سیکنڈ (نعت کے اختتام تک)");
+  };
+
+  // ==========================================
+  // 4. Safe Dynamic Elements Placement
+  // ==========================================
+  function injectEnhancementsSafely() {
+    // 1. Place Mode button next to moon timer button
+    var moonBtn = document.querySelector("button:has(.fa-moon), button[onclick*='timer'], button:contains('ٹائمر')");
+    if (!moonBtn) {
+      var allBtns = document.querySelectorAll("button");
+      for (var i = 0; i < allBtns.length; i++) {
+        if (allBtns[i].innerText && allBtns[i].innerText.includes("ٹائمر")) {
+          moonBtn = allBtns[i];
+          break;
+        }
+      }
+    }
+    if (moonBtn && !document.getElementById("trackModeToggleBtn")) {
+      var modeBtn = document.createElement("button");
+      modeBtn.id = "trackModeToggleBtn";
+      modeBtn.type = "button";
+      modeBtn.className = "mode-switch-btn";
+      modeBtn.onclick = window.cycleTrackMode;
+      moonBtn.parentNode.insertBefore(modeBtn, moonBtn.nextSibling);
+      updateTrackModeBtnUI();
+    }
+
+    // 2. Place End of Track button inside timer popup
+    var timerPresetArea = document.querySelector(".timer-modal, .stop-music-modal, [class*='modal']:has(input)");
+    if (timerPresetArea && !document.getElementById("endOfTrackBtn")) {
+      var endBtn = document.createElement("button");
+      endBtn.id = "endOfTrackBtn";
+      endBtn.type = "button";
+      endBtn.className = "end-track-btn";
+      endBtn.innerText = "⏳ نعت کا بقیہ وقت (End of track)";
+      endBtn.onclick = window.setRemainingSleepTimer;
+      timerPresetArea.appendChild(endBtn);
+    }
+
+    // 3. Audio Ended Listener
+    var audio = document.querySelector("audio");
+    if (audio && !audio.dataset.safeModeAttached) {
+      audio.dataset.safeModeAttached = "true";
+      audio.addEventListener("ended", function() {
+        if (window.currentTrackMode === "repeat") {
+          audio.currentTime = 0;
+          audio.play();
+        } else if (window.currentTrackMode === "shuffle") {
+          var btns = Array.from(document.querySelectorAll("button")).filter(function(b){
+            return b.innerText && (b.innerText.includes("سنیں") || b.innerText.includes("مطالعہ"));
+          });
+          if (btns.length > 0) {
+            var rand = btns[Math.floor(Math.random() * btns.length)];
+            rand.click();
+          }
+        } else {
+          // Play Next
+          var playBtns = Array.from(document.querySelectorAll("button")).filter(function(b){
+            return b.innerText && b.innerText.includes("سنیں");
+          });
+          for (var j = 0; j < playBtns.length; j++) {
+            if (playBtns[j].dataset.playing === "true" || playBtns[j].classList.contains("active")) {
+              if (j + 1 < playBtns.length) {
+                playBtns[j + 1].click();
+                return;
+              }
+            }
+          }
+        }
+      });
+    }
+  }
+
+  // Run triggers
+  document.addEventListener("DOMContentLoaded", function() {
+    activateRedDot5s();
+    injectEnhancementsSafely();
   });
-  observer.observe(document.body, { childList: true, subtree: true });
+  setInterval(injectEnhancementsSafely, 1500);
+
+  // Hook Login
+  document.addEventListener("click", function(e) {
+    if (e.target && e.target.innerText && (e.target.innerText.includes("تصدیق") || e.target.innerText.includes("داخل"))) {
+      setTimeout(activateRedDot5s, 500);
+    }
+  });
 </script>
 
 </body>
