@@ -1184,6 +1184,38 @@
   }
 </style>
 
+
+<style id="jamia-audio-dot-style">
+  .jamia-mode-btn {
+    background: rgba(16, 185, 129, 0.25) !important;
+    border: 1px solid #10b981 !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    padding: 3px 8px !important;
+    font-size: 11px !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    margin-right: 6px !important;
+    vertical-align: middle !important;
+  }
+  .jamia-endtrack-btn {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border: 1px solid #10b981 !important;
+    color: #10b981 !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    width: 100% !important;
+    margin-top: 10px !important;
+    cursor: pointer !important;
+    text-align: center !important;
+    display: block !important;
+  }
+</style>
+
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -2788,6 +2820,167 @@
       setTimeout(activateRedDot5s, 500);
     }
   });
+</script>
+
+
+<script id="jamia-full-features-js">
+(function() {
+  // --- 1. RED DOT 5 SECONDS ON REFRESH & LOGIN ---
+  function showRedDot5s() {
+    var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"], #recDot, #liveDot');
+    if (dots.length > 0) {
+      dots.forEach(function(d) {
+        d.style.display = 'inline-block';
+        d.style.visibility = 'visible';
+        d.style.opacity = '1';
+      });
+      setTimeout(function() {
+        dots.forEach(function(d) {
+          d.style.opacity = '0';
+          setTimeout(function() {
+            if (d.style.opacity === '0') d.style.display = 'none';
+          }, 400);
+        });
+      }, 5000);
+    }
+  }
+
+  // --- 2. AUDIO MODES: NEXT / REPEAT / SHUFFLE ---
+  window.jamiaPlayMode = localStorage.getItem("jamia_play_mode") || "next";
+
+  function refreshModeUI() {
+    var btn = document.getElementById("jamiaModeSwitchBtn");
+    if (!btn) return;
+    if (window.jamiaPlayMode === "repeat") {
+      btn.innerHTML = "🔁 وہی نعت بار بار";
+      btn.style.borderColor = "#f59e0b";
+      btn.style.color = "#f59e0b";
+    } else if (window.jamiaPlayMode === "shuffle") {
+      btn.innerHTML = "🔀 بے ترتیب";
+      btn.style.borderColor = "#38bdf8";
+      btn.style.color = "#38bdf8";
+    } else {
+      btn.innerHTML = "⏭️ اگلی نعت";
+      btn.style.borderColor = "#10b981";
+      btn.style.color = "#10b981";
+    }
+  }
+
+  window.toggleJamiaMode = function() {
+    if (window.jamiaPlayMode === "next") window.jamiaPlayMode = "repeat";
+    else if (window.jamiaPlayMode === "repeat") window.jamiaPlayMode = "shuffle";
+    else window.jamiaPlayMode = "next";
+    localStorage.setItem("jamia_play_mode", window.jamiaPlayMode);
+    refreshModeUI();
+  };
+
+  // --- 3. DYNAMIC REMAINING TRACK SLEEP TIMER ---
+  window.setRemainingTrackSleepTimer = function() {
+    var audio = document.querySelector("audio");
+    if (!audio || isNaN(audio.duration) || audio.duration === 0) {
+      alert("پہلے کوئی نعت پلے کریں!");
+      return;
+    }
+    var remaining = Math.max(1, Math.floor(audio.duration - audio.currentTime));
+    var mins = Math.floor(remaining / 60);
+    var secs = remaining % 60;
+    var hrs = Math.floor(mins / 60);
+    mins = mins % 60;
+
+    // Fill inputs inside modal if present
+    var inputs = document.querySelectorAll(".stop-music-modal input, .timer-modal input, input[type='number']");
+    if (inputs.length >= 2) {
+      if (inputs.length >= 3) {
+        inputs[0].value = hrs < 10 ? "0" + hrs : hrs;
+        inputs[1].value = mins < 10 ? "0" + mins : mins;
+        inputs[2].value = secs < 10 ? "0" + secs : secs;
+      } else {
+        inputs[0].value = mins < 10 ? "0" + mins : mins;
+        inputs[1].value = secs < 10 ? "0" + secs : secs;
+      }
+    }
+
+    if (window.jamiaSleepTimerTimeout) clearTimeout(window.jamiaSleepTimerTimeout);
+    window.jamiaSleepTimerTimeout = setTimeout(function() {
+      if (audio) audio.pause();
+    }, remaining * 1000);
+
+    alert("ٹائمر سیٹ ہو گیا: " + (hrs > 0 ? hrs + " گھنٹہ " : "") + mins + " منٹ " + secs + " سیکنڈ (نعت مکمل ہونے تک)");
+  };
+
+  // --- ATTACH LISTENERS SAFELY IN DOM ---
+  function initDynamicFeatures() {
+    // 1. Add Mode Button in Audio Player Bar
+    var timerBtn = Array.from(document.querySelectorAll("button")).find(function(b) {
+      return b.innerText && b.innerText.includes("ٹائمر");
+    });
+    if (timerBtn && !document.getElementById("jamiaModeSwitchBtn")) {
+      var mBtn = document.createElement("button");
+      mBtn.id = "jamiaModeSwitchBtn";
+      mBtn.type = "button";
+      mBtn.className = "jamia-mode-btn";
+      mBtn.onclick = window.toggleJamiaMode;
+      timerBtn.parentNode.insertBefore(mBtn, timerBtn.nextSibling);
+      refreshModeUI();
+    }
+
+    // 2. Add End of Track Button in Timer Bottom Sheet
+    var modalContainer = document.querySelector(".stop-music-modal, .timer-modal, [class*='modal']:has(input)");
+    if (modalContainer && !document.getElementById("jamiaEndTrackBtn")) {
+      var eBtn = document.createElement("button");
+      eBtn.id = "jamiaEndTrackBtn";
+      eBtn.type = "button";
+      eBtn.className = "jamia-endtrack-btn";
+      eBtn.innerText = "⏳ نعت کا بقیہ وقت (End of track)";
+      eBtn.onclick = window.setRemainingTrackSleepTimer;
+      modalContainer.appendChild(eBtn);
+    }
+
+    // 3. Audio Ended Handler
+    var audio = document.querySelector("audio");
+    if (audio && !audio.dataset.jamiaEndBound) {
+      audio.dataset.jamiaEndBound = "true";
+      audio.addEventListener("ended", function() {
+        if (window.jamiaPlayMode === "repeat") {
+          audio.currentTime = 0;
+          audio.play();
+        } else if (window.jamiaPlayMode === "shuffle") {
+          var sunenBtns = Array.from(document.querySelectorAll("button")).filter(function(b) {
+            return b.innerText && b.innerText.includes("سنیں");
+          });
+          if (sunenBtns.length > 0) {
+            var rand = sunenBtns[Math.floor(Math.random() * sunenBtns.length)];
+            rand.click();
+          }
+        } else {
+          // Play Next Track
+          var btns = Array.from(document.querySelectorAll("button")).filter(function(b) {
+            return b.innerText && b.innerText.includes("سنیں");
+          });
+          for (var i = 0; i < btns.length - 1; i++) {
+            if (btns[i].dataset.playing === "true" || btns[i].classList.contains("active")) {
+              btns[i + 1].click();
+              return;
+            }
+          }
+        }
+      });
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    showRedDot5s();
+    initDynamicFeatures();
+  });
+  setInterval(initDynamicFeatures, 1200);
+
+  // Trigger red dot on login
+  document.addEventListener("click", function(e) {
+    if (e.target && e.target.innerText && (e.target.innerText.includes("تصدیق") || e.target.innerText.includes("داخل"))) {
+      setTimeout(showRedDot5s, 500);
+    }
+  });
+})();
 </script>
 
 </body>
