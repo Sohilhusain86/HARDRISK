@@ -1202,16 +1202,20 @@
 </style>
 
 
-    <div class="filter-tags">
+        <!-- Row 1: Kutub Filter -->
+    <div class="filter-tags" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
       <div class="filter-tag active" onclick="setFilter('all', this)">تمام کتب</div>
       <div class="filter-tag" onclick="setFilter('papers', this)">امتحانی پرچے</div>
       <div class="filter-tag" onclick="setFilter('islamic', this)">دینی و فقہی</div>
-      <div class="filter-tag" onclick="setFilter('math', this)">
-ریاضی (Math)</div>
-            <div class="filter-tag" onclick="setFilter('hindi', this)">درسی ہندی</div>
-      <div class="filter-tag" onclick="setFilter('naat', this)">تمام نعتیں</div>
-      <div class="filter-tag" onclick="setFilter('asjad', this)">حضور عسجد رضا</div>
-      <div class="filter-tag" onclick="setFilter('sabir', this)">صابر رضا ازہری</div>
+      <div class="filter-tag" onclick="setFilter('math', this)">ریاضی (Math)</div>
+      <div class="filter-tag" onclick="setFilter('hindi', this)">درسی ہندی</div>
+    </div>
+
+    <!-- Row 2: Naat Sharif Dedicated Panel -->
+    <div class="filter-tags" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; border-top: 1px solid rgba(0, 255, 163, 0.2); padding-top: 8px;">
+      <div class="filter-tag" style="border-color: #00ffa3 !important; color: #00ffa3 !important;" onclick="setFilter('naat', this)"><i class="fa-solid fa-music" style="margin-left: 4px;"></i> تمام نعتیں</div>
+      <div class="filter-tag" style="border-color: #00ffa3 !important; color: #00ffa3 !important;" onclick="setFilter('asjad', this)">حضور عسجد رضا</div>
+      <div class="filter-tag" style="border-color: #00ffa3 !important; color: #00ffa3 !important;" onclick="setFilter('sabir', this)">صابر رضا ازہری</div>
     </div>
 
     <!-- Scalable Book Container -->
@@ -1551,14 +1555,28 @@
         : LIBRARY_DATA;
     }
 
-    function filterLibrary() {
+        function filterLibrary() {
       const q = document.getElementById("lib-search").value.toLowerCase().trim();
       const currentList = getActiveLibrary();
 
       const filtered = currentList.filter(b => {
-        const matchesCategory = (currentCategory === 'all' || b.category === currentCategory);
         const titleText = (b.title || "").toLowerCase();
         const subText = (b.subtitle || "").toLowerCase();
+        const isNaat = (b.category === "naat" || b.type === "audio");
+
+        let matchesCategory = false;
+        if (currentCategory === 'all') {
+          matchesCategory = true;
+        } else if (currentCategory === 'naat') {
+          matchesCategory = isNaat;
+        } else if (currentCategory === 'asjad') {
+          matchesCategory = isNaat && (titleText.includes("asjad") || titleText.includes("عسجد"));
+        } else if (currentCategory === 'sabir') {
+          matchesCategory = isNaat && (titleText.includes("sabir") || titleText.includes("صابر"));
+        } else {
+          matchesCategory = (!isNaat && b.category === currentCategory);
+        }
+
         const matchesSearch = !q || titleText.includes(q) || subText.includes(q);
         return matchesCategory && matchesSearch;
       });
