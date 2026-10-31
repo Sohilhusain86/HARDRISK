@@ -1151,6 +1151,22 @@
   }
 </style>
 
+
+<style id="red-dot-custom-5s">
+  .rec-dot, .red-dot, [class*="red-dot"], [class*="recording-dot"] {
+    animation-duration: 1s !important;
+  }
+  .rec-dot-active {
+    display: inline-block !important;
+    opacity: 1 !important;
+    transition: opacity 0.5s ease !important;
+  }
+  .rec-dot-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+</style>
+
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -2576,6 +2592,61 @@
     updateModeBtnUI();
     bindAudioEndEvent();
   }, 1500);
+</script>
+
+
+<script id="red-dot-5s-logic">
+  window.triggerRedDot5s = function() {
+    var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="red-dot"], [class*="recording-dot"], #recDot, #liveDot');
+    if (!dots || dots.length === 0) return;
+
+    dots.forEach(function(dot) {
+      dot.classList.remove('rec-dot-hidden');
+      dot.classList.add('rec-dot-active');
+      dot.style.display = 'inline-block';
+      dot.style.visibility = 'visible';
+      dot.style.opacity = '1';
+    });
+
+    if (window.redDotTimeout) clearTimeout(window.redDotTimeout);
+    window.redDotTimeout = setTimeout(function() {
+      dots.forEach(function(dot) {
+        dot.classList.add('rec-dot-hidden');
+        dot.classList.remove('rec-dot-active');
+        setTimeout(function() {
+          if (dot.classList.contains('rec-dot-hidden')) {
+            dot.style.display = 'none';
+          }
+        }, 500);
+      });
+    }, 5000); // 5 seconds
+  };
+
+  // Run on initial page load / refresh
+  document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(window.triggerRedDot5s, 400);
+  });
+
+  // Attach to login submit button / form
+  function attachLoginDotTrigger() {
+    var loginBtns = document.querySelectorAll("button, input[type='submit']");
+    loginBtns.forEach(function(btn) {
+      if (btn.innerText && (btn.innerText.includes("تصدیق") || btn.innerText.includes("داخل") || btn.innerText.includes("Login"))) {
+        if (!btn.dataset.dotBound) {
+          btn.dataset.dotBound = "true";
+          btn.addEventListener("click", function() {
+            setTimeout(window.triggerRedDot5s, 600);
+          });
+        }
+      }
+    });
+  }
+
+  // Monitor DOM for login modal disappearance
+  var observer = new MutationObserver(function(mutations) {
+    attachLoginDotTrigger();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
 </script>
 
 </body>
