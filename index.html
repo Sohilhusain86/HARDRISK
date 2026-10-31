@@ -1117,6 +1117,35 @@
   }
 </style>
 
+
+<style id="audio-features-style">
+  .jamia-play-mode-btn {
+    background: rgba(16, 185, 129, 0.2) !important;
+    border: 1px solid #10b981 !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    padding: 3px 8px !important;
+    font-size: 11px !important;
+    cursor: pointer !important;
+    margin-right: 6px !important;
+    vertical-align: middle !important;
+  }
+  .jamia-endtrack-btn {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border: 1px solid #10b981 !important;
+    color: #10b981 !important;
+    border-radius: 8px !important;
+    padding: 8px !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    margin-top: 10px !important;
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+</style>
+
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -2239,39 +2268,32 @@
 </script>
 
 
-<script id="jamia-perfect-engine">
+<script id="audio-features-script">
 (function() {
-  // 1. RED DOT & LOADING BADGE (5 SECONDS ON REFRESH & LOGIN)
-  function triggerRedDot5s() {
-    // Dhundo red dot ya "مزید کتب و نعتیں" wala banner
-    var badges = Array.from(document.querySelectorAll("div, p, span, button")).filter(function(el) {
-      return el.innerText && el.innerText.includes("مزید کتب و نعتیں");
-    });
-    var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"]');
-
-    var elementsToToggle = badges.concat(Array.from(dots));
-    elementsToToggle.forEach(function(el) {
-      el.style.display = 'inline-block';
-      el.style.visibility = 'visible';
-      el.style.opacity = '1';
-    });
-
-    if (window.redDotTimer) clearTimeout(window.redDotTimer);
-    window.redDotTimer = setTimeout(function() {
-      elementsToToggle.forEach(function(el) {
-        el.style.opacity = '0';
-        setTimeout(function() {
-          if (el.style.opacity === '0') el.style.display = 'none';
-        }, 400);
+  // 1. RED DOT (5 SECONDS ON REFRESH & ON LOGIN)
+  function startRedDot5s() {
+    var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"], #recDot, #liveDot');
+    if (dots.length > 0) {
+      dots.forEach(function(d) {
+        d.style.display = 'inline-block';
+        d.style.visibility = 'visible';
+        d.style.opacity = '1';
       });
-    }, 5000); // Poore 5 seconds
+      setTimeout(function() {
+        dots.forEach(function(d) {
+          d.style.opacity = '0';
+          setTimeout(function() {
+            if (d.style.opacity === '0') d.style.display = 'none';
+          }, 400);
+        });
+      }, 5000);
+    }
   }
 
-  // 2. PLAY MODES LOGIC
-  window.jamiaPlayMode = localStorage.getItem("jamia_play_mode") || "next"; // next, repeat, shuffle
-  window.currentPlayingIndex = 0;
+  // 2. MODES: NEXT / REPEAT / SHUFFLE
+  window.jamiaPlayMode = localStorage.getItem("jamia_play_mode") || "next";
 
-  function updateModeUI() {
+  function refreshModeBtn() {
     var btn = document.getElementById("jamiaPlayModeBtn");
     if (!btn) return;
     if (window.jamiaPlayMode === "repeat") {
@@ -2294,87 +2316,111 @@
     else if (window.jamiaPlayMode === "repeat") window.jamiaPlayMode = "shuffle";
     else window.jamiaPlayMode = "next";
     localStorage.setItem("jamia_play_mode", window.jamiaPlayMode);
-    updateModeUI();
+    refreshModeBtn();
   };
 
-  // 3. TRACK NAAT SELECTION & AUTO-PLAY
-  function getSunenButtons() {
-    return Array.from(document.querySelectorAll("button")).filter(function(b) {
-      return b.innerText && b.innerText.includes("سنیں");
-    });
-  }
-
-  function bindSunenButtons() {
-    var buttons = getSunenButtons();
-    buttons.forEach(function(btn, idx) {
-      if (!btn.dataset.indexBound) {
-        btn.dataset.indexBound = "true";
-        btn.addEventListener("click", function() {
-          window.currentPlayingIndex = idx;
-        });
-      }
-    });
-  }
-
-  function playNextTrack() {
-    var buttons = getSunenButtons();
-    if (buttons.length === 0) return;
-
-    if (window.jamiaPlayMode === "repeat") {
-      var audio = document.querySelector("audio");
-      if (audio) { audio.currentTime = 0; audio.play(); }
-    } else if (window.jamiaPlayMode === "shuffle") {
-      var randIdx = Math.floor(Math.random() * buttons.length);
-      window.currentPlayingIndex = randIdx;
-      buttons[randIdx].click();
-    } else {
-      // Auto Next
-      var nextIdx = window.currentPlayingIndex + 1;
-      if (nextIdx >= buttons.length) nextIdx = 0; // wapas pehli naat par
-      window.currentPlayingIndex = nextIdx;
-      buttons[nextIdx].click();
-    }
-  }
-
-  // 4. ATTACH TO AUDIO PLAYER
-  function bindAudioPlayer() {
+  // 3. END-OF-TRACK SLEEP TIMER
+  window.setRemainingSleepTimer = function() {
     var audio = document.querySelector("audio");
-    if (audio && !audio.dataset.perfectBound) {
-      audio.dataset.perfectBound = "true";
+    if (!audio || isNaN(audio.duration) || audio.duration === 0) {
+      alert("پہلے کوئی نعت پلے کریں!");
+      return;
+    }
+    var remaining = Math.max(1, Math.floor(audio.duration - audio.currentTime));
+    var mins = Math.floor(remaining / 60);
+    var secs = remaining % 60;
+    var hrs = Math.floor(mins / 60);
+    mins = mins % 60;
+
+    var inputs = document.querySelectorAll(".stop-music-modal input, .timer-modal input, input[type='number']");
+    if (inputs.length >= 2) {
+      if (inputs.length >= 3) {
+        inputs[0].value = hrs < 10 ? "0" + hrs : hrs;
+        inputs[1].value = mins < 10 ? "0" + mins : mins;
+        inputs[2].value = secs < 10 ? "0" + secs : secs;
+      } else {
+        inputs[0].value = mins < 10 ? "0" + mins : mins;
+        inputs[1].value = secs < 10 ? "0" + secs : secs;
+      }
+    }
+
+    if (window.jamiaSleepTimerTimeout) clearTimeout(window.jamiaSleepTimerTimeout);
+    window.jamiaSleepTimerTimeout = setTimeout(function() {
+      if (audio) audio.pause();
+    }, remaining * 1000);
+
+    alert("ٹائمر سیٹ ہو گیا: " + (hrs > 0 ? hrs + " گھنٹہ " : "") + mins + " منٹ " + secs + " سیکنڈ (نعت کے اختتام تک)");
+  };
+
+  // DOM INJECTION
+  function injectControls() {
+    // Mode button next to moon/timer button
+    var timerBtn = Array.from(document.querySelectorAll("button")).find(function(b) {
+      return b.innerText && b.innerText.includes("ٹائمر");
+    });
+    if (timerBtn && !document.getElementById("jamiaPlayModeBtn")) {
+      var mBtn = document.createElement("button");
+      mBtn.id = "jamiaPlayModeBtn";
+      mBtn.type = "button";
+      mBtn.className = "jamia-play-mode-btn";
+      mBtn.onclick = window.cycleJamiaPlayMode;
+      timerBtn.parentNode.insertBefore(mBtn, timerBtn.nextSibling);
+      refreshModeBtn();
+    }
+
+    // End-of-track button inside sleep timer modal
+    var modal = document.querySelector(".stop-music-modal, .timer-modal, [class*='modal']:has(input)");
+    if (modal && !document.getElementById("jamiaEndTrackBtn")) {
+      var eBtn = document.createElement("button");
+      eBtn.id = "jamiaEndTrackBtn";
+      eBtn.type = "button";
+      eBtn.className = "jamia-endtrack-btn";
+      eBtn.innerText = "⏳ نعت کا بقیہ وقت (End of track)";
+      eBtn.onclick = window.setRemainingSleepTimer;
+      modal.appendChild(eBtn);
+    }
+
+    // Audio onEnded event listener
+    var audio = document.querySelector("audio");
+    if (audio && !audio.dataset.modeAttached) {
+      audio.dataset.modeAttached = "true";
       audio.addEventListener("ended", function() {
-        playNextTrack();
-      });
-      // Safety check agar ended event miss ho jaye
-      audio.addEventListener("timeupdate", function() {
-        if (audio.duration && audio.currentTime >= audio.duration - 0.3) {
-          if (!audio.dataset.endedTriggered) {
-            audio.dataset.endedTriggered = "true";
-            playNextTrack();
-            setTimeout(function(){ audio.dataset.endedTriggered = ""; }, 2000);
+        if (window.jamiaPlayMode === "repeat") {
+          audio.currentTime = 0;
+          audio.play();
+        } else if (window.jamiaPlayMode === "shuffle") {
+          var btns = Array.from(document.querySelectorAll("button")).filter(function(b) {
+            return b.innerText && b.innerText.includes("سنیں");
+          });
+          if (btns.length > 0) {
+            var rand = btns[Math.floor(Math.random() * btns.length)];
+            rand.click();
+          }
+        } else {
+          var btns = Array.from(document.querySelectorAll("button")).filter(function(b) {
+            return b.innerText && b.innerText.includes("سنیں");
+          });
+          for (var i = 0; i < btns.length - 1; i++) {
+            if (btns[i].dataset.playing === "true" || btns[i].classList.contains("active")) {
+              btns[i + 1].click();
+              return;
+            }
           }
         }
       });
     }
   }
 
-  // Hook everything
   document.addEventListener("DOMContentLoaded", function() {
-    triggerRedDot5s();
-    updateModeUI();
-    bindSunenButtons();
-    bindAudioPlayer();
+    startRedDot5s();
+    injectControls();
   });
+  setInterval(injectControls, 1200);
 
-  setInterval(function() {
-    updateModeUI();
-    bindSunenButtons();
-    bindAudioPlayer();
-  }, 1000);
-
-  // Hook Login button
+  // Trigger red dot on login button click
   document.addEventListener("click", function(e) {
     if (e.target && e.target.innerText && (e.target.innerText.includes("تصدیق") || e.target.innerText.includes("داخل"))) {
-      setTimeout(triggerRedDot5s, 400);
+      setTimeout(startRedDot5s, 500);
     }
   });
 })();
