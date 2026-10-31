@@ -1086,8 +1086,14 @@
 
 
 
-<style id="jamia-root-styles">
-  .jamia-playmode-btn {
+
+
+
+
+
+
+<style id="jamia-final-styles">
+  .jamia-play-mode-btn {
     background: rgba(16, 185, 129, 0.25) !important;
     border: 1px solid #10b981 !important;
     color: #ffffff !important;
@@ -1100,35 +1106,6 @@
     display: inline-flex !important;
     align-items: center !important;
     gap: 4px !important;
-  }
-  .jamia-endtrack-btn {
-    background: rgba(16, 185, 129, 0.15) !important;
-    border: 1px solid #10b981 !important;
-    color: #10b981 !important;
-    border-radius: 8px !important;
-    padding: 9px !important;
-    font-size: 12px !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
-    margin-top: 10px !important;
-    display: block !important;
-    width: 100% !important;
-    text-align: center !important;
-  }
-</style>
-
-
-<style id="audio-features-style">
-  .jamia-play-mode-btn {
-    background: rgba(16, 185, 129, 0.2) !important;
-    border: 1px solid #10b981 !important;
-    color: #ffffff !important;
-    border-radius: 8px !important;
-    padding: 3px 8px !important;
-    font-size: 11px !important;
-    cursor: pointer !important;
-    margin-right: 6px !important;
-    vertical-align: middle !important;
   }
   .jamia-endtrack-btn {
     background: rgba(16, 185, 129, 0.15) !important;
@@ -2051,31 +2028,20 @@
 
 
 
-<script id="jamia-root-logic">
-(function() {
-  // -------------------------------------------------------------
-  // A. ONESIGNAL LOGIN PUSH PROMPT (Har naye phone par maangega)
-  // -------------------------------------------------------------
-  function triggerOneSignalPush() {
-    try {
-      if (window.OneSignalDeferred) {
-        window.OneSignalDeferred.push(async function(OneSignal) {
-          await OneSignal.Slidedown.promptPush();
-        });
-      } else if (window.OneSignal && window.OneSignal.Slidedown) {
-        window.OneSignal.Slidedown.promptPush();
-      }
-    } catch(err) {
-      console.log("OneSignal push trigger error:", err);
-    }
-  }
 
-  // -------------------------------------------------------------
-  // B. RED DOT & BADGE 5 SECONDS (Refresh par bhi, Login par bhi)
-  // -------------------------------------------------------------
-  function showRedIndicator5s() {
+
+
+
+
+
+<script id="jamia-final-engine">
+(function() {
+  // ==========================================================
+  // 1. RED DOT & BADGE (5 SECONDS ON REFRESH & ON LOGIN)
+  // ==========================================================
+  window.triggerRedDot5s = function() {
     var targets = [];
-    var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"]');
+    var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"], #recDot, #liveDot');
     dots.forEach(function(d){ targets.push(d); });
 
     var allElements = document.querySelectorAll("div, p, span");
@@ -2092,208 +2058,56 @@
       t.style.opacity = '1';
     });
 
-    if (window.redDotTimeoutRef) clearTimeout(window.redDotTimeoutRef);
-    window.redDotTimeoutRef = setTimeout(function() {
+    if (window.redDotTimerRef) clearTimeout(window.redDotTimerRef);
+    window.redDotTimerRef = setTimeout(function() {
       targets.forEach(function(t) {
         t.style.opacity = '0';
         setTimeout(function() {
           if (t.style.opacity === '0') t.style.display = 'none';
         }, 500);
       });
-    }, 5000);
-  }
+    }, 5000); // 5 Seconds
+  };
 
-  // -------------------------------------------------------------
-  // C. AUDIO MODES (Next / Repeat / Shuffle) & AUTO-PLAY
-  // -------------------------------------------------------------
-  window.jamiaPlayMode = localStorage.getItem("jamia_play_mode") || "next";
-  window.activeNaatIndex = 0;
-
-  function updateModeButtonUI() {
-    var btn = document.getElementById("jamiaPlayModeBtn");
-    if (!btn) return;
-    if (window.jamiaPlayMode === "repeat") {
-      btn.innerHTML = "🔁 وہی نعت بار بار";
-      btn.style.borderColor = "#f59e0b";
-      btn.style.color = "#f59e0b";
-    } else if (window.jamiaPlayMode === "shuffle") {
-      btn.innerHTML = "🔀 بے ترتیب";
-      btn.style.borderColor = "#38bdf8";
-      btn.style.color = "#38bdf8";
-    } else {
-      btn.innerHTML = "⏭️ اگلی نعت";
-      btn.style.borderColor = "#10b981";
-      btn.style.color = "#10b981";
+  // ==========================================================
+  // 2. ONESIGNAL NOTIFICATION PROMPT ON LOGIN (Direct Gesture)
+  // ==========================================================
+  window.requestNotificationOnLogin = function() {
+    // Native Browser Dialog
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission().then(function(perm) {
+        console.log("Notification permission:", perm);
+      }).catch(function(err){ console.log(err); });
     }
-  }
+    // OneSignal Dialog
+    try {
+      if (window.OneSignalDeferred) {
+        window.OneSignalDeferred.push(async function(OneSignal) {
+          await OneSignal.Notifications.requestPermission();
+        });
+      } else if (window.OneSignal && window.OneSignal.Notifications) {
+        window.OneSignal.Notifications.requestPermission();
+      }
+    } catch(e) {
+      console.log("OneSignal push error:", e);
+    }
+  };
 
-  window.toggleJamiaPlayMode = function() {
-    if (window.jamiaPlayMode === "next") window.jamiaPlayMode = "repeat";
-    else if (window.jamiaPlayMode === "repeat") window.jamiaPlayMode = "shuffle";
-    else window.jamiaPlayMode = "next";
-    localStorage.setItem("jamia_play_mode", window.jamiaPlayMode);
+  // ==========================================================
+  // 3. AUDIO PLAY MODES (REPEAT / NEXT / SHUFFLE)
+  // ==========================================================
+  window.jamiaPlayMode = localStorage.getItem("jamia_play_mode") || "next";
+  window.currentPlayingUrl = "";
+
+  // Hook original playAudio function to track current track URL
+  var origPlayAudio = window.playAudio;
+  window.playAudio = function(audioUrl, title) {
+    window.currentPlayingUrl = audioUrl;
+    if (origPlayAudio) origPlayAudio(audioUrl, title);
     updateModeButtonUI();
   };
 
-  function getAllSunenButtons() {
-    return Array.from(document.querySelectorAll("button")).filter(function(b) {
-      return b.innerText && b.innerText.includes("سنیں");
-    });
-  }
-
-  function trackNaatButtons() {
-    var btns = getAllSunenButtons();
-    btns.forEach(function(btn, idx) {
-      if (!btn.dataset.trackerBound) {
-        btn.dataset.trackerBound = "true";
-        btn.addEventListener("click", function() {
-          window.activeNaatIndex = idx;
-        });
-      }
-    });
-  }
-
-  window.playNextTrackInQueue = function() {
-    var btns = getAllSunenButtons();
-    if (btns.length === 0) return;
-
-    if (window.jamiaPlayMode === "repeat") {
-      if (btns[window.activeNaatIndex]) btns[window.activeNaatIndex].click();
-    } else if (window.jamiaPlayMode === "shuffle") {
-      var rand = Math.floor(Math.random() * btns.length);
-      window.activeNaatIndex = rand;
-      btns[rand].click();
-    } else {
-      var next = window.activeNaatIndex + 1;
-      if (next >= btns.length) next = 0;
-      window.activeNaatIndex = next;
-      btns[next].click();
-    }
-  };
-
-  // -------------------------------------------------------------
-  // D. REMAINING TRACK SLEEP TIMER
-  // -------------------------------------------------------------
-  window.setRemainingSleepTimer = function() {
-    var audio = document.querySelector("audio");
-    var remainingSeconds = 300; // default 5 min fallback
-    if (audio && audio.duration && !isNaN(audio.duration)) {
-      remainingSeconds = Math.max(1, Math.floor(audio.duration - audio.currentTime));
-    }
-    var mins = Math.floor(remainingSeconds / 60);
-    var secs = remainingSeconds % 60;
-    var hrs = Math.floor(mins / 60);
-    mins = mins % 60;
-
-    var inputs = document.querySelectorAll(".stop-music-modal input, .timer-modal input, input[type='number']");
-    if (inputs.length >= 2) {
-      if (inputs.length >= 3) {
-        inputs[0].value = hrs < 10 ? "0" + hrs : hrs;
-        inputs[1].value = mins < 10 ? "0" + mins : mins;
-        inputs[2].value = secs < 10 ? "0" + secs : secs;
-      } else {
-        inputs[0].value = mins < 10 ? "0" + mins : mins;
-        inputs[1].value = secs < 10 ? "0" + secs : secs;
-      }
-    }
-
-    if (window.jamiaSleepTimerTimeout) clearTimeout(window.jamiaSleepTimerTimeout);
-    window.jamiaSleepTimerTimeout = setTimeout(function() {
-      var aud = document.querySelector("audio");
-      if (aud) aud.pause();
-      var iframe = document.querySelector("iframe");
-      if (iframe) iframe.src = "";
-    }, remainingSeconds * 1000);
-
-    alert("ٹائمر سیٹ ہو گیا: " + (hrs > 0 ? hrs + " گھنٹہ " : "") + mins + " منٹ " + secs + " سیکنڈ");
-  };
-
-  // -------------------------------------------------------------
-  // E. ATTACH UI CONTROLS DYNAMICALLY
-  // -------------------------------------------------------------
-  function attachUIEnhancements() {
-    trackNaatButtons();
-
-    // Mode button next to moon/timer button
-    var timerBtn = Array.from(document.querySelectorAll("button")).find(function(b) {
-      return b.innerText && b.innerText.includes("ٹائمر");
-    });
-    if (timerBtn && !document.getElementById("jamiaPlayModeBtn")) {
-      var mBtn = document.createElement("button");
-      mBtn.id = "jamiaPlayModeBtn";
-      mBtn.type = "button";
-      mBtn.className = "jamia-playmode-btn";
-      mBtn.onclick = window.toggleJamiaPlayMode;
-      timerBtn.parentNode.insertBefore(mBtn, timerBtn.nextSibling);
-      updateModeButtonUI();
-    }
-
-    // End of track button inside sleep timer modal
-    var modal = document.querySelector(".stop-music-modal, .timer-modal, [class*='modal']:has(input)");
-    if (modal && !document.getElementById("jamiaEndTrackBtn")) {
-      var eBtn = document.createElement("button");
-      eBtn.id = "jamiaEndTrackBtn";
-      eBtn.type = "button";
-      eBtn.className = "jamia-endtrack-btn";
-      eBtn.innerText = "⏳ نعت کا بقیہ وقت (End of track)";
-      eBtn.onclick = window.setRemainingSleepTimer;
-      modal.appendChild(eBtn);
-    }
-
-    // Native audio listener if audio element exists
-    var audio = document.querySelector("audio");
-    if (audio && !audio.dataset.trackBound) {
-      audio.dataset.trackBound = "true";
-      audio.addEventListener("ended", window.playNextTrackInQueue);
-    }
-  }
-
-  // -------------------------------------------------------------
-  // F. GLOBAL TRIGGERS (Load & Login)
-  // -------------------------------------------------------------
-  document.addEventListener("DOMContentLoaded", function() {
-    showRedIndicator5s();
-    attachUIEnhancements();
-  });
-  setInterval(attachUIEnhancements, 1200);
-
-  // Login click / submit hook
-  document.addEventListener("click", function(e) {
-    if (e.target && e.target.innerText && (e.target.innerText.includes("تصدیق") || e.target.innerText.includes("داخل"))) {
-      showRedIndicator5s();
-      triggerOneSignalPush();
-    }
-  });
-})();
-</script>
-
-
-<script id="audio-features-script">
-(function() {
-  // 1. RED DOT (5 SECONDS ON REFRESH & ON LOGIN)
-  function startRedDot5s() {
-    var dots = document.querySelectorAll('.rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"], #recDot, #liveDot');
-    if (dots.length > 0) {
-      dots.forEach(function(d) {
-        d.style.display = 'inline-block';
-        d.style.visibility = 'visible';
-        d.style.opacity = '1';
-      });
-      setTimeout(function() {
-        dots.forEach(function(d) {
-          d.style.opacity = '0';
-          setTimeout(function() {
-            if (d.style.opacity === '0') d.style.display = 'none';
-          }, 400);
-        });
-      }, 5000);
-    }
-  }
-
-  // 2. MODES: NEXT / REPEAT / SHUFFLE
-  window.jamiaPlayMode = localStorage.getItem("jamia_play_mode") || "next";
-
-  function refreshModeBtn() {
+  function updateModeButtonUI() {
     var btn = document.getElementById("jamiaPlayModeBtn");
     if (!btn) return;
     if (window.jamiaPlayMode === "repeat") {
@@ -2316,21 +2130,53 @@
     else if (window.jamiaPlayMode === "repeat") window.jamiaPlayMode = "shuffle";
     else window.jamiaPlayMode = "next";
     localStorage.setItem("jamia_play_mode", window.jamiaPlayMode);
-    refreshModeBtn();
+    updateModeButtonUI();
   };
 
-  // 3. END-OF-TRACK SLEEP TIMER
-  window.setRemainingSleepTimer = function() {
-    var audio = document.querySelector("audio");
-    if (!audio || isNaN(audio.duration) || audio.duration === 0) {
+  // Trigger next / repeat when track ends
+  function handleTrackFinished() {
+    var audio = document.getElementById("globalHtmlAudio");
+    if (!audio) return;
+
+    if (window.jamiaPlayMode === "repeat") {
+      audio.currentTime = 0;
+      audio.play().catch(function(e){ console.log(e); });
+      return;
+    }
+
+    var allNaatButtons = Array.from(document.querySelectorAll("button[onclick*='playAudio']"));
+    if (allNaatButtons.length === 0) return;
+
+    if (window.jamiaPlayMode === "shuffle") {
+      var randIdx = Math.floor(Math.random() * allNaatButtons.length);
+      allNaatButtons[randIdx].click();
+      return;
+    }
+
+    // Default: Next Track in queue
+    var currentIndex = allNaatButtons.findIndex(function(b) {
+      var oc = b.getAttribute("onclick") || "";
+      return oc.includes(window.currentPlayingUrl);
+    });
+
+    if (currentIndex === -1) currentIndex = 0;
+    var nextIndex = (currentIndex + 1) % allNaatButtons.length;
+    allNaatButtons[nextIndex].click();
+  }
+
+  // ==========================================================
+  // 4. DYNAMIC REMAINING TRACK SLEEP TIMER
+  // ==========================================================
+  window.setRemainingTrackSleepTimer = function() {
+    var audio = document.getElementById("globalHtmlAudio");
+    if (!audio || !audio.duration || isNaN(audio.duration)) {
       alert("پہلے کوئی نعت پلے کریں!");
       return;
     }
     var remaining = Math.max(1, Math.floor(audio.duration - audio.currentTime));
-    var mins = Math.floor(remaining / 60);
+    var hrs = Math.floor(remaining / 3600);
+    var mins = Math.floor((remaining % 3600) / 60);
     var secs = remaining % 60;
-    var hrs = Math.floor(mins / 60);
-    mins = mins % 60;
 
     var inputs = document.querySelectorAll(".stop-music-modal input, .timer-modal input, input[type='number']");
     if (inputs.length >= 2) {
@@ -2344,17 +2190,19 @@
       }
     }
 
-    if (window.jamiaSleepTimerTimeout) clearTimeout(window.jamiaSleepTimerTimeout);
-    window.jamiaSleepTimerTimeout = setTimeout(function() {
-      if (audio) audio.pause();
+    if (window.jamiaCustomSleepTimer) clearTimeout(window.jamiaCustomSleepTimer);
+    window.jamiaCustomSleepTimer = setTimeout(function() {
+      if (audio) { audio.pause(); audio.currentTime = 0; }
     }, remaining * 1000);
 
-    alert("ٹائمر سیٹ ہو گیا: " + (hrs > 0 ? hrs + " گھنٹہ " : "") + mins + " منٹ " + secs + " سیکنڈ (نعت کے اختتام تک)");
+    alert("ٹائمر سیٹ ہو گیا: " + (hrs > 0 ? hrs + " گھنٹہ " : "") + mins + " منٹ " + secs + " سیکنڈ (نعت مکمل ہونے تک)");
   };
 
-  // DOM INJECTION
-  function injectControls() {
-    // Mode button next to moon/timer button
+  // ==========================================================
+  // 5. ATTACH CONTROLS AND LISTENERS
+  // ==========================================================
+  function attachAllFeatures() {
+    // Mode button next to timer button
     var timerBtn = Array.from(document.querySelectorAll("button")).find(function(b) {
       return b.innerText && b.innerText.includes("ٹائمر");
     });
@@ -2365,10 +2213,10 @@
       mBtn.className = "jamia-play-mode-btn";
       mBtn.onclick = window.cycleJamiaPlayMode;
       timerBtn.parentNode.insertBefore(mBtn, timerBtn.nextSibling);
-      refreshModeBtn();
+      updateModeButtonUI();
     }
 
-    // End-of-track button inside sleep timer modal
+    // End-of-track button in timer modal
     var modal = document.querySelector(".stop-music-modal, .timer-modal, [class*='modal']:has(input)");
     if (modal && !document.getElementById("jamiaEndTrackBtn")) {
       var eBtn = document.createElement("button");
@@ -2376,53 +2224,44 @@
       eBtn.type = "button";
       eBtn.className = "jamia-endtrack-btn";
       eBtn.innerText = "⏳ نعت کا بقیہ وقت (End of track)";
-      eBtn.onclick = window.setRemainingSleepTimer;
+      eBtn.onclick = window.setRemainingTrackSleepTimer;
       modal.appendChild(eBtn);
     }
 
-    // Audio onEnded event listener
-    var audio = document.querySelector("audio");
-    if (audio && !audio.dataset.modeAttached) {
-      audio.dataset.modeAttached = "true";
-      audio.addEventListener("ended", function() {
-        if (window.jamiaPlayMode === "repeat") {
-          audio.currentTime = 0;
-          audio.play();
-        } else if (window.jamiaPlayMode === "shuffle") {
-          var btns = Array.from(document.querySelectorAll("button")).filter(function(b) {
-            return b.innerText && b.innerText.includes("سنیں");
-          });
-          if (btns.length > 0) {
-            var rand = btns[Math.floor(Math.random() * btns.length)];
-            rand.click();
-          }
-        } else {
-          var btns = Array.from(document.querySelectorAll("button")).filter(function(b) {
-            return b.innerText && b.innerText.includes("سنیں");
-          });
-          for (var i = 0; i < btns.length - 1; i++) {
-            if (btns[i].dataset.playing === "true" || btns[i].classList.contains("active")) {
-              btns[i + 1].click();
-              return;
-            }
-          }
-        }
+    // Bind ended event to globalHtmlAudio
+    var audio = document.getElementById("globalHtmlAudio");
+    if (audio && !audio.dataset.finalBound) {
+      audio.dataset.finalBound = "true";
+      audio.addEventListener("ended", handleTrackFinished);
+    }
+
+    // Bind login button
+    var loginBtn = document.getElementById("btn-login");
+    if (loginBtn && !loginBtn.dataset.notifyBound) {
+      loginBtn.dataset.notifyBound = "true";
+      loginBtn.addEventListener("click", function() {
+        window.requestNotificationOnLogin();
+        setTimeout(window.triggerRedDot5s, 600);
       });
     }
   }
 
-  document.addEventListener("DOMContentLoaded", function() {
-    startRedDot5s();
-    injectControls();
-  });
-  setInterval(injectControls, 1200);
-
-  // Trigger red dot on login button click
-  document.addEventListener("click", function(e) {
-    if (e.target && e.target.innerText && (e.target.innerText.includes("تصدیق") || e.target.innerText.includes("داخل"))) {
-      setTimeout(startRedDot5s, 500);
+  // Hook verifyAccess if credentials match
+  var origVerify = window.verifyAccess;
+  window.verifyAccess = function() {
+    var passEl = document.getElementById('user-pass');
+    var pass = passEl ? passEl.value.trim() : "";
+    if (typeof MASTER_PASSWORD !== "undefined" && pass === MASTER_PASSWORD) {
+      setTimeout(window.triggerRedDot5s, 300);
     }
+    if (origVerify) return origVerify.apply(this, arguments);
+  };
+
+  document.addEventListener("DOMContentLoaded", function() {
+    window.triggerRedDot5s();
+    attachAllFeatures();
   });
+  setInterval(attachAllFeatures, 1000);
 })();
 </script>
 
