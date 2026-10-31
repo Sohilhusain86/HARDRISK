@@ -1202,13 +1202,29 @@
 </style>
 
 
-        <!-- Row 1: Kutub Filter -->
-    <div class="filter-tags" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
-      <div class="filter-tag active" onclick="setFilter('all', this)">تمام کتب</div>
-      <div class="filter-tag" onclick="setFilter('papers', this)">امتحانی پرچے</div>
-      <div class="filter-tag" onclick="setFilter('islamic', this)">دینی و فقہی</div>
-      <div class="filter-tag" onclick="setFilter('math', this)">ریاضی (Math)</div>
-      <div class="filter-tag" onclick="setFilter('hindi', this)">درسی ہندی</div>
+            <!-- Filter Hide/Show Toggle Button -->
+    <div style="display:flex; justify-content:flex-end; margin: 4px 0 6px 0;">
+      <button type="button" id="toggleFiltersBtn" onclick="toggleFilterRows()" style="background:rgba(0, 255, 163, 0.12); border:1px solid #00ffa3; color:#00ffa3; padding:4px 14px; border-radius:15px; font-size:12px; cursor:pointer; font-family:inherit; display:inline-flex; align-items:center; gap:6px; box-shadow: 0 2px 8px rgba(0,255,163,0.15);">
+        <i class="fa-solid fa-eye-slash" id="toggleFiltersIcon"></i>
+        <span id="toggleFiltersText">فلٹرز چھپائیں</span>
+      </button>
+    </div>
+    <div id="collapsibleFiltersWrapper" style="transition: all 0.25s ease;">
+      <!-- Row 1: Kutub Filter -->
+      <div class="filter-tags" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
+        <div class="filter-tag active" onclick="setFilter('all', this)">تمام کتب</div>
+        <div class="filter-tag" onclick="setFilter('papers', this)">امتحانی پرچے</div>
+        <div class="filter-tag" onclick="setFilter('islamic', this)">دینی و فقہی</div>
+        <div class="filter-tag" onclick="setFilter('math', this)">ریاضی (Math)</div>
+        <div class="filter-tag" onclick="setFilter('hindi', this)">درسی ہندی</div>
+      </div>
+
+      <!-- Row 2: Naat Sharif Dedicated Panel -->
+      <div class="filter-tags" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; border-top: 1px solid rgba(0, 255, 163, 0.2); padding-top: 8px;">
+        <div class="filter-tag" style="border-color: #00ffa3 !important; color: #00ffa3 !important;" onclick="setFilter('naat', this)"><i class="fa-solid fa-music" style="margin-left: 4px;"></i> تمام نعتیں</div>
+        <div class="filter-tag" style="border-color: #00ffa3 !important; color: #00ffa3 !important;" onclick="setFilter('asjad', this)">حضور عسجد رضا</div>
+        <div class="filter-tag" style="border-color: #00ffa3 !important; color: #00ffa3 !important;" onclick="setFilter('sabir', this)">صابر رضا ازہری</div>
+      </div>
     </div>
 
     <!-- Row 2: Naat Sharif Dedicated Panel -->
@@ -2107,5 +2123,285 @@
 
 
 
+
+<script id="jamia-filter-toggle-js">
+function toggleFilterRows() {
+  var wrapper = document.getElementById("collapsibleFiltersWrapper");
+  var textSpan = document.getElementById("toggleFiltersText");
+  var icon = document.getElementById("toggleFiltersIcon");
+  if (!wrapper) return;
+
+  if (wrapper.style.display === "none") {
+    wrapper.style.display = "block";
+    if (textSpan) textSpan.innerText = "فلٹرز چھپائیں";
+    if (icon) icon.className = "fa-solid fa-eye-slash";
+  } else {
+    wrapper.style.display = "none";
+    if (textSpan) textSpan.innerText = "فلٹرز دکھائیں";
+    if (icon) icon.className = "fa-solid fa-sliders";
+  }
+}
+</script>
+
+<script id="jamia-naats-master">
+(function() {
+  const NAATS_API_URL = "https://script.google.com/macros/s/AKfycbwi02ykZWWmq3nedwL0ULzk730QAJbwo7E_saM0hM32DOBI7ATrdWijHxvKfTZeY95-Ug/exec";
+  window.JAMIA_NAATS_LIST = [];
+  let sleepIntervalId = null;
+  let sleepTotalSecs = 0;
+
+  function cleanNaatTitle(raw) {
+    if (!raw) return "نعت شریف";
+    return raw.replace(/\[.*?\]/g, "").replace(/\(\s*MP3[^)]*\)/gi, "").replace(/\(\s*\d+\s*K\s*\)/gi, "").replace(/\.(mp3|m4a|wav|aac|ogg)$/i, "").replace(/[-_]+/g, " ").replace(/\s{2,}/g, " ").trim();
+  }
+
+  function detectNaatKhwan(title) {
+    const t = (title || "").toLowerCase();
+    if (t.includes("sabir") || t.includes("صابر") || t.includes("azhari") || t.includes("ازہری") || t.includes("साबिर")) return "sabira";
+    if (t.includes("rafiq") || t.includes("rafeeq") || t.includes("رفیق") || t.includes("रफ़ीक़")) return "rafiq";
+    if (t.includes("asjad") || t.includes("عسجد") || t.includes("اسجد") || t.includes("असजद")) return "asjad";
+    return "other";
+  }
+
+  function buildNaatTabsInBar() {
+    if (document.getElementById("tab-all-naats")) return;
+    const allEls = Array.from(document.querySelectorAll("button, div, span, a"));
+    const refTab = allEls.find(el => {
+      const txt = (el.innerText || "").trim();
+      return (txt === "امتحانی پرچے" || txt === "تمام کتب" || txt.includes("Math")) && el.children.length === 0;
+    });
+    if (!refTab || !refTab.parentElement) return;
+
+    const parentBar = refTab.parentElement;
+    const tabsToCreate = [
+      { id: "tab-all-naats", key: "all_naats", label: "تمام نعتیں" },
+      { id: "tab-asjad", key: "asjad", label: "حضور عسجد رضا" },
+      { id: "tab-sabira", key: "sabira", label: "صابر رضا ازہری" },
+      { id: "tab-rafiq", key: "rafiq", label: "رفیق رضا قادری" }
+    ];
+
+    tabsToCreate.reverse().forEach(item => {
+      const clone = refTab.cloneNode(true);
+      clone.id = item.id;
+      clone.classList.remove("active");
+      clone.innerText = item.label;
+      clone.removeAttribute("onclick");
+      clone.addEventListener("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.runJamiaFilter(item.key, clone);
+      });
+      if (parentBar.firstElementChild) {
+        parentBar.insertBefore(clone, parentBar.firstElementChild.nextSibling);
+      } else {
+        parentBar.appendChild(clone);
+      }
+    });
+
+    Array.from(parentBar.children).forEach(child => {
+      if (!child.id || !child.id.startsWith("tab-")) {
+        child.addEventListener("click", function() {
+          tabsToCreate.forEach(t => {
+            const el = document.getElementById(t.id);
+            if (el) el.classList.remove("active");
+          });
+        });
+      }
+    });
+  }
+
+  async function fetchNaatsFromDrive() {
+    if (window.JAMIA_NAATS_LIST.length > 0) return window.JAMIA_NAATS_LIST;
+    try {
+      const res = await fetch(NAATS_API_URL);
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        window.JAMIA_NAATS_LIST = data.map(nt => {
+          const neatTitle = cleanNaatTitle(nt.title);
+          return {
+            id: nt.id,
+            title: neatTitle,
+            naatKhwan: detectNaatKhwan(neatTitle),
+            subtitle: "آڈیو نعت شریف • " + (nt.size || "MP3"),
+            author: "جامعۃ الرضا آڈیو لائبریری",
+            category: "naat",
+            type: "audio",
+            language: "Urdu",
+            size: nt.size || "MP3",
+            pages: nt.size || "MP3",
+            coverClass: "cover-bahar",
+            icon: "fa-solid fa-music",
+            coverTitle: neatTitle.substring(0, 18),
+            audioUrl: "https://drive.google.com/file/d/" + nt.id + "/preview",
+            downloadName: neatTitle + ".mp3",
+            allowDownload: true
+          };
+        });
+      }
+    } catch (err) {}
+    return window.JAMIA_NAATS_LIST;
+  }
+
+  // 1. Play Audio with Working Close Button Fix
+  window.playAudio = function(audioUrlOrId, title) {
+    const bar = document.getElementById("emeraldAudioBar");
+    const titleEl = document.getElementById("audioPlayerTitle");
+    const timeEl = document.getElementById("audioPlayerTime");
+    const icon = document.getElementById("audioPlayIcon");
+    const prog = document.getElementById("audioProgressBar");
+
+    const cleanT = cleanNaatTitle(title);
+    if (titleEl) titleEl.innerText = cleanT;
+    if (timeEl) timeEl.innerText = "نیچے پلے بٹن دبائیں 👇";
+    if (icon) icon.className = "fa-solid fa-music";
+    if (prog) prog.style.display = "none";
+    if (bar) bar.style.display = "block";
+
+    let fileId = audioUrlOrId;
+    const idMatch = (audioUrlOrId || "").match(/id=([^&]+)/) || (audioUrlOrId || "").match(/\/d\/([^\/]+)/);
+    if (idMatch) fileId = idMatch[1];
+
+    // Close button (Cross X) ko 100% active karna
+    const closeBtn = bar.querySelector(".fa-xmark, .fa-times")?.closest("button, div") || bar.firstElementChild?.querySelector("button, span, i");
+    if (closeBtn) {
+      closeBtn.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.closeAudioPlayerFully();
+      };
+    }
+
+    document.querySelectorAll(".driveEmbedBoxClass").forEach(el => el.remove());
+
+    const embedWrap = document.createElement("div");
+    embedWrap.className = "driveEmbedBoxClass";
+    embedWrap.style.cssText = "width:100%; height:140px; overflow:hidden; border-radius:12px; margin-top:10px; border:2px solid #00ffa3; background:#031810;";
+
+    const iframe = document.createElement("iframe");
+    iframe.src = "https://drive.google.com/file/d/" + fileId + "/preview";
+    iframe.allow = "autoplay";
+    iframe.style.cssText = "width:100%; height:200px; border:none; margin-top:-30px;";
+
+    embedWrap.appendChild(iframe);
+    bar.appendChild(embedWrap);
+  };
+
+  // 2. Cross button Dabate hi Player hatana
+  window.closeAudioPlayerFully = function() {
+    const bar = document.getElementById("emeraldAudioBar");
+    if (bar) bar.style.display = "none";
+    const audio = document.getElementById("globalHtmlAudio");
+    if (audio) { audio.pause(); audio.src = ""; }
+    document.querySelectorAll(".driveEmbedBoxClass").forEach(el => el.remove());
+  };
+
+  // 3. DD Music Style Timer Modal Handlers
+  window.cycleSleepTimer = function() {
+    const m = document.getElementById("ddMusicSleepModal");
+    if (m) m.style.display = "flex";
+  };
+
+  window.closeDdTimerModal = function() {
+    const m = document.getElementById("ddMusicSleepModal");
+    if (m) m.style.display = "none";
+  };
+
+  window.setDdQuickTime = function(h, m, s) {
+    document.getElementById("ddHours").value = (h < 10 ? "0" : "") + h;
+    document.getElementById("ddMinutes").value = (m < 10 ? "0" : "") + m;
+    document.getElementById("ddSeconds").value = (s < 10 ? "0" : "") + s;
+  };
+
+  window.startDdTimer = function() {
+    const h = parseInt(document.getElementById("ddHours").value, 10) || 0;
+    const m = parseInt(document.getElementById("ddMinutes").value, 10) || 0;
+    const s = parseInt(document.getElementById("ddSeconds").value, 10) || 0;
+
+    sleepTotalSecs = (h * 3600) + (m * 60) + s;
+    closeDdTimerModal();
+
+    const txtEl = document.getElementById("sleepTimerText");
+    const badgeEl = document.getElementById("sleepTimerBadge");
+
+    if (sleepIntervalId) clearInterval(sleepIntervalId);
+
+    if (sleepTotalSecs <= 0) {
+      if (txtEl) txtEl.innerText = "ٹائمر";
+      if (badgeEl) badgeEl.style.display = "none";
+      return;
+    }
+
+    if (txtEl) txtEl.innerText = (h > 0 ? h + "h " : "") + (m > 0 ? m + "m" : s + "s");
+    if (badgeEl) {
+      badgeEl.style.display = "block";
+      badgeEl.innerText = "🌙 سونے کا ٹائمر سیٹ ہو گیا ہے";
+    }
+
+    sleepIntervalId = setInterval(() => {
+      sleepTotalSecs--;
+      if (sleepTotalSecs <= 0) {
+        clearInterval(sleepIntervalId);
+        window.closeAudioPlayerFully();
+        if (txtEl) txtEl.innerText = "ٹائمر";
+        if (badgeEl) badgeEl.style.display = "none";
+      } else if (badgeEl) {
+        const rh = Math.floor(sleepTotalSecs / 3600);
+        const rm = Math.floor((sleepTotalSecs % 3600) / 60);
+        const rs = sleepTotalSecs % 60;
+        badgeEl.innerText = "🌙 ٹائمر باقی: " + (rh > 0 ? rh + ":" : "") + (rm < 10 ? "0" + rm : rm) + ":" + (rs < 10 ? "0" + rs : rs);
+      }
+    }, 1000);
+  };
+
+  function cleanRenderedNaatCards() {
+    document.querySelectorAll("button[onclick*='playAudio']").forEach(btn => {
+      const card = btn.closest(".book-card") || btn.parentElement.parentElement;
+      if (!card) return;
+      const walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT, null, false);
+      let node;
+      while ((node = walker.nextNode())) {
+        let val = node.nodeValue;
+        if (val.includes("b.type") || val.includes("مکمل کتاب")) {
+          val = val.replace(/\$\{.*?\}/g, "آڈیو نعت").replace(/b\.type.*?\}/g, "آڈیو نعت").replace("مکمل کتاب", "آڈیو نعت");
+        }
+        val = val.replace("دینیات", "نعت شریف").replace("صفحات:", "سائز:").replace("مؤلف:", "پیشکش:");
+        node.nodeValue = val;
+      }
+    });
+  }
+
+  window.runJamiaFilter = async function(catKey, clickedEl) {
+    if (clickedEl && clickedEl.parentElement) {
+      Array.from(clickedEl.parentElement.children).forEach(c => c.classList.remove("active"));
+      clickedEl.classList.add("active");
+    }
+
+    const allNaats = await fetchNaatsFromDrive();
+    let filtered = [];
+
+    if (catKey === "all_naats") {
+      filtered = allNaats;
+    } else {
+      filtered = allNaats.filter(n => n.naatKhwan === catKey);
+    }
+
+    if (typeof renderBooks === "function") {
+      renderBooks(filtered);
+      setTimeout(cleanRenderedNaatCards, 40);
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", function() {
+    buildNaatTabsInBar();
+    fetchNaatsFromDrive();
+    setInterval(() => {
+      buildNaatTabsInBar();
+      cleanRenderedNaatCards();
+    }, 800);
+  });
+  setTimeout(buildNaatTabsInBar, 300);
+  fetchNaatsFromDrive();
+})();
+</script>
 </body>
 </html>
