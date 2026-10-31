@@ -1128,6 +1128,29 @@
   }
 </style>
 
+
+<style id="custom-player-enhancements">
+  .mode-toggle-btn {
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid #10b981;
+    color: #fff;
+    border-radius: 8px;
+    padding: 3px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: 4px;
+  }
+  .end-track-chip {
+    background: #1e293b !important;
+    border: 1px solid #10b981 !important;
+    color: #10b981 !important;
+    font-weight: bold;
+  }
+</style>
+
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -1982,8 +2005,8 @@
         <button id="audioPlayPauseBtn" onclick="togglePlayPauseAudio()" type="button" style="width: 34px; height: 34px; border-radius: 50%; background: #00ffa3; color: #031810; border: none; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; cursor: pointer;">
           <i id="audioPlayIcon" class="fa-solid fa-play"></i>
         </button>
-        <button id="sleepTimerBtn" onclick="cycleSleepTimer()" type="button" title="سونے کا ٹائمر (Sleep Timer)" style="background: rgba(0,255,163,0.12); border: 1px solid rgba(0,255,163,0.35); color: #00ffa3; border-radius: 8px; padding: 4px 8px; font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; gap: 4px;">
-          <i class="fa-solid fa-moon"></i> <span id="sleepTimerText">ٹائمر</span>
+        <button id="sleepTimerBtn" onclick="cycleSleepTimer()" type="button" title="سونے کا ٹائمر</button><button type="button" id="audioModeBtn" class="mode-toggle-btn" onclick="cycleAudioPlayMode()" title="پلے انداز">⏭️ خودکار اگلی</button><button style="display:none" (Sleep Timer)" style="background: rgba(0,255,163,0.12); border: 1px solid rgba(0,255,163,0.35); color: #00ffa3; border-radius: 8px; padding: 4px 8px; font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+          <i class="fa-solid fa-moon"></i> <span id="sleepTimerText">ٹائمر</button><button type="button" id="audioModeBtn" class="mode-toggle-btn" onclick="cycleAudioPlayMode()" title="پلے انداز">⏭️ خودکار اگلی</button><button style="display:none"</span>
         </button>
         <button onclick="closeAudioPlayer()" type="button" style="background: transparent; border: none; color: #94a3b8; font-size: 1rem; cursor: pointer; padding: 4px;">
           <i class="fa-solid fa-xmark"></i>
@@ -2029,6 +2052,7 @@
       <button type="button" onclick="setDdQuickTime(0, 30, 0)" style="background:#2a2b32; border:none; padding:10px; border-radius:20px; color:#cbd5e1; font-weight:600; font-size:0.85rem; cursor:pointer;">30m</button>
       <button type="button" onclick="setDdQuickTime(0, 45, 0)" style="background:#2a2b32; border:none; padding:10px; border-radius:20px; color:#cbd5e1; font-weight:600; font-size:0.85rem; cursor:pointer;">45m</button>
       <button type="button" onclick="setDdQuickTime(1, 0, 0)" style="background:#2a2b32; border:none; padding:10px; border-radius:20px; color:#cbd5e1; font-weight:600; font-size:0.85rem; cursor:pointer;">60m</button>
+        <button type="button" class="end-track-chip" onclick="setTimerToEndOfTrack()" style="grid-column: span 2; padding: 8px; border-radius: 8px; cursor: pointer;">⏳ نعت کا بقیہ وقت (End of track)</button>
     </div>
 
     <!-- Actions -->
@@ -2244,7 +2268,7 @@
     if (sleepIntervalId) clearInterval(sleepIntervalId);
 
     if (sleepTotalSecs <= 0) {
-      if (txtEl) txtEl.innerText = "ٹائمر";
+      if (txtEl) txtEl.innerText = "ٹائمر</button><button type="button" id="audioModeBtn" class="mode-toggle-btn" onclick="cycleAudioPlayMode()" title="پلے انداز">⏭️ خودکار اگلی</button><button style="display:none"";
       if (badgeEl) badgeEl.style.display = "none";
       return;
     }
@@ -2252,7 +2276,7 @@
     if (txtEl) txtEl.innerText = (h > 0 ? h + "h " : "") + (m > 0 ? m + "m" : s + "s");
     if (badgeEl) {
       badgeEl.style.display = "block";
-      badgeEl.innerText = "🌙 سونے کا ٹائمر سیٹ ہو گیا ہے";
+      badgeEl.innerText = "🌙 سونے کا ٹائمر</button><button type="button" id="audioModeBtn" class="mode-toggle-btn" onclick="cycleAudioPlayMode()" title="پلے انداز">⏭️ خودکار اگلی</button><button style="display:none" سیٹ ہو گیا ہے";
     }
 
     sleepIntervalId = setInterval(() => {
@@ -2260,13 +2284,13 @@
       if (sleepTotalSecs <= 0) {
         clearInterval(sleepIntervalId);
         window.closeAudioPlayerFully();
-        if (txtEl) txtEl.innerText = "ٹائمر";
+        if (txtEl) txtEl.innerText = "ٹائمر</button><button type="button" id="audioModeBtn" class="mode-toggle-btn" onclick="cycleAudioPlayMode()" title="پلے انداز">⏭️ خودکار اگلی</button><button style="display:none"";
         if (badgeEl) badgeEl.style.display = "none";
       } else if (badgeEl) {
         const rh = Math.floor(sleepTotalSecs / 3600);
         const rm = Math.floor((sleepTotalSecs % 3600) / 60);
         const rs = sleepTotalSecs % 60;
-        badgeEl.innerText = "🌙 ٹائمر باقی: " + (rh > 0 ? rh + ":" : "") + (rm < 10 ? "0" + rm : rm) + ":" + (rs < 10 ? "0" + rs : rs);
+        badgeEl.innerText = "🌙 ٹائمر</button><button type="button" id="audioModeBtn" class="mode-toggle-btn" onclick="cycleAudioPlayMode()" title="پلے انداز">⏭️ خودکار اگلی</button><button style="display:none" باقی: " + (rh > 0 ? rh + ":" : "") + (rm < 10 ? "0" + rm : rm) + ":" + (rs < 10 ? "0" + rs : rs);
       }
     }, 1000);
   };
@@ -2382,7 +2406,7 @@
       var display = document.getElementById("timerDisplay") || document.querySelector(".timer-badge");
       window.jamiaSleepTimer = setTimeout(function() {
         if (audio) { audio.pause(); audio.currentTime = 0; }
-        if (display) display.innerText = "ٹائمر ختم";
+        if (display) display.innerText = "ٹائمر</button><button type="button" id="audioModeBtn" class="mode-toggle-btn" onclick="cycleAudioPlayMode()" title="پلے انداز">⏭️ خودکار اگلی</button><button style="display:none" ختم";
       }, remainingSeconds * 1000);
       if (display) {
         var mins = Math.floor(remainingSeconds / 60);
@@ -2426,6 +2450,132 @@
 
   document.addEventListener("DOMContentLoaded", attachAudioPlayerListeners);
   setInterval(attachAudioPlayerListeners, 2000);
+</script>
+
+
+<script id="player-auto-modes-logic">
+  window.jamiaPlayMode = localStorage.getItem("jamia_play_mode") || "next"; // 'next', 'repeat', 'shuffle'
+
+  function updateModeBtnUI() {
+    var b = document.getElementById("audioModeBtn");
+    if (!b) return;
+    if (window.jamiaPlayMode === "repeat") {
+      b.innerHTML = "🔁 وہی نعت بار بار";
+      b.style.borderColor = "#f59e0b";
+      b.style.color = "#f59e0b";
+    } else if (window.jamiaPlayMode === "shuffle") {
+      b.innerHTML = "🔀 بے ترتیب نعتیں";
+      b.style.borderColor = "#38bdf8";
+      b.style.color = "#38bdf8";
+    } else {
+      b.innerHTML = "⏭️ خودکار اگلی نعت";
+      b.style.borderColor = "#10b981";
+      b.style.color = "#10b981";
+    }
+  }
+
+  window.cycleAudioPlayMode = function() {
+    if (window.jamiaPlayMode === "next") window.jamiaPlayMode = "repeat";
+    else if (window.jamiaPlayMode === "repeat") window.jamiaPlayMode = "shuffle";
+    else window.jamiaPlayMode = "next";
+    localStorage.setItem("jamia_play_mode", window.jamiaPlayMode);
+    updateModeBtnUI();
+  };
+
+  // Naat end timer function
+  window.setTimerToEndOfTrack = function() {
+    var audio = document.querySelector("audio");
+    if (!audio || isNaN(audio.duration) || audio.duration === 0) {
+      alert("پہلے کوئی نعت پلے کریں!");
+      return;
+    }
+    var remaining = Math.max(1, Math.floor(audio.duration - audio.currentTime));
+    var mins = Math.floor(remaining / 60);
+    var secs = remaining % 60;
+    var hrs = Math.floor(mins / 60);
+    mins = mins % 60;
+
+    // Fill timer input boxes if present
+    var inputs = document.querySelectorAll(".timer-modal input, .stop-music-modal input, input[type='number']");
+    if (inputs.length >= 2) {
+      if (inputs.length >= 3) {
+        inputs[0].value = hrs < 10 ? "0" + hrs : hrs;
+        inputs[1].value = mins < 10 ? "0" + mins : mins;
+        inputs[2].value = secs < 10 ? "0" + secs : secs;
+      } else {
+        inputs[0].value = mins < 10 ? "0" + mins : mins;
+        inputs[1].value = secs < 10 ? "0" + secs : secs;
+      }
+    }
+
+    // Direct countdown start
+    if (window.sleepTimerTimeout) clearTimeout(window.sleepTimerTimeout);
+    window.sleepTimerTimeout = setTimeout(function() {
+      if (audio) audio.pause();
+      alert("نعت مکمل ہونے پر ٹائمر پورا ہو گیا۔");
+    }, remaining * 1000);
+
+    // Close bottom sheet if open
+    var closeBtn = document.querySelector(".stop-music-modal .cancel-btn, button:contains('CANCEL')");
+    var modal = document.querySelector(".stop-music-modal, [class*='modal']");
+    alert("ٹائمر سیٹ ہو گیا: " + mins + " منٹ " + secs + " سیکنڈ (نعت کے اختتام تک)");
+  };
+
+  // Handle track finished event
+  function bindAudioEndEvent() {
+    var audio = document.querySelector("audio");
+    if (audio && !audio.dataset.modeBound) {
+      audio.dataset.modeBound = "true";
+      audio.addEventListener("ended", function() {
+        if (window.jamiaPlayMode === "repeat") {
+          audio.currentTime = 0;
+          audio.play();
+        } else if (window.jamiaPlayMode === "shuffle") {
+          var allPlayBtns = Array.from(document.querySelectorAll("button")).filter(function(b){
+            return b.innerText.includes("سنیں") || b.innerText.includes("مطالعہ");
+          });
+          if (allPlayBtns.length > 0) {
+            var randomBtn = allPlayBtns[Math.floor(Math.random() * allPlayBtns.length)];
+            randomBtn.click();
+          }
+        } else {
+          // Default: Play next track
+          var playButtons = Array.from(document.querySelectorAll("button")).filter(function(b){
+            return b.innerText.includes("سنیں");
+          });
+          var currentSrc = audio.src;
+          var nextBtn = null;
+          for (var i = 0; i < playButtons.length - 1; i++) {
+            if (playButtons[i].classList.contains("active") || playButtons[i].dataset.playing === "true") {
+              nextBtn = playButtons[i+1];
+              break;
+            }
+          }
+          if (nextBtn) {
+            nextBtn.click();
+          } else if (playButtons.length > 0) {
+            // agar track track na mile toh agla sunen button click karein
+            var activeIdx = -1;
+            playButtons.forEach(function(b, idx){
+              if (b.disabled || b.style.opacity === "0.5") activeIdx = idx;
+            });
+            if (activeIdx !== -1 && activeIdx + 1 < playButtons.length) {
+              playButtons[activeIdx + 1].click();
+            }
+          }
+        }
+      });
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    updateModeBtnUI();
+    bindAudioEndEvent();
+  });
+  setInterval(function() {
+    updateModeBtnUI();
+    bindAudioEndEvent();
+  }, 1500);
 </script>
 
 </body>
