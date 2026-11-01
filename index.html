@@ -1,15 +1,33 @@
 <!DOCTYPE html>
 <html lang="ur" dir="rtl">
 <head>
+  <title>Maktaba Faqeer e Raah e Raza Sohil | Khazina e Razviya Sohil Husain Portal | جامعۃ الرضا ڈیجیٹل کتب خانہ</title>
+  <meta name="description" content="Maktaba Faqeer e Raah e Raza Sohil • Khazina e Razviya Sohil Husain Portal • Darul Mutala Sohil Raza Digital Archive • Markaz e Kutub Sohil Husain Razvi • Ganjina e Asjad o Sohil Islamic Library." />
+  <meta name="keywords" content="Maktaba Faqeer e Raah e Raza Sohil, Khazina e Razviya Sohil Husain Portal, Darul Mutala Sohil Raza Digital Archive, Markaz e Kutub Sohil Husain Razvi, Ganjina e Asjad o Sohil Islamic Library, Sohil Husain" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "DigitalDocumentLibrary",
+    "name": "Maktaba Faqeer e Raah e Raza Sohil",
+    "alternateName": [
+      "Khazina e Razviya Sohil Husain Portal",
+      "Darul Mutala Sohil Raza Digital Archive",
+      "Markaz e Kutub Sohil Husain Razvi",
+      "Ganjina e Asjad o Sohil Islamic Library",
+      "جامعۃ الرضا ڈیجیٹل کتب خانہ"
+    ],
+    "url": "https://hardrisk.vercel.app/"
+  }
+  </script>
   <meta name="google-site-verification" content="YwNhHzAItEsJgBEWbSSmvZK2QNyGF1WmkDrqADIRREA" />
 
-  <meta name="description" content="جامعۃ الرضا ڈیجیٹل کتب خانہ - اسلامی کتب، درسی کتب، امتحانی پرچے اور آڈیو نعت شریف کا آن لائن پورٹل۔">
-  <meta name="keywords" content="Jamia Al-Raza Digital Maktaba, Jamia Al Raza Library, امتحانی پرچے, نعت شریف, جامعۃ الرضا">
+  
+  
   <meta name="author" content="Sohil Husain">
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>جامعۃ الرضا ڈیجیٹل کتب خانہ | Jamia Al-Raza Digital Maktaba</title>
+  
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1686,18 +1704,18 @@
         : LIBRARY_DATA;
     }
 
-            function filterLibrary() {
+                function filterLibrary() {
       const q = (document.getElementById("lib-search") ? document.getElementById("lib-search").value : "").toLowerCase().trim();
       const currentList = getActiveLibrary();
 
       const filtered = currentList.filter(b => {
         const titleText = (b.title || "").toLowerCase();
         const subText = (b.subtitle || "").toLowerCase();
-        const isNaat = (b.category === "naat" || b.type === "audio");
+        const isNaat = (b.category === "naat" || b.type === "audio" || (b.title && (b.title.includes("نعت") || b.title.includes("Sabir") || b.title.includes("Asjad") || b.title.includes("@download"))));
 
         let matchesCategory = false;
         if (currentCategory === 'all') {
-          matchesCategory = true;
+          matchesCategory = !isNaat;
         } else if (currentCategory === 'naat') {
           matchesCategory = isNaat;
         } else if (currentCategory === 'asjad') {
