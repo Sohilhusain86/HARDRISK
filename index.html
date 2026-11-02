@@ -2032,7 +2032,8 @@
       } catch (_) {}
 
       showDashboard(name);
-      if (window.triggerRedDot5s) window.triggerRedDot5s();
+      if (window.spawnInstantRedDot5s) window.spawnInstantRedDot5s();
+      
     }
 
     // ==========================================
@@ -2642,30 +2643,60 @@ function toggleFilterRows() {
 
 
 
-<script id="jamia-reddot-5s-engine">
+
+
+
+<script id="jamia-guaranteed-reddot-engine">
 (function() {
-  window.triggerRedDot5s = function() {
-    // Screen par scroll event trigger karein taaki sticky elements foran jag jaayen
-    window.dispatchEvent(new Event("scroll"));
+  window.spawnInstantRedDot5s = function() {
+    // Purana dot agar bacha ho to hata dein
+    var old = document.getElementById("instant-live-pulse-dot");
+    if (old) old.remove();
 
-    var dots = document.querySelectorAll(".rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"], #recDot, #liveDot");
-    dots.forEach(function(d) {
-      d.style.setProperty("display", "inline-block", "important");
-      d.style.setProperty("visibility", "visible", "important");
-      d.style.setProperty("opacity", "1", "important");
-    });
+    // Screen ke top par direct floating dot create karein (Kisi div par depend nahi)
+    var dot = document.createElement("div");
+    dot.id = "instant-live-pulse-dot";
+    dot.innerHTML = `
+      <style>
+        #instant-live-pulse-dot {
+          position: fixed !important;
+          top: 14px !important;
+          right: 16px !important;
+          width: 12px !important;
+          height: 12px !important;
+          background-color: #ef4444 !important;
+          border-radius: 50% !important;
+          z-index: 9999999 !important;
+          pointer-events: none !important;
+          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8) !important;
+          animation: guaranteedPulse 1s infinite ease-in-out !important;
+          transition: opacity 0.5s ease-out !important;
+        }
+        @keyframes guaranteedPulse {
+          0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); }
+          70% { transform: scale(1.3); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+          100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+      </style>
+    `;
 
+    document.body.appendChild(dot);
+
+    // Poore 5 second baad screen se bilkul delete ho jaye
     setTimeout(function() {
-      dots.forEach(function(d) {
-        d.style.setProperty("display", "none", "important");
-        d.style.setProperty("opacity", "0", "important");
-      });
+      if (dot) {
+        dot.style.opacity = "0";
+        setTimeout(function() { dot.remove(); }, 500);
+      }
     }, 5000);
   };
 
-  document.addEventListener("DOMContentLoaded", function() {
-    setTimeout(window.triggerRedDot5s, 300);
-  });
+  // Page Refresh hone par bhi foran dikhe
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    window.spawnInstantRedDot5s();
+  } else {
+    document.addEventListener("DOMContentLoaded", window.spawnInstantRedDot5s);
+  }
 })();
 </script>
 
