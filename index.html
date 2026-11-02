@@ -3306,5 +3306,63 @@ function toggleFilterRows() {
 </script>
 <!-- END_FLOATING_HELP_DOCK -->
 
+
+<!-- START_5S_INSTALL_POPUP -->
+<div id="pwa-5s-install-toast" style="display: none; position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 99999999; width: 92%; max-width: 380px; background: rgba(15, 23, 42, 0.98); border: 1.5px solid #10b981; border-radius: 14px; padding: 10px 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); direction: rtl; text-align: right; font-family: inherit; box-sizing: border-box; animation: slideDown 0.35s ease-out;">
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+    
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <img src="/icon-192.png" alt="Logo" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid #fbbf24; object-fit: cover;">
+      <div>
+        <div style="font-size: 12px; font-weight: bold; color: #f8fafc;">مکتبہ جامعہ ایپ انسٹال کریں</div>
+        <div style="font-size: 10px; color: #94a3b8;">آف لائن اور تیز رفتار رسائی کے لیے</div>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <button type="button" onclick="handlePWAInstallClick(); dismiss5sToast();" style="background: linear-gradient(135deg, #10b981, #059669); border: 0; color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+        <i class="fa-solid fa-download"></i> انسٹال
+      </button>
+      <button type="button" onclick="dismiss5sToast()" style="background: none; border: 0; color: #64748b; font-size: 16px; cursor: pointer; padding: 2px 5px;">&times;</button>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  @keyframes slideDown {
+    from { opacity: 0; transform: translate(-50%, -20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+</style>
+
+<script id="pwa-5s-toast-engine">
+  function dismiss5sToast() {
+    var toast = document.getElementById("pwa-5s-install-toast");
+    if (toast) {
+      toast.style.transition = "opacity 0.4s ease, transform 0.4s ease";
+      toast.style.opacity = "0";
+      toast.style.transform = "translate(-50%, -20px)";
+      setTimeout(function() { toast.style.display = "none"; }, 400);
+    }
+  }
+
+  // Login page ya refresh hote hi 5 second ke liye trigger
+  window.addEventListener("load", function() {
+    var toast = document.getElementById("pwa-5s-install-toast");
+    if (!toast) return;
+
+    // Sirf tab dikhaye jab user login screen par ho (already logged in na ho)
+    if (!localStorage.getItem("jamia_ula_name")) {
+      setTimeout(function() {
+        toast.style.display = "block";
+        // Theek 5 second baad khud ba khud gayab
+        setTimeout(dismiss5sToast, 5000);
+      }, 700);
+    }
+  });
+</script>
+<!-- END_5S_INSTALL_POPUP -->
+
 </body>
 </html>
