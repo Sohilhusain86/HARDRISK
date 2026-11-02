@@ -1,16 +1,16 @@
-const CACHE_NAME = 'jamia-pwa-v3';
+const CACHE_NAME = 'jamia-maktaba-pwa-v5';
 
-self.addEventListener('install', (e) => {
+self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(clients.claim());
+self.addEventListener('activate', (event) => {
+  event.waitUntil(clients.claim());
 });
 
-self.addEventListener('fetch', (e) => {
-  // क्रोम PWA इंस्टॉलेशन के लिए फ़ेच हैंडलर का होना ज़रूरी है
-  e.respondWith(
-    fetch(e.request).catch(() => new Response("Offline"))
+self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+  event.respondWith(
+    fetch(event.request).catch(() => caches.match(event.request))
   );
 });
