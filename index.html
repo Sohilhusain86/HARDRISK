@@ -1992,6 +1992,7 @@
       } catch (_) {}
 
       showDashboard(name);
+      if (window.triggerRedDot5s) window.triggerRedDot5s();
     }
 
     // ==========================================
@@ -2594,6 +2595,31 @@ function toggleFilterRows() {
       return cleanList;
     };
   }
+})();
+</script>
+
+
+<script id="jamia-reddot-5s-engine">
+(function() {
+  window.triggerRedDot5s = function() {
+    var dots = document.querySelectorAll(".rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"], #recDot, #liveDot");
+    dots.forEach(function(d) {
+      d.style.display = "inline-block";
+      d.style.visibility = "visible";
+      d.style.opacity = "1";
+    });
+
+    setTimeout(function() {
+      dots.forEach(function(d) {
+        d.style.display = "none";
+        d.style.opacity = "0";
+      });
+    }, 5000);
+  };
+
+  document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(window.triggerRedDot5s, 200);
+  });
 })();
 </script>
 
