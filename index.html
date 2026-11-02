@@ -1233,6 +1233,31 @@
     </button>
 
     <div id="error-alert" class="error-msg">درج شدہ معلومات غلط ہیں!</div>
+
+    <!-- Report & Help Contact Box -->
+    <div style="margin-top: 15px; padding: 12px; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; text-align: center; direction: rtl;">
+      <div style="font-size: 11px; color: #94a3b8; margin-bottom: 9px; font-weight: bold;">
+        <i class="fa-solid fa-headset" style="color: #38bdf8;"></i> کوئی مسئلہ یا خرابی ہو تو براہِ راست رابطہ کریں:
+      </div>
+      <div style="display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <!-- Email -->
+        <a href="mailto:sohilhusain2025@gmail.com?subject=Jamia%20Library%20Help" title="Email" style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px; background: #1e293b; border: 1px solid #334155; padding: 6px 12px; border-radius: 8px; font-size: 11px; color: #38bdf8;">
+          <i class="fa-solid fa-envelope" style="font-size: 13px;"></i>
+          <span>ای میل</span>
+        </a>
+        <!-- WhatsApp 1 -->
+        <a href="https://wa.me/919760833104?text=السلام%20علیکم" target="_blank" title="WhatsApp 1" style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px; background: #064e3b; border: 1px solid #059669; padding: 6px 12px; border-radius: 8px; font-size: 11px; color: #34d399;">
+          <i class="fa-brands fa-whatsapp" style="font-size: 14px;"></i>
+          <span>واٹس ایپ ۱</span>
+        </a>
+        <!-- WhatsApp 2 -->
+        <a href="https://wa.me/918439602526?text=السلام%20علیکم" target="_blank" title="WhatsApp 2" style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px; background: #064e3b; border: 1px solid #059669; padding: 6px 12px; border-radius: 8px; font-size: 11px; color: #34d399;">
+          <i class="fa-brands fa-whatsapp" style="font-size: 14px;"></i>
+          <span>واٹس ایپ ۲</span>
+        </a>
+      </div>
+    </div>
+
   </div>
 
   <!-- 2. SCALABLE LIBRARY DASHBOARD -->
@@ -2614,26 +2639,32 @@ function toggleFilterRows() {
 </script>
 
 
+
+
+
 <script id="jamia-reddot-5s-engine">
 (function() {
   window.triggerRedDot5s = function() {
+    // Screen par scroll event trigger karein taaki sticky elements foran jag jaayen
+    window.dispatchEvent(new Event("scroll"));
+
     var dots = document.querySelectorAll(".rec-dot, .red-dot, [class*="rec-dot"], [class*="red-dot"], #recDot, #liveDot");
     dots.forEach(function(d) {
-      d.style.display = "inline-block";
-      d.style.visibility = "visible";
-      d.style.opacity = "1";
+      d.style.setProperty("display", "inline-block", "important");
+      d.style.setProperty("visibility", "visible", "important");
+      d.style.setProperty("opacity", "1", "important");
     });
 
     setTimeout(function() {
       dots.forEach(function(d) {
-        d.style.display = "none";
-        d.style.opacity = "0";
+        d.style.setProperty("display", "none", "important");
+        d.style.setProperty("opacity", "0", "important");
       });
     }, 5000);
   };
 
   document.addEventListener("DOMContentLoaded", function() {
-    setTimeout(window.triggerRedDot5s, 200);
+    setTimeout(window.triggerRedDot5s, 300);
   });
 })();
 </script>
