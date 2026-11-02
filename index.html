@@ -1218,6 +1218,251 @@
     </button>
 
     <div id="error-alert" class="error-msg">درج شدہ معلومات غلط ہیں!</div>
+
+<!-- START_STUDENT_QUIZ_BOX -->
+<div id="quiz-student-wrapper" style="margin-top: 15px; width: 100%; box-sizing: border-box; text-align: center; direction: rtl; font-family: inherit;">
+  
+  <button type="button" id="btn-toggle-quiz" onclick="toggleStudentQuiz()" style="background: rgba(30, 41, 59, 0.75); border: 1px solid rgba(56, 189, 248, 0.35); color: #38bdf8; font-size: 11.5px; font-weight: 600; padding: 8px 14px; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: 0.2s;">
+    <i class="fa-solid fa-user-shield" style="color: #fbbf24;"></i>
+    <span>طلبۂ جامعہ کی تصدیقی جانچ (بغیر پاس ورڈ داخلہ)</span>
+    <i class="fa-solid fa-chevron-down" id="quiz-chevron" style="font-size: 10px; transition: 0.2s;"></i>
+  </button>
+
+  <div id="quiz-card-box" style="display: none; margin-top: 12px; max-height: 65vh; overflow-y: auto; background: rgba(15, 23, 42, 0.98); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 14px; padding: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.6); text-align: right; box-sizing: border-box;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin-bottom: 12px;">
+      <span style="font-size: 11.5px; font-weight: bold; color: #e2e8f0; display: flex; align-items: center; gap: 6px;">
+        <i class="fa-solid fa-graduation-cap" style="color: #38bdf8;"></i> طلبۂ کرام کی تصدیق
+      </span>
+      <span id="quiz-step-badge" style="font-size: 10.5px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 3px 9px; border-radius: 20px; font-weight: bold;">سوال ۱ از ۶</span>
+    </div>
+
+    <div id="quiz-active-area">
+      <div id="quiz-question-title" style="font-size: 12.5px; color: #f8fafc; font-weight: 600; margin-bottom: 8px; line-height: 1.5;">
+        سوال ۱: آپ کے مدرسہ کا نام کیا ہے؟
+      </div>
+      
+      <input type="text" id="quiz-answer-input" placeholder="جواب درج کریں..." style="width: 100%; box-sizing: border-box; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 9px 12px; color: #f1f5f9; font-size: 12px; outline: none; margin-bottom: 10px; direction: auto;">
+      
+      <div id="quiz-error-msg" style="display: none; color: #f87171; font-size: 11px; margin-bottom: 8px; font-weight: 600;">
+        جواب درست نہیں ہے، دوبارہ کوشش فرمائیں۔
+      </div>
+
+      <div style="display: flex; gap: 8px; justify-content: flex-end;">
+        <button type="button" onclick="submitQuizStep()" style="background: linear-gradient(135deg, #0284c7, #0369a1); border: 0; color: #fff; padding: 8px 18px; border-radius: 8px; font-size: 11.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+          <span>تصدیق و اگلا سوال</span> <i class="fa-solid fa-arrow-left"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="quiz-success-area" style="display: none; text-align: center; padding: 15px 0;">
+      <div style="width: 44px; height: 44px; margin: 0 auto 10px; background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.4); border-radius: 50%; display: grid; place-items: center; color: #4ade80; font-size: 20px;">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <div style="font-size: 13px; font-weight: bold; color: #f8fafc; margin-bottom: 6px;">تصدیق کامیاب رہی!</div>
+      <p style="font-size: 11.5px; color: #38bdf8; margin: 0;">
+        <i class="fa-solid fa-spinner fa-spin"></i> ڈیجیٹل کتب خانہ میں داخل کیا جا رہا ہے...
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<script id="quiz-student-engine">
+(function() {
+  var currentStep = 1;
+  var enteredStudentName = "";
+  var enteredRollNumber = "";
+
+  function normalizeDigits(str) {
+    return (str || "").replace(/[۰-۹]/g, function(d) {
+      return d.charCodeAt(0) - 1776;
+    }).replace(/[٠-٩]/g, function(d) {
+      return d.charCodeAt(0) - 1632;
+    }).trim();
+  }
+
+  function isValidName(val) {
+    var s = (val || "").trim();
+    if (s.length < 2) return false;
+
+    if (/^(.)+$/.test(s.replace(/\s+/g, ""))) return false;
+
+    if (/^[A-Za-z\s\.\'\-]+$/.test(s)) {
+      var englishLetters = s.replace(/[^A-Za-z]/g, "");
+      return /[aeiouyAEIOUY]/.test(s) && englishLetters.length >= 2;
+    }
+
+    if (/[\u0600-\u06FF]/.test(s)) {
+      var urduLetters = s.replace(/[^\u0600-\u06FF]/g, "");
+      return urduLetters.length >= 2;
+    }
+
+    if (/[\u0900-\u097F]/.test(s)) {
+      var hindiLetters = s.replace(/[^\u0900-\u097F]/g, "");
+      return hindiLetters.length >= 2;
+    }
+
+    return s.length >= 3;
+  }
+
+  var questions = [
+    {
+      num: 1,
+      title: "سوال ۱: آپ کے مدرسہ کا نام کیا ہے؟",
+      errorText: "مدرسہ کا نام درست درج فرمائیں۔",
+      validate: function(ans) {
+        var a = (ans || "").toLowerCase().trim();
+        var hasRaza = /رضا|رضوی|raza|razaa|rada|raja|रज़ा|रजा|राज़ा/.test(a);
+        var hasJamia = /جامع|jami|jame|jamiya|ciis|جامعہ|جامعت|جامعة|जामिया|जामिआ|جامعتہ/.test(a);
+        return hasRaza && (hasJamia || /markaz|centre|bareilly|university|بریلی/.test(a) || a.length >= 5);
+      }
+    },
+    {
+      num: 2,
+      title: "سوال ۲: آپ کی جماعت کا نام کیا ہے؟",
+      errorText: "جماعت کا نام درست نہیں ہے۔",
+      validate: function(ans) {
+        var a = (ans || "").toLowerCase().trim();
+        return /ula|oola|oula|awla|ola|اولى|اولی|اولٰی|اولا|उला|ऊला|ओला/.test(a);
+      }
+    },
+    {
+      num: 3,
+      title: "سوال ۳: آپ کا نام کیا ہے؟",
+      errorText: "براہِ کرم درست اور مکمل نام درج فرمائیں۔",
+      validate: function(ans) {
+        if (!isValidName(ans)) return false;
+        enteredStudentName = ans.trim();
+        return true;
+      }
+    },
+    {
+      num: 4,
+      title: "سوال ۴: آپ کا رول نمبر کیا ہے؟",
+      errorText: "براہِ کرم درست ۴ ہندسی رول نمبر درج فرمائیں (مثال: 1234)۔",
+      validate: function(ans) {
+        var cleanDigits = normalizeDigits(ans);
+        if (/^\d{4}$/.test(cleanDigits)) {
+          enteredRollNumber = cleanDigits;
+          return true;
+        }
+        return false;
+      }
+    },
+    {
+      num: 5,
+      title: "سوال ۵: تجوید کون پڑھاتا ہے؟",
+      errorText: "استادِ محترم کا نام درست درج فرمائیں۔",
+      validate: function(ans) {
+        var a = (ans || "").toLowerCase().trim();
+        return /sharaf|sharafuddin|sharf|شرف|शरफ|शराफ/.test(a);
+      }
+    },
+    {
+      num: 6,
+      title: "سوال ۶: سائٹ کا ایڈمن / مالک کون ہے؟",
+      errorText: "ایڈمن کا نام درست درج فرمائیں۔",
+      validate: function(ans) {
+        var a = (ans || "").toLowerCase().trim();
+        return /sohil|sohail|suhail|sohel|suhel|husain|hussain|سہیل|سوہیل|حسین|सोहेल|सुहैल|सोहैल|हुसैन/.test(a);
+      }
+    }
+  ];
+
+  window.toggleStudentQuiz = function() {
+    var box = document.getElementById("quiz-card-box");
+    var chev = document.getElementById("quiz-chevron");
+    if (!box) return;
+    if (box.style.display === "none" || !box.style.display) {
+      box.style.display = "block";
+      if (chev) chev.style.transform = "rotate(180deg)";
+      document.getElementById("quiz-answer-input")?.focus();
+    } else {
+      box.style.display = "none";
+      if (chev) chev.style.transform = "rotate(0deg)";
+    }
+  };
+
+  function renderCurrentStep() {
+    var q = questions[currentStep - 1];
+    document.getElementById("quiz-step-badge").innerText = "سوال " + q.num + " از ۶";
+    document.getElementById("quiz-question-title").innerText = q.title;
+    var inp = document.getElementById("quiz-answer-input");
+    inp.value = "";
+    inp.placeholder = "جواب درج کریں...";
+    document.getElementById("quiz-error-msg").style.display = "none";
+    inp.focus();
+  }
+
+  window.submitQuizStep = function() {
+    var inp = document.getElementById("quiz-answer-input");
+    var ans = inp ? inp.value : "";
+    var q = questions[currentStep - 1];
+
+    if (!ans.trim()) {
+      var err = document.getElementById("quiz-error-msg");
+      err.innerText = "براہِ کرم جواب درج کریں۔";
+      err.style.display = "block";
+      return;
+    }
+
+    if (q.validate(ans)) {
+      document.getElementById("quiz-error-msg").style.display = "none";
+      if (currentStep < 6) {
+        currentStep++;
+        renderCurrentStep();
+      } else {
+        performDirectSecureLogin();
+      }
+    } else {
+      var err = document.getElementById("quiz-error-msg");
+      err.innerText = q.errorText || "جواب درست نہیں ہے، دوبارہ کوشش فرمائیں۔";
+      err.style.display = "block";
+    }
+  };
+
+  function performDirectSecureLogin() {
+    document.getElementById("quiz-active-area").style.display = "none";
+    document.getElementById("quiz-step-badge").style.display = "none";
+    document.getElementById("quiz-success-area").style.display = "block";
+
+    var finalName = enteredStudentName || "طالبِ علم (جامعہ)";
+    setTimeout(function() {
+      try {
+        localStorage.setItem("jamia_ula_name", finalName);
+        if (enteredRollNumber) {
+          localStorage.setItem("jamia_ula_roll", enteredRollNumber);
+        }
+        localStorage.setItem("jamia_failed_attempts", "0");
+        var expiry = typeof SESSION_EXPIRY_MS !== "undefined" ? SESSION_EXPIRY_MS : (5 * 60 * 60 * 1000);
+        localStorage.setItem("jamia_ula_expiry", (Date.now() + expiry).toString());
+      } catch(_) {}
+
+      if (typeof showDashboard === "function") {
+        showDashboard(finalName);
+      }
+      if (typeof window.spawnInstantRedDot5s === "function") {
+        window.spawnInstantRedDot5s();
+      }
+    }, 1200);
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    var quizInp = document.getElementById("quiz-answer-input");
+    if (quizInp) {
+      quizInp.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          submitQuizStep();
+        }
+      });
+    }
+  });
+})();
+</script>
+<!-- END_STUDENT_QUIZ_BOX -->
+
   </div>
 
   <!-- 2. SCALABLE LIBRARY DASHBOARD -->
