@@ -2993,6 +2993,22 @@ function toggleFilterRows() {
 </script>
 
 
+
+
+
+<script id="jamia-pwa-register-engine">
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' }).then(function(reg) {
+        console.log('PWA Service Worker Registered Successfully:', reg.scope);
+      }).catch(function(err) {
+        console.warn('SW Registration note:', err);
+      });
+    });
+  }
+</script>
+
+
 <!-- START_FLOATING_HELP_DOCK -->
 <style>
   #fab-help-main-btn {
@@ -3012,7 +3028,7 @@ function toggleFilterRows() {
     align-items: center;
     gap: 8px;
     box-shadow: 0 8px 24px rgba(2, 132, 199, 0.5);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease;
     direction: rtl;
     font-family: inherit;
     user-select: none;
@@ -3032,25 +3048,20 @@ function toggleFilterRows() {
     border: 1.5px solid rgba(56, 189, 248, 0.4);
     border-radius: 16px;
     padding: 14px;
-    box-shadow: 0 16px 35px rgba(0, 0, 0, 0.75);
+    box-shadow: 0 16px 35px rgba(0, 0, 0, 0.8);
     direction: rtl;
     text-align: right;
     font-family: inherit;
     box-sizing: border-box;
-    animation: fabPop 0.22s ease-out;
-  }
-  @keyframes fabPop {
-    from { opacity: 0; transform: translateY(10px) scale(0.96); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
   }
   .fab-action-link {
     text-decoration: none;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 9px 12px;
+    padding: 10px 12px;
     border-radius: 10px;
-    margin-bottom: 7px;
+    margin-bottom: 8px;
     font-size: 11.5px;
     font-weight: 600;
     box-sizing: border-box;
@@ -3060,13 +3071,13 @@ function toggleFilterRows() {
     filter: brightness(1.2);
   }
 
-  /* Full Screen Detailed Site Guide Modal */
+  /* Safe Academic Guide Modal */
   #site-guide-modal-overlay {
     display: none;
     position: fixed;
     inset: 0;
     z-index: 9999999;
-    background: rgba(2, 6, 23, 0.9);
+    background: rgba(2, 6, 23, 0.92);
     backdrop-filter: blur(6px);
     align-items: center;
     justify-content: center;
@@ -3080,8 +3091,8 @@ function toggleFilterRows() {
     border: 1.5px solid #38bdf8;
     border-radius: 18px;
     width: 100%;
-    max-width: 520px;
-    max-height: 84vh;
+    max-width: 500px;
+    max-height: 82vh;
     display: flex;
     flex-direction: column;
     box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85);
@@ -3122,7 +3133,7 @@ function toggleFilterRows() {
   <i class="fa-solid fa-chevron-up" id="fab-chev" style="font-size: 10px; transition: 0.25s;"></i>
 </button>
 
-<!-- Floating Popup Menu (4 Actions) -->
+<!-- Floating Popup Menu (4 Clean Actions) -->
 <div id="fab-help-menu-card" onclick="event.stopPropagation()">
   <div style="font-size: 11px; color: #94a3b8; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
     <span><i class="fa-solid fa-circle-question" style="color: #38bdf8;"></i> آپ کی کیا مدد کی جائے؟</span>
@@ -3130,7 +3141,7 @@ function toggleFilterRows() {
   </div>
 
   <!-- WhatsApp 1 -->
-  <a href="https://wa.me/919760833104?text=السلام%20علیکم%20ورحمۃ%20اللہ" target="_blank" class="fab-action-link" style="background: rgba(6, 78, 59, 0.85); border: 1px solid #059669; color: #6ee7b7;">
+  <a href="https://wa.me/919760833104?text=السلام%20علیکم%20ورحمۃ%20اللہ" target="_blank" onclick="event.stopPropagation(); toggleFabMenu();" class="fab-action-link" style="background: rgba(6, 78, 59, 0.85); border: 1px solid #059669; color: #6ee7b7;">
     <span style="display: flex; align-items: center; gap: 8px;">
       <i class="fa-brands fa-whatsapp" style="font-size: 15px;"></i>
       <span>واٹس ایپ رابطہ (۱)</span>
@@ -3139,7 +3150,7 @@ function toggleFilterRows() {
   </a>
 
   <!-- WhatsApp 2 -->
-  <a href="https://wa.me/918439602526?text=السلام%20علیکم%20ورحمۃ%20اللہ" target="_blank" class="fab-action-link" style="background: rgba(6, 78, 59, 0.85); border: 1px solid #059669; color: #6ee7b7;">
+  <a href="https://wa.me/918439602526?text=السلام%20علیکم%20ورحمۃ%20اللہ" target="_blank" onclick="event.stopPropagation(); toggleFabMenu();" class="fab-action-link" style="background: rgba(6, 78, 59, 0.85); border: 1px solid #059669; color: #6ee7b7;">
     <span style="display: flex; align-items: center; gap: 8px;">
       <i class="fa-brands fa-whatsapp" style="font-size: 15px;"></i>
       <span>واٹس ایپ رابطہ (۲)</span>
@@ -3147,110 +3158,83 @@ function toggleFilterRows() {
     <i class="fa-solid fa-arrow-left" style="font-size: 10px;"></i>
   </a>
 
-  <!-- Email -->
-  <a href="mailto:sohilhusain2025@gmail.com?subject=Jamia%20Digital%20Library%20Assistance" class="fab-action-link" style="background: rgba(30, 41, 59, 0.85); border: 1px solid #38bdf8; color: #38bdf8;">
+  <!-- Direct Email (Strictly Launches Mail App, Closes Menu, No Modal Connection) -->
+  <a href="mailto:sohilhusain2025@gmail.com?subject=Jamia%20Digital%20Library%20Assistance" onclick="event.stopPropagation(); toggleFabMenu();" class="fab-action-link" style="background: rgba(30, 41, 59, 0.85); border: 1px solid #38bdf8; color: #38bdf8;">
     <span style="display: flex; align-items: center; gap: 8px;">
       <i class="fa-solid fa-envelope" style="font-size: 14px;"></i>
-      <span>براہِ راست ای میل</span>
+      <span>براہِ راست ای میل (Email)</span>
     </span>
     <i class="fa-solid fa-arrow-left" style="font-size: 10px;"></i>
   </a>
 
-  <!-- 4th Action: Complete Site Details & Guidelines Modal -->
+  <!-- 4th Action: Academic Guidelines Modal -->
   <button type="button" onclick="openSiteGuideModal(event)" class="fab-action-link" style="width: 100%; border: 1px solid #f59e0b; background: rgba(120, 53, 15, 0.5); color: #fbbf24; cursor: pointer; text-align: right; font-family: inherit;">
     <span style="display: flex; align-items: center; gap: 8px;">
       <i class="fa-solid fa-book-open-reader" style="font-size: 14px;"></i>
-      <span>پورٹل کی تفصیلی رہنمائی</span>
+      <span>کتب خانہ کا تعارف و عمومی رہنمائی</span>
     </span>
     <i class="fa-solid fa-arrow-left" style="font-size: 10px;"></i>
   </button>
 </div>
 
-<!-- Detailed Guide Full Screen Modal -->
+<!-- Safe Academic Guidelines Modal (NO LOGIN SECRETS, NO TIMERS, NO QUESTION LEAKS) -->
 <div id="site-guide-modal-overlay" onclick="closeSiteGuideModal()">
   <div id="site-guide-modal-box" onclick="event.stopPropagation()">
     
     <!-- Modal Header -->
     <div style="padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.95);">
       <div style="font-size: 13.5px; font-weight: 800; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
-        <i class="fa-solid fa-shield-halved" style="color: #38bdf8;"></i>
-        <span>جامعۃ الرضا ڈیجیٹل کتب خانہ — مکمل تعارف و رہنمائی</span>
+        <i class="fa-solid fa-book-bookmark" style="color: #38bdf8;"></i>
+        <span>جامعۃ الرضا ڈیجیٹل کتب خانہ — تعارف و عمومی رہنمائی</span>
       </div>
       <button type="button" onclick="closeSiteGuideModal()" style="background: none; border: 0; color: #94a3b8; font-size: 22px; cursor: pointer; line-height: 1; padding: 0 4px;">&times;</button>
     </div>
 
-    <!-- Modal Body with Rich Details -->
+    <!-- Modal Body (Purely Academic & Safe) -->
     <div class="guide-scroll-body">
       
       <!-- 1. Intro -->
       <div class="guide-section-card">
         <div class="guide-section-title">
-          <i class="fa-solid fa-circle-info"></i> ۱. کتب خانہ کا تعارف و مقصد
+          <i class="fa-solid fa-school"></i> ۱. کتب خانہ کا تعارف و مقاصد
         </div>
         <div>
-          یہ پورٹل جامعۃ الرضا (بریلی شریف) کے طلبۂ کرام بالخصوص جماعت اولیٰ کے لیے تیار کیا گیا ہے۔ اس کا مقصد نصابی کتب، سالانہ و ششماہی امتحانی پرچہ جات، حل شدہ سوال نامے اور روحانی کلام و نعتوں کے مجموعے تک آسان، تیز رفتار اور جدید رسائی فراہم کرنا ہے۔
+          یہ تعلیمی پورٹل جامعۃ الرضا (مرکزِ اہلِ سنّت، بریلی شریف) کے طلبۂ کرام کی علمی و درسی معاونت کے لیے قائم کیا گیا ہے۔ اس پلیٹ فارم کا بنیادی مقصد نصابی کتب، شروحات، سابقہ امتحانی پرچہ جات اور علمی و دینی ذخیرے تک آسان رسائی فراہم کرنا ہے۔
         </div>
       </div>
 
-      <!-- 2. Login & Quiz System -->
+      <!-- 2. Portal Usage & Reading -->
       <div class="guide-section-card">
         <div class="guide-section-title">
-          <i class="fa-solid fa-key" style="color: #fbbf24;"></i> ۲. لاگ اِن و سیکیورٹی جانچ کا طریقہ
+          <i class="fa-solid fa-book-open" style="color: #38bdf8;"></i> ۲. کتب و امتحانی پرچوں کا مطالعہ
         </div>
         <div>
-          پورٹل کی سیکیورٹی کے تحت صرف باوقار طلبۂ جامعہ ہی داخل ہو سکتے ہیں۔ اگر آپ کو پاس ورڈ معلوم نہ ہو تو لاگ اِن فارم کے اوپر موجود <b>"پاس ورڈ حاصل کریں"</b> والے سنہرے بٹن پر کلک کریں۔ آپ کے سامنے ۶ آسان تصدیقی سوالات آئیں گے:
+          پورٹل میں داخلے کے بعد طلبۂ کرام کے لیے درج ذیل سہولیات میسر ہیں:
           <ul style="margin: 6px 0; padding-right: 20px;">
-            <li>مدرسہ کا نام اور جماعت کا نام۔</li>
-            <li>آپ کا نام (حقیقی نام جس میں اعراب یا حروفِ علت شامل ہوں)۔</li>
-            <li>آپ کا ۴ ہندسی رول نمبر۔</li>
-            <li>تجوید کے استادِ محترم کا نام اور سائٹ ایڈمن کا نام۔</li>
-          </ul>
-          تمام ۶ سوالات کے درست جواب پر اصل پاس ورڈ فریم میں ظاہر ہو جائے گا جسے خودکار بٹن دبا کر فوراََ بھرا جا سکتا ہے۔
-        </div>
-      </div>
-
-      <!-- 3. Lockout System -->
-      <div class="guide-section-card">
-        <div class="guide-section-title">
-          <i class="fa-solid fa-user-lock" style="color: #ef4444;"></i> ۳. تین غلط کوششوں پر حفاظتی لاک
-        </div>
-        <div>
-          کسی بھی قسم کی غیر متعلقہ کوششوں کو روکنے کے لیے سائٹ پر خودکار کلاؤڈ سیکیورٹی لاک فعال ہے:
-          <ul style="margin: 6px 0; padding-right: 20px;">
-            <li>اگر ۳ مرتبہ غلط معلومات یا پاس ورڈ درج کیا گیا تو پہلی بار پورٹل <b>۲ گھنٹے</b> کے لیے مقفل ہو جائے گا۔</li>
-            <li>دوبارہ ۳ غلطیوں پر <b>۳ گھنٹے</b> اور اس کے بعد <b>۵ گھنٹے</b> کا لاک آؤٹ لائیو ٹائمر کے ساتھ جاری رہے گا۔</li>
-            <li>پیج ریفریش کرنے سے یہ وقت ضائع نہیں ہوتا، لہٰذا احتیاط سے معلومات درج فرمائیں۔</li>
+            <li><b>سرچ بار:</b> اوپر موجود سرچ خانے سے کسی بھی کتاب، پرچے یا مصنف کے نام سے فوری تلاش کریں۔</li>
+            <li><b>موضوعاتی فلٹرز:</b> تمام کتب، درسی کتب، فقہی مسائل، امتحانی پرچے اور نعتیں علیحدہ خانوں میں ترتیب دی گئی ہیں۔</li>
+            <li><b>آن لائن مطالعہ:</b> کسی بھی کتاب پر کلک کر کے اس کا براہِ راست آن لائن مطالعہ کیا جا سکتا ہے۔</li>
           </ul>
         </div>
       </div>
 
-      <!-- 4. 5-Hour Session & Red Dot -->
+      <!-- 3. Policy -->
       <div class="guide-section-card">
         <div class="guide-section-title">
-          <i class="fa-solid fa-circle-dot" style="color: #ef4444;"></i> ۴. ۵ گھنٹے کا سیشن اور ریڈ ڈاٹ الرٹ
+          <i class="fa-solid fa-shield" style="color: #fbbf24;"></i> ۳. اختصاص و ضوابط
         </div>
         <div>
-          لاگ اِن ہوتے ہی سیکیورٹی سیشن شروع ہو جاتا ہے۔ اوپر دائیں کونے پر ابھرنے والا چمکتا ہوا <b>ریڈ ڈاٹ (Red Pulse Dot)</b> اس بات کی علامت ہے کہ آپ کا مستند سیشن فعال ہو چکا ہے۔ یہ سیشن پورے ۵ گھنٹے تک برقرار رہتا ہے جس کے بعد صارف خود بخود باحفاظت لاگ آؤٹ ہو جاتا ہے۔
+          یہ پورٹل خالصتاً طلبۂ جامعہ کے تعلیمی فائدے کے لیے مخصوص ہے۔ تمام طلبۂ کرام سے گزارش ہے کہ علمی مواد کے احترام کو ملحوظ رکھیں اور کتب خانے سے زیادہ سے زیادہ تعلیمی استفادہ حاصل کریں۔
         </div>
       </div>
 
-      <!-- 5. Search & Filters -->
-      <div class="guide-section-card">
-        <div class="guide-section-title">
-          <i class="fa-solid fa-magnifying-glass" style="color: #34d399;"></i> ۵. سرچ اور فلٹرز کا استعمال
-        </div>
-        <div>
-          ڈیش بورڈ پر موجود سرچ بار کے ذریعے آپ کسی بھی کتاب، پرچے یا نعت کو کتاب کے نام یا مصنف کے نام سے تلاش کر سکتے ہیں۔ مزید یہ کہ تمام کتب، پرچہ جات، فقہی اور امتحانی کیٹیگریز کے فلٹرز پر کلک کر کے آپ مطلوبہ مواد فوری حاصل کر سکتے ہیں۔
-        </div>
-      </div>
-
-      <!-- 6. Developer & Ownership -->
+      <!-- 4. Support & New Book Requests -->
       <div class="guide-section-card" style="border-color: rgba(56, 189, 248, 0.4); background: rgba(15, 23, 42, 0.9);">
         <div class="guide-section-title">
-          <i class="fa-solid fa-code"></i> ۶. تخلیق و تکنیکی انتظام
+          <i class="fa-solid fa-headset" style="color: #34d399;"></i> ۴. نئی کتب کی شمولیت و تکنیکی تعاون
         </div>
         <div>
-          یہ پورٹل <b>سہیل حسین (فقیرِ راہِ رضا)</b> کی کاوشوں کا نتیجہ ہے جسے طلبہ کے تعلیمی تعاون کے لیے مستقل اپڈیٹ کیا جا رہا ہے۔ کسی بھی خرابی یا نئی کتب کی شمولیت کے لیے واٹس ایپ یا ای میل کے ذریعے رابطہ کیا جا سکتا ہے۔
+          اگر آپ کو کسی خاص درسی کتاب، حل شدہ سوال نامے یا پرچے کی ضرورت ہو جو فی الحال موجود نہ ہو، یا سائٹ میں کسی قسم کی تکنیکی دشواری پیش آئے، تو آپ مینو میں موجود <b>واٹس ایپ</b> یا <b>ای میل</b> کے ذریعے سائٹ ایڈمن (سہیل حسین) کو مطلع فرما سکتے ہیں۔
         </div>
       </div>
 
@@ -3296,7 +3280,6 @@ function toggleFilterRows() {
     if (modal) modal.style.display = "none";
   }
 
-  // Click outside to close fab popup
   window.addEventListener("click", function(e) {
     var menu = document.getElementById("fab-help-menu-card");
     var btn = document.getElementById("fab-help-main-btn");
@@ -3311,19 +3294,6 @@ function toggleFilterRows() {
   });
 </script>
 <!-- END_FLOATING_HELP_DOCK -->
-
-
-<script id="jamia-pwa-register-engine">
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('/sw.js', { scope: '/' }).then(function(reg) {
-        console.log('PWA Service Worker Registered Successfully:', reg.scope);
-      }).catch(function(err) {
-        console.warn('SW Registration note:', err);
-      });
-    });
-  }
-</script>
 
 </body>
 </html>
