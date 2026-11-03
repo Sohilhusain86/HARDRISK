@@ -1259,6 +1259,9 @@
 </style>
 
 
+
+
+
 <style id="jamia-ticker-style">
   .jamia-ticker-wrapper {
     width: calc(100% - 20px);
@@ -1303,11 +1306,12 @@
   .jamia-ticker-track {
     display: inline-flex;
     white-space: nowrap;
-    animation: seamlessScrollJamia 65s linear infinite;
+    will-change: transform;
+    animation: seamlessScrollJamia 35s linear infinite;
     direction: ltr;
   }
-  .jamia-ticker-track.paused {
-    animation-play-state: paused !important;
+  .jamia-ticker-wrapper:hover .jamia-ticker-track {
+    animation-play-state: paused;
   }
   .jamia-ticker-segment {
     font-size: 0.82rem;
@@ -1342,10 +1346,10 @@
   }
   @keyframes seamlessScrollJamia {
     0% {
-      transform: translateX(0);
+      transform: translate3d(0, 0, 0);
     }
     100% {
-      transform: translateX(-50%);
+      transform: translate3d(-50%, 0, 0);
     }
   }
   @media (max-width: 480px) {
@@ -1359,6 +1363,9 @@
     .jamia-ticker-badge {
       font-size: 0.65rem;
       padding: 2px 7px;
+    }
+    .jamia-ticker-track {
+      animation-duration: 32s;
     }
   }
 </style>
@@ -1479,7 +1486,8 @@
   <!-- 2. SCALABLE LIBRARY DASHBOARD -->
   <div class="card" id="content-section">
     
-<div class="jamia-ticker-wrapper" id="jamiaAnnouncementTicker" title="روکنے کے لیے ٹچ کریں" onmouseenter="pauseTicker(true)" onmouseleave="pauseTicker(false)" ontouchstart="pauseTicker(true)" ontouchend="pauseTicker(false)">
+
+<div class="jamia-ticker-wrapper" id="jamiaAnnouncementTicker">
   <div class="jamia-ticker-badge">
     <i class="fa-solid fa-bullhorn"></i>
     <span>اعلان</span>
@@ -3650,17 +3658,10 @@ function fallbackWhatsappShare(msg) {
 </script>
 
 
-<script id="jamia-dynamic-ticker-js">
-function pauseTicker(val) {
-  var t = document.getElementById("jamiaTickerTrack");
-  if (!t) return;
-  if (val) {
-    t.classList.add("paused");
-  } else {
-    t.classList.remove("paused");
-  }
-}
 
+
+
+<script id="jamia-dynamic-ticker-js">
 function updateJamiaTickerNewArrivals() {
   try {
     var list = [];
@@ -3688,35 +3689,39 @@ function updateJamiaTickerNewArrivals() {
         .trim();
     }
 
+    // सबसे ताज़ा (Newest) आइटम हासिल करने के लिए लिस्ट को आख़िर से स्कैन करें
+    var reversedList = list.slice().reverse();
     var naats = [];
     var books = [];
 
-    for (var i = 0; i < list.length; i++) {
-      var item = list[i];
+    for (var i = 0; i < reversedList.length; i++) {
+      var item = reversedList[i];
       var rawT = (item.title || "").toLowerCase();
       var isNaat = (item.category === "naat" || item.type === "audio" || rawT.includes("نعت") || rawT.includes("sabir") || rawT.includes("asjad") || rawT.includes("@download"));
+
+      var ct = cleanTitle(item.title);
+      if (!ct) continue;
+
       if (isNaat) {
-        naats.push(cleanTitle(item.title));
+        if (naats.indexOf(ct) === -1 && naats.length < 5) {
+          naats.push(ct);
+        }
       } else {
-        books.push(cleanTitle(item.title));
+        if (books.indexOf(ct) === -1 && books.length < 5) {
+          books.push(ct);
+        }
       }
+
+      if (books.length >= 5 && naats.length >= 5) break;
     }
 
     var latestText = "";
-
-    // अगर किताबें और नातें दोनों जुड़ी हैं तो 5 किताबें + 5 नातें
     if (books.length > 0 && naats.length > 0) {
-      var topBooks = books.slice(0, 5).filter(Boolean);
-      var topNaats = naats.slice(0, 5).filter(Boolean);
-      latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین اضافہ</span> <span class="gold">نئی کتب (5):</span> [ ' + topBooks.join(" ، ") + ' ] <span class="dot">•</span> 🎙️ <span class="gold">نئی نعتیں (5):</span> [ ' + topNaats.join(" ، ") + ' ] ✨';
+      latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین کتب (5)</span>: [ ' + books.join(" ، ") + ' ] <span class="dot">•</span> 🎙️ <span class="badge-new">تازہ ترین نعتیں (5)</span>: [ ' + naats.join(" ، ") + ' ] ✨';
     } else if (books.length > 0) {
-      // अगर सिर्फ किताबें हैं तो 10 किताबें
-      var topBooks = books.slice(0, 10).filter(Boolean);
-      latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین کتب (Top 10)</span>: [ ' + topBooks.join(" ، ") + ' ] ✨';
+      latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین اضافہ جات</span>: [ ' + books.join(" ، ") + ' ] ✨';
     } else if (naats.length > 0) {
-      // अगर सिर्फ नातें हैं तो 10 नातें
-      var topNaats = naats.slice(0, 10).filter(Boolean);
-      latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین نعتیں (Top 10)</span>: [ ' + topNaats.join(" ، ") + ' ] ✨';
+      latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین نعتیں</span>: [ ' + naats.join(" ، ") + ' ] ✨';
     }
 
     if (latestText) {
@@ -3731,10 +3736,10 @@ function updateJamiaTickerNewArrivals() {
   }
 }
 
-// पेज लोड होने पर और बैकग्राउंड डेटा आने पर ऑटो ट्रिगर
+// पेज लोड होने पर ट्रिगर करें
 window.addEventListener("DOMContentLoaded", function() {
-  setTimeout(updateJamiaTickerNewArrivals, 1000);
-  setTimeout(updateJamiaTickerNewArrivals, 3000);
+  setTimeout(updateJamiaTickerNewArrivals, 800);
+  setTimeout(updateJamiaTickerNewArrivals, 2500);
 });
 </script>
 
