@@ -1215,30 +1215,119 @@
 
 
 
-<style id="top-action-btns-style">
+
+
+
+
+
+
+
+
+
+<style id="jamia-ticker-and-actions-style">
+  .jamia-ticker-wrapper {
+    display: none;
+    width: calc(100% - 16px);
+    max-width: 550px;
+    margin: 4px auto 2px auto !important;
+    background: rgba(10, 20, 35, 0.9);
+    border: 1px solid rgba(0, 255, 163, 0.4);
+    border-radius: 20px;
+    padding: 3px 10px;
+    box-sizing: border-box;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+    direction: ltr;
+  }
+  .jamia-ticker-badge {
+    background: linear-gradient(135deg, #059669, #0284c7);
+    color: #ffffff;
+    font-size: 0.68rem;
+    font-weight: bold;
+    padding: 2px 7px;
+    border-radius: 10px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 0 8px rgba(5, 150, 105, 0.5);
+    flex-shrink: 0;
+  }
+  .jamia-ticker-content {
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent);
+  }
+  .jamia-ticker-track {
+    display: inline-flex;
+    white-space: nowrap;
+    will-change: transform;
+    animation: seamlessScrollJamia 34s linear infinite;
+    direction: ltr;
+  }
+  .jamia-ticker-wrapper:hover .jamia-ticker-track {
+    animation-play-state: paused;
+  }
+  .jamia-ticker-segment {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #f1f5f9;
+    padding-right: 40px;
+    direction: rtl;
+    display: inline-block;
+  }
+  .jamia-ticker-segment b { color: #38bdf8; font-weight: 700; }
+  .jamia-ticker-segment .gold { color: #fbbf24; font-weight: 700; }
+  .jamia-ticker-segment .badge-new {
+    background: rgba(225, 29, 72, 0.3);
+    border: 1px solid #f43f5e;
+    color: #fda4af;
+    padding: 1px 5px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    margin: 0 4px;
+  }
+  .jamia-ticker-segment .dot {
+    margin: 0 10px;
+    color: #00ffa3;
+    font-weight: bold;
+  }
+  @keyframes seamlessScrollJamia {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
+  }
+
   .jamia-top-bar-clean {
-    display: flex !important;
+    display: none;
     justify-content: flex-end !important;
     align-items: center !important;
     gap: 8px !important;
     width: 100% !important;
     max-width: 550px !important;
-    margin: 6px auto 10px auto !important;
-    padding: 0 10px !important;
+    margin: 2px auto 4px auto !important;
+    padding: 0 8px !important;
     box-sizing: border-box !important;
     direction: ltr !important;
   }
   .jamia-top-btn {
-    border-radius: 20px !important;
-    padding: 6px 13px !important;
-    font-size: 0.8rem !important;
+    border-radius: 18px !important;
+    padding: 4px 11px !important;
+    font-size: 0.76rem !important;
     font-weight: bold !important;
     cursor: pointer !important;
     display: inline-flex !important;
     align-items: center !important;
-    gap: 6px !important;
+    gap: 5px !important;
     outline: none !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.35) !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3) !important;
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
     transition: all 0.2s ease !important;
@@ -1255,118 +1344,6 @@
     background: rgba(225, 29, 72, 0.2) !important;
     border: 1px solid #f43f5e !important;
     color: #fb7185 !important;
-  }
-</style>
-
-
-
-
-
-<style id="jamia-ticker-style">
-  .jamia-ticker-wrapper {
-    width: calc(100% - 20px);
-    max-width: 550px;
-    margin: 8px auto 6px auto;
-    background: rgba(10, 20, 35, 0.88);
-    border: 1px solid rgba(0, 255, 163, 0.4);
-    border-radius: 25px;
-    padding: 5px 12px;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    overflow: hidden;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(0, 255, 163, 0.1);
-    direction: ltr;
-  }
-  .jamia-ticker-badge {
-    background: linear-gradient(135deg, #059669, #0284c7);
-    color: #ffffff;
-    font-size: 0.72rem;
-    font-weight: bold;
-    padding: 3px 9px;
-    border-radius: 12px;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    box-shadow: 0 0 10px rgba(5, 150, 105, 0.6);
-    flex-shrink: 0;
-  }
-  .jamia-ticker-content {
-    flex: 1;
-    overflow: hidden;
-    white-space: nowrap;
-    position: relative;
-    mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent);
-  }
-  .jamia-ticker-track {
-    display: inline-flex;
-    white-space: nowrap;
-    will-change: transform;
-    animation: seamlessScrollJamia 35s linear infinite;
-    direction: ltr;
-  }
-  .jamia-ticker-wrapper:hover .jamia-ticker-track {
-    animation-play-state: paused;
-  }
-  .jamia-ticker-segment {
-    font-size: 0.82rem;
-    font-weight: 500;
-    color: #f1f5f9;
-    padding-right: 50px;
-    direction: rtl;
-    display: inline-block;
-  }
-  .jamia-ticker-segment b {
-    color: #38bdf8;
-    font-weight: 700;
-  }
-  .jamia-ticker-segment .gold {
-    color: #fbbf24;
-    font-weight: 700;
-  }
-  .jamia-ticker-segment .badge-new {
-    background: rgba(225, 29, 72, 0.3);
-    border: 1px solid #f43f5e;
-    color: #fda4af;
-    padding: 1px 6px;
-    border-radius: 10px;
-    font-size: 0.72rem;
-    font-weight: bold;
-    margin: 0 4px;
-  }
-  .jamia-ticker-segment .dot {
-    margin: 0 12px;
-    color: #00ffa3;
-    font-weight: bold;
-  }
-  @keyframes seamlessScrollJamia {
-    0% {
-      transform: translate3d(0, 0, 0);
-    }
-    100% {
-      transform: translate3d(-50%, 0, 0);
-    }
-  }
-  @media (max-width: 480px) {
-    .jamia-ticker-wrapper {
-      margin: 6px auto 4px auto;
-      padding: 4px 8px;
-    }
-    .jamia-ticker-segment {
-      font-size: 0.76rem;
-    }
-    .jamia-ticker-badge {
-      font-size: 0.65rem;
-      padding: 2px 7px;
-    }
-    .jamia-ticker-track {
-      animation-duration: 32s;
-    }
   }
 </style>
 
@@ -1487,6 +1464,10 @@
   <div class="card" id="content-section">
     
 
+
+
+
+
 <div class="jamia-ticker-wrapper" id="jamiaAnnouncementTicker">
   <div class="jamia-ticker-badge">
     <i class="fa-solid fa-bullhorn"></i>
@@ -1500,7 +1481,7 @@
   </div>
 </div>
 <!-- end-jamia-ticker -->
-<div class="jamia-top-bar-clean">
+<div class="jamia-top-bar-clean" id="jamiaTopActionsBar">
   <button type="button" class="jamia-top-btn jamia-btn-share" onclick="handleProSharePortal()" title="شیئر">
     <i class="fa-solid fa-share-nodes"></i>
     <span>شیئر</span>
@@ -3661,8 +3642,49 @@ function fallbackWhatsappShare(msg) {
 
 
 
+
+
+
 <script id="jamia-dynamic-ticker-js">
+function checkJamiaLoginState() {
+  var ticker = document.getElementById("jamiaAnnouncementTicker");
+  var topBar = document.getElementById("jamiaTopActionsBar");
+  if (!ticker || !topBar) return;
+
+  var loginBox = document.getElementById("loginScreen") || 
+                 document.getElementById("loginModal") || 
+                 document.getElementById("loginCard") || 
+                 document.getElementById("login-container") ||
+                 document.querySelector(".login-card");
+
+  var isLoginVisible = false;
+  if (loginBox) {
+    var st = window.getComputedStyle(loginBox);
+    if (st.display !== "none" && st.visibility !== "hidden" && st.opacity !== "0") {
+      isLoginVisible = true;
+    }
+  }
+
+  var user = localStorage.getItem("currentUser") || 
+             localStorage.getItem("userToken") || 
+             localStorage.getItem("jamia_auth_token") || 
+             sessionStorage.getItem("currentUser");
+
+  var hasWelcome = document.body ? document.body.innerText.includes("خوش آمدید") : false;
+
+  if (!isLoginVisible && (user || hasWelcome)) {
+    ticker.style.display = "flex";
+    topBar.style.display = "flex";
+  } else {
+    ticker.style.display = "none";
+    topBar.style.display = "none";
+  }
+}
+
+var tickerHasLoadedDriveData = false;
+
 function updateJamiaTickerNewArrivals() {
+  if (tickerHasLoadedDriveData) return;
   try {
     var list = [];
     if (typeof getActiveLibrary === 'function') {
@@ -3673,7 +3695,7 @@ function updateJamiaTickerNewArrivals() {
       list = LIBRARY_DATA;
     }
 
-    if (!list || list.length === 0) return;
+    if (!list || list.length < 20) return;
 
     function cleanTitle(t) {
       if (!t) return "";
@@ -3689,10 +3711,9 @@ function updateJamiaTickerNewArrivals() {
         .trim();
     }
 
-    // सबसे ताज़ा (Newest) आइटम हासिल करने के लिए लिस्ट को आख़िर से स्कैन करें
     var reversedList = list.slice().reverse();
-    var naats = [];
-    var books = [];
+    var allNaats = [];
+    var allBooks = [];
 
     for (var i = 0; i < reversedList.length; i++) {
       var item = reversedList[i];
@@ -3703,25 +3724,23 @@ function updateJamiaTickerNewArrivals() {
       if (!ct) continue;
 
       if (isNaat) {
-        if (naats.indexOf(ct) === -1 && naats.length < 5) {
-          naats.push(ct);
-        }
+        if (allNaats.indexOf(ct) === -1) allNaats.push(ct);
       } else {
-        if (books.indexOf(ct) === -1 && books.length < 5) {
-          books.push(ct);
-        }
+        if (allBooks.indexOf(ct) === -1) allBooks.push(ct);
       }
-
-      if (books.length >= 5 && naats.length >= 5) break;
     }
 
     var latestText = "";
-    if (books.length > 0 && naats.length > 0) {
-      latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین کتب (5)</span>: [ ' + books.join(" ، ") + ' ] <span class="dot">•</span> 🎙️ <span class="badge-new">تازہ ترین نعتیں (5)</span>: [ ' + naats.join(" ، ") + ' ] ✨';
-    } else if (books.length > 0) {
-      latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین اضافہ جات</span>: [ ' + books.join(" ، ") + ' ] ✨';
-    } else if (naats.length > 0) {
-      latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین نعتیں</span>: [ ' + naats.join(" ، ") + ' ] ✨';
+    if (allBooks.length > 0 && allNaats.length > 0) {
+      var topB = allBooks.slice(0, 5);
+      var topN = allNaats.slice(0, 5);
+      latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین کتب (5)</span>: [ ' + topB.join(" ، ") + ' ] <span class="dot">•</span> 🎙️ <span class="badge-new">تازہ ترین نعتیں (5)</span>: [ ' + topN.join(" ، ") + ' ] ✨';
+    } else if (allBooks.length > 0) {
+      var topB = allBooks.slice(0, 10);
+      latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین کتب (Top 10)</span>: [ ' + topB.join(" ، ") + ' ] ✨';
+    } else if (allNaats.length > 0) {
+      var topN = allNaats.slice(0, 10);
+      latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین نعتیں (Top 10)</span>: [ ' + topN.join(" ، ") + ' ] ✨';
     }
 
     if (latestText) {
@@ -3730,16 +3749,18 @@ function updateJamiaTickerNewArrivals() {
         var baseContent = seg.getAttribute("data-base") || seg.innerHTML;
         seg.innerHTML = baseContent + latestText;
       });
+      tickerHasLoadedDriveData = true;
     }
-  } catch (e) {
-    console.error("Ticker auto-sync error:", e);
-  }
+  } catch (e) {}
 }
 
-// पेज लोड होने पर ट्रिगर करें
 window.addEventListener("DOMContentLoaded", function() {
-  setTimeout(updateJamiaTickerNewArrivals, 800);
-  setTimeout(updateJamiaTickerNewArrivals, 2500);
+  checkJamiaLoginState();
+  setInterval(checkJamiaLoginState, 1000);
+
+  setTimeout(updateJamiaTickerNewArrivals, 11000);
+  setTimeout(updateJamiaTickerNewArrivals, 15000);
+  setTimeout(updateJamiaTickerNewArrivals, 20000);
 });
 </script>
 
