@@ -1208,6 +1208,66 @@
   }
 </style>
 
+
+<style id="top-action-btns-style">
+  .top-nav-actions {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 9999;
+  }
+  .top-action-btn {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(0, 255, 163, 0.4);
+    color: #e2e8f0;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+  }
+  .top-action-btn:hover, .top-action-btn:active {
+    transform: translateY(-1px);
+  }
+  .top-btn-share {
+    border-color: rgba(56, 189, 248, 0.5);
+    color: #38bdf8;
+  }
+  .top-btn-share:hover, .top-btn-share:active {
+    background: rgba(56, 189, 248, 0.2);
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.45);
+  }
+  .top-btn-logout {
+    border-color: rgba(244, 63, 94, 0.5);
+    color: #fb7185;
+  }
+  .top-btn-logout:hover, .top-btn-logout:active {
+    background: rgba(244, 63, 94, 0.2);
+    box-shadow: 0 0 14px rgba(244, 63, 94, 0.45);
+  }
+  @media (max-width: 480px) {
+    .top-nav-actions {
+      top: 10px;
+      right: 10px;
+      gap: 5px;
+    }
+    .top-action-btn {
+      padding: 5px 9px;
+      font-size: 0.74rem;
+    }
+  }
+</style>
+
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -3426,6 +3486,51 @@ function toggleFilterRows() {
   });
 </script>
 <!-- END_5S_INSTALL_POPUP -->
+
+
+<script id="pro-top-actions-script">
+function handleSiteLogout() {
+  const confirmed = confirm("کیا آپ واقعی لاگ آؤٹ کرنا چاہتے ہیں؟\n(Are you sure you want to log out?)");
+  if (!confirmed) return;
+
+  try {
+    // अगर कोड में पहले से कोई लॉगआउट फ़ंक्शन मौजूद हो
+    if (typeof window.userLogout === 'function') window.userLogout();
+    if (typeof window.doLogout === 'function') window.doLogout();
+
+    // पूरी तरह स्टोरेज साफ़ करें
+    localStorage.clear();
+    sessionStorage.clear();
+  } catch (e) {}
+
+  alert("کامیابی کے ساتھ لاگ آؤٹ ہو گئے۔\n(Successfully logged out)");
+  window.location.reload();
+}
+
+function handleProSharePortal() {
+  const portalUrl = "https://hardrisk.vercel.app/";
+  const formattedMsg = "✨ *مکتبہ فقیرِ راہِ رضا سہیل* ✨\n📚 جامعۃ الرضا ڈیجیٹل کتب خانہ، علمی و درسی کتب، پی ڈی ایف و نعتیہ کلام کا منفرد پورٹل\n\n🔗 مطالعہ و ڈاؤنلوڈ کے لیے ابھی وزٹ کریں:\n" + portalUrl;
+
+  // अगर ब्राउज़र का नेटिव शेयर उपलब्ध हो
+  if (navigator.share) {
+    navigator.share({
+      title: "Maktaba Faqeer e Raah e Raza Sohil",
+      text: formattedMsg
+    }).catch(function(err) {
+      if (err.name !== 'AbortError') {
+        fallbackWhatsappShare(formattedMsg);
+      }
+    });
+  } else {
+    fallbackWhatsappShare(formattedMsg);
+  }
+}
+
+function fallbackWhatsappShare(msg) {
+  const waUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(msg);
+  window.open(waUrl, "_blank");
+}
+</script>
 
 </body>
 </html>
