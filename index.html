@@ -1618,6 +1618,12 @@
       }
     }
 
+    // --- 100-ITEMS BATCH / CHUNK RENDERING SYSTEM ---
+    let currentRenderList = [];
+    let currentRenderIndex = 0;
+    const CHUNK_SIZE = 100;
+    let isChunkLoading = false;
+
     function renderBooks(customList) {
       const booksToRender = customList || (typeof allBooks !== 'undefined' ? allBooks : (typeof books !== 'undefined' ? books : defaultBooks));
       const grid = document.getElementById("books-list") || document.getElementById("booksGrid");
@@ -1640,10 +1646,40 @@
         return;
       }
 
-            booksToRender.forEach((b, index) => {
-        const itemNumber = index + 1;
-        
-        // --- A. CLEAN RAW TITLES (Bot tags, YouTube channels, Hashtags, Extensions) ---
+      currentRenderList = booksToRender;
+      currentRenderIndex = 0;
+
+      // पहली 100 किताबें तुरंत लोड करें
+      renderNextBatch();
+
+      // स्क्रॉल करने पर अगली 100 लोड करने वाला डिटेक्टर
+      if (!window.__chunkScrollBound) {
+        window.__chunkScrollBound = true;
+        window.addEventListener('scroll', () => {
+          if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 650) {
+            renderNextBatch();
+          }
+        }, { passive: true });
+      }
+    }
+
+    function renderNextBatch() {
+      if (isChunkLoading || currentRenderIndex >= currentRenderList.length) return;
+      isChunkLoading = true;
+
+      const grid = document.getElementById("books-list") || document.getElementById("booksGrid");
+      if (!grid) { isChunkLoading = false; return; }
+
+      const oldLoadMore = document.getElementById("jamiaLoadMoreContainer");
+      if (oldLoadMore) oldLoadMore.remove();
+
+      const nextBatch = currentRenderList.slice(currentRenderIndex, currentRenderIndex + CHUNK_SIZE);
+      const frag = document.createDocumentFragment();
+
+      nextBatch.forEach((b, offset) => {
+        const itemNumber = currentRenderIndex + offset + 1;
+
+        // --- A. CLEAN RAW TITLES ---
         let rawTitle = (b.title || "").trim();
         const exactTitleMap = {
           "00458 Lataef-Asharif-3-ur-LQ (1)": "لطائفِ اشرفی (جلد سوم)",
@@ -1657,7 +1693,7 @@
           "موبائيل فون كى ضرو": "موبائل فون کے ضروری مسائل",
           "مفتی اعظم ہند کی ک": "مفتی اعظم ہند کی کرامات",
           "عظمت غوث اعظم علیہ": "عظمتِ غوثِ اعظم علیہ الرحمۃ",
-          "ٹی وی اور آئینہ کی": "ٹی وی اور آئینہ کی تصویر میں فرق"
+          "ٹی وی اور آئینہ کی": "ٹی وی اور آئینہ کی تصویر में فرق"
         };
 
         let cleanTitle = exactTitleMap[rawTitle] || rawTitle
@@ -1801,8 +1837,28 @@
             </div>
           </div>
         `;
-        grid.appendChild(card);
+        frag.appendChild(card);
       });
+
+      grid.appendChild(frag);
+      currentRenderIndex += nextBatch.length;
+
+      // अगर और किताबें बची हैं तो नीचे 'مزید لوڈ کریں' बटन दिखाएं
+      if (currentRenderIndex < currentRenderList.length) {
+        const remaining = currentRenderList.length - currentRenderIndex;
+        const loadContainer = document.createElement("div");
+        loadContainer.id = "jamiaLoadMoreContainer";
+        loadContainer.style.cssText = "grid-column: 1 / -1; text-align: center; margin: 25px auto; width: 100%;";
+        loadContainer.innerHTML = `
+          <button type="button" onclick="renderNextBatch()" style="background: linear-gradient(135deg, #059669, #0284c7); border: none; color: #fff; padding: 10px 24px; border-radius: 25px; font-size: 0.95rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(5,150,105,0.3); display: inline-flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-circle-chevron-down"></i>
+            مزید لوڈ کریں (${Math.min(CHUNK_SIZE, remaining)} مزید)
+          </button>
+        `;
+        grid.appendChild(loadContainer);
+      }
+
+      isChunkLoading = false;
     }
 
     function getActiveLibrary() {
