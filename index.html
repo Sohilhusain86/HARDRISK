@@ -3807,5 +3807,22 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<script id="jamia-instant-update-notify">
+(function() {
+  var notifyVer = "v_update_nov2026_01";
+  if (localStorage.getItem("jamia_seen_update") !== notifyVer) {
+    window.addEventListener("DOMContentLoaded", function() {
+      setTimeout(function() {
+        if (typeof showJamiaToast === 'function') {
+          showJamiaToast("🎉 ✨ اہم اپڈیٹ: مکتبہ فقیرِ راہِ رضا سہیل\n⚡ تیز ترین فاسٹ لوڈنگ، لائیو اعلان نامہ پٹی اور تازہ ترین کتب و صوتیات شامل کر دی گئی ہیں! ابھی وزٹ فرمائیں۔");
+        } else if (Notification && Notification.permission === "granted") {
+          new Notification("✨ اہم اپڈیٹ: مکتبہ فقیرِ راہِ رضا سہیل", { body: "⚡ تیز ترین فاسٹ لوڈنگ، لائیو اعلان نامہ پٹی اور تازہ ترین کتب و صوتیات شامل کر دی گئی ہیں! ابھی وزٹ فرمائیں۔", icon: "/favicon.ico" });
+        }
+        localStorage.setItem("jamia_seen_update", notifyVer);
+      }, 1500);
+    });
+  }
+})();
+</script>
 </body>
 </html>
