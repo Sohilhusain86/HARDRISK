@@ -1361,6 +1361,37 @@
   }
 </style>
 
+
+<style id="jamia-exit-toast-style">
+  #jamiaExitToast {
+    position: fixed;
+    bottom: 75px;
+    left: 50%;
+    transform: translateX(-50%) translateY(30px);
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(0, 255, 163, 0.5);
+    color: #f8fafc;
+    padding: 9px 18px;
+    border-radius: 25px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    z-index: 9999999;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    direction: rtl;
+    text-align: center;
+    white-space: nowrap;
+  }
+  #jamiaExitToast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -3824,5 +3855,64 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 })();
 </script>
+
+<div id="jamiaExitToast">
+  <i class="fa-solid fa-arrow-right-from-bracket" style="color: #00ffa3; margin-left: 6px;"></i>
+  باہر نکلنے کے لیے دوبارہ بیک دبائیں
+</div>
+
+
+<script id="jamia-double-tap-exit-js">
+(function() {
+  var lastBackPressTime = 0;
+  var exitToastTimeout = null;
+
+  function showExitToast() {
+    var toast = document.getElementById("jamiaExitToast");
+    if (!toast) return;
+
+    toast.classList.add("show");
+    if (exitToastTimeout) clearTimeout(exitToastTimeout);
+    exitToastTimeout = setTimeout(function() {
+      toast.classList.remove("show");
+    }, 2000);
+  }
+
+  // Initial history trap push
+  function pushTrapState() {
+    window.history.pushState({ jamia_exit_trap: true }, "");
+  }
+
+  window.addEventListener("load", function() {
+    pushTrapState();
+  });
+
+  window.addEventListener("popstate", function(e) {
+    // 1. Agar koi Modal / PDF Viewer / Image viewer khula ho to pehle use band karein
+    var activeModal = document.querySelector(".modal.show, .pdf-fullscreen-wrap, [id*='modal'][style*='block'], [id*='viewer'][style*='flex']");
+    if (activeModal && activeModal.style.display !== "none") {
+      if (typeof closePdfModal === 'function') closePdfModal();
+      else if (typeof closeModal === 'function') closeModal();
+      else activeModal.style.display = "none";
+      pushTrapState();
+      return;
+    }
+
+    var currentTime = new Date().getTime();
+
+    // 2. Agar 2 second ke andar dobara back dabaya jaye
+    if (currentTime - lastBackPressTime < 2000) {
+      // Allow exit
+      window.history.back();
+    } else {
+      // Pehli baar dabane par exit rokein aur toast dikhayein
+      lastBackPressTime = currentTime;
+      showExitToast();
+      pushTrapState();
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
