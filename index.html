@@ -1212,19 +1212,25 @@
 
 
 
+
+
+
 <style id="top-action-btns-style">
-  .jamia-fixed-top-actions {
-    position: fixed !important;
-    top: 15px !important;
-    right: 15px !important;
+  .jamia-top-bar-clean {
     display: flex !important;
+    justify-content: flex-end !important;
     align-items: center !important;
     gap: 8px !important;
-    z-index: 999999 !important;
+    width: 100% !important;
+    max-width: 550px !important;
+    margin: 6px auto 10px auto !important;
+    padding: 0 10px !important;
+    box-sizing: border-box !important;
+    direction: ltr !important;
   }
   .jamia-top-btn {
     border-radius: 20px !important;
-    padding: 6px 12px !important;
+    padding: 6px 13px !important;
     font-size: 0.8rem !important;
     font-weight: bold !important;
     cursor: pointer !important;
@@ -1232,50 +1238,30 @@
     align-items: center !important;
     gap: 6px !important;
     outline: none !important;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.6) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
     transition: all 0.2s ease !important;
   }
   .jamia-top-btn:active {
     transform: scale(0.95) !important;
   }
   .jamia-btn-share {
-    background: rgba(14, 165, 233, 0.25) !important;
+    background: rgba(14, 165, 233, 0.2) !important;
     border: 1px solid #38bdf8 !important;
     color: #38bdf8 !important;
   }
   .jamia-btn-logout {
-    background: rgba(225, 29, 72, 0.25) !important;
+    background: rgba(225, 29, 72, 0.2) !important;
     border: 1px solid #f43f5e !important;
     color: #fb7185 !important;
-  }
-  @media (max-width: 480px) {
-    .jamia-fixed-top-actions {
-      top: 12px !important;
-      right: 10px !important;
-      gap: 6px !important;
-    }
-    .jamia-top-btn {
-      padding: 5px 9px !important;
-      font-size: 0.72rem !important;
-    }
   }
 </style>
 
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
-<div class="jamia-fixed-top-actions">
-  <button type="button" class="jamia-top-btn jamia-btn-share" onclick="handleProSharePortal()" title="شیئر">
-    <i class="fa-solid fa-share-nodes"></i>
-    <span>شیئر</span>
-  </button>
-  <button type="button" class="jamia-top-btn jamia-btn-logout" onclick="handleSiteLogout()" title="لاگ آؤٹ">
-    <i class="fa-solid fa-right-from-bracket"></i>
-    <span>لاگ آؤٹ</span>
-  </button>
-</div>
+
 
 
   <!-- 1. LOGIN SCREEN -->
@@ -1387,7 +1373,19 @@
 
   <!-- 2. SCALABLE LIBRARY DASHBOARD -->
   <div class="card" id="content-section">
-    <div class="exclusive-badge" style="border-color:#00ffa3; color:#00ffa3;">
+    
+<div class="jamia-top-bar-clean">
+  <button type="button" class="jamia-top-btn jamia-btn-share" onclick="handleProSharePortal()" title="شیئر">
+    <i class="fa-solid fa-share-nodes"></i>
+    <span>شیئر</span>
+  </button>
+  <button type="button" class="jamia-top-btn jamia-btn-logout" onclick="handleSiteLogout()" title="لاگ آؤٹ">
+    <i class="fa-solid fa-right-from-bracket"></i>
+    <span>لاگ آؤٹ</span>
+  </button>
+</div>
+
+<div class="exclusive-badge" style="border-color:#00ffa3; color:#00ffa3;">
       <i class="fa-solid fa-circle-check"></i>
       <span id="welcome-user">خوش آمدید!</span>
     </div>
