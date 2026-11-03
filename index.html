@@ -1227,13 +1227,16 @@
 
 
 
+
+
+
 <style id="jamia-ticker-and-actions-style">
   .jamia-ticker-wrapper {
     display: none;
-    width: calc(100% - 16px);
+    width: calc(100% - 14px);
     max-width: 550px;
-    margin: 2px auto 2px auto !important;
-    background: rgba(10, 20, 35, 0.92);
+    margin: -24px auto 10px auto !important; /* ऊपर हरी लाइन के बिल्कुल करीब */
+    background: rgba(10, 20, 35, 0.94);
     border: 1px solid rgba(0, 255, 163, 0.4);
     border-radius: 20px;
     padding: 3px 10px;
@@ -1273,7 +1276,7 @@
     display: inline-flex;
     white-space: nowrap;
     will-change: transform;
-    animation: naturalUrduScroll 46s linear infinite;
+    animation: naturalUrduFlow 48s linear infinite;
     direction: rtl;
   }
   .jamia-ticker-wrapper:hover .jamia-ticker-track {
@@ -1283,7 +1286,7 @@
     font-size: 0.78rem;
     font-weight: 500;
     color: #f1f5f9;
-    padding-left: 60px;
+    padding-left: 50px;
     direction: rtl;
     display: inline-block;
     unicode-bidi: isolate;
@@ -1311,10 +1314,9 @@
     font-weight: bold;
   }
   
-  /* प्राकृतिक उर्दू दिशा: दाएँ से प्रवेश कर बाएँ निकलना */
-  @keyframes naturalUrduScroll {
-    0% { transform: translate3d(0, 0, 0); }
-    100% { transform: translate3d(50%, 0, 0); }
+  @keyframes naturalUrduFlow {
+    0% { transform: translate3d(-50%, 0, 0); }
+    100% { transform: translate3d(0, 0, 0); }
   }
 
   .jamia-top-bar-clean {
@@ -1324,7 +1326,7 @@
     gap: 8px !important;
     width: 100% !important;
     max-width: 550px !important;
-    margin: 2px auto 4px auto !important;
+    margin: 0 auto 10px auto !important; /* टिकर और वेलकम के बीच बराबर 10px स्पेस */
     padding: 0 8px !important;
     box-sizing: border-box !important;
     direction: ltr !important;
@@ -1344,9 +1346,7 @@
     -webkit-backdrop-filter: blur(8px) !important;
     transition: all 0.2s ease !important;
   }
-  .jamia-top-btn:active {
-    transform: scale(0.95) !important;
-  }
+  .jamia-top-btn:active { transform: scale(0.95) !important; }
   .jamia-btn-share {
     background: rgba(14, 165, 233, 0.2) !important;
     border: 1px solid #38bdf8 !important;
@@ -1475,6 +1475,10 @@
   <!-- 2. SCALABLE LIBRARY DASHBOARD -->
   <div class="card" id="content-section">
     
+
+
+
+
 
 
 
@@ -3664,6 +3668,9 @@ function fallbackWhatsappShare(msg) {
 
 
 
+
+
+
 <script id="jamia-dynamic-ticker-js">
 function checkJamiaLoginState() {
   var ticker = document.getElementById("jamiaAnnouncementTicker");
@@ -3702,92 +3709,104 @@ function checkJamiaLoginState() {
 
 var tickerHasLoadedDriveData = false;
 
-function updateJamiaTickerNewArrivals() {
-  if (tickerHasLoadedDriveData) return;
-  try {
-    var list = [];
-    if (typeof getActiveLibrary === 'function') {
-      list = getActiveLibrary();
-    } else if (window.ALL_BOOKS_CACHE && window.ALL_BOOKS_CACHE.length > 0) {
-      list = window.ALL_BOOKS_CACHE;
-    } else if (typeof LIBRARY_DATA !== 'undefined' && Array.isArray(LIBRARY_DATA)) {
-      list = LIBRARY_DATA;
+function applyNewArrivalsToTicker(list) {
+  if (tickerHasLoadedDriveData || !list || list.length < 10) return;
+
+  function cleanTitle(t) {
+    if (!t) return "";
+    return t
+      .replace(/\[@download[_\s]*it[_\s]*bot(?:[_\s]*mp3)?\]/gi, "")
+      .replace(/^(?:Sunni Digital Media|Gulistaan E Quadri|meraj islamic tube)\s*/gi, "")
+      .replace(/#[a-zA-Z0-9_\u0600-\u06FF]+/g, "")
+      .replace(/[｜|]+/g, " • ")
+      .replace(/\(MP3[\s_]*\d+K\)/gi, "")
+      .replace(/\.(opus|mp3|m4a|wav|pdf)$/gi, "")
+      .replace(/\s*\(\d+\)$/, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+  }
+
+  function formatTextSpan(str) {
+    if (/^[a-zA-Z0-9\s\-.,()•|&:']+$/.test(str)) {
+      return '<span class="eng-text">' + str + '</span>';
     }
+    return str;
+  }
 
-    if (!list || list.length < 20) return;
+  var reversedList = list.slice().reverse();
+  var allNaats = [];
+  var allBooks = [];
 
-    function cleanTitle(t) {
-      if (!t) return "";
-      return t
-        .replace(/\[@download[_\s]*it[_\s]*bot(?:[_\s]*mp3)?\]/gi, "")
-        .replace(/^(?:Sunni Digital Media|Gulistaan E Quadri|meraj islamic tube)\s*/gi, "")
-        .replace(/#[a-zA-Z0-9_\u0600-\u06FF]+/g, "")
-        .replace(/[｜|]+/g, " • ")
-        .replace(/\(MP3[\s_]*\d+K\)/gi, "")
-        .replace(/\.(opus|mp3|m4a|wav|pdf)$/gi, "")
-        .replace(/\s*\(\d+\)$/, "")
-        .replace(/\s{2,}/g, " ")
-        .trim();
+  for (var i = 0; i < reversedList.length; i++) {
+    var item = reversedList[i];
+    var rawT = (item.title || "").toLowerCase();
+    var isNaat = (item.category === "naat" || item.type === "audio" || rawT.includes("نعت") || rawT.includes("sabir") || rawT.includes("asjad") || rawT.includes("@download"));
+
+    var ct = cleanTitle(item.title);
+    if (!ct) continue;
+
+    if (isNaat) {
+      if (allNaats.indexOf(ct) === -1) allNaats.push(ct);
+    } else {
+      if (allBooks.indexOf(ct) === -1) allBooks.push(ct);
     }
+  }
 
-    function formatTextSpan(str) {
-      // अगर शब्द में इंग्लिश या रोमन लेटर्स हैं तो उसे सेफ ltr स्पैन दें
-      if (/^[a-zA-Z0-9\s\-.,()•|&:']+$/.test(str)) {
-        return '<span class="eng-text">' + str + '</span>';
-      }
-      return str;
-    }
+  var latestText = "";
+  if (allBooks.length > 0 && allNaats.length > 0) {
+    var topB = allBooks.slice(0, 5).map(formatTextSpan);
+    var topN = allNaats.slice(0, 5).map(formatTextSpan);
+    latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین کتب (5)</span>: [ ' + topB.join(" ، ") + ' ] <span class="dot">•</span> 🎙️ <span class="badge-new">تازہ ترین نعتیں (5)</span>: [ ' + topN.join(" ، ") + ' ] ✨';
+  } else if (allBooks.length > 0) {
+    var topB = allBooks.slice(0, 10).map(formatTextSpan);
+    latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین کتب (Top 10)</span>: [ ' + topB.join(" ، ") + ' ] ✨';
+  } else if (allNaats.length > 0) {
+    var topN = allNaats.slice(0, 10).map(formatTextSpan);
+    latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین نعتیں (Top 10)</span>: [ ' + topN.join(" ، ") + ' ] ✨';
+  }
 
-    var reversedList = list.slice().reverse();
-    var allNaats = [];
-    var allBooks = [];
-
-    for (var i = 0; i < reversedList.length; i++) {
-      var item = reversedList[i];
-      var rawT = (item.title || "").toLowerCase();
-      var isNaat = (item.category === "naat" || item.type === "audio" || rawT.includes("نعت") || rawT.includes("sabir") || rawT.includes("asjad") || rawT.includes("@download"));
-
-      var ct = cleanTitle(item.title);
-      if (!ct) continue;
-
-      if (isNaat) {
-        if (allNaats.indexOf(ct) === -1) allNaats.push(ct);
-      } else {
-        if (allBooks.indexOf(ct) === -1) allBooks.push(ct);
-      }
-    }
-
-    var latestText = "";
-    if (allBooks.length > 0 && allNaats.length > 0) {
-      var topB = allBooks.slice(0, 5).map(formatTextSpan);
-      var topN = allNaats.slice(0, 5).map(formatTextSpan);
-      latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین کتب (5)</span>: [ ' + topB.join(" ، ") + ' ] <span class="dot">•</span> 🎙️ <span class="badge-new">تازہ ترین نعتیں (5)</span>: [ ' + topN.join(" ، ") + ' ] ✨';
-    } else if (allBooks.length > 0) {
-      var topB = allBooks.slice(0, 10).map(formatTextSpan);
-      latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین کتب (Top 10)</span>: [ ' + topB.join(" ، ") + ' ] ✨';
-    } else if (allNaats.length > 0) {
-      var topN = allNaats.slice(0, 10).map(formatTextSpan);
-      latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین نعتیں (Top 10)</span>: [ ' + topN.join(" ، ") + ' ] ✨';
-    }
-
-    if (latestText) {
-      var segments = document.querySelectorAll(".jamia-ticker-segment");
-      segments.forEach(function(seg) {
-        var baseContent = seg.getAttribute("data-base") || seg.innerHTML;
-        seg.innerHTML = baseContent + latestText;
-      });
-      tickerHasLoadedDriveData = true;
-    }
-  } catch (e) {}
+  if (latestText) {
+    var segments = document.querySelectorAll(".jamia-ticker-segment");
+    segments.forEach(function(seg) {
+      var baseContent = seg.getAttribute("data-base") || seg.innerHTML;
+      seg.innerHTML = baseContent + latestText;
+    });
+    tickerHasLoadedDriveData = true;
+  }
 }
+
+// 1. सीधे renderBooks फ़ंक्शन पर हुक (जैसे ही ड्राइव से किताबें लोड होंगी, तुरंत टिकर में जुड़ जाएंगी)
+var origRenderBooks = window.renderBooks;
+window.renderBooks = function(customList) {
+  if (typeof origRenderBooks === "function") {
+    origRenderBooks.apply(this, arguments);
+  }
+  var list = customList || (typeof allBooks !== 'undefined' ? allBooks : (typeof books !== 'undefined' ? books : []));
+  if (list && list.length > 10) {
+    applyNewArrivalsToTicker(list);
+  }
+};
+
+// 2. बैकअप पोलर (हर 2 सेकंड में चेक करेगा)
+var driveSyncInterval = setInterval(function() {
+  if (tickerHasLoadedDriveData) {
+    clearInterval(driveSyncInterval);
+    return;
+  }
+  var list = (typeof allBooks !== 'undefined' && allBooks.length > 10) ? allBooks :
+             (window.ALL_BOOKS_CACHE && window.ALL_BOOKS_CACHE.length > 10) ? window.ALL_BOOKS_CACHE :
+             (typeof getActiveLibrary === 'function' && getActiveLibrary().length > 10) ? getActiveLibrary() :
+             (typeof books !== 'undefined' && books.length > 10) ? books : null;
+
+  if (list && list.length > 10) {
+    applyNewArrivalsToTicker(list);
+    clearInterval(driveSyncInterval);
+  }
+}, 2000);
 
 window.addEventListener("DOMContentLoaded", function() {
   checkJamiaLoginState();
   setInterval(checkJamiaLoginState, 1000);
-
-  // 12 सेकंड बाद और 16 सेकंड बाद ताज़ा डेटा स्मूथली लोड होगा
-  setTimeout(updateJamiaTickerNewArrivals, 12000);
-  setTimeout(updateJamiaTickerNewArrivals, 16000);
 });
 </script>
 
