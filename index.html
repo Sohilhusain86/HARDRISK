@@ -1224,13 +1224,16 @@
 
 
 
+
+
+
 <style id="jamia-ticker-and-actions-style">
   .jamia-ticker-wrapper {
     display: none;
     width: calc(100% - 16px);
     max-width: 550px;
-    margin: 4px auto 2px auto !important;
-    background: rgba(10, 20, 35, 0.9);
+    margin: 2px auto 2px auto !important;
+    background: rgba(10, 20, 35, 0.92);
     border: 1px solid rgba(0, 255, 163, 0.4);
     border-radius: 20px;
     padding: 3px 10px;
@@ -1240,7 +1243,7 @@
     overflow: hidden;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
     direction: ltr;
   }
   .jamia-ticker-badge {
@@ -1264,13 +1267,14 @@
     position: relative;
     mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent);
     -webkit-mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent);
+    direction: rtl;
   }
   .jamia-ticker-track {
     display: inline-flex;
     white-space: nowrap;
     will-change: transform;
-    animation: seamlessScrollJamia 34s linear infinite;
-    direction: ltr;
+    animation: naturalUrduScroll 46s linear infinite;
+    direction: rtl;
   }
   .jamia-ticker-wrapper:hover .jamia-ticker-track {
     animation-play-state: paused;
@@ -1279,17 +1283,23 @@
     font-size: 0.78rem;
     font-weight: 500;
     color: #f1f5f9;
-    padding-right: 40px;
+    padding-left: 60px;
     direction: rtl;
     display: inline-block;
+    unicode-bidi: isolate;
   }
   .jamia-ticker-segment b { color: #38bdf8; font-weight: 700; }
   .jamia-ticker-segment .gold { color: #fbbf24; font-weight: 700; }
+  .jamia-ticker-segment .eng-text {
+    direction: ltr;
+    display: inline-block;
+    unicode-bidi: isolate;
+  }
   .jamia-ticker-segment .badge-new {
     background: rgba(225, 29, 72, 0.3);
     border: 1px solid #f43f5e;
     color: #fda4af;
-    padding: 1px 5px;
+    padding: 1px 6px;
     border-radius: 8px;
     font-size: 0.7rem;
     font-weight: bold;
@@ -1300,9 +1310,11 @@
     color: #00ffa3;
     font-weight: bold;
   }
-  @keyframes seamlessScrollJamia {
+  
+  /* प्राकृतिक उर्दू दिशा: दाएँ से प्रवेश कर बाएँ निकलना */
+  @keyframes naturalUrduScroll {
     0% { transform: translate3d(0, 0, 0); }
-    100% { transform: translate3d(-50%, 0, 0); }
+    100% { transform: translate3d(50%, 0, 0); }
   }
 
   .jamia-top-bar-clean {
@@ -1468,6 +1480,10 @@
 
 
 
+
+
+
+
 <div class="jamia-ticker-wrapper" id="jamiaAnnouncementTicker">
   <div class="jamia-ticker-badge">
     <i class="fa-solid fa-bullhorn"></i>
@@ -1475,8 +1491,8 @@
   </div>
   <div class="jamia-ticker-content">
     <div class="jamia-ticker-track" id="jamiaTickerTrack">
-      <div class="jamia-ticker-segment" data-base="✨ <b>مکتبہ فقیرِ راہِ رضا</b> <span class="dot">•</span> <span class="gold">جامعۃ الرضا ڈیجیٹل کتب خانہ</span> <span class="dot">•</span> <b>ترتیب و پیشکش:</b> فقیرِ راہِ رضا سہیل حسین (Sohil Husain) <span class="dot">•</span> 📚 اسلامی، درسی و فقہی کتب، افکار و فتاویٰ کا مستند گنجینہ <span class="dot">•</span> 📝 شعبۂ امتحانات: تمام درجات کے سالانہ امتحانی پرچہ جات <span class="dot">•</span> 🎙️ بزمِ صوتیات: حضور عسجد رضا خاں و بلبلِ باغِ مدینہ صابر رضا کی پر سوز آڈیو نعتیں <span class="dot">•</span> ⚡ تیز ترین سنگل کلک ڈاؤنلوڈ و فل اسکرین مطالعہ">✨ <b>مکتبہ فقیرِ راہِ رضا</b> <span class="dot">•</span> <span class="gold">جامعۃ الرضا ڈیجیٹل کتب خانہ</span> <span class="dot">•</span> <b>ترتیب و پیشکش:</b> فقیرِ راہِ رضا سہیل حسین (Sohil Husain) <span class="dot">•</span> 📚 اسلامی، درسی و فقہی کتب، افکار و فتاویٰ کا مستند گنجینہ <span class="dot">•</span> 📝 شعبۂ امتحانات: تمام درجات کے سالانہ امتحانی پرچہ جات <span class="dot">•</span> 🎙️ بزمِ صوتیات: حضور عسجد رضا خاں و بلبلِ باغِ مدینہ صابر رضا کی پر سوز آڈیو نعتیں <span class="dot">•</span> ⚡ تیز ترین سنگل کلک ڈاؤنلوڈ و فل اسکرین مطالعہ</div>
-      <div class="jamia-ticker-segment" data-base="✨ <b>مکتبہ فقیرِ راہِ رضا</b> <span class="dot">•</span> <span class="gold">جامعۃ الرضا ڈیجیٹل کتب خانہ</span> <span class="dot">•</span> <b>ترتیب و پیشکش:</b> فقیرِ راہِ رضا سہیل حسین (Sohil Husain) <span class="dot">•</span> 📚 اسلامی، درسی و فقہی کتب، افکار و فتاویٰ کا مستند گنجینہ <span class="dot">•</span> 📝 شعبۂ امتحانات: تمام درجات کے سالانہ امتحانی پرچہ جات <span class="dot">•</span> 🎙️ بزمِ صوتیات: حضور عسجد رضا خاں و بلبلِ باغِ مدینہ صابر رضا کی پر سوز آڈیو نعتیں <span class="dot">•</span> ⚡ تیز ترین سنگل کلک ڈاؤنلوڈ و فل اسکرین مطالعہ">✨ <b>مکتبہ فقیرِ راہِ رضا</b> <span class="dot">•</span> <span class="gold">جامعۃ الرضا ڈیجیٹل کتب خانہ</span> <span class="dot">•</span> <b>ترتیب و پیشکش:</b> فقیرِ راہِ رضا سہیل حسین (Sohil Husain) <span class="dot">•</span> 📚 اسلامی، درسی و فقہی کتب، افکار و فتاویٰ کا مستند گنجینہ <span class="dot">•</span> 📝 شعبۂ امتحانات: تمام درجات کے سالانہ امتحانی پرچہ جات <span class="dot">•</span> 🎙️ بزمِ صوتیات: حضور عسجد رضا خاں و بلبلِ باغِ مدینہ صابر رضا کی پر سوز آڈیو نعتیں <span class="dot">•</span> ⚡ تیز ترین سنگل کلک ڈاؤنلوڈ و فل اسکرین مطالعہ</div>
+      <div class="jamia-ticker-segment" data-base="✨ <b>مکتبہ فقیرِ راہِ رضا</b> <span class="dot">•</span> <span class="gold">جامعۃ الرضا ڈیجیٹل کتب خانہ</span> <span class="dot">•</span> <b>ترتیب و پیشکش:</b> فقیرِ راہِ رضا سہیل حسین (<span class="eng-text">Sohil Husain</span>) <span class="dot">•</span> 📚 اسلامی، درسی و فقہی کتب، افکار و فتاویٰ کا مستند گنجینہ <span class="dot">•</span> 📝 شعبۂ امتحانات: تمام درجات کے سالانہ امتحانی پرچہ جات <span class="dot">•</span> 🎙️ بزمِ صوتیات: حضور عسجد رضا خاں و بلبلِ باغِ مدینہ صابر رضا کی پر سوز آڈیو نعتیں <span class="dot">•</span> ⚡ تیز ترین سنگل کلک ڈاؤنلوڈ و فل اسکرین مطالعہ">✨ <b>مکتبہ فقیرِ راہِ رضا</b> <span class="dot">•</span> <span class="gold">جامعۃ الرضا ڈیجیٹل کتب خانہ</span> <span class="dot">•</span> <b>ترتیب و پیشکش:</b> فقیرِ راہِ رضا سہیل حسین (<span class="eng-text">Sohil Husain</span>) <span class="dot">•</span> 📚 اسلامی، درسی و فقہی کتب، افکار و فتاویٰ کا مستند گنجینہ <span class="dot">•</span> 📝 شعبۂ امتحانات: تمام درجات کے سالانہ امتحانی پرچہ جات <span class="dot">•</span> 🎙️ بزمِ صوتیات: حضور عسجد رضا خاں و بلبلِ باغِ مدینہ صابر رضا کی پر سوز آڈیو نعتیں <span class="dot">•</span> ⚡ تیز ترین سنگل کلک ڈاؤنلوڈ و فل اسکرین مطالعہ</div>
+      <div class="jamia-ticker-segment" data-base="✨ <b>مکتبہ فقیرِ راہِ رضا</b> <span class="dot">•</span> <span class="gold">جامعۃ الرضا ڈیجیٹل کتب خانہ</span> <span class="dot">•</span> <b>ترتیب و پیشکش:</b> فقیرِ راہِ رضا سہیل حسین (<span class="eng-text">Sohil Husain</span>) <span class="dot">•</span> 📚 اسلامی، درسی و فقہی کتب، افکار و فتاویٰ کا مستند گنجینہ <span class="dot">•</span> 📝 شعبۂ امتحانات: تمام درجات کے سالانہ امتحانی پرچہ جات <span class="dot">•</span> 🎙️ بزمِ صوتیات: حضور عسجد رضا خاں و بلبلِ باغِ مدینہ صابر رضا کی پر سوز آڈیو نعتیں <span class="dot">•</span> ⚡ تیز ترین سنگل کلک ڈاؤنلوڈ و فل اسکرین مطالعہ">✨ <b>مکتبہ فقیرِ راہِ رضا</b> <span class="dot">•</span> <span class="gold">جامعۃ الرضا ڈیجیٹل کتب خانہ</span> <span class="dot">•</span> <b>ترتیب و پیشکش:</b> فقیرِ راہِ رضا سہیل حسین (<span class="eng-text">Sohil Husain</span>) <span class="dot">•</span> 📚 اسلامی، درسی و فقہی کتب، افکار و فتاویٰ کا مستند گنجینہ <span class="dot">•</span> 📝 شعبۂ امتحانات: تمام درجات کے سالانہ امتحانی پرچہ جات <span class="dot">•</span> 🎙️ بزمِ صوتیات: حضور عسجد رضا خاں و بلبلِ باغِ مدینہ صابر رضا کی پر سوز آڈیو نعتیں <span class="dot">•</span> ⚡ تیز ترین سنگل کلک ڈاؤنلوڈ و فل اسکرین مطالعہ</div>
     </div>
   </div>
 </div>
@@ -3645,6 +3661,9 @@ function fallbackWhatsappShare(msg) {
 
 
 
+
+
+
 <script id="jamia-dynamic-ticker-js">
 function checkJamiaLoginState() {
   var ticker = document.getElementById("jamiaAnnouncementTicker");
@@ -3711,6 +3730,14 @@ function updateJamiaTickerNewArrivals() {
         .trim();
     }
 
+    function formatTextSpan(str) {
+      // अगर शब्द में इंग्लिश या रोमन लेटर्स हैं तो उसे सेफ ltr स्पैन दें
+      if (/^[a-zA-Z0-9\s\-.,()•|&:']+$/.test(str)) {
+        return '<span class="eng-text">' + str + '</span>';
+      }
+      return str;
+    }
+
     var reversedList = list.slice().reverse();
     var allNaats = [];
     var allBooks = [];
@@ -3732,14 +3759,14 @@ function updateJamiaTickerNewArrivals() {
 
     var latestText = "";
     if (allBooks.length > 0 && allNaats.length > 0) {
-      var topB = allBooks.slice(0, 5);
-      var topN = allNaats.slice(0, 5);
+      var topB = allBooks.slice(0, 5).map(formatTextSpan);
+      var topN = allNaats.slice(0, 5).map(formatTextSpan);
       latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین کتب (5)</span>: [ ' + topB.join(" ، ") + ' ] <span class="dot">•</span> 🎙️ <span class="badge-new">تازہ ترین نعتیں (5)</span>: [ ' + topN.join(" ، ") + ' ] ✨';
     } else if (allBooks.length > 0) {
-      var topB = allBooks.slice(0, 10);
+      var topB = allBooks.slice(0, 10).map(formatTextSpan);
       latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین کتب (Top 10)</span>: [ ' + topB.join(" ، ") + ' ] ✨';
     } else if (allNaats.length > 0) {
-      var topN = allNaats.slice(0, 10);
+      var topN = allNaats.slice(0, 10).map(formatTextSpan);
       latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین نعتیں (Top 10)</span>: [ ' + topN.join(" ، ") + ' ] ✨';
     }
 
@@ -3758,9 +3785,9 @@ window.addEventListener("DOMContentLoaded", function() {
   checkJamiaLoginState();
   setInterval(checkJamiaLoginState, 1000);
 
-  setTimeout(updateJamiaTickerNewArrivals, 11000);
-  setTimeout(updateJamiaTickerNewArrivals, 15000);
-  setTimeout(updateJamiaTickerNewArrivals, 20000);
+  // 12 सेकंड बाद और 16 सेकंड बाद ताज़ा डेटा स्मूथली लोड होगा
+  setTimeout(updateJamiaTickerNewArrivals, 12000);
+  setTimeout(updateJamiaTickerNewArrivals, 16000);
 });
 </script>
 
