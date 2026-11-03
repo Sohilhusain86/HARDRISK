@@ -1227,26 +1227,23 @@
 
 
 
-
-
-
 <style id="jamia-ticker-and-actions-style">
   .jamia-ticker-wrapper {
     display: none;
     width: calc(100% - 16px);
     max-width: 550px;
-    margin: 8px auto 14px auto !important; /* ऊपर हरी लाइन के पास, नीचे खुला स्पेस */
+    margin: 2px auto 2px auto !important;
     background: rgba(10, 20, 35, 0.92);
-    border: 1px solid rgba(0, 255, 163, 0.45);
+    border: 1px solid rgba(0, 255, 163, 0.4);
     border-radius: 20px;
-    padding: 4px 10px;
+    padding: 3px 10px;
     box-sizing: border-box;
     align-items: center;
     gap: 8px;
     overflow: hidden;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
     direction: ltr;
   }
   .jamia-ticker-badge {
@@ -1254,7 +1251,7 @@
     color: #ffffff;
     font-size: 0.68rem;
     font-weight: bold;
-    padding: 3px 8px;
+    padding: 2px 7px;
     border-radius: 10px;
     white-space: nowrap;
     display: inline-flex;
@@ -1299,7 +1296,7 @@
     unicode-bidi: isolate;
   }
   .jamia-ticker-segment .badge-new {
-    background: rgba(225, 29, 72, 0.35);
+    background: rgba(225, 29, 72, 0.3);
     border: 1px solid #f43f5e;
     color: #fda4af;
     padding: 1px 6px;
@@ -1313,33 +1310,34 @@
     color: #00ffa3;
     font-weight: bold;
   }
+  
+  /* प्राकृतिक उर्दू दिशा: दाएँ से प्रवेश कर बाएँ निकलना */
   @keyframes naturalUrduScroll {
     0% { transform: translate3d(0, 0, 0); }
     100% { transform: translate3d(50%, 0, 0); }
   }
 
-  /* शेयर/लॉगआउट बार - बीच में साफ़ स्पेस */
   .jamia-top-bar-clean {
     display: none;
     justify-content: flex-end !important;
     align-items: center !important;
-    gap: 10px !important;
+    gap: 8px !important;
     width: 100% !important;
     max-width: 550px !important;
-    margin: 0 auto 15px auto !important; /* वेलकम बैज से 15px की साफ़ दूरी */
+    margin: 2px auto 4px auto !important;
     padding: 0 8px !important;
     box-sizing: border-box !important;
     direction: ltr !important;
   }
   .jamia-top-btn {
     border-radius: 18px !important;
-    padding: 5px 12px !important;
+    padding: 4px 11px !important;
     font-size: 0.76rem !important;
     font-weight: bold !important;
     cursor: pointer !important;
     display: inline-flex !important;
     align-items: center !important;
-    gap: 6px !important;
+    gap: 5px !important;
     outline: none !important;
     box-shadow: 0 3px 10px rgba(0,0,0,0.3) !important;
     backdrop-filter: blur(8px) !important;
@@ -1477,10 +1475,6 @@
   <!-- 2. SCALABLE LIBRARY DASHBOARD -->
   <div class="card" id="content-section">
     
-
-
-
-
 
 
 
@@ -3670,9 +3664,6 @@ function fallbackWhatsappShare(msg) {
 
 
 
-
-
-
 <script id="jamia-dynamic-ticker-js">
 function checkJamiaLoginState() {
   var ticker = document.getElementById("jamiaAnnouncementTicker");
@@ -3723,8 +3714,7 @@ function updateJamiaTickerNewArrivals() {
       list = LIBRARY_DATA;
     }
 
-    // अगर ड्राइव लोड होने के बाद लिस्ट तैयार है
-    if (!list || list.length === 0) return;
+    if (!list || list.length < 20) return;
 
     function cleanTitle(t) {
       if (!t) return "";
@@ -3741,13 +3731,13 @@ function updateJamiaTickerNewArrivals() {
     }
 
     function formatTextSpan(str) {
+      // अगर शब्द में इंग्लिश या रोमन लेटर्स हैं तो उसे सेफ ltr स्पैन दें
       if (/^[a-zA-Z0-9\s\-.,()•|&:']+$/.test(str)) {
         return '<span class="eng-text">' + str + '</span>';
       }
       return str;
     }
 
-    // सबसे नई किताबों के लिए लिस्ट को पीछे से रिवर्स स्कैन करें
     var reversedList = list.slice().reverse();
     var allNaats = [];
     var allBooks = [];
@@ -3791,27 +3781,13 @@ function updateJamiaTickerNewArrivals() {
   } catch (e) {}
 }
 
-// renderBooks फ़ंक्शन के साथ ऑटोमैटिक हुक: जैसे ही किताबें लोड होंगी, टिकर तुरंत अपडेट होगा
-(function hookIntoLibraryLoad() {
-  var origRender = window.renderBooks;
-  if (typeof origRender === "function") {
-    window.renderBooks = function() {
-      var res = origRender.apply(this, arguments);
-      setTimeout(updateJamiaTickerNewArrivals, 500);
-      return res;
-    };
-  }
-})();
-
 window.addEventListener("DOMContentLoaded", function() {
   checkJamiaLoginState();
-  setInterval(checkJamiaLoginState, 800);
+  setInterval(checkJamiaLoginState, 1000);
 
-  // बैकअप टाइमर्स
-  var attempts = [2000, 5000, 10000, 15000, 25000, 40000];
-  attempts.forEach(function(t) {
-    setTimeout(updateJamiaTickerNewArrivals, t);
-  });
+  // 12 सेकंड बाद और 16 सेकंड बाद ताज़ा डेटा स्मूथली लोड होगा
+  setTimeout(updateJamiaTickerNewArrivals, 12000);
+  setTimeout(updateJamiaTickerNewArrivals, 16000);
 });
 </script>
 
