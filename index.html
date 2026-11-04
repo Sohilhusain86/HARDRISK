@@ -1547,17 +1547,7 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
     </div>
 
     
-<div class="jamia-auth-card" id="jamiaAuthenticatorBox">
-  <div class="jamia-auth-header">
-    <span><i class="fa-solid fa-shield-halved" style="color:#00ffa3;"></i> لائیو پاس ورڈ تصدیق</span>
-    <span class="jamia-auth-badge"><i class="fa-solid fa-arrows-rotate"></i> 10s آٹو چینج</span>
-  </div>
-  <div class="jamia-auth-code-box">
-    <div class="jamia-auth-timer-circle" id="jamiaAuthTimer">10</div>
-    <div class="jamia-auth-digits" id="jamiaAuthCodeDisplay">------</div>
-  </div>
-  
-</div>
+
 
 <div class="form-group">
       <label for="user-pass">
@@ -2434,13 +2424,11 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
       }
 
       const validCodes = [
-        calcSlotCode(currentSlot),
-        calcSlotCode((currentSlot - 1 + 7200) % 7200),
-        calcSlotCode((currentSlot + 1) % 7200)
+        active12sCode
       ];
 
       // अगर पास कोड इन 3 स्लॉट्स (36 सेकंड विंडो) में से किसी से भी मैच नहीं होता
-      if (!validCodes.includes(pass)) {
+      if (pass !== active12sCode) {
         err.innerHTML = "غلط پاس ورڈ! براہِ کرم اسکرین پر ظاہر ہونے والا 12 سیکنڈ کا لائیو کوڈ درج کریں۔";
         err.style.display = "block";
         return;
@@ -3202,6 +3190,32 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
 
+
+
+<script id="jamia-dashboard-full-restore">
+// डैशबोर्ड खुलते ही टिकर, लॉगआउट, हेल्प मेन्यू और लाइब्रेरी डेटा को चालू करना
+window.addEventListener("DOMContentLoaded", function() {
+  var origShowDashboard = window.showDashboard;
+  if (typeof origShowDashboard === 'function') {
+    window.showDashboard = function(userName) {
+      origShowDashboard(userName);
+      
+      // 1. टिकर पट्टी को सामने लाना
+      var ticker = document.getElementById("jamiaAnnouncementTicker");
+      if (ticker) ticker.style.setProperty("display", "flex", "important");
+      
+      // 2. टॉप एक्शन बार (लॉगआउट / शेयर)
+      var topActions = document.getElementById("jamiaTopActionsBar");
+      if (topActions) topActions.style.setProperty("display", "flex", "important");
+
+      // 3. नात व किताबों का डेटा अगर लोड न हुआ हो तो दोबारा लोड ट्रिगर करना
+      if (typeof renderBooks === 'function') {
+        try { renderBooks(LIBRARY_DATA || []); } catch(e) {}
+      }
+    };
+  }
+});
+</script>
 
 </body>
 </html>
