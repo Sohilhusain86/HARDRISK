@@ -1563,17 +1563,7 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
     </div>
 
     
-<div class="jamia-auth-card" id="jamiaAuthenticatorBox">
-  <div class="jamia-auth-header">
-    <span><i class="fa-solid fa-shield-halved" style="color:#00ffa3;"></i> لائیو پاس ورڈ تصدیق</span>
-    <span class="jamia-auth-badge"><i class="fa-solid fa-arrows-rotate"></i> 10s آٹو چینج</span>
-  </div>
-  <div class="jamia-auth-code-box">
-    <div class="jamia-auth-timer-circle" id="jamiaAuthTimer">10</div>
-    <div class="jamia-auth-digits" id="jamiaAuthCodeDisplay">------</div>
-  </div>
-  
-</div>
+
 
 <div class="form-group">
       <label for="user-pass">
@@ -3230,31 +3220,45 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
 
-<script id="jamia-toggle-filters-working-script">
+
+
+<script id="jamia-toggle-filters-bulletproof">
 window.toggleFilters = function() {
   var wrapper = document.getElementById("collapsibleFiltersWrapper");
-  var btnText = document.getElementById("toggleFiltersText") || document.querySelector("#toggleFiltersBtn span");
-  var btnIcon = document.querySelector("#toggleFiltersBtn i") || document.querySelector("button[onclick*='toggleFilters'] i");
+  if (!wrapper) wrapper = document.querySelector(".filter-tags");
+  var txt = document.getElementById("toggleFiltersText") || document.querySelector("#toggleFiltersBtn span");
+  var icon = document.querySelector("#toggleFiltersBtn i") || document.querySelector("button[onclick*='toggleFilters'] i");
 
-  if (!wrapper) {
-    // Agar id kisi aur wrapper me ho
-    wrapper = document.querySelector(".filter-tags");
-  }
+  if (!wrapper) return;
 
-  if (wrapper) {
-    var isHidden = (window.getComputedStyle(wrapper).display === "none");
-    if (isHidden) {
-      wrapper.style.setProperty("display", "block", "important");
-      if (btnText) btnText.innerText = "فلٹرز چھپائیں";
-      if (btnIcon) btnIcon.className = "fa-solid fa-eye-slash";
-    } else {
-      wrapper.style.setProperty("display", "none", "important");
-      if (btnText) btnText.innerText = "فلٹرز دکھائیں";
-      if (btnIcon) btnIcon.className = "fa-solid fa-eye";
+  var isHidden = (wrapper.style.display === "none" || window.getComputedStyle(wrapper).display === "none");
+
+  if (isHidden) {
+    wrapper.style.setProperty("display", "block", "important");
+    if (txt) txt.innerText = "فلٹرز چھپائیں";
+    if (icon) {
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    }
+  } else {
+    wrapper.style.setProperty("display", "none", "important");
+    if (txt) txt.innerText = "فلٹرز دکھائیں";
+    if (icon) {
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
     }
   }
 };
-</script>
 
+document.addEventListener("DOMContentLoaded", function() {
+  var btn = document.getElementById("toggleFiltersBtn") || document.querySelector("button[onclick*='toggleFilters']");
+  if (btn) {
+    btn.onclick = function(e) {
+      if (e) e.preventDefault();
+      window.toggleFilters();
+    };
+  }
+});
+</script>
 </body>
 </html>
