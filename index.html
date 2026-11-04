@@ -1409,59 +1409,60 @@ try {
 
 
 
-<script id="jamia-12s-perfect-auth">
-// 24 घंटे = 86,400s / 12s = 7,200 स्लॉट्स
-function get12sCode() {
-  var now = new Date();
-  var sec = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
-  var slot = Math.floor(sec / 12);
-  var rem = 12 - (sec % 12);
-  if (rem === 0) rem = 12;
 
-  var codeNum = ((((slot * 1664525) + 1013904223) & 0x7fffffff) % 900000) + 100000;
-  return { code: codeNum.toString(), rem: rem, slot: slot };
+
+<script id="jamia-bulletproof-auth">
+// 24 घंटे = 86400 सेकंड / 12 = 7200 स्लॉट्स
+window.JAMIA_LIVE_PASS = "";
+window.JAMIA_PREV_PASS = "";
+
+function generate12sDigits(slot) {
+  var seed = ((slot * 1664525) + 1013904223) & 0x7fffffff;
+  return (((seed % 900000) + 100000)).toString();
 }
 
-function updateTotpTicker() {
-  var c = get12sCode();
-  var disp = document.getElementById("jamiaLiveCodeDisplay");
-  var timer = document.getElementById("jamiaLiveTimerCircle");
-  if (disp) disp.innerText = c.code.slice(0, 3) + " " + c.code.slice(3, 6);
-  if (timer) timer.innerText = c.rem;
+function refresh12sPasscode() {
+  var now = new Date();
+  var secSinceMidnight = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+  var slot = Math.floor(secSinceMidnight / 12);
+  var rem = 12 - (secSinceMidnight % 12);
+  if (rem === 0) rem = 12;
+
+  var currentCode = generate12sDigits(slot);
+  var prevCode = generate12sDigits((slot - 1 + 7200) % 7200);
+
+  // जो स्क्रीन पर दिखेगा, वही मान्य होगा
+  window.JAMIA_LIVE_PASS = currentCode;
+  window.JAMIA_PREV_PASS = prevCode;
+
+  var disp = document.getElementById("livePasscodeText");
+  var timer = document.getElementById("liveTimerBadge");
+  if (disp) disp.innerText = currentCode.slice(0, 3) + " " + currentCode.slice(3, 6);
+  if (timer) timer.innerText = rem;
 }
 
 function autoFillJamiaLiveTOTP() {
-  var c = get12sCode();
-  var inp = document.getElementById("user-pass") || document.querySelector("input[type='password']");
-  if (inp) {
-    inp.value = c.code; // बिना स्पेस का साफ़ 6-अंकीय कोड
+  var inp = document.getElementById("user-pass");
+  if (inp && window.JAMIA_LIVE_PASS) {
+    inp.value = window.JAMIA_LIVE_PASS;
     inp.type = "text";
     setTimeout(function() { inp.type = "password"; }, 1500);
     inp.focus();
   }
 }
 
-// 12-सेकंड कोड की सटीक जाँच
-function checkIs12sPassValid(entered) {
+function isEnteredPassValid(entered) {
   if (!entered) return false;
-  // सभी स्पेस और गैर-संख्यात्मक वर्ण साफ़ करना
   var clean = entered.toString().replace(/[^0-9]/g, '').trim();
-  var c = get12sCode();
-
-  var prevSlot = (c.slot - 1 + 7200) % 7200;
-  var prevCode = (((((prevSlot * 1664525) + 1013904223) & 0x7fffffff) % 900000) + 100000).toString();
-
-  var nextSlot = (c.slot + 1) % 7200;
-  var nextCode = (((((nextSlot * 1664525) + 1013904223) & 0x7fffffff) % 900000) + 100000).toString();
-
-  return (clean === c.code || clean === prevCode || clean === nextCode);
+  // स्क्रीन पर चल रहा ताज़ा कोड या पिछला 12s कोड
+  return (clean === window.JAMIA_LIVE_PASS || clean === window.JAMIA_PREV_PASS);
 }
 
-// हर 1 सेकंड में लाइव टाइमर व कोड बदलना
-setInterval(updateTotpTicker, 1000);
-window.addEventListener("DOMContentLoaded", updateTotpTicker);
+// तुरंत चालू करें और हर सेकंड अपडेट रखें
+refresh12sPasscode();
+setInterval(refresh12sPasscode, 1000);
+window.addEventListener("DOMContentLoaded", refresh12sPasscode);
 </script>
-
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -2435,7 +2436,7 @@ window.addEventListener("DOMContentLoaded", updateTotpTicker);
       if (checkLockTimer()) return;
 
       const name = document.getElementById('user-name').value.trim();
-      const pass = document.getElementById('user-pass').value.trim();
+      const pass = (document.getElementById('user-pass').value || '').replace(/[^0-9]/g, '').trim();
       const err = document.getElementById('error-alert');
 
       if (!name) {
@@ -2446,7 +2447,7 @@ window.addEventListener("DOMContentLoaded", updateTotpTicker);
 
       let failedAttempts = parseInt(localStorage.getItem("jamia_failed_attempts") || "0", 10);
 
-      if (!checkIs12sPassValid(pass)) {
+      if (!isEnteredPassValid(pass)) {
         failedAttempts++;
         localStorage.setItem("jamia_failed_attempts", failedAttempts.toString());
         if (failedAttempts >= 5) {
