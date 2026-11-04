@@ -1547,15 +1547,7 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
     </div>
 
     
-<div class="jamia-auth-card" id="jamiaAuthenticatorBox">
-  <div class="jamia-auth-header">
-    <span><i class="fa-solid fa-shield-halved" style="color:#00ffa3;"></i> لائیو پاس ورڈ تصدیق</span>
-    <span class="jamia-auth-badge"><i class="fa-solid fa-arrows-rotate"></i> 10s آٹو چینج</span>
-  </div>
-  <div class="jamia-auth-code-box">
-    <div class="jamia-auth-timer-circle" id="jamiaAuthTimer">10</div>
-    <div class="jamia-auth-digits" id="jamiaAuthCodeDisplay">------</div>
-  </div>
+
   
 </div>
 
@@ -3203,5 +3195,50 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
 
+<script id="jamia-restore-topbar-ticker">
+function forceShowJamiaTopBar() {
+  var ticker = document.getElementById("jamiaAnnouncementTicker");
+  var topBar = document.getElementById("jamiaTopActionsBar");
+  
+  // अगर लॉगिन स्क्रीन छुपी हुई है या यूजर लॉग इन है
+  var loginBox = document.getElementById("loginScreen") || 
+                 document.getElementById("loginModal") || 
+                 document.getElementById("loginCard") || 
+                 document.querySelector(".login-card");
+                 
+  var isLoginVisible = false;
+  if (loginBox) {
+    var st = window.getComputedStyle(loginBox);
+    if (st.display !== "none" && st.visibility !== "hidden" && st.opacity !== "0") {
+      isLoginVisible = true;
+    }
+  }
+  
+  var hasWelcome = document.body ? (document.body.innerText.includes("خوش آمدید") || document.body.innerText.includes("عزیزم")) : false;
+  var userStored = localStorage.getItem("jamia_ula_name") || localStorage.getItem("currentUser");
+
+  if (!isLoginVisible && (hasWelcome || userStored)) {
+    if (ticker) ticker.style.setProperty("display", "flex", "important");
+    if (topBar) topBar.style.setProperty("display", "flex", "important");
+  } else {
+    if (ticker) ticker.style.display = "none";
+    if (topBar) topBar.style.display = "none";
+  }
+}
+
+// हर सेकंड चेक करे और लॉगिन होते ही तुरंत ऊपर दोनों पट्टियां दिखा दे
+setInterval(forceShowJamiaTopBar, 800);
+window.addEventListener("DOMContentLoaded", forceShowJamiaTopBar);
+
+// showDashboard फंक्शन के अंदर भी इसे जोड़ना
+if (typeof showDashboard === 'function') {
+  var origShowDash = showDashboard;
+  showDashboard = function(n) {
+    origShowDash(n);
+    setTimeout(forceShowJamiaTopBar, 100);
+    setTimeout(forceShowJamiaTopBar, 500);
+  };
+}
+</script>
 </body>
 </html>
