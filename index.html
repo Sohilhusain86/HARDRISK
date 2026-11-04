@@ -3465,5 +3465,112 @@ window.openViewer = function(url, title) {
 };
 </script>
 
+
+<script id="jamia-center-audio-real-sync">
+// पुरानी बैकअप वाली असली ऑडियो लिंकिंग
+function getGlobalAudio() {
+  var a = document.getElementById("globalHtmlAudio");
+  if (!a) {
+    a = document.createElement("audio");
+    a.id = "globalHtmlAudio";
+    a.preload = "metadata";
+    document.body.appendChild(a);
+  }
+  return a;
+}
+
+function fmtSec(s) {
+  if (isNaN(s) || s < 0) return "0:00";
+  var m = Math.floor(s / 60);
+  var sec = Math.floor(s % 60);
+  return m + ":" + (sec < 10 ? "0" : "") + sec;
+}
+
+// जब भी यूजर سنیں (Play) दबाए:
+window.playAudio = function(audioUrl, title, artist) {
+  var modal = document.getElementById("jamiaAudioModalOverlay");
+  var titleEl = document.getElementById("jamiaAudioTitle");
+  var artistEl = document.getElementById("jamiaAudioArtist");
+  var playIcon = document.getElementById("jamiaAudioPlayIcon");
+  var curTime = document.getElementById("jamiaAudioCurrentTime");
+  var durTime = document.getElementById("jamiaAudioDuration");
+  var seekbar = document.getElementById("jamiaAudioSeekbar");
+
+  var audio = getGlobalAudio();
+
+  if (titleEl) titleEl.innerText = title || "نعت شریف";
+  if (artistEl) artistEl.innerText = artist || "نعت خواں";
+
+  if (audio.src !== audioUrl) {
+    audio.src = audioUrl;
+  }
+
+  audio.play().then(function() {
+    if (playIcon) playIcon.className = "fa-solid fa-pause";
+  }).catch(function(e) {
+    console.log("Audio play error:", e);
+    if (playIcon) playIcon.className = "fa-solid fa-play";
+  });
+
+  // टाइमर और सीखबार अपडेट
+  audio.ontimeupdate = function() {
+    if (curTime) curTime.innerText = fmtSec(audio.currentTime);
+    if (seekbar && audio.duration) {
+      seekbar.value = (audio.currentTime / audio.duration) * 100;
+    }
+  };
+
+  audio.onloadedmetadata = function() {
+    if (durTime) durTime.innerText = fmtSec(audio.duration);
+  };
+
+  audio.onended = function() {
+    if (playIcon) playIcon.className = "fa-solid fa-play";
+  };
+
+  if (seekbar) {
+    seekbar.oninput = function() {
+      if (audio.duration) {
+        audio.currentTime = (seekbar.value / 100) * audio.duration;
+      }
+    };
+  }
+
+  // बॉक्स दिखाना
+  if (modal) modal.style.display = "flex";
+};
+
+// पुराने फंक्शन्स के ओवरराइड ताकि किसी भी बटन से यही बॉक्स खुले
+window.playEmeraldAudio = window.playAudio;
+window.playNaat = window.playAudio;
+
+window.closeJamiaAudioModal = function() {
+  var modal = document.getElementById("jamiaAudioModalOverlay");
+  var audio = getGlobalAudio();
+  if (audio) audio.pause();
+  if (modal) modal.style.display = "none";
+};
+
+window.toggleJamiaAudioPlay = function() {
+  var audio = getGlobalAudio();
+  var playIcon = document.getElementById("jamiaAudioPlayIcon");
+  if (!audio) return;
+  if (audio.paused) {
+    audio.play();
+    if (playIcon) playIcon.className = "fa-solid fa-pause";
+  } else {
+    audio.pause();
+    if (playIcon) playIcon.className = "fa-solid fa-play";
+  }
+};
+
+window.seekJamiaAudio = function(delta) {
+  var audio = getGlobalAudio();
+  if (audio) {
+    audio.currentTime = Math.max(0, Math.min(audio.duration || 0, audio.currentTime + delta));
+  }
+};
+</script>
+
 </body>
 </html>
