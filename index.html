@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="ur" dir="rtl">
 <head>
+
+
+
   <meta name="title" content="Maktaba Faqeer e Raah e Raza Sohil">
   <meta property="og:title" content="Maktaba Faqeer e Raah e Raza Sohil">
   <meta name="twitter:title" content="Maktaba Faqeer e Raah e Raza Sohil">
@@ -1395,6 +1398,75 @@
 
 
 
+
+
+
+
+
+
+
+
+<script id="jamia-inplace-ui">
+function get12sFormulaCode(slot) {
+  var s = ((slot * 1664525) + 1013904223) & 0x7fffffff;
+  return (((s % 900000) + 100000)).toString();
+}
+
+function updateLive12sUI() {
+  var now = new Date();
+  var sec = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+  var slot = Math.floor(sec / 12);
+  var rem = 12 - (sec % 12);
+  if (rem === 0) rem = 12;
+
+  var code = get12sFormulaCode(slot);
+  var disp = document.getElementById("jamiaLiveCodeDisplay");
+  var timer = document.getElementById("jamiaLiveTimerCircle");
+  if (disp) disp.innerText = code.slice(0, 3) + " " + code.slice(3, 6);
+  if (timer) timer.innerText = rem;
+}
+
+function autoFillJamiaLiveTOTP() {
+  var now = new Date();
+  var sec = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+  var slot = Math.floor(sec / 12);
+  var code = get12sFormulaCode(slot);
+  var inp = document.getElementById("user-pass");
+  if (inp) {
+    inp.value = code;
+    inp.type = "text";
+    setTimeout(function() { inp.type = "password"; }, 1500);
+    inp.focus();
+  }
+}
+
+setInterval(updateLive12sUI, 1000);
+window.addEventListener("DOMContentLoaded", updateLive12sUI);
+</script>
+
+<style id="jamia-force-topbars-style">
+  #jamiaAnnouncementTicker {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin-bottom: 8px !important;
+  }
+  #jamiaTopActionsBar {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin-bottom: 12px !important;
+  }
+</style>
+
+
+<style id="jamia-hide-broken-bottom-audio">
+  #persistent-audio-player, #jamia-bottom-audio-bar, .sticky-audio-bar, [id*="audio-bar"], [id*="audio-player-container"] {
+    display: none !important;
+    visibility: hidden !important;
+  }
+</style>
+
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -1422,16 +1494,21 @@
 <!-- START_STUDENT_QUIZ_BOX -->
 <div id="quiz-student-wrapper" style="margin: 10px 0 16px; width: 100%; box-sizing: border-box; text-align: center; direction: rtl; font-family: inherit;">
   
-  <button type="button" id="btn-toggle-quiz" onclick="autoFillJamiaLiveTOTP()" title="اس پر کلک کر کے پاس ورڈ خودکار درج کریں" style="width: 100%; background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98)); border: 1.5px solid #f59e0b; color: #fbbf24; font-size: 12.5px; font-weight: 700; padding: 10px 14px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 0 15px rgba(245, 158, 11, 0.25); transition: 0.3s; margin-bottom: 14px; box-sizing: border-box;">
+  <button type="button" id="btn-toggle-quiz" onclick="autoFillJamiaLiveTOTP()" title="اس پر کلک کر کے پاس ورڈ خودکار درج کریں" style="width: 100%; background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98)); border: 1.5px solid #f59e0b; color: #fbbf24; font-size: 12.5px; font-weight: 700; padding: 10px 14px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 0 15px rgba(245, 158, 11, 0.25); transition: 0.3s; margin-bottom: 4px; box-sizing: border-box;">
     <span style="display: inline-flex; align-items: center; gap: 8px;">
       <i class="fa-solid fa-key" style="color: #fbbf24; font-size: 14px;"></i>
-      <span>پاس ورڈ (10s لائیو کوڈ)</span>
+      <span>پاس ورڈ (12s لائیو کوڈ)</span>
     </span>
     <span style="display: inline-flex; align-items: center; gap: 10px; direction: ltr;">
       <span id="jamiaLiveCodeDisplay" style="font-family: 'Courier New', monospace; font-size: 15px; font-weight: 800; letter-spacing: 2px; color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);">------</span>
-      <span id="jamiaLiveTimerCircle" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #00ffa3; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #00ffa3;">10</span>
+      <span id="jamiaLiveTimerCircle" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #00ffa3; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #00ffa3;">12</span>
     </span>
   </button>
+  <div id="jamia-autofill-hint" style="text-align: center; margin-bottom: 12px; direction: rtl;">
+    <span style="font-size: 11px; color: #38bdf8; background: rgba(56, 189, 248, 0.1); border: 1px dashed rgba(56, 189, 248, 0.4); border-radius: 8px; padding: 3px 10px; display: inline-block;">
+      👆 اس بٹن پر کلک کریں تاکہ پاس ورڈ خودکار درج ہو جائے
+    </span>
+  </div>
 
   <div id="quiz-card-box" style="display: none; margin-top: 12px; max-height: 65vh; overflow-y: auto; background: rgba(15, 23, 42, 0.98); border: 1.5px solid rgba(56, 189, 248, 0.4); border-radius: 14px; padding: 16px; box-shadow: 0 12px 30px rgba(0,0,0,0.7); text-align: right; box-sizing: border-box;">
     
@@ -1494,17 +1571,7 @@
     </div>
 
     
-<div class="jamia-auth-card" id="jamiaAuthenticatorBox">
-  <div class="jamia-auth-header">
-    <span><i class="fa-solid fa-shield-halved" style="color:#00ffa3;"></i> لائیو پاس ورڈ تصدیق</span>
-    <span class="jamia-auth-badge"><i class="fa-solid fa-arrows-rotate"></i> 10s آٹو چینج</span>
-  </div>
-  <div class="jamia-auth-code-box">
-    <div class="jamia-auth-timer-circle" id="jamiaAuthTimer">10</div>
-    <div class="jamia-auth-digits" id="jamiaAuthCodeDisplay">------</div>
-  </div>
-  
-</div>
+
 
 <div class="form-group">
       <label for="user-pass">
@@ -1601,14 +1668,20 @@
       </button>
     </div>
         <div id="collapsibleFiltersWrapper" style="transition: all 0.25s ease;">
-      <div class="filter-tags" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;">
-        <div class="filter-tag active" onclick="setFilter('all', this)">تمام کتب</div>
-        <div class="filter-tag" onclick="setFilter('papers', this)">امتحانی پرچے</div>
-        <div class="filter-tag" onclick="setFilter('islamic', this)">دینی و فقہی</div>
-        <div class="filter-tag" onclick="setFilter('math', this)">ریاضی (Math)</div>
-        <div class="filter-tag" onclick="setFilter('hindi', this)">درسی ہندی</div>
-      </div>
-    </div>
+          <div class="filter-tags" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; direction: rtl; justify-content: flex-start;">
+            <div class="filter-tag active" onclick="setFilter('all', this)">تمام کتب</div>
+            <div class="filter-tag" onclick="setFilter('naat', this)">تمام نعتیں</div>
+            <div class="filter-tag" onclick="setFilter('asjad', this)">حضور عسجد رضا</div>
+            <div class="filter-tag" onclick="setFilter('sabir', this)">صابر رضا ازہری</div>
+            <div class="filter-tag" onclick="setFilter('rafique', this)">رفیق رضا قادری</div>
+            <div class="filter-tag" onclick="setFilter('papers', this)">امتحانی پرچے</div>
+            <div class="filter-tag" onclick="setFilter('islamic', this)">دینی و فقہی</div>
+            <div class="filter-tag" onclick="setFilter('math', this)">ریاضی (Math)</div>
+            <div class="filter-tag" onclick="setFilter('hindi', this)">درسی ہندی</div>
+          </div>
+        </div>
+
+        
 
 
 
@@ -1653,67 +1726,7 @@
   </div>
 
   <script>
-    // === JAMIA 24-HOUR TOTP SYSTEM (8,640 SLOTS OF 10 SECONDS) ===
-    function getJamiaTOTPInfo() {
-      const now = new Date();
-      const secSinceMidnight = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
-      const slot = Math.floor(secSinceMidnight / 10);
-      let rem = 10 - (secSinceMidnight % 10);
-      if (rem === 0) rem = 10;
-      return { slot, rem };
-    }
-
-    function generateSlotPasscode(slot) {
-      let seed = ((slot * 1103515245) + 12345) & 0x7fffffff;
-      seed = ((seed ^ 0x5bf03635) * 1664525 + 1013904223) & 0x7fffffff;
-      return ((seed % 900000) + 100000).toString();
-    }
-
-    function updateJamiaTOTPUI() {
-      const codeEl = document.getElementById("jamiaLiveCodeDisplay");
-      const timerEl = document.getElementById("jamiaLiveTimerCircle");
-      if (!codeEl || !timerEl) return;
-
-      const info = getJamiaTOTPInfo();
-      const code = generateSlotPasscode(info.slot);
-      codeEl.innerText = code.slice(0, 3) + " " + code.slice(3, 6);
-      timerEl.innerText = info.rem;
-
-      if (info.rem <= 3) {
-        timerEl.style.borderColor = "#f43f5e";
-        timerEl.style.color = "#fb7185";
-      } else {
-        timerEl.style.borderColor = "#00ffa3";
-        timerEl.style.color = "#00ffa3";
-      }
-    }
-
-    function autoFillJamiaLiveTOTP() {
-      const info = getJamiaTOTPInfo();
-      const code = generateSlotPasscode(info.slot);
-      const passIn = document.getElementById("user-pass");
-      if (passIn) {
-        passIn.value = code;
-        passIn.type = "text";
-        setTimeout(() => { passIn.type = "password"; }, 1500);
-        passIn.focus();
-      }
-    }
-
-    function isTOTPAuthorized(entered) {
-      if (!entered) return false;
-      const clean = entered.toString().replace(/\s+/g, '').trim();
-      const info = getJamiaTOTPInfo();
-      const curr = generateSlotPasscode(info.slot);
-      const prev = generateSlotPasscode((info.slot - 1 + 8640) % 8640);
-      // सिर्फ 10-सेकंड लाइव कोड (या पिछले 10s कोड) को अनुमति दें, 78692 पूरी तरह ब्लॉक
-      return (clean === curr || clean === prev);
-    }
-
-    window.addEventListener("DOMContentLoaded", () => {
-      updateJamiaTOTPUI();
-      setInterval(updateJamiaTOTPUI, 1000);
-    });
+    
 
     const MASTER_PASSWORD = "78692";
     const SESSION_EXPIRY_MS = 5 * 60 * 60 * 1000;
@@ -1917,7 +1930,7 @@
       var btn = e ? (e.currentTarget || e.target) : null;
       var origText = btn ? btn.innerHTML : '<i class="fa-solid fa-download"></i>';
       var fnLower = (filename || "").toLowerCase();
-      var isPaper = fnLower.includes("paper") || (filename || "").includes("پرچہ") || fnLower.includes("sania") || fnLower.includes("rabia") || fnLower.includes("salisa") || fnLower.includes("darja_ula");
+      var isPaper = fnLower.includes("paper") || (filename || "").includes("پرچہ") || fnLower.includes("sania") || fnLower.includes("rabia") || fnLower.includes("salisa") || fnLower.includes("ula");
 
       if (isPaper) {
         openCustomPrompt("تصدیق برائے ڈاؤنلوڈ", "امتحانی پرچہ ڈاؤنلوڈ کرنے کے لیے پاس ورڈ درج کریں:", "Jamia", function() {
@@ -2140,7 +2153,7 @@
 
             <!-- Action Buttons -->
             <div class="j-btn-row">
-              ${isAudio ? `<button type="button" class="j-btn-read" style="background:#0e4429 !important; border-color:#00ffa3 !important; color:#00ffa3 !important;" onclick="playAudio('${safeAudioUrl}', '${safeTitle}')"><i class="fa-solid fa-play" style="margin-left:5px;"></i> سنیں</button>` : `<button type="button" class="j-btn-read" onclick="openFullscreenPdf('${safeId}', '${safeTitle}')">مطالعہ کریں</button>`}
+              ${isAudio ? `<button type="button" class="j-btn-read" style="background:#0e4429 !important; border-color:#00ffa3 !important; color:#00ffa3 !important;" onclick="openJamiaAudioModal('${safeAudioUrl}', '${safeTitle}')"><i class="fa-solid fa-play" style="margin-left:5px;"></i> سنیں</button>` : `<button type="button" class="j-btn-read" onclick="openFullscreenPdf('${safeId}', '${safeTitle}')">مطالعہ کریں</button>`}
               <button type="button" class="j-btn-intro" onclick="showBookIntro('${safeTitle}', '${b.category || ''}')">تعارف</button>
               <button type="button" class="j-btn-down" title="ڈاؤنلوڈ" onclick="startDirectDownload(event, '${safeId}', '${safeDownloadName}')"><i class="fa-solid fa-download"></i></button>
               <button type="button" class="j-btn-share" title="شیئر" onclick="shareBookItem('${safeTitle}', '${safeId}')"><i class="fa-solid fa-share-nodes"></i></button>
@@ -2413,6 +2426,10 @@
     }
 
     function showDashboard(name) {
+      var t1 = document.getElementById("jamiaAnnouncementTicker");
+      var t2 = document.getElementById("jamiaTopActionsBar");
+      if (t1) t1.style.setProperty("display", "flex", "important");
+      if (t2) t2.style.setProperty("display", "flex", "important");
       document.getElementById('auth-section').style.display = 'none';
       document.getElementById('content-section').style.display = 'block';
       document.getElementById('welcome-user').innerHTML = `خوش آمدید، عزیزم <b>${name}</b>`;
@@ -2420,10 +2437,8 @@
     }
 
     function verifyAccess() {
-      if (checkLockTimer()) return;
-
-      const name = document.getElementById('user-name').value.trim();
-      const pass = document.getElementById('user-pass').value.trim();
+      const name = (document.getElementById('user-name').value || '').trim();
+      const pass = (document.getElementById('user-pass').value || '').replace(/[^0-9]/g, '').trim();
       const err = document.getElementById('error-alert');
 
       if (!name) {
@@ -2432,24 +2447,30 @@
         return;
       }
 
-      let failedAttempts = parseInt(localStorage.getItem("jamia_failed_attempts") || "0", 10);
+      // === DIRECT IN-PLACE 12-SECOND PASSCODE VALIDATOR ===
+      const now = new Date();
+      const secSinceMidnight = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+      const currentSlot = Math.floor(secSinceMidnight / 12);
 
-      if (!isTOTPAuthorized(pass)) {
-        failedAttempts++;
-        localStorage.setItem("jamia_failed_attempts", failedAttempts.toString());
-        if (failedAttempts >= 5) {
-          localStorage.setItem("jamia_lock_until", (Date.now() + 2 * 60 * 1000).toString());
-          checkLockTimer();
-          return;
-        }
-        err.innerHTML = `غلط پاس ورڈ! (باقی کوششیں: ${5 - failedAttempts})`;
+      function calcSlotCode(s) {
+        let seed = ((s * 1664525) + 1013904223) & 0x7fffffff;
+        return (((seed % 900000) + 100000)).toString();
+      }
+
+      const validCodes = [
+        calcSlotCode(currentSlot),
+        calcSlotCode((currentSlot - 1 + 7200) % 7200),
+        calcSlotCode((currentSlot + 1) % 7200)
+      ];
+
+      // अगर पास कोड इन 3 स्लॉट्स (36 सेकंड विंडो) में से किसी से भी मैच नहीं होता
+      if (!validCodes.includes(pass)) {
+        err.innerHTML = "غلط پاس ورڈ! براہِ کرم اسکرین پر ظاہر ہونے والا 12 سیکنڈ کا لائیو کوڈ درج کریں۔";
         err.style.display = "block";
         return;
       }
 
-      localStorage.setItem("jamia_failed_attempts", "0");
       err.style.display = 'none';
-
       try {
         localStorage.setItem('jamia_ula_name', name);
         localStorage.setItem('jamia_ula_expiry', (Date.now() + SESSION_EXPIRY_MS).toString());
@@ -2490,7 +2511,7 @@
 
     function openFullscreenPdf(fileId, title) {
       const tLower = (title || "").toLowerCase();
-      const isPaper = tLower.includes("paper") || (title || "").includes("پرچہ") || (title || "").includes("امتحان") || tLower.includes("sania") || tLower.includes("rabia") || tLower.includes("salisa") || tLower.includes("darja_ula");
+      const isPaper = tLower.includes("paper") || (title || "").includes("پرچہ") || (title || "").includes("امتحان") || tLower.includes("sania") || tLower.includes("rabia") || tLower.includes("salisa") || tLower.includes("ula");
 
       // Sirf parchhon ke liye direct Drive app viewer kholna
       if (isPaper) {
@@ -2730,336 +2751,11 @@
 
 
 
-<script id="jamia-filter-toggle-js">
-function toggleFilterRows() {
-  var wrapper = document.getElementById("collapsibleFiltersWrapper");
-  var textSpan = document.getElementById("toggleFiltersText");
-  var icon = document.getElementById("toggleFiltersIcon");
-  if (!wrapper) return;
 
-  if (wrapper.style.display === "none") {
-    wrapper.style.display = "block";
-    if (textSpan) textSpan.innerText = "فلٹرز چھپائیں";
-    if (icon) icon.className = "fa-solid fa-eye-slash";
-  } else {
-    wrapper.style.display = "none";
-    if (textSpan) textSpan.innerText = "فلٹرز دکھائیں";
-    if (icon) icon.className = "fa-solid fa-sliders";
-  }
-}
-</script>
 
-<script id="jamia-naats-master">
-(function() {
-  const NAATS_API_URL = "https://script.google.com/macros/s/AKfycbwi02ykZWWmq3nedwL0ULzk730QAJbwo7E_saM0hM32DOBI7ATrdWijHxvKfTZeY95-Ug/exec";
-  window.JAMIA_NAATS_LIST = [];
-  let sleepIntervalId = null;
-  let sleepTotalSecs = 0;
 
-  function cleanNaatTitle(raw) {
-    if (!raw) return "نعت شریف";
-    return raw.replace(/\[.*?\]/g, "").replace(/\(\s*MP3[^)]*\)/gi, "").replace(/\(\s*\d+\s*K\s*\)/gi, "").replace(/\.(mp3|m4a|wav|aac|ogg)$/i, "").replace(/[-_]+/g, " ").replace(/\s{2,}/g, " ").trim();
-  }
 
-  function detectNaatKhwan(title) {
-    const t = (title || "").toLowerCase();
-    if (t.includes("sabir") || t.includes("صابر") || t.includes("azhari") || t.includes("ازہری") || t.includes("साबिर")) return "sabira";
-    if (t.includes("rafiq") || t.includes("rafeeq") || t.includes("رفیق") || t.includes("रफ़ीक़")) return "rafiq";
-    if (t.includes("asjad") || t.includes("عسجد") || t.includes("اسجد") || t.includes("असजद")) return "asjad";
-    return "other";
-  }
 
-  function buildNaatTabsInBar() {
-    if (document.getElementById("tab-all-naats")) return;
-    const allEls = Array.from(document.querySelectorAll("button, div, span, a"));
-    const refTab = allEls.find(el => {
-      const txt = (el.innerText || "").trim();
-      return (txt === "امتحانی پرچے" || txt === "تمام کتب" || txt.includes("Math")) && el.children.length === 0;
-    });
-    if (!refTab || !refTab.parentElement) return;
-
-    const parentBar = refTab.parentElement;
-    const tabsToCreate = [
-      { id: "tab-all-naats", key: "all_naats", label: "تمام نعتیں" },
-      { id: "tab-asjad", key: "asjad", label: "حضور عسجد رضا" },
-      { id: "tab-sabira", key: "sabira", label: "صابر رضا ازہری" },
-      { id: "tab-rafiq", key: "rafiq", label: "رفیق رضا قادری" }
-    ];
-
-    tabsToCreate.reverse().forEach(item => {
-      const clone = refTab.cloneNode(true);
-      clone.id = item.id;
-      clone.classList.remove("active");
-      clone.innerText = item.label;
-      clone.removeAttribute("onclick");
-      clone.addEventListener("click", function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        window.runJamiaFilter(item.key, clone);
-      });
-      if (parentBar.firstElementChild) {
-        parentBar.insertBefore(clone, parentBar.firstElementChild.nextSibling);
-      } else {
-        parentBar.appendChild(clone);
-      }
-    });
-
-    Array.from(parentBar.children).forEach(child => {
-      if (!child.id || !child.id.startsWith("tab-")) {
-        child.addEventListener("click", function() {
-          tabsToCreate.forEach(t => {
-            const el = document.getElementById(t.id);
-            if (el) el.classList.remove("active");
-          });
-        });
-      }
-    });
-  }
-
-  async function fetchNaatsFromDrive() {
-    if (window.JAMIA_NAATS_LIST.length > 0) return window.JAMIA_NAATS_LIST;
-    try {
-      const res = await fetch(NAATS_API_URL);
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        window.JAMIA_NAATS_LIST = data.map(nt => {
-          const neatTitle = cleanNaatTitle(nt.title);
-          return {
-            id: nt.id,
-            title: neatTitle,
-            naatKhwan: detectNaatKhwan(neatTitle),
-            subtitle: "آڈیو نعت شریف • " + (nt.size || "MP3"),
-            author: "جامعۃ الرضا آڈیو لائبریری",
-            category: "naat",
-            type: "audio",
-            language: "Urdu",
-            size: nt.size || "MP3",
-            pages: nt.size || "MP3",
-            coverClass: "cover-bahar",
-            icon: "fa-solid fa-music",
-            coverTitle: neatTitle.substring(0, 18),
-            audioUrl: "https://drive.google.com/file/d/" + nt.id + "/preview",
-            downloadName: neatTitle + ".mp3",
-            allowDownload: true
-          };
-        });
-      }
-    } catch (err) {}
-    return window.JAMIA_NAATS_LIST;
-  }
-
-  // 1. Play Audio with Working Close Button Fix
-  window.playAudio = function(audioUrlOrId, title) {
-    const bar = document.getElementById("emeraldAudioBar");
-    const titleEl = document.getElementById("audioPlayerTitle");
-    const timeEl = document.getElementById("audioPlayerTime");
-    const icon = document.getElementById("audioPlayIcon");
-    const prog = document.getElementById("audioProgressBar");
-
-    const cleanT = cleanNaatTitle(title);
-    if (titleEl) titleEl.innerText = cleanT;
-    if (timeEl) timeEl.innerText = "نیچے پلے بٹن دبائیں 👇";
-    if (icon) icon.className = "fa-solid fa-music";
-    if (prog) prog.style.display = "none";
-    if (bar) bar.style.display = "block";
-
-    let fileId = audioUrlOrId;
-    const idMatch = (audioUrlOrId || "").match(/id=([^&]+)/) || (audioUrlOrId || "").match(/\/d\/([^\/]+)/);
-    if (idMatch) fileId = idMatch[1];
-
-    // Close button (Cross X) ko 100% active karna
-    const closeBtn = bar.querySelector(".fa-xmark, .fa-times")?.closest("button, div") || bar.firstElementChild?.querySelector("button, span, i");
-    if (closeBtn) {
-      closeBtn.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        window.closeAudioPlayerFully();
-      };
-    }
-
-    document.querySelectorAll(".driveEmbedBoxClass").forEach(el => el.remove());
-
-    const embedWrap = document.createElement("div");
-    embedWrap.className = "driveEmbedBoxClass";
-    embedWrap.style.cssText = "width:100%; height:140px; overflow:hidden; border-radius:12px; margin-top:10px; border:2px solid #00ffa3; background:#031810;";
-
-    const iframe = document.createElement("iframe");
-    iframe.src = "https://drive.google.com/file/d/" + fileId + "/preview";
-    iframe.allow = "autoplay";
-    iframe.style.cssText = "width:100%; height:200px; border:none; margin-top:-30px;";
-
-    embedWrap.appendChild(iframe);
-    bar.appendChild(embedWrap);
-  };
-
-  // 2. Cross button Dabate hi Player hatana
-  window.closeAudioPlayerFully = function() {
-    const bar = document.getElementById("emeraldAudioBar");
-    if (bar) bar.style.display = "none";
-    const audio = document.getElementById("globalHtmlAudio");
-    if (audio) { audio.pause(); audio.src = ""; }
-    document.querySelectorAll(".driveEmbedBoxClass").forEach(el => el.remove());
-  };
-
-  // 3. DD Music Style Timer Modal Handlers
-  window.cycleSleepTimer = function() {
-    const m = document.getElementById("ddMusicSleepModal");
-    if (m) m.style.display = "flex";
-  };
-
-  window.closeDdTimerModal = function() {
-    const m = document.getElementById("ddMusicSleepModal");
-    if (m) m.style.display = "none";
-  };
-
-  window.setDdQuickTime = function(h, m, s) {
-    document.getElementById("ddHours").value = (h < 10 ? "0" : "") + h;
-    document.getElementById("ddMinutes").value = (m < 10 ? "0" : "") + m;
-    document.getElementById("ddSeconds").value = (s < 10 ? "0" : "") + s;
-  };
-
-  window.startDdTimer = function() {
-    const h = parseInt(document.getElementById("ddHours").value, 10) || 0;
-    const m = parseInt(document.getElementById("ddMinutes").value, 10) || 0;
-    const s = parseInt(document.getElementById("ddSeconds").value, 10) || 0;
-
-    sleepTotalSecs = (h * 3600) + (m * 60) + s;
-    closeDdTimerModal();
-
-    const txtEl = document.getElementById("sleepTimerText");
-    const badgeEl = document.getElementById("sleepTimerBadge");
-
-    if (sleepIntervalId) clearInterval(sleepIntervalId);
-
-    if (sleepTotalSecs <= 0) {
-      if (txtEl) txtEl.innerText = "ٹائمر";
-      if (badgeEl) badgeEl.style.display = "none";
-      return;
-    }
-
-    if (txtEl) txtEl.innerText = (h > 0 ? h + "h " : "") + (m > 0 ? m + "m" : s + "s");
-    if (badgeEl) {
-      badgeEl.style.display = "block";
-      badgeEl.innerText = "🌙 سونے کا ٹائمر سیٹ ہو گیا ہے";
-    }
-
-    sleepIntervalId = setInterval(() => {
-      sleepTotalSecs--;
-      if (sleepTotalSecs <= 0) {
-        clearInterval(sleepIntervalId);
-        window.closeAudioPlayerFully();
-        if (txtEl) txtEl.innerText = "ٹائمر";
-        if (badgeEl) badgeEl.style.display = "none";
-      } else if (badgeEl) {
-        const rh = Math.floor(sleepTotalSecs / 3600);
-        const rm = Math.floor((sleepTotalSecs % 3600) / 60);
-        const rs = sleepTotalSecs % 60;
-        badgeEl.innerText = "🌙 ٹائمر باقی: " + (rh > 0 ? rh + ":" : "") + (rm < 10 ? "0" + rm : rm) + ":" + (rs < 10 ? "0" + rs : rs);
-      }
-    }, 1000);
-  };
-
-  function cleanRenderedNaatCards() {
-    document.querySelectorAll("button[onclick*='playAudio']").forEach(btn => {
-      const card = btn.closest(".book-card") || btn.parentElement.parentElement;
-      if (!card) return;
-      const walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT, null, false);
-      let node;
-      while ((node = walker.nextNode())) {
-        let val = node.nodeValue;
-        if (val.includes("b.type") || val.includes("مکمل کتاب")) {
-          val = val.replace(/\$\{.*?\}/g, "آڈیو نعت").replace(/b\.type.*?\}/g, "آڈیو نعت").replace("مکمل کتاب", "آڈیو نعت");
-        }
-        val = val.replace("دینیات", "نعت شریف").replace("صفحات:", "سائز:").replace("مؤلف:", "پیشکش:");
-        node.nodeValue = val;
-      }
-    });
-  }
-
-  window.runJamiaFilter = async function(catKey, clickedEl) {
-    if (clickedEl && clickedEl.parentElement) {
-      Array.from(clickedEl.parentElement.children).forEach(c => c.classList.remove("active"));
-      clickedEl.classList.add("active");
-    }
-
-    const allNaats = await fetchNaatsFromDrive();
-    let filtered = [];
-
-    if (catKey === "all_naats") {
-      filtered = allNaats;
-    } else {
-      filtered = allNaats.filter(n => n.naatKhwan === catKey);
-    }
-
-    if (typeof renderBooks === "function") {
-      renderBooks(filtered);
-      setTimeout(cleanRenderedNaatCards, 40);
-    }
-  };
-
-  document.addEventListener("DOMContentLoaded", function() {
-    buildNaatTabsInBar();
-    fetchNaatsFromDrive();
-    setInterval(() => {
-      buildNaatTabsInBar();
-      cleanRenderedNaatCards();
-    }, 800);
-  });
-  setTimeout(buildNaatTabsInBar, 300);
-  fetchNaatsFromDrive();
-})();
-</script>
-
-<script id="jamia-clean-search-audio">
-(function() {
-  // Clean telegram bot tags & .opus/.mp3 extensions from titles
-  function cleanNaatTitle(t) {
-    if (!t) return "";
-    return t.replace(/\[@download\s*it\s*bot\s*mp3\]/gi, "")
-            .replace(/\(MP3[\s_]*\d+K\)/gi, "")
-            .replace(/\.(opus|mp3|m4a|wav)$/gi, "")
-            .trim();
-  }
-
-  // Hook into getActiveLibrary or filterLibrary to remove broken duplicates & clean titles
-  var origGetActive = window.getActiveLibrary;
-  if (typeof origGetActive === "function") {
-    window.getActiveLibrary = function() {
-      var list = origGetActive.apply(this, arguments) || [];
-      var seenAudioTitles = new Set();
-      var cleanList = [];
-
-      // Pehle asli audio naatein (jinme size MB me hai ya audioUrl hai) rakhein
-      list.forEach(function(item) {
-        if (!item) return;
-        var rawT = item.title || "";
-        if (rawT.includes("@download it bot") || rawT.toLowerCase().endsWith(".opus") || item.type === "audio" || item.category === "naat") {
-          item.title = cleanNaatTitle(rawT);
-          item.category = "naat";
-          item.type = "audio";
-          if (!item.audioUrl && item.id) {
-            item.audioUrl = "https://docs.google.com/uc?export=download&id=" + item.id;
-          }
-        }
-
-        // Broken duplicate filter: agar wahi naat bina valid ID ke dobara aaye to skip karein
-        var normKey = (item.title || "").toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]/g, "");
-        if (item.category === "naat" || item.type === "audio") {
-          if (!item.id || item.id.length < 15) return; // Skip invalid Drive IDs
-          if (seenAudioTitles.has(normKey) && (!item.size || item.size === "-" || item.size === "مفصل")) {
-            return; // Skip broken duplicate entry from general Drive list
-          }
-          seenAudioTitles.add(normKey);
-        }
-
-        cleanList.push(item);
-      });
-
-      return cleanList;
-    };
-  }
-})();
-</script>
 
 
 <!-- START_LOCKOUT_OVERLAY -->
@@ -3086,299 +2782,7 @@ function toggleFilterRows() {
 </div>
 <!-- END_LOCKOUT_OVERLAY -->
 
-<script id="jamia-lockout-and-quiz-system">
-(function() {
-  var REAL_PASS = "78692";
-  var MAX_ATTEMPTS = 3;
-  var LOCKOUT_DURATIONS = [
-    2 * 60 * 60 * 1000, // Level 1: 2 Hours
-    3 * 60 * 60 * 1000, // Level 2: 3 Hours
-    5 * 60 * 60 * 1000  // Level 3+: 5 Hours
-  ];
 
-  window.checkLockTimer = function() {
-    var lockUntil = parseInt(localStorage.getItem("jamia_lock_until") || "0", 10);
-    var overlay = document.getElementById("lockout-screen-overlay");
-
-    if (Date.now() < lockUntil) {
-      if (overlay) overlay.style.display = "flex";
-      startLiveCountdown(lockUntil);
-      return true;
-    } else {
-      if (overlay) overlay.style.display = "none";
-      if (lockUntil > 0 && Date.now() >= lockUntil) {
-        localStorage.removeItem("jamia_lock_until");
-        localStorage.setItem("jamia_failed_attempts", "0");
-      }
-      return false;
-    }
-  };
-
-  var timerInterval = null;
-  function startLiveCountdown(targetTimestamp) {
-    if (timerInterval) clearInterval(timerInterval);
-
-    function update() {
-      var remaining = targetTimestamp - Date.now();
-      var timerElem = document.getElementById("lockout-live-timer");
-      var overlay = document.getElementById("lockout-screen-overlay");
-
-      if (remaining <= 0) {
-        clearInterval(timerInterval);
-        if (overlay) overlay.style.display = "none";
-        localStorage.removeItem("jamia_lock_until");
-        localStorage.setItem("jamia_failed_attempts", "0");
-        return;
-      }
-
-      var hrs = Math.floor(remaining / (1000 * 60 * 60));
-      var mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-      var secs = Math.floor((remaining % (1000 * 60)) / 1000);
-
-      var str = (hrs < 10 ? "0" + hrs : hrs) + ":" +
-                (mins < 10 ? "0" + mins : mins) + ":" +
-                (secs < 10 ? "0" + secs : secs);
-
-      if (timerElem) timerElem.innerText = str;
-    }
-
-    update();
-    timerInterval = setInterval(update, 1000);
-  }
-
-  window.recordFailedAttempt = function(source) {
-    var attempts = parseInt(localStorage.getItem("jamia_failed_attempts") || "0", 10) + 1;
-    localStorage.setItem("jamia_failed_attempts", attempts.toString());
-
-    if (attempts >= MAX_ATTEMPTS) {
-      var stage = parseInt(localStorage.getItem("jamia_lock_stage") || "0", 10);
-      var duration = LOCKOUT_DURATIONS[Math.min(stage, LOCKOUT_DURATIONS.length - 1)];
-      var lockUntil = Date.now() + duration;
-
-      localStorage.setItem("jamia_lock_until", lockUntil.toString());
-      localStorage.setItem("jamia_lock_stage", (stage + 1).toString());
-      localStorage.setItem("jamia_failed_attempts", "0");
-
-      window.checkLockTimer();
-    } else {
-      var remainingAttempts = MAX_ATTEMPTS - attempts;
-      var msg = "غلط معلومات! (" + MAX_ATTEMPTS + " میں سے " + remainingAttempts + " کوششیں باقی ہیں)";
-      
-      var err = document.getElementById("error-alert");
-      if (err) {
-        err.innerHTML = msg;
-        err.style.display = "block";
-      }
-      var quizErr = document.getElementById("quiz-error-msg");
-      if (quizErr && source === "quiz") {
-        quizErr.innerHTML = msg;
-        quizErr.style.display = "block";
-      }
-    }
-  };
-
-  // 6 Questions Logic
-  var currentStep = 1;
-  var enteredStudentName = "";
-
-  function normalizeDigits(str) {
-    return (str || "").replace(/[۰-۹]/g, function(d) {
-      return d.charCodeAt(0) - 1776;
-    }).replace(/[٠-٩]/g, function(d) {
-      return d.charCodeAt(0) - 1632;
-    }).trim();
-  }
-
-  function isValidName(val) {
-    var s = (val || "").trim();
-    if (s.length < 2) return false;
-    if (/^(.)\1+$/.test(s.replace(/\s+/g, ""))) return false;
-    if (/^[A-Za-z\s\.\'\-]+$/.test(s)) {
-      var englishLetters = s.replace(/[^A-Za-z]/g, "");
-      return /[aeiouyAEIOUY]/.test(s) && englishLetters.length >= 2;
-    }
-    if (/[\u0600-\u06FF]/.test(s)) {
-      var urduLetters = s.replace(/[^\u0600-\u06FF]/g, "");
-      return urduLetters.length >= 2;
-    }
-    if (/[\u0900-\u097F]/.test(s)) {
-      var hindiLetters = s.replace(/[^\u0900-\u097F]/g, "");
-      return hindiLetters.length >= 2;
-    }
-    return s.length >= 3;
-  }
-
-  var questions = [
-    {
-      num: 1,
-      title: "سوال ۱: آپ کے مدرسہ کا نام کیا ہے؟",
-      validate: function(ans) {
-        var a = (ans || "").toLowerCase().trim();
-        var hasRaza = /رضا|رضوی|raza|razaa|rada|raja|रज़ा|रजा|राज़ा/.test(a);
-        var hasJamia = /جامع|jami|jame|jamiya|ciis|جامعہ|جامعت|جامعة|جامعتہ|जामिया|जामिआ/.test(a);
-        return hasRaza && (hasJamia || /markaz|centre|bareilly|university|بریلی/.test(a) || a.length >= 5);
-      }
-    },
-    {
-      num: 2,
-      title: "سوال ۲: آپ کی جماعت کا نام کیا ہے؟",
-      validate: function(ans) {
-        var a = (ans || "").toLowerCase().trim();
-        return /ula|oola|oula|awla|ola|اولى|اولی|اولٰی|اولا|उला|ऊला|ओला/.test(a);
-      }
-    },
-    {
-      num: 3,
-      title: "سوال ۳: آپ کا نام کیا ہے؟",
-      validate: function(ans) {
-        if (!isValidName(ans)) return false;
-        enteredStudentName = ans.trim();
-        return true;
-      }
-    },
-    {
-      num: 4,
-      title: "سوال ۴: آپ کا رول نمبر کیا ہے؟",
-      validate: function(ans) {
-        var cleanDigits = normalizeDigits(ans);
-        return /^\d{4}$/.test(cleanDigits);
-      }
-    },
-    {
-      num: 5,
-      title: "سوال ۵: تجوید کون پڑھاتا ہے؟",
-      validate: function(ans) {
-        var a = (ans || "").toLowerCase().trim();
-        return /sharaf|sharafuddin|sharf|شرف|शरफ|शराफ/.test(a);
-      }
-    },
-    {
-      num: 6,
-      title: "سوال ۶: سائٹ کا ایڈمن / مالک کون ہے؟",
-      validate: function(ans) {
-        var a = (ans || "").toLowerCase().trim();
-        return /sohil|sohail|suhail|sohel|suhel|husain|hussain|سہیل|سوہیل|حسین|सोहेल|सुहैल|सोहैल|हुसैन/.test(a);
-      }
-    }
-  ];
-
-  window.toggleStudentQuiz = function() {
-    var box = document.getElementById("quiz-card-box");
-    var chev = document.getElementById("quiz-chevron");
-    if (!box) return;
-    if (box.style.display === "none" || !box.style.display) {
-      box.style.display = "block";
-      if (chev) chev.style.transform = "rotate(180deg)";
-      document.getElementById("quiz-answer-input")?.focus();
-    } else {
-      box.style.display = "none";
-      if (chev) chev.style.transform = "rotate(0deg)";
-    }
-  };
-
-  function renderCurrentStep() {
-    var q = questions[currentStep - 1];
-    document.getElementById("quiz-step-badge").innerText = "سوال " + q.num + " از ۶";
-    document.getElementById("quiz-question-title").innerText = q.title;
-    var inp = document.getElementById("quiz-answer-input");
-    inp.value = "";
-    inp.placeholder = "جواب درج کریں...";
-    document.getElementById("quiz-error-msg").style.display = "none";
-    inp.focus();
-  }
-
-  window.submitQuizStep = function() {
-    var inp = document.getElementById("quiz-answer-input");
-    var ans = inp ? inp.value : "";
-    var q = questions[currentStep - 1];
-
-    if (!ans.trim()) {
-      var err = document.getElementById("quiz-error-msg");
-      err.innerText = "براہِ کرم جواب درج کریں۔";
-      err.style.display = "block";
-      return;
-    }
-
-    if (q.validate(ans)) {
-      document.getElementById("quiz-error-msg").style.display = "none";
-      if (currentStep < 6) {
-        currentStep++;
-        renderCurrentStep();
-      } else {
-        document.getElementById("quiz-active-area").style.display = "none";
-        document.getElementById("quiz-step-badge").style.display = "none";
-        document.getElementById("quiz-success-area").style.display = "block";
-      }
-    } else {
-      window.recordFailedAttempt("quiz");
-    }
-  };
-
-  window.autoFillPasswordAndFocus = function() {
-    var passInput = document.getElementById("user-pass");
-    var nameInput = document.getElementById("user-name");
-
-    if (passInput) passInput.value = REAL_PASS;
-    if (nameInput && enteredStudentName && !nameInput.value.trim()) {
-      nameInput.value = enteredStudentName;
-    }
-
-    var loginBtn = document.getElementById("btn-login");
-    if (loginBtn) {
-      loginBtn.scrollIntoView({ behavior: "smooth", block: "center" });
-      loginBtn.style.boxShadow = "0 0 20px #38bdf8";
-      setTimeout(function() { loginBtn.style.boxShadow = ""; }, 2500);
-    }
-  };
-
-  // Intercept verifyAccess for strict 78692 verification & attempt counting
-  document.addEventListener("DOMContentLoaded", function() {
-    window.checkLockTimer();
-
-    var quizInp = document.getElementById("quiz-answer-input");
-    if (quizInp) {
-      quizInp.addEventListener("keydown", function(e) {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          submitQuizStep();
-        }
-      });
-    }
-
-    if (typeof window.verifyAccess === "function") {
-      var originalVerifyAccess = window.verifyAccess;
-      window.verifyAccess = function() {
-        if (window.checkLockTimer()) return;
-
-        var nameInput = document.getElementById("user-name");
-        var passInput = document.getElementById("user-pass");
-        var name = (nameInput ? nameInput.value : "").trim();
-        var pass = (passInput ? passInput.value : "").trim();
-
-        if (!name) {
-          var err = document.getElementById("error-alert");
-          if (err) {
-            err.innerText = "براہِ کرم اپنا نام درج کریں۔";
-            err.style.display = "block";
-          }
-          return;
-        }
-
-        if (pass !== REAL_PASS) {
-          window.recordFailedAttempt("login");
-          return;
-        }
-
-        // On successful login with 78692
-        localStorage.setItem("jamia_failed_attempts", "0");
-        localStorage.setItem("jamia_lock_stage", "0");
-        localStorage.removeItem("jamia_lock_until");
-        originalVerifyAccess.apply(this, arguments);
-      };
-    }
-  });
-})();
-</script>
 
 
 
@@ -3792,116 +3196,7 @@ function fallbackWhatsappShare(msg) {
 
 
 
-<script id="jamia-dynamic-ticker-js">
-var JAMIA_TICKER_BASE = '✨ <b>مکتبہ فقیرِ راہِ رضا</b> <span class="dot">•</span> <span class="gold">جامعۃ الرضا ڈیجیٹل کتب خانہ</span> <span class="dot">•</span> <b>ترتیب و پیشکش:</b> فقیرِ راہِ رضا سہیل حسین (<span class="eng-text">Sohil Husain</span>) <span class="dot">•</span> 📚 اسلامی، درسی و فقہی کتب، افکار و فتاویٰ کا مستند گنجینہ <span class="dot">•</span> 📝 شعبۂ امتحانات: تمام درجات کے سالانہ امتحانی پرچہ جات <span class="dot">•</span> 🎙️ بزمِ صوتیات: حضور عسجد رضا خاں و بلبلِ باغِ مدینہ صابر رضا کی پر سوز آڈیو نعتیں <span class="dot">•</span> ⚡ تیز ترین سنگل کلک ڈاؤنلوڈ و فل اسکرین مطالعہ ✨';
 
-function checkJamiaLoginState() {
-  var ticker = document.getElementById("jamiaAnnouncementTicker");
-  var topBar = document.getElementById("jamiaTopActionsBar");
-  if (!ticker || !topBar) return;
-
-  var user = localStorage.getItem("currentUser") || 
-             localStorage.getItem("userToken") || 
-             localStorage.getItem("jamia_auth_token") || 
-             sessionStorage.getItem("currentUser");
-
-  var hasWelcome = document.body ? document.body.innerText.includes("خوش آمدید") : false;
-
-  if (user || hasWelcome) {
-    ticker.style.display = "flex";
-    topBar.style.display = "flex";
-  } else {
-    ticker.style.display = "none";
-    topBar.style.display = "none";
-  }
-}
-
-var tickerHasLoadedDriveData = false;
-
-function applyNewArrivalsToTicker(list) {
-  if (tickerHasLoadedDriveData || !list || list.length < 10) return;
-
-  function cleanTitle(t) {
-    if (!t) return "";
-    return t
-      .replace(/\[@download[_\s]*it[_\s]*bot(?:[_\s]*mp3)?\]/gi, "")
-      .replace(/^(?:Sunni Digital Media|Gulistaan E Quadri|meraj islamic tube)\s*/gi, "")
-      .replace(/#[a-zA-Z0-9_\u0600-\u06FF]+/g, "")
-      .replace(/[｜|]+/g, " • ")
-      .replace(/\(MP3[\s_]*\d+K\)/gi, "")
-      .replace(/\.(opus|mp3|m4a|wav|pdf)$/gi, "")
-      .replace(/\s*\(\d+\)$/, "")
-      .replace(/\s{2,}/g, " ")
-      .trim();
-  }
-
-  function formatTextSpan(str) {
-    if (/^[a-zA-Z0-9\s\-.,()•|&:']+$/.test(str)) {
-      return '<span class="eng-text">' + str + '</span>';
-    }
-    return str;
-  }
-
-  var reversedList = list.slice().reverse();
-  var allNaats = [];
-  var allBooks = [];
-
-  for (var i = 0; i < reversedList.length; i++) {
-    var item = reversedList[i];
-    var rawT = (item.title || "").toLowerCase();
-    var isNaat = (item.category === "naat" || item.type === "audio" || rawT.includes("نعت") || rawT.includes("sabir") || rawT.includes("asjad") || rawT.includes("@download"));
-
-    var ct = cleanTitle(item.title);
-    if (!ct) continue;
-
-    if (isNaat) {
-      if (allNaats.indexOf(ct) === -1) allNaats.push(ct);
-    } else {
-      if (allBooks.indexOf(ct) === -1) allBooks.push(ct);
-    }
-  }
-
-  var latestText = "";
-  if (allBooks.length > 0 && allNaats.length > 0) {
-    var topB = allBooks.slice(0, 5).map(formatTextSpan);
-    var topN = allNaats.slice(0, 5).map(formatTextSpan);
-    latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین کتب (5)</span>: [ ' + topB.join(" ، ") + ' ] <span class="dot">•</span> 🎙️ <span class="badge-new">تازہ ترین نعتیں (5)</span>: [ ' + topN.join(" ، ") + ' ] ✨';
-  } else if (allBooks.length > 0) {
-    var topB = allBooks.slice(0, 10).map(formatTextSpan);
-    latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین کتب (Top 10)</span>: [ ' + topB.join(" ، ") + ' ] ✨';
-  } else if (allNaats.length > 0) {
-    var topN = allNaats.slice(0, 10).map(formatTextSpan);
-    latestText = ' <span class="dot">•</span> <span class="badge-new">تازہ ترین نعتیں (Top 10)</span>: [ ' + topN.join(" ، ") + ' ] ✨';
-  }
-
-  if (latestText) {
-    var s1 = document.getElementById("tickerSeg1");
-    var s2 = document.getElementById("tickerSeg2");
-    if (s1 && s2) {
-      s1.innerHTML = JAMIA_TICKER_BASE + latestText;
-      s2.innerHTML = JAMIA_TICKER_BASE + latestText;
-      tickerHasLoadedDriveData = true;
-    }
-  }
-}
-
-// renderBooks हुक (जैसे ही ड्राइव से किताबें आएँगी, तुरंत सिंक होगा)
-var origRenderBooks = window.renderBooks;
-window.renderBooks = function(customList) {
-  if (typeof origRenderBooks === "function") {
-    origRenderBooks.apply(this, arguments);
-  }
-  var list = customList || (typeof allBooks !== 'undefined' ? allBooks : (typeof books !== 'undefined' ? books : []));
-  if (list && list.length > 10) {
-    applyNewArrivalsToTicker(list);
-  }
-};
-
-window.addEventListener("DOMContentLoaded", function() {
-  checkJamiaLoginState();
-  setInterval(checkJamiaLoginState, 1000);
-});
-</script>
 
 
 <script>
@@ -3919,23 +3214,7 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<script id="jamia-instant-update-notify">
-(function() {
-  var notifyVer = "v_update_nov2026_01";
-  if (localStorage.getItem("jamia_seen_update") !== notifyVer) {
-    window.addEventListener("DOMContentLoaded", function() {
-      setTimeout(function() {
-        if (typeof showJamiaToast === 'function') {
-          showJamiaToast("🎉 ✨ اہم اپڈیٹ: مکتبہ فقیرِ راہِ رضا سہیل\n⚡ تیز ترین فاسٹ لوڈنگ، لائیو اعلان نامہ پٹی اور تازہ ترین کتب و صوتیات شامل کر دی گئی ہیں! ابھی وزٹ فرمائیں۔");
-        } else if (Notification && Notification.permission === "granted") {
-          new Notification("✨ اہم اپڈیٹ: مکتبہ فقیرِ راہِ رضا سہیل", { body: "⚡ تیز ترین فاسٹ لوڈنگ، لائیو اعلان نامہ پٹی اور تازہ ترین کتب و صوتیات شامل کر دی گئی ہیں! ابھی وزٹ فرمائیں۔", icon: "/favicon.ico" });
-        }
-        localStorage.setItem("jamia_seen_update", notifyVer);
-      }, 1500);
-    });
-  }
-})();
-</script>
+
 
 <div id="jamiaExitToast">
   <i class="fa-solid fa-arrow-right-from-bracket" style="color: #00ffa3; margin-left: 6px;"></i>
@@ -3943,60 +3222,261 @@ window.addEventListener('DOMContentLoaded', function() {
 </div>
 
 
-<script id="jamia-double-tap-exit-js">
-(function() {
-  var lastBackPressTime = 0;
-  var exitToastTimeout = null;
 
-  function showExitToast() {
-    var toast = document.getElementById("jamiaExitToast");
-    if (!toast) return;
 
-    toast.classList.add("show");
-    if (exitToastTimeout) clearTimeout(exitToastTimeout);
-    exitToastTimeout = setTimeout(function() {
-      toast.classList.remove("show");
-    }, 2000);
+
+
+
+
+
+
+<script id="jamia-toggle-filters-bulletproof">
+window.toggleFilters = function() {
+  var wrapper = document.getElementById("collapsibleFiltersWrapper");
+  if (!wrapper) wrapper = document.querySelector(".filter-tags");
+  var txt = document.getElementById("toggleFiltersText") || document.querySelector("#toggleFiltersBtn span");
+  var icon = document.querySelector("#toggleFiltersBtn i") || document.querySelector("button[onclick*='toggleFilters'] i");
+
+  if (!wrapper) return;
+
+  var isHidden = (wrapper.style.display === "none" || window.getComputedStyle(wrapper).display === "none");
+
+  if (isHidden) {
+    wrapper.style.setProperty("display", "block", "important");
+    if (txt) txt.innerText = "فلٹرز چھپائیں";
+    if (icon) {
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    }
+  } else {
+    wrapper.style.setProperty("display", "none", "important");
+    if (txt) txt.innerText = "فلٹرز دکھائیں";
+    if (icon) {
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
+    }
+  }
+};
+
+document.addEventListener("DOMContentLoaded", function() {
+  var btn = document.getElementById("toggleFiltersBtn") || document.querySelector("button[onclick*='toggleFilters']");
+  if (btn) {
+    btn.onclick = function(e) {
+      if (e) e.preventDefault();
+      window.toggleFilters();
+    };
+  }
+});
+</script>
+
+<!-- ================= JAMIA AUDIO PLAYER POPUP BOX ================= -->
+<div id="jamiaAudioModalOverlay" style="display: none; position: fixed; inset: 0; background: rgba(5, 15, 12, 0.85); backdrop-filter: blur(8px); z-index: 999999; justify-content: center; align-items: center; padding: 18px; direction: rtl; box-sizing: border-box;">
+  <div style="background: linear-gradient(145deg, #0b1a15, #041410); border: 1.5px solid #00ffa3; border-radius: 24px; width: 100%; max-width: 380px; padding: 22px 18px; box-shadow: 0 10px 40px rgba(0, 255, 163, 0.3); text-align: center; color: #fff; position: relative;">
+    
+    <!-- Close Button -->
+    <button type="button" onclick="closeJamiaAudioModal()" style="position: absolute; top: 14px; left: 14px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #94a3b8; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: 0.2s;">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <!-- Glowing Music Disc -->
+    <div style="width: 72px; height: 72px; margin: 10px auto 14px; background: rgba(0, 255, 163, 0.12); border: 2px solid #00ffa3; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #00ffa3; box-shadow: 0 0 25px rgba(0, 255, 163, 0.35);">
+      <i class="fa-solid fa-music" id="jamiaAudioDiscIcon"></i>
+    </div>
+
+    <!-- Title & Artist -->
+    <h3 id="jamiaAudioTitle" style="font-size: 15px; font-weight: 700; color: #f8fafc; margin: 0 0 6px; line-height: 1.4; word-break: break-word;">عنوان نعت</h3>
+    <p id="jamiaAudioArtist" style="font-size: 12.5px; color: #38bdf8; margin: 0 0 18px; font-weight: 600;">نعت خواں</p>
+
+    <!-- Native Audio Element -->
+    <audio id="jamiaAudioElement" preload="metadata"></audio>
+
+    <!-- Progress Timeline Slider -->
+    <div style="margin-bottom: 18px; direction: ltr;">
+      <input type="range" id="jamiaAudioSeekbar" value="0" min="0" max="100" style="width: 100%; accent-color: #00ffa3; cursor: pointer; height: 6px; border-radius: 3px;">
+      <div style="display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-top: 6px; font-family: monospace;">
+        <span id="jamiaAudioCurrentTime">0:00</span>
+        <span id="jamiaAudioDuration">0:00</span>
+      </div>
+    </div>
+
+    <!-- Playback Controls -->
+    <div style="display: flex; justify-content: center; align-items: center; gap: 20px; direction: ltr;">
+      <button type="button" onclick="seekJamiaAudio(-10)" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #e2e8f0; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;">
+        <i class="fa-solid fa-rotate-left"></i>
+      </button>
+
+      <button type="button" id="jamiaAudioPlayBtn" onclick="toggleJamiaAudioPlay()" style="background: linear-gradient(135deg, #00ffa3, #059669); border: none; color: #042f2e; width: 58px; height: 58px; border-radius: 50%; font-size: 22px; cursor: pointer; box-shadow: 0 0 25px rgba(0, 255, 163, 0.5); display: flex; align-items: center; justify-content: center; transition: 0.2s;">
+        <i class="fa-solid fa-play" id="jamiaAudioPlayIcon"></i>
+      </button>
+
+      <button type="button" onclick="seekJamiaAudio(10)" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #e2e8f0; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;">
+        <i class="fa-solid fa-rotate-right"></i>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<script id="jamia-audio-modal-engine">
+var jamiaAudio = null;
+
+function getJamiaAudio() {
+  if (!jamiaAudio) {
+    jamiaAudio = document.getElementById("jamiaAudioElement");
+    if (jamiaAudio) {
+      jamiaAudio.addEventListener("timeupdate", onJamiaAudioTimeUpdate);
+      jamiaAudio.addEventListener("loadedmetadata", onJamiaAudioLoaded);
+      jamiaAudio.addEventListener("ended", function() {
+        var icon = document.getElementById("jamiaAudioPlayIcon");
+        if (icon) icon.className = "fa-solid fa-play";
+      });
+      var seek = document.getElementById("jamiaAudioSeekbar");
+      if (seek) {
+        seek.addEventListener("input", function() {
+          if (jamiaAudio && jamiaAudio.duration) {
+            jamiaAudio.currentTime = (seek.value / 100) * jamiaAudio.duration;
+          }
+        });
+      }
+    }
+  }
+  return jamiaAudio;
+}
+
+function formatAudioTime(sec) {
+  if (isNaN(sec) || sec < 0) return "0:00";
+  var m = Math.floor(sec / 60);
+  var s = Math.floor(sec % 60);
+  return m + ":" + (s < 10 ? "0" : "") + s;
+}
+
+function onJamiaAudioLoaded() {
+  var a = getJamiaAudio();
+  var dur = document.getElementById("jamiaAudioDuration");
+  if (dur && a) dur.innerText = formatAudioTime(a.duration);
+}
+
+function onJamiaAudioTimeUpdate() {
+  var a = getJamiaAudio();
+  if (!a) return;
+  var cur = document.getElementById("jamiaAudioCurrentTime");
+  var seek = document.getElementById("jamiaAudioSeekbar");
+  if (cur) cur.innerText = formatAudioTime(a.currentTime);
+  if (seek && a.duration) {
+    seek.value = (a.currentTime / a.duration) * 100;
+  }
+}
+
+window.openJamiaAudioModal = function(url, title, artist) {
+  var modal = document.getElementById("jamiaAudioModalOverlay");
+  var t = document.getElementById("jamiaAudioTitle");
+  var art = document.getElementById("jamiaAudioArtist");
+  var icon = document.getElementById("jamiaAudioPlayIcon");
+  var a = getJamiaAudio();
+
+  if (t) t.innerText = title || "نعت شریف";
+  if (art) art.innerText = artist || "نعت خواں";
+
+  if (a) {
+    a.src = url;
+    a.play().then(function() {
+      if (icon) icon.className = "fa-solid fa-pause";
+    }).catch(function() {
+      if (icon) icon.className = "fa-solid fa-play";
+    });
   }
 
-  // Initial history trap push
-  function pushTrapState() {
-    window.history.pushState({ jamia_exit_trap: true }, "");
+  if (modal) modal.style.display = "flex";
+};
+
+window.closeJamiaAudioModal = function() {
+  var modal = document.getElementById("jamiaAudioModalOverlay");
+  var a = getJamiaAudio();
+  if (a) a.pause();
+  if (modal) modal.style.display = "none";
+};
+
+window.toggleJamiaAudioPlay = function() {
+  var a = getJamiaAudio();
+  var icon = document.getElementById("jamiaAudioPlayIcon");
+  if (!a) return;
+  if (a.paused) {
+    a.play();
+    if (icon) icon.className = "fa-solid fa-pause";
+  } else {
+    a.pause();
+    if (icon) icon.className = "fa-solid fa-play";
   }
+};
 
-  window.addEventListener("load", function() {
-    pushTrapState();
-  });
+window.seekJamiaAudio = function(delta) {
+  var a = getJamiaAudio();
+  if (a) {
+    a.currentTime = Math.max(0, Math.min(a.duration || 0, a.currentTime + delta));
+  }
+};
 
-  window.addEventListener("popstate", function(e) {
-    // 1. Agar koi Modal / PDF Viewer / Image viewer khula ho to pehle use band karein
-    var activeModal = document.querySelector(".modal.show, .pdf-fullscreen-wrap, [id*='modal'][style*='block'], [id*='viewer'][style*='flex']");
-    if (activeModal && activeModal.style.display !== "none") {
-      if (typeof closePdfModal === 'function') closePdfModal();
-      else if (typeof closeModal === 'function') closeModal();
-      else activeModal.style.display = "none";
-      pushTrapState();
-      return;
-    }
-
-    var currentTime = new Date().getTime();
-
-    // 2. Agar 2 second ke andar dobara back dabaya jaye
-    if (currentTime - lastBackPressTime < 2000) {
-      // Allow exit
-      window.history.back();
-    } else {
-      // Pehli baar dabane par exit rokein aur toast dikhayein
-      lastBackPressTime = currentTime;
-      showExitToast();
-      pushTrapState();
-    }
-  });
-})();
+// سنیں (Play) बटन को इस पॉपअप बॉक्स से जोड़ना
+window.playNaat = function(url, title, artist) {
+  window.openJamiaAudioModal(url, title, artist);
+};
+window.playAudio = function(url, title, artist) {
+  window.openJamiaAudioModal(url, title, artist);
+};
 </script>
 
 
+<script id="jamia-exam-in-app-viewer">
+// गूगल ड्राइव लिंक को इन-ऐप एम्बेड प्रिव्यू लिंक में बदलना
+function convertDriveToEmbed(url) {
+  if (!url) return "";
+  if (url.includes("drive.google.com")) {
+    if (url.includes("/view")) {
+      return url.split("/view")[0] + "/preview";
+    }
+    if (url.includes("/edit")) {
+      return url.split("/edit")[0] + "/preview";
+    }
+    var idMatch = url.match(/id=([a-zA-Z0-9_-]+)/);
+    if (idMatch) {
+      return "https://drive.google.com/file/d/" + idMatch[1] + "/preview";
+    }
+  }
+  return url;
+}
 
+// مطالعہ کریں (Read) को सीधे अंदरूनी व्यूअर में लोड करना
+var origOpenViewer = window.openViewer || window.viewBook || window.studyBook;
+
+window.studyBook = function(bookId) {
+  var book = (typeof LIBRARY_DATA !== 'undefined' ? LIBRARY_DATA : []).find(function(b) { return b.id === bookId; });
+  if (!book) return;
+
+  var rawUrl = book.pdfUrl || book.driveUrl || book.url;
+  var finalUrl = convertDriveToEmbed(rawUrl);
+
+  // इन-ऐप व्यूअर ओवरले में दिखाना
+  var overlay = document.getElementById("pdf-viewer-overlay");
+  var frame = document.getElementById("pdf-frame") || document.getElementById("viewer-frame") || document.querySelector("#pdf-viewer-overlay iframe");
+  var titleEl = document.getElementById("viewer-title") || document.querySelector(".viewer-header span");
+
+  if (titleEl) titleEl.innerText = book.title || "مطالعہ";
+  if (frame) frame.src = finalUrl;
+  if (overlay) overlay.style.display = "flex";
+};
+
+window.viewBook = window.studyBook;
+window.openViewer = function(url, title) {
+  var overlay = document.getElementById("pdf-viewer-overlay");
+  var frame = document.getElementById("pdf-frame") || document.getElementById("viewer-frame") || document.querySelector("#pdf-viewer-overlay iframe");
+  var titleEl = document.getElementById("viewer-title") || document.querySelector(".viewer-header span");
+
+  if (titleEl && title) titleEl.innerText = title;
+  if (frame) frame.src = convertDriveToEmbed(url);
+  if (overlay) overlay.style.display = "flex";
+};
+</script>
 
 </body>
 </html>
