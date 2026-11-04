@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="ur" dir="rtl">
 <head>
+
+<script id="jamia-lockout-clear-fix">
+try {
+  localStorage.removeItem("jamia_failed_attempts");
+  localStorage.removeItem("jamia_lockout_until");
+  localStorage.removeItem("jamia_lockout_time");
+  localStorage.removeItem("jamia_lockout");
+} catch(e) {}
+</script>
+
   <meta name="title" content="Maktaba Faqeer e Raah e Raza Sohil">
   <meta property="og:title" content="Maktaba Faqeer e Raah e Raza Sohil">
   <meta name="twitter:title" content="Maktaba Faqeer e Raah e Raza Sohil">
@@ -1395,6 +1405,72 @@
 
 
 
+
+<script id="jamia-12s-totp-engine">
+// 24 Hours = 86,400s / 12s = 7,200 unique daily slots
+window.getJamiaTOTPInfo = function() {
+  const now = new Date();
+  const secSinceMidnight = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+  const slot = Math.floor(secSinceMidnight / 12);
+  let rem = 12 - (secSinceMidnight % 12);
+  if (rem === 0) rem = 12;
+  return { slot: slot, rem: rem };
+};
+
+window.generateSlotPasscode = function(slot) {
+  let seed = ((slot * 1103515245) + 12345) & 0x7fffffff;
+  seed = ((seed ^ 0x5bf03635) * 1664525 + 1013904223) & 0x7fffffff;
+  return ((seed % 900000) + 100000).toString();
+};
+
+window.updateJamiaTOTPUI = function() {
+  const codeEl = document.getElementById("jamiaLiveCodeDisplay");
+  const timerEl = document.getElementById("jamiaLiveTimerCircle");
+  if (!codeEl || !timerEl) return;
+
+  const info = window.getJamiaTOTPInfo();
+  const code = window.generateSlotPasscode(info.slot);
+  codeEl.innerText = code.slice(0, 3) + " " + code.slice(3, 6);
+  timerEl.innerText = info.rem;
+
+  if (info.rem <= 3) {
+    timerEl.style.borderColor = "#f43f5e";
+    timerEl.style.color = "#fb7185";
+  } else {
+    timerEl.style.borderColor = "#00ffa3";
+    timerEl.style.color = "#00ffa3";
+  }
+};
+
+window.autoFillJamiaLiveTOTP = function() {
+  const info = window.getJamiaTOTPInfo();
+  const code = window.generateSlotPasscode(info.slot);
+  const passIn = document.getElementById("user-pass") || document.querySelector("input[type='password']");
+  if (passIn) {
+    passIn.value = code;
+    passIn.type = "text";
+    setTimeout(() => { passIn.type = "password"; }, 1500);
+    passIn.focus();
+  }
+};
+
+window.isTOTPAuthorized = function(entered) {
+  if (!entered) return false;
+  const clean = entered.toString().replace(/\s+/g, '').trim();
+  const info = window.getJamiaTOTPInfo();
+  const curr = window.generateSlotPasscode(info.slot);
+  const prev = window.generateSlotPasscode((info.slot - 1 + 7200) % 7200);
+  const next = window.generateSlotPasscode((info.slot + 1) % 7200);
+
+  return (clean === curr || clean === prev || clean === next);
+};
+
+window.addEventListener("DOMContentLoaded", function() {
+  window.updateJamiaTOTPUI();
+  setInterval(window.updateJamiaTOTPUI, 1000);
+});
+</script>
+
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -1425,11 +1501,11 @@
   <button type="button" id="btn-toggle-quiz" onclick="autoFillJamiaLiveTOTP()" title="اس پر کلک کر کے پاس ورڈ خودکار درج کریں" style="width: 100%; background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98)); border: 1.5px solid #f59e0b; color: #fbbf24; font-size: 12.5px; font-weight: 700; padding: 10px 14px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 0 15px rgba(245, 158, 11, 0.25); transition: 0.3s; margin-bottom: 14px; box-sizing: border-box;">
     <span style="display: inline-flex; align-items: center; gap: 8px;">
       <i class="fa-solid fa-key" style="color: #fbbf24; font-size: 14px;"></i>
-      <span>پاس ورڈ (10s لائیو کوڈ)</span>
+      <span>پاس ورڈ (12s لائیو کوڈ)</span>
     </span>
     <span style="display: inline-flex; align-items: center; gap: 10px; direction: ltr;">
       <span id="jamiaLiveCodeDisplay" style="font-family: 'Courier New', monospace; font-size: 15px; font-weight: 800; letter-spacing: 2px; color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);">------</span>
-      <span id="jamiaLiveTimerCircle" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #00ffa3; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #00ffa3;">10</span>
+      <span id="jamiaLiveTimerCircle" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #00ffa3; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #00ffa3;">12</span>
     </span>
   </button>
 
@@ -1653,67 +1729,7 @@
   </div>
 
   <script>
-    // === JAMIA 24-HOUR TOTP SYSTEM (8,640 SLOTS OF 10 SECONDS) ===
-    function getJamiaTOTPInfo() {
-      const now = new Date();
-      const secSinceMidnight = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
-      const slot = Math.floor(secSinceMidnight / 10);
-      let rem = 10 - (secSinceMidnight % 10);
-      if (rem === 0) rem = 10;
-      return { slot, rem };
-    }
-
-    function generateSlotPasscode(slot) {
-      let seed = ((slot * 1103515245) + 12345) & 0x7fffffff;
-      seed = ((seed ^ 0x5bf03635) * 1664525 + 1013904223) & 0x7fffffff;
-      return ((seed % 900000) + 100000).toString();
-    }
-
-    function updateJamiaTOTPUI() {
-      const codeEl = document.getElementById("jamiaLiveCodeDisplay");
-      const timerEl = document.getElementById("jamiaLiveTimerCircle");
-      if (!codeEl || !timerEl) return;
-
-      const info = getJamiaTOTPInfo();
-      const code = generateSlotPasscode(info.slot);
-      codeEl.innerText = code.slice(0, 3) + " " + code.slice(3, 6);
-      timerEl.innerText = info.rem;
-
-      if (info.rem <= 3) {
-        timerEl.style.borderColor = "#f43f5e";
-        timerEl.style.color = "#fb7185";
-      } else {
-        timerEl.style.borderColor = "#00ffa3";
-        timerEl.style.color = "#00ffa3";
-      }
-    }
-
-    function autoFillJamiaLiveTOTP() {
-      const info = getJamiaTOTPInfo();
-      const code = generateSlotPasscode(info.slot);
-      const passIn = document.getElementById("user-pass");
-      if (passIn) {
-        passIn.value = code;
-        passIn.type = "text";
-        setTimeout(() => { passIn.type = "password"; }, 1500);
-        passIn.focus();
-      }
-    }
-
-    function isTOTPAuthorized(entered) {
-      if (!entered) return false;
-      const clean = entered.toString().replace(/\s+/g, '').trim();
-      const info = getJamiaTOTPInfo();
-      const curr = generateSlotPasscode(info.slot);
-      const prev = generateSlotPasscode((info.slot - 1 + 8640) % 8640);
-      // सिर्फ 10-सेकंड लाइव कोड (या पिछले 10s कोड) को अनुमति दें, 78692 पूरी तरह ब्लॉक
-      return (clean === curr || clean === prev);
-    }
-
-    window.addEventListener("DOMContentLoaded", () => {
-      updateJamiaTOTPUI();
-      setInterval(updateJamiaTOTPUI, 1000);
-    });
+    
 
     const MASTER_PASSWORD = "78692";
     const SESSION_EXPIRY_MS = 5 * 60 * 60 * 1000;
@@ -2434,7 +2450,7 @@
 
       let failedAttempts = parseInt(localStorage.getItem("jamia_failed_attempts") || "0", 10);
 
-      if (!isTOTPAuthorized(pass)) {
+      if (!window.isTOTPAuthorized(pass)) {
         failedAttempts++;
         localStorage.setItem("jamia_failed_attempts", failedAttempts.toString());
         if (failedAttempts >= 5) {
