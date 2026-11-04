@@ -1547,7 +1547,17 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
     </div>
 
     
-
+<div class="jamia-auth-card" id="jamiaAuthenticatorBox">
+  <div class="jamia-auth-header">
+    <span><i class="fa-solid fa-shield-halved" style="color:#00ffa3;"></i> لائیو پاس ورڈ تصدیق</span>
+    <span class="jamia-auth-badge"><i class="fa-solid fa-arrows-rotate"></i> 10s آٹو چینج</span>
+  </div>
+  <div class="jamia-auth-code-box">
+    <div class="jamia-auth-timer-circle" id="jamiaAuthTimer">10</div>
+    <div class="jamia-auth-digits" id="jamiaAuthCodeDisplay">------</div>
+  </div>
+  
+</div>
 
 <div class="form-group">
       <label for="user-pass">
@@ -1644,21 +1654,25 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
       </button>
     </div>
         <div id="collapsibleFiltersWrapper" style="transition: all 0.25s ease;">
-      <div class="filter-tags" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;">
-        <div class="filter-tag active" onclick="setFilter('all', this)">تمام کتب</div>
-        <div class="filter-tag" onclick="setFilter('papers', this)">امتحانی پرچے</div>
-        <div class="filter-tag" onclick="setFilter('islamic', this)">دینی و فقہی</div>
-        <div class="filter-tag" onclick="setFilter('math', this)">ریاضی (Math)</div>
-        <div class="filter-tag" onclick="setFilter('hindi', this)">درسی ہندی</div>
-      </div>
-    </div>
+          <div class="filter-tags" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; direction: rtl; justify-content: flex-start;">
+            <div class="filter-tag active" onclick="setFilter('all', this)">تمام کتب</div>
+            <div class="filter-tag" onclick="setFilter('naat', this)">تمام نعتیں</div>
+            <div class="filter-tag" onclick="setFilter('asjad', this)">حضور عسجد رضا</div>
+            <div class="filter-tag" onclick="setFilter('sabir', this)">صابر رضا ازہری</div>
+            <div class="filter-tag" onclick="setFilter('rafique', this)">رفیق رضا قادری</div>
+            <div class="filter-tag" onclick="setFilter('papers', this)">امتحانی پرچے</div>
+            <div class="filter-tag" onclick="setFilter('islamic', this)">دینی و فقہی</div>
+            <div class="filter-tag" onclick="setFilter('math', this)">ریاضی (Math)</div>
+            <div class="filter-tag" onclick="setFilter('hindi', this)">درسی ہندی</div>
+          </div>
+        </div>
+
+        
 
 
 
     <!-- Scalable Book Container -->
-        </div>
-
-        <div class="books-container" id="books-list"></div>
+    <div class="books-container" id="books-list"></div>
 
     <button type="button" class="btn-lock-again" onclick="manualLogout()">
       <i class="fa-solid fa-arrow-right-from-bracket"></i> لاگ آؤٹ کریں (Logout)
@@ -2425,10 +2439,14 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
         return (((seed % 900000) + 100000)).toString();
       }
 
-      const activeCode = calcSlotCode(currentSlot);
+      const validCodes = [
+        calcSlotCode(currentSlot),
+        calcSlotCode((currentSlot - 1 + 7200) % 7200),
+        calcSlotCode((currentSlot + 1) % 7200)
+      ];
 
-      // Strictly current 12-second slot only (old codes blocked instantly)
-      if (pass !== activeCode) {
+      // अगर पास कोड इन 3 स्लॉट्स (36 सेकंड विंडो) में से किसी से भी मैच नहीं होता
+      if (!validCodes.includes(pass)) {
         err.innerHTML = "غلط پاس ورڈ! براہِ کرم اسکرین پر ظاہر ہونے والا 12 سیکنڈ کا لائیو کوڈ درج کریں۔";
         err.style.display = "block";
         return;
@@ -3190,25 +3208,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
 
-
-
-<script id="jamia-post-login-enabler">
-(function() {
-  function activateDashboardElements() {
-    var ticker = document.getElementById("jamiaAnnouncementTicker");
-    var topBar = document.getElementById("jamiaTopActionsBar");
-    var dash = document.getElementById("content-section");
-
-    if (dash && window.getComputedStyle(dash).display !== "none") {
-      if (ticker) ticker.style.setProperty("display", "flex", "important");
-      if (topBar) topBar.style.setProperty("display", "flex", "important");
-    }
-  }
-
-  setInterval(activateDashboardElements, 500);
-  window.addEventListener("DOMContentLoaded", activateDashboardElements);
-})();
-</script>
 
 </body>
 </html>
