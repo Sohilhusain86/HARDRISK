@@ -1393,92 +1393,7 @@
 </style>
 
 
-<style id="jamia-authenticator-style">
-  .jamia-auth-card {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(6, 78, 59, 0.4));
-    border: 1px solid rgba(0, 255, 163, 0.45);
-    border-radius: 16px;
-    padding: 12px 14px;
-    margin: 12px auto;
-    max-width: 320px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 255, 163, 0.08);
-    text-align: center;
-    backdrop-filter: blur(10px);
-    direction: rtl;
-  }
-  .jamia-auth-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.74rem;
-    color: #94a3b8;
-    margin-bottom: 8px;
-    font-weight: 600;
-  }
-  .jamia-auth-badge {
-    background: rgba(0, 255, 163, 0.15);
-    border: 1px solid #00ffa3;
-    color: #00ffa3;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 0.68rem;
-    font-weight: bold;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .jamia-auth-code-box {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    margin: 8px 0;
-  }
-  .jamia-auth-digits {
-    font-family: 'Courier New', monospace;
-    font-size: 1.6rem;
-    font-weight: 800;
-    letter-spacing: 5px;
-    color: #38bdf8;
-    text-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
-    direction: ltr;
-  }
-  .jamia-auth-timer-circle {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    border: 2px solid rgba(0, 255, 163, 0.3);
-    border-top: 2px solid #00ffa3;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: #00ffa3;
-    flex-shrink: 0;
-  }
-  .jamia-auth-fill-btn {
-    width: 100%;
-    background: rgba(56, 189, 248, 0.15);
-    border: 1px solid #38bdf8;
-    color: #e0f2fe;
-    border-radius: 10px;
-    padding: 6px 10px;
-    font-size: 0.76rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 4px;
-  }
-  .jamia-auth-fill-btn:active {
-    transform: scale(0.97);
-    background: rgba(56, 189, 248, 0.35);
-  }
-</style>
+
 
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
@@ -1507,12 +1422,15 @@
 <!-- START_STUDENT_QUIZ_BOX -->
 <div id="quiz-student-wrapper" style="margin: 10px 0 16px; width: 100%; box-sizing: border-box; text-align: center; direction: rtl; font-family: inherit;">
   
-  <button type="button" id="btn-toggle-quiz" onclick="toggleStudentQuiz()" style="width: 100%; background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98)); border: 1.5px solid #f59e0b; color: #fbbf24; font-size: 12.5px; font-weight: 700; padding: 11px 14px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 0 15px rgba(245, 158, 11, 0.25); transition: 0.3s;">
+  <button type="button" id="btn-toggle-quiz" onclick="autoFillJamiaLiveTOTP()" title="اس پر کلک کر کے پاس ورڈ خودکار درج کریں" style="width: 100%; background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98)); border: 1.5px solid #f59e0b; color: #fbbf24; font-size: 12.5px; font-weight: 700; padding: 10px 14px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 0 15px rgba(245, 158, 11, 0.25); transition: 0.3s; margin-bottom: 14px; box-sizing: border-box;">
     <span style="display: inline-flex; align-items: center; gap: 8px;">
       <i class="fa-solid fa-key" style="color: #fbbf24; font-size: 14px;"></i>
-      <span>پاس ورڈ حاصل کریں (طلبۂ جامعہ کی ۶ سوالاتی جانچ)</span>
+      <span>پاس ورڈ (10s لائیو کوڈ)</span>
     </span>
-    <i class="fa-solid fa-chevron-down" id="quiz-chevron" style="font-size: 11px; transition: 0.3s;"></i>
+    <span style="display: inline-flex; align-items: center; gap: 10px; direction: ltr;">
+      <span id="jamiaLiveCodeDisplay" style="font-family: 'Courier New', monospace; font-size: 15px; font-weight: 800; letter-spacing: 2px; color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);">------</span>
+      <span id="jamiaLiveTimerCircle" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #00ffa3; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #00ffa3;">10</span>
+    </span>
   </button>
 
   <div id="quiz-card-box" style="display: none; margin-top: 12px; max-height: 65vh; overflow-y: auto; background: rgba(15, 23, 42, 0.98); border: 1.5px solid rgba(56, 189, 248, 0.4); border-radius: 14px; padding: 16px; box-shadow: 0 12px 30px rgba(0,0,0,0.7); text-align: right; box-sizing: border-box;">
@@ -1585,10 +1503,7 @@
     <div class="jamia-auth-timer-circle" id="jamiaAuthTimer">10</div>
     <div class="jamia-auth-digits" id="jamiaAuthCodeDisplay">------</div>
   </div>
-  <button type="button" class="jamia-auth-fill-btn" onclick="jamiaAutoFillPasscode()">
-    <i class="fa-solid fa-key"></i>
-    <span>یہ پاسورڈ خودکار درج کریں (One-Click)</span>
-  </button>
+  
 </div>
 
 <div class="form-group">
@@ -1738,6 +1653,68 @@
   </div>
 
   <script>
+    // === JAMIA 24-HOUR TOTP SYSTEM (8,640 SLOTS OF 10 SECONDS) ===
+    function getJamiaTOTPInfo() {
+      const now = new Date();
+      const secSinceMidnight = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+      const slot = Math.floor(secSinceMidnight / 10);
+      let rem = 10 - (secSinceMidnight % 10);
+      if (rem === 0) rem = 10;
+      return { slot, rem };
+    }
+
+    function generateSlotPasscode(slot) {
+      let seed = ((slot * 1103515245) + 12345) & 0x7fffffff;
+      seed = ((seed ^ 0x5bf03635) * 1664525 + 1013904223) & 0x7fffffff;
+      return ((seed % 900000) + 100000).toString();
+    }
+
+    function updateJamiaTOTPUI() {
+      const codeEl = document.getElementById("jamiaLiveCodeDisplay");
+      const timerEl = document.getElementById("jamiaLiveTimerCircle");
+      if (!codeEl || !timerEl) return;
+
+      const info = getJamiaTOTPInfo();
+      const code = generateSlotPasscode(info.slot);
+      codeEl.innerText = code.slice(0, 3) + " " + code.slice(3, 6);
+      timerEl.innerText = info.rem;
+
+      if (info.rem <= 3) {
+        timerEl.style.borderColor = "#f43f5e";
+        timerEl.style.color = "#fb7185";
+      } else {
+        timerEl.style.borderColor = "#00ffa3";
+        timerEl.style.color = "#00ffa3";
+      }
+    }
+
+    function autoFillJamiaLiveTOTP() {
+      const info = getJamiaTOTPInfo();
+      const code = generateSlotPasscode(info.slot);
+      const passIn = document.getElementById("user-pass");
+      if (passIn) {
+        passIn.value = code;
+        passIn.type = "text";
+        setTimeout(() => { passIn.type = "password"; }, 1500);
+        passIn.focus();
+      }
+    }
+
+    function isTOTPAuthorized(entered) {
+      if (!entered) return false;
+      const clean = entered.toString().replace(/\s+/g, '').trim();
+      const info = getJamiaTOTPInfo();
+      const curr = generateSlotPasscode(info.slot);
+      const prev = generateSlotPasscode((info.slot - 1 + 8640) % 8640);
+      // सिर्फ 10-सेकंड लाइव कोड (या पिछले 10s कोड) को अनुमति दें, 78692 पूरी तरह ब्लॉक
+      return (clean === curr || clean === prev);
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      updateJamiaTOTPUI();
+      setInterval(updateJamiaTOTPUI, 1000);
+    });
+
     const MASTER_PASSWORD = "78692";
     const SESSION_EXPIRY_MS = 5 * 60 * 60 * 1000;
     let currentZoom = 1.0;
@@ -2457,7 +2434,7 @@
 
       let failedAttempts = parseInt(localStorage.getItem("jamia_failed_attempts") || "0", 10);
 
-      if (pass !== MASTER_PASSWORD) {
+      if (!isTOTPAuthorized(pass)) {
         failedAttempts++;
         localStorage.setItem("jamia_failed_attempts", failedAttempts.toString());
         if (failedAttempts >= 5) {
@@ -4019,93 +3996,7 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>
 
 
-<script id="jamia-authenticator-js">
-// 24 ghante = 1440 min = 8640 10-second slots
-function getJamiaTOTPInfo() {
-  var now = new Date();
-  var secSinceMidnight = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
-  var slot = Math.floor(secSinceMidnight / 10); // 0 to 8639
-  var rem = 10 - (secSinceMidnight % 10);
-  return { slot: slot, rem: rem };
-}
 
-// Slot index se unique 6-digit code banane ka deterministic formula
-function generateSlotPasscode(slot) {
-  var seed = ((slot * 1103515245) + 12345) & 0x7fffffff;
-  seed = ((seed ^ 0x5bf03635) * 1664525 + 1013904223) & 0x7fffffff;
-  var codeNum = (seed % 900000) + 100000;
-  return codeNum.toString();
-}
-
-function updateJamiaAuthDisplay() {
-  var codeEl = document.getElementById("jamiaAuthCodeDisplay");
-  var timerEl = document.getElementById("jamiaAuthTimer");
-  if (!codeEl || !timerEl) return;
-
-  var info = getJamiaTOTPInfo();
-  var currentCode = generateSlotPasscode(info.slot);
-
-  codeEl.innerText = currentCode.slice(0, 3) + " " + currentCode.slice(3, 6);
-  timerEl.innerText = info.rem;
-
-  if (info.rem <= 3) {
-    timerEl.style.borderColor = "#f43f5e";
-    timerEl.style.color = "#fb7185";
-  } else {
-    timerEl.style.borderColor = "rgba(0, 255, 163, 0.4)";
-    timerEl.style.color = "#00ffa3";
-  }
-}
-
-function jamiaAutoFillPasscode() {
-  var info = getJamiaTOTPInfo();
-  var currentCode = generateSlotPasscode(info.slot);
-  var passInput = document.querySelector("#loginScreen input[type='password'], #loginScreen input[name*='pass'], input[id*='pass'], input[type='password'], .login-card input");
-  if (passInput) {
-    passInput.value = currentCode;
-    passInput.type = "text"; // Dikhe ki code enter ho gaya
-    setTimeout(function() { passInput.type = "password"; }, 2000);
-    passInput.focus();
-  }
-}
-
-// Password Validator: Current slot ya pichhle slot ka code hi manzoor hoga
-window.validateJamiaDynamicAuth = function(inputPass) {
-  if (!inputPass) return false;
-  var cleaned = inputPass.toString().trim().replace(/\s+/g, '');
-  var info = getJamiaTOTPInfo();
-  var currentCode = generateSlotPasscode(info.slot);
-  var prevSlot = (info.slot - 1 + 8640) % 8640;
-  var prevCode = generateSlotPasscode(prevSlot);
-
-  return (cleaned === currentCode || cleaned === prevCode);
-};
-
-// Global Login Hook: Form submit ya checkPassword par dynamic verification
-function hookJamiaLoginAuth() {
-  var loginForm = document.querySelector("#loginScreen form, .login-card form");
-  var passInput = document.querySelector("#loginScreen input[type='password'], #loginScreen input[name*='pass'], input[id*='pass'], input[type='password'], .login-card input");
-  var loginBtn = document.querySelector("#loginScreen button, .login-card button, [onclick*='Login'], [onclick*='login']");
-
-  if (typeof window.checkPassword === 'function' && !window.checkPassword._jamiaHooked) {
-    var origCheck = window.checkPassword;
-    window.checkPassword = function(p) {
-      var val = p || (passInput ? passInput.value : "");
-      if (window.validateJamiaDynamicAuth(val) || origCheck(val)) {
-        return true;
-      }
-      return false;
-    };
-    window.checkPassword._jamiaHooked = true;
-  }
-}
-
-window.addEventListener("DOMContentLoaded", function() {
-  updateJamiaAuthDisplay();
-  setInterval(updateJamiaAuthDisplay, 1000);
-  hookJamiaLoginAuth();
-});
-</script>
 
 </body>
 </html>
