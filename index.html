@@ -1930,7 +1930,7 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
       var btn = e ? (e.currentTarget || e.target) : null;
       var origText = btn ? btn.innerHTML : '<i class="fa-solid fa-download"></i>';
       var fnLower = (filename || "").toLowerCase();
-      var isPaper = fnLower.includes("paper") || (filename || "").includes("پرچہ") || fnLower.includes("sania") || fnLower.includes("rabia") || fnLower.includes("salisa") || fnLower.includes("ula");
+      var isPaper = fnLower.includes("paper") || (filename || "").includes("پرچہ") || fnLower.includes("sania") || fnLower.includes("rabia") || fnLower.includes("salisa") || fnLower.includes("darja_ula");
 
       if (isPaper) {
         openCustomPrompt("تصدیق برائے ڈاؤنلوڈ", "امتحانی پرچہ ڈاؤنلوڈ کرنے کے لیے پاس ورڈ درج کریں:", "Jamia", function() {
@@ -2510,19 +2510,6 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
     }
 
     function openFullscreenPdf(fileId, title) {
-      const tLower = (title || "").toLowerCase();
-      const isPaper = tLower.includes("paper") || (title || "").includes("پرچہ") || (title || "").includes("امتحان") || tLower.includes("sania") || tLower.includes("rabia") || tLower.includes("salisa") || tLower.includes("ula");
-
-      // Sirf parchhon ke liye direct Drive app viewer kholna
-      if (isPaper) {
-        const a = document.createElement("a");
-        a.href = "https://drive.google.com/file/d/" + fileId + "/view?usp=drivesdk";
-        a.target = "_blank";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        return;
-      }
       const viewer = document.getElementById('pdf-viewer-overlay');
       const frame = document.getElementById('fullscreen-frame');
       document.getElementById('viewer-title').innerText = title;
@@ -2634,7 +2621,7 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
   </div>
 
   <!-- Floating Bottom Emerald Audio Player -->
-  <div id="emeraldAudioBar">
+  <div id="emeraldAudioBar" style="display:none !important;">
     <div id="sleepTimerBadge" style="display:none; font-size:0.7rem; color:#00ffa3; text-align:center; background:rgba(0,255,163,0.1); border-radius:6px; padding:2px 6px; margin-bottom:4px;"></div>
     <div style="display: flex; align-items: center; justify-content: space-between;">
       <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;">
