@@ -1460,12 +1460,7 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
 </style>
 
 
-<style id="jamia-hide-broken-bottom-audio">
-  #persistent-audio-player, #jamia-bottom-audio-bar, .sticky-audio-bar, [id*="audio-bar"], [id*="audio-player-container"] {
-    display: none !important;
-    visibility: hidden !important;
-  }
-</style>
+
 
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
@@ -1930,12 +1925,19 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
       var btn = e ? (e.currentTarget || e.target) : null;
       var origText = btn ? btn.innerHTML : '<i class="fa-solid fa-download"></i>';
       var fnLower = (filename || "").toLowerCase();
-      var isPaper = fnLower.includes("paper") || (filename || "").includes("پرچہ") || fnLower.includes("sania") || fnLower.includes("rabia") || fnLower.includes("salisa") || fnLower.includes("ula");
+      // STRICT CHECK: सिर्फ और सिर्फ इम्तिहानी पर्चों पर पासवर्ड
+      const fnLower = (filename || "").toLowerCase();
+      const isPaper = fnLower.includes("پرچہ") || fnLower.includes("parcha") || fnLower.includes("imtihan") || 
+                      (typeof item !== "undefined" && item && item.category === "papers");
 
       if (isPaper) {
         openCustomPrompt("تصدیق برائے ڈاؤنلوڈ", "امتحانی پرچہ ڈاؤنلوڈ کرنے کے لیے پاس ورڈ درج کریں:", "Jamia", function() {
           runFileDownload(btn, origText, fileId, filename);
         });
+      } else {
+        // नातें और बाकी सभी किताबें बिना किसी पासवर्ड के डायरेक्ट डाउनलोड होंगी
+        runFileDownload(btn, origText, fileId, filename);
+      });
       } else {
         runFileDownload(btn, origText, fileId, filename);
       }
@@ -3269,162 +3271,10 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 
-<!-- ================= JAMIA AUDIO PLAYER POPUP BOX ================= -->
-<div id="jamiaAudioModalOverlay" style="display: none; position: fixed; inset: 0; background: rgba(5, 15, 12, 0.85); backdrop-filter: blur(8px); z-index: 999999; justify-content: center; align-items: center; padding: 18px; direction: rtl; box-sizing: border-box;">
-  <div style="background: linear-gradient(145deg, #0b1a15, #041410); border: 1.5px solid #00ffa3; border-radius: 24px; width: 100%; max-width: 380px; padding: 22px 18px; box-shadow: 0 10px 40px rgba(0, 255, 163, 0.3); text-align: center; color: #fff; position: relative;">
-    
-    <!-- Close Button -->
-    <button type="button" onclick="closeJamiaAudioModal()" style="position: absolute; top: 14px; left: 14px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #94a3b8; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: 0.2s;">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
-
-    <!-- Glowing Music Disc -->
-    <div style="width: 72px; height: 72px; margin: 10px auto 14px; background: rgba(0, 255, 163, 0.12); border: 2px solid #00ffa3; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #00ffa3; box-shadow: 0 0 25px rgba(0, 255, 163, 0.35);">
-      <i class="fa-solid fa-music" id="jamiaAudioDiscIcon"></i>
-    </div>
-
-    <!-- Title & Artist -->
-    <h3 id="jamiaAudioTitle" style="font-size: 15px; font-weight: 700; color: #f8fafc; margin: 0 0 6px; line-height: 1.4; word-break: break-word;">عنوان نعت</h3>
-    <p id="jamiaAudioArtist" style="font-size: 12.5px; color: #38bdf8; margin: 0 0 18px; font-weight: 600;">نعت خواں</p>
-
-    <!-- Native Audio Element -->
-    <audio id="jamiaAudioElement" preload="metadata"></audio>
-
-    <!-- Progress Timeline Slider -->
-    <div style="margin-bottom: 18px; direction: ltr;">
-      <input type="range" id="jamiaAudioSeekbar" value="0" min="0" max="100" style="width: 100%; accent-color: #00ffa3; cursor: pointer; height: 6px; border-radius: 3px;">
-      <div style="display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-top: 6px; font-family: monospace;">
-        <span id="jamiaAudioCurrentTime">0:00</span>
-        <span id="jamiaAudioDuration">0:00</span>
-      </div>
-    </div>
-
-    <!-- Playback Controls -->
-    <div style="display: flex; justify-content: center; align-items: center; gap: 20px; direction: ltr;">
-      <button type="button" onclick="seekJamiaAudio(-10)" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #e2e8f0; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;">
-        <i class="fa-solid fa-rotate-left"></i>
-      </button>
-
-      <button type="button" id="jamiaAudioPlayBtn" onclick="toggleJamiaAudioPlay()" style="background: linear-gradient(135deg, #00ffa3, #059669); border: none; color: #042f2e; width: 58px; height: 58px; border-radius: 50%; font-size: 22px; cursor: pointer; box-shadow: 0 0 25px rgba(0, 255, 163, 0.5); display: flex; align-items: center; justify-content: center; transition: 0.2s;">
-        <i class="fa-solid fa-play" id="jamiaAudioPlayIcon"></i>
-      </button>
-
-      <button type="button" onclick="seekJamiaAudio(10)" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #e2e8f0; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;">
-        <i class="fa-solid fa-rotate-right"></i>
-      </button>
-    </div>
-
-  </div>
-</div>
 
 
-<script id="jamia-audio-modal-engine">
-var jamiaAudio = null;
 
-function getJamiaAudio() {
-  if (!jamiaAudio) {
-    jamiaAudio = document.getElementById("jamiaAudioElement");
-    if (jamiaAudio) {
-      jamiaAudio.addEventListener("timeupdate", onJamiaAudioTimeUpdate);
-      jamiaAudio.addEventListener("loadedmetadata", onJamiaAudioLoaded);
-      jamiaAudio.addEventListener("ended", function() {
-        var icon = document.getElementById("jamiaAudioPlayIcon");
-        if (icon) icon.className = "fa-solid fa-play";
-      });
-      var seek = document.getElementById("jamiaAudioSeekbar");
-      if (seek) {
-        seek.addEventListener("input", function() {
-          if (jamiaAudio && jamiaAudio.duration) {
-            jamiaAudio.currentTime = (seek.value / 100) * jamiaAudio.duration;
-          }
-        });
-      }
-    }
-  }
-  return jamiaAudio;
-}
 
-function formatAudioTime(sec) {
-  if (isNaN(sec) || sec < 0) return "0:00";
-  var m = Math.floor(sec / 60);
-  var s = Math.floor(sec % 60);
-  return m + ":" + (s < 10 ? "0" : "") + s;
-}
-
-function onJamiaAudioLoaded() {
-  var a = getJamiaAudio();
-  var dur = document.getElementById("jamiaAudioDuration");
-  if (dur && a) dur.innerText = formatAudioTime(a.duration);
-}
-
-function onJamiaAudioTimeUpdate() {
-  var a = getJamiaAudio();
-  if (!a) return;
-  var cur = document.getElementById("jamiaAudioCurrentTime");
-  var seek = document.getElementById("jamiaAudioSeekbar");
-  if (cur) cur.innerText = formatAudioTime(a.currentTime);
-  if (seek && a.duration) {
-    seek.value = (a.currentTime / a.duration) * 100;
-  }
-}
-
-window.openJamiaAudioModal = function(url, title, artist) {
-  var modal = document.getElementById("jamiaAudioModalOverlay");
-  var t = document.getElementById("jamiaAudioTitle");
-  var art = document.getElementById("jamiaAudioArtist");
-  var icon = document.getElementById("jamiaAudioPlayIcon");
-  var a = getJamiaAudio();
-
-  if (t) t.innerText = title || "نعت شریف";
-  if (art) art.innerText = artist || "نعت خواں";
-
-  if (a) {
-    a.src = url;
-    a.play().then(function() {
-      if (icon) icon.className = "fa-solid fa-pause";
-    }).catch(function() {
-      if (icon) icon.className = "fa-solid fa-play";
-    });
-  }
-
-  if (modal) modal.style.display = "flex";
-};
-
-window.closeJamiaAudioModal = function() {
-  var modal = document.getElementById("jamiaAudioModalOverlay");
-  var a = getJamiaAudio();
-  if (a) a.pause();
-  if (modal) modal.style.display = "none";
-};
-
-window.toggleJamiaAudioPlay = function() {
-  var a = getJamiaAudio();
-  var icon = document.getElementById("jamiaAudioPlayIcon");
-  if (!a) return;
-  if (a.paused) {
-    a.play();
-    if (icon) icon.className = "fa-solid fa-pause";
-  } else {
-    a.pause();
-    if (icon) icon.className = "fa-solid fa-play";
-  }
-};
-
-window.seekJamiaAudio = function(delta) {
-  var a = getJamiaAudio();
-  if (a) {
-    a.currentTime = Math.max(0, Math.min(a.duration || 0, a.currentTime + delta));
-  }
-};
-
-// سنیں (Play) बटन को इस पॉपअप बॉक्स से जोड़ना
-window.playNaat = function(url, title, artist) {
-  window.openJamiaAudioModal(url, title, artist);
-};
-window.playAudio = function(url, title, artist) {
-  window.openJamiaAudioModal(url, title, artist);
-};
-</script>
 
 
 <script id="jamia-exam-in-app-viewer">
