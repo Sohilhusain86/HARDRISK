@@ -1406,69 +1406,60 @@ try {
 
 
 
-<script id="jamia-12s-totp-engine">
-// 24 Hours = 86,400s / 12s = 7,200 unique daily slots
-window.getJamiaTOTPInfo = function() {
-  const now = new Date();
-  const secSinceMidnight = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
-  const slot = Math.floor(secSinceMidnight / 12);
-  let rem = 12 - (secSinceMidnight % 12);
+
+
+
+<script id="jamia-12s-perfect-auth">
+// 24 घंटे = 86,400s / 12s = 7,200 स्लॉट्स
+function get12sCode() {
+  var now = new Date();
+  var sec = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+  var slot = Math.floor(sec / 12);
+  var rem = 12 - (sec % 12);
   if (rem === 0) rem = 12;
-  return { slot: slot, rem: rem };
-};
 
-window.generateSlotPasscode = function(slot) {
-  let seed = ((slot * 1103515245) + 12345) & 0x7fffffff;
-  seed = ((seed ^ 0x5bf03635) * 1664525 + 1013904223) & 0x7fffffff;
-  return ((seed % 900000) + 100000).toString();
-};
+  var codeNum = ((((slot * 1664525) + 1013904223) & 0x7fffffff) % 900000) + 100000;
+  return { code: codeNum.toString(), rem: rem, slot: slot };
+}
 
-window.updateJamiaTOTPUI = function() {
-  const codeEl = document.getElementById("jamiaLiveCodeDisplay");
-  const timerEl = document.getElementById("jamiaLiveTimerCircle");
-  if (!codeEl || !timerEl) return;
+function updateTotpTicker() {
+  var c = get12sCode();
+  var disp = document.getElementById("jamiaLiveCodeDisplay");
+  var timer = document.getElementById("jamiaLiveTimerCircle");
+  if (disp) disp.innerText = c.code.slice(0, 3) + " " + c.code.slice(3, 6);
+  if (timer) timer.innerText = c.rem;
+}
 
-  const info = window.getJamiaTOTPInfo();
-  const code = window.generateSlotPasscode(info.slot);
-  codeEl.innerText = code.slice(0, 3) + " " + code.slice(3, 6);
-  timerEl.innerText = info.rem;
-
-  if (info.rem <= 3) {
-    timerEl.style.borderColor = "#f43f5e";
-    timerEl.style.color = "#fb7185";
-  } else {
-    timerEl.style.borderColor = "#00ffa3";
-    timerEl.style.color = "#00ffa3";
+function autoFillJamiaLiveTOTP() {
+  var c = get12sCode();
+  var inp = document.getElementById("user-pass") || document.querySelector("input[type='password']");
+  if (inp) {
+    inp.value = c.code; // बिना स्पेस का साफ़ 6-अंकीय कोड
+    inp.type = "text";
+    setTimeout(function() { inp.type = "password"; }, 1500);
+    inp.focus();
   }
-};
+}
 
-window.autoFillJamiaLiveTOTP = function() {
-  const info = window.getJamiaTOTPInfo();
-  const code = window.generateSlotPasscode(info.slot);
-  const passIn = document.getElementById("user-pass") || document.querySelector("input[type='password']");
-  if (passIn) {
-    passIn.value = code;
-    passIn.type = "text";
-    setTimeout(() => { passIn.type = "password"; }, 1500);
-    passIn.focus();
-  }
-};
-
-window.isTOTPAuthorized = function(entered) {
+// 12-सेकंड कोड की सटीक जाँच
+function checkIs12sPassValid(entered) {
   if (!entered) return false;
-  const clean = entered.toString().replace(/\s+/g, '').trim();
-  const info = window.getJamiaTOTPInfo();
-  const curr = window.generateSlotPasscode(info.slot);
-  const prev = window.generateSlotPasscode((info.slot - 1 + 7200) % 7200);
-  const next = window.generateSlotPasscode((info.slot + 1) % 7200);
+  // सभी स्पेस और गैर-संख्यात्मक वर्ण साफ़ करना
+  var clean = entered.toString().replace(/[^0-9]/g, '').trim();
+  var c = get12sCode();
 
-  return (clean === curr || clean === prev || clean === next);
-};
+  var prevSlot = (c.slot - 1 + 7200) % 7200;
+  var prevCode = (((((prevSlot * 1664525) + 1013904223) & 0x7fffffff) % 900000) + 100000).toString();
 
-window.addEventListener("DOMContentLoaded", function() {
-  window.updateJamiaTOTPUI();
-  setInterval(window.updateJamiaTOTPUI, 1000);
-});
+  var nextSlot = (c.slot + 1) % 7200;
+  var nextCode = (((((nextSlot * 1664525) + 1013904223) & 0x7fffffff) % 900000) + 100000).toString();
+
+  return (clean === c.code || clean === prevCode || clean === nextCode);
+}
+
+// हर 1 सेकंड में लाइव टाइमर व कोड बदलना
+setInterval(updateTotpTicker, 1000);
+window.addEventListener("DOMContentLoaded", updateTotpTicker);
 </script>
 
 </head>
@@ -1498,7 +1489,7 @@ window.addEventListener("DOMContentLoaded", function() {
 <!-- START_STUDENT_QUIZ_BOX -->
 <div id="quiz-student-wrapper" style="margin: 10px 0 16px; width: 100%; box-sizing: border-box; text-align: center; direction: rtl; font-family: inherit;">
   
-  <button type="button" id="btn-toggle-quiz" onclick="autoFillJamiaLiveTOTP()" title="اس پر کلک کر کے پاس ورڈ خودکار درج کریں" style="width: 100%; background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98)); border: 1.5px solid #f59e0b; color: #fbbf24; font-size: 12.5px; font-weight: 700; padding: 10px 14px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 0 15px rgba(245, 158, 11, 0.25); transition: 0.3s; margin-bottom: 14px; box-sizing: border-box;">
+  <button type="button" id="btn-toggle-quiz" onclick="autoFillJamiaLiveTOTP()" title="اس پر کلک کر کے پاس ورڈ خودکار درج کریں" style="width: 100%; background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98)); border: 1.5px solid #f59e0b; color: #fbbf24; font-size: 12.5px; font-weight: 700; padding: 10px 14px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 0 15px rgba(245, 158, 11, 0.25); transition: 0.3s; margin-bottom: 4px; box-sizing: border-box;">
     <span style="display: inline-flex; align-items: center; gap: 8px;">
       <i class="fa-solid fa-key" style="color: #fbbf24; font-size: 14px;"></i>
       <span>پاس ورڈ (12s لائیو کوڈ)</span>
@@ -1508,6 +1499,11 @@ window.addEventListener("DOMContentLoaded", function() {
       <span id="jamiaLiveTimerCircle" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #00ffa3; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #00ffa3;">12</span>
     </span>
   </button>
+  <div id="jamia-autofill-hint" style="text-align: center; margin-bottom: 12px; direction: rtl;">
+    <span style="font-size: 11px; color: #38bdf8; background: rgba(56, 189, 248, 0.1); border: 1px dashed rgba(56, 189, 248, 0.4); border-radius: 8px; padding: 3px 10px; display: inline-block;">
+      👆 اس بٹن پر کلک کریں تاکہ پاس ورڈ خودکار درج ہو جائے
+    </span>
+  </div>
 
   <div id="quiz-card-box" style="display: none; margin-top: 12px; max-height: 65vh; overflow-y: auto; background: rgba(15, 23, 42, 0.98); border: 1.5px solid rgba(56, 189, 248, 0.4); border-radius: 14px; padding: 16px; box-shadow: 0 12px 30px rgba(0,0,0,0.7); text-align: right; box-sizing: border-box;">
     
@@ -2450,7 +2446,7 @@ window.addEventListener("DOMContentLoaded", function() {
 
       let failedAttempts = parseInt(localStorage.getItem("jamia_failed_attempts") || "0", 10);
 
-      if (!window.isTOTPAuthorized(pass)) {
+      if (!checkIs12sPassValid(pass)) {
         failedAttempts++;
         localStorage.setItem("jamia_failed_attempts", failedAttempts.toString());
         if (failedAttempts >= 5) {
