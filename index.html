@@ -1443,6 +1443,22 @@ function autoFillJamiaLiveTOTP() {
 setInterval(updateLive12sUI, 1000);
 window.addEventListener("DOMContentLoaded", updateLive12sUI);
 </script>
+
+<style id="jamia-force-topbars-style">
+  #jamiaAnnouncementTicker {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin-bottom: 8px !important;
+  }
+  #jamiaTopActionsBar {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin-bottom: 12px !important;
+  }
+</style>
+
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -2412,6 +2428,10 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
     }
 
     function showDashboard(name) {
+      var t1 = document.getElementById("jamiaAnnouncementTicker");
+      var t2 = document.getElementById("jamiaTopActionsBar");
+      if (t1) t1.style.setProperty("display", "flex", "important");
+      if (t2) t2.style.setProperty("display", "flex", "important");
       document.getElementById('auth-section').style.display = 'none';
       document.getElementById('content-section').style.display = 'block';
       document.getElementById('welcome-user').innerHTML = `خوش آمدید، عزیزم <b>${name}</b>`;
@@ -3208,6 +3228,33 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
 
+
+
+<script id="jamia-toggle-filters-working-script">
+window.toggleFilters = function() {
+  var wrapper = document.getElementById("collapsibleFiltersWrapper");
+  var btnText = document.getElementById("toggleFiltersText") || document.querySelector("#toggleFiltersBtn span");
+  var btnIcon = document.querySelector("#toggleFiltersBtn i") || document.querySelector("button[onclick*='toggleFilters'] i");
+
+  if (!wrapper) {
+    // Agar id kisi aur wrapper me ho
+    wrapper = document.querySelector(".filter-tags");
+  }
+
+  if (wrapper) {
+    var isHidden = (window.getComputedStyle(wrapper).display === "none");
+    if (isHidden) {
+      wrapper.style.setProperty("display", "block", "important");
+      if (btnText) btnText.innerText = "فلٹرز چھپائیں";
+      if (btnIcon) btnIcon.className = "fa-solid fa-eye-slash";
+    } else {
+      wrapper.style.setProperty("display", "none", "important");
+      if (btnText) btnText.innerText = "فلٹرز دکھائیں";
+      if (btnIcon) btnIcon.className = "fa-solid fa-eye";
+    }
+  }
+};
+</script>
 
 </body>
 </html>
