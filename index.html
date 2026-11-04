@@ -1393,95 +1393,115 @@
 </style>
 
 
+
+
+
 <style id="jamia-authenticator-style">
-  .jamia-auth-card {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(6, 78, 59, 0.4));
-    border: 1px solid rgba(0, 255, 163, 0.45);
-    border-radius: 16px;
-    padding: 12px 14px;
-    margin: 12px auto;
-    max-width: 320px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 255, 163, 0.08);
-    text-align: center;
-    backdrop-filter: blur(10px);
-    direction: rtl;
+  .jamia-auth-box-exact {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    background: rgba(10, 25, 45, 0.95) !important;
+    border: 1.5px solid #eab308 !important; /* Theek purane box jaisa golden border */
+    border-radius: 14px !important;
+    padding: 10px 14px !important;
+    margin: 10px 0 14px 0 !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45), inset 0 0 10px rgba(234, 179, 8, 0.12) !important;
+    text-align: center !important;
+    backdrop-filter: blur(8px) !important;
+    direction: rtl !important;
   }
-  .jamia-auth-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.74rem;
-    color: #94a3b8;
-    margin-bottom: 8px;
-    font-weight: 600;
+  .jamia-auth-header-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    font-size: 0.78rem !important;
+    color: #fde047 !important;
+    font-weight: 700 !important;
+    margin-bottom: 6px !important;
   }
-  .jamia-auth-badge {
-    background: rgba(0, 255, 163, 0.15);
-    border: 1px solid #00ffa3;
-    color: #00ffa3;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 0.68rem;
-    font-weight: bold;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+  .jamia-auth-badge-pill {
+    background: rgba(0, 255, 163, 0.15) !important;
+    border: 1px solid #00ffa3 !important;
+    color: #00ffa3 !important;
+    padding: 2px 8px !important;
+    border-radius: 12px !important;
+    font-size: 0.68rem !important;
+    font-weight: bold !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
   }
-  .jamia-auth-code-box {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    margin: 8px 0;
+  .jamia-auth-digits-row {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin: 6px 0 !important;
+    direction: ltr !important;
   }
   .jamia-auth-digits {
-    font-family: 'Courier New', monospace;
-    font-size: 1.6rem;
-    font-weight: 800;
-    letter-spacing: 5px;
-    color: #38bdf8;
-    text-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
-    direction: ltr;
+    font-family: 'Courier New', monospace !important;
+    font-size: 1.7rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 5px !important;
+    color: #38bdf8 !important;
+    text-shadow: 0 0 12px rgba(56, 189, 248, 0.55) !important;
   }
   .jamia-auth-timer-circle {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    border: 2px solid rgba(0, 255, 163, 0.3);
-    border-top: 2px solid #00ffa3;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: #00ffa3;
-    flex-shrink: 0;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    border: 2px solid #00ffa3 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.76rem !important;
+    font-weight: bold !important;
+    color: #00ffa3 !important;
+    flex-shrink: 0 !important;
   }
   .jamia-auth-fill-btn {
-    width: 100%;
-    background: rgba(56, 189, 248, 0.15);
-    border: 1px solid #38bdf8;
-    color: #e0f2fe;
-    border-radius: 10px;
-    padding: 6px 10px;
-    font-size: 0.76rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 4px;
+    width: 100% !important;
+    background: rgba(56, 189, 248, 0.15) !important;
+    border: 1px solid #38bdf8 !important;
+    color: #e0f2fe !important;
+    border-radius: 10px !important;
+    padding: 7px 12px !important;
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    margin-top: 4px !important;
+    transition: all 0.2s ease !important;
   }
   .jamia-auth-fill-btn:active {
-    transform: scale(0.97);
-    background: rgba(56, 189, 248, 0.35);
+    transform: scale(0.97) !important;
+    background: rgba(56, 189, 248, 0.35) !important;
   }
 </style>
 
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
+
+<div class="jamia-auth-box-exact" id="jamiaAuthenticatorBox">
+  <div class="jamia-auth-header-row">
+    <span><i class="fa-solid fa-key" style="color:#eab308; margin-left:6px;"></i> پاس ورڈ حاصل کریں (10s لائیو کوڈ)</span>
+    <span class="jamia-auth-badge-pill"><i class="fa-solid fa-arrows-rotate"></i> 10s آٹو چینج</span>
+  </div>
+  <div class="jamia-auth-digits-row">
+    <div class="jamia-auth-timer-circle" id="jamiaAuthTimer">10</div>
+    <div class="jamia-auth-digits" id="jamiaAuthCodeDisplay">------</div>
+  </div>
+  <button type="button" class="jamia-auth-fill-btn" onclick="jamiaAutoFillPasscode()">
+    <i class="fa-solid fa-key"></i>
+    <span>یہ پاسورڈ خودکار درج کریں (One-Click)</span>
+  </button>
+</div>
+<!-- end-jamia-auth-card -->
+
 
 
 
@@ -1576,70 +1596,7 @@
     </div>
 
     
-<div class="jamia-auth-card" id="jamiaAuthenticatorBox">
-  <div class="jamia-auth-header">
-    <span><i class="fa-solid fa-shield-halved" style="color:#00ffa3;"></i> لائیو پاس ورڈ تصدیق</span>
-    <span class="jamia-auth-badge"><i class="fa-solid fa-arrows-rotate"></i> 10s آٹو چینج</span>
-  </div>
-  <div class="jamia-auth-code-box">
-    <div class="jamia-auth-timer-circle" id="jamiaAuthTimer">10</div>
-    <div class="jamia-auth-digits" id="jamiaAuthCodeDisplay">------</div>
-  </div>
-  <button type="button" class="jamia-auth-fill-btn" onclick="jamiaAutoFillPasscode()">
-    <i class="fa-solid fa-key"></i>
-    <span>یہ پاسورڈ خودکار درج کریں (One-Click)</span>
-  </button>
-</div>
 
-<div class="form-group">
-      <label for="user-pass">
-        <i class="fa-solid fa-key" style="color:#fbbf24;"></i> 
-        خفیہ پاس ورڈ (Security Password)
-      </label>
-      <input type="password" id="user-pass" class="form-input" placeholder="پاس ورڈ درج کریں" autocomplete="current-password">
-    </div>
-
-    <button type="button" class="btn-submit" id="btn-login" onclick="verifyAccess()">
-      <i class="fa-solid fa-arrow-right-to-bracket"></i> &nbsp; تصدیق کریں اور داخل ہوں (Open)
-    </button>
-
-    <div id="error-alert" class="error-msg">درج شدہ معلومات غلط ہیں!</div>
-
-
-
-  </div>
-
-  <!-- 2. SCALABLE LIBRARY DASHBOARD -->
-  <div class="card" id="content-section">
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="jamia-ticker-wrapper" id="jamiaAnnouncementTicker">
-  <div class="jamia-ticker-badge">
-    <i class="fa-solid fa-bullhorn"></i>
-    <span>اعلان</span>
-  </div>
-  <div class="jamia-ticker-content">
-    <div class="jamia-ticker-track" id="jamiaTickerTrack">
-      <div class="jamia-ticker-segment" id="tickerSeg1">✨ <b>مکتبہ فقیرِ راہِ رضا</b> <span class="dot">•</span> <span class="gold">جامعۃ الرضا ڈیجیٹل کتب خانہ</span> <span class="dot">•</span> <b>ترتیب و پیشکش:</b> فقیرِ راہِ رضا سہیل حسین (<span class="eng-text">Sohil Husain</span>) <span class="dot">•</span> 📚 اسلامی، درسی و فقہی کتب، افکار و فتاویٰ کا مستند گنجینہ <span class="dot">•</span> 📝 شعبۂ امتحانات: تمام درجات کے سالانہ امتحانی پرچہ جات <span class="dot">•</span> 🎙️ بزمِ صوتیات: حضور عسجد رضا خاں و بلبلِ باغِ مدینہ صابر رضا کی پر سوز آڈیو نعتیں <span class="dot">•</span> ⚡ تیز ترین سنگل کلک ڈاؤنلوڈ و فل اسکرین مطالعہ ✨</div>
-      <div class="jamia-ticker-segment" id="tickerSeg2">✨ <b>مکتبہ فقیرِ راہِ رضا</b> <span class="dot">•</span> <span class="gold">جامعۃ الرضا ڈیجیٹل کتب خانہ</span> <span class="dot">•</span> <b>ترتیب و پیشکش:</b> فقیرِ راہِ رضا سہیل حسین (<span class="eng-text">Sohil Husain</span>) <span class="dot">•</span> 📚 اسلامی، درسی و فقہی کتب، افکار و فتاویٰ کا مستند گنجینہ <span class="dot">•</span> 📝 شعبۂ امتحانات: تمام درجات کے سالانہ امتحانی پرچہ جات <span class="dot">•</span> 🎙️ بزمِ صوتیات: حضور عسجد رضا خاں و بلبلِ باغِ مدینہ صابر رضا کی پر سوز آڈیو نعتیں <span class="dot">•</span> ⚡ تیز ترین سنگل کلک ڈاؤنلوڈ و فل اسکرین مطالعہ ✨</div>
-    </div>
-  </div>
 </div>
 <!-- end-jamia-ticker -->
 <div class="jamia-top-bar-clean" id="jamiaTopActionsBar">
@@ -4019,17 +3976,20 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>
 
 
+
+
+
 <script id="jamia-authenticator-js">
-// 24 ghante = 1440 min = 8640 10-second slots
+// 24 ghante = 1440 minute = 8640 slots
 function getJamiaTOTPInfo() {
   var now = new Date();
   var secSinceMidnight = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
-  var slot = Math.floor(secSinceMidnight / 10); // 0 to 8639
+  var slot = Math.floor(secSinceMidnight / 10);
   var rem = 10 - (secSinceMidnight % 10);
+  if (rem === 0) rem = 10;
   return { slot: slot, rem: rem };
 }
 
-// Slot index se unique 6-digit code banane ka deterministic formula
 function generateSlotPasscode(slot) {
   var seed = ((slot * 1103515245) + 12345) & 0x7fffffff;
   seed = ((seed ^ 0x5bf03635) * 1664525 + 1013904223) & 0x7fffffff;
@@ -4052,7 +4012,7 @@ function updateJamiaAuthDisplay() {
     timerEl.style.borderColor = "#f43f5e";
     timerEl.style.color = "#fb7185";
   } else {
-    timerEl.style.borderColor = "rgba(0, 255, 163, 0.4)";
+    timerEl.style.borderColor = "#00ffa3";
     timerEl.style.color = "#00ffa3";
   }
 }
@@ -4060,50 +4020,119 @@ function updateJamiaAuthDisplay() {
 function jamiaAutoFillPasscode() {
   var info = getJamiaTOTPInfo();
   var currentCode = generateSlotPasscode(info.slot);
-  var passInput = document.querySelector("#loginScreen input[type='password'], #loginScreen input[name*='pass'], input[id*='pass'], input[type='password'], .login-card input");
+  var passInput = document.querySelector("input[type='password'], input[id*='pass'], input[name*='pass'], input[placeholder*='پاس ورڈ']");
   if (passInput) {
     passInput.value = currentCode;
-    passInput.type = "text"; // Dikhe ki code enter ho gaya
+    passInput.type = "text";
     setTimeout(function() { passInput.type = "password"; }, 2000);
     passInput.focus();
   }
 }
 
-// Password Validator: Current slot ya pichhle slot ka code hi manzoor hoga
-window.validateJamiaDynamicAuth = function(inputPass) {
-  if (!inputPass) return false;
-  var cleaned = inputPass.toString().trim().replace(/\s+/g, '');
+// 100% Strict Passcode Matcher
+window.isPasscodeStrictlyValid = function(inputVal) {
+  if (!inputVal) return false;
+  var cleaned = inputVal.toString().replace(/\s+/g, '').trim();
   var info = getJamiaTOTPInfo();
   var currentCode = generateSlotPasscode(info.slot);
   var prevSlot = (info.slot - 1 + 8640) % 8640;
   var prevCode = generateSlotPasscode(prevSlot);
 
+  // 78692 ya koi bhi man-marzi ka code strictly false hoga
   return (cleaned === currentCode || cleaned === prevCode);
 };
 
-// Global Login Hook: Form submit ya checkPassword par dynamic verification
-function hookJamiaLoginAuth() {
-  var loginForm = document.querySelector("#loginScreen form, .login-card form");
-  var passInput = document.querySelector("#loginScreen input[type='password'], #loginScreen input[name*='pass'], input[id*='pass'], input[type='password'], .login-card input");
-  var loginBtn = document.querySelector("#loginScreen button, .login-card button, [onclick*='Login'], [onclick*='login']");
+// Purane "پاس ورڈ حاصل کریں" box ki jagah Naye Authenticator ko place karna
+function placeAuthenticatorBoxProperly() {
+  var authBox = document.getElementById("jamiaAuthenticatorBox");
+  if (!authBox) return;
 
-  if (typeof window.checkPassword === 'function' && !window.checkPassword._jamiaHooked) {
-    var origCheck = window.checkPassword;
-    window.checkPassword = function(p) {
-      var val = p || (passInput ? passInput.value : "");
-      if (window.validateJamiaDynamicAuth(val) || origCheck(val)) {
-        return true;
+  // Purana accordion dhoondo
+  var elements = document.querySelectorAll("div, details, .accordion");
+  var oldBox = null;
+  for (var i = 0; i < elements.length; i++) {
+    var el = elements[i];
+    if (el.id !== "jamiaAuthenticatorBox" && (el.innerText.includes("طلبۂ جامعہ کی ۶ سوالاتی جانچ") || (el.innerText.includes("پاس ورڈ حاصل کریں") && !el.classList.contains("jamia-auth-box-exact")))) {
+      var candidate = el;
+      while (candidate.parentElement && candidate.parentElement.tagName !== "FORM" && candidate.parentElement.tagName !== "BODY" && !candidate.parentElement.id.toLowerCase().includes("screen")) {
+        if (candidate.parentElement.innerText.includes("طالب علم کا نام")) break;
+        candidate = candidate.parentElement;
       }
-      return false;
-    };
-    window.checkPassword._jamiaHooked = true;
+      oldBox = candidate;
+      break;
+    }
+  }
+
+  if (oldBox && authBox) {
+    oldBox.style.setProperty("display", "none", "important");
+    oldBox.parentNode.insertBefore(authBox, oldBox);
+  } else {
+    // Agar oldBox na mile to "طالب علم کا نام" ke theek upar insert karein
+    var allLabels = document.querySelectorAll("label, div, p");
+    for (var j = 0; j < allLabels.length; j++) {
+      if (allLabels[j].innerText.includes("طالب علم کا نام")) {
+        var targetWrap = allLabels[j].closest("div") || allLabels[j];
+        targetWrap.parentNode.insertBefore(authBox, targetWrap);
+        break;
+      }
+    }
   }
 }
 
+// CAPTURE-PHASE HARD INTERCEPT: Kisi bhi galat password ko portal ke andar ghusne hi na de
+function handleLoginSecurityCheck(e) {
+  var btn = e.target.closest("button, [type='submit'], [onclick*='dakhil'], [onclick*='Login'], [onclick*='login']");
+  if (!btn) return;
+  if (btn.classList.contains("jamia-auth-fill-btn")) return;
+
+  var txt = btn.innerText || btn.textContent || "";
+  if (txt.includes("داخل ہوں") || txt.includes("تصدیق کریں") || txt.includes("Open") || (btn.id && btn.id.toLowerCase().includes("login"))) {
+    var passInput = document.querySelector("input[type='password'], input[id*='pass'], input[name*='pass'], input[placeholder*='پاس ورڈ']");
+    var nameInput = document.querySelector("input[type='text'], input[id*='name'], input[name*='name'], input[placeholder*='نام']");
+
+    var enteredPass = passInput ? passInput.value : "";
+    var enteredName = nameInput ? nameInput.value.trim() : "";
+
+    if (!enteredName) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      alert("براہ کرم اپنا نام درج کریں۔\n(Please enter your name)");
+      if (nameInput) nameInput.focus();
+      return false;
+    }
+
+    if (!window.isPasscodeStrictlyValid(enteredPass)) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      alert("❌ غلط پاس ورڈ!\n\nصرف وہی پاس ورڈ قابلِ قبول ہے جو اوپر اسکرین پر ہر 10 سیکنڈ میں لائیو تبدیل ہو رہا ہے۔\n\nپرانا پاسورڈ (78692) اور دیگر تمام پاسورڈز مکمل طور پر بلاک ہیں۔");
+      if (passInput) {
+        passInput.value = "";
+        passInput.focus();
+      }
+      return false;
+    }
+  }
+}
+
+// Capture phase listeners (runs before inline onclicks)
+window.addEventListener("click", handleLoginSecurityCheck, true);
+window.addEventListener("submit", function(e) {
+  var passInput = e.target.querySelector("input[type='password'], input[id*='pass'], input[name*='pass']");
+  if (passInput && !window.isPasscodeStrictlyValid(passInput.value)) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    alert("❌ غلط پاس ورڈ! صرف 10 سیکنڈ والا لائیو پاس ورڈ درج کریں۔");
+    return false;
+  }
+}, true);
+
 window.addEventListener("DOMContentLoaded", function() {
+  placeAuthenticatorBoxProperly();
   updateJamiaAuthDisplay();
   setInterval(updateJamiaAuthDisplay, 1000);
-  hookJamiaLoginAuth();
 });
 </script>
 
