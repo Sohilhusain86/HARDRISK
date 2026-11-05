@@ -2361,10 +2361,10 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
 
       try {
         const res = await fetch(DRIVE_API_URL);
-        const dynamicBooks = await res.json();
+        const dynamicBooks = await res.json(); try { if(typeof markJamiaDataLoaded === "function") markJamiaDataLoaded("books"); } catch(e){}
         try {
           const nRes = await fetch(NAATS_API_URL);
-          const naats = await nRes.json();
+          const naats = await nRes.json(); try { if(typeof markJamiaDataLoaded === "function") markJamiaDataLoaded("naats"); } catch(e){}
           if (Array.isArray(naats)) {
             naats.forEach(nt => {
               dynamicBooks.push({
@@ -2383,7 +2383,7 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
               });
             });
           }
-        } catch(nErr) { console.log("Naats fetch skipped:", nErr); }
+        } catch(nErr) { console.log("Naats fetch skipped:", nErr); try { if(typeof markJamiaDataLoaded === "function") markJamiaDataLoaded("naats"); } catch(e){} }
 
         const combined = [...LIBRARY_DATA];
         dynamicBooks.forEach(db => {
@@ -2725,7 +2725,7 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
 
   // Jab pura data load ho jaye tab hide karein, ya max 7 second tak wait karein
   window.addEventListener("load", function() {
-    setTimeout(window.hideJamiaBlinker, 6500);
+    
   });
 </script>
 
@@ -3620,5 +3620,34 @@ window.openViewer = function(url, title) {
   fetchNaatsFromDrive();
 })();
 </script>
+
+<script id="jamia-smart-blinker-engine">
+window.jamiaLoadStatus = { booksDone: false, naatsDone: false };
+
+window.updateJamiaBlinkerText = function() {
+  var b = document.getElementById("jamiaSyncBlinker");
+  if (!b) return;
+  var textSpan = b.querySelector("span:nth-child(2)") || b.querySelector("span");
+  
+  if (window.jamiaLoadStatus.booksDone && window.jamiaLoadStatus.naatsDone) {
+    b.style.transition = "opacity 0.6s ease";
+    b.style.opacity = "0";
+    setTimeout(function() { if (b) b.remove(); }, 600);
+  } else if (window.jamiaLoadStatus.booksDone && !window.jamiaLoadStatus.naatsDone) {
+    if (textSpan) textSpan.innerText = "نعتیں لوڈ ہو رہی ہیں...";
+  } else if (!window.jamiaLoadStatus.booksDone && window.jamiaLoadStatus.naatsDone) {
+    if (textSpan) textSpan.innerText = "مزید کتب لوڈ ہو रही हैं...";
+  } else {
+    if (textSpan) textSpan.innerText = "مزید کتب و نعتیں لوڈ ہو رہی ہیں...";
+  }
+};
+
+window.markJamiaDataLoaded = function(type) {
+  if (type === 'books') window.jamiaLoadStatus.booksDone = true;
+  if (type === 'naats') window.jamiaLoadStatus.naatsDone = true;
+  window.updateJamiaBlinkerText();
+};
+</script>
+
 </body>
 </html>
