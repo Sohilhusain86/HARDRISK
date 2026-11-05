@@ -2153,7 +2153,7 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
 
             <!-- Action Buttons -->
             <div class="j-btn-row">
-              ${isAudio ? `<button type="button" class="j-btn-read" style="background:#0e4429 !important; border-color:#00ffa3 !important; color:#00ffa3 !important;" onclick="openJamiaAudioModal('${safeAudioUrl}', '${safeTitle}')"><i class="fa-solid fa-play" style="margin-left:5px;"></i> سنیں</button>` : `<button type="button" class="j-btn-read" onclick="openFullscreenPdf('${safeId}', '${safeTitle}')">مطالعہ کریں</button>`}
+              ${isAudio ? `<button type="button" class="j-btn-read" style="background:#0e4429 !important; border-color:#00ffa3 !important; color:#00ffa3 !important;" onclick="window.playAudio('${safeAudioUrl}', '${safeTitle}')"><i class="fa-solid fa-play" style="margin-left:5px;"></i> سنیں</button>` : `<button type="button" class="j-btn-read" onclick="openFullscreenPdf('${safeId}', '${safeTitle}')">مطالعہ کریں</button>`}
               <button type="button" class="j-btn-intro" onclick="showBookIntro('${safeTitle}', '${b.category || ''}')">تعارف</button>
               <button type="button" class="j-btn-down" title="ڈاؤنلوڈ" onclick="startDirectDownload(event, '${safeId}', '${safeDownloadName}')"><i class="fa-solid fa-download"></i></button>
               <button type="button" class="j-btn-share" title="شیئر" onclick="shareBookItem('${safeTitle}', '${safeId}')"><i class="fa-solid fa-share-nodes"></i></button>
@@ -3458,6 +3458,8 @@ window.openViewer = function(url, title) {
   }
 
   // 1. Play Audio with Working Close Button Fix
+  window.openJamiaAudioModal = window.playAudio;
+  window.playNaat = window.playAudio;
   window.playAudio = function(audioUrlOrId, title) {
     const bar = document.getElementById("emeraldAudioBar");
     const titleEl = document.getElementById("audioPlayerTitle");
