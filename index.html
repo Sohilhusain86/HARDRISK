@@ -1470,6 +1470,35 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
 
 
 
+
+<style id="jamia-unidirectional-marquee">
+  #audioPlayerTitleWrapper {
+    overflow: hidden !important;
+    position: relative !important;
+    width: 100% !important;
+    direction: ltr !important;
+    text-align: right !important;
+  }
+  .jamia-scrolling-title {
+    display: inline-block;
+    white-space: nowrap;
+    animation: jamiaOneWayScroll 10s linear infinite;
+  }
+  @keyframes jamiaOneWayScroll {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+</style>
+<script>
+  // Direction detector: Urdu vs English
+  window.updateMarqueeDirection = function(text) {
+    const el = document.getElementById("audioPlayerTitle");
+    if (!el) return;
+    const isUrdu = /[ اردو ط ظ ض ص ش س ز ر ذ د خ ح ج ث ت ب ا ئ ء و ه ن م ل ك ق ف غ ع غ ]/.test(text);
+    el.style.animationDirection = isUrdu ? "reverse" : "normal";
+  };
+</script>
+
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
