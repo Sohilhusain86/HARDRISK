@@ -1468,13 +1468,7 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
 </style>
 
 
-<script id="force-cache-update">
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(function(regs) {
-    for (let reg of regs) { reg.update(); }
-  });
-}
-</script>
+
 
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
@@ -2370,10 +2364,12 @@ if ('serviceWorker' in navigator) {
 
       try {
         const res = await fetch(DRIVE_API_URL);
-        const dynamicBooks = await res.json(); try { if(typeof markJamiaDataLoaded === "function") markJamiaDataLoaded("books"); } catch(e){}
+        const dynamicBooks = await res.json();
+        if (Array.isArray(dynamicBooks) && dynamicBooks.length > 0) { window.__driveBooksFetched = true; if (window.syncJamiaRedDot) window.syncJamiaRedDot(); } 
         try {
           const nRes = await fetch(NAATS_API_URL);
-          const naats = await nRes.json(); try { if(typeof markJamiaDataLoaded === "function") markJamiaDataLoaded("naats"); } catch(e){}
+          const naats = await nRes.json();
+          if (Array.isArray(naats)) { window.__driveNaatsFetched = true; window.JAMIA_NAATS_LIST = naats; if (window.syncJamiaRedDot) window.syncJamiaRedDot(); } 
           if (Array.isArray(naats)) {
             naats.forEach(nt => {
               dynamicBooks.push({
@@ -2392,7 +2388,7 @@ if ('serviceWorker' in navigator) {
               });
             });
           }
-        } catch(nErr) { console.log("Naats fetch skipped:", nErr); try { if(typeof markJamiaDataLoaded === "function") markJamiaDataLoaded("naats"); } catch(e){} }
+        } catch(nErr) { console.log("Naats fetch skipped:", nErr);  }
 
         const combined = [...LIBRARY_DATA];
         dynamicBooks.forEach(db => {
@@ -3622,91 +3618,23 @@ window.openViewer = function(url, title) {
 
 
 
-<script id="jamia-smart-blinker-engine">
-(function() {
-  window.jamiaLoadStatus = { booksDone: false, naatsDone: false };
 
-  window.updateJamiaBlinkerUI = function() {
-    var b = document.getElementById("jamiaSyncBlinker");
-    if (!b) return;
-    var spans = b.querySelectorAll("span");
-    var textSpan = spans.length > 1 ? spans[1] : spans[0];
 
-    if (window.jamiaLoadStatus.booksDone && window.jamiaLoadStatus.naatsDone) {
-      // जब दोनों 100% लोड हो जाएँ, तो 1 सेकंड तक "مکمل ہو گیا" दिखाकर हटाएँ
-      if (textSpan) textSpan.innerText = "تمام کتب و نعتیں لوڈ ہو گئیں ✓";
-      setTimeout(function() {
-        b.style.transition = "opacity 0.6s ease";
-        b.style.opacity = "0";
-        setTimeout(function() { b.style.display = "none"; }, 600);
-      }, 900);
-    } else if (window.jamiaLoadStatus.booksDone && !window.jamiaLoadStatus.naatsDone) {
-      b.style.display = "flex";
-      b.style.opacity = "1";
-      if (textSpan) textSpan.innerText = "نعتیں لوڈ ہو رہی ہیں...";
-    } else if (!window.jamiaLoadStatus.booksDone && window.jamiaLoadStatus.naatsDone) {
-      b.style.display = "flex";
-      b.style.opacity = "1";
-      if (textSpan) textSpan.innerText = "مزید کتب لوڈ ہو رہی ہیں...";
-    } else {
-      b.style.display = "flex";
-      b.style.opacity = "1";
-      if (textSpan) textSpan.innerText = "مزید کتب و نعتیں لوڈ ہو رہی ہیں...";
-    }
-  };
-
-  window.markJamiaDataLoaded = function(type) {
-    if (type === "books") window.jamiaLoadStatus.booksDone = true;
-    if (type === "naats") window.jamiaLoadStatus.naatsDone = true;
-    window.updateJamiaBlinkerUI();
-  };
-
-  // Fetch Interceptor: जैसे ही असली API से डेटा आए, अपने आप पता चल जाए
-  const origFetch = window.fetch;
-  window.fetch = async function(...args) {
-    const url = (typeof args[0] === "string") ? args[0] : (args[0]?.url || "");
-    try {
-      const response = await origFetch.apply(this, args);
-      const clone = response.clone();
-      clone.json().then(function() {
-        if (typeof NAATS_API_URL !== "undefined" && url.includes(NAATS_API_URL.substring(0, 45))) {
-          window.markJamiaDataLoaded("naats");
-        } else if (typeof DRIVE_API_URL !== "undefined" && url.includes(DRIVE_API_URL.substring(0, 45))) {
-          window.markJamiaDataLoaded("books");
-        }
-      }).catch(function(){});
-      return response;
-    } catch (err) {
-      if (typeof NAATS_API_URL !== "undefined" && url.includes(NAATS_API_URL.substring(0, 45))) {
-        window.markJamiaDataLoaded("naats");
-      } else if (typeof DRIVE_API_URL !== "undefined" && url.includes(DRIVE_API_URL.substring(0, 45))) {
-        window.markJamiaDataLoaded("books");
-      }
-      throw err;
-    }
-  };
-
-  document.addEventListener("DOMContentLoaded", function() {
-    window.updateJamiaBlinkerUI();
-  });
-})();
-</script>
 
 <!-- JAMIA_10_FEATURES_START -->
 <style id="jamia-10-features-css">
-  /* 1. Continue Reading Bar */
   #jamiaContinueBar {
     display: none;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    background: linear-gradient(135deg, rgba(6, 78, 59, 0.92), rgba(2, 44, 34, 0.96));
+    background: linear-gradient(135deg, rgba(6, 78, 59, 0.95), rgba(2, 44, 34, 0.98));
     border: 1px solid #10b981;
     border-radius: 14px;
-    padding: 8px 14px;
+    padding: 9px 14px;
     margin: 10px auto 12px auto;
-    max-width: 96%;
-    box-shadow: 0 4px 15px rgba(0, 255, 163, 0.12);
+    max-width: 95%;
+    box-shadow: 0 4px 15px rgba(0, 255, 163, 0.15);
     direction: rtl;
   }
   #jamiaContinueBar .jc-info {
@@ -3714,7 +3642,7 @@ window.openViewer = function(url, title) {
     align-items: center;
     gap: 8px;
     color: #ecfdf5;
-    font-size: 0.85rem;
+    font-size: 0.84rem;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -3730,11 +3658,9 @@ window.openViewer = function(url, title) {
     cursor: pointer;
     flex-shrink: 0;
   }
-
-  /* 2. Favorite Star Button */
   .j-btn-fav {
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(251, 191, 36, 0.45) !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid rgba(251, 191, 36, 0.5) !important;
     color: #fbbf24 !important;
     border-radius: 10px;
     width: 36px;
@@ -3743,21 +3669,18 @@ window.openViewer = function(url, title) {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform 0.2s ease;
   }
   .j-btn-fav.active {
-    background: rgba(251, 191, 36, 0.2) !important;
+    background: rgba(251, 191, 36, 0.22) !important;
     border-color: #fbbf24 !important;
     text-shadow: 0 0 8px #fbbf24;
   }
-
-  /* 7. NEW Badge */
   .jamia-new-badge {
     position: absolute;
     top: 10px;
     left: 10px;
     background: linear-gradient(135deg, #10b981, #059669);
-    color: #ffffff;
+    color: #fff;
     font-size: 0.68rem;
     font-weight: bold;
     padding: 2px 8px;
@@ -3766,25 +3689,21 @@ window.openViewer = function(url, title) {
     z-index: 5;
     pointer-events: none;
   }
-
-  /* 5. Audio Next/Prev Controls */
   .jamia-audio-nav-btn {
-    background: rgba(0, 255, 163, 0.12);
-    border: 1px solid rgba(0, 255, 163, 0.4);
+    background: rgba(0, 255, 163, 0.14);
+    border: 1px solid rgba(0, 255, 163, 0.45);
     color: #00ffa3;
     border-radius: 8px;
     padding: 3px 9px;
     font-size: 0.78rem;
     cursor: pointer;
-    margin: 0 3px;
+    margin: 0 2px;
   }
-
-  /* 6. PDF Eye-Care Overlay */
   #jamiaPdfEyeCareOverlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(245, 158, 11, 0.16);
+    background: rgba(245, 158, 11, 0.18);
     mix-blend-mode: multiply;
     pointer-events: none;
     z-index: 999998;
@@ -3796,7 +3715,7 @@ window.openViewer = function(url, title) {
     left: 50%;
     transform: translateX(-50%);
     z-index: 999999;
-    background: #1e293b;
+    background: #064e3b;
     color: #fde68a;
     border: 1px solid #f59e0b;
     border-radius: 20px;
@@ -3804,15 +3723,13 @@ window.openViewer = function(url, title) {
     font-size: 0.78rem;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
   }
-
-  /* 9 & 10. Custom Action Modal (Intro Copy & Book Request) */
   #jamiaSmartModal {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.78);
+    background: rgba(0, 0, 0, 0.8);
     z-index: 999995;
     align-items: center;
     justify-content: center;
@@ -3827,22 +3744,77 @@ window.openViewer = function(url, title) {
     width: 100%;
     padding: 18px;
     color: #ecfdf5;
-    box-shadow: 0 12px 35px rgba(0,0,0,0.7);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.75);
     text-align: right;
   }
 </style>
 
-<!-- 6. Eye-Care Overlay & Toggle -->
 <div id="jamiaPdfEyeCareOverlay"></div>
 <button id="jamiaPdfEyeCareBtn" type="button" onclick="window.toggleJamiaEyeCare()">🌙 آئی کیئر موڈ: آف</button>
 
-<!-- 9 & 10. Smart Modal for Copy Intro & Request Form -->
 <div id="jamiaSmartModal" onclick="if(event.target===this)this.style.display='none'">
   <div class="jamia-modal-card" id="jamiaSmartModalContent"></div>
 </div>
 
-<script id="jamia-10-features-js">
+<script id="jamia-smart-blinker-engine">
 (function() {
+  // =========================================================================
+  // PART A: 100% REAL DRIVE BOOKS & NAATS RED DOT TRACKER
+  // (4-5 لوکل کتابوں کو نظر انداز کر کے صرف ڈرائیو کی اصل لوڈنگ کو ٹریک کرے گا)
+  // =========================================================================
+  window.__driveBooksFetched = false;
+  window.__driveBooksRendered = false;
+  window.__driveNaatsFetched = false;
+
+  const initialLocalCount = (typeof LIBRARY_DATA !== "undefined" && Array.isArray(LIBRARY_DATA)) ? LIBRARY_DATA.length : 5;
+
+  window.syncJamiaRedDot = function() {
+    const b = document.getElementById("jamiaSyncBlinker");
+    if (!b || b.dataset.fullyDone === "1") return;
+
+    const spans = b.querySelectorAll("span");
+    const textSpan = spans.length > 1 ? spans[1] : spans[0];
+
+    // چیک کریں کہ نعتوں کی لسٹ واقعی آ چکی ہے یا نہیں
+    if (window.JAMIA_NAATS_LIST && window.JAMIA_NAATS_LIST.length > 0) {
+      window.__driveNaatsFetched = true;
+    }
+
+    // چیک کریں کہ ڈرائیو کی کتابیں آ کر کارڈز کی تعداد ابتدائی 4-5 سے زیادہ ہوئی یا نہیں
+    const renderedCardsCount = document.querySelectorAll(".j-btn-row").length;
+    const booksTrulyReady = window.__driveBooksRendered || (window.__driveBooksFetched && renderedCardsCount > initialLocalCount);
+    const naatsTrulyReady = window.__driveNaatsFetched;
+
+    b.style.display = "flex";
+    b.style.opacity = "1";
+
+    if (booksTrulyReady && naatsTrulyReady) {
+      b.dataset.fullyDone = "1";
+      if (textSpan) textSpan.innerText = "تمام کتب و نعتیں لوڈ ہو گئیں ✓";
+      setTimeout(function() {
+        b.style.transition = "opacity 0.6s ease";
+        b.style.opacity = "0";
+        setTimeout(function() { b.style.display = "none"; }, 600);
+      }, 900);
+    } else if (booksTrulyReady && !naatsTrulyReady) {
+      if (textSpan) textSpan.innerText = "نعتیں لوڈ ہو رہی ہیں...";
+    } else if (!booksTrulyReady && naatsTrulyReady) {
+      if (textSpan) textSpan.innerText = "مزید کتب لوڈ ہو رہی ہیں...";
+    } else {
+      if (textSpan) textSpan.innerText = "مزید کتب و نعتیں لوڈ ہو رہی ہیں...";
+    }
+  };
+
+  // ہر 600ms پر حقیقی اسٹیٹس چیک کریں (جب تک دونوں ڈرائیو سے نہ آ جائیں)
+  const trackerInterval = setInterval(function() {
+    window.syncJamiaRedDot();
+    const b = document.getElementById("jamiaSyncBlinker");
+    if (b && b.dataset.fullyDone === "1") clearInterval(trackerInterval);
+  }, 600);
+
+  // =========================================================================
+  // PART B: ALL 10 FEATURES ENGINE (DIRECTLY HOOKED TO renderBooks)
+  // =========================================================================
   const FAV_KEY = "jamia_fav_items_v1";
   const LAST_KEY = "jamia_last_opened_v1";
 
@@ -3853,9 +3825,7 @@ window.openViewer = function(url, title) {
     try { localStorage.setItem(FAV_KEY, JSON.stringify(list)); } catch(e) {}
   }
 
-  // -----------------------------------------------------------
-  // FEATURE 1: Continue Reading / Listening Bar
-  // -----------------------------------------------------------
+  // 1. Continue Reading / Listening Bar
   function initContinueBar() {
     if (document.getElementById("jamiaContinueBar")) return;
     const searchInput = document.querySelector("input[type='text'], input[type='search'], #searchInput");
@@ -3886,7 +3856,7 @@ window.openViewer = function(url, title) {
       if (!last || !last.title) { bar.style.display = "none"; return; }
       const txt = document.getElementById("jamiaContinueText");
       const btn = document.getElementById("jamiaContinueOpenBtn");
-      if (txt) txt.innerText = (last.type === "audio" ? "🎵 آخری سنی گئی نعت: " : "📖 آخری پڑھی گئی کتاب: ") + last.title;
+      if (txt) txt.innerText = (last.type === "audio" ? "🎵 آخری نعت: " : "📖 آخری کتاب: ") + last.title;
       if (btn) {
         btn.onclick = function() {
           if (last.type === "audio" && typeof window.playAudio === "function") {
@@ -3907,9 +3877,7 @@ window.openViewer = function(url, title) {
     } catch(e) {}
   }
 
-  // -----------------------------------------------------------
-  // FEATURE 2, 7: Card Enhancements (⭐ Fav Star & 🟢 NEW Badge)
-  // -----------------------------------------------------------
+  // 2 & 7. Favorite Star Button + NEW Badge on Cards
   window.toggleJamiaFav = function(itemTitle, btnEl) {
     let favs = getFavs();
     if (favs.includes(itemTitle)) {
@@ -3923,16 +3891,15 @@ window.openViewer = function(url, title) {
     updateCategoryCounts();
   };
 
-  function enhanceCards() {
+  function decorateRenderedCards() {
     const favs = getFavs();
-    const cards = document.querySelectorAll(".j-btn-row");
-    cards.forEach((row, index) => {
-      const card = row.closest(".book-card, .j-card, div[style*='border']") || row.parentElement.parentElement;
+    const rows = document.querySelectorAll(".j-btn-row");
+    rows.forEach((row, idx) => {
+      const card = row.closest(".book-card, .j-card") || row.parentElement?.parentElement;
       if (!card) return;
       const titleEl = card.querySelector("h3, h4, .j-title, strong") || card.firstElementChild;
       const titleText = (titleEl ? titleEl.innerText : "").trim();
 
-      // Add ⭐ Star Button once
       if (!row.querySelector(".j-btn-fav") && titleText) {
         const isFav = favs.includes(titleText);
         const favBtn = document.createElement("button");
@@ -3948,8 +3915,8 @@ window.openViewer = function(url, title) {
         row.appendChild(favBtn);
       }
 
-      // Add 🟢 NEW Badge on dynamic/latest items
-      if (card && !card.querySelector(".jamia-new-badge") && index >= 6 && index < 14) {
+      // ڈرائیو سے آنے والی نئی کتابوں پر "نیا اضافہ" کا بیج
+      if (idx >= initialLocalCount && idx < initialLocalCount + 8 && !card.querySelector(".jamia-new-badge")) {
         card.style.position = "relative";
         const badge = document.createElement("span");
         badge.className = "jamia-new-badge";
@@ -3959,8 +3926,7 @@ window.openViewer = function(url, title) {
     });
   }
 
-  // Add "⭐ میری پسند" Filter Button in Filter Bar
-  function ensureFavFilterButton() {
+  function ensureFavFilterTab() {
     if (document.getElementById("tab-jamia-favs")) return;
     const allBtns = Array.from(document.querySelectorAll("button, span, div"));
     const refBtn = allBtns.find(el => el.children.length === 0 && (el.innerText || "").trim().startsWith("تمام کتب"));
@@ -3975,115 +3941,169 @@ window.openViewer = function(url, title) {
       e.preventDefault();
       const favs = getFavs();
       document.querySelectorAll(".j-btn-row").forEach(row => {
-        const card = row.parentElement.parentElement;
+        const card = row.parentElement?.parentElement;
         if (!card) return;
         const txt = card.innerText || "";
-        const match = favs.some(f => f && txt.includes(f));
-        card.style.display = match ? "" : "none";
+        card.style.display = favs.some(f => f && txt.includes(f)) ? "" : "none";
       });
     };
     refBtn.parentElement.appendChild(favTab);
   }
 
-  // -----------------------------------------------------------
-  // FEATURE 3: Smart Roman + Urdu Diacritic-Free Search
-  // -----------------------------------------------------------
+  // 3. Smart Multi-Script Search (Urdu + Roman)
   const romanMap = {
     "bahar": "بہار", "shariat": "شریعت", "saniya": "ثانیہ", "ula": "اولی",
     "salisa": "ثالثہ", "rabia": "رابعہ", "khamisa": "خامسہ", "parcha": "پرچہ",
     "paper": "پرچہ", "asjad": "عسجد", "sabir": "صابر", "rafiq": "رفیق",
-    "naat": "نعت", "math": "ریاضی", "hindi": "ہندی", "fiqh": "فقہ", "usool": "اصول"
+    "naat": "نعت", "math": "ریاضی", "hindi": "ہندی", "fiqh": "فقہ"
   };
 
-  function normalizeText(str) {
-    return (str || "")
-      .replace(/[ً-ٰٟ]/g, "")
-      .replace(/[أإآ]/g, "ا")
-      .replace(/ة/g, "ہ")
-      .replace(/ي/g, "ی")
-      .toLowerCase();
+  function normText(s) {
+    return (s || "").replace(/[ً-ٰٟ]/g, "").replace(/[أإآ]/g, "ا").replace(/ة/g, "ہ").replace(/ي/g, "ی").toLowerCase();
   }
 
-  function enhanceSearchBox() {
-    const searchInput = document.querySelector("input[type='text'], input[type='search'], #searchInput");
-    if (!searchInput || searchInput.dataset.smartBound) return;
-    searchInput.dataset.smartBound = "1";
-
-    searchInput.addEventListener("input", function() {
-      const rawQ = (this.value || "").trim().toLowerCase();
-      if (!rawQ) return;
-      let mappedQ = normalizeText(rawQ);
-      Object.keys(romanMap).forEach(k => {
-        if (rawQ.includes(k)) mappedQ = normalizeText(romanMap[k]);
-      });
-
+  function bindSmartSearch() {
+    const inp = document.querySelector("input[type='text'], input[type='search'], #searchInput");
+    if (!inp || inp.dataset.smartBound) return;
+    inp.dataset.smartBound = "1";
+    inp.addEventListener("input", function() {
+      const q = (this.value || "").trim().toLowerCase();
+      if (!q) return;
+      let mapped = normText(q);
+      Object.keys(romanMap).forEach(k => { if (q.includes(k)) mapped = normText(romanMap[k]); });
       document.querySelectorAll(".j-btn-row").forEach(row => {
-        const card = row.parentElement.parentElement;
+        const card = row.parentElement?.parentElement;
         if (!card) return;
-        const cardNorm = normalizeText(card.innerText || "");
-        if (cardNorm.includes(mappedQ) || cardNorm.includes(normalizeText(rawQ))) {
-          card.style.display = "";
-        }
+        const cText = normText(card.innerText || "");
+        if (cText.includes(mapped) || cText.includes(normText(q))) card.style.display = "";
       });
     });
   }
 
-  // -----------------------------------------------------------
-  // FEATURE 5: Next / Previous Buttons in Audio Player Bar
-  // -----------------------------------------------------------
+  // 5. Audio Next / Prev Controls
   window.jamiaPlayAdjacentNaat = function(dir) {
     const list = window.JAMIA_NAATS_LIST || [];
     if (!list.length) return;
-    const currentTitle = (document.getElementById("audioPlayerTitle")?.innerText || "").trim();
-    let idx = list.findIndex(n => (n.title || "").includes(currentTitle) || currentTitle.includes(n.title || ""));
+    const cur = (document.getElementById("audioPlayerTitle")?.innerText || "").trim();
+    let idx = list.findIndex(n => (n.title || "").includes(cur) || cur.includes(n.title || ""));
     if (idx === -1) idx = 0;
-    let nextIdx = (idx + dir + list.length) % list.length;
-    const item = list[nextIdx];
+    const item = list[(idx + dir + list.length) % list.length];
     if (item && typeof window.playAudio === "function") {
       window.playAudio(item.audioUrl || item.id, item.title);
     }
   };
 
-  function injectAudioNextPrev() {
+  function injectAudioNav() {
     const bar = document.getElementById("emeraldAudioBar");
     if (!bar || document.getElementById("jamiaAudioNavWrap")) return;
     const timeEl = document.getElementById("audioPlayerTime");
     if (!timeEl || !timeEl.parentElement) return;
-
     const nav = document.createElement("span");
     nav.id = "jamiaAudioNavWrap";
     nav.style.marginRight = "8px";
     nav.innerHTML = `
-      <button type="button" class="jamia-audio-nav-btn" title="پچھلی نعت" onclick="window.jamiaPlayAdjacentNaat(-1)">⏮</button>
-      <button type="button" class="jamia-audio-nav-btn" title="اگلی نعت" onclick="window.jamiaPlayAdjacentNaat(1)">⏭</button>
+      <button type="button" class="jamia-audio-nav-btn" onclick="window.jamiaPlayAdjacentNaat(-1)">⏮</button>
+      <button type="button" class="jamia-audio-nav-btn" onclick="window.jamiaPlayAdjacentNaat(1)">⏭</button>
     `;
     timeEl.parentElement.appendChild(nav);
   }
 
-  // -----------------------------------------------------------
-  // FEATURE 6: PDF Eye-Care Mode + Hook Audio/PDF for Feature 1
-  // -----------------------------------------------------------
+  // 6. PDF Eye-Care Filter
   window.toggleJamiaEyeCare = function() {
     const ov = document.getElementById("jamiaPdfEyeCareOverlay");
     const btn = document.getElementById("jamiaPdfEyeCareBtn");
     if (!ov || !btn) return;
-    if (ov.style.display === "block") {
-      ov.style.display = "none";
-      btn.innerText = "🌙 آئی کیئر موڈ: آف";
-    } else {
-      ov.style.display = "block";
-      btn.innerText = "☀️ آئی کیئر موڈ: آن";
-    }
+    const on = ov.style.display === "block";
+    ov.style.display = on ? "none" : "block";
+    btn.innerText = on ? "🌙 آئی کیئر موڈ: آف" : "☀️ آئی کیئر موڈ: آن";
   };
 
-  function hookCoreFunctions() {
+  // 8. Category Counts
+  function updateCategoryCounts() {
+    const totalCards = document.querySelectorAll(".j-btn-row").length;
+    const naatCount = (window.JAMIA_NAATS_LIST || []).length;
+    const favCount = getFavs().length;
+    document.querySelectorAll("button, span, div").forEach(el => {
+      if (el.children.length > 0) return;
+      const raw = (el.innerText || "").replace(/\s*\(\d+\)$/, "").trim();
+      if (raw === "تمام کتب" && totalCards > initialLocalCount) {
+        el.innerText = `تمام کتب (${totalCards})`;
+      } else if (raw === "تمام نعتیں" && naatCount > 0) {
+        el.innerText = `تمام نعتیں (${naatCount})`;
+      } else if (raw === "⭐ میری پسند") {
+        el.innerText = `⭐ میری پسند (${favCount})`;
+      }
+    });
+  }
+
+  // 10. Request Modal & Floating Button
+  window.openJamiaRequestModal = function() {
+    const modal = document.getElementById("jamiaSmartModal");
+    const content = document.getElementById("jamiaSmartModalContent");
+    if (!modal || !content) return;
+    content.innerHTML = `
+      <h3 style="margin:0 0 10px 0; color:#10b981; font-size:1.1rem;">📩 کتاب یا نعت کی فرمائش</h3>
+      <p style="font-size:0.82rem; color:#cbd5e1; margin-bottom:10px;">جو کتاب، پرچہ یا نعت آپ کو مطلوب ہے اس کا نام لکھیں:</p>
+      <input id="jamiaReqInput" type="text" placeholder="نام لکھیں..." style="width:100%; padding:10px; border-radius:10px; border:1px solid #10b981; background:#022c22; color:#fff; margin-bottom:12px; box-sizing:border-box;">
+      <div style="display:flex; gap:8px;">
+        <button type="button" onclick="window.submitJamiaRequest()" style="flex:1; background:#10b981; color:#022c22; border:none; padding:9px; border-radius:12px; font-weight:bold; cursor:pointer;">فرمائش بھیجیں ✓</button>
+        <button type="button" onclick="document.getElementById('jamiaSmartModal').style.display='none'" style="background:#1e293b; color:#fff; border:none; padding:9px 14px; border-radius:12px; cursor:pointer;">بند کریں</button>
+      </div>
+    `;
+    modal.style.display = "flex";
+  };
+
+  window.submitJamiaRequest = function() {
+    const val = (document.getElementById("jamiaReqInput")?.value || "").trim();
+    if (!val) return;
+    const reqs = JSON.parse(localStorage.getItem("jamia_user_requests") || "[]");
+    reqs.push({ item: val, date: new Date().toISOString() });
+    localStorage.setItem("jamia_user_requests", JSON.stringify(reqs));
+    document.getElementById("jamiaSmartModalContent").innerHTML = `
+      <div style="text-align:center; padding:15px;">
+        <h3 style="color:#10b981;">جزاک اللہ خیراً! ✓</h3>
+        <p style="font-size:0.88rem;">آپ کی فرمائش (<strong>${val}</strong>) درج کر لی گئی ہے۔</p>
+        <button type="button" onclick="document.getElementById('jamiaSmartModal').style.display='none'" style="margin-top:10px; background:#10b981; color:#022c22; border:none; padding:8px 20px; border-radius:12px; font-weight:bold;">ٹھیک ہے</button>
+      </div>`;
+  };
+
+  function injectRequestBtn() {
+    if (document.getElementById("jamiaReqFloatingBtn")) return;
+    const btn = document.createElement("button");
+    btn.id = "jamiaReqFloatingBtn";
+    btn.type = "button";
+    btn.onclick = window.openJamiaRequestModal;
+    btn.style.cssText = "position:fixed; bottom:18px; right:16px; z-index:9990; background:linear-gradient(135deg,#059669,#047857); color:#fff; border:1px solid #34d399; border-radius:25px; padding:8px 14px; font-size:0.78rem; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.45); cursor:pointer;";
+    btn.innerHTML = "📩 فرمائش";
+    document.body.appendChild(btn);
+  }
+
+  // Hook renderBooks, playAudio, openFullscreenPdf, shareBookItem, showBookIntro
+  function hookAllCoreFunctions() {
+    if (typeof window.renderBooks === "function" && !window.renderBooks._jamiaHooked) {
+      const origRender = window.renderBooks;
+      window.renderBooks = function(list) {
+        const r = origRender.apply(this, arguments);
+        if (Array.isArray(list) && list.length > initialLocalCount) {
+          window.__driveBooksRendered = true;
+        }
+        setTimeout(function() {
+          decorateRenderedCards();
+          updateCategoryCounts();
+          window.syncJamiaRedDot();
+        }, 50);
+        return r;
+      };
+      window.renderBooks._jamiaHooked = true;
+    }
+
     if (typeof window.playAudio === "function" && !window.playAudio._jamiaHooked) {
       const origPlay = window.playAudio;
       window.playAudio = function(urlOrId, title) {
         recordLastOpened("audio", urlOrId, title);
-        const res = origPlay.apply(this, arguments);
-        setTimeout(injectAudioNextPrev, 100);
-        return res;
+        const r = origPlay.apply(this, arguments);
+        setTimeout(injectAudioNav, 80);
+        return r;
       };
       window.playAudio._jamiaHooked = true;
     }
@@ -4100,149 +4120,65 @@ window.openViewer = function(url, title) {
     }
 
     if (typeof window.closeFullscreenPdf === "function" && !window.closeFullscreenPdf._jamiaHooked) {
-      const origClosePdf = window.closeFullscreenPdf;
+      const origClose = window.closeFullscreenPdf;
       window.closeFullscreenPdf = function() {
         const btn = document.getElementById("jamiaPdfEyeCareBtn");
         const ov = document.getElementById("jamiaPdfEyeCareOverlay");
         if (btn) btn.style.display = "none";
         if (ov) ov.style.display = "none";
-        return origClosePdf.apply(this, arguments);
+        return origClose.apply(this, arguments);
       };
       window.closeFullscreenPdf._jamiaHooked = true;
     }
 
-    // FEATURE 4: Direct Deep-Link Share Hook
     if (typeof window.shareBookItem === "function" && !window.shareBookItem._jamiaHooked) {
       window.shareBookItem = function(title, id) {
         const deepUrl = window.location.origin + window.location.pathname + "?item=" + encodeURIComponent(id || title);
-        const shareText = "📚 جامعۃ الرضا ڈیجیٹل کتب خانہ
-✨ " + title + "
-👇 براہِ راست کھولنے کے لیے لنک پر کلک کریں:
-" + deepUrl;
-        if (navigator.share) {
-          navigator.share({ title: title, text: shareText, url: deepUrl }).catch(()=>{});
-        } else {
-          navigator.clipboard.writeText(shareText);
-          alert("لنک کاپی ہو گیا ہے!");
-        }
+        const txt = "📚 جامعۃ الرضا ڈیجیٹل کتب خانہ\n✨ " + title + "\n👇 براہِ راست کھولنے کے لیے کلک کریں:\n" + deepUrl;
+        if (navigator.share) navigator.share({ title, text: txt, url: deepUrl }).catch(()=>{});
+        else { navigator.clipboard.writeText(txt); alert("لنک کاپی ہو گیا!"); }
       };
       window.shareBookItem._jamiaHooked = true;
     }
 
-    // FEATURE 9: Intro Modal with Copy Details Button
     if (typeof window.showBookIntro === "function" && !window.showBookIntro._jamiaHooked) {
       window.showBookIntro = function(title, category) {
         const modal = document.getElementById("jamiaSmartModal");
         const content = document.getElementById("jamiaSmartModalContent");
         if (!modal || !content) return;
-        const catName = category === "naat" ? "آڈیو نعت شریف" : (category === "papers" ? "امتحانی پرچہ" : "درسی و اسلامی کتاب");
-        const detailsText = `عنوان: ${title}
-زمرہ: ${catName}
-پیشکش: جامعۃ الرضا ڈیجیٹل کتب خانہ
-لنک: ${window.location.origin}`;
+        const cat = category === "naat" ? "آڈیو نعت شریف" : (category === "papers" ? "امتحانی پرچہ" : "درسی و اسلامی کتاب");
+        const copyTxt = `عنوان: ${title}\nزمرہ: ${cat}\nپیشکش: جامعۃ الرضا ڈیجیٹل کتب خانہ`;
         content.innerHTML = `
           <h3 style="margin:0 0 10px 0; color:#10b981; font-size:1.1rem;">📖 تعارف و تفصیلات</h3>
           <p style="margin:6px 0; font-size:0.92rem;"><strong>عنوان:</strong> ${title}</p>
-          <p style="margin:6px 0; font-size:0.88rem; color:#a7f3d0;"><strong>زمرہ:</strong> ${catName}</p>
-          <p style="margin:6px 0 14px 0; font-size:0.82rem; color:#cbd5e1;">جامعۃ الرضا ڈیجیٹل لائبریری کی جانب سے طلبہ و قارئین کے استفادے کے لیے پیش کردہ مستند نسخہ۔</p>
+          <p style="margin:6px 0 14px 0; font-size:0.88rem; color:#a7f3d0;"><strong>زمرہ:</strong> ${cat}</p>
           <div style="display:flex; gap:8px;">
-            <button type="button" onclick="navigator.clipboard.writeText(\`${detailsText.replace(/`/g,'')}\`); this.innerText='✅ کاپی ہو گیا!';" style="flex:1; background:#10b981; color:#022c22; border:none; padding:9px; border-radius:12px; font-weight:bold; cursor:pointer;">📋 تفصیل کاپی کریں</button>
+            <button type="button" onclick="navigator.clipboard.writeText('${copyTxt}'); this.innerText='✅ کاپی ہو گیا!';" style="flex:1; background:#10b981; color:#022c22; border:none; padding:9px; border-radius:12px; font-weight:bold; cursor:pointer;">📋 تفصیل کاپی کریں</button>
             <button type="button" onclick="document.getElementById('jamiaSmartModal').style.display='none'" style="background:#1e293b; color:#fff; border:none; padding:9px 14px; border-radius:12px; cursor:pointer;">بند کریں</button>
-          </div>
-        `;
+          </div>`;
         modal.style.display = "flex";
       };
       window.showBookIntro._jamiaHooked = true;
     }
   }
 
-  // -----------------------------------------------------------
-  // FEATURE 8: Live Category Badge Counts
-  // -----------------------------------------------------------
-  function updateCategoryCounts() {
-    const naatCount = (window.JAMIA_NAATS_LIST || []).length;
-    const favCount = getFavs().length;
-    document.querySelectorAll("button, span, div").forEach(el => {
-      if (el.children.length > 0) return;
-      const raw = (el.innerText || "").replace(/\s*\(\d+\)$/, "").trim();
-      if (raw === "تمام نعتیں" && naatCount > 0) {
-        el.innerText = `تمام نعتیں (${naatCount})`;
-      } else if (raw === "⭐ میری پسند") {
-        el.innerText = `⭐ میری پسند (${favCount})`;
-      }
-    });
-  }
-
-  // -----------------------------------------------------------
-  // FEATURE 10: Request a Book / Naat Form
-  // -----------------------------------------------------------
-  window.openJamiaRequestModal = function() {
-    const modal = document.getElementById("jamiaSmartModal");
-    const content = document.getElementById("jamiaSmartModalContent");
-    if (!modal || !content) return;
-    content.innerHTML = `
-      <h3 style="margin:0 0 10px 0; color:#10b981; font-size:1.1rem;">📩 نئی کتاب یا نعت کی فرمائش</h3>
-      <p style="font-size:0.82rem; color:#cbd5e1; margin-bottom:10px;">جو کتاب، پرچہ یا نعت آپ کو مطلوب ہے اس کا نام نیچے لکھیں:</p>
-      <input id="jamiaReqInput" type="text" placeholder="کتاب یا نعت کا نام لکھیں..." style="width:100%; padding:10px; border-radius:10px; border:1px solid #10b981; background:#022c22; color:#fff; margin-bottom:12px; box-sizing:border-box;">
-      <div style="display:flex; gap:8px;">
-        <button type="button" onclick="window.submitJamiaRequest()" style="flex:1; background:#10b981; color:#022c22; border:none; padding:9px; border-radius:12px; font-weight:bold; cursor:pointer;">فرمائش محفوظ کریں ✓</button>
-        <button type="button" onclick="document.getElementById('jamiaSmartModal').style.display='none'" style="background:#1e293b; color:#fff; border:none; padding:9px 14px; border-radius:12px; cursor:pointer;">بند کریں</button>
-      </div>
-    `;
-    modal.style.display = "flex";
-  };
-
-  window.submitJamiaRequest = function() {
-    const val = (document.getElementById("jamiaReqInput")?.value || "").trim();
-    if (!val) return;
-    const reqs = JSON.parse(localStorage.getItem("jamia_user_requests") || "[]");
-    reqs.push({ item: val, date: new Date().toISOString() });
-    localStorage.setItem("jamia_user_requests", JSON.stringify(reqs));
-    const content = document.getElementById("jamiaSmartModalContent");
-    if (content) {
-      content.innerHTML = `<div style="text-align:center; padding:15px;"><h3 style="color:#10b981;">جزاک اللہ خیراً! ✓</h3><p style="font-size:0.88rem;">آپ کی فرمائش (<strong>${val}</strong>) نوٹ کر لی گئی ہے۔ جلد ہی اسے لائبریری میں شامل کر دیا جائے گا۔</p><button type="button" onclick="document.getElementById('jamiaSmartModal').style.display='none'" style="margin-top:10px; background:#10b981; color:#022c22; border:none; padding:8px 20px; border-radius:12px; font-weight:bold;">ٹھیک ہے</button></div>`;
-    }
-  };
-
-  function injectRequestButton() {
-    if (document.getElementById("jamiaReqFloatingBtn")) return;
-    const btn = document.createElement("button");
-    btn.id = "jamiaReqFloatingBtn";
-    btn.type = "button";
-    btn.onclick = window.openJamiaRequestModal;
-    btn.style.cssText = "position:fixed; bottom:18px; right:16px; z-index:9990; background:linear-gradient(135deg,#059669,#047857); color:#fff; border:1px solid #34d399; border-radius:25px; padding:8px 14px; font-size:0.78rem; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.4); cursor:pointer;";
-    btn.innerHTML = "📩 فرمائش";
-    document.body.appendChild(btn);
-  }
-
-  // Check Deep-Link (?item=...) on Load
-  function checkDeepLinkOnLoad() {
-    const params = new URLSearchParams(window.location.search);
-    const itemQ = params.get("item");
-    if (!itemQ) return;
-    const searchInput = document.querySelector("input[type='text'], input[type='search'], #searchInput");
-    if (searchInput) {
-      searchInput.value = itemQ;
-      searchInput.dispatchEvent(new Event("input", { bubbles: true }));
-    }
-  }
-
-  function runAllEnhancements() {
+  function bootAll() {
     initContinueBar();
-    ensureFavFilterButton();
-    enhanceCards();
-    enhanceSearchBox();
-    hookCoreFunctions();
-    injectAudioNextPrev();
+    ensureFavFilterTab();
+    bindSmartSearch();
+    hookAllCoreFunctions();
+    decorateRenderedCards();
+    injectAudioNav();
     updateCategoryCounts();
-    injectRequestButton();
+    injectRequestBtn();
+    window.syncJamiaRedDot();
   }
 
   document.addEventListener("DOMContentLoaded", function() {
-    runAllEnhancements();
-    setTimeout(checkDeepLinkOnLoad, 1500);
-    setInterval(runAllEnhancements, 1200);
+    bootAll();
+    setInterval(bootAll, 1000);
   });
+  bootAll();
 })();
 </script>
 <!-- JAMIA_10_FEATURES_END -->
