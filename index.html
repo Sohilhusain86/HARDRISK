@@ -3763,6 +3763,7 @@ window.openViewer = function(url, title) {
 
 
 
+
 <!-- JAMIA_10_FEATURES_START -->
 <style id="jamia-10-features-css">
   #jamiaContinueBar {
@@ -3933,6 +3934,23 @@ window.openViewer = function(url, title) {
     align-items: center;
     gap: 8px;
   }
+  /* Strict Container for Audio Title Marquee */
+  #audioPlayerTitleWrapper {
+    overflow: hidden !important;
+    position: relative !important;
+    width: 100% !important;
+    display: block !important;
+  }
+  .jamia-scrolling-title {
+    display: inline-block;
+    white-space: nowrap;
+    animation: jamiaMarqueeText 10s linear infinite;
+  }
+  @keyframes jamiaMarqueeText {
+    0% { transform: translateX(0%); }
+    50% { transform: translateX(30%); }
+    100% { transform: translateX(0%); }
+  }
 </style>
 
 <div id="jamiaPdfEyeCareOverlay"></div>
@@ -3974,7 +3992,7 @@ window.openViewer = function(url, title) {
 (function() {
   const FAV_KEY = "jamia_fav_ids_v2";
   const LAST_KEY = "jamia_last_item_v2";
-  const THEME_KEY = "jamia_selected_theme_v4";
+  const THEME_KEY = "jamia_selected_theme_v5";
 
   const themesList = [
     { name: "ایمرلڈ گرین (اصلی)", bg: "#022c22", card: "#042f2e", primary: "#10b981", text: "#ecfdf5" },
@@ -4036,12 +4054,13 @@ window.openViewer = function(url, title) {
     document.documentElement.style.setProperty("--jamia-primary", t.primary);
     document.documentElement.style.setProperty("--jamia-text", t.text);
 
-    document.body.style.backgroundColor = t.bg;
-    document.body.style.color = t.text;
+    document.body.style.setProperty("background-color", t.bg, "important");
+    document.body.style.setProperty("color", t.text, "important");
 
-    document.querySelectorAll(".book-card, .j-card, .jamia-modal-card, #emeraldAudioBar, .search-box").forEach(el => {
-      el.style.backgroundColor = t.card;
-      el.style.color = t.text;
+    // Apply globally to all cards and containers
+    document.querySelectorAll(".j-book-card, .book-card, .j-card, .jamia-modal-card, #emeraldAudioBar, .search-box, header").forEach(el => {
+      el.style.setProperty("background-color", t.card, "important");
+      el.style.setProperty("color", t.text, "important");
     });
   }
 
@@ -4164,7 +4183,7 @@ window.openViewer = function(url, title) {
     filterContainer.appendChild(favTab);
   }
 
-  // --- Perfect Audio Loop & Auto-Next / Seamless Repeat ---
+  // --- Bulletproof Seamless Audio Loop & Marquee Title Box ---
   window.jamiaCurrentPlayingIndex = 0;
   window.jamiaIsLoopActive = false;
 
@@ -4211,10 +4230,12 @@ window.openViewer = function(url, title) {
     `;
     timeEl.parentElement.appendChild(nav);
 
-    // FIXED Title Ellipsis inside box (No breaking out)
+    // FIXED Marquee Title Box Inside Limits
     const titleEl = document.getElementById("audioPlayerTitle");
     if (titleEl) {
-      titleEl.style.cssText = "font-size: 0.82rem; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right; width: 100%; display: block;";
+      const parent = titleEl.parentElement;
+      if (parent) parent.id = "audioPlayerTitleWrapper";
+      titleEl.className = "jamia-scrolling-title";
     }
   }
 
@@ -4402,13 +4423,12 @@ window.openViewer = function(url, title) {
         const r = origPlay.apply(this, arguments);
         const audio = document.getElementById("globalHtmlAudio");
         if (audio) {
-          // Clean & Reliable onended listener for loop or auto-next seamless play
+          // Clean & Bug-free onended listener without early cutoff glitches
           audio.onended = function() {
             if (window.jamiaIsLoopActive) {
               audio.currentTime = 0;
               audio.play().catch(()=>{});
             } else {
-              // Automatically play the next naat seamlessly
               window.jamiaPlayAdjacentNaat(1);
             }
           };
