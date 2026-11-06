@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jamia-maktaba-pwa-v5';
+const CACHE_NAME = 'jamia-v1793945166';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();

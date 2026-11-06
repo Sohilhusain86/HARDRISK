@@ -1467,6 +1467,15 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
   }
 </style>
 
+
+<script id="force-cache-update">
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function(regs) {
+    for (let reg of regs) { reg.update(); }
+  });
+}
+</script>
+
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
