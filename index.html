@@ -3759,6 +3759,9 @@ window.openViewer = function(url, title) {
 </script>
 
 
+
+
+
 <!-- JAMIA_10_FEATURES_START -->
 <style id="jamia-10-features-css">
   #jamiaContinueBar {
@@ -3893,6 +3896,43 @@ window.openViewer = function(url, title) {
     box-shadow: 0 12px 35px rgba(0,0,0,0.85);
     text-align: right;
   }
+  /* Settings Gear Header Style */
+  #jamiaSettingsHeaderBtn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #34d399;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .jamia-theme-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+    margin-top: 10px;
+    direction: rtl;
+  }
+  .jamia-theme-btn {
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 </style>
 
 <div id="jamiaPdfEyeCareOverlay"></div>
@@ -3930,10 +3970,88 @@ window.openViewer = function(url, title) {
 })();
 </script>
 
-<script id="jamia-master-10-features">
+<script id="jamia-master-engine">
 (function() {
   const FAV_KEY = "jamia_fav_ids_v2";
   const LAST_KEY = "jamia_last_item_v2";
+  const THEME_KEY = "jamia_selected_theme_v3";
+
+  // --- 20 Themes Configuration ---
+  const themesList = [
+    { name: "ایمرلڈ گرین (اصلی)", bg: "#022c22", card: "#042f2e", primary: "#10b981", text: "#ecfdf5" },
+    { name: "شاہی نیلا (Royal Blue)", bg: "#0f172a", card: "#1e293b", primary: "#3b82f6", text: "#f8fafc" },
+    { name: "روبی ریڈ (Ruby Red)", bg: "#2a0208", card: "#3f050f", primary: "#f43f5e", text: "#ffe4e6" },
+    { name: "سنہری امبر (Amber Gold)", bg: "#291802", card: "#3f2503", primary: "#f59e0b", text: "#fef3c7" },
+    { name: "پرپل نائٹ (Midnight Purple)", bg: "#1e1b4b", card: "#312e81", primary: "#8b5cf6", text: "#ede9fe" },
+    { name: "سائبر سیان (Cyber Cyan)", bg: "#042f2e", card: "#064e3b", primary: "#06b6d4", text: "#cffafe" },
+    { name: "روز پنک (Rose Pink)", bg: "#38021c", card: "#50042a", primary: "#ec4899", text: "#fce7f3" },
+    { name: "پستادہ سبز (Sage Green)", bg: "#132a1e", card: "#1b3b2b", primary: "#22c55e", text: "#dcfce7" },
+    { name: "چاکلیٹ برائون (Warm Brown)", bg: "#291b11", card: "#3d2919", primary: "#d97706", text: "#fef3c7" },
+    { name: "اسٹیل گرے (Steel Grey)", bg: "#18181b", card: "#27272a", primary: "#71717a", text: "#f4f4f5" },
+    { name: "سنسیٹ اورنج (Sunset Orange)", bg: "#381202", card: "#521b03", primary: "#f97316", text: "#ffedd5" },
+    { name: "الیکٹرک انڈیگو (Indigo)", bg: "#172554", card: "#1e3a8a", primary: "#6366f1", text: "#e0e7ff" },
+    { name: "پستہ وایلیٹ (Violet)", bg: "#2e1065", card: "#4c1d95", primary: "#a855f7", text: "#f3e8ff" },
+    { name: "ٹیل ماسٹر (Teal Master)", bg: "#042f2c", card: "#064e44", primary: "#14b8a6", text: "#ccfbf1" },
+    { name: "لائم برائٹ (Lime Fresh)", bg: "#142d0c", card: "#1e4212", primary: "#84cc16", text: "#ecfccb" },
+    { name: "OLED Black", bg: "#000000", card: "#111111", primary: "#10b981", text: "#ffffff" },
+    { name: "مہرون کلاسک (Maroon)", bg: "#310a0a", card: "#471010", primary: "#e11d48", text: "#ffe4e6" },
+    { name: "نیوی ڈیپ (Navy Deep)", bg: "#030712", card: "#111827", primary: "#2563eb", text: "#eff6ff" },
+    { name: "فورسٹ گرین (Forest)", bg: "#062811", card: "#0b3b1a", primary: "#15803d", text: "#dcfce7" },
+    { name: "کوپر برونز (Copper)", bg: "#2d1b0d", card: "#432813", primary: "#b45309", text: "#fef3c7" }
+  ];
+
+  window.openJamiaSettingsModal = function() {
+    const modal = document.getElementById("jamiaSmartModal");
+    const content = document.getElementById("jamiaSmartModalContent");
+    if (!modal || !content) return;
+
+    content.innerHTML = `
+      <h3 style="margin:0 0 8px 0; color:#10b981; font-size:1.1rem;">⚙️ تھیم اور رنگ کی ترتیبات</h3>
+      <p style="margin:0 0 10px 0; font-size:0.8rem; color:#cbd5e1;">پوری لائبریری کے لیے کوئی بھی ایک خوبصورت تھیم منتخب کریں:</p>
+      <div class="jamia-theme-grid">
+        ${themesList.map((t, idx) => `
+          <button type="button" class="jamia-theme-btn" style="background:${t.card};" onclick="window.applyJamiaTheme(${idx})">
+            <span style="width:14px; height:14px; border-radius:50%; background:${t.primary}; display:inline-block; flex-shrink:0;"></span>
+            <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${t.name}</span>
+          </button>
+        `).join("")}
+      </div>
+      <div style="margin-top:16px; text-align:left;">
+        <button type="button" onclick="document.getElementById('jamiaSmartModal').style.display='none'" style="background:#1e293b; color:#fff; border:none; padding:8px 16px; border-radius:12px; cursor:pointer;">بند کریں</button>
+      </div>
+    `;
+    modal.style.display = "flex";
+  };
+
+  window.applyJamiaTheme = function(index) {
+    const t = themesList[index];
+    if (!t) return;
+    localStorage.setItem(THEME_KEY, JSON.stringify(t));
+    activateTheme(t);
+    document.getElementById("jamiaSmartModal").style.display = "none";
+  };
+
+  function activateTheme(t) {
+    document.body.style.backgroundColor = t.bg;
+    document.body.style.color = t.text;
+    document.querySelectorAll(".book-card, .j-card, .jamia-modal-card, #emeraldAudioBar").forEach(el => {
+      el.style.backgroundColor = t.card;
+      el.style.color = t.text;
+    });
+  }
+
+  // Inject Settings Gear next to Logout/Share in Header
+  function injectSettingsGearHeader() {
+    const topActions = document.getElementById("jamiaTopActionsBar") || document.querySelector(".top-actions, header");
+    if (!topActions || document.getElementById("jamiaSettingsHeaderBtn")) return;
+
+    const gearBtn = document.createElement("button");
+    gearBtn.id = "jamiaSettingsHeaderBtn";
+    gearBtn.type = "button";
+    gearBtn.innerHTML = '<i class="fa-solid fa-gear"></i> تھیم';
+    gearBtn.onclick = window.openJamiaSettingsModal;
+    topActions.appendChild(gearBtn);
+  }
 
   window.getJamiaFavIds = function() {
     try { return JSON.parse(localStorage.getItem(FAV_KEY) || "[]"); } catch(e) { return []; }
@@ -4042,14 +4160,12 @@ window.openViewer = function(url, title) {
     filterContainer.appendChild(favTab);
   }
 
-  // 100% Working Audio Loop & Title Ellipsis Fix
+  // --- Bulletproof Audio Loop & Strict Ellipsis Title ---
   window.jamiaCurrentPlayingIndex = 0;
   window.jamiaIsLoopActive = false;
 
   window.jamiaToggleLoop = function(btnEl) {
     window.jamiaIsLoopActive = !window.jamiaIsLoopActive;
-    const audio = document.getElementById("globalHtmlAudio");
-    if (audio) audio.loop = window.jamiaIsLoopActive;
     if (btnEl) {
       if (window.jamiaIsLoopActive) {
         btnEl.classList.add("active-loop");
@@ -4183,7 +4299,7 @@ window.openViewer = function(url, title) {
       <p style="margin:0 0 14px 0; font-size:0.82rem; color:#cbd5e1;">جامعۃ الرضا ڈیجیٹل لائبریری کی جانب سے طلبہ کے مطالعہ کے لیے مستند آن لائن نسخہ۔</p>
       <div style="display:flex; gap:8px;">
         <button type="button" onclick="window.jamiaCopyHelper(null, this)" style="flex:1; background:#10b981; color:#022c22; border:none; padding:10px; border-radius:12px; font-weight:bold; cursor:pointer;">📋 تفصیل کاپی کریں</button>
-        <button type="button" onclick="document.getElementById('jamiaSmartModal').style.display='none'" style="background:#1e293b; color:#fff; border:none; padding:10px 14px; border-radius:12px; cursor:pointer;">بند کریں</button>
+        <button type="button" onclick="document.getElementById('jamiaSmartModal').style.display='none'" style="background:#1e293b; color:#fff; border:none; padding:9px 14px; border-radius:12px; cursor:pointer;">بند کریں</button>
       </div>`;
     modal.style.display = "flex";
   };
@@ -4282,14 +4398,11 @@ window.openViewer = function(url, title) {
         const r = origPlay.apply(this, arguments);
         const audio = document.getElementById("globalHtmlAudio");
         if (audio) {
-          audio.loop = window.jamiaIsLoopActive;
-          audio.onended = function() {
-            if (window.jamiaIsLoopActive) {
+          // Robust Loop Listener: Agar loop active hai toh end hone par ya 1s pehle restart kar dena
+          audio.ontimeupdate = function() {
+            if (window.jamiaIsLoopActive && audio.duration && (audio.duration - audio.currentTime < 1.2)) {
               audio.currentTime = 0;
               audio.play().catch(()=>{});
-            } else {
-              const icon = document.getElementById("audioPlayIcon");
-              if (icon) icon.className = "fa-solid fa-play";
             }
           };
         }
@@ -4305,8 +4418,16 @@ window.openViewer = function(url, title) {
     ensureFavTabInFilterBar();
     hookCore();
     injectAudioNavButtons();
+    injectSettingsGearHeader();
     if (window.updateJamiaCategoryCounts) window.updateJamiaCategoryCounts();
     injectRequestBtn();
+
+    // Load saved theme on startup
+    try {
+      const saved = JSON.parse(localStorage.getItem(THEME_KEY) || "null");
+      if (saved) activateTheme(saved);
+    } catch(e) {}
+
     const viewer = document.getElementById("pdf-viewer-overlay");
     if (viewer && !viewer.dataset.obsBound) {
       viewer.dataset.obsBound = "1";
@@ -4322,140 +4443,5 @@ window.openViewer = function(url, title) {
 })();
 </script>
 <!-- JAMIA_10_FEATURES_END -->
-<!-- JAMIA_THEME_ENGINE_START -->
-<style id="jamia-theme-css">
-  #jamiaSettingsGear {
-    position: fixed;
-    bottom: 75px;
-    right: 16px;
-    z-index: 9991;
-    background: linear-gradient(135deg, #059669, #047857);
-    color: #fff;
-    border: 1px solid #34d399;
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    cursor: pointer;
-    transition: transform 0.3s ease;
-  }
-  #jamiaSettingsGear:hover {
-    transform: rotate(45deg);
-  }
-  .jamia-theme-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    max-height: 320px;
-    overflow-y: auto;
-    margin-top: 10px;
-    direction: rtl;
-  }
-  .jamia-theme-btn {
-    padding: 8px 10px;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.2);
-    color: #fff;
-    font-size: 0.78rem;
-    font-weight: bold;
-    cursor: pointer;
-    text-align: right;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s;
-  }
-  .jamia-theme-btn:hover {
-    border-color: #34d399;
-    transform: scale(1.02);
-  }
-</style>
-
-<button id="jamiaSettingsGear" type="button" onclick="window.openJamiaSettingsModal()" title="سیٹنگز اور تھیمز">
-  <i class="fa-solid fa-gear"></i>
-</button>
-
-<script id="jamia-theme-script">
-(function() {
-  const themes = [
-    { name: "ایمرلڈ گرین (اصلی)", bg: "#022c22", card: "#042f2e", primary: "#10b981", text: "#ecfdf5" },
-    { name: "شاہی نیلا (Royal Blue)", bg: "#0f172a", card: "#1e293b", primary: "#3b82f6", text: "#f8fafc" },
-    { name: "روبی ریڈ (Ruby Red)", bg: "#2a0208", card: "#3f050f", primary: "#f43f5e", text: "#ffe4e6" },
-    { name: "سنہری امبر (Amber Gold)", bg: "#291802", card: "#3f2503", primary: "#f59e0b", text: "#fef3c7" },
-    { name: "پرپل نائٹ (Midnight Purple)", bg: "#1e1b4b", card: "#312e81", primary: "#8b5cf6", text: "#ede9fe" },
-    { name: "سائبر سیان (Cyber Cyan)", bg: "#042f2e", card: "#064e3b", primary: "#06b6d4", text: "#cffafe" },
-    { name: "روز پنک (Rose Pink)", bg: "#38021c", card: "#50042a", primary: "#ec4899", text: "#fce7f3" },
-    { name: "پستادہ سبز (Sage Green)", bg: "#132a1e", card: "#1b3b2b", primary: "#22c55e", text: "#dcfce7" },
-    { name: "چاکلیٹ برائون (Warm Brown)", bg: "#291b11", card: "#3d2919", primary: "#d97706", text: "#fef3c7" },
-    { name: "اسٹیل گرے (Steel Grey)", bg: "#18181b", card: "#27272a", primary: "#71717a", text: "#f4f4f5" },
-    { name: "سنسیٹ اورنج (Sunset Orange)", bg: "#381202", card: "#521b03", primary: "#f97316", text: "#ffedd5" },
-    { name: "الیکٹرک انڈیگو (Indigo)", bg: "#172554", card: "#1e3a8a", primary: "#6366f1", text: "#e0e7ff" },
-    { name: "پستہ وایلیٹ (Violet)", bg: "#2e1065", card: "#4c1d95", primary: "#a855f7", text: "#f3e8ff" },
-    { name: "ٹیل ماسٹر (Teal Master)", bg: "#042f2c", card: "#064e44", primary: "#14b8a6", text: "#ccfbf1" },
-    { name: "لائم برائٹ (Lime Fresh)", bg: "#142d0c", card: "#1e4212", primary: "#84cc16", text: "#ecfccb" },
-    { name: "فریسیا بلیک (OLED Black)", bg: "#000000", card: "#111111", primary: "#10b981", text: "#ffffff" },
-    { name: "مہرون کلاسک (Classic Maroon)", bg: "#310a0a", card: "#471010", primary: "#e11d48", text: "#ffe4e6" },
-    { name: "نیوی ڈیپ (Navy Deep)", bg: "#030712", card: "#111827", primary: "#2563eb", text: "#eff6ff" },
-    { name: "فレスト گرین (Forest)", bg: "#062811", card: "#0b3b1a", primary: "#15803d", text: "#dcfce7" },
-    { name: "کوپر برونز (Copper Bronze)", bg: "#2d1b0d", card: "#432813", primary: "#b45309", text: "#fef3c7" }
-  ];
-
-  window.openJamiaSettingsModal = function() {
-    const modal = document.getElementById("jamiaSmartModal");
-    const content = document.getElementById("jamiaSmartModalContent");
-    if (!modal || !content) return;
-
-    content.innerHTML = `
-      <h3 style="margin:0 0 8px 0; color:var(--primary-color, #10b981); font-size:1.1rem;">⚙️ سیٹنگز اور کلر تھیمز</h3>
-      <p style="margin:0 0 10px 0; font-size:0.8rem; color:#cbd5e1;">اپنی پسند کا رنگ اور تھیم منتخب کریں (20 الگ الگ تھیمز دستیاب ہیں):</p>
-      <div class="jamia-theme-grid">
-        ${themes.map((t, idx) => `
-          <button type="button" class="jamia-theme-btn" style="background:${t.card};" onclick="window.applyJamiaTheme(${idx})">
-            <span style="width:14px; height:14px; border-radius:50%; background:${t.primary}; display:inline-block; flex-shrink:0;"></span>
-            <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${t.name}</span>
-          </button>
-        `).join("")}
-      </div>
-      <div style="margin-top:16px; text-align:left;">
-        <button type="button" onclick="document.getElementById('jamiaSmartModal').style.display='none'" style="background:#1e293b; color:#fff; border:none; padding:8px 16px; border-radius:12px; cursor:pointer;">بند کریں</button>
-      </div>
-    `;
-    modal.style.display = "flex";
-  };
-
-  window.applyJamiaTheme = function(index) {
-    const t = themes[index];
-    if (!t) return;
-    localStorage.setItem("jamia_selected_theme_v2", JSON.stringify(t));
-    
-    document.body.style.backgroundColor = t.bg;
-    document.querySelectorAll(".book-card, .j-card, .jamia-modal-card").forEach(el => {
-      el.style.backgroundColor = t.card;
-    });
-    
-    // Root variable injection
-    document.documentElement.style.setProperty("--primary-color", t.primary);
-    alert("✅ تھیم تبدیل ہو گئی: " + t.name);
-    document.getElementById("jamiaSmartModal").style.display = "none";
-  };
-
-  // Load saved theme on startup
-  window.addEventListener("DOMContentLoaded", function() {
-    try {
-      const saved = JSON.parse(localStorage.getItem("jamia_selected_theme_v2") || "null");
-      if (saved) {
-        document.body.style.backgroundColor = saved.bg;
-        document.documentElement.style.setProperty("--primary-color", saved.primary);
-      }
-    } catch(e) {}
-  });
-})();
-</script>
-<!-- JAMIA_THEME_ENGINE_END -->
-
 </body>
 </html>
