@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jamia-v1793945382';
+const CACHE_NAME = 'jamia-v1793947368';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
