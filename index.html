@@ -4328,5 +4328,67 @@ window.openViewer = function(url, title) {
 })();
 </script>
 <!-- JAMIA_10_FEATURES_END -->
+
+<script id="jamia-offline-data-cache">
+(function() {
+  const origFetch = window.fetch;
+  window.fetch = async function(...args) {
+    const url = String(args[0] || "");
+    try {
+      const res = await origFetch.apply(this, args);
+      const clone = res.clone();
+      clone.json().then(data => {
+        if (url.includes("script.google.com")) {
+          if (Array.isArray(data)) {
+            if (url.includes("AKfycbwi02yk")) {
+              localStorage.setItem("jamia_offline_naats", JSON.stringify(data));
+            } else {
+              localStorage.setItem("jamia_offline_books", JSON.stringify(data));
+            }
+          }
+        }
+      }).catch(()=>{});
+      return res;
+    } catch (err) {
+      // Agar offline ho toh localStorage se cached data load karein
+      if (url.includes("script.google.com")) {
+        const cachedBooks = localStorage.getItem("jamia_offline_books");
+        const cachedNaats = localStorage.getItem("jamia_offline_naats");
+        if (url.includes("AKfycbwi02yk") && cachedNaats) {
+          return new Response(cachedNaats, { status: 200, headers: { 'Content-Type': 'application/json' } });
+        } else if (cachedBooks) {
+          return new Response(cachedBooks, { status: 200, headers: { 'Content-Type': 'application/json' } });
+        }
+      }
+      throw err;
+    }
+  };
+
+  // Offline startup load from localStorage cache
+  window.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+      if (!window.ALL_BOOKS_CACHE || window.ALL_BOOKS_CACHE.length === 0) {
+        const cb = localStorage.getItem("jamia_offline_books");
+        if (cb) {
+          try {
+            const parsed = JSON.parse(cb);
+            if (typeof window.renderBooks === "function") {
+              window.ALL_BOOKS_CACHE = parsed;
+              window.renderBooks(parsed);
+            }
+          } catch(e) {}
+        }
+      }
+      if (!window.JAMIA_NAATS_LIST || window.JAMIA_NAATS_LIST.length === 0) {
+        const cn = localStorage.getItem("jamia_offline_naats");
+        if (cn) {
+          try { window.JAMIA_NAATS_LIST = JSON.parse(cn); } catch(e) {}
+        }
+      }
+    }, 800);
+  });
+})();
+</script>
+
 </body>
 </html>
