@@ -3764,6 +3764,7 @@ window.openViewer = function(url, title) {
 
 
 
+
 <!-- JAMIA_10_FEATURES_START -->
 <style id="jamia-10-features-css">
   #jamiaContinueBar {
@@ -3844,11 +3845,6 @@ window.openViewer = function(url, title) {
     cursor: pointer;
     margin: 0 2px;
   }
-  .jamia-audio-nav-btn.active-loop {
-    background: var(--jamia-primary, #10b981) !important;
-    color: #022c22 !important;
-    box-shadow: 0 0 10px var(--jamia-primary, #10b981);
-  }
   #jamiaPdfEyeCareOverlay {
     display: none;
     position: fixed;
@@ -3898,17 +3894,17 @@ window.openViewer = function(url, title) {
     box-shadow: 0 12px 35px rgba(0,0,0,0.85);
     text-align: right;
   }
-  #jamiaSettingsHeaderBtn {
+  .jamia-header-action-btn {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #34d399;
     border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 0.8rem;
+    padding: 6px 12px;
+    font-size: 0.78rem;
     font-weight: bold;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
@@ -3934,7 +3930,7 @@ window.openViewer = function(url, title) {
     align-items: center;
     gap: 8px;
   }
-  /* Strict Container for Audio Title Marquee */
+  /* Bounded Smooth Marquee Ticker */
   #audioPlayerTitleWrapper {
     overflow: hidden !important;
     position: relative !important;
@@ -3944,11 +3940,11 @@ window.openViewer = function(url, title) {
   .jamia-scrolling-title {
     display: inline-block;
     white-space: nowrap;
-    animation: jamiaMarqueeText 10s linear infinite;
+    animation: jamiaSmoothMarquee 12s linear infinite;
   }
-  @keyframes jamiaMarqueeText {
+  @keyframes jamiaSmoothMarquee {
     0% { transform: translateX(0%); }
-    50% { transform: translateX(30%); }
+    50% { transform: translateX(35%); }
     100% { transform: translateX(0%); }
   }
 </style>
@@ -3992,7 +3988,8 @@ window.openViewer = function(url, title) {
 (function() {
   const FAV_KEY = "jamia_fav_ids_v2";
   const LAST_KEY = "jamia_last_item_v2";
-  const THEME_KEY = "jamia_selected_theme_v5";
+  const THEME_KEY = "jamia_selected_theme_v6";
+  const ZOOM_KEY = "jamia_site_zoom_level";
 
   const themesList = [
     { name: "ایمرلڈ گرین (اصلی)", bg: "#022c22", card: "#042f2e", primary: "#10b981", text: "#ecfdf5" },
@@ -4057,23 +4054,56 @@ window.openViewer = function(url, title) {
     document.body.style.setProperty("background-color", t.bg, "important");
     document.body.style.setProperty("color", t.text, "important");
 
-    // Apply globally to all cards and containers
     document.querySelectorAll(".j-book-card, .book-card, .j-card, .jamia-modal-card, #emeraldAudioBar, .search-box, header").forEach(el => {
       el.style.setProperty("background-color", t.card, "important");
       el.style.setProperty("color", t.text, "important");
     });
   }
 
-  function injectSettingsGearHeader() {
-    const topActions = document.getElementById("jamiaTopActionsBar") || document.querySelector(".top-actions, header");
-    if (!topActions || document.getElementById("jamiaSettingsHeaderBtn")) return;
+  // --- Zoom In / Zoom Out (Plus / Minus) feature ---
+  window.jamiaCurrentZoom = 1.0;
+  window.jamiaAdjustZoom = function(delta) {
+    window.jamiaCurrentZoom = Math.min(1.25, Math.max(0.75, window.jamiaCurrentZoom + delta));
+    document.body.style.zoom = window.jamiaCurrentZoom;
+    localStorage.setItem(ZOOM_KEY, window.jamiaCurrentZoom);
+  };
 
-    const gearBtn = document.createElement("button");
-    gearBtn.id = "jamiaSettingsHeaderBtn";
-    gearBtn.type = "button";
-    gearBtn.innerHTML = '<i class="fa-solid fa-gear"></i> تھیم';
-    gearBtn.onclick = window.openJamiaSettingsModal;
-    topActions.appendChild(gearBtn);
+  // Inject Settings Gear and Zoom buttons next to Logout/Share in Header
+  function injectHeaderControls() {
+    const topActions = document.getElementById("jamiaTopActionsBar") || document.querySelector(".top-actions, header");
+    if (!topActions) return;
+
+    if (!document.getElementById("jamiaSettingsHeaderBtn")) {
+      const gearBtn = document.createElement("button");
+      gearBtn.id = "jamiaSettingsHeaderBtn";
+      gearBtn.type = "button";
+      gearBtn.className = "jamia-header-action-btn";
+      gearBtn.innerHTML = '<i class="fa-solid fa-gear"></i> تھیم';
+      gearBtn.onclick = window.openJamiaSettingsModal;
+      topActions.appendChild(gearBtn);
+    }
+
+    if (!document.getElementById("jamiaZoomOutBtn")) {
+      const zoomOut = document.createElement("button");
+      zoomOut.id = "jamiaZoomOutBtn";
+      zoomOut.type = "button";
+      zoomOut.className = "jamia-header-action-btn";
+      zoomOut.title = "سائز چھوٹا کریں";
+      zoomOut.innerText = "➖ چھوٹا";
+      zoomOut.onclick = function() { window.jamiaAdjustZoom(-0.08); };
+      topActions.appendChild(zoomOut);
+    }
+
+    if (!document.getElementById("jamiaZoomInBtn")) {
+      const zoomIn = document.createElement("button");
+      zoomIn.id = "jamiaZoomInBtn";
+      zoomIn.type = "button";
+      zoomIn.className = "jamia-header-action-btn";
+      zoomIn.title = "سائز بڑا کریں";
+      zoomIn.innerText = "➕ بڑا";
+      zoomIn.onclick = function() { window.jamiaAdjustZoom(0.08); };
+      topActions.appendChild(zoomIn);
+    }
   }
 
   window.getJamiaFavIds = function() {
@@ -4183,7 +4213,7 @@ window.openViewer = function(url, title) {
     filterContainer.appendChild(favTab);
   }
 
-  // --- Bulletproof Seamless Audio Loop & Marquee Title Box ---
+  // --- Audio Player & Marquee Ticker Setup ---
   window.jamiaCurrentPlayingIndex = 0;
   window.jamiaIsLoopActive = false;
 
@@ -4192,7 +4222,7 @@ window.openViewer = function(url, title) {
     if (btnEl) {
       if (window.jamiaIsLoopActive) {
         btnEl.classList.add("active-loop");
-        btnEl.title = "لوپ: آن (مسلسل بجتی رہے گی)";
+        btnEl.title = "لوپ: آن";
       } else {
         btnEl.classList.remove("active-loop");
         btnEl.title = "لوپ: آف";
@@ -4230,7 +4260,7 @@ window.openViewer = function(url, title) {
     `;
     timeEl.parentElement.appendChild(nav);
 
-    // FIXED Marquee Title Box Inside Limits
+    // Bounded Marquee Ticker Fix
     const titleEl = document.getElementById("audioPlayerTitle");
     if (titleEl) {
       const parent = titleEl.parentElement;
@@ -4423,7 +4453,6 @@ window.openViewer = function(url, title) {
         const r = origPlay.apply(this, arguments);
         const audio = document.getElementById("globalHtmlAudio");
         if (audio) {
-          // Clean & Bug-free onended listener without early cutoff glitches
           audio.onended = function() {
             if (window.jamiaIsLoopActive) {
               audio.currentTime = 0;
@@ -4445,14 +4474,20 @@ window.openViewer = function(url, title) {
     ensureFavTabInFilterBar();
     hookCore();
     injectAudioNavButtons();
-    injectSettingsGearHeader();
+    injectHeaderControls();
     if (window.updateJamiaCategoryCounts) window.updateJamiaCategoryCounts();
     injectRequestBtn();
 
-    // Load saved theme on startup
+    // Load saved theme and zoom on startup
     try {
-      const saved = JSON.parse(localStorage.getItem(THEME_KEY) || "null");
-      if (saved) activateTheme(saved);
+      const savedTheme = JSON.parse(localStorage.getItem(THEME_KEY) || "null");
+      if (savedTheme) activateTheme(savedTheme);
+
+      const savedZoom = parseFloat(localStorage.getItem(ZOOM_KEY) || "1.0");
+      if (!isNaN(savedZoom)) {
+        window.jamiaCurrentZoom = savedZoom;
+        document.body.style.zoom = savedZoom;
+      }
     } catch(e) {}
 
     const viewer = document.getElementById("pdf-viewer-overlay");
