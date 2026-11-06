@@ -3758,6 +3758,7 @@ window.openViewer = function(url, title) {
 })();
 </script>
 
+
 <!-- JAMIA_10_FEATURES_START -->
 <style id="jamia-10-features-css">
   #jamiaContinueBar {
@@ -3945,7 +3946,6 @@ window.openViewer = function(url, title) {
     return f.includes(id) || (title && f.includes(title.trim()));
   };
 
-  // 1. Continue Bar with Hide/Show Toggle
   function ensureContinueBar() {
     let bar = document.getElementById("jamiaContinueBar");
     if (!bar) {
@@ -3990,10 +3990,7 @@ window.openViewer = function(url, title) {
     if (!bar) return;
     try {
       let last = JSON.parse(localStorage.getItem(LAST_KEY) || "null");
-      if (!last || !last.title) {
-        bar.style.display = "none";
-        return;
-      }
+      if (!last || !last.title) { bar.style.display = "none"; return; }
       const txt = document.getElementById("jamiaContinueText");
       const btn = document.getElementById("jamiaContinueOpenBtn");
       if (txt) txt.innerText = (last.type === "audio" ? "🎵 آخری نعت: " : "📖 مطالعہ جاری رکھیں: ") + last.title;
@@ -4017,7 +4014,6 @@ window.openViewer = function(url, title) {
     } catch(e) {}
   };
 
-  // 2. Favorites Star & Tab
   window.toggleJamiaFavItem = function(e, id, title, btnEl) {
     if (e) { e.preventDefault(); e.stopPropagation(); }
     let favs = window.getJamiaFavIds();
@@ -4046,7 +4042,7 @@ window.openViewer = function(url, title) {
     filterContainer.appendChild(favTab);
   }
 
-  // 5. Audio Next / Prev & True Loop Toggle
+  // 100% Working Audio Loop & Title Ellipsis Fix
   window.jamiaCurrentPlayingIndex = 0;
   window.jamiaIsLoopActive = false;
 
@@ -4057,7 +4053,7 @@ window.openViewer = function(url, title) {
     if (btnEl) {
       if (window.jamiaIsLoopActive) {
         btnEl.classList.add("active-loop");
-        btnEl.title = "لوپ: آن (دوبارہ بجتا رہے گا)";
+        btnEl.title = "لوپ: آن";
       } else {
         btnEl.classList.remove("active-loop");
         btnEl.title = "لوپ: آف";
@@ -4071,8 +4067,6 @@ window.openViewer = function(url, title) {
       : (window.ALL_BOOKS_CACHE || []).filter(b => b.type === "audio" || b.category === "naat");
     if (!list.length) return;
     if (dir === 0) {
-      // Replay current
-      window.jamiaPlayAdjacentNaat(0); // handled or restart current
       const audio = document.getElementById("globalHtmlAudio");
       if (audio) { audio.currentTime = 0; audio.play().catch(()=>{}); }
       return;
@@ -4097,21 +4091,13 @@ window.openViewer = function(url, title) {
     `;
     timeEl.parentElement.appendChild(nav);
 
-    // Marquee scrolling effect for audio title (#audioPlayerTitle)
+    // FIXED Title Box: Strict Ellipsis inside box (No breaking out)
     const titleEl = document.getElementById("audioPlayerTitle");
-    if (titleEl && !titleEl.dataset.marqueeWrapped) {
-      titleEl.dataset.marqueeWrapped = "1";
-      titleEl.style.cssText = "display: inline-block; white-space: nowrap; animation: jamiaMarquee 12s linear infinite;";
-      if (!document.getElementById("jamiaMarqueeKeyframes")) {
-        const style = document.createElement("style");
-        style.id = "jamiaMarqueeKeyframes";
-        style.innerHTML = "@keyframes jamiaMarquee { 0% { transform: translateX(0%); } 100% { transform: translateX(50%); } }";
-        document.head.appendChild(style);
-      }
+    if (titleEl) {
+      titleEl.style.cssText = "font-size: 0.82rem; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right; width: 100%; display: block;";
     }
   }
 
-  // PDF Eye-Care
   window.toggleJamiaEyeCare = function() {
     const ov = document.getElementById("jamiaPdfEyeCareOverlay");
     const btn = document.getElementById("jamiaPdfEyeCareBtn");
@@ -4131,7 +4117,6 @@ window.openViewer = function(url, title) {
     if (!isVisible && ov) ov.style.display = "none";
   });
 
-  // Counts & Badges
   window.updateJamiaCategoryCounts = function() {
     const allItems = (window.ALL_BOOKS_CACHE && window.ALL_BOOKS_CACHE.length > 0) ? window.ALL_BOOKS_CACHE : (typeof LIBRARY_DATA !== "undefined" ? LIBRARY_DATA : []);
     const booksOnly = allItems.filter(b => b.type !== "audio" && b.category !== "naat");
@@ -4169,7 +4154,6 @@ window.openViewer = function(url, title) {
     });
   };
 
-  // Copy & Intro
   window.jamiaLastIntroCopyText = "";
   window.jamiaCopyHelper = function(text, btnEl) {
     const str = text || window.jamiaLastIntroCopyText || "";
@@ -4204,7 +4188,6 @@ window.openViewer = function(url, title) {
     modal.style.display = "flex";
   };
 
-  // Request Modal (Auto-save + Clean WhatsApp) & Hide on Login Screen
   window.openJamiaRequestModal = function() {
     const modal = document.getElementById("jamiaSmartModal");
     const content = document.getElementById("jamiaSmartModalContent");
@@ -4257,8 +4240,6 @@ window.openViewer = function(url, title) {
       btn.innerHTML = "📩 فرمائش";
       document.body.appendChild(btn);
     }
-    
-    // Check if logged in (content-section visible)
     const contentSec = document.getElementById("content-section");
     const isLogged = contentSec && contentSec.style.display !== "none" && contentSec.style.display !== "";
     btn.style.display = isLogged ? "block" : "none";
@@ -4300,7 +4281,18 @@ window.openViewer = function(url, title) {
         }
         const r = origPlay.apply(this, arguments);
         const audio = document.getElementById("globalHtmlAudio");
-        if (audio) audio.loop = window.jamiaIsLoopActive;
+        if (audio) {
+          audio.loop = window.jamiaIsLoopActive;
+          audio.onended = function() {
+            if (window.jamiaIsLoopActive) {
+              audio.currentTime = 0;
+              audio.play().catch(()=>{});
+            } else {
+              const icon = document.getElementById("audioPlayIcon");
+              if (icon) icon.className = "fa-solid fa-play";
+            }
+          };
+        }
         setTimeout(injectAudioNavButtons, 80);
         return r;
       };
