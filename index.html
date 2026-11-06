@@ -3668,6 +3668,7 @@ window.openViewer = function(url, title) {
 
 
 
+
 <!-- JAMIA_10_FEATURES_START -->
 <style id="jamia-10-features-css">
   #jamiaContinueBar {
@@ -3806,7 +3807,68 @@ window.openViewer = function(url, title) {
   <div class="jamia-modal-card" id="jamiaSmartModalContent"></div>
 </div>
 
-<script id="jamia-clean-engine">
+<script id="jamia-smart-blinker-engine">
+(function() {
+  // Red Dot: True Drive Books & Naats Loader + Exact 2s Auto-Hide
+  window.jamiaLoadStatus = { booksDone: false, naatsDone: false };
+
+  window.checkAndHideBlinker = function() {
+    var b = document.getElementById("jamiaSyncBlinker");
+    if (!b || b.dataset.hidden === "1") return;
+
+    var spans = b.querySelectorAll("span");
+    var textSpan = spans.length > 1 ? spans[1] : spans[0];
+
+    if (window.JAMIA_NAATS_LIST && window.JAMIA_NAATS_LIST.length > 0) {
+      window.jamiaLoadStatus.naatsDone = true;
+    }
+    if (window.ALL_BOOKS_CACHE && window.ALL_BOOKS_CACHE.length > 5) {
+      window.jamiaLoadStatus.booksDone = true;
+    }
+
+    b.style.display = "flex";
+    b.style.opacity = "1";
+
+    if (window.jamiaLoadStatus.booksDone && window.jamiaLoadStatus.naatsDone) {
+      b.dataset.hidden = "1";
+      if (textSpan) textSpan.innerText = "تمام کتب و نعتیں لوڈ ہو گئیں ✓";
+      if (window.updateJamiaCategoryCounts) window.updateJamiaCategoryCounts();
+      
+      // Load hone ke theek 2 second baad smooth fade-out
+      setTimeout(function() {
+        b.style.transition = "opacity 0.6s ease";
+        b.style.opacity = "0";
+        setTimeout(function() { b.style.display = "none"; }, 600);
+      }, 2000);
+    } else if (window.jamiaLoadStatus.booksDone && !window.jamiaLoadStatus.naatsDone) {
+      if (textSpan) textSpan.innerText = "نعتیں لوڈ ہو رہی ہیں...";
+    } else if (!window.jamiaLoadStatus.booksDone && window.jamiaLoadStatus.naatsDone) {
+      if (textSpan) textSpan.innerText = "مزید کتب لوڈ ہو رہی ہیں...";
+    } else {
+      if (textSpan) textSpan.innerText = "مزید کتب و نعتیں لوڈ ہو رہی ہیں...";
+    }
+  };
+
+  const tInterval = setInterval(function() {
+    window.checkAndHideBlinker();
+    const b = document.getElementById("jamiaSyncBlinker");
+    if (b && b.dataset.hidden === "1") clearInterval(tInterval);
+  }, 400);
+
+  // Safety fallback (10s max)
+  setTimeout(function() {
+    var b = document.getElementById("jamiaSyncBlinker");
+    if (b && b.dataset.hidden !== "1") {
+      b.dataset.hidden = "1";
+      b.style.transition = "opacity 0.6s ease";
+      b.style.opacity = "0";
+      setTimeout(function() { b.style.display = "none"; }, 600);
+    }
+  }, 10000);
+})();
+</script>
+
+<script id="jamia-master-10-features">
 (function() {
   const FAV_KEY = "jamia_fav_ids_v2";
   const LAST_KEY = "jamia_last_item_v2";
@@ -3822,7 +3884,7 @@ window.openViewer = function(url, title) {
     return f.includes(id) || (title && f.includes(title.trim()));
   };
 
-  // 1. Continue Bar with permanent close handler
+  // 1. Continue Reading Bar with Hide/Show Toggle
   function ensureContinueBar() {
     let bar = document.getElementById("jamiaContinueBar");
     if (!bar) {
@@ -3839,14 +3901,24 @@ window.openViewer = function(url, title) {
         </div>
         <div style="display:flex; gap:6px; align-items:center;">
           <button type="button" class="jc-btn" id="jamiaContinueOpenBtn">کھولیں ◀</button>
-          <span id="jamiaCloseBarBtn" style="color:#94a3b8; cursor:pointer; padding:0 6px; font-weight:bold;">✕</span>
+          <span id="jamiaToggleBarBtn" title="چھپائیں / ظاہر کریں" style="color:#34d399; cursor:pointer; padding:0 6px; font-size:0.8rem; font-weight:bold;">👁️ چھپائیں</span>
         </div>
       `;
       searchBox.insertAdjacentElement("afterend", bar);
 
-      document.getElementById("jamiaCloseBarBtn").onclick = function() {
-        localStorage.removeItem(LAST_KEY);
-        bar.style.display = "none";
+      document.getElementById("jamiaToggleBarBtn").onclick = function() {
+        const txtSpan = document.getElementById("jamiaContinueText");
+        const openBtn = document.getElementById("jamiaContinueOpenBtn");
+        const isHidden = this.innerText.includes("ظاہر");
+        if (isHidden) {
+          this.innerText = "👁️ چھپائیں";
+          if (txtSpan) txtSpan.style.display = "inline";
+          if (openBtn) openBtn.style.display = "inline-block";
+        } else {
+          this.innerText = "👁️ ظاہر کریں";
+          if (txtSpan) txtSpan.style.display = "none";
+          if (openBtn) openBtn.style.display = "none";
+        }
       };
     }
     renderContinueBar();
@@ -4065,7 +4137,7 @@ window.openViewer = function(url, title) {
     modal.style.display = "flex";
   };
 
-  // 10. Request Modal
+  // 10. Request Modal (Direct to your WhatsApp number 918439602526)
   window.openJamiaRequestModal = function() {
     const modal = document.getElementById("jamiaSmartModal");
     const content = document.getElementById("jamiaSmartModalContent");
@@ -4082,13 +4154,13 @@ window.openViewer = function(url, title) {
     }
 
     content.innerHTML = `
-      <h3 style="margin:0 0 8px 0; color:#10b981; font-size:1.1rem;">📩 کتاب یا نعت کی فرمائش (Admin کو بھیجیں)</h3>
-      <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:10px;">مطلوبہ کتاب یا نعت کا نام لکھیں:</p>
+      <h3 style="margin:0 0 8px 0; color:#10b981; font-size:1.1rem;">📩 کتاب یا نعت کی فرمائش (ایڈمن کو بھیجیں)</h3>
+      <p style="margin:0 0 10px 0; font-size:0.8rem; color:#cbd5e1;">مطلوبہ کتاب یا نعت کا نام لکھیں (یہ سیدھے سہیل حسین کے واٹس ایپ پر جائے گی):</p>
       <input id="jamiaReqInput" type="text" placeholder="نام لکھیں..." style="width:100%; padding:10px; border-radius:10px; border:1px solid #10b981; background:#022c22; color:#fff; margin-bottom:10px; box-sizing:border-box;">
       <div style="display:flex; flex-direction:column; gap:8px;">
-        <button type="button" onclick="window.submitJamiaRequest(true)" style="background:#10b981; color:#022c22; border:none; padding:10px; border-radius:12px; font-weight:bold; cursor:pointer;"><i class="fa-brands fa-whatsapp"></i> ایڈمن کو واٹس ایپ پر بھیجیں ◀</button>
+        <button type="button" onclick="window.submitJamiaRequest(true)" style="background:#10b981; color:#022c22; border:none; padding:10px; border-radius:12px; font-weight:bold; cursor:pointer;"><i class="fa-brands fa-whatsapp"></i> واٹس ایپ پر بھیجیں (918439602526) ◀</button>
         <div style="display:flex; gap:8px;">
-          <button type="button" onclick="window.submitJamiaRequest(false)" style="flex:1; background:#065f46; color:#ecfdf5; border:1px solid #10b981; padding:8px; border-radius:12px; font-size:0.8rem; cursor:pointer;">لسٹ میں محفوظ کریں ✓</button>
+          <button type="button" onclick="window.submitJamiaRequest(false)" style="flex:1; background:#065f46; color:#ecfdf5; border:1px solid #10b981; padding:8px; border-radius:12px; font-size:0.8rem; cursor:pointer;">محفوظ کریں ✓</button>
           <button type="button" onclick="document.getElementById('jamiaSmartModal').style.display='none'" style="background:#1e293b; color:#fff; border:none; padding:8px 14px; border-radius:12px; cursor:pointer;">بند کریں</button>
         </div>
       </div>
@@ -4107,7 +4179,8 @@ window.openViewer = function(url, title) {
 
     if (sendViaWhatsApp) {
       const waText = "📚 *جامعۃ الرضا ڈیجیٹل کتب خانہ - نئی فرمائش*\n👤 نام: " + studentName + "\n📖 مطلوبہ کتاب/نعت: *" + val + "*";
-      window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(waText), "_blank");
+      // Direct WhatsApp link targeting your specific number 918439602526
+      window.open("https://api.whatsapp.com/send?phone=918439602526&text=" + encodeURIComponent(waText), "_blank");
     }
     window.openJamiaRequestModal();
   };
@@ -4123,7 +4196,7 @@ window.openViewer = function(url, title) {
     document.body.appendChild(btn);
   }
 
-  // 4. Safe Deep-Link Handler (Sirf 1 baar khulega, baar-baar audio trigger nahi hoga)
+  // 4. Safe Deep-Link Handler
   let deepLinkHandled = false;
   function checkAndAutoOpenSharedBook() {
     if (deepLinkHandled) return;
@@ -4140,7 +4213,6 @@ window.openViewer = function(url, title) {
 
     if (found) {
       deepLinkHandled = true;
-      // URL saaf kar dena taaki baar-baar refresh par audio na khule
       if (window.history && window.history.replaceState) {
         window.history.replaceState({}, document.title, window.location.pathname);
       }
