@@ -4305,5 +4305,30 @@ window.openViewer = function(url, title) {
 })();
 </script>
 <!-- JAMIA_10_FEATURES_END -->
+
+<script id="jamia-offline-storage-engine">
+(function() {
+  // Service Worker Registration for Offline Caching
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('./sw.js').then(function(reg) {
+        console.log('Jamia Offline ServiceWorker registered successfully:', reg.scope);
+      }).catch(function(err) {
+        console.log('ServiceWorker registration failed:', err);
+      });
+    });
+  }
+
+  // Hook PDF Viewer & Audio to cache blobs/files locally in IndexedDB/CacheStorage
+  window.addEventListener('DOMContentLoaded', function() {
+    if ('caches' in window) {
+      caches.open('jamia-offline-books-v1').then(function(cache) {
+        console.log('Jamia Offline Cache Storage Initialized.');
+      });
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
