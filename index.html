@@ -3695,6 +3695,69 @@ window.openViewer = function(url, title) {
 })();
 </script>
 
+
+
+<script id="jamia-offline-data-cache">
+(function() {
+  const origFetch = window.fetch;
+  window.fetch = async function(...args) {
+    const url = String(args[0] || "");
+    try {
+      const res = await origFetch.apply(this, args);
+      const clone = res.clone();
+      clone.json().then(data => {
+        if (url.includes("script.google.com")) {
+          if (Array.isArray(data)) {
+            if (url.includes("AKfycbwi02yk")) {
+              localStorage.setItem("jamia_offline_naats", JSON.stringify(data));
+            } else {
+              localStorage.setItem("jamia_offline_books", JSON.stringify(data));
+            }
+          }
+        }
+      }).catch(()=>{});
+      return res;
+    } catch (err) {
+      // Agar offline ho toh localStorage se cached data load karein
+      if (url.includes("script.google.com")) {
+        const cachedBooks = localStorage.getItem("jamia_offline_books");
+        const cachedNaats = localStorage.getItem("jamia_offline_naats");
+        if (url.includes("AKfycbwi02yk") && cachedNaats) {
+          return new Response(cachedNaats, { status: 200, headers: { 'Content-Type': 'application/json' } });
+        } else if (cachedBooks) {
+          return new Response(cachedBooks, { status: 200, headers: { 'Content-Type': 'application/json' } });
+        }
+      }
+      throw err;
+    }
+  };
+
+  // Offline startup load from localStorage cache
+  window.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+      if (!window.ALL_BOOKS_CACHE || window.ALL_BOOKS_CACHE.length === 0) {
+        const cb = localStorage.getItem("jamia_offline_books");
+        if (cb) {
+          try {
+            const parsed = JSON.parse(cb);
+            if (typeof window.renderBooks === "function") {
+              window.ALL_BOOKS_CACHE = parsed;
+              window.renderBooks(parsed);
+            }
+          } catch(e) {}
+        }
+      }
+      if (!window.JAMIA_NAATS_LIST || window.JAMIA_NAATS_LIST.length === 0) {
+        const cn = localStorage.getItem("jamia_offline_naats");
+        if (cn) {
+          try { window.JAMIA_NAATS_LIST = JSON.parse(cn); } catch(e) {}
+        }
+      }
+    }, 800);
+  });
+})();
+</script>
+
 <!-- JAMIA_10_FEATURES_START -->
 <style id="jamia-10-features-css">
   #jamiaContinueBar {
@@ -3775,6 +3838,11 @@ window.openViewer = function(url, title) {
     cursor: pointer;
     margin: 0 2px;
   }
+  .jamia-audio-nav-btn.active-loop {
+    background: #10b981 !important;
+    color: #022c22 !important;
+    box-shadow: 0 0 10px #10b981;
+  }
   #jamiaPdfEyeCareOverlay {
     display: none;
     position: fixed;
@@ -3835,64 +3903,29 @@ window.openViewer = function(url, title) {
 
 <script id="jamia-smart-blinker-engine">
 (function() {
-  // True Blinker Engine: Jab tak asli drive books aur naats render na ho jayein, red dot nahi hatega
   window.jamiaLoadStatus = { booksDone: false, naatsDone: false };
-
   window.checkAndHideBlinker = function() {
     var b = document.getElementById("jamiaSyncBlinker");
     if (!b || b.dataset.hidden === "1") return;
-
     var spans = b.querySelectorAll("span");
     var textSpan = spans.length > 1 ? spans[1] : spans[0];
-
-    if (window.JAMIA_NAATS_LIST && window.JAMIA_NAATS_LIST.length > 0) {
-      window.jamiaLoadStatus.naatsDone = true;
-    }
-    // Jab total cards 10 ya usse zyada render ho jayein tabhi books load maani jayengi
+    if (window.JAMIA_NAATS_LIST && window.JAMIA_NAATS_LIST.length > 0) window.jamiaLoadStatus.naatsDone = true;
     const cardsCount = document.querySelectorAll(".j-btn-row").length;
-    if (cardsCount >= 10 || (window.ALL_BOOKS_CACHE && window.ALL_BOOKS_CACHE.length > 10)) {
-      window.jamiaLoadStatus.booksDone = true;
-    }
-
+    if (cardsCount >= 10 || (window.ALL_BOOKS_CACHE && window.ALL_BOOKS_CACHE.length > 10)) window.jamiaLoadStatus.booksDone = true;
     b.style.display = "flex";
     b.style.opacity = "1";
-
     if (window.jamiaLoadStatus.booksDone && window.jamiaLoadStatus.naatsDone) {
       b.dataset.hidden = "1";
       if (textSpan) textSpan.innerText = "تمام کتب و نعتیں لوڈ ہو گئیں ✓";
       if (window.updateJamiaCategoryCounts) window.updateJamiaCategoryCounts();
-      
-      // Bilkul theek 2 second baad smooth fade-out
       setTimeout(function() {
         b.style.transition = "opacity 0.6s ease";
         b.style.opacity = "0";
         setTimeout(function() { b.style.display = "none"; }, 600);
       }, 2000);
-    } else if (window.jamiaLoadStatus.booksDone && !window.jamiaLoadStatus.naatsDone) {
-      if (textSpan) textSpan.innerText = "نعتیں لوڈ ہو रही हैं...";
-    } else if (!window.jamiaLoadStatus.booksDone && window.jamiaLoadStatus.naatsDone) {
-      if (textSpan) textSpan.innerText = "مزید کتب لوڈ ہو رہی ہیں...";
-    } else {
-      if (textSpan) textSpan.innerText = "مزید کتب و نعتیں لوڈ ہو رہی ہیں...";
     }
   };
-
-  const tInterval = setInterval(function() {
-    window.checkAndHideBlinker();
-    const b = document.getElementById("jamiaSyncBlinker");
-    if (b && b.dataset.hidden === "1") clearInterval(tInterval);
-  }, 400);
-
-  // Safety fallback (12 seconds)
-  setTimeout(function() {
-    var b = document.getElementById("jamiaSyncBlinker");
-    if (b && b.dataset.hidden !== "1") {
-      b.dataset.hidden = "1";
-      b.style.transition = "opacity 0.6s ease";
-      b.style.opacity = "0";
-      setTimeout(function() { b.style.display = "none"; }, 600);
-    }
-  }, 12000);
+  setInterval(window.checkAndHideBlinker, 400);
 })();
 </script>
 
@@ -3956,11 +3989,14 @@ window.openViewer = function(url, title) {
     const bar = document.getElementById("jamiaContinueBar");
     if (!bar) return;
     try {
-      const last = JSON.parse(localStorage.getItem(LAST_KEY) || "null");
-      if (!last || !last.title) { bar.style.display = "none"; return; }
+      let last = JSON.parse(localStorage.getItem(LAST_KEY) || "null");
+      if (!last || !last.title) {
+        bar.style.display = "none";
+        return;
+      }
       const txt = document.getElementById("jamiaContinueText");
       const btn = document.getElementById("jamiaContinueOpenBtn");
-      if (txt) txt.innerText = (last.type === "audio" ? "🎵 آخری نعت: " : "📖 آخری کتاب: ") + last.title;
+      if (txt) txt.innerText = (last.type === "audio" ? "🎵 آخری نعت: " : "📖 مطالعہ جاری رکھیں: ") + last.title;
       if (btn) {
         btn.onclick = function() {
           if (last.type === "audio" && typeof window.playAudio === "function") {
@@ -3981,7 +4017,7 @@ window.openViewer = function(url, title) {
     } catch(e) {}
   };
 
-  // 2. Favorites Star & Filter Tab
+  // 2. Favorites Star & Tab
   window.toggleJamiaFavItem = function(e, id, title, btnEl) {
     if (e) { e.preventDefault(); e.stopPropagation(); }
     let favs = window.getJamiaFavIds();
@@ -3995,16 +4031,13 @@ window.openViewer = function(url, title) {
     }
     saveJamiaFavIds(favs);
     window.updateJamiaCategoryCounts();
-    if (typeof currentCategory !== "undefined" && currentCategory === "fav") {
-      filterLibrary();
-    }
+    if (typeof currentCategory !== "undefined" && currentCategory === "fav") filterLibrary();
   };
 
   function ensureFavTabInFilterBar() {
     if (document.getElementById("tab-jamia-favs")) return;
     const filterContainer = document.querySelector(".filter-tags");
     if (!filterContainer) return;
-
     const favTab = document.createElement("div");
     favTab.id = "tab-jamia-favs";
     favTab.className = "filter-tag";
@@ -4013,26 +4046,40 @@ window.openViewer = function(url, title) {
     filterContainer.appendChild(favTab);
   }
 
-  // 5. Audio Next / Prev (`⏮` / `⏭`) + Replay (`🔁`)
+  // 5. Audio Next / Prev & True Loop Toggle
   window.jamiaCurrentPlayingIndex = 0;
+  window.jamiaIsLoopActive = false;
+
+  window.jamiaToggleLoop = function(btnEl) {
+    window.jamiaIsLoopActive = !window.jamiaIsLoopActive;
+    const audio = document.getElementById("globalHtmlAudio");
+    if (audio) audio.loop = window.jamiaIsLoopActive;
+    if (btnEl) {
+      if (window.jamiaIsLoopActive) {
+        btnEl.classList.add("active-loop");
+        btnEl.title = "لوپ: آن (دوبارہ بجتا رہے گا)";
+      } else {
+        btnEl.classList.remove("active-loop");
+        btnEl.title = "لوپ: آف";
+      }
+    }
+  };
 
   window.jamiaPlayAdjacentNaat = function(dir) {
     const list = (window.JAMIA_NAATS_LIST && window.JAMIA_NAATS_LIST.length > 0)
       ? window.JAMIA_NAATS_LIST
       : (window.ALL_BOOKS_CACHE || []).filter(b => b.type === "audio" || b.category === "naat");
     if (!list.length) return;
-
     if (dir === 0) {
-      const cur = list[window.jamiaCurrentPlayingIndex] || list[0];
-      if (cur && typeof window.playAudio === "function") window.playAudio(cur.audioUrl || cur.id, cur.title);
+      // Replay current
+      window.jamiaPlayAdjacentNaat(0); // handled or restart current
+      const audio = document.getElementById("globalHtmlAudio");
+      if (audio) { audio.currentTime = 0; audio.play().catch(()=>{}); }
       return;
     }
-
     window.jamiaCurrentPlayingIndex = (window.jamiaCurrentPlayingIndex + dir + list.length) % list.length;
     const item = list[window.jamiaCurrentPlayingIndex];
-    if (item && typeof window.playAudio === "function") {
-      window.playAudio(item.audioUrl || item.id, item.title);
-    }
+    if (item && typeof window.playAudio === "function") window.playAudio(item.audioUrl || item.id, item.title);
   };
 
   function injectAudioNavButtons() {
@@ -4045,13 +4092,26 @@ window.openViewer = function(url, title) {
     nav.style.marginRight = "8px";
     nav.innerHTML = `
       <button type="button" class="jamia-audio-nav-btn" title="پچھلی نعت" onclick="window.jamiaPlayAdjacentNaat(-1)">⏮</button>
-      <button type="button" class="jamia-audio-nav-btn" title="دوبارہ چلائیں" onclick="window.jamiaPlayAdjacentNaat(0)">🔁</button>
+      <button type="button" class="jamia-audio-nav-btn ${window.jamiaIsLoopActive ? 'active-loop' : ''}" title="لوپ (ریپیٹ)" onclick="window.jamiaToggleLoop(this)">🔁</button>
       <button type="button" class="jamia-audio-nav-btn" title="اگلی نعت" onclick="window.jamiaPlayAdjacentNaat(1)">⏭</button>
     `;
     timeEl.parentElement.appendChild(nav);
+
+    // Marquee scrolling effect for audio title (#audioPlayerTitle)
+    const titleEl = document.getElementById("audioPlayerTitle");
+    if (titleEl && !titleEl.dataset.marqueeWrapped) {
+      titleEl.dataset.marqueeWrapped = "1";
+      titleEl.style.cssText = "display: inline-block; white-space: nowrap; animation: jamiaMarquee 12s linear infinite;";
+      if (!document.getElementById("jamiaMarqueeKeyframes")) {
+        const style = document.createElement("style");
+        style.id = "jamiaMarqueeKeyframes";
+        style.innerHTML = "@keyframes jamiaMarquee { 0% { transform: translateX(0%); } 100% { transform: translateX(50%); } }";
+        document.head.appendChild(style);
+      }
+    }
   }
 
-  // 6. PDF Eye-Care Mode
+  // PDF Eye-Care
   window.toggleJamiaEyeCare = function() {
     const ov = document.getElementById("jamiaPdfEyeCareOverlay");
     const btn = document.getElementById("jamiaPdfEyeCareBtn");
@@ -4071,7 +4131,7 @@ window.openViewer = function(url, title) {
     if (!isVisible && ov) ov.style.display = "none";
   });
 
-  // 7 & 8. Category Counts & Badges
+  // Counts & Badges
   window.updateJamiaCategoryCounts = function() {
     const allItems = (window.ALL_BOOKS_CACHE && window.ALL_BOOKS_CACHE.length > 0) ? window.ALL_BOOKS_CACHE : (typeof LIBRARY_DATA !== "undefined" ? LIBRARY_DATA : []);
     const booksOnly = allItems.filter(b => b.type !== "audio" && b.category !== "naat");
@@ -4109,26 +4169,7 @@ window.openViewer = function(url, title) {
     });
   };
 
-  function markNewest5DriveCards() {
-    const allItems = (window.ALL_BOOKS_CACHE || []).filter(b => b.type !== "audio" && b.category !== "naat");
-    if (allItems.length <= 6) return;
-    const newestIds = allItems.slice(-5).map(b => b.id);
-
-    document.querySelectorAll(".j-btn-row").forEach(row => {
-      const card = row.parentElement?.parentElement;
-      if (!card || card.querySelector(".jamia-new-badge")) return;
-      const htmlStr = row.innerHTML || "";
-      if (newestIds.some(id => id && htmlStr.includes(id))) {
-        card.style.position = "relative";
-        const badge = document.createElement("span");
-        badge.className = "jamia-new-badge";
-        badge.innerText = "نیا اضافہ";
-        card.appendChild(badge);
-      }
-    });
-  }
-
-  // 9. Copy Helper & Intro
+  // Copy & Intro
   window.jamiaLastIntroCopyText = "";
   window.jamiaCopyHelper = function(text, btnEl) {
     const str = text || window.jamiaLastIntroCopyText || "";
@@ -4140,9 +4181,7 @@ window.openViewer = function(url, title) {
     ta.select();
     try { document.execCommand("copy"); } catch(e) {}
     ta.remove();
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(str).catch(()=>{});
-    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(str).catch(()=>{});
     if (btnEl) btnEl.innerText = "✅ تفصیل کاپی ہو گئی!";
   };
 
@@ -4165,7 +4204,7 @@ window.openViewer = function(url, title) {
     modal.style.display = "flex";
   };
 
-  // 10. Request Modal (Auto-Save + Clean WhatsApp 918439602526 without showing raw number text)
+  // Request Modal (Auto-save + Clean WhatsApp) & Hide on Login Screen
   window.openJamiaRequestModal = function() {
     const modal = document.getElementById("jamiaSmartModal");
     const content = document.getElementById("jamiaSmartModalContent");
@@ -4183,8 +4222,8 @@ window.openViewer = function(url, title) {
 
     content.innerHTML = `
       <h3 style="margin:0 0 8px 0; color:#10b981; font-size:1.1rem;">📩 کتاب یا نعت کی فرمائش</h3>
-      <p style="margin:0 0 10px 0; font-size:0.8rem; color:#cbd5e1;">مطلوبہ کتاب یا نعت کا نام لکھیں (یہ خودبخود محفوظ ہو کر ایڈمن کو واٹس ایپ پر چلی جائے گی):</p>
-      <input id="jamiaReqInput" type="text" placeholder="مطلوبہ کتاب یا نعت کا نام لکھیں..." style="width:100%; padding:10px; border-radius:10px; border:1px solid #10b981; background:#022c22; color:#fff; margin-bottom:10px; box-sizing:border-box;">
+      <p style="margin:0 0 10px 0; font-size:0.8rem; color:#cbd5e1;">مطلوبہ کتاب یا نعت کا نام لکھیں:</p>
+      <input id="jamiaReqInput" type="text" placeholder="نام لکھیں..." style="width:100%; padding:10px; border-radius:10px; border:1px solid #10b981; background:#022c22; color:#fff; margin-bottom:10px; box-sizing:border-box;">
       <div style="display:flex; flex-direction:column; gap:8px;">
         <button type="button" onclick="window.submitJamiaRequest()" style="background:#10b981; color:#022c22; border:none; padding:10px; border-radius:12px; font-weight:bold; cursor:pointer;"><i class="fa-brands fa-whatsapp"></i> فرمائش محفوظ کریں اور واٹس ایپ پر بھیجیں ◀</button>
         <button type="button" onclick="document.getElementById('jamiaSmartModal').style.display='none'" style="background:#1e293b; color:#fff; border:none; padding:8px 14px; border-radius:12px; cursor:pointer;">بند کریں</button>
@@ -4196,57 +4235,33 @@ window.openViewer = function(url, title) {
 
   window.submitJamiaRequest = function() {
     const val = (document.getElementById("jamiaReqInput")?.value || "").trim();
-    if (!val) { alert("براہِ کرم پہلے کتاب یا نعت کا نام لکھیں!"); return; }
+    if (!val) { alert("براہِ کرم پہلے نام لکھیں!"); return; }
     const studentName = localStorage.getItem("jamia_ula_name") || "طالب علم";
     const reqs = JSON.parse(localStorage.getItem("jamia_user_requests") || "[]");
     reqs.unshift({ item: val, user: studentName, date: new Date().toISOString() });
     localStorage.setItem("jamia_user_requests", JSON.stringify(reqs));
 
-    // Auto-save ho gaya, ab seedha clean WhatsApp URL open karega (No raw number text on button)
     const waText = "📚 *جامعۃ الرضا ڈیجیٹل کتب خانہ - نئی فرمائش*\n👤 نام: " + studentName + "\n📖 مطلوبہ کتاب/نعت: *" + val + "*";
     window.open("https://api.whatsapp.com/send?phone=918439602526&text=" + encodeURIComponent(waText), "_blank");
     window.openJamiaRequestModal();
   };
 
   function injectRequestBtn() {
-    if (document.getElementById("jamiaReqFloatingBtn")) return;
-    const btn = document.createElement("button");
-    btn.id = "jamiaReqFloatingBtn";
-    btn.type = "button";
-    btn.onclick = window.openJamiaRequestModal;
-    btn.style.cssText = "position:fixed; bottom:18px; right:16px; z-index:9990; background:linear-gradient(135deg,#059669,#047857); color:#fff; border:1px solid #34d399; border-radius:25px; padding:8px 14px; font-size:0.78rem; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.45); cursor:pointer;";
-    btn.innerHTML = "📩 فرمائش";
-    document.body.appendChild(btn);
-  }
-
-  // 4. Safe Deep-Link Handler
-  let deepLinkHandled = false;
-  function checkAndAutoOpenSharedBook() {
-    if (deepLinkHandled) return;
-    const params = new URLSearchParams(window.location.search);
-    let targetId = params.get("open") || params.get("item") || "";
-    if (!targetId && window.location.hash) {
-      targetId = decodeURIComponent(window.location.hash.replace(/^#(book|item)=/, ""));
+    let btn = document.getElementById("jamiaReqFloatingBtn");
+    if (!btn) {
+      btn = document.createElement("button");
+      btn.id = "jamiaReqFloatingBtn";
+      btn.type = "button";
+      btn.onclick = window.openJamiaRequestModal;
+      btn.style.cssText = "position:fixed; bottom:18px; right:16px; z-index:9990; background:linear-gradient(135deg,#059669,#047857); color:#fff; border:1px solid #34d399; border-radius:25px; padding:8px 14px; font-size:0.78rem; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.45); cursor:pointer;";
+      btn.innerHTML = "📩 فرمائش";
+      document.body.appendChild(btn);
     }
-    if (!targetId) return;
-
-    const allItems = (window.ALL_BOOKS_CACHE && window.ALL_BOOKS_CACHE.length > 0) ? window.ALL_BOOKS_CACHE : [];
-    const naats = window.JAMIA_NAATS_LIST || [];
-    const found = allItems.find(b => b.id === targetId || b.title === targetId) || naats.find(n => n.id === targetId || n.title === targetId);
-
-    if (found) {
-      deepLinkHandled = true;
-      if (window.history && window.history.replaceState) {
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-      setTimeout(function() {
-        if (found.type === "audio" || found.category === "naat" || found.audioUrl) {
-          if (typeof window.playAudio === "function") window.playAudio(found.audioUrl || found.id, found.title);
-        } else if (typeof window.openFullscreenPdf === "function") {
-          window.openFullscreenPdf(found.id, found.title);
-        }
-      }, 500);
-    }
+    
+    // Check if logged in (content-section visible)
+    const contentSec = document.getElementById("content-section");
+    const isLogged = contentSec && contentSec.style.display !== "none" && contentSec.style.display !== "";
+    btn.style.display = isLogged ? "block" : "none";
   }
 
   function hookCore() {
@@ -4284,24 +4299,12 @@ window.openViewer = function(url, title) {
           if (idx !== -1) window.jamiaCurrentPlayingIndex = idx;
         }
         const r = origPlay.apply(this, arguments);
+        const audio = document.getElementById("globalHtmlAudio");
+        if (audio) audio.loop = window.jamiaIsLoopActive;
         setTimeout(injectAudioNavButtons, 80);
         return r;
       };
       window.playAudio._jamiaHooked = true;
-    }
-
-    if (typeof window.renderBooks === "function" && !window.renderBooks._jamiaHooked) {
-      const origRender = window.renderBooks;
-      window.renderBooks = function(list) {
-        const r = origRender.apply(this, arguments);
-        setTimeout(function() {
-          markNewest5DriveCards();
-          window.updateJamiaCategoryCounts();
-          checkAndAutoOpenSharedBook();
-        }, 60);
-        return r;
-      };
-      window.renderBooks._jamiaHooked = true;
     }
   }
 
@@ -4309,9 +4312,8 @@ window.openViewer = function(url, title) {
     ensureContinueBar();
     ensureFavTabInFilterBar();
     hookCore();
-    markNewest5DriveCards();
     injectAudioNavButtons();
-    window.updateJamiaCategoryCounts();
+    if (window.updateJamiaCategoryCounts) window.updateJamiaCategoryCounts();
     injectRequestBtn();
     const viewer = document.getElementById("pdf-viewer-overlay");
     if (viewer && !viewer.dataset.obsBound) {
@@ -4322,73 +4324,11 @@ window.openViewer = function(url, title) {
 
   document.addEventListener("DOMContentLoaded", function() {
     boot();
-    setTimeout(checkAndAuthOpenSharedBook, 800);
+    setInterval(injectRequestBtn, 1000);
   });
   boot();
 })();
 </script>
 <!-- JAMIA_10_FEATURES_END -->
-
-<script id="jamia-offline-data-cache">
-(function() {
-  const origFetch = window.fetch;
-  window.fetch = async function(...args) {
-    const url = String(args[0] || "");
-    try {
-      const res = await origFetch.apply(this, args);
-      const clone = res.clone();
-      clone.json().then(data => {
-        if (url.includes("script.google.com")) {
-          if (Array.isArray(data)) {
-            if (url.includes("AKfycbwi02yk")) {
-              localStorage.setItem("jamia_offline_naats", JSON.stringify(data));
-            } else {
-              localStorage.setItem("jamia_offline_books", JSON.stringify(data));
-            }
-          }
-        }
-      }).catch(()=>{});
-      return res;
-    } catch (err) {
-      // Agar offline ho toh localStorage se cached data load karein
-      if (url.includes("script.google.com")) {
-        const cachedBooks = localStorage.getItem("jamia_offline_books");
-        const cachedNaats = localStorage.getItem("jamia_offline_naats");
-        if (url.includes("AKfycbwi02yk") && cachedNaats) {
-          return new Response(cachedNaats, { status: 200, headers: { 'Content-Type': 'application/json' } });
-        } else if (cachedBooks) {
-          return new Response(cachedBooks, { status: 200, headers: { 'Content-Type': 'application/json' } });
-        }
-      }
-      throw err;
-    }
-  };
-
-  // Offline startup load from localStorage cache
-  window.addEventListener('DOMContentLoaded', function() {
-    setTimeout(() => {
-      if (!window.ALL_BOOKS_CACHE || window.ALL_BOOKS_CACHE.length === 0) {
-        const cb = localStorage.getItem("jamia_offline_books");
-        if (cb) {
-          try {
-            const parsed = JSON.parse(cb);
-            if (typeof window.renderBooks === "function") {
-              window.ALL_BOOKS_CACHE = parsed;
-              window.renderBooks(parsed);
-            }
-          } catch(e) {}
-        }
-      }
-      if (!window.JAMIA_NAATS_LIST || window.JAMIA_NAATS_LIST.length === 0) {
-        const cn = localStorage.getItem("jamia_offline_naats");
-        if (cn) {
-          try { window.JAMIA_NAATS_LIST = JSON.parse(cn); } catch(e) {}
-        }
-      }
-    }, 800);
-  });
-})();
-</script>
-
 </body>
 </html>
