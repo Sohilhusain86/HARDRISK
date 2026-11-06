@@ -3762,6 +3762,7 @@ window.openViewer = function(url, title) {
 
 
 
+
 <!-- JAMIA_10_FEATURES_START -->
 <style id="jamia-10-features-css">
   #jamiaContinueBar {
@@ -3769,8 +3770,8 @@ window.openViewer = function(url, title) {
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    background: linear-gradient(135deg, rgba(6, 78, 59, 0.96), rgba(2, 44, 34, 0.98));
-    border: 1.5px solid #10b981;
+    background: var(--jamia-card-bg, rgba(6, 78, 59, 0.96));
+    border: 1.5px solid var(--jamia-primary, #10b981);
     border-radius: 14px;
     padding: 10px 14px;
     margin: 10px auto 14px auto;
@@ -3790,7 +3791,7 @@ window.openViewer = function(url, title) {
     text-overflow: ellipsis;
   }
   #jamiaContinueBar .jc-btn {
-    background: #10b981;
+    background: var(--jamia-primary, #10b981);
     color: #022c22;
     border: none;
     border-radius: 20px;
@@ -3843,9 +3844,9 @@ window.openViewer = function(url, title) {
     margin: 0 2px;
   }
   .jamia-audio-nav-btn.active-loop {
-    background: #10b981 !important;
+    background: var(--jamia-primary, #10b981) !important;
     color: #022c22 !important;
-    box-shadow: 0 0 10px #10b981;
+    box-shadow: 0 0 10px var(--jamia-primary, #10b981);
   }
   #jamiaPdfEyeCareOverlay {
     display: none;
@@ -3884,8 +3885,8 @@ window.openViewer = function(url, title) {
     direction: rtl;
   }
   .jamia-modal-card {
-    background: #042f2e;
-    border: 1.5px solid #10b981;
+    background: var(--jamia-card-bg, #042f2e);
+    border: 1.5px solid var(--jamia-primary, #10b981);
     border-radius: 18px;
     max-width: 420px;
     width: 100%;
@@ -3896,7 +3897,6 @@ window.openViewer = function(url, title) {
     box-shadow: 0 12px 35px rgba(0,0,0,0.85);
     text-align: right;
   }
-  /* Settings Gear Header Style */
   #jamiaSettingsHeaderBtn {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -3974,9 +3974,8 @@ window.openViewer = function(url, title) {
 (function() {
   const FAV_KEY = "jamia_fav_ids_v2";
   const LAST_KEY = "jamia_last_item_v2";
-  const THEME_KEY = "jamia_selected_theme_v3";
+  const THEME_KEY = "jamia_selected_theme_v4";
 
-  // --- 20 Themes Configuration ---
   const themesList = [
     { name: "ایمرلڈ گرین (اصلی)", bg: "#022c22", card: "#042f2e", primary: "#10b981", text: "#ecfdf5" },
     { name: "شاہی نیلا (Royal Blue)", bg: "#0f172a", card: "#1e293b", primary: "#3b82f6", text: "#f8fafc" },
@@ -4006,7 +4005,7 @@ window.openViewer = function(url, title) {
     if (!modal || !content) return;
 
     content.innerHTML = `
-      <h3 style="margin:0 0 8px 0; color:#10b981; font-size:1.1rem;">⚙️ تھیم اور رنگ کی ترتیبات</h3>
+      <h3 style="margin:0 0 8px 0; color:var(--jamia-primary, #10b981); font-size:1.1rem;">⚙️ تھیم اور رنگ کی ترتیبات</h3>
       <p style="margin:0 0 10px 0; font-size:0.8rem; color:#cbd5e1;">پوری لائبریری کے لیے کوئی بھی ایک خوبصورت تھیم منتخب کریں:</p>
       <div class="jamia-theme-grid">
         ${themesList.map((t, idx) => `
@@ -4032,15 +4031,20 @@ window.openViewer = function(url, title) {
   };
 
   function activateTheme(t) {
+    document.documentElement.style.setProperty("--jamia-bg", t.bg);
+    document.documentElement.style.setProperty("--jamia-card-bg", t.card);
+    document.documentElement.style.setProperty("--jamia-primary", t.primary);
+    document.documentElement.style.setProperty("--jamia-text", t.text);
+
     document.body.style.backgroundColor = t.bg;
     document.body.style.color = t.text;
-    document.querySelectorAll(".book-card, .j-card, .jamia-modal-card, #emeraldAudioBar").forEach(el => {
+
+    document.querySelectorAll(".book-card, .j-card, .jamia-modal-card, #emeraldAudioBar, .search-box").forEach(el => {
       el.style.backgroundColor = t.card;
       el.style.color = t.text;
     });
   }
 
-  // Inject Settings Gear next to Logout/Share in Header
   function injectSettingsGearHeader() {
     const topActions = document.getElementById("jamiaTopActionsBar") || document.querySelector(".top-actions, header");
     if (!topActions || document.getElementById("jamiaSettingsHeaderBtn")) return;
@@ -4075,7 +4079,7 @@ window.openViewer = function(url, title) {
       bar.id = "jamiaContinueBar";
       bar.innerHTML = `
         <div class="jc-info">
-          <i class="fa-solid fa-clock-rotate-left" style="color:#10b981;"></i>
+          <i class="fa-solid fa-clock-rotate-left" style="color:var(--jamia-primary,#10b981);"></i>
           <span id="jamiaContinueText">پچھلا مطالعہ جاری رکھیں</span>
         </div>
         <div style="display:flex; gap:6px; align-items:center;">
@@ -4160,7 +4164,7 @@ window.openViewer = function(url, title) {
     filterContainer.appendChild(favTab);
   }
 
-  // --- Bulletproof Audio Loop & Strict Ellipsis Title ---
+  // --- Perfect Audio Loop & Auto-Next / Seamless Repeat ---
   window.jamiaCurrentPlayingIndex = 0;
   window.jamiaIsLoopActive = false;
 
@@ -4169,7 +4173,7 @@ window.openViewer = function(url, title) {
     if (btnEl) {
       if (window.jamiaIsLoopActive) {
         btnEl.classList.add("active-loop");
-        btnEl.title = "لوپ: آن";
+        btnEl.title = "لوپ: آن (مسلسل بجتی رہے گی)";
       } else {
         btnEl.classList.remove("active-loop");
         btnEl.title = "لوپ: آف";
@@ -4207,7 +4211,7 @@ window.openViewer = function(url, title) {
     `;
     timeEl.parentElement.appendChild(nav);
 
-    // FIXED Title Box: Strict Ellipsis inside box (No breaking out)
+    // FIXED Title Ellipsis inside box (No breaking out)
     const titleEl = document.getElementById("audioPlayerTitle");
     if (titleEl) {
       titleEl.style.cssText = "font-size: 0.82rem; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right; width: 100%; display: block;";
@@ -4293,12 +4297,12 @@ window.openViewer = function(url, title) {
     window.jamiaLastIntroCopyText = "📚 عنوان: " + title + "\n📂 شعبہ: " + cat + "\n🏛️ پیشکش: جامعۃ الرضا ڈیجیٹل کتب خانہ\n🔗 لنک: " + window.location.origin;
 
     content.innerHTML = `
-      <h3 style="margin:0 0 10px 0; color:#10b981; font-size:1.1rem;">📖 کتاب / نعت کا تعارف</h3>
+      <h3 style="margin:0 0 10px 0; color:var(--jamia-primary, #10b981); font-size:1.1rem;">📖 کتاب / نعت کا تعارف</h3>
       <p style="margin:6px 0; font-size:0.95rem;"><strong>عنوان:</strong> ${title}</p>
       <p style="margin:6px 0 10px 0; font-size:0.88rem; color:#a7f3d0;"><strong>شعبہ:</strong> ${cat}</p>
       <p style="margin:0 0 14px 0; font-size:0.82rem; color:#cbd5e1;">جامعۃ الرضا ڈیجیٹل لائبریری کی جانب سے طلبہ کے مطالعہ کے لیے مستند آن لائن نسخہ۔</p>
       <div style="display:flex; gap:8px;">
-        <button type="button" onclick="window.jamiaCopyHelper(null, this)" style="flex:1; background:#10b981; color:#022c22; border:none; padding:10px; border-radius:12px; font-weight:bold; cursor:pointer;">📋 تفصیل کاپی کریں</button>
+        <button type="button" onclick="window.jamiaCopyHelper(null, this)" style="flex:1; background:var(--jamia-primary, #10b981); color:#022c22; border:none; padding:10px; border-radius:12px; font-weight:bold; cursor:pointer;">📋 تفصیل کاپی کریں</button>
         <button type="button" onclick="document.getElementById('jamiaSmartModal').style.display='none'" style="background:#1e293b; color:#fff; border:none; padding:9px 14px; border-radius:12px; cursor:pointer;">بند کریں</button>
       </div>`;
     modal.style.display = "flex";
@@ -4320,11 +4324,11 @@ window.openViewer = function(url, title) {
     }
 
     content.innerHTML = `
-      <h3 style="margin:0 0 8px 0; color:#10b981; font-size:1.1rem;">📩 کتاب یا نعت کی فرمائش</h3>
+      <h3 style="margin:0 0 8px 0; color:var(--jamia-primary, #10b981); font-size:1.1rem;">📩 کتاب یا نعت کی فرمائش</h3>
       <p style="margin:0 0 10px 0; font-size:0.8rem; color:#cbd5e1;">مطلوبہ کتاب یا نعت کا نام لکھیں:</p>
-      <input id="jamiaReqInput" type="text" placeholder="نام لکھیں..." style="width:100%; padding:10px; border-radius:10px; border:1px solid #10b981; background:#022c22; color:#fff; margin-bottom:10px; box-sizing:border-box;">
+      <input id="jamiaReqInput" type="text" placeholder="نام لکھیں..." style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--jamia-primary, #10b981); background:#022c22; color:#fff; margin-bottom:10px; box-sizing:border-box;">
       <div style="display:flex; flex-direction:column; gap:8px;">
-        <button type="button" onclick="window.submitJamiaRequest()" style="background:#10b981; color:#022c22; border:none; padding:10px; border-radius:12px; font-weight:bold; cursor:pointer;"><i class="fa-brands fa-whatsapp"></i> فرمائش محفوظ کریں اور واٹس ایپ پر بھیجیں ◀</button>
+        <button type="button" onclick="window.submitJamiaRequest()" style="background:var(--jamia-primary, #10b981); color:#022c22; border:none; padding:10px; border-radius:12px; font-weight:bold; cursor:pointer;"><i class="fa-brands fa-whatsapp"></i> فرمائش محفوظ کریں اور واٹس ایپ پر بھیجیں ◀</button>
         <button type="button" onclick="document.getElementById('jamiaSmartModal').style.display='none'" style="background:#1e293b; color:#fff; border:none; padding:8px 14px; border-radius:12px; cursor:pointer;">بند کریں</button>
       </div>
       ${reqsHtml}
@@ -4398,11 +4402,14 @@ window.openViewer = function(url, title) {
         const r = origPlay.apply(this, arguments);
         const audio = document.getElementById("globalHtmlAudio");
         if (audio) {
-          // Robust Loop Listener: Agar loop active hai toh end hone par ya 1s pehle restart kar dena
-          audio.ontimeupdate = function() {
-            if (window.jamiaIsLoopActive && audio.duration && (audio.duration - audio.currentTime < 1.2)) {
+          // Clean & Reliable onended listener for loop or auto-next seamless play
+          audio.onended = function() {
+            if (window.jamiaIsLoopActive) {
               audio.currentTime = 0;
               audio.play().catch(()=>{});
+            } else {
+              // Automatically play the next naat seamlessly
+              window.jamiaPlayAdjacentNaat(1);
             }
           };
         }
