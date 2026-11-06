@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jamia-offline-cache-v1';
+const CACHE_NAME = 'jamia-v1793959629';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

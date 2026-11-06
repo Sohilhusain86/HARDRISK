@@ -3669,6 +3669,32 @@ window.openViewer = function(url, title) {
 
 
 
+
+
+<script id="jamia-offline-storage-engine">
+(function() {
+  // Service Worker Registration for Offline Caching
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('./sw.js').then(function(reg) {
+        console.log('Jamia Offline ServiceWorker registered successfully:', reg.scope);
+      }).catch(function(err) {
+        console.log('ServiceWorker registration failed:', err);
+      });
+    });
+  }
+
+  // Hook PDF Viewer & Audio to cache blobs/files locally in IndexedDB/CacheStorage
+  window.addEventListener('DOMContentLoaded', function() {
+    if ('caches' in window) {
+      caches.open('jamia-offline-books-v1').then(function(cache) {
+        console.log('Jamia Offline Cache Storage Initialized.');
+      });
+    }
+  });
+})();
+</script>
+
 <!-- JAMIA_10_FEATURES_START -->
 <style id="jamia-10-features-css">
   #jamiaContinueBar {
@@ -3809,7 +3835,7 @@ window.openViewer = function(url, title) {
 
 <script id="jamia-smart-blinker-engine">
 (function() {
-  // Red Dot: True Drive Books & Naats Loader + Exact 2s Auto-Hide
+  // True Blinker Engine: Jab tak asli drive books aur naats render na ho jayein, red dot nahi hatega
   window.jamiaLoadStatus = { booksDone: false, naatsDone: false };
 
   window.checkAndHideBlinker = function() {
@@ -3822,7 +3848,9 @@ window.openViewer = function(url, title) {
     if (window.JAMIA_NAATS_LIST && window.JAMIA_NAATS_LIST.length > 0) {
       window.jamiaLoadStatus.naatsDone = true;
     }
-    if (window.ALL_BOOKS_CACHE && window.ALL_BOOKS_CACHE.length > 5) {
+    // Jab total cards 10 ya usse zyada render ho jayein tabhi books load maani jayengi
+    const cardsCount = document.querySelectorAll(".j-btn-row").length;
+    if (cardsCount >= 10 || (window.ALL_BOOKS_CACHE && window.ALL_BOOKS_CACHE.length > 10)) {
       window.jamiaLoadStatus.booksDone = true;
     }
 
@@ -3834,14 +3862,14 @@ window.openViewer = function(url, title) {
       if (textSpan) textSpan.innerText = "تمام کتب و نعتیں لوڈ ہو گئیں ✓";
       if (window.updateJamiaCategoryCounts) window.updateJamiaCategoryCounts();
       
-      // Load hone ke theek 2 second baad smooth fade-out
+      // Bilkul theek 2 second baad smooth fade-out
       setTimeout(function() {
         b.style.transition = "opacity 0.6s ease";
         b.style.opacity = "0";
         setTimeout(function() { b.style.display = "none"; }, 600);
       }, 2000);
     } else if (window.jamiaLoadStatus.booksDone && !window.jamiaLoadStatus.naatsDone) {
-      if (textSpan) textSpan.innerText = "نعتیں لوڈ ہو رہی ہیں...";
+      if (textSpan) textSpan.innerText = "نعتیں لوڈ ہو रही हैं...";
     } else if (!window.jamiaLoadStatus.booksDone && window.jamiaLoadStatus.naatsDone) {
       if (textSpan) textSpan.innerText = "مزید کتب لوڈ ہو رہی ہیں...";
     } else {
@@ -3855,7 +3883,7 @@ window.openViewer = function(url, title) {
     if (b && b.dataset.hidden === "1") clearInterval(tInterval);
   }, 400);
 
-  // Safety fallback (10s max)
+  // Safety fallback (12 seconds)
   setTimeout(function() {
     var b = document.getElementById("jamiaSyncBlinker");
     if (b && b.dataset.hidden !== "1") {
@@ -3864,7 +3892,7 @@ window.openViewer = function(url, title) {
       b.style.opacity = "0";
       setTimeout(function() { b.style.display = "none"; }, 600);
     }
-  }, 10000);
+  }, 12000);
 })();
 </script>
 
@@ -3884,7 +3912,7 @@ window.openViewer = function(url, title) {
     return f.includes(id) || (title && f.includes(title.trim()));
   };
 
-  // 1. Continue Reading Bar with Hide/Show Toggle
+  // 1. Continue Bar with Hide/Show Toggle
   function ensureContinueBar() {
     let bar = document.getElementById("jamiaContinueBar");
     if (!bar) {
@@ -4137,7 +4165,7 @@ window.openViewer = function(url, title) {
     modal.style.display = "flex";
   };
 
-  // 10. Request Modal (Direct to your WhatsApp number 918439602526)
+  // 10. Request Modal (Auto-Save + Clean WhatsApp 918439602526 without showing raw number text)
   window.openJamiaRequestModal = function() {
     const modal = document.getElementById("jamiaSmartModal");
     const content = document.getElementById("jamiaSmartModalContent");
@@ -4148,40 +4176,35 @@ window.openViewer = function(url, title) {
     let reqsHtml = "";
     if (reqs.length > 0) {
       reqsHtml = `<div style="margin-top:14px; border-top:1px solid #065f46; padding-top:10px; max-height:140px; overflow-y:auto;">
-        <p style="font-size:0.78rem; color:#34d399; font-weight:bold; margin:0 0 6px 0;">📋 اس فون سے بھیجی گئی فرمائشیں:</p>
+        <p style="font-size:0.78rem; color:#34d399; font-weight:bold; margin:0 0 6px 0;">📋 اس فون پر محفوظ فرمائشیں:</p>
         ${reqs.map((r, i) => `<div style="font-size:0.75rem; background:#022c22; padding:5px 8px; border-radius:6px; margin-top:4px;">${i+1}. <b>${r.item}</b> <span style="color:#94a3b8;">(${r.user || studentName})</span></div>`).join("")}
       </div>`;
     }
 
     content.innerHTML = `
-      <h3 style="margin:0 0 8px 0; color:#10b981; font-size:1.1rem;">📩 کتاب یا نعت کی فرمائش (ایڈمن کو بھیجیں)</h3>
-      <p style="margin:0 0 10px 0; font-size:0.8rem; color:#cbd5e1;">مطلوبہ کتاب یا نعت کا نام لکھیں (یہ سیدھے سہیل حسین کے واٹس ایپ پر جائے گی):</p>
-      <input id="jamiaReqInput" type="text" placeholder="نام لکھیں..." style="width:100%; padding:10px; border-radius:10px; border:1px solid #10b981; background:#022c22; color:#fff; margin-bottom:10px; box-sizing:border-box;">
+      <h3 style="margin:0 0 8px 0; color:#10b981; font-size:1.1rem;">📩 کتاب یا نعت کی فرمائش</h3>
+      <p style="margin:0 0 10px 0; font-size:0.8rem; color:#cbd5e1;">مطلوبہ کتاب یا نعت کا نام لکھیں (یہ خودبخود محفوظ ہو کر ایڈمن کو واٹس ایپ پر چلی جائے گی):</p>
+      <input id="jamiaReqInput" type="text" placeholder="مطلوبہ کتاب یا نعت کا نام لکھیں..." style="width:100%; padding:10px; border-radius:10px; border:1px solid #10b981; background:#022c22; color:#fff; margin-bottom:10px; box-sizing:border-box;">
       <div style="display:flex; flex-direction:column; gap:8px;">
-        <button type="button" onclick="window.submitJamiaRequest(true)" style="background:#10b981; color:#022c22; border:none; padding:10px; border-radius:12px; font-weight:bold; cursor:pointer;"><i class="fa-brands fa-whatsapp"></i> واٹس ایپ پر بھیجیں (918439602526) ◀</button>
-        <div style="display:flex; gap:8px;">
-          <button type="button" onclick="window.submitJamiaRequest(false)" style="flex:1; background:#065f46; color:#ecfdf5; border:1px solid #10b981; padding:8px; border-radius:12px; font-size:0.8rem; cursor:pointer;">محفوظ کریں ✓</button>
-          <button type="button" onclick="document.getElementById('jamiaSmartModal').style.display='none'" style="background:#1e293b; color:#fff; border:none; padding:8px 14px; border-radius:12px; cursor:pointer;">بند کریں</button>
-        </div>
+        <button type="button" onclick="window.submitJamiaRequest()" style="background:#10b981; color:#022c22; border:none; padding:10px; border-radius:12px; font-weight:bold; cursor:pointer;"><i class="fa-brands fa-whatsapp"></i> فرمائش محفوظ کریں اور واٹس ایپ پر بھیجیں ◀</button>
+        <button type="button" onclick="document.getElementById('jamiaSmartModal').style.display='none'" style="background:#1e293b; color:#fff; border:none; padding:8px 14px; border-radius:12px; cursor:pointer;">بند کریں</button>
       </div>
       ${reqsHtml}
     `;
     modal.style.display = "flex";
   };
 
-  window.submitJamiaRequest = function(sendViaWhatsApp) {
+  window.submitJamiaRequest = function() {
     const val = (document.getElementById("jamiaReqInput")?.value || "").trim();
-    if (!val) { alert("براہِ کرم پہلے نام لکھیں!"); return; }
+    if (!val) { alert("براہِ کرم پہلے کتاب یا نعت کا نام لکھیں!"); return; }
     const studentName = localStorage.getItem("jamia_ula_name") || "طالب علم";
     const reqs = JSON.parse(localStorage.getItem("jamia_user_requests") || "[]");
     reqs.unshift({ item: val, user: studentName, date: new Date().toISOString() });
     localStorage.setItem("jamia_user_requests", JSON.stringify(reqs));
 
-    if (sendViaWhatsApp) {
-      const waText = "📚 *جامعۃ الرضا ڈیجیٹل کتب خانہ - نئی فرمائش*\n👤 نام: " + studentName + "\n📖 مطلوبہ کتاب/نعت: *" + val + "*";
-      // Direct WhatsApp link targeting your specific number 918439602526
-      window.open("https://api.whatsapp.com/send?phone=918439602526&text=" + encodeURIComponent(waText), "_blank");
-    }
+    // Auto-save ho gaya, ab seedha clean WhatsApp URL open karega (No raw number text on button)
+    const waText = "📚 *جامعۃ الرضا ڈیجیٹل کتب خانہ - نئی فرمائش*\n👤 نام: " + studentName + "\n📖 مطلوبہ کتاب/نعت: *" + val + "*";
+    window.open("https://api.whatsapp.com/send?phone=918439602526&text=" + encodeURIComponent(waText), "_blank");
     window.openJamiaRequestModal();
   };
 
@@ -4299,36 +4322,11 @@ window.openViewer = function(url, title) {
 
   document.addEventListener("DOMContentLoaded", function() {
     boot();
-    setTimeout(checkAndAutoOpenSharedBook, 800);
+    setTimeout(checkAndAuthOpenSharedBook, 800);
   });
   boot();
 })();
 </script>
 <!-- JAMIA_10_FEATURES_END -->
-
-<script id="jamia-offline-storage-engine">
-(function() {
-  // Service Worker Registration for Offline Caching
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('./sw.js').then(function(reg) {
-        console.log('Jamia Offline ServiceWorker registered successfully:', reg.scope);
-      }).catch(function(err) {
-        console.log('ServiceWorker registration failed:', err);
-      });
-    });
-  }
-
-  // Hook PDF Viewer & Audio to cache blobs/files locally in IndexedDB/CacheStorage
-  window.addEventListener('DOMContentLoaded', function() {
-    if ('caches' in window) {
-      caches.open('jamia-offline-books-v1').then(function(cache) {
-        console.log('Jamia Offline Cache Storage Initialized.');
-      });
-    }
-  });
-})();
-</script>
-
 </body>
 </html>
