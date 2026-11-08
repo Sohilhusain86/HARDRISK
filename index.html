@@ -4534,5 +4534,188 @@ window.openViewer = function(url, title) {
 })();
 </script>
 <!-- JAMIA_10_FEATURES_END -->
+<!-- JAMIA_LIVE_TRACKER_START -->
+<style>
+  #jamiaUsagePill {
+    position: fixed; bottom: 75px; left: 10px; z-index: 99990;
+    background: rgba(15, 23, 42, 0.92); color: #f8fafc;
+    border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 30px;
+    padding: 5px 12px; font-size: 11px; font-family: sans-serif;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4); backdrop-filter: blur(6px);
+  }
+  #jamiaUsagePill .u-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; display: inline-block; }
+  #jamiaUsagePill .u-btn {
+    background: rgba(255,255,255,0.1); border: none; color: #38bdf8;
+    border-radius: 50%; width: 22px; height: 22px; cursor: pointer;
+    font-size: 11px; display: inline-flex; align-items: center; justify-content: center;
+  }
+  #jamiaAdminModal {
+    display: none; position: fixed; inset: 0; z-index: 99999;
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+    padding: 15px; overflow-y: auto; font-family: sans-serif; color: #fff;
+  }
+  .ja-box {
+    max-width: 650px; margin: 20px auto; background: #1e293b;
+    border: 1px solid #334155; border-radius: 14px; padding: 15px;
+  }
+  .ja-row {
+    background: #0f172a; border: 1px solid #334155; border-radius: 10px;
+    padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between;
+    align-items: center; font-size: 12px;
+  }
+</style>
+
+<div id="jamiaUsagePill">
+  <span class="u-dot"></span>
+  <span>اسکرین: <b id="juActive">0m 0s</b></span>
+  <span style="opacity:0.4">|</span>
+  <span>بیک گراؤنڈ: <b id="juBg" style="color:#f59e0b;">0m 0s</b></span>
+  <button class="u-btn" onclick="openJamiaAdminStats()" title="Admin Analytics">📊</button>
+</div>
+
+<div id="jamiaAdminModal">
+  <div class="ja-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h3 style="margin:0; font-size:16px; color:#10b981;">📊 لائیو وزٹرز اور استعمال ریکارڈ</h3>
+      <div>
+        <button onclick="loadJamiaAdminLogs()" style="background:#0284c7; color:#fff; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:12px;">🔄 Refresh</button>
+        <button onclick="document.getElementById('jamiaAdminModal').style.display='none'" style="background:#ef4444; color:#fff; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:12px; margin-left:5px;">✕</button>
+      </div>
+    </div>
+    <div id="jaSummary" style="font-size:12px; color:#94a3b8; margin-bottom:10px;">لوڈ ہو رہا ہے...</div>
+    <div id="jaList"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const TRACK_API = "https://script.google.com/macros/s/AKfycbwi02ykZWWmq3nedwL0ULzk730QAJbwo7E_saM0hM32DOBI7ATrdWijHxvKfTZeY95-Ug/exec";
+  const todayKey = new Date().toISOString().slice(0,10);
+
+  let uid = localStorage.getItem("jamia_uid");
+  if (!uid) {
+    uid = "u_" + Math.random().toString(36).substring(2, 10) + "_" + Date.now().toString(36);
+    localStorage.setItem("jamia_uid", uid);
+  }
+
+  let savedDay = localStorage.getItem("jamia_track_day");
+  if (savedDay !== todayKey) {
+    localStorage.setItem("jamia_track_day", todayKey);
+    localStorage.setItem("jamia_active_sec", "0");
+    localStorage.setItem("jamia_bg_sec", "0");
+  }
+
+  let activeSec = parseInt(localStorage.getItem("jamia_active_sec") || "0", 10);
+  let bgSec = parseInt(localStorage.getItem("jamia_bg_sec") || "0", 10);
+  let lastTick = Date.now();
+
+  function fmtTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    if (h > 0) return h + "h " + m + "m";
+    return m + "m " + s + "s";
+  }
+
+  function getDeviceModel() {
+    const ua = navigator.userAgent;
+    const m = ua.match(/\(([^)]+)\)/);
+    if (!m) return "Mobile";
+    const parts = m[1].split(";");
+    return (parts[parts.length - 1] || "Phone").replace(/Build\/.*/i, "").trim().slice(0, 22);
+  }
+
+  setInterval(function() {
+    const now = Date.now();
+    const delta = Math.min(60, Math.max(1, Math.round((now - lastTick) / 1000)));
+    lastTick = now;
+
+    if (document.visibilityState === "visible") {
+      activeSec += delta;
+      localStorage.setItem("jamia_active_sec", String(activeSec));
+    } else {
+      bgSec += delta;
+      localStorage.setItem("jamia_bg_sec", String(bgSec));
+    }
+
+    const aEl = document.getElementById("juActive");
+    const bEl = document.getElementById("juBg");
+    if (aEl) aEl.textContent = fmtTime(activeSec);
+    if (bEl) bEl.textContent = fmtTime(bgSec);
+  }, 1000);
+
+  function syncWithServer() {
+    const uName = localStorage.getItem("jamia_ula_name") || (document.getElementById("user-name") && document.getElementById("user-name").value) || "Guest (Login Screen)";
+    const total = activeSec + bgSec;
+    const qs = "?action=track&uid=" + encodeURIComponent(uid)
+             + "&name=" + encodeURIComponent(uName)
+             + "&active=" + activeSec
+             + "&bg=" + bgSec
+             + "&total=" + total
+             + "&dev=" + encodeURIComponent(getDeviceModel())
+             + "&t=" + Date.now();
+    fetch(TRACK_API + qs, { mode: "no-cors", keepalive: true }).catch(function(){});
+  }
+
+  setTimeout(syncWithServer, 3000);
+  setInterval(syncWithServer, 25000);
+  document.addEventListener("visibilitychange", syncWithServer);
+
+  window.openJamiaAdminStats = function() {
+    if (sessionStorage.getItem("jamia_admin_ok") !== "1") {
+      const pin = prompt("ایڈمن پن کوڈ درج کریں (Admin PIN):");
+      if (pin !== "7860") {
+        alert("غلط پن کوڈ!");
+        return;
+      }
+      sessionStorage.setItem("jamia_admin_ok", "1");
+    }
+    document.getElementById("jamiaAdminModal").style.display = "block";
+    window.loadJamiaAdminLogs();
+  };
+
+  window.loadJamiaAdminLogs = async function() {
+    const listEl = document.getElementById("jaList");
+    const sumEl = document.getElementById("jaSummary");
+    sumEl.textContent = "ڈیٹا لوڈ ہو رہا ہے...";
+    try {
+      const res = await fetch(TRACK_API + "?action=get_logs&t=" + Date.now());
+      const data = await res.json();
+      const arr = Object.keys(data).map(k => data[k]).sort((a,b) => (b.lastSeen||0) - (a.lastSeen||0));
+      const now = Date.now();
+      let onlineCount = 0;
+
+      listEl.innerHTML = arr.map(u => {
+        const diffSec = Math.floor((now - (u.lastSeen || 0)) / 1000);
+        const isOnline = diffSec < 45;
+        if (isOnline) onlineCount++;
+        const timeStr = new Date(u.lastSeen).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        return `<div class="ja-row">
+          <div>
+            <div style="font-weight:bold; font-size:13px; color:${isOnline ? '#10b981' : '#f8fafc'};">
+              ${isOnline ? '🟢 Online' : '⚪ Offline'} • ${u.name}
+            </div>
+            <div style="color:#94a3b8; font-size:11px; margin-top:3px;">
+              📱 ${u.device || 'Phone'} | 🕒 آخری بار: ${timeStr} (${diffSec < 60 ? diffSec + 's ago' : Math.floor(diffSec/60) + 'm ago'})
+            </div>
+          </div>
+          <div style="text-align:right; line-height:1.5;">
+            <div style="color:#38bdf8;">اسکرین: <b>${fmtTime(u.activeSec||0)}</b></div>
+            <div style="color:#f59e0b;">بیک گراؤنڈ: <b>${fmtTime(u.bgSec||0)}</b></div>
+          </div>
+        </div>`;
+      }).join("") || "<div style='padding:15px;text-align:center;'>ابھی کوئی ریکارڈ نہیں ہے</div>";
+
+      sumEl.innerHTML = `کل وزٹرز: <b>${arr.length}</b> | اس وقت آن لائن: <b style="color:#10b981;">${onlineCount}</b>`;
+    } catch (e) {
+      sumEl.textContent = "لوڈ کرنے میں دشواری: " + e.message;
+    }
+  };
+})();
+</script>
+<!-- JAMIA_LIVE_TRACKER_END -->
+
 </body>
 </html>
