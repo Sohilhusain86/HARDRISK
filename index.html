@@ -3223,7 +3223,17 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
 function handleSiteLogout() {
   if (!confirm("کیا آپ واقعی لاگ آؤٹ کرنا چاہتے ہیں؟\n(Are you sure you want to log out?)")) return;
   try {
+    (function(){
+    var keep = {};
+    for(var i=0; i<localStorage.length; i++){
+        var k = localStorage.key(i);
+        if(!/jamia_ula_name|jamia_ula_expiry|auth|session|pass/i.test(k)){
+            keep[k] = localStorage.getItem(k);
+        }
+    }
     localStorage.clear();
+    for(var k in keep){ localStorage.setItem(k, keep[k]); }
+})();
     sessionStorage.clear();
   } catch (e) {}
   alert("کامیابی کے ساتھ لاگ آؤٹ ہو گئے۔\n(Successfully logged out)");
@@ -4716,6 +4726,143 @@ window.openViewer = function(url, title) {
 })();
 </script>
 <!-- JAMIA_LIVE_TRACKER_END -->
+
+
+<script id="jamia-emerald-ram-engine">
+(function() {
+  // Keep Red Dot hidden while on login screen, without deleting its state
+  function checkLoginRedDot() {
+    var savedName = localStorage.getItem('jamia_ula_name');
+    var savedExpiry = localStorage.getItem('jamia_ula_expiry');
+    var isLoggedIn = savedName && savedExpiry && (Date.now() < parseInt(savedExpiry, 10));
+    var dots = document.querySelectorAll('.red-dot, .notification-dot, #redDot, #notifDot, [id*="RedDot"], [class*="red-dot"]');
+    dots.forEach(function(d) {
+      if (!isLoggedIn) {
+        d.dataset.loginHidden = "1";
+        d.style.setProperty("display", "none", "important");
+      } else if (d.dataset.loginHidden === "1") {
+        d.style.removeProperty("display");
+        delete d.dataset.loginHidden;
+        if (window.syncJamiaRedDot) window.syncJamiaRedDot();
+      }
+    });
+  }
+  setInterval(checkLoginRedDot, 400);
+  window.addEventListener("DOMContentLoaded", checkLoginRedDot);
+
+  // Connect existing #emeraldAudioBar popup to RAM Blob Engine (No black iframe!)
+  var activeFetchController = null;
+  var currentBlobUrl = null;
+
+  function applyEmeraldRamPlayer() {
+    window.playAudio = async function(audioUrlOrId, title) {
+      const bar = document.getElementById("emeraldAudioBar");
+      const audio = document.getElementById("globalHtmlAudio");
+      const titleEl = document.getElementById("audioPlayerTitle");
+      const timeEl = document.getElementById("audioPlayerTime");
+      const icon = document.getElementById("audioPlayIcon");
+      const prog = document.getElementById("audioProgressBar");
+      const playBtn = document.getElementById("audioPlayPauseBtn");
+
+      if (!bar || !audio) return;
+
+      // Remove any old black Google Drive iframe box
+      document.querySelectorAll(".driveEmbedBoxClass").forEach(el => el.remove());
+
+      // Restore native emerald controls inside the popup
+      if (prog) prog.style.display = "block";
+      if (playBtn) playBtn.style.display = "flex";
+      bar.style.display = "flex";
+      bar.classList.add("active");
+
+      const cleanT = (typeof cleanNaatTitle === "function") ? cleanNaatTitle(title || "نعت شریف") : (title || "نعت شریف");
+      if (titleEl) titleEl.innerText = cleanT;
+      if (timeEl) timeEl.innerText = "⏳ میموری میں لوڈ ہو رہا ہے...";
+      if (icon) icon.className = "fa-solid fa-spinner fa-spin";
+
+      // Extract Drive File ID or URL
+      let fileId = audioUrlOrId || "";
+      const idMatch = fileId.match(/id=([^&]+)/) || fileId.match(/\/d\/([^\/]+)/) || fileId.match(/[-\w]{25,}/);
+      let proxyUrl = "";
+      if (idMatch && (fileId.includes("drive.google.com") || fileId.includes("docs.google.com") || !fileId.startsWith("http"))) {
+        proxyUrl = "/api/stream?id=" + encodeURIComponent(idMatch[1] || idMatch[0]);
+      } else {
+        proxyUrl = "/api/stream?url=" + encodeURIComponent(fileId);
+      }
+
+      // Cancel any previous loading naat
+      if (activeFetchController) activeFetchController.abort();
+      activeFetchController = new AbortController();
+
+      audio.pause();
+      audio.loop = !!window.jamiaIsLoopActive;
+
+      try {
+        const res = await fetch(proxyUrl, { signal: activeFetchController.signal });
+        if (!res.ok) throw new Error("Stream error");
+        const blob = await res.blob();
+        if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
+        currentBlobUrl = URL.createObjectURL(blob);
+        audio.src = currentBlobUrl;
+        audio.loop = !!window.jamiaIsLoopActive;
+        await audio.play();
+        if (icon) icon.className = "fa-solid fa-pause";
+      } catch (err) {
+        if (err.name === "AbortError") return;
+        // Fallback to direct proxy stream
+        audio.src = proxyUrl;
+        audio.loop = !!window.jamiaIsLoopActive;
+        audio.play().then(() => {
+          if (icon) icon.className = "fa-solid fa-pause";
+        }).catch(() => {
+          if (icon) icon.className = "fa-solid fa-play";
+          if (timeEl) timeEl.innerText = "پلے بٹن دبائیں ▶️";
+        });
+      }
+    };
+
+    window.openJamiaAudioModal = window.playAudio;
+    window.playNaat = window.playAudio;
+
+    // Ensure loop button and ended event work 100% seamlessly with existing controls
+    const audio = document.getElementById("globalHtmlAudio");
+    if (audio) {
+      audio.onended = function() {
+        const icon = document.getElementById("audioPlayIcon");
+        const prog = document.getElementById("audioProgressBar");
+        if (window.jamiaIsLoopActive || audio.loop) {
+          audio.currentTime = 0;
+          audio.play().catch(() => {});
+          if (icon) icon.className = "fa-solid fa-pause";
+        } else {
+          if (icon) icon.className = "fa-solid fa-play";
+          if (prog) prog.value = 0;
+        }
+      };
+    }
+
+    // Hook existing jamiaToggleLoop so it also sets audio.loop directly
+    const origToggleLoop = window.jamiaToggleLoop;
+    window.jamiaToggleLoop = function(btnEl) {
+      if (typeof origToggleLoop === "function") {
+        origToggleLoop(btnEl);
+      } else {
+        window.jamiaIsLoopActive = !window.jamiaIsLoopActive;
+        if (btnEl) btnEl.classList.toggle("active-loop", window.jamiaIsLoopActive);
+      }
+      const aud = document.getElementById("globalHtmlAudio");
+      if (aud) aud.loop = !!window.jamiaIsLoopActive;
+    };
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", applyEmeraldRamPlayer);
+  } else {
+    applyEmeraldRamPlayer();
+  }
+  window.addEventListener("load", applyEmeraldRamPlayer);
+})();
+</script>
 
 </body>
 </html>
