@@ -5113,5 +5113,48 @@ window.openViewer = function(url, title) {
 })();
 </script>
 
+
+<style id="jamia-time-badge-layer-fix">
+  /* Audio Player popup ko Time badge se upar rakhna */
+  #emeraldAudioBar,
+  #emeraldAudioBar.active {
+    z-index: 2147483640 !important;
+  }
+  /* Modals (Sleep Timer waghera) ko Audio Player se bhi upar rakhna */
+  #ddMusicSleepModal,
+  #portalModalOverlay,
+  #jamiaSmartModal,
+  .sec-modal-overlay {
+    z-index: 2147483647 !important;
+  }
+</style>
+<script id="jamia-time-badge-down-script">
+(function() {
+  function pushTimeBadgeDown() {
+    var bar = document.getElementById("emeraldAudioBar");
+    var isPlayerOpen = bar && bar.classList.contains("active") && bar.style.display !== "none";
+    var allDivs = document.querySelectorAll("div, span, button");
+    for (var i = 0; i < allDivs.length; i++) {
+      var el = allDivs[i];
+      if (el.children.length <= 6 && el.innerText && el.innerText.indexOf("بیک گراؤنڈ:") !== -1 && el.innerText.indexOf("اسکرین:") !== -1) {
+        var st = window.getComputedStyle(el);
+        if (st.position === "fixed" || st.position === "absolute") {
+          el.style.setProperty("z-index", "9990", "important");
+          if (isPlayerOpen) {
+            el.style.setProperty("opacity", "0", "important");
+            el.style.setProperty("pointer-events", "none", "important");
+          } else {
+            el.style.removeProperty("opacity");
+            el.style.removeProperty("pointer-events");
+          }
+        }
+      }
+    }
+  }
+  setInterval(pushTimeBadgeDown, 300);
+  window.addEventListener("DOMContentLoaded", pushTimeBadgeDown);
+})();
+</script>
+
 </body>
 </html>
