@@ -4728,151 +4728,10 @@ window.openViewer = function(url, title) {
 <!-- JAMIA_LIVE_TRACKER_END -->
 
 
-<script id="jamia-emerald-ram-engine">
-(function() {
-  // Keep Red Dot hidden while on login screen, without deleting its state
-  function checkLoginRedDot() {
-    var savedName = localStorage.getItem('jamia_ula_name');
-    var savedExpiry = localStorage.getItem('jamia_ula_expiry');
-    var isLoggedIn = savedName && savedExpiry && (Date.now() < parseInt(savedExpiry, 10));
-    var dots = document.querySelectorAll('.red-dot, .notification-dot, #redDot, #notifDot, [id*="RedDot"], [class*="red-dot"]');
-    dots.forEach(function(d) {
-      if (!isLoggedIn) {
-        d.dataset.loginHidden = "1";
-        d.style.setProperty("display", "none", "important");
-      } else if (d.dataset.loginHidden === "1") {
-        d.style.removeProperty("display");
-        delete d.dataset.loginHidden;
-        if (window.syncJamiaRedDot) window.syncJamiaRedDot();
-      }
-    });
-  }
-  setInterval(checkLoginRedDot, 400);
-  window.addEventListener("DOMContentLoaded", checkLoginRedDot);
-
-  // Connect existing #emeraldAudioBar popup to RAM Blob Engine (No black iframe!)
-  var activeFetchController = null;
-  var currentBlobUrl = null;
-
-  function applyEmeraldRamPlayer() {
-    window.playAudio = async function(audioUrlOrId, title) {
-      const bar = document.getElementById("emeraldAudioBar");
-      const audio = document.getElementById("globalHtmlAudio");
-      const titleEl = document.getElementById("audioPlayerTitle");
-      const timeEl = document.getElementById("audioPlayerTime");
-      const icon = document.getElementById("audioPlayIcon");
-      const prog = document.getElementById("audioProgressBar");
-      const playBtn = document.getElementById("audioPlayPauseBtn");
-
-      if (!bar || !audio) return;
-
-      // Remove any old black Google Drive iframe box
-      document.querySelectorAll(".driveEmbedBoxClass").forEach(el => el.remove());
-
-      // Restore native emerald controls inside the popup
-      if (prog) prog.style.display = "block";
-      if (playBtn) playBtn.style.display = "flex";
-      bar.style.display = "flex";
-      bar.classList.add("active");
-
-      const cleanT = (typeof cleanNaatTitle === "function") ? cleanNaatTitle(title || "نعت شریف") : (title || "نعت شریف");
-      if (titleEl) titleEl.innerText = cleanT;
-      if (timeEl) timeEl.innerText = "⏳ میموری میں لوڈ ہو رہا ہے...";
-      if (icon) icon.className = "fa-solid fa-spinner fa-spin";
-
-      // Extract Drive File ID or URL
-      let fileId = audioUrlOrId || "";
-      const idMatch = fileId.match(/id=([^&]+)/) || fileId.match(/\/d\/([^\/]+)/) || fileId.match(/[-\w]{25,}/);
-      let proxyUrl = "";
-      if (idMatch && (fileId.includes("drive.google.com") || fileId.includes("docs.google.com") || !fileId.startsWith("http"))) {
-        proxyUrl = "/api/stream?id=" + encodeURIComponent(idMatch[1] || idMatch[0]);
-      } else {
-        proxyUrl = "/api/stream?url=" + encodeURIComponent(fileId);
-      }
-
-      // Cancel any previous loading naat
-      if (activeFetchController) activeFetchController.abort();
-      activeFetchController = new AbortController();
-
-      audio.pause();
-      audio.loop = !!window.jamiaIsLoopActive;
-
-      try {
-        const res = await fetch(proxyUrl, { signal: activeFetchController.signal });
-        if (!res.ok) throw new Error("Stream error");
-        const blob = await res.blob();
-        if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
-        currentBlobUrl = URL.createObjectURL(blob);
-        audio.src = currentBlobUrl;
-        audio.loop = !!window.jamiaIsLoopActive;
-        await audio.play();
-        if (icon) icon.className = "fa-solid fa-pause";
-      } catch (err) {
-        if (err.name === "AbortError") return;
-        // Fallback to direct proxy stream
-        audio.src = proxyUrl;
-        audio.loop = !!window.jamiaIsLoopActive;
-        audio.play().then(() => {
-          if (icon) icon.className = "fa-solid fa-pause";
-        }).catch(() => {
-          if (icon) icon.className = "fa-solid fa-play";
-          if (timeEl) timeEl.innerText = "پلے بٹن دبائیں ▶️";
-        });
-      }
-    };
-
-    window.openJamiaAudioModal = window.playAudio;
-    window.playNaat = window.playAudio;
-
-    // Ensure loop button and ended event work 100% seamlessly with existing controls
-    const audio = document.getElementById("globalHtmlAudio");
-    if (audio) {
-      audio.onended = function() {
-        const icon = document.getElementById("audioPlayIcon");
-        const prog = document.getElementById("audioProgressBar");
-        if (window.jamiaIsLoopActive || audio.loop) {
-          audio.currentTime = 0;
-          audio.play().catch(() => {});
-          if (icon) icon.className = "fa-solid fa-pause";
-        } else {
-          if (icon) icon.className = "fa-solid fa-play";
-          if (prog) prog.value = 0;
-        }
-      };
-    }
-
-    // Hook existing jamiaToggleLoop so it also sets audio.loop directly
-    const origToggleLoop = window.jamiaToggleLoop;
-    window.jamiaToggleLoop = function(btnEl) {
-      if (typeof origToggleLoop === "function") {
-        origToggleLoop(btnEl);
-      } else {
-        window.jamiaIsLoopActive = !window.jamiaIsLoopActive;
-        if (btnEl) btnEl.classList.toggle("active-loop", window.jamiaIsLoopActive);
-      }
-      const aud = document.getElementById("globalHtmlAudio");
-      if (aud) aud.loop = !!window.jamiaIsLoopActive;
-    };
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", applyEmeraldRamPlayer);
-  } else {
-    applyEmeraldRamPlayer();
-  }
-  window.addEventListener("load", applyEmeraldRamPlayer);
-})();
-</script>
 
 
-<style id="jamia-popup-lift-fix">
-  /* Audio popup ko neele Help button (مرکزِ مدد و سہولیات) se upar rakhne ka fix */
-  #emeraldAudioBar,
-  #emeraldAudioBar.active {
-    bottom: 68px !important;
-    z-index: 2147483640 !important;
-  }
-</style>
+
+
 <script id="jamia-instant-naats-cache">
 (function() {
   var NAAT_CACHE_KEY = "jamia_cached_naats_v1";
@@ -4942,6 +4801,315 @@ window.openViewer = function(url, title) {
     } catch (e) {}
     return response;
   };
+})();
+</script>
+
+
+<style id="jamia-popup-lift-fix">
+  /* 1. Audio player Help icon se upar rahe, aur close karne par 100% gayab ho */
+  #emeraldAudioBar {
+    bottom: 68px !important;
+    z-index: 99990 !important;
+  }
+  #emeraldAudioBar:not(.active) {
+    display: none !important;
+  }
+  #emeraldAudioBar.active {
+    display: flex !important;
+  }
+  /* 2. Timer popup aur dusre modals hamesha Audio Player ke UPAR khulein */
+  #ddMusicSleepModal,
+  #portalModalOverlay,
+  #jamiaSmartModal,
+  .sec-modal-overlay {
+    z-index: 2147483647 !important;
+  }
+  /* 3. Loop aur Shuffle button jab active hon toh saaf chamkein */
+  .jamia-audio-nav-btn.active-loop,
+  .jamia-audio-nav-btn.active-shuffle {
+    background: #00ffa3 !important;
+    color: #031810 !important;
+    border-color: #00ffa3 !important;
+    box-shadow: 0 0 10px rgba(0, 255, 163, 0.7) !important;
+  }
+</style>
+
+<script id="jamia-emerald-ram-engine">
+(function() {
+  // Login screen par Red Dot chhupana (bina history delete kiye)
+  function checkLoginRedDot() {
+    var savedName = localStorage.getItem('jamia_ula_name');
+    var savedExpiry = localStorage.getItem('jamia_ula_expiry');
+    var isLoggedIn = savedName && savedExpiry && (Date.now() < parseInt(savedExpiry, 10));
+    var dots = document.querySelectorAll('.red-dot, .notification-dot, #redDot, #notifDot, [id*="RedDot"], [class*="red-dot"]');
+    dots.forEach(function(d) {
+      if (!isLoggedIn) {
+        d.dataset.loginHidden = "1";
+        d.style.setProperty("display", "none", "important");
+      } else if (d.dataset.loginHidden === "1") {
+        d.style.removeProperty("display");
+        delete d.dataset.loginHidden;
+        if (window.syncJamiaRedDot) window.syncJamiaRedDot();
+      }
+    });
+  }
+  setInterval(checkLoginRedDot, 400);
+  window.addEventListener("DOMContentLoaded", checkLoginRedDot);
+
+  // Audio States: Loop, Shuffle, Current Index
+  window.jamiaIsLoopActive = false;
+  window.jamiaIsShuffleActive = false;
+  window.jamiaCurrentPlayingIndex = 0;
+  var activeFetchController = null;
+  var currentBlobUrl = null;
+  var isTransitioningTrack = false;
+
+  function getNaatPlaylist() {
+    if (window.JAMIA_NAATS_LIST && window.JAMIA_NAATS_LIST.length > 0) {
+      return window.JAMIA_NAATS_LIST;
+    }
+    if (typeof LIBRARY_DATA !== "undefined" && Array.isArray(LIBRARY_DATA)) {
+      var list = LIBRARY_DATA.filter(function(b) { return b.type === "audio" || b.category === "naat"; });
+      if (list.length > 0) return list;
+    }
+    return [];
+  }
+
+  function extractDriveId(str) {
+    if (!str) return "";
+    var m = String(str).match(/id=([^&]+)/) || String(str).match(/\/d\/([^\/]+)/) || String(str).match(/[-\w]{25,}/);
+    return m ? (m[1] || m[0]) : String(str);
+  }
+
+  // Nav buttons (Prev, Loop, Shuffle, Next) inject aur update karna
+  function ensureNavButtons() {
+    var wrap = document.getElementById("jamiaAudioNavWrap");
+    if (!wrap) {
+      var timeEl = document.getElementById("audioPlayerTime");
+      if (timeEl && timeEl.parentElement) {
+        wrap = document.createElement("span");
+        wrap.id = "jamiaAudioNavWrap";
+        wrap.style.marginRight = "8px";
+        timeEl.parentElement.appendChild(wrap);
+      }
+    }
+    if (wrap && !document.getElementById("jamiaShuffleBtn")) {
+      wrap.innerHTML = `
+        <button type="button" class="jamia-audio-nav-btn" title="پچھلی نعت" onclick="window.jamiaPlayAdjacentNaat(-1)">⏮</button>
+        <button type="button" id="jamiaLoopBtn" class="jamia-audio-nav-btn ${window.jamiaIsLoopActive ? 'active-loop' : ''}" title="لوپ (ایک ہی نعت بار بار)" onclick="window.jamiaToggleLoop(this)">🔁</button>
+        <button type="button" id="jamiaShuffleBtn" class="jamia-audio-nav-btn ${window.jamiaIsShuffleActive ? 'active-shuffle' : ''}" title="شفل (بے ترتیب نعتیں)" onclick="window.jamiaToggleShuffle(this)">🔀</button>
+        <button type="button" class="jamia-audio-nav-btn" title="اگلی نعت" onclick="window.jamiaPlayAdjacentNaat(1)">⏭</button>
+      `;
+    }
+    var lBtn = document.getElementById("jamiaLoopBtn") || (wrap && wrap.querySelector('[onclick*="jamiaToggleLoop"]'));
+    if (lBtn) lBtn.classList.toggle("active-loop", !!window.jamiaIsLoopActive);
+    var sBtn = document.getElementById("jamiaShuffleBtn");
+    if (sBtn) sBtn.classList.toggle("active-shuffle", !!window.jamiaIsShuffleActive);
+  }
+
+  // 1. Loop Button Toggle
+  window.jamiaToggleLoop = function(btnEl) {
+    window.jamiaIsLoopActive = !window.jamiaIsLoopActive;
+    ensureNavButtons();
+  };
+
+  // 2. Shuffle Button Toggle
+  window.jamiaToggleShuffle = function(btnEl) {
+    window.jamiaIsShuffleActive = !window.jamiaIsShuffleActive;
+    ensureNavButtons();
+  };
+
+  // 3. Next / Previous / Auto-Next / Shuffle Handler
+  window.jamiaPlayAdjacentNaat = function(dir) {
+    var list = getNaatPlaylist();
+    if (!list.length) return;
+
+    if (window.jamiaIsShuffleActive && dir !== 0 && list.length > 1) {
+      var nextIdx = window.jamiaCurrentPlayingIndex;
+      while (nextIdx === window.jamiaCurrentPlayingIndex) {
+        nextIdx = Math.floor(Math.random() * list.length);
+      }
+      window.jamiaCurrentPlayingIndex = nextIdx;
+    } else {
+      window.jamiaCurrentPlayingIndex = (window.jamiaCurrentPlayingIndex + dir + list.length) % list.length;
+    }
+
+    var item = list[window.jamiaCurrentPlayingIndex];
+    if (item) {
+      var urlOrId = item.audioUrl || item.id;
+      window.playAudio(urlOrId, item.title);
+    }
+  };
+
+  // 4. Close Player (100% Working Cross Button)
+  window.closeAudioPlayer = function() {
+    var bar = document.getElementById("emeraldAudioBar");
+    var audio = document.getElementById("globalHtmlAudio");
+    var icon = document.getElementById("audioPlayIcon");
+    if (activeFetchController) activeFetchController.abort();
+    if (audio) {
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.load();
+    }
+    if (icon) icon.className = "fa-solid fa-play";
+    if (bar) {
+      bar.classList.remove("active");
+      bar.style.setProperty("display", "none", "important");
+    }
+    document.querySelectorAll(".driveEmbedBoxClass").forEach(function(el) { el.remove(); });
+  };
+  window.closeAudioPlayerFully = window.closeAudioPlayer;
+
+  // 5. Handle Track End (Loop OR Shuffle OR Sequential Next Naat)
+  function handleTrackEnded() {
+    if (isTransitioningTrack) return;
+    isTransitioningTrack = true;
+    setTimeout(function() { isTransitioningTrack = false; }, 800);
+
+    var audio = document.getElementById("globalHtmlAudio");
+    var icon = document.getElementById("audioPlayIcon");
+    var prog = document.getElementById("audioProgressBar");
+
+    if (window.jamiaIsLoopActive) {
+      // Loop ON: Turant 0:00 se bina ruke dobara chalayein
+      if (audio) {
+        audio.currentTime = 0;
+        if (prog) prog.value = 0;
+        var p = audio.play();
+        if (p && p.catch) p.catch(function(){});
+        if (icon) icon.className = "fa-solid fa-pause";
+      }
+    } else {
+      // Loop OFF: Line se agli naat (ya Shuffle ON hai toh random naat) chalayein
+      window.jamiaPlayAdjacentNaat(1);
+    }
+  }
+
+  // 6. Main playAudio Function with RAM Blob Engine
+  function setupMasterPlayer() {
+    ensureNavButtons();
+
+    window.playAudio = async function(audioUrlOrId, title) {
+      var bar = document.getElementById("emeraldAudioBar");
+      var audio = document.getElementById("globalHtmlAudio");
+      var titleEl = document.getElementById("audioPlayerTitle");
+      var timeEl = document.getElementById("audioPlayerTime");
+      var icon = document.getElementById("audioPlayIcon");
+      var prog = document.getElementById("audioProgressBar");
+      var playBtn = document.getElementById("audioPlayPauseBtn");
+
+      if (!bar || !audio) return;
+
+      ensureNavButtons();
+      document.querySelectorAll(".driveEmbedBoxClass").forEach(function(el) { el.remove(); });
+
+      // Sync current index in playlist so Next/Prev works accurately
+      var targetId = extractDriveId(audioUrlOrId);
+      var list = getNaatPlaylist();
+      for (var i = 0; i < list.length; i++) {
+        var itemId = extractDriveId(list[i].id || list[i].audioUrl);
+        if (itemId && itemId === targetId) {
+          window.jamiaCurrentPlayingIndex = i;
+          break;
+        }
+      }
+
+      if (prog) { prog.style.display = "block"; prog.value = 0; }
+      if (playBtn) playBtn.style.display = "flex";
+      bar.classList.add("active");
+      bar.style.setProperty("display", "flex", "important");
+
+      // Re-bind close button inside bar
+      var closeBtns = bar.querySelectorAll('[onclick*="closeAudioPlayer"], .fa-xmark, .fa-times');
+      closeBtns.forEach(function(el) {
+        var btn = el.closest("button") || el;
+        btn.onclick = function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.closeAudioPlayer();
+        };
+      });
+
+      var cleanT = (typeof cleanNaatTitle === "function") ? cleanNaatTitle(title || "نعت شریف") : (title || "نعت شریف");
+      if (titleEl) titleEl.innerText = cleanT;
+      if (timeEl) timeEl.innerText = "⏳ لوڈ ہو رہا ہے...";
+      if (icon) icon.className = "fa-solid fa-spinner fa-spin";
+
+      var proxyUrl = "";
+      if (targetId && (String(audioUrlOrId).includes("drive.google.com") || String(audioUrlOrId).includes("docs.google.com") || !String(audioUrlOrId).startsWith("http"))) {
+        proxyUrl = "/api/stream?id=" + encodeURIComponent(targetId);
+      } else {
+        proxyUrl = "/api/stream?url=" + encodeURIComponent(audioUrlOrId);
+      }
+
+      if (activeFetchController) activeFetchController.abort();
+      activeFetchController = new AbortController();
+
+      audio.pause();
+      // Native audio.loop false rakhenge taaki hamara custom handler 100% control kare
+      audio.loop = false;
+
+      try {
+        var res = await fetch(proxyUrl, { signal: activeFetchController.signal });
+        if (!res.ok) throw new Error("Stream failed");
+        var blob = await res.blob();
+        if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
+        currentBlobUrl = URL.createObjectURL(blob);
+        audio.src = currentBlobUrl;
+        audio.currentTime = 0;
+        await audio.play();
+        if (icon) icon.className = "fa-solid fa-pause";
+      } catch (err) {
+        if (err.name === "AbortError") return;
+        audio.src = proxyUrl;
+        audio.currentTime = 0;
+        audio.play().then(function() {
+          if (icon) icon.className = "fa-solid fa-pause";
+        }).catch(function() {
+          if (icon) icon.className = "fa-solid fa-play";
+          if (timeEl) timeEl.innerText = "پلے بٹن دبائیں ▶️";
+        });
+      }
+    };
+
+    window.openJamiaAudioModal = window.playAudio;
+    window.playNaat = window.playAudio;
+
+    var audio = document.getElementById("globalHtmlAudio");
+    if (audio) {
+      // Override ontimeupdate with Pre-End Guard so it NEVER gets stuck at 10:43 / 10:43
+      audio.ontimeupdate = function() {
+        var prog = document.getElementById("audioProgressBar");
+        var timeEl = document.getElementById("audioPlayerTime");
+        if (audio.duration && isFinite(audio.duration)) {
+          if (prog) prog.value = (audio.currentTime / audio.duration) * 100;
+          var curM = Math.floor(audio.currentTime / 60);
+          var curS = Math.floor(audio.currentTime % 60);
+          var durM = Math.floor(audio.duration / 60);
+          var durS = Math.floor(audio.duration % 60);
+          if (timeEl) {
+            timeEl.innerText = (curM < 10 ? "0"+curM : curM) + ":" + (curS < 10 ? "0"+curS : curS) + " / " + (durM < 10 ? "0"+durM : durM) + ":" + (durS < 10 ? "0"+durS : durS);
+          }
+          // Pre-End Guard: khatam hone se 0.25s pehle hi Loop ya Next trigger kar de
+          if (audio.duration > 2 && (audio.duration - audio.currentTime) <= 0.25) {
+            handleTrackEnded();
+          }
+        }
+      };
+
+      audio.onended = function() {
+        handleTrackEnded();
+      };
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupMasterPlayer);
+  } else {
+    setupMasterPlayer();
+  }
+  window.addEventListener("load", setupMasterPlayer);
 })();
 </script>
 
