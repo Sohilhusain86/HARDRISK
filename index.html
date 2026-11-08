@@ -4864,5 +4864,86 @@ window.openViewer = function(url, title) {
 })();
 </script>
 
+
+<style id="jamia-popup-lift-fix">
+  /* Audio popup ko neele Help button (مرکزِ مدد و سہولیات) se upar rakhne ka fix */
+  #emeraldAudioBar,
+  #emeraldAudioBar.active {
+    bottom: 68px !important;
+    z-index: 2147483640 !important;
+  }
+</style>
+<script id="jamia-instant-naats-cache">
+(function() {
+  var NAAT_CACHE_KEY = "jamia_cached_naats_v1";
+
+  // 1. Site khulte hi 0 second mein cached naatein LIBRARY_DATA mein shamil karein
+  function injectCachedNaatsInstantly() {
+    try {
+      var raw = localStorage.getItem(NAAT_CACHE_KEY);
+      if (!raw) return;
+      var cachedNaats = JSON.parse(raw);
+      if (!Array.isArray(cachedNaats) || cachedNaats.length === 0) return;
+
+      window.JAMIA_NAATS_LIST = cachedNaats;
+      window.__driveNaatsFetched = true;
+
+      if (typeof LIBRARY_DATA !== "undefined" && Array.isArray(LIBRARY_DATA)) {
+        var existingIds = new Set(LIBRARY_DATA.map(function(item) { return item.id; }));
+        cachedNaats.forEach(function(nt) {
+          if (!existingIds.has(nt.id)) {
+            var neatTitle = (typeof cleanNaatTitle === "function") ? cleanNaatTitle(nt.title || "نعت شریف") : (nt.title || "نعت شریف");
+            var khwan = (typeof detectNaatKhwan === "function") ? detectNaatKhwan(neatTitle) : "جامعۃ الرضا آڈیو لائبریری";
+            LIBRARY_DATA.push({
+              id: nt.id,
+              title: neatTitle,
+              naatKhwan: khwan,
+              subtitle: "آڈیو نعت شریف • " + (nt.size || "MP3"),
+              author: "جامعۃ الرضا آڈیو لائبریری",
+              category: "naat",
+              type: "audio",
+              language: "Urdu",
+              size: nt.size || "MP3",
+              pages: nt.size || "MP3",
+              coverClass: "cover-bahar",
+              icon: "fa-solid fa-music",
+              coverTitle: neatTitle.substring(0, 18),
+              audioUrl: nt.audioUrl || ("https://docs.google.com/uc?export=download&id=" + nt.id),
+              downloadName: (nt.downloadName || neatTitle) + ".mp3",
+              allowDownload: true
+            });
+            existingIds.add(nt.id);
+          }
+        });
+        if (typeof renderBooks === "function") {
+          renderBooks(LIBRARY_DATA);
+        }
+      }
+    } catch (e) {}
+  }
+
+  // Turant aur DOMContentLoaded dono par chalayein
+  injectCachedNaatsInstantly();
+  document.addEventListener("DOMContentLoaded", injectCachedNaatsInstantly);
+
+  // 2. Jab background mein Google Script se naatein aayein, toh unhein cache mein save kar lein
+  var origFetch = window.fetch;
+  window.fetch = async function() {
+    var response = await origFetch.apply(this, arguments);
+    try {
+      var urlStr = (arguments[0] && arguments[0].url) ? arguments[0].url : String(arguments[0] || "");
+      if (typeof NAATS_API_URL !== "undefined" && urlStr.indexOf(NAATS_API_URL) !== -1) {
+        response.clone().json().then(function(data) {
+          if (Array.isArray(data) && data.length > 0) {
+            localStorage.setItem(NAAT_CACHE_KEY, JSON.stringify(data));
+          }
+        }).catch(function(){});
+      }
+    } catch (e) {}
+    return response;
+  };
+})();
+</script>
+
 </body>
 </html>
