@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ur" dir="rtl">
-<head>
+<head><script>localStorage.removeItem("jamia_offline_naats");if("serviceWorker" in navigator){navigator.serviceWorker.getRegistrations().then(r=>r.forEach(reg=>reg.unregister()));if(window.caches)caches.keys().then(k=>k.forEach(c=>caches.delete(c)));}</script>
 
 
 
@@ -2436,7 +2436,7 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
         const dynamicBooks = await res.json();
         if (Array.isArray(dynamicBooks) && dynamicBooks.length > 0) { window.__driveBooksFetched = true; if (window.syncJamiaRedDot) window.syncJamiaRedDot(); } 
         try {
-          const nRes = await fetch(NAATS_API_URL);
+          const nRes = await fetch(NAATS_API_URL + "?t=" + Date.now());
           const naats = await nRes.json();
           if (Array.isArray(naats)) { window.__driveNaatsFetched = true; window.JAMIA_NAATS_LIST = naats; if (window.syncJamiaRedDot) window.syncJamiaRedDot(); } 
           if (Array.isArray(naats)) {
@@ -3489,9 +3489,9 @@ window.openViewer = function(url, title) {
   }
 
   async function fetchNaatsFromDrive() {
-    if (window.JAMIA_NAATS_LIST.length > 0) return window.JAMIA_NAATS_LIST;
+    // Always fetch fresh naats from Drive
     try {
-      const res = await fetch(NAATS_API_URL);
+      const res = await fetch(NAATS_API_URL + "?t=" + Date.now());
       const data = await res.json();
       if (Array.isArray(data)) {
         window.JAMIA_NAATS_LIST = data.map(nt => {
