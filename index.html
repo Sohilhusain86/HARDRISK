@@ -5156,5 +5156,395 @@ window.openViewer = function(url, title) {
 })();
 </script>
 
+
+<style id="jamia-history-modal-css">
+  #jamiaUserHistoryOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 18, 12, 0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 2147483647 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    box-sizing: border-box;
+    direction: rtl;
+    font-family: inherit;
+  }
+  .jh-card {
+    background: radial-gradient(circle at top, #0d3326 0%, #04150f 100%);
+    border: 1px solid rgba(0, 255, 163, 0.45);
+    box-shadow: 0 15px 45px rgba(0,0,0,0.9), 0 0 25px rgba(0, 255, 163, 0.18);
+    border-radius: 18px;
+    width: 100%;
+    max-width: 450px;
+    max-height: 86vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: #f8fafc;
+  }
+  .jh-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(0, 255, 163, 0.22);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(0, 0, 0, 0.25);
+  }
+  .jh-date-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    scrollbar-width: none;
+  }
+  .jh-date-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(0, 255, 163, 0.25);
+    color: #cbd5e1;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    white-space: nowrap;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .jh-date-btn.active {
+    background: #00ffa3;
+    color: #031810;
+    border-color: #00ffa3;
+    box-shadow: 0 0 10px rgba(0, 255, 163, 0.4);
+  }
+  .jh-body {
+    padding: 14px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .jh-summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .jh-stat-box {
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(0, 255, 163, 0.25);
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+  }
+  .jh-item-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-right: 3px solid #00ffa3;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+</style>
+
+<script id="jamia-smart-timer-history">
+(function() {
+  var STORAGE_KEY = "jamia_daily_activity_log_v3";
+
+  // Local Date Key (YYYY-MM-DD) jo raat 12 baje local time par badalta hai
+  function getDateKey(daysOffset) {
+    var d = new Date();
+    if (daysOffset) d.setDate(d.getDate() + daysOffset);
+    var yy = d.getFullYear();
+    var mm = String(d.getMonth() + 1).padStart(2, '0');
+    var dd = String(d.getDate()).padStart(2, '0');
+    return yy + "-" + mm + "-" + dd;
+  }
+
+  function loadAllLogs() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveAllLogs(data) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {}
+  }
+
+  function ensureDayRecord(logs, dateKey) {
+    if (!logs[dateKey]) {
+      logs[dateKey] = {
+        screenSec: 0,
+        bgSec: 0,
+        items: {}
+      };
+    }
+    return logs[dateKey];
+  }
+
+  function formatShortTime(totalSec) {
+    totalSec = Math.max(0, Math.floor(totalSec || 0));
+    var h = Math.floor(totalSec / 3600);
+    var m = Math.floor((totalSec % 3600) / 60);
+    var s = totalSec % 60;
+    if (h > 0) return h + "h " + m + "m " + s + "s";
+    return m + "m " + s + "s";
+  }
+
+  function formatUrduTime(totalSec) {
+    totalSec = Math.max(0, Math.floor(totalSec || 0));
+    var h = Math.floor(totalSec / 3600);
+    var m = Math.floor((totalSec % 3600) / 60);
+    var s = totalSec % 60;
+    if (h > 0) return h + " گھنٹہ " + m + " منٹ " + s + " سیکنڈ";
+    if (m > 0) return m + " منٹ " + s + " سیکنڈ";
+    return s + " سیکنڈ";
+  }
+
+  // Check if Naat audio is actively playing right now
+  function isNaatPlayingNow() {
+    var audio = document.getElementById("globalHtmlAudio");
+    var bar = document.getElementById("emeraldAudioBar");
+    if (!audio || !bar) return false;
+    var barActive = bar.classList.contains("active") && bar.style.display !== "none";
+    return Boolean(barActive && !audio.paused && !audio.ended && audio.currentTime > 0);
+  }
+
+  function getCurrentPlayingNaatTitle() {
+    var tEl = document.getElementById("audioPlayerTitle");
+    var t = tEl ? (tEl.innerText || "").trim() : "";
+    if (!t || t.indexOf("لوڈ ہو رہا") !== -1) return "نعت شریف";
+    return t;
+  }
+
+  // Find the floating timer badge element on screen
+  function findFloatingTimeBadge() {
+    var els = document.querySelectorAll("div, span, button");
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      if (el.children.length <= 6 && el.innerText && el.innerText.indexOf("اسکرین:") !== -1 && el.innerText.indexOf("بیک گراؤنڈ:") !== -1) {
+        return el;
+      }
+    }
+    return null;
+  }
+
+  // Update the text inside the floating badge so it always shows TODAY'S accurate time
+  function syncFloatingBadgeDisplay(dayRec) {
+    var badge = findFloatingTimeBadge();
+    if (!badge) return;
+
+    // Bind click listener once for opening user history modal
+    if (!badge.dataset.jamiaUserHistoryBound) {
+      badge.dataset.jamiaUserHistoryBound = "1";
+      badge.style.cursor = "pointer";
+      badge.addEventListener("click", function(e) {
+        // Agar left side wale chhote chart/admin icon par click hua ho toh uska apna kaam hone dein
+        var target = e.target;
+        var isChartIcon = target && (target.tagName === "IMG" || target.tagName === "I" || (target.innerText && target.innerText.indexOf("📊") !== -1));
+        if (isChartIcon && target !== badge) {
+          return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        window.openJamiaUserHistoryModal(getDateKey(0));
+      }, true);
+    }
+
+    var scrTxt = formatShortTime(dayRec.screenSec);
+    var bgTxt = formatShortTime(dayRec.bgSec);
+
+    // Replace time text inside badge cleanly while preserving its icons/dots
+    var walked = false;
+    var walker = document.createTreeWalker(badge, NodeFilter.SHOW_TEXT, null, false);
+    var node;
+    while ((node = walker.nextNode())) {
+      var val = node.nodeValue || "";
+      if (val.indexOf("اسکرین:") !== -1 || val.indexOf("بیک گراؤنڈ:") !== -1) {
+        node.nodeValue = " اسکرین: " + scrTxt + " | بیک گراؤنڈ: " + bgTxt + " ";
+        walked = true;
+        break;
+      }
+    }
+
+    if (!walked) {
+      // If split across spans, update innerHTML carefully
+      var spans = badge.querySelectorAll("span, b, strong");
+      spans.forEach(function(sp) {
+        var t = sp.innerText || "";
+        if (t.indexOf("اسکرین:") !== -1 && t.indexOf("بیک گراؤنڈ:") === -1) {
+          sp.innerText = "اسکرین: " + scrTxt;
+        } else if (t.indexOf("بیک گراؤنڈ:") !== -1 && t.indexOf("اسکرین:") === -1) {
+          sp.innerText = "بیک گراؤنڈ: " + bgTxt;
+        } else if (t.matches('[style*="orange"], [style*="#f59e0b"], [style*="#fbbf24"]')) {
+          sp.innerText = bgTxt;
+        }
+      });
+    }
+  }
+
+  // Main 1-Second Ticker (Midnight Reset + Strict Background Audio Check)
+  var lastTickTime = Date.now();
+  setInterval(function() {
+    var now = Date.now();
+    var elapsedSec = Math.round((now - lastTickTime) / 1000);
+    if (elapsedSec < 1 || elapsedSec > 15) elapsedSec = 1;
+    lastTickTime = now;
+
+    var todayKey = getDateKey(0);
+    var logs = loadAllLogs();
+    var dayRec = ensureDayRecord(logs, todayKey);
+
+    var isVisible = !document.hidden && document.visibilityState === "visible";
+    var naatPlaying = isNaatPlayingNow();
+
+    if (isVisible) {
+      // Screen khuli hai: Screen time badhega
+      dayRec.screenSec += elapsedSec;
+      if (naatPlaying) {
+        var title = getCurrentPlayingNaatTitle();
+        if (!dayRec.items[title]) {
+          dayRec.items[title] = { screen: 0, bg: 0, type: "naat", lastTime: "" };
+        }
+        dayRec.items[title].screen += elapsedSec;
+        dayRec.items[title].lastTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+      saveAllLogs(logs);
+    } else {
+      // Screen band hai ya background mein hai: SIRF tab gine jab Naat baj rahi ho!
+      if (naatPlaying) {
+        dayRec.bgSec += elapsedSec;
+        var bgTitle = getCurrentPlayingNaatTitle();
+        if (!dayRec.items[bgTitle]) {
+          dayRec.items[bgTitle] = { screen: 0, bg: 0, type: "naat", lastTime: "" };
+        }
+        dayRec.items[bgTitle].bg += elapsedSec;
+        dayRec.items[bgTitle].lastTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        saveAllLogs(logs);
+      }
+    }
+
+    syncFloatingBadgeDisplay(dayRec);
+  }, 1000);
+
+  // Format date label for buttons (e.g., آج, کل, or Date)
+  function getFriendlyDateLabel(dateKey) {
+    if (dateKey === getDateKey(0)) return "آج (" + dateKey.slice(5) + ")";
+    if (dateKey === getDateKey(-1)) return "کل (" + dateKey.slice(5) + ")";
+    return "تاریخ: " + dateKey;
+  }
+
+  // Open Full History Modal for any user
+  window.openJamiaUserHistoryModal = function(selectedDateKey) {
+    var existing = document.getElementById("jamiaUserHistoryOverlay");
+    if (existing) existing.remove();
+
+    var logs = loadAllLogs();
+    var todayKey = getDateKey(0);
+    var yesterdayKey = getDateKey(-1);
+
+    // Ensure Today and Yesterday always appear in date tabs
+    ensureDayRecord(logs, todayKey);
+    ensureDayRecord(logs, yesterdayKey);
+
+    var allDates = Object.keys(logs).sort().reverse();
+    var activeDate = selectedDateKey || todayKey;
+    var activeRec = logs[activeDate] || { screenSec: 0, bgSec: 0, items: {} };
+
+    var overlay = document.createElement("div");
+    overlay.id = "jamiaUserHistoryOverlay";
+    overlay.onclick = function(e) {
+      if (e.target === overlay) overlay.remove();
+    };
+
+    var dateTabsHtml = allDates.slice(0, 10).map(function(dKey) {
+      var isAct = (dKey === activeDate) ? "active" : "";
+      return '<button type="button" class="jh-date-btn ' + isAct + '" onclick="window.openJamiaUserHistoryModal('' + dKey + '')">' + getFriendlyDateLabel(dKey) + '</button>';
+    }).join("");
+
+    var itemKeys = Object.keys(activeRec.items || {});
+    // Sort items by total listening time descending
+    itemKeys.sort(function(a, b) {
+      var totA = (activeRec.items[a].screen || 0) + (activeRec.items[a].bg || 0);
+      var totB = (activeRec.items[b].screen || 0) + (activeRec.items[b].bg || 0);
+      return totB - totA;
+    });
+
+    var itemsHtml = "";
+    if (itemKeys.length === 0) {
+      itemsHtml = '<div style="text-align:center; padding:26px 12px; color:#94a3b8; font-size:0.86rem; background:rgba(0,0,0,0.25); border-radius:12px;">اس تاریخ (' + activeDate + ') میں ابھی تک کوئی نعت نہیں سنی گئی۔</div>';
+    } else {
+      itemKeys.forEach(function(title) {
+        var it = activeRec.items[title];
+        var scrS = it.screen || 0;
+        var bgS = it.bg || 0;
+        var totS = scrS + bgS;
+        itemsHtml += `
+          <div class="jh-item-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+              <div style="font-weight:bold; font-size:0.86rem; color:#ffffff; line-height:1.4;">🎵 ${title}</div>
+              ${it.lastTime ? `<span style="font-size:0.7rem; color:#00ffa3; background:rgba(0,255,163,0.12); padding:2px 6px; border-radius:6px; white-space:nowrap;">${it.lastTime}</span>` : ''}
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; margin-top:8px; font-size:0.76rem; color:#cbd5e1; border-top:1px solid rgba(255,255,255,0.06); padding-top:6px;">
+              <span>📱 اسکرین پر: <b style="color:#00ffa3;">${formatUrduTime(scrS)}</b></span>
+              <span>🎧 بیک گراؤنڈ میں: <b style="color:#fbbf24;">${formatUrduTime(bgS)}</b></span>
+              <span>⏱️ کل وقت: <b style="color:#38bdf8;">${formatUrduTime(totS)}</b></span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    overlay.innerHTML = `
+      <div class="jh-card">
+        <div class="jh-header">
+          <div style="font-weight:bold; font-size:1rem; color:#00ffa3; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-clock-rotate-left"></i> روزانہ سننے کی تفصیلات (History)
+          </div>
+          <button type="button" onclick="document.getElementById('jamiaUserHistoryOverlay').remove()" style="background:rgba(255,255,255,0.08); border:none; color:#fff; width:30px; height:30px; border-radius:50%; cursor:pointer; font-size:0.95rem;">✕</button>
+        </div>
+
+        <div class="jh-date-bar">
+          ${dateTabsHtml}
+        </div>
+
+        <div class="jh-body">
+          <div style="font-size:0.76rem; color:#94a3b8; text-align:center; margin-bottom:10px;">
+            📅 منتخب تاریخ: <b style="color:#fff;">${activeDate}</b> • رات 12 بجے نیا دن شروع ہوتا ہے
+          </div>
+
+          <div class="jh-summary-grid">
+            <div class="jh-stat-box">
+              <div style="font-size:0.74rem; color:#94a3b8;">📱 کل اسکرین ٹائم</div>
+              <div style="font-size:0.95rem; font-weight:bold; color:#00ffa3; margin-top:4px;">${formatUrduTime(activeRec.screenSec)}</div>
+            </div>
+            <div class="jh-stat-box">
+              <div style="font-size:0.74rem; color:#94a3b8;">🎧 کل بیک گراؤنڈ (نعت)</div>
+              <div style="font-size:0.95rem; font-weight:bold; color:#fbbf24; margin-top:4px;">${formatUrduTime(activeRec.bgSec)}</div>
+            </div>
+          </div>
+
+          <div style="font-size:0.86rem; font-weight:bold; color:#00ffa3; margin-bottom:8px;">
+            📜 اس دن کیا کیا اور کتنی دیر سنا گیا:
+          </div>
+          ${itemsHtml}
+        </div>
+
+        <div style="padding:12px 16px; border-top:1px solid rgba(255,255,255,0.08); text-align:center; background:rgba(0,0,0,0.3);">
+          <button type="button" onclick="document.getElementById('jamiaUserHistoryOverlay').remove()" style="width:100%; background:linear-gradient(135deg, #00ffa3, #00b875); color:#031810; border:none; padding:10px; border-radius:10px; font-weight:bold; font-size:0.9rem; cursor:pointer;">بند کریں</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+  };
+})();
+</script>
+
 </body>
 </html>
