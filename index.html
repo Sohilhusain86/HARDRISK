@@ -1499,6 +1499,7 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
   };
 </script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -4601,7 +4602,14 @@ window.openViewer = function(url, title) {
 <script>
 (function(){
   const TRACK_API = "https://script.google.com/macros/s/AKfycbwi02ykZWWmq3nedwL0ULzk730QAJbwo7E_saM0hM32DOBI7ATrdWijHxvKfTZeY95-Ug/exec";
-  const todayKey = new Date().toISOString().slice(0,10);
+  function getLocalTodayKey(offsetDays) {
+    const d = new Date();
+    if (offsetDays) d.setDate(d.getDate() + offsetDays);
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+
+  let todayKey = getLocalTodayKey(0);
+  const HIST_KEY = "jamia_daily_history_v1";
 
   let uid = localStorage.getItem("jamia_uid");
   if (!uid) {
@@ -4609,24 +4617,77 @@ window.openViewer = function(url, title) {
     localStorage.setItem("jamia_uid", uid);
   }
 
+  function loadHistory() {
+    let h = {};
+    try { h = JSON.parse(localStorage.getItem(HIST_KEY) || "{}"); } catch(e) { h = {}; }
+    // Migrate any previous logs from older keys so yesterday's / today's data is never lost
+    ["jamia_user_daily_activity_v8", "jamia_master_activity_logs_v9", "jamia_master_activity_logs_v10", "jamia_historical_archives"].forEach(function(k) {
+      try {
+        const old = JSON.parse(localStorage.getItem(k) || "{}");
+        for (const d in old) {
+          if (!h[d]) h[d] = { screenSec: 0, bgSec: 0, items: {} };
+          h[d].screenSec = Math.max(h[d].screenSec || 0, old[d].screenSec || 0);
+          h[d].bgSec = Math.max(h[d].bgSec || 0, old[d].bgSec || 0);
+          if (old[d].items) {
+            h[d].items = h[d].items || {};
+            for (const it in old[d].items) {
+              if (!h[d].items[it]) h[d].items[it] = old[d].items[it];
+            }
+          }
+        }
+      } catch(e) {}
+    });
+    return h;
+  }
+
+  function saveHistory(h) {
+    try { localStorage.setItem(HIST_KEY, JSON.stringify(h)); } catch(e) {}
+  }
+
+  let hist = loadHistory();
   let savedDay = localStorage.getItem("jamia_track_day");
-  if (savedDay !== todayKey) {
+  let prevActive = parseInt(localStorage.getItem("jamia_active_sec") || "0", 10);
+  let prevBg = parseInt(localStorage.getItem("jamia_bg_sec") || "0", 10);
+
+  if (savedDay && savedDay !== todayKey) {
+    // Save previous day's final time before resetting for midnight
+    if (!hist[savedDay]) hist[savedDay] = { screenSec: 0, bgSec: 0, items: {} };
+    hist[savedDay].screenSec = Math.max(hist[savedDay].screenSec || 0, prevActive);
+    hist[savedDay].bgSec = Math.max(hist[savedDay].bgSec || 0, prevBg);
+    saveHistory(hist);
     localStorage.setItem("jamia_track_day", todayKey);
     localStorage.setItem("jamia_active_sec", "0");
     localStorage.setItem("jamia_bg_sec", "0");
+  } else if (!savedDay) {
+    localStorage.setItem("jamia_track_day", todayKey);
   }
 
-  let activeSec = parseInt(localStorage.getItem("jamia_active_sec") || "0", 10);
-  let bgSec = parseInt(localStorage.getItem("jamia_bg_sec") || "0", 10);
+  if (!hist[todayKey]) hist[todayKey] = { screenSec: 0, bgSec: 0, items: {} };
+  let activeSec = Math.max(parseInt(localStorage.getItem("jamia_active_sec") || "0", 10), hist[todayKey].screenSec || 0);
+  let bgSec = Math.max(parseInt(localStorage.getItem("jamia_bg_sec") || "0", 10), hist[todayKey].bgSec || 0);
+  localStorage.setItem("jamia_active_sec", String(activeSec));
+  localStorage.setItem("jamia_bg_sec", String(bgSec));
+  saveHistory(hist);
+
   let lastTick = Date.now();
 
   function fmtTime(sec) {
-    sec = Math.max(0, Math.floor(sec));
+    sec = Math.max(0, Math.floor(sec || 0));
     const h = Math.floor(sec / 3600);
     const m = Math.floor((sec % 3600) / 60);
     const s = sec % 60;
-    if (h > 0) return h + "h " + m + "m";
+    if (h > 0) return h + "h " + m + "m " + s + "s";
     return m + "m " + s + "s";
+  }
+
+  function fmtUrduTime(sec) {
+    sec = Math.max(0, Math.floor(sec || 0));
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    if (h > 0) return h + " گھنٹہ " + m + " منٹ " + s + " سیکنڈ";
+    if (m > 0) return m + " منٹ " + s + " سیکنڈ";
+    return s + " سیکنڈ";
   }
 
   function getDeviceModel() {
@@ -4637,24 +4698,190 @@ window.openViewer = function(url, title) {
     return (parts[parts.length - 1] || "Phone").replace(/Build\/.*/i, "").trim().slice(0, 22);
   }
 
+  function isNaatActivelyPlaying() {
+    const audio = document.getElementById("globalHtmlAudio");
+    const bar = document.getElementById("emeraldAudioBar");
+    if (!audio || !bar) return false;
+    const barActive = bar.classList.contains("active") && bar.style.display !== "none";
+    return Boolean(barActive && !audio.paused && !audio.ended && audio.currentTime > 0);
+  }
+
+  function isPdfActivelyOpen() {
+    const viewer = document.getElementById("pdf-viewer-overlay");
+    return Boolean(viewer && viewer.style.display && viewer.style.display !== "none");
+  }
+
   setInterval(function() {
     const now = Date.now();
-    const delta = Math.min(60, Math.max(1, Math.round((now - lastTick) / 1000)));
+    const delta = Math.min(5, Math.max(1, Math.round((now - lastTick) / 1000)));
     lastTick = now;
 
-    if (document.visibilityState === "visible") {
+    const currentDayKey = getLocalTodayKey(0);
+    let logs = loadHistory();
+
+    // Exact 12:00 AM Midnight Transition Check
+    if (currentDayKey !== todayKey) {
+      if (!logs[todayKey]) logs[todayKey] = { screenSec: 0, bgSec: 0, items: {} };
+      logs[todayKey].screenSec = activeSec;
+      logs[todayKey].bgSec = bgSec;
+      todayKey = currentDayKey;
+      activeSec = 0;
+      bgSec = 0;
+      localStorage.setItem("jamia_track_day", todayKey);
+      localStorage.setItem("jamia_active_sec", "0");
+      localStorage.setItem("jamia_bg_sec", "0");
+    }
+
+    if (!logs[todayKey]) logs[todayKey] = { screenSec: 0, bgSec: 0, items: {} };
+    if (!logs[todayKey].items) logs[todayKey].items = {};
+
+    const naatPlaying = isNaatActivelyPlaying();
+    const pdfOpen = isPdfActivelyOpen();
+    const isVisible = !document.hidden && document.visibilityState === "visible";
+    const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+    if (isVisible) {
       activeSec += delta;
       localStorage.setItem("jamia_active_sec", String(activeSec));
-    } else {
+      logs[todayKey].screenSec = activeSec;
+
+      if (naatPlaying) {
+        const tEl = document.getElementById("audioPlayerTitle");
+        const title = "🎵 " + ((tEl && tEl.innerText ? tEl.innerText.trim() : "") || "نعت شریف");
+        if (!logs[todayKey].items[title]) logs[todayKey].items[title] = { screen: 0, bg: 0, lastTime: "" };
+        logs[todayKey].items[title].screen += delta;
+        logs[todayKey].items[title].lastTime = timeStr;
+      } else if (pdfOpen) {
+        const pEl = document.getElementById("viewer-title");
+        const pTitle = "📖 " + ((pEl && pEl.innerText ? pEl.innerText.trim() : "") || "کتاب کا مطالعہ");
+        if (!logs[todayKey].items[pTitle]) logs[todayKey].items[pTitle] = { screen: 0, bg: 0, lastTime: "" };
+        logs[todayKey].items[pTitle].screen += delta;
+        logs[todayKey].items[pTitle].lastTime = timeStr;
+      }
+      saveHistory(logs);
+    } else if (naatPlaying) {
+      // STRICT: Background timer increments ONLY when audio is actively playing
       bgSec += delta;
       localStorage.setItem("jamia_bg_sec", String(bgSec));
+      logs[todayKey].bgSec = bgSec;
+
+      const tEl2 = document.getElementById("audioPlayerTitle");
+      const title2 = "🎵 " + ((tEl2 && tEl2.innerText ? tEl2.innerText.trim() : "") || "نعت شریف");
+      if (!logs[todayKey].items[title2]) logs[todayKey].items[title2] = { screen: 0, bg: 0, lastTime: "" };
+      logs[todayKey].items[title2].bg += delta;
+      logs[todayKey].items[title2].lastTime = timeStr;
+      saveHistory(logs);
     }
 
     const aEl = document.getElementById("juActive");
     const bEl = document.getElementById("juBg");
     if (aEl) aEl.textContent = fmtTime(activeSec);
     if (bEl) bEl.textContent = fmtTime(bgSec);
+
+    const pill = document.getElementById("jamiaUsagePill");
+    if (pill && !pill.dataset.historyBound) {
+      pill.dataset.historyBound = "1";
+      pill.style.cursor = "pointer";
+      pill.addEventListener("click", function(e) {
+        if (e.target && e.target.closest(".u-btn")) return;
+        window.openJamiaUserHistoryModal(todayKey);
+      });
+    }
   }, 1000);
+
+  function friendlyDateLabel(dKey) {
+    const tKey = getLocalTodayKey(0);
+    const yKey = getLocalTodayKey(-1);
+    if (dKey === tKey) return "آج (" + dKey.slice(5) + ")";
+    if (dKey === yKey) return "کل (" + dKey.slice(5) + ")";
+    return dKey;
+  }
+
+  window.openJamiaUserHistoryModal = function(selectedDateKey) {
+    const oldModal = document.getElementById("jamiaUserHistoryOverlay");
+    if (oldModal) oldModal.remove();
+
+    const logs = loadHistory();
+    const curToday = getLocalTodayKey(0);
+    const curYesterday = getLocalTodayKey(-1);
+
+    if (!logs[curToday]) logs[curToday] = { screenSec: activeSec, bgSec: bgSec, items: {} };
+    logs[curToday].screenSec = Math.max(logs[curToday].screenSec || 0, activeSec);
+    logs[curToday].bgSec = Math.max(logs[curToday].bgSec || 0, bgSec);
+    if (!logs[curYesterday]) logs[curYesterday] = { screenSec: 0, bgSec: 0, items: {} };
+    saveHistory(logs);
+
+    const allDates = Object.keys(logs).sort().reverse();
+    const activeDate = selectedDateKey || curToday;
+    const rec = logs[activeDate] || { screenSec: 0, bgSec: 0, items: {} };
+
+    const dateTabs = allDates.slice(0, 30).map(function(d) {
+      const cls = (d === activeDate) ? "jh-date-btn active" : "jh-date-btn";
+      return '<button type="button" class="' + cls + '" onclick="window.openJamiaUserHistoryModal(\'' + d + '\')">' + friendlyDateLabel(d) + '</button>';
+    }).join("");
+
+    const itemKeys = Object.keys(rec.items || {});
+    itemKeys.sort(function(a, b) {
+      return ((rec.items[b].screen || 0) + (rec.items[b].bg || 0)) - ((rec.items[a].screen || 0) + (rec.items[a].bg || 0));
+    });
+
+    let itemsHtml = "";
+    if (itemKeys.length === 0) {
+      itemsHtml = '<div style="text-align:center; padding:18px; color:#94a3b8; font-size:0.82rem; background:rgba(0,0,0,0.25); border-radius:10px;">اس تاریخ (' + activeDate + ') میں ابھی کوئی کتاب یا نعت ریکارڈ نہیں ہوئی۔</div>';
+    } else {
+      itemKeys.forEach(function(k) {
+        const it = rec.items[k];
+        const sTime = it.screen || 0;
+        const bTime = it.bg || 0;
+        itemsHtml += '<div class="jh-item-card" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-right:3px solid #00ffa3; border-radius:10px; padding:10px 12px; margin-bottom:8px;">' +
+          '<div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">' +
+            '<div style="font-weight:bold; font-size:0.84rem; color:#fff;">' + k + '</div>' +
+            (it.lastTime ? '<span style="font-size:0.7rem; color:#00ffa3; background:rgba(0,255,163,0.12); padding:2px 6px; border-radius:6px;">' + it.lastTime + '</span>' : '') +
+          '</div>' +
+          '<div style="display:flex; justify-content:space-between; margin-top:6px; font-size:0.74rem; color:#cbd5e1;">' +
+            '<span>📱 اسکرین: <b style="color:#00ffa3;">' + fmtUrduTime(sTime) + '</b></span>' +
+            '<span>🎧 بیک گراؤنڈ: <b style="color:#f59e0b;">' + fmtUrduTime(bTime) + '</b></span>' +
+            '<span>⏱️ کل: <b style="color:#38bdf8;">' + fmtUrduTime(sTime + bTime) + '</b></span>' +
+          '</div>' +
+        '</div>';
+      });
+    }
+
+    const overlay = document.createElement("div");
+    overlay.id = "jamiaUserHistoryOverlay";
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML =
+      '<div class="jh-card">' +
+        '<div class="jh-header">' +
+          '<div style="font-weight:bold; font-size:0.92rem; color:#00ffa3; display:flex; align-items:center; gap:8px;">' +
+            '<i class="fa-solid fa-clock-rotate-left"></i> روزانہ سننے اور پڑھنے کا ریکارڈ' +
+          '</div>' +
+          '<button type="button" onclick="document.getElementById(\'jamiaUserHistoryOverlay\').remove()" style="background:rgba(255,255,255,0.1); border:none; color:#fff; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button>' +
+        '</div>' +
+        '<div class="jh-date-bar">' + dateTabs + '</div>' +
+        '<div class="jh-body" style="padding:14px; overflow-y:auto; flex:1;">' +
+          '<div style="font-size:0.74rem; color:#94a3b8; text-align:center; margin-bottom:10px;">' +
+            '📅 تاریخ: <b style="color:#fff;">' + activeDate + '</b> (رات 12:00 بجے خودکار نیا دن)' +
+          '</div>' +
+          '<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">' +
+            '<div style="background:rgba(0,0,0,0.45); border:1px solid rgba(0,255,163,0.25); border-radius:12px; padding:10px; text-align:center;">' +
+              '<div style="font-size:0.72rem; color:#94a3b8;">📱 کل اسکرین ٹائم</div>' +
+              '<div style="font-size:0.88rem; font-weight:bold; color:#00ffa3; margin-top:4px;">' + fmtUrduTime(rec.screenSec) + '</div>' +
+            '</div>' +
+            '<div style="background:rgba(0,0,0,0.45); border:1px solid rgba(245,158,11,0.3); border-radius:12px; padding:10px; text-align:center;">' +
+              '<div style="font-size:0.72rem; color:#94a3b8;">🎧 بیک گراؤنڈ (صرف نعت)</div>' +
+              '<div style="font-size:0.88rem; font-weight:bold; color:#f59e0b; margin-top:4px;">' + fmtUrduTime(rec.bgSec) + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div style="font-size:0.82rem; font-weight:bold; color:#00ffa3; margin-bottom:8px;">📜 تفصیلی لسٹ (کتابیں اور نعتیں):</div>' +
+          itemsHtml +
+        '</div>' +
+        '<div style="padding:10px 14px; border-top:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.3);">' +
+          '<button type="button" onclick="document.getElementById(\'jamiaUserHistoryOverlay\').remove()" style="width:100%; background:linear-gradient(135deg, #00ffa3, #00b875); color:#031810; border:none; padding:9px; border-radius:10px; font-weight:bold; font-size:0.88rem; cursor:pointer;">بند کریں</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+  };
 
   function syncWithServer() {
     const uName = localStorage.getItem("jamia_ula_name") || (document.getElementById("user-name") && document.getElementById("user-name").value) || "Guest (Login Screen)";
@@ -5337,203 +5564,237 @@ window.openViewer = function(url, title) {
   }
 </style>
 
-<script id="jamia-exact-timer-v8">
+
+
+
+<script id="jamia-core-features-v1">
 (function() {
-  var STORAGE_KEY = "jamia_user_daily_activity_v8";
-
-  function getDateKey(daysOffset) {
-    var d = new Date();
-    if (daysOffset) d.setDate(d.getDate() + daysOffset);
-    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+  if (window.pdfjsLib) {
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
   }
 
-  function loadLogs() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch(e) { return {}; }
-  }
+  // =====================================================
+  // FEATURE A: IN-SCREEN PDF.JS READER (FOR LARGE PDFS)
+  // =====================================================
+  let currentPdfDoc = null;
+  let currentRenderToken = 0;
 
-  function saveLogs(data) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
-  }
+  window.openFullscreenPdf = function(fileId, title) {
+    const tLower = (title || "").toLowerCase();
+    const isPaper = tLower.includes("paper") || (title || "").includes("پرچہ") || (title || "").includes("امتحان") || tLower.includes("sania") || tLower.includes("rabia") || tLower.includes("salisa") || tLower.includes("darja_ula");
 
-  function ensureDay(logs, dKey) {
-    if (!logs[dKey]) {
-      logs[dKey] = { screenSec: 0, bgSec: 0, items: {} };
+    if (isPaper) {
+      const a = document.createElement("a");
+      a.href = "https://drive.google.com/file/d/" + fileId + "/view";
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      return;
     }
-    return logs[dKey];
-  }
 
-  function fmtShort(sec) {
-    sec = Math.max(0, Math.floor(sec || 0));
-    var h = Math.floor(sec / 3600);
-    var m = Math.floor((sec % 3600) / 60);
-    var s = sec % 60;
-    if (h > 0) return h + "h " + m + "m " + s + "s";
-    return m + "m " + s + "s";
-  }
+    if (typeof window.recordJamiaLastItem === "function") {
+      window.recordJamiaLastItem("pdf", fileId, title);
+    }
+    const eyeBtn = document.getElementById("jamiaPdfEyeCareBtn");
+    if (eyeBtn) eyeBtn.style.display = "block";
 
-  function fmtUrdu(sec) {
-    sec = Math.max(0, Math.floor(sec || 0));
-    var h = Math.floor(sec / 3600);
-    var m = Math.floor((sec % 3600) / 60);
-    var s = sec % 60;
-    if (h > 0) return h + " گھنٹہ " + m + " منٹ " + s + " سیکنڈ";
-    if (m > 0) return m + " منٹ " + s + " سیکنڈ";
-    return s + " سیکنڈ";
-  }
+    const viewer = document.getElementById("pdf-viewer-overlay");
+    const frame = document.getElementById("fullscreen-frame");
+    const titleEl = document.getElementById("viewer-title");
+    if (titleEl) titleEl.innerText = title || "کتاب";
+    if (typeof zoomReset === "function") zoomReset();
+    if (viewer) viewer.style.display = "flex";
 
-  function isNaatPlaying() {
-    var audio = document.getElementById("globalHtmlAudio");
-    var bar = document.getElementById("emeraldAudioBar");
-    if (!audio || !bar) return false;
-    var isOpen = bar.classList.contains("active") && bar.style.display !== "none";
-    return Boolean(isOpen && !audio.paused && !audio.ended && audio.currentTime > 0);
-  }
+    // Extract clean Drive File ID
+    const m = String(fileId || "").match(/[-\w]{25,}/);
+    const cleanId = m ? m[0] : String(fileId || "").trim();
+    const streamUrl = "/api/stream?type=pdf&id=" + encodeURIComponent(cleanId);
 
-  function getNaatTitle() {
-    var tEl = document.getElementById("audioPlayerTitle");
-    var t = tEl ? (tEl.innerText || "").trim() : "";
-    if (!t || t.indexOf("لوڈ ہو رہا") !== -1) return "نعت شریف";
-    return t;
-  }
+    // Prepare custom in-screen canvas container right next to #fullscreen-frame
+    let customBox = document.getElementById("jamiaPdfCanvasContainer");
+    if (!customBox && frame && frame.parentNode) {
+      customBox = document.createElement("div");
+      customBox.id = "jamiaPdfCanvasContainer";
+      customBox.style.cssText = "width:100%; height:100%; overflow-y:auto; overflow-x:auto; background:#0f172a; display:none; flex-direction:column; align-items:center; padding:12px 6px 60px 6px; box-sizing:border-box; -webkit-overflow-scrolling:touch;";
+      frame.parentNode.appendChild(customBox);
+    }
 
-  // 1-Second Timer Ticker & UI Hook
-  setInterval(function() {
-    var todayKey = getDateKey(0);
-    var logs = loadLogs();
-    var dayRec = ensureDay(logs, todayKey);
-
-    var isVisible = !document.hidden && document.visibilityState === "visible";
-    var playing = isNaatPlaying();
-
-    if (isVisible) {
-      dayRec.screenSec += 1;
-      if (playing) {
-        var name = getNaatTitle();
-        if (!dayRec.items[name]) dayRec.items[name] = { screen: 0, bg: 0, lastTime: "" };
-        dayRec.items[name].screen += 1;
-        dayRec.items[name].lastTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (!window.pdfjsLib || !customBox) {
+      if (frame) {
+        frame.style.display = "block";
+        frame.src = "https://drive.google.com/file/d/" + cleanId + "/preview";
       }
-      saveLogs(logs);
-    } else if (playing) {
-      // Background seconds strictly increment ONLY when a Naat is playing!
-      dayRec.bgSec += 1;
-      var bgName = getNaatTitle();
-      if (!dayRec.items[bgName]) dayRec.items[bgName] = { screen: 0, bg: 0, lastTime: "" };
-      dayRec.items[bgName].bg += 1;
-      dayRec.items[bgName].lastTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      saveLogs(logs);
+      return;
     }
 
-    // Update the visual pill / badge on screen and make it clickable
-    var pill = document.getElementById("jamiaUsagePill");
-    if (pill) {
-      var aElem = document.getElementById("juActive");
-      var bElem = document.getElementById("juBg");
-      if (aElem) aElem.textContent = fmtShort(dayRec.screenSec);
-      if (bElem) bElem.textContent = fmtShort(dayRec.bgSec);
+    // Hide Drive iframe and show in-screen progressive PDF.js reader
+    if (frame) {
+      frame.src = "";
+      frame.style.display = "none";
+    }
+    customBox.style.display = "flex";
+    customBox.innerHTML =
+      '<div id="jamiaPdfLoaderMsg" style="color:#00ffa3; margin-top:45px; font-size:0.95rem; text-align:center; padding:16px; background:rgba(0,255,163,0.08); border:1px solid rgba(0,255,163,0.3); border-radius:12px;">' +
+        '<i class="fa-solid fa-spinner fa-spin"></i> کتاب اسکرین کے اندر لوڈ ہو رہی ہے...<br>' +
+        '<small style="color:#cbd5e1; font-size:0.75rem;">بڑی کتابیں بھی اسی اسکرین میں صفحہ بہ صفحہ کھلیں گی</small>' +
+      '</div>';
 
-      if (!pill.dataset.clickBound) {
-        pill.dataset.clickBound = "true";
-        pill.style.cursor = "pointer";
-        pill.onclick = function(e) {
-          if (e.target && e.target.closest("button")) return; // Admin chart button chhod kar
-          window.openJamiaUserHistoryModal(getDateKey(0));
-        };
+    const myToken = ++currentRenderToken;
+
+    window.pdfjsLib.getDocument({
+      url: streamUrl,
+      rangeChunkSize: 65536,
+      disableAutoFetch: false,
+      disableStream: false
+    }).promise.then(function(pdfDoc) {
+      if (myToken !== currentRenderToken) return;
+      currentPdfDoc = pdfDoc;
+      customBox.innerHTML =
+        '<div style="position:sticky; top:4px; z-index:20; background:rgba(2,20,13,0.92); color:#00ffa3; border:1px solid rgba(0,255,163,0.4); padding:4px 14px; border-radius:20px; font-size:0.76rem; margin-bottom:10px; box-shadow:0 4px 12px rgba(0,0,0,0.5);">' +
+          'کل صفحات: <b>' + pdfDoc.numPages + '</b>' +
+        '</div>';
+
+      // Create lazy-rendered page slots so even a 500-page / 200MB book opens in 1 second without lag
+      const pageObserver = new IntersectionObserver(function(entries, obs) {
+        entries.forEach(function(entry) {
+          if (!entry.isIntersecting) return;
+          const holder = entry.target;
+          obs.unobserve(holder);
+          const pNum = parseInt(holder.dataset.pageNumber, 10);
+          if (!pNum || holder.dataset.rendered === "1") return;
+          holder.dataset.rendered = "1";
+
+          pdfDoc.getPage(pNum).then(function(page) {
+            if (myToken !== currentRenderToken) return;
+            const vp = page.getViewport({ scale: 1.5 });
+            const canvas = document.createElement("canvas");
+            canvas.style.cssText = "width:100%; max-width:820px; height:auto; display:block; background:#fff; border-radius:6px;";
+            canvas.width = vp.width;
+            canvas.height = vp.height;
+            const ctx = canvas.getContext("2d");
+            holder.innerHTML = "";
+            holder.style.minHeight = "auto";
+            holder.appendChild(canvas);
+            page.render({ canvasContext: ctx, viewport: vp });
+          });
+        });
+      }, { root: customBox, rootMargin: "600px 0px" });
+
+      for (let p = 1; p <= pdfDoc.numPages; p++) {
+        const slot = document.createElement("div");
+        slot.className = "jamia-pdf-page-slot";
+        slot.dataset.pageNumber = String(p);
+        slot.style.cssText = "width:98%; max-width:820px; min-height:420px; margin-bottom:14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:6px; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:0.8rem; box-shadow:0 6px 18px rgba(0,0,0,0.6);";
+        slot.innerHTML = '<span>صفحہ ' + p + ' لوڈ ہو رہا ہے...</span>';
+        customBox.appendChild(slot);
+        pageObserver.observe(slot);
       }
-    }
-  }, 1000);
-
-  function friendlyDate(dKey) {
-    if (dKey === getDateKey(0)) return "آج (" + dKey.slice(5) + ")";
-    if (dKey === getDateKey(-1)) return "کل (" + dKey.slice(5) + ")";
-    return "تاریخ: " + dKey;
-  }
-
-  // Full History Modal for everyday users
-  window.openJamiaUserHistoryModal = function(selectedDateKey) {
-    var existing = document.getElementById("jamiaUserHistoryOverlay");
-    if (existing) existing.remove();
-
-    var logs = loadLogs();
-    ensureDay(logs, getDateKey(0));
-    ensureDay(logs, getDateKey(-1));
-
-    var dates = Object.keys(logs).sort().reverse();
-    var activeDate = selectedDateKey || getDateKey(0);
-    var rec = logs[activeDate] || { screenSec: 0, bgSec: 0, items: {} };
-
-    var overlay = document.createElement("div");
-    overlay.id = "jamiaUserHistoryOverlay";
-    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
-
-    var dateTabs = dates.slice(0, 14).map(function(d) {
-      var activeClass = (d === activeDate) ? "active" : "";
-      return '<button type="button" class="jh-date-btn ' + activeClass + '" onclick="window.openJamiaUserHistoryModal(\'' + d + '\')">' + friendlyDate(d) + '</button>';
-    }).join("");
-
-    var itemNames = Object.keys(rec.items || {});
-    itemNames.sort(function(a, b) {
-      var totA = (rec.items[a].screen || 0) + (rec.items[a].bg || 0);
-      var totB = (rec.items[b].screen || 0) + (rec.items[b].bg || 0);
-      return totB - totA;
+    }).catch(function(err) {
+      if (myToken !== currentRenderToken) return;
+      // Fallback to Drive preview if stream fails
+      customBox.style.display = "none";
+      if (frame) {
+        frame.style.display = "block";
+        frame.src = "https://drive.google.com/file/d/" + cleanId + "/preview";
+      }
     });
+  };
 
-    var itemsHtml = "";
-    if (itemNames.length === 0) {
-      itemsHtml = '<div style="text-align:center; padding:24px; color:#94a3b8; font-size:0.85rem; background:rgba(0,0,0,0.2); border-radius:10px;">اس تاریخ (' + activeDate + ') میں کوئی سرگرمی ریکارڈ نہیں ہوئی۔</div>';
-    } else {
-      itemNames.forEach(function(name) {
-        var it = rec.items[name];
-        var scr = it.screen || 0;
-        var bg = it.bg || 0;
-        var tot = scr + bg;
-        itemsHtml += `
-          <div class="jh-item-card">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-              <div style="font-weight:bold; font-size:0.85rem; color:#fff;">🎵 ${name}</div>
-              ${it.lastTime ? '<span style="font-size:0.7rem; color:#00ffa3; background:rgba(0,255,163,0.1); padding:2px 6px; border-radius:6px;">' + it.lastTime + '</span>' : ''}
-            </div>
-            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; margin-top:8px; font-size:0.75rem; color:#cbd5e1; border-top:1px solid rgba(255,255,255,0.06); pt:6px;">
-              <span>📱 اسکرین: <b style="color:#00ffa3;">${fmtUrdu(scr)}</b></span>
-              <span>🎧 بیک گراؤنڈ: <b style="color:#f59e0b;">${fmtUrdu(bg)}</b></span>
-              <span>⏱️ کل: <b style="color:#38bdf8;">${fmtUrdu(tot)}</b></span>
-            </div>
-          </div>
-        `;
+  const origClosePdf = window.closeFullscreenPdf;
+  window.closeFullscreenPdf = function() {
+    currentRenderToken++;
+    const customBox = document.getElementById("jamiaPdfCanvasContainer");
+    if (customBox) {
+      customBox.innerHTML = "";
+      customBox.style.display = "none";
+    }
+    const eyeBtn = document.getElementById("jamiaPdfEyeCareBtn");
+    if (eyeBtn) eyeBtn.style.display = "none";
+    if (typeof origClosePdf === "function") origClosePdf();
+  };
+
+  // Connect existing Zoom (+ / - / 100%) to custom PDF container as well
+  const origApplyZoom = window.applyZoom;
+  window.applyZoom = function() {
+    if (typeof origApplyZoom === "function") origApplyZoom();
+    const customBox = document.getElementById("jamiaPdfCanvasContainer");
+    if (customBox && typeof currentZoom !== "undefined") {
+      const slots = customBox.querySelectorAll(".jamia-pdf-page-slot");
+      slots.forEach(function(s) {
+        s.style.width = Math.round(98 * currentZoom) + "%";
+        s.style.maxWidth = Math.round(820 * currentZoom) + "px";
       });
     }
-
-    overlay.innerHTML = `
-      <div class="jh-card">
-        <div class="jh-header">
-          <div style="font-weight:bold; font-size:0.95rem; color:#00ffa3; display:flex; align-items:center; gap:8px;">
-            <i class="fa-solid fa-clock-rotate-left"></i> روزانہ سننے اور پڑھने کا ریکارڈ
-          </div>
-          <button type="button" onclick="document.getElementById('jamiaUserHistoryOverlay').remove()" style="background:rgba(255,255,255,0.08); border:none; color:#fff; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button>
-        </div>
-        <div class="jh-date-bar">${dateTabs}</div>
-        <div class="jh-body">
-          <div style="font-size:0.75rem; color:#94a3b8; text-align:center; margin-bottom:10px;">
-            📅 منتخب تاریخ: <b style="color:#fff;">${activeDate}</b> (رات 12 بجے خودکار ری سیٹ)
-          </div>
-          <div class="jh-summary-grid">
-            <div class="jh-stat-box">
-              <div style="font-size:0.72rem; color:#94a3b8;">📱 کل اسکرین ٹائم</div>
-              <div style="font-size:0.9rem; font-weight:bold; color:#00ffa3; margin-top:4px;">${fmtUrdu(rec.screenSec)}</div>
-            </div>
-            <div style="font-size:0.72rem; color:#94a3b8;">🎧 کل بیک گراؤنڈ (صرف نعت)</div>
-            <div style="font-size:0.9rem; font-weight:bold; color:#f59e0b; margin-top:4px;">${fmtUrdu(rec.bgSec)}</div>
-          </div>
-          <div style="font-size:0.85rem; font-weight:bold; color:#00ffa3; margin-bottom:8px;">📜 تفصیلی لسٹ:</div>
-          ${itemsHtml}
-        </div>
-        <div style="padding:12px 16px; border-top:1px solid rgba(255,255,255,0.08); text-align:center; background:rgba(0,0,0,0.3);">
-          <button type="button" onclick="document.getElementById('jamiaUserHistoryOverlay').remove()" style="width:100%; background:linear-gradient(135deg, #00ffa3, #00b875); color:#031810; border:none; padding:10px; border-radius:10px; font-weight:bold; font-size:0.9rem; cursor:pointer;">بند کریں</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(overlay);
   };
+
+  // =====================================================
+  // FEATURE B: 20,000 ITEMS AUTO-SCROLL CHUNKING
+  // =====================================================
+  window.addEventListener("scroll", function() {
+    const loadMoreBtn = document.getElementById("jamiaLoadMoreContainer");
+    if (loadMoreBtn && typeof window.renderNextBatch === "function") {
+      const rect = loadMoreBtn.getBoundingClientRect();
+      if (rect.top < window.innerHeight + 450) {
+        window.renderNextBatch();
+      }
+    }
+  }, { passive: true });
+
+  // =====================================================
+  // FEATURE C: SHARE LINK (?open=ID) AUTO-OPENER
+  // =====================================================
+  let deepLinkOpened = false;
+  function checkAndOpenSharedItem() {
+    if (deepLinkOpened) return;
+    const params = new URLSearchParams(window.location.search);
+    const rawTarget = params.get("open") || params.get("item") || params.get("id");
+    if (!rawTarget) return;
+
+    // Wait until user is on content-section (logged in)
+    const contentSec = document.getElementById("content-section");
+    if (contentSec && contentSec.style.display === "none") return;
+
+    let allItems = [];
+    if (typeof getActiveLibrary === "function") {
+      allItems = allItems.concat(getActiveLibrary() || []);
+    } else if (typeof LIBRARY_DATA !== "undefined") {
+      allItems = allItems.concat(LIBRARY_DATA || []);
+    }
+    if (Array.isArray(window.JAMIA_NAATS_LIST)) {
+      allItems = allItems.concat(window.JAMIA_NAATS_LIST);
+    }
+
+    if (allItems.length === 0) return;
+
+    const cleanTarget = (rawTarget.match(/[-\w]{25,}/) || [rawTarget])[0];
+    let matched = null;
+    for (let i = 0; i < allItems.length; i++) {
+      const item = allItems[i];
+      const itemId = String(item.id || item.audioUrl || "");
+      if (itemId === rawTarget || itemId.includes(cleanTarget)) {
+        matched = item;
+        break;
+      }
+    }
+
+    if (matched) {
+      deepLinkOpened = true;
+      const isAudio = (matched.type === "audio" || matched.category === "naat" || Boolean(matched.audioUrl));
+      const itemTitle = matched.title || "جامعۃ الرضا";
+      setTimeout(function() {
+        if (isAudio && typeof window.playAudio === "function") {
+          window.playAudio(matched.audioUrl || matched.id, itemTitle);
+        } else if (typeof window.openFullscreenPdf === "function") {
+          window.openFullscreenPdf(matched.id, itemTitle);
+        }
+      }, 400);
+    }
+  }
+
+  setInterval(checkAndOpenSharedItem, 900);
+  window.addEventListener("DOMContentLoaded", checkAndOpenSharedItem);
 })();
 </script>
 
