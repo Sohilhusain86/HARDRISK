@@ -55,9 +55,31 @@ export default async function handler(req, res) {
     }
 
     res.status(response.status);
-    const arrayBuffer = await response.arrayBuffer();
-    res.send(Buffer.from(arrayBuffer));
+    
+    // STREAM THE CHUNKS DIRECTLY WITHOUT PRE-BUFFERING 50MB FILE IN MEMORY
+    if (response.body && typeof response.body.pipeTo === "function") {
+      const reader = response.body.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        res.write(value);
+      }
+      res.end();
+    } else if (response.body && typeof response.body.getReader === "function") {
+      const reader = response.body.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        res.write(Buffer.from(value));
+      }
+      res.end();
+    } else {
+      const arrayBuffer = await response.arrayBuffer();
+      res.send(Buffer.from(arrayBuffer));
+    }
   } catch (err) {
-    res.status(500).send("Stream error: " + err.message);
+    if (!res.headersSent) {
+      res.status(500).send("Stream error: " + err.message);
+    }
   }
 }

@@ -5569,9 +5569,11 @@ window.openViewer = function(url, title) {
 
 <script id="jamia-core-features-v1">
 (function() {
+  
   if (window.pdfjsLib) {
     window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
   }
+
 
   // =====================================================
   // FEATURE A: IN-SCREEN PDF.JS READER (FOR LARGE PDFS)
@@ -5646,8 +5648,9 @@ window.openViewer = function(url, title) {
     window.pdfjsLib.getDocument({
       url: streamUrl,
       rangeChunkSize: 65536,
-      disableAutoFetch: false,
-      disableStream: false
+      disableAutoFetch: true,
+      disableStream: true,
+      enableXfa: false
     }).promise.then(function(pdfDoc) {
       if (myToken !== currentRenderToken) return;
       currentPdfDoc = pdfDoc;
