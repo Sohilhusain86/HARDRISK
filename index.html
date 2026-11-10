@@ -5784,6 +5784,7 @@ window.openViewer = function(url, title) {
 
     if (matched) {
       deepLinkOpened = true;
+      try { const cleanUrl = window.location.origin + window.location.pathname; window.history.replaceState({}, document.title, cleanUrl); } catch(e) {}
       const isAudio = (matched.type === "audio" || matched.category === "naat" || Boolean(matched.audioUrl));
       const itemTitle = matched.title || "جامعۃ الرضا";
       setTimeout(function() {
@@ -6248,6 +6249,459 @@ window.openViewer = function(url, title) {
     cleanUpFilterButtons();
     window.filterLibrary();
   }, 400);
+})();
+</script>
+
+
+<style id="jamia-quick-name-modal-css">
+  #jamiaQuickNameOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 18, 12, 0.94);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 2147483646 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    direction: rtl;
+  }
+  .jqn-box {
+    background: radial-gradient(circle at top, #0d3326 0%, #04150f 100%);
+    border: 1.5px solid #00ffa3;
+    border-radius: 18px;
+    padding: 22px 18px;
+    width: 100%;
+    max-width: 370px;
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.9), 0 0 25px rgba(0,255,163,0.25);
+  }
+</style>
+
+<script id="jamia-five-fixes-engine">
+(function() {
+  // =========================================================================
+  // FIX 1 & 2: SHARE LINK ONE-TIME PLAY + PASSWORDLESS NAME-ONLY LOGIN
+  // =========================================================================
+  const urlParams = new URLSearchParams(window.location.search);
+  const sharedTargetId = urlParams.get("open") || urlParams.get("item") || urlParams.get("id");
+
+  if (sharedTargetId) {
+    // Save in sessionStorage for this single visit and immediately strip ?open= from address bar
+    // so refreshing the page NEVER replays the naat/book again!
+    sessionStorage.setItem("jamia_pending_shared_item", sharedTargetId);
+    try {
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+    } catch (e) {}
+  }
+
+  function checkAndShowQuickNameLogin() {
+    const pending = sessionStorage.getItem("jamia_pending_shared_item");
+    if (!pending) return;
+
+    const savedName = localStorage.getItem("jamia_ula_name");
+    const savedExpiry = parseInt(localStorage.getItem("jamia_ula_expiry") || "0", 10);
+    const isLogged = Boolean(savedName && savedExpiry > Date.now());
+
+    if (isLogged) {
+      openPendingSharedItem();
+      return;
+    }
+
+    if (document.getElementById("jamiaQuickNameOverlay")) return;
+
+    const overlay = document.createElement("div");
+    overlay.id = "jamiaQuickNameOverlay";
+    overlay.innerHTML =
+      '<div class="jqn-box">' +
+        '<div style="font-size:2rem; margin-bottom:8px;">🕌</div>' +
+        '<h3 style="margin:0 0 8px 0; color:#00ffa3; font-size:1.1rem;">جامعۃ الرضا ڈیجیٹل کتب خانہ</h3>' +
+        '<p style="margin:0 0 14px 0; font-size:0.86rem; color:#cbd5e1; line-height:1.6;">نام ڈال کر لاگ ان ہوں! اور نعت پلے کریں یا کتاب پڑھیں</p>' +
+        '<input id="jamiaQuickNameInput" type="text" placeholder="اپنا نام یہاں لکھیں..." style="width:100%; padding:11px 12px; border-radius:10px; border:1px solid #00ffa3; background:#022c22; color:#fff; font-size:0.95rem; text-align:center; box-sizing:border-box; margin-bottom:12px;">' +
+        '<button type="button" id="jamiaQuickNameBtn" style="width:100%; background:linear-gradient(135deg, #00ffa3, #059669); color:#022c22; border:none; padding:11px; border-radius:10px; font-weight:bold; font-size:0.95rem; cursor:pointer;">لاگ ان ہوں اور کھولیں ⬅️</button>' +
+      '</div>';
+
+    document.body.appendChild(overlay);
+
+    const inp = document.getElementById("jamiaQuickNameInput");
+    const btn = document.getElementById("jamiaQuickNameBtn");
+
+    function submitQuickName() {
+      const nameVal = (inp && inp.value ? inp.value.trim() : "");
+      if (!nameVal) {
+        if (inp) inp.style.borderColor = "#ef4444";
+        return;
+      }
+      const expiry = Date.now() + (365 * 24 * 60 * 60 * 1000);
+      localStorage.setItem("jamia_ula_name", nameVal);
+      localStorage.setItem("jamia_ula_expiry", String(expiry));
+      overlay.remove();
+      if (typeof window.showDashboard === "function") {
+        window.showDashboard(nameVal);
+      } else {
+        const authSec = document.getElementById("auth-section");
+        const contSec = document.getElementById("content-section");
+        if (authSec) authSec.style.display = "none";
+        if (contSec) contSec.style.display = "block";
+      }
+      setTimeout(openPendingSharedItem, 400);
+    }
+
+    if (btn) btn.onclick = submitQuickName;
+    if (inp) {
+      inp.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") submitQuickName();
+      });
+    }
+  }
+
+  function openPendingSharedItem() {
+    const rawTarget = sessionStorage.getItem("jamia_pending_shared_item");
+    if (!rawTarget) return;
+
+    const contSec = document.getElementById("content-section");
+    if (contSec && contSec.style.display === "none") return;
+
+    const cleanTarget = (rawTarget.match(/[-\w]{25,}/) || [rawTarget])[0];
+    const allItems = [];
+    if (typeof window.getCleanJamiaLists === "function") {
+      const lists = window.getCleanJamiaLists();
+      allItems.push(...lists.books, ...lists.naats);
+    } else {
+      if (typeof LIBRARY_DATA !== "undefined") allItems.push(...LIBRARY_DATA);
+      if (Array.isArray(window.ALL_BOOKS_CACHE)) allItems.push(...window.ALL_BOOKS_CACHE);
+      if (Array.isArray(window.JAMIA_NAATS_LIST)) allItems.push(...window.JAMIA_NAATS_LIST);
+    }
+
+    if (allItems.length === 0) return;
+
+    let matched = null;
+    for (let i = 0; i < allItems.length; i++) {
+      const it = allItems[i];
+      const idStr = String(it.id || it.audioUrl || "");
+      if (idStr === rawTarget || idStr.includes(cleanTarget)) {
+        matched = it;
+        break;
+      }
+    }
+
+    if (matched) {
+      // Remove immediately so it NEVER triggers again on refresh!
+      sessionStorage.removeItem("jamia_pending_shared_item");
+      const isAudio = (matched.type === "audio" || matched.category === "naat" || Boolean(matched.audioUrl));
+      const title = matched.title || "جامعۃ الرضا";
+      setTimeout(function() {
+        if (isAudio && typeof window.playAudio === "function") {
+          window.playAudio(matched.audioUrl || matched.id, title);
+        } else if (typeof window.openFullscreenPdf === "function") {
+          window.openFullscreenPdf(matched.id, title);
+        }
+      }, 300);
+    }
+  }
+
+  // =========================================================================
+  // FIX 3: PERMANENT PINNED ASJAD MIYAN NAATS + CLEAN BOOK/NAAT COUNTS
+  // =========================================================================
+  const PINNED_ASJAD_KEY = "jamia_pinned_asjad_naats_v1";
+
+  // Default fallback pinned Asjad Miyan naats so the Naat section is NEVER empty on startup
+  const DEFAULT_ASJAD_NAATS = [
+    {
+      id: "asjad_pin_1",
+      title: "کلامِ حضور عسجد رضا خاں قادری (منتخب نعت ١)",
+      naatKhwan: "asjad",
+      subtitle: "آڈیو نعت شریف • حضور عسجد رضا",
+      author: "حضور عسجد رضا خاں",
+      category: "naat",
+      type: "audio",
+      language: "Urdu",
+      size: "MP3",
+      pages: "MP3",
+      coverClass: "cover-bahar",
+      icon: "fa-solid fa-music",
+      coverTitle: "کلام حضور عسجد رضا",
+      isPlaceholderPin: true
+    }
+  ];
+
+  function getPinnedAsjadNaats() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(PINNED_ASJAD_KEY) || "[]");
+      if (Array.isArray(saved) && saved.length > 0) return saved;
+    } catch (e) {}
+    return [];
+  }
+
+  function savePinnedAsjadNaats(naatsArray) {
+    try {
+      const asjadOnly = naatsArray.filter(function(n) {
+        const t = String(n.title || "").toLowerCase();
+        return n.naatKhwan === "asjad" || t.includes("asjad") || t.includes("عسجد") || t.includes("اسجد") || t.includes("असजद");
+      }).slice(0, 12);
+      if (asjadOnly.length > 0) {
+        localStorage.setItem(PINNED_ASJAD_KEY, JSON.stringify(asjadOnly));
+      }
+    } catch (e) {}
+  }
+
+  function extractDriveId(rawIdOrUrl) {
+    const s = String(rawIdOrUrl || "").trim();
+    const m = s.match(/[-\w]{25,}/);
+    return m ? m[0] : s;
+  }
+
+  window.getCleanJamiaLists = function() {
+    const booksMap = new Map();
+    const naatsMap = new Map();
+
+    // 1. First, insert permanently pinned Asjad Miyan naats at the very top of Naats list!
+    const pinnedAsjad = getPinnedAsjadNaats();
+    pinnedAsjad.forEach(function(nt) {
+      if (!nt || !nt.id) return;
+      const cid = extractDriveId(nt.id);
+      naatsMap.set(cid, Object.assign({}, nt, {
+        id: cid,
+        category: "naat",
+        type: "audio",
+        naatKhwan: "asjad"
+      }));
+    });
+
+    // 2. Collect all raw items from LIBRARY_DATA, ALL_BOOKS_CACHE, JAMIA_NAATS_LIST
+    const rawItems = [];
+    if (typeof LIBRARY_DATA !== "undefined" && Array.isArray(LIBRARY_DATA)) rawItems.push(...LIBRARY_DATA);
+    if (Array.isArray(window.ALL_BOOKS_CACHE)) rawItems.push(...window.ALL_BOOKS_CACHE);
+    if (Array.isArray(window.JAMIA_NAATS_LIST)) rawItems.push(...window.JAMIA_NAATS_LIST);
+
+    const seenBookTitles = new Set();
+
+    rawItems.forEach(function(item) {
+      if (!item || !item.id || item.isPlaceholderPin) return;
+      const cid = extractDriveId(item.id);
+      const titleNorm = String(item.title || "").trim().toLowerCase();
+      const cat = (typeof window.classifyJamiaItem === "function") ? window.classifyJamiaItem(item) : (item.category || "islamic");
+
+      if (cat === "naat" || item.type === "audio" || item.category === "naat") {
+        const tLower = String(item.title || "").toLowerCase();
+        let khwan = item.naatKhwan || "other";
+        if (tLower.includes("asjad") || tLower.includes("عسجد") || tLower.includes("اسجد") || tLower.includes("असजद")) khwan = "asjad";
+        else if (tLower.includes("sabir") || tLower.includes("صابر") || tLower.includes("ازہری") || tLower.includes("साबिर")) khwan = "sabira";
+        else if (tLower.includes("rafiq") || tLower.includes("رفیق") || tLower.includes("रफ़ीक़")) khwan = "rafiq";
+
+        if (!naatsMap.has(cid)) {
+          naatsMap.set(cid, Object.assign({}, item, {
+            id: cid,
+            category: "naat",
+            type: "audio",
+            naatKhwan: khwan
+          }));
+        }
+      } else {
+        // Strict deduplication for books by both Drive ID and normalized title so book count is 100% exact
+        if (!booksMap.has(cid) && (!titleNorm || !seenBookTitles.has(titleNorm))) {
+          if (titleNorm) seenBookTitles.add(titleNorm);
+          booksMap.set(cid, Object.assign({}, item, {
+            id: cid,
+            category: cat,
+            type: "pdf"
+          }));
+        }
+      }
+    });
+
+    // Order naats so pinned Asjad Miyan naats stay at the top, followed by remaining naats
+    const allNaats = Array.from(naatsMap.values());
+    savePinnedAsjadNaats(allNaats);
+
+    const topAsjad = allNaats.filter(n => n.naatKhwan === "asjad").slice(0, 10);
+    const topIds = new Set(topAsjad.map(n => n.id));
+    const restNaats = allNaats.filter(n => !topIds.has(n.id));
+
+    return {
+      books: Array.from(booksMap.values()),
+      naats: topAsjad.concat(restNaats)
+    };
+  };
+
+  // Override counts & filter to use our deduplicated & Asjad-pinned lists
+  window.updateJamiaCategoryCounts = function() {
+    const { books, naats } = window.getCleanJamiaLists();
+    const favIds = (typeof window.getJamiaFavIds === "function") ? window.getJamiaFavIds() : [];
+
+    const counts = {
+      all: books.length,
+      naat: naats.length,
+      islamic: books.filter(b => b.category === "islamic").length,
+      darsi: books.filter(b => b.category === "darsi").length,
+      papers: books.filter(b => b.category === "papers").length,
+      fav: books.concat(naats).filter(b => favIds.includes(b.id) || favIds.includes((b.title || "").trim())).length
+    };
+
+    const labels = {
+      all: "تمام کتب",
+      naat: "تمام نعتیں",
+      islamic: "دینی و فقہی",
+      darsi: "درسی کتب",
+      papers: "امتحانی پرچے",
+      fav: "⭐ میری پسند"
+    };
+
+    document.querySelectorAll(".filter-tag").forEach(function(tag) {
+      const oc = tag.getAttribute("onclick") || "";
+      if (oc.includes("'math'") || oc.includes("'hindi'")) {
+        tag.style.setProperty("display", "none", "important");
+        return;
+      }
+      Object.keys(labels).forEach(function(key) {
+        if (oc.includes("'" + key + "'")) {
+          tag.innerText = labels[key] + " (" + counts[key] + ")";
+        }
+      });
+    });
+  };
+
+  // =========================================================================
+  // FIX 4: REAL HTML5 AUDIO STREAM + NOTIFICATION BAR NEXT/PREV/SEEK CONTROLS
+  // =========================================================================
+  window.playAudio = function(audioUrlOrId, title) {
+    const bar = document.getElementById("emeraldAudioBar");
+    const audio = document.getElementById("globalHtmlAudio");
+    const titleEl = document.getElementById("audioPlayerTitle");
+    const timeEl = document.getElementById("audioPlayerTime");
+    const icon = document.getElementById("audioPlayIcon");
+    const prog = document.getElementById("audioProgressBar");
+
+    const cleanTitle = String(title || "نعت شریف").replace(/\.(mp3|m4a|wav)$/i, "").trim();
+    const fileId = extractDriveId(audioUrlOrId);
+    const streamSrc = "/api/stream?type=audio&id=" + encodeURIComponent(fileId);
+
+    // Track current index in naats list for Next / Previous notification buttons
+    const { naats } = window.getCleanJamiaLists();
+    const foundIdx = naats.findIndex(n => extractDriveId(n.id) === fileId || n.title === cleanTitle);
+    if (foundIdx !== -1) {
+      window.jamiaCurrentPlayingIndex = foundIdx;
+    }
+
+    if (typeof window.recordJamiaLastItem === "function") {
+      window.recordJamiaLastItem("audio", fileId, cleanTitle);
+    }
+
+    // Remove any old iframe embeds so native HTML5 audio & notification controls work 100%
+    document.querySelectorAll(".driveEmbedBoxClass").forEach(el => el.remove());
+
+    if (titleEl) titleEl.innerText = cleanTitle;
+    if (timeEl) timeEl.innerText = "لوڈ ہو رہا ہے...";
+    if (prog) {
+      prog.style.display = "block";
+      prog.value = 0;
+    }
+    if (bar) {
+      bar.style.display = "flex";
+      bar.classList.add("active");
+    }
+
+    if (audio) {
+      if (audio.dataset.currentId !== fileId) {
+        audio.dataset.currentId = fileId;
+        audio.src = streamSrc;
+      }
+      audio.play().then(function() {
+        if (icon) icon.className = "fa-solid fa-pause";
+        setupNotificationMediaSession(cleanTitle, audio);
+      }).catch(function() {
+        if (icon) icon.className = "fa-solid fa-play";
+      });
+    }
+  };
+
+  window.openJamiaAudioModal = window.playAudio;
+  window.playNaat = window.playAudio;
+
+  function setupNotificationMediaSession(title, audio) {
+    if (!("mediaSession" in navigator)) return;
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: title,
+      artist: "جامعۃ الرضا آڈیو لائبریری",
+      album: "جامعۃ الرضا ڈیجیٹل کتب خانہ",
+      artwork: [
+        { src: "https://cdn-icons-png.flaticon.com/512/2995/2995101.png", sizes: "512x512", type: "image/png" }
+      ]
+    });
+
+    navigator.mediaSession.setActionHandler("play", function() {
+      audio.play().catch(function(){});
+      navigator.mediaSession.playbackState = "playing";
+    });
+
+    navigator.mediaSession.setActionHandler("pause", function() {
+      audio.pause();
+      navigator.mediaSession.playbackState = "paused";
+    });
+
+    navigator.mediaSession.setActionHandler("previoustrack", function() {
+      if (typeof window.jamiaPlayAdjacentNaat === "function") {
+        window.jamiaPlayAdjacentNaat(-1);
+      }
+    });
+
+    navigator.mediaSession.setActionHandler("nexttrack", function() {
+      if (typeof window.jamiaPlayAdjacentNaat === "function") {
+        window.jamiaPlayAdjacentNaat(1);
+      }
+    });
+
+    navigator.mediaSession.setActionHandler("seekbackward", function(details) {
+      const skip = details.seekOffset || 10;
+      audio.currentTime = Math.max(audio.currentTime - skip, 0);
+    });
+
+    navigator.mediaSession.setActionHandler("seekforward", function(details) {
+      const skip = details.seekOffset || 10;
+      audio.currentTime = Math.min(audio.currentTime + skip, audio.duration || audio.currentTime + skip);
+    });
+
+    try {
+      navigator.mediaSession.setActionHandler("seekto", function(details) {
+        if (details.fastSeek && "fastSeek" in audio) {
+          audio.fastSeek(details.seekTime);
+          return;
+        }
+        audio.currentTime = details.seekTime;
+      });
+    } catch (e) {}
+  }
+
+  // Update position state on timeupdate so Android notification seek-bar moves smoothly
+  document.addEventListener("DOMContentLoaded", function() {
+    const audio = document.getElementById("globalHtmlAudio");
+    if (audio) {
+      audio.addEventListener("timeupdate", function() {
+        if ("mediaSession" in navigator && "setPositionState" in navigator.mediaSession) {
+          if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
+            try {
+              navigator.mediaSession.setPositionState({
+                duration: audio.duration,
+                playbackRate: audio.playbackRate || 1,
+                position: Math.min(audio.currentTime, audio.duration)
+              });
+            } catch (e) {}
+          }
+        }
+      });
+    }
+    checkAndShowQuickNameLogin();
+  });
+
+  setInterval(function() {
+    checkAndShowQuickNameLogin();
+    openPendingSharedItem();
+    window.updateJamiaCategoryCounts();
+  }, 900);
 })();
 </script>
 
