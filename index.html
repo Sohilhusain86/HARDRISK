@@ -2492,7 +2492,7 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
         });
 
         window.ALL_BOOKS_CACHE = combined;
-        renderBooks(combined.filter(b => b.type !== "audio" && b.category !== "naat"));
+        if (typeof window.filterLibrary === "function") { window.filterLibrary(); } else { renderBooks(combined.filter(b => b.type !== "audio" && b.category !== "naat")); }
       } catch (err) {
         console.error("Fetch error:", err);
         if (typeof LIBRARY_DATA !== 'undefined') renderBooks(LIBRARY_DATA);
@@ -3782,7 +3782,7 @@ window.openViewer = function(url, title) {
             const parsed = JSON.parse(cb);
             if (typeof window.renderBooks === "function") {
               window.ALL_BOOKS_CACHE = parsed;
-              window.renderBooks(parsed);
+              if (typeof window.filterLibrary === "function") window.filterLibrary();
             }
           } catch(e) {}
         }
@@ -5001,8 +5001,8 @@ window.openViewer = function(url, title) {
             existingIds.add(nt.id);
           }
         });
-        if (typeof renderBooks === "function") {
-          renderBooks(LIBRARY_DATA);
+        if (typeof window.filterLibrary === "function") {
+          window.filterLibrary();
         }
       }
     } catch (e) {}
@@ -5798,6 +5798,456 @@ window.openViewer = function(url, title) {
 
   setInterval(checkAndOpenSharedItem, 900);
   window.addEventListener("DOMContentLoaded", checkAndOpenSharedItem);
+})();
+</script>
+
+
+<script id="jamia-smart-drive-and-strict-filters">
+(function() {
+  // =========================================================================
+  // 1. STRICT BOOK CLASSIFICATION (SEPARATING DARSI / SYLLABUS FROM ISLAMIC/FIQHI)
+  // =========================================================================
+  function classifyBookCategory(item) {
+    if (!item) return "islamic";
+    const rawCat = String(item.category || "").toLowerCase();
+    const rawType = String(item.type || "").toLowerCase();
+    const title = String(item.title || "");
+    const sub = String(item.subtitle || "");
+    const dl = String(item.downloadName || "");
+    const combinedText = (title + " " + sub + " " + dl).toLowerCase();
+
+    // A. Naat / Audio Check
+    if (
+      rawType === "audio" ||
+      rawCat === "naat" ||
+      Boolean(item.audioUrl) ||
+      combinedText.includes(".mp3") ||
+      combinedText.includes("آڈیو نعت")
+    ) {
+      return "naat";
+    }
+
+    // B. Exam Papers Check
+    if (
+      rawCat === "papers" ||
+      combinedText.includes("paper") ||
+      title.includes("پرچہ") ||
+      title.includes("امتحانی") ||
+      title.includes("سالانہ امتحان") ||
+      title.includes("ششماہی")
+    ) {
+      return "papers";
+    }
+
+    // C. Darsi / Syllabus / Grammar / School Subjects Check (Excluded from Deeni & Fiqhi)
+    const darsiKeywords = [
+      "شرح مائة", "مائۃ عامل", "مائة عامل", "مایت عامل", "miat aamil", "miat amil",
+      "ہدایۃ النحو", "هداية النحو", "hidayatun nahw", "کافیہ", "كافية", "kafiya",
+      "نحو", "nahw", "صرف", "sarf", "منطق", "mantiq", "بلاغت", "balaghat",
+      "مرقات", "ایساغوجی", "میزان الصرف", "منشعب", "پنج گنج", "علم الصیغہ", "علم الصرف", "علم النحو",
+      "نصاب", "درسی", "darsi", "درجہ", "darja", "کلاس", "class ", "chapter",
+      "math", "mathematics", "ریاضی", "حساب", "hindi", "ہندی", "हिंदी", "कक्षा", "पाठ", "प्रश्नोत्तरी",
+      "english", "انگریزی", "گرامر", "grammar", "قواعد", "ترجمہ", "انشاء", "طریقہ جدیدہ", "فیض الادب"
+    ];
+
+    if (rawCat === "math" || rawCat === "hindi" || rawCat === "darsi") {
+      return "darsi";
+    }
+    for (let i = 0; i < darsiKeywords.length; i++) {
+      if (combinedText.includes(darsiKeywords[i])) {
+        return "darsi";
+      }
+    }
+
+    // D. Pure Deeni, Fiqhi, Aqaid, Fatawa, Seerat, Hadith, Tafseer
+    return "islamic";
+  }
+
+  window.classifyJamiaItem = classifyBookCategory;
+
+  // =========================================================================
+  // 2. REMOVE "MATH" & "HINDI" FILTER TABS & REPLACE WITH CLEAN "DARSI" TAB
+  // =========================================================================
+  function cleanUpFilterButtons() {
+    const tags = document.querySelectorAll(".filter-tag");
+    let darsiTagExists = false;
+
+    tags.forEach(function(tag) {
+      const oc = tag.getAttribute("onclick") || "";
+      if (oc.includes("'darsi'")) darsiTagExists = true;
+    });
+
+    tags.forEach(function(tag) {
+      const oc = tag.getAttribute("onclick") || "";
+      if (oc.includes("'math'")) {
+        if (!darsiTagExists) {
+          tag.setAttribute("onclick", "setFilter('darsi', this)");
+          tag.innerText = "درسی و نصابی کتب";
+          tag.id = "filter-tag-darsi";
+          darsiTagExists = true;
+        } else {
+          tag.style.setProperty("display", "none", "important");
+        }
+      } else if (oc.includes("'hindi'")) {
+        tag.style.setProperty("display", "none", "important");
+      }
+    });
+  }
+
+  // =========================================================================
+  // 3. UNIFIED MASTER LIST (NO DUPLICATES, NO MIXING BETWEEN BOOKS & NAATS)
+  // =========================================================================
+  function getCleanSeparatedLists() {
+    const booksMap = new Map();
+    const naatsMap = new Map();
+
+    const rawSources = [];
+    if (typeof LIBRARY_DATA !== "undefined" && Array.isArray(LIBRARY_DATA)) {
+      rawSources.push(...LIBRARY_DATA);
+    }
+    if (window.ALL_BOOKS_CACHE && Array.isArray(window.ALL_BOOKS_CACHE)) {
+      rawSources.push(...window.ALL_BOOKS_CACHE);
+    }
+    if (window.JAMIA_NAATS_LIST && Array.isArray(window.JAMIA_NAATS_LIST)) {
+      rawSources.push(...window.JAMIA_NAATS_LIST);
+    }
+
+    rawSources.forEach(function(item) {
+      if (!item || !item.id) return;
+      const cleanId = String(item.id).trim();
+      const cat = classifyBookCategory(item);
+
+      if (cat === "naat") {
+        if (!naatsMap.has(cleanId)) {
+          const copy = Object.assign({}, item, { category: "naat", type: "audio" });
+          naatsMap.set(cleanId, copy);
+        }
+      } else {
+        if (!booksMap.has(cleanId)) {
+          const copy = Object.assign({}, item, { category: cat, type: "pdf" });
+          booksMap.set(cleanId, copy);
+        }
+      }
+    });
+
+    return {
+      books: Array.from(booksMap.values()),
+      naats: Array.from(naatsMap.values())
+    };
+  }
+
+  // =========================================================================
+  // 4. STRICT TAB FILTERING & ACCURATE COUNTS
+  // =========================================================================
+  let activeTabState = "all"; // 'all', 'islamic', 'darsi', 'papers', 'fav', 'naat', 'asjad', 'sabira', 'rafiq'
+
+  function normStr(s) {
+    return String(s || "")
+      .replace(/[ً-ٰٟ]/g, "")
+      .replace(/[أإآ]/g, "ا")
+      .replace(/ة/g, "ہ")
+      .replace(/ي/g, "ی")
+      .replace(/ۂ/g, "ہ")
+      .toLowerCase();
+  }
+
+  window.updateJamiaCategoryCounts = function() {
+    cleanUpFilterButtons();
+    const { books, naats } = getCleanSeparatedLists();
+    const favIds = (typeof window.getJamiaFavIds === "function") ? window.getJamiaFavIds() : [];
+
+    const counts = {
+      all: books.length,
+      naat: naats.length,
+      islamic: books.filter(b => b.category === "islamic").length,
+      darsi: books.filter(b => b.category === "darsi").length,
+      papers: books.filter(b => b.category === "papers").length,
+      fav: books.concat(naats).filter(b => favIds.includes(b.id) || favIds.includes((b.title || "").trim())).length
+    };
+
+    const labels = {
+      all: "تمام کتب",
+      naat: "تمام نعتیں",
+      islamic: "دینی و فقہی",
+      darsi: "درسی کتب",
+      papers: "امتحانی پرچے",
+      fav: "⭐ میری پسند"
+    };
+
+    document.querySelectorAll(".filter-tag").forEach(function(tag) {
+      const oc = tag.getAttribute("onclick") || "";
+      Object.keys(labels).forEach(function(key) {
+        if (oc.includes("'" + key + "'")) {
+          tag.innerText = labels[key] + " (" + counts[key] + ")";
+        }
+      });
+    });
+  };
+
+  window.filterLibrary = function() {
+    cleanUpFilterButtons();
+    window.updateJamiaCategoryCounts();
+
+    const searchInput = document.getElementById("lib-search");
+    const rawQ = (searchInput ? searchInput.value : "").trim().toLowerCase();
+    const qNorm = normStr(rawQ);
+    const favIds = (typeof window.getJamiaFavIds === "function") ? window.getJamiaFavIds() : [];
+    const { books, naats } = getCleanSeparatedLists();
+
+    const cat = (typeof currentCategory !== "undefined" && currentCategory) ? currentCategory : activeTabState;
+    activeTabState = cat;
+
+    let pool = [];
+    if (cat === "naat" || cat === "all_naats") {
+      pool = naats;
+    } else if (cat === "asjad") {
+      pool = naats.filter(n => normStr(n.title).includes("asjad") || normStr(n.title).includes("عسجد") || normStr(n.title).includes("اسجد") || n.naatKhwan === "asjad");
+    } else if (cat === "sabir" || cat === "sabira") {
+      pool = naats.filter(n => normStr(n.title).includes("sabir") || normStr(n.title).includes("صابر") || normStr(n.title).includes("ازہری") || n.naatKhwan === "sabira");
+    } else if (cat === "rafique" || cat === "rafiq") {
+      pool = naats.filter(n => normStr(n.title).includes("rafiq") || normStr(n.title).includes("رفیق") || n.naatKhwan === "rafiq");
+    } else if (cat === "fav") {
+      pool = books.concat(naats).filter(b => favIds.includes(b.id) || favIds.includes((b.title || "").trim()));
+    } else if (cat === "islamic") {
+      pool = books.filter(b => b.category === "islamic");
+    } else if (cat === "darsi") {
+      pool = books.filter(b => b.category === "darsi");
+    } else if (cat === "papers") {
+      pool = books.filter(b => b.category === "papers");
+    } else {
+      // Default 'all' -> ONLY BOOKS (Never mix naats here)
+      pool = books;
+    }
+
+    if (rawQ) {
+      pool = pool.filter(function(b) {
+        const hay = normStr(b.title) + " " + normStr(b.subtitle) + " " + String(b.downloadName || "").toLowerCase();
+        return hay.includes(qNorm) || hay.includes(rawQ);
+      });
+    }
+
+    if (typeof window.renderBooks === "function") {
+      window.renderBooks(pool);
+    }
+  };
+
+  window.setFilter = function(cat, elem) {
+    if (typeof currentCategory !== "undefined") {
+      currentCategory = cat;
+    }
+    activeTabState = cat;
+    document.querySelectorAll(".filter-tag").forEach(t => t.classList.remove("active"));
+    if (elem) elem.classList.add("active");
+    window.filterLibrary();
+  };
+
+  window.runJamiaFilter = function(catKey, clickedEl) {
+    const mapped = (catKey === "all_naats") ? "naat" : catKey;
+    window.setFilter(mapped, clickedEl);
+  };
+
+  // =========================================================================
+  // 5. 40 MB SMART PDF SWITCH (<= 40MB DIRECT DRIVE PREVIEW, > 40MB STREAM)
+  // =========================================================================
+  function parseSizeInMB(item, titleStr) {
+    if (!item && !titleStr) return 0;
+    const rawSize = String((item && (item.size || item.pages || item.subtitle)) || titleStr || "");
+    const match = rawSize.match(/(\d+(?:\.\d+)?)\s*(mb|gb|kb)/i);
+    if (!match) return 0;
+    const val = parseFloat(match[1]);
+    const unit = match[2].toLowerCase();
+    if (unit === "gb") return val * 1024;
+    if (unit === "kb") return val / 1024;
+    return val;
+  }
+
+  function findBookItemById(fileId, title) {
+    const { books } = getCleanSeparatedLists();
+    const cleanId = (String(fileId || "").match(/[-\w]{25,}/) || [fileId])[0];
+    for (let i = 0; i < books.length; i++) {
+      if (String(books[i].id).includes(cleanId) || (title && books[i].title === title)) {
+        return books[i];
+      }
+    }
+    return null;
+  }
+
+  let pdfStreamToken = 0;
+
+  window.openFullscreenPdf = function(fileId, title) {
+    const tLower = String(title || "").toLowerCase();
+    const isPaper = tLower.includes("paper") || String(title || "").includes("پرچہ") || String(title || "").includes("امتحان") || tLower.includes("sania") || tLower.includes("rabia") || tLower.includes("salisa") || tLower.includes("darja_ula");
+
+    if (isPaper) {
+      const a = document.createElement("a");
+      a.href = "https://drive.google.com/file/d/" + fileId + "/view";
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      return;
+    }
+
+    if (typeof window.recordJamiaLastItem === "function") {
+      window.recordJamiaLastItem("pdf", fileId, title);
+    }
+    const eyeBtn = document.getElementById("jamiaPdfEyeCareBtn");
+    if (eyeBtn) eyeBtn.style.display = "block";
+
+    const viewer = document.getElementById("pdf-viewer-overlay");
+    const frame = document.getElementById("fullscreen-frame");
+    const titleEl = document.getElementById("viewer-title");
+    if (titleEl) titleEl.innerText = title || "کتاب";
+    if (typeof zoomReset === "function") zoomReset();
+    if (viewer) viewer.style.display = "flex";
+
+    const m = String(fileId || "").match(/[-\w]{25,}/);
+    const cleanId = m ? m[0] : String(fileId || "").trim();
+    const customBox = document.getElementById("jamiaPdfCanvasContainer");
+
+    const bookObj = findBookItemById(cleanId, title);
+    const knownSizeMB = parseSizeInMB(bookObj, title);
+
+    // Helper: Open directly in fast Google Drive Preview iframe (for <= 40MB)
+    function openInDrivePreview() {
+      pdfStreamToken++;
+      if (customBox) {
+        customBox.innerHTML = "";
+        customBox.style.display = "none";
+      }
+      if (frame) {
+        frame.style.display = "block";
+        frame.src = "https://drive.google.com/file/d/" + cleanId + "/preview";
+      }
+    }
+
+    // Helper: Open in progressive chunk stream reader (for > 40MB)
+    function openInStreamReader() {
+      let box = document.getElementById("jamiaPdfCanvasContainer");
+      if (!box && frame && frame.parentNode) {
+        box = document.createElement("div");
+        box.id = "jamiaPdfCanvasContainer";
+        box.style.cssText = "width:100%; height:100%; overflow-y:auto; overflow-x:auto; background:#0f172a; display:none; flex-direction:column; align-items:center; padding:12px 6px 60px 6px; box-sizing:border-box; -webkit-overflow-scrolling:touch;";
+        frame.parentNode.appendChild(box);
+      }
+      if (!window.pdfjsLib || !box) {
+        openInDrivePreview();
+        return;
+      }
+
+      if (frame) {
+        frame.src = "";
+        frame.style.display = "none";
+      }
+      box.style.display = "flex";
+      box.innerHTML =
+        '<div style="color:#00ffa3; margin-top:45px; font-size:0.95rem; text-align:center; padding:16px; background:rgba(0,255,163,0.08); border:1px solid rgba(0,255,163,0.3); border-radius:12px;">' +
+          '<i class="fa-solid fa-spinner fa-spin"></i> بڑی کتاب (40MB+) اسٹریمنگ موڈ میں کھل رہی ہے...<br>' +
+          '<button type="button" id="jamiaSwitchToDriveBtn" style="margin-top:10px; background:#0284c7; color:#fff; border:none; padding:6px 12px; border-radius:8px; font-size:0.78rem; cursor:pointer;">ڈرائیو پریویو میں کھولیں</button>' +
+        '</div>';
+
+      const swBtn = document.getElementById("jamiaSwitchToDriveBtn");
+      if (swBtn) swBtn.onclick = openInDrivePreview;
+
+      const myToken = ++pdfStreamToken;
+      const streamUrl = "/api/stream?type=pdf&id=" + encodeURIComponent(cleanId);
+
+      window.pdfjsLib.getDocument({
+        url: streamUrl,
+        rangeChunkSize: 65536,
+        disableAutoFetch: true,
+        disableStream: true
+      }).promise.then(function(pdfDoc) {
+        if (myToken !== pdfStreamToken) return;
+        box.innerHTML =
+          '<div style="position:sticky; top:4px; z-index:20; background:rgba(2,20,13,0.94); color:#00ffa3; border:1px solid rgba(0,255,163,0.4); padding:5px 12px; border-radius:20px; font-size:0.76rem; margin-bottom:10px; display:flex; align-items:center; gap:10px; box-shadow:0 4px 12px rgba(0,0,0,0.5);">' +
+            '<span>کل صفحات: <b>' + pdfDoc.numPages + '</b></span>' +
+            '<input id="jamiaPageJumpInput" type="number" min="1" max="' + pdfDoc.numPages + '" placeholder="صفحہ نمبر..." style="width:75px; padding:2px 6px; border-radius:6px; border:1px solid #00ffa3; background:#031810; color:#fff; font-size:0.75rem;">' +
+            '<button type="button" id="jamiaPageJumpBtn" style="background:#00ffa3; color:#031810; border:none; padding:2px 8px; border-radius:6px; font-weight:bold; font-size:0.74rem; cursor:pointer;">جائیں</button>' +
+          '</div>';
+
+        const pageObserver = new IntersectionObserver(function(entries, obs) {
+          entries.forEach(function(entry) {
+            if (!entry.isIntersecting) return;
+            const holder = entry.target;
+            obs.unobserve(holder);
+            const pNum = parseInt(holder.dataset.pageNumber, 10);
+            if (!pNum || holder.dataset.rendered === "1") return;
+            holder.dataset.rendered = "1";
+
+            pdfDoc.getPage(pNum).then(function(page) {
+              if (myToken !== pdfStreamToken) return;
+              const vp = page.getViewport({ scale: 1.45 });
+              const canvas = document.createElement("canvas");
+              canvas.style.cssText = "width:100%; max-width:820px; height:auto; display:block; background:#fff; border-radius:6px;";
+              canvas.width = vp.width;
+              canvas.height = vp.height;
+              const ctx = canvas.getContext("2d");
+              holder.innerHTML = "";
+              holder.style.minHeight = "auto";
+              holder.appendChild(canvas);
+              page.render({ canvasContext: ctx, viewport: vp });
+            });
+          });
+        }, { root: box, rootMargin: "500px 0px" });
+
+        for (let p = 1; p <= pdfDoc.numPages; p++) {
+          const slot = document.createElement("div");
+          slot.className = "jamia-pdf-page-slot";
+          slot.id = "jamia-pdf-page-" + p;
+          slot.dataset.pageNumber = String(p);
+          slot.style.cssText = "width:98%; max-width:820px; min-height:420px; margin-bottom:14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:6px; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:0.8rem;";
+          slot.innerHTML = '<span>صفحہ ' + p + '</span>';
+          box.appendChild(slot);
+          pageObserver.observe(slot);
+        }
+
+        const jBtn = document.getElementById("jamiaPageJumpBtn");
+        const jInp = document.getElementById("jamiaPageJumpInput");
+        if (jBtn && jInp) {
+          jBtn.onclick = function() {
+            const targetP = parseInt(jInp.value, 10);
+            const targetEl = document.getElementById("jamia-pdf-page-" + targetP);
+            if (targetEl) targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+          };
+        }
+      }).catch(function() {
+        if (myToken !== pdfStreamToken) return;
+        openInDrivePreview();
+      });
+    }
+
+    // Decision logic: <= 40 MB opens immediately via Google Drive Preview!
+    if (knownSizeMB > 40) {
+      openInStreamReader();
+    } else if (knownSizeMB > 0 && knownSizeMB <= 40) {
+      openInDrivePreview();
+    } else {
+      // Size unknown in metadata: open immediately in Drive Preview (fastest), and check size in background
+      openInDrivePreview();
+      fetch("/api/stream?type=pdf&id=" + encodeURIComponent(cleanId), { method: "HEAD" })
+        .then(function(r) {
+          const len = parseInt(r.headers.get("content-length") || "0", 10);
+          const mb = len / (1024 * 1024);
+          // Only switch to stream reader if file exceeds 40 MB (where Drive Preview shows refusal message)
+          if (mb > 40 && viewer && viewer.style.display !== "none") {
+            openInStreamReader();
+          }
+        })
+        .catch(function() {});
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", function() {
+    cleanUpFilterButtons();
+    window.filterLibrary();
+    setInterval(cleanUpFilterButtons, 1500);
+  });
+  setTimeout(function() {
+    cleanUpFilterButtons();
+    window.filterLibrary();
+  }, 400);
 })();
 </script>
 

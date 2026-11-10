@@ -1,4 +1,15 @@
+import { Readable } from "node:stream";
+
 export default async function handler(req, res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Range, Content-Type");
+  res.setHeader("Access-Control-Expose-Headers", "Content-Range, Content-Length, Accept-Ranges");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   const { id, url, type } = req.query;
   let fileId = id || "";
 
@@ -20,25 +31,32 @@ export default async function handler(req, res) {
 
   try {
     const headers = {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "Accept": "*/*"
     };
     if (req.headers.range) {
       headers["Range"] = req.headers.range;
     }
 
-    let response = await fetch(targetUrl, { headers, redirect: "follow" });
-    let contentType = response.headers.get("content-type") || "";
+    let response = await fetch(targetUrl, {
+      method: req.method === "HEAD" ? "HEAD" : "GET",
+      headers,
+      redirect: "follow"
+    });
 
+    let contentType = response.headers.get("content-type") || "";
     if (contentType.includes("text/html") && fileId) {
       const altUrl = `https://drive.google.com/uc?export=download&id=${fileId}&confirm=t`;
-      response = await fetch(altUrl, { headers, redirect: "follow" });
+      response = await fetch(altUrl, {
+        method: req.method === "HEAD" ? "HEAD" : "GET",
+        headers,
+        redirect: "follow"
+      });
       contentType = response.headers.get("content-type") || "";
     }
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Range, Content-Type");
-    res.setHeader("Access-Control-Expose-Headers", "Content-Range, Content-Length, Accept-Ranges");
     res.setHeader("Accept-Ranges", "bytes");
+    res.setHeader("Cache-Control", "public, max-age=3600");
 
     if (type === "pdf") {
       res.setHeader("Content-Type", "application/pdf");
@@ -47,36 +65,27 @@ export default async function handler(req, res) {
       res.setHeader("Content-Type", contentType.includes("audio") ? contentType : "audio/mpeg");
     }
 
-    if (response.headers.get("content-length")) {
-      res.setHeader("Content-Length", response.headers.get("content-length"));
-    }
-    if (response.headers.get("content-range")) {
-      res.setHeader("Content-Range", response.headers.get("content-range"));
-    }
+    const cLen = response.headers.get("content-length");
+    if (cLen) res.setHeader("Content-Length", cLen);
+
+    const cRange = response.headers.get("content-range");
+    if (cRange) res.setHeader("Content-Range", cRange);
 
     res.status(response.status);
-    
-    // STREAM THE CHUNKS DIRECTLY WITHOUT PRE-BUFFERING 50MB FILE IN MEMORY
-    if (response.body && typeof response.body.pipeTo === "function") {
-      const reader = response.body.getReader();
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        res.write(value);
-      }
-      res.end();
-    } else if (response.body && typeof response.body.getReader === "function") {
-      const reader = response.body.getReader();
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        res.write(Buffer.from(value));
-      }
-      res.end();
-    } else {
-      const arrayBuffer = await response.arrayBuffer();
-      res.send(Buffer.from(arrayBuffer));
+
+    if (req.method === "HEAD" || !response.body) {
+      return res.end();
     }
+
+    // Native high-speed Node stream pipe (zero memory buffering lag)
+    const nodeStream = Readable.fromWeb(response.body);
+    nodeStream.on("error", () => {
+      if (!res.writableEnded) res.end();
+    });
+    req.on("close", () => {
+      try { nodeStream.destroy(); } catch (_) {}
+    });
+    nodeStream.pipe(res);
   } catch (err) {
     if (!res.headersSent) {
       res.status(500).send("Stream error: " + err.message);
