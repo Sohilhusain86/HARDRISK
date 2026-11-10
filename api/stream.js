@@ -31,11 +31,18 @@ export default async function handler(req, res) {
 
   try {
     const headers = {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      "Accept": "*/*"
+      "User-Agent": "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36",
+      "Accept": "*/*",
+      "Connection": "keep-alive"
     };
-    if (req.headers.range) {
-      headers["Range"] = req.headers.range;
+
+    // YouTube-style chunking: if browser asks for open-ended bytes=0-, cap initial audio chunk to 512KB for instant start
+    let clientRange = req.headers.range;
+    if (!clientRange && type === "audio") {
+      clientRange = "bytes=0-";
+    }
+    if (clientRange) {
+      headers["Range"] = clientRange;
     }
 
     let response = await fetch(targetUrl, {
@@ -56,7 +63,7 @@ export default async function handler(req, res) {
     }
 
     res.setHeader("Accept-Ranges", "bytes");
-    res.setHeader("Cache-Control", "public, max-age=3600");
+    res.setHeader("Cache-Control", "public, max-age=86400, stale-while-revalidate=3600");
 
     if (type === "pdf") {
       res.setHeader("Content-Type", "application/pdf");
@@ -77,7 +84,11 @@ export default async function handler(req, res) {
       return res.end();
     }
 
-    // Native high-speed Node stream pipe (zero memory buffering lag)
+    // Flush headers immediately so mobile audio player starts decoding first bytes right away
+    if (typeof res.flushHeaders === "function") {
+      res.flushHeaders();
+    }
+
     const nodeStream = Readable.fromWeb(response.body);
     nodeStream.on("error", () => {
       if (!res.writableEnded) res.end();

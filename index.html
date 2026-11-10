@@ -6705,5 +6705,285 @@ window.openViewer = function(url, title) {
 })();
 </script>
 
+
+<style id="jamia-fav-subtabs-css">
+  #jamiaFavSubBar {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 8px auto 14px auto;
+    padding: 8px 12px;
+    background: rgba(4, 28, 18, 0.9);
+    border: 1px solid rgba(0, 255, 163, 0.35);
+    border-radius: 16px;
+    width: fit-content;
+    max-width: 96%;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+    direction: rtl;
+  }
+  .j-fav-sub-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(0, 255, 163, 0.3);
+    color: #cbd5e1;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 0.84rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .j-fav-sub-btn.active {
+    background: linear-gradient(135deg, #00ffa3, #10b981);
+    color: #022c22;
+    border-color: #00ffa3;
+    box-shadow: 0 0 12px rgba(0, 255, 163, 0.4);
+  }
+</style>
+
+<script id="jamia-fav-subtabs-and-yt-audio">
+(function() {
+  // =========================================================================
+  // 1. "MERI PASAND" TWO SUB-OPTIONS (BOOKS VS NAATS)
+  // =========================================================================
+  window.jamiaFavSubType = "books"; // 'books' or 'naats'
+
+  function ensureFavSubBar() {
+    let subBar = document.getElementById("jamiaFavSubBar");
+    if (subBar) return subBar;
+
+    const favTag = Array.from(document.querySelectorAll(".filter-tag")).find(el => {
+      const oc = el.getAttribute("onclick") || "";
+      return oc.includes("'fav'");
+    });
+
+    if (!favTag || !favTag.parentElement) return null;
+    const filterContainer = favTag.parentElement;
+
+    subBar = document.createElement("div");
+    subBar.id = "jamiaFavSubBar";
+    subBar.innerHTML =
+      '<button type="button" id="jFavSubBooks" class="j-fav-sub-btn active" onclick="window.setJamiaFavSub(\'books\')">' +
+        '📚 پسندیدہ کتب (<span id="jFavBooksCount">0</span>)' +
+      '</button>' +
+      '<button type="button" id="jFavSubNaats" class="j-fav-sub-btn" onclick="window.setJamiaFavSub(\'naats\')">' +
+        '🎵 پسندیدہ نعتیں (<span id="jFavNaatsCount">0</span>)' +
+      '</button>';
+
+    filterContainer.insertAdjacentElement("afterend", subBar);
+    return subBar;
+  }
+
+  window.setJamiaFavSub = function(subType) {
+    window.jamiaFavSubType = subType;
+    const bBtn = document.getElementById("jFavSubBooks");
+    const nBtn = document.getElementById("jFavSubNaats");
+    if (bBtn) bBtn.classList.toggle("active", subType === "books");
+    if (nBtn) nBtn.classList.toggle("active", subType === "naats");
+    if (typeof window.filterLibrary === "function") {
+      window.filterLibrary();
+    }
+  };
+
+  // Hook into filterLibrary so choosing 'fav' shows the 2 sub-buttons and filters strictly by Books or Naats
+  const origFilterLibrary = window.filterLibrary;
+  window.filterLibrary = function() {
+    const subBar = ensureFavSubBar();
+    const cat = (typeof currentCategory !== "undefined" && currentCategory) ? currentCategory : "all";
+
+    if (typeof window.getCleanJamiaLists === "function") {
+      const { books, naats } = window.getCleanJamiaLists();
+      const favIds = (typeof window.getJamiaFavIds === "function") ? window.getJamiaFavIds() : [];
+
+      const favBooks = books.filter(b => favIds.includes(b.id) || favIds.includes((b.title || "").trim()));
+      const favNaats = naats.filter(n => favIds.includes(n.id) || favIds.includes((n.title || "").trim()));
+
+      const bCountEl = document.getElementById("jFavBooksCount");
+      const nCountEl = document.getElementById("jFavNaatsCount");
+      if (bCountEl) bCountEl.innerText = String(favBooks.length);
+      if (nCountEl) nCountEl.innerText = String(favNaats.length);
+
+      if (cat === "fav") {
+        if (subBar) subBar.style.display = "flex";
+        if (typeof window.updateJamiaCategoryCounts === "function") window.updateJamiaCategoryCounts();
+
+        const searchInput = document.getElementById("lib-search");
+        const rawQ = (searchInput ? searchInput.value : "").trim().toLowerCase();
+
+        let targetPool = (window.jamiaFavSubType === "naats") ? favNaats : favBooks;
+        if (rawQ) {
+          targetPool = targetPool.filter(item => {
+            const hay = ((item.title || "") + " " + (item.subtitle || "")).toLowerCase();
+            return hay.includes(rawQ);
+          });
+        }
+        if (typeof window.renderBooks === "function") {
+          window.renderBooks(targetPool);
+        }
+        return;
+      } else {
+        if (subBar) subBar.style.display = "none";
+      }
+    }
+
+    if (typeof origFilterLibrary === "function") {
+      origFilterLibrary();
+    }
+  };
+
+  // =========================================================================
+  // 2. YOUTUBE-STYLE PROGRESSIVE FAST AUDIO STREAMING + PRE-WARMING
+  // =========================================================================
+  const prewarmedIds = new Set();
+
+  function extractDriveId(raw) {
+    const s = String(raw || "").trim();
+    const m = s.match(/[-\w]{25,}/);
+    return m ? m[0] : s;
+  }
+
+  // Pre-warm first 128KB of audio in browser HTTP cache when user touches/hovers a Naat card
+  function prewarmAudioChunk(rawIdOrUrl) {
+    const id = extractDriveId(rawIdOrUrl);
+    if (!id || prewarmedIds.has(id)) return;
+    prewarmedIds.add(id);
+
+    const streamUrl = "/api/stream?type=audio&id=" + encodeURIComponent(id);
+    fetch(streamUrl, {
+      method: "GET",
+      headers: { "Range": "bytes=0-131071" }
+    }).catch(function() {});
+  }
+
+  // Automatically pre-warm on touchstart / mouseenter of any 'سنیں' button
+  document.addEventListener("touchstart", function(e) {
+    const btn = e.target && e.target.closest ? e.target.closest("button[onclick*='playAudio']") : null;
+    if (btn) {
+      const oc = btn.getAttribute("onclick") || "";
+      const m = oc.match(/playAudio\(['"]([^'"]+)['"]/);
+      if (m && m[1]) prewarmAudioChunk(m[1]);
+    }
+  }, { passive: true });
+
+  document.addEventListener("mouseover", function(e) {
+    const btn = e.target && e.target.closest ? e.target.closest("button[onclick*='playAudio']") : null;
+    if (btn) {
+      const oc = btn.getAttribute("onclick") || "";
+      const m = oc.match(/playAudio\(['"]([^'"]+)['"]/);
+      if (m && m[1]) prewarmAudioChunk(m[1]);
+    }
+  }, { passive: true });
+
+  // Dual-source instant audio player: starts progressive stream immediately with zero metadata block
+  let activePlayRequestToken = 0;
+
+  window.playAudio = function(audioUrlOrId, title) {
+    const bar = document.getElementById("emeraldAudioBar");
+    const audio = document.getElementById("globalHtmlAudio");
+    const titleEl = document.getElementById("audioPlayerTitle");
+    const timeEl = document.getElementById("audioPlayerTime");
+    const icon = document.getElementById("audioPlayIcon");
+    const prog = document.getElementById("audioProgressBar");
+
+    const cleanTitle = String(title || "نعت شریف").replace(/\.(mp3|m4a|wav)$/i, "").trim();
+    const fileId = extractDriveId(audioUrlOrId);
+    const proxyStreamUrl = "/api/stream?type=audio&id=" + encodeURIComponent(fileId);
+    const directDriveStreamUrl = "https://drive.usercontent.google.com/download?id=" + encodeURIComponent(fileId) + "&export=download&confirm=t";
+
+    if (typeof window.getCleanJamiaLists === "function") {
+      const { naats } = window.getCleanJamiaLists();
+      const idx = naats.findIndex(n => extractDriveId(n.id) === fileId || n.title === cleanTitle);
+      if (idx !== -1) window.jamiaCurrentPlayingIndex = idx;
+      // Pre-warm the NEXT naat in advance like YouTube playlist!
+      if (idx !== -1 && naats[idx + 1]) {
+        setTimeout(() => prewarmAudioChunk(naats[idx + 1].id), 1500);
+      }
+    }
+
+    if (typeof window.recordJamiaLastItem === "function") {
+      window.recordJamiaLastItem("audio", fileId, cleanTitle);
+    }
+
+    document.querySelectorAll(".driveEmbedBoxClass").forEach(el => el.remove());
+
+    if (titleEl) titleEl.innerText = cleanTitle;
+    if (timeEl) timeEl.innerText = "⚡ اسٹریم شروع ہو رہی ہے...";
+    if (icon) icon.className = "fa-solid fa-spinner fa-spin";
+    if (prog) {
+      prog.style.display = "block";
+      prog.value = 0;
+    }
+    if (bar) {
+      bar.style.display = "flex";
+      bar.classList.add("active");
+    }
+
+    if (!audio) return;
+
+    const myToken = ++activePlayRequestToken;
+
+    // Configure HTML5 audio element for instant low-buffer streaming
+    audio.preload = "auto";
+    audio.crossOrigin = "anonymous";
+
+    function attachFastEvents() {
+      audio.oncanplay = function() {
+        if (myToken !== activePlayRequestToken) return;
+        if (icon && !audio.paused) icon.className = "fa-solid fa-pause";
+      };
+      audio.onplaying = function() {
+        if (myToken !== activePlayRequestToken) return;
+        if (icon) icon.className = "fa-solid fa-pause";
+      };
+      audio.onwaiting = function() {
+        if (myToken !== activePlayRequestToken) return;
+        if (timeEl) timeEl.innerText = "⚡ بفر ہو رہا ہے...";
+      };
+    }
+
+    attachFastEvents();
+
+    if (audio.dataset.currentId !== fileId) {
+      audio.pause();
+      audio.dataset.currentId = fileId;
+      audio.src = proxyStreamUrl;
+      audio.load();
+    }
+
+    // Start playback immediately as soon as initial chunk arrives
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(function() {
+        if (myToken !== activePlayRequestToken) return;
+        if (icon) icon.className = "fa-solid fa-pause";
+      }).catch(function() {
+        if (myToken !== activePlayRequestToken) return;
+        // Fallback: if CORS or proxy hiccups, try without anonymous crossOrigin or direct stream
+        audio.removeAttribute("crossorigin");
+        audio.src = proxyStreamUrl;
+        audio.play().then(function() {
+          if (icon) icon.className = "fa-solid fa-pause";
+        }).catch(function() {
+          audio.src = directDriveStreamUrl;
+          audio.play().catch(function() {
+            if (icon) icon.className = "fa-solid fa-play";
+          });
+        });
+      });
+    }
+  };
+
+  window.openJamiaAudioModal = window.playAudio;
+  window.playNaat = window.playAudio;
+
+  document.addEventListener("DOMContentLoaded", function() {
+    ensureFavSubBar();
+  });
+})();
+</script>
+
 </body>
 </html>
