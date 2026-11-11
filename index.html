@@ -7014,5 +7014,200 @@ window.openViewer = function(url, title) {
 })();
 </script>
 
+
+<script id="jamia-bg-continuous-audio-fix">
+(function() {
+  function getCleanId(raw) {
+    const s = String(raw || "").trim();
+    const m = s.match(/[-\w]{25,}/);
+    return m ? m[0] : s;
+  }
+
+  function getNaatsPlaylist() {
+    if (typeof window.getCleanJamiaLists === "function") {
+      const lists = window.getCleanJamiaLists();
+      if (lists && Array.isArray(lists.naats) && lists.naats.length > 0) return lists.naats;
+    }
+    if (Array.isArray(window.JAMIA_NAATS_LIST) && window.JAMIA_NAATS_LIST.length > 0) {
+      return window.JAMIA_NAATS_LIST;
+    }
+    const all = (window.ALL_BOOKS_CACHE && window.ALL_BOOKS_CACHE.length) ? window.ALL_BOOKS_CACHE : (typeof LIBRARY_DATA !== "undefined" ? LIBRARY_DATA : []);
+    return all.filter(function(x) { return x && (x.type === "audio" || x.category === "naat" || x.audioUrl); });
+  }
+
+  let playToken = 0;
+
+  // Seamless Background-Safe Play Function (NO audio.pause() before src swap!)
+  window.playAudio = function(audioUrlOrId, title) {
+    const bar = document.getElementById("emeraldAudioBar");
+    const audio = document.getElementById("globalHtmlAudio");
+    const titleEl = document.getElementById("audioPlayerTitle");
+    const timeEl = document.getElementById("audioPlayerTime");
+    const icon = document.getElementById("audioPlayIcon");
+    const prog = document.getElementById("audioProgressBar");
+
+    if (!audio) return;
+
+    const cleanTitle = String(title || "نعت شریف").replace(/\.(mp3|m4a|wav)$/i, "").trim();
+    const fileId = getCleanId(audioUrlOrId);
+    const streamUrl = "/api/stream?type=audio&id=" + encodeURIComponent(fileId);
+
+    // Update playlist index for automatic next/prev
+    const naats = getNaatsPlaylist();
+    const idx = naats.findIndex(function(n) {
+      return getCleanId(n.id || n.audioUrl) === fileId || String(n.title || "").trim() === cleanTitle;
+    });
+    if (idx !== -1) {
+      window.jamiaCurrentPlayingIndex = idx;
+    }
+
+    if (typeof window.recordJamiaLastItem === "function") {
+      window.recordJamiaLastItem("audio", fileId, cleanTitle);
+    }
+
+    // Remove any old iframe embeds
+    document.querySelectorAll(".driveEmbedBoxClass").forEach(function(el) { el.remove(); });
+
+    if (titleEl) titleEl.innerText = cleanTitle;
+    if (timeEl) timeEl.innerText = "⚡ اسٹریم جا ری ہے...";
+    if (icon) icon.className = "fa-solid fa-spinner fa-spin";
+    if (prog) {
+      prog.style.display = "block";
+      prog.value = 0;
+    }
+    if (bar) {
+      bar.style.display = "flex";
+      bar.classList.add("active");
+    }
+
+    // CRITICAL FIX: Never set crossOrigin="anonymous" or call audio.pause() before changing src!
+    // Calling pause() in background drops Android WebView/Chrome WakeLock & AudioFocus immediately.
+    audio.removeAttribute("crossorigin");
+    audio.preload = "auto";
+
+    const myToken = ++playToken;
+    audio.dataset.currentId = fileId;
+    audio.src = streamUrl;
+
+    updateMediaSessionMetadata(cleanTitle, audio);
+
+    const playAttempt = audio.play();
+    if (playAttempt !== undefined) {
+      playAttempt.then(function() {
+        if (myToken !== playToken) return;
+        if (icon) icon.className = "fa-solid fa-pause";
+        if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
+      }).catch(function() {
+        if (myToken !== playToken) return;
+        // Direct Google Drive fallback if proxy hiccups
+        audio.src = "https://drive.usercontent.google.com/download?id=" + encodeURIComponent(fileId) + "&export=download&confirm=t";
+        audio.play().then(function() {
+          if (icon) icon.className = "fa-solid fa-pause";
+          if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
+        }).catch(function() {
+          if (icon) icon.className = "fa-solid fa-play";
+        });
+      });
+    }
+  };
+
+  window.openJamiaAudioModal = window.playAudio;
+  window.playNaat = window.playAudio;
+
+  // Next / Previous Naat switcher that keeps audio session alive
+  window.jamiaPlayAdjacentNaat = function(dir) {
+    const naats = getNaatsPlaylist();
+    if (!naats.length) return;
+    let curIdx = typeof window.jamiaCurrentPlayingIndex === "number" ? window.jamiaCurrentPlayingIndex : 0;
+    let nextIdx = curIdx + (dir || 1);
+    if (nextIdx >= naats.length) nextIdx = 0;
+    if (nextIdx < 0) nextIdx = naats.length - 1;
+    window.jamiaCurrentPlayingIndex = nextIdx;
+    const nextItem = naats[nextIdx];
+    if (nextItem) {
+      window.playAudio(nextItem.audioUrl || nextItem.id, nextItem.title);
+    }
+  };
+
+  function updateMediaSessionMetadata(title, audio) {
+    if (!("mediaSession" in navigator)) return;
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: title,
+        artist: "جامعۃ الرضا آڈیو لائبریری",
+        album: "جامعۃ الرضا ڈیجیٹل کتب خانہ",
+        artwork: [{ src: "https://cdn-icons-png.flaticon.com/512/2995/2995101.png", sizes: "512x512", type: "image/png" }]
+      });
+      navigator.mediaSession.setActionHandler("play", function() { audio.play().catch(function(){}); });
+      navigator.mediaSession.setActionHandler("pause", function() { audio.pause(); });
+      navigator.mediaSession.setActionHandler("previoustrack", function() { window.jamiaPlayAdjacentNaat(-1); });
+      navigator.mediaSession.setActionHandler("nexttrack", function() { window.jamiaPlayAdjacentNaat(1); });
+    } catch (e) {}
+  }
+
+  function bindContinuousBackgroundPlayback() {
+    const audio = document.getElementById("globalHtmlAudio");
+    if (!audio || audio.dataset.bgContinuousBound === "1") return;
+    audio.dataset.bgContinuousBound = "1";
+
+    const icon = document.getElementById("audioPlayIcon");
+    const timeEl = document.getElementById("audioPlayerTime");
+
+    audio.addEventListener("playing", function() {
+      if (icon) icon.className = "fa-solid fa-pause";
+      if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
+    });
+
+    audio.addEventListener("pause", function() {
+      // Only show play icon if it didn't pause due to track ending
+      if (!audio.ended && icon) icon.className = "fa-solid fa-play";
+    });
+
+    // When a naat finishes in background, immediately transition to the next naat!
+    audio.addEventListener("ended", function() {
+      if (window.jamiaIsLoopActive) {
+        audio.currentTime = 0;
+        audio.play().catch(function(){});
+      } else {
+        window.jamiaPlayAdjacentNaat(1);
+      }
+    });
+
+    // Pre-fetch next naat when current naat is 15 seconds away from finishing
+    let lastPrewarmedNextId = "";
+    audio.addEventListener("timeupdate", function() {
+      if (!audio.duration || isNaN(audio.duration)) return;
+      const remaining = audio.duration - audio.currentTime;
+      if (remaining > 0 && remaining < 15) {
+        const naats = getNaatsPlaylist();
+        if (!naats.length) return;
+        const nextIdx = ((window.jamiaCurrentPlayingIndex || 0) + 1) % naats.length;
+        const nextItem = naats[nextIdx];
+        const nextId = nextItem ? getCleanId(nextItem.id || nextItem.audioUrl) : "";
+        if (nextId && nextId !== lastPrewarmedNextId) {
+          lastPrewarmedNextId = nextId;
+          fetch("/api/stream?type=audio&id=" + encodeURIComponent(nextId), {
+            headers: { "Range": "bytes=0-131071" }
+          }).catch(function(){});
+        }
+      }
+    });
+
+    // Auto-recover if stream stalls mid-way in background
+    audio.addEventListener("error", function() {
+      const cid = audio.dataset.currentId;
+      if (cid && !audio.dataset.retriedDirect) {
+        audio.dataset.retriedDirect = "1";
+        audio.src = "https://drive.usercontent.google.com/download?id=" + encodeURIComponent(cid) + "&export=download&confirm=t";
+        audio.play().catch(function(){});
+      }
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", bindContinuousBackgroundPlayback);
+  setTimeout(bindContinuousBackgroundPlayback, 500);
+})();
+</script>
+
 </body>
 </html>
