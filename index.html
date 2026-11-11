@@ -7860,5 +7860,110 @@ window.openViewer = function(url, title) {
 })();
 </script>
 
+
+<script id="jamia-core-favorite-engine">
+(function() {
+  const FAV_KEY = "jamia_fav_ids_v2";
+
+  window.getJamiaFavIds = function() {
+    try {
+      return JSON.parse(localStorage.getItem(FAV_KEY) || "[]");
+    } catch(e) {
+      return [];
+    }
+  };
+
+  window.isJamiaFav = function(id, title) {
+    const favs = window.getJamiaFavIds();
+    const cleanId = String(id || "").trim();
+    const cleanTitle = String(title || "").trim();
+    return favs.includes(cleanId) || favs.includes(cleanTitle);
+  };
+
+  window.toggleJamiaFavItem = function(e, id, title, btnEl) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    let favs = window.getJamiaFavIds();
+    const cleanId = String(id || "").trim();
+    const cleanTitle = String(title || "").trim();
+    const targetKey = cleanId || cleanTitle;
+
+    if (!targetKey) return;
+
+    if (favs.includes(targetKey) || (cleanTitle && favs.includes(cleanTitle))) {
+      favs = favs.filter(function(x) {
+        return x !== targetKey && x !== cleanTitle && x !== cleanId;
+      });
+      if (btnEl) {
+        btnEl.classList.remove("active");
+        btnEl.innerHTML = '<i class="fa-regular fa-star"></i> <span>پسند</span>';
+      }
+    } else {
+      favs.push(targetKey);
+      if (cleanTitle && !favs.includes(cleanTitle)) {
+        favs.push(cleanTitle);
+      }
+      if (btnEl) {
+        btnEl.classList.add("active");
+        btnEl.innerHTML = '<i class="fa-solid fa-star"></i> <span>پسندیدہ ✓</span>';
+      }
+    }
+
+    try {
+      localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+    } catch(err) {}
+
+    if (typeof window.updateJamiaCategoryCounts === "function") {
+      window.updateJamiaCategoryCounts();
+    }
+    if (typeof window.filterLibrary === "function" && typeof currentCategory !== "undefined" && currentCategory === "fav") {
+      window.filterLibrary();
+    }
+  };
+
+  // Bind Audio Bar Favorite Button Robustly
+  function ensureAudioFavButtonSync() {
+    const bar = document.getElementById("emeraldAudioBar");
+    if (!bar) return;
+    let btn = document.getElementById("jamiaAudioFavOnlyBtn");
+    if (!btn) {
+      const navWrap = document.getElementById("jamiaAudioNavWrap") || bar.firstElementChild || bar;
+      btn = document.createElement("button");
+      btn.id = "jamiaAudioFavOnlyBtn";
+      btn.type = "button";
+      btn.title = "میری پسند میں شامل کریں";
+      btn.innerHTML = '<i class="fa-regular fa-star"></i> <span>پسند</span>';
+      
+      btn.onclick = function(e) {
+        const audio = document.getElementById("globalHtmlAudio");
+        const tEl = document.getElementById("audioPlayerTitle");
+        const cid = (audio && audio.dataset.currentId) ? audio.dataset.currentId : "";
+        const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : "نعت شریف";
+        
+        window.toggleJamiaFavItem(e, cid || cTitle, cTitle, btn);
+      };
+      navWrap.appendChild(btn);
+    }
+
+    // Sync button active/inactive state
+    const audio = document.getElementById("globalHtmlAudio");
+    const tEl = document.getElementById("audioPlayerTitle");
+    const cid = (audio && audio.dataset.currentId) ? audio.dataset.currentId : "";
+    const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : "";
+    const isFav = window.isJamiaFav(cid, cTitle);
+
+    btn.classList.toggle("active", isFav);
+    btn.innerHTML = isFav
+      ? '<i class="fa-solid fa-star"></i> <span>پسندیدہ ✓</span>'
+      : '<i class="fa-regular fa-star"></i> <span>پسند</span>';
+  }
+
+  document.addEventListener("DOMContentLoaded", ensureAudioFavButtonSync);
+  setInterval(ensureAudioFavButtonSync, 600);
+})();
+</script>
+
 </body>
 </html>
