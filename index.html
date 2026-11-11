@@ -6799,8 +6799,8 @@ window.openViewer = function(url, title) {
       const { books, naats } = window.getCleanJamiaLists();
       const favIds = (typeof window.getJamiaFavIds === "function") ? window.getJamiaFavIds() : [];
 
-      const favBooks = books.filter(b => favIds.includes(b.id) || favIds.includes((b.title || "").trim()));
-      const favNaats = naats.filter(n => favIds.includes(n.id) || favIds.includes((n.title || "").trim()));
+      const favBooks = books.filter(b => window.isJamiaFav ? window.isJamiaFav(b.id, b.title) : (favIds.includes(b.id) || favIds.includes((b.title || "").trim())));
+      const favNaats = naats.filter(n => window.isJamiaFav ? window.isJamiaFav(n.id || n.audioUrl, n.title) : (favIds.includes(n.id) || favIds.includes((n.title || "").trim())));
 
       const bCountEl = document.getElementById("jFavBooksCount");
       const nCountEl = document.getElementById("jFavNaatsCount");
@@ -7775,129 +7775,142 @@ window.openViewer = function(url, title) {
 
 
 
-<script id="jamia-final-back-and-naatfav-fix">
+
+
+
+<script id="jamia-clean-fav-and-back-v3">
 (function() {
   const FAV_KEY = "jamia_fav_ids_v2";
 
-  function extractDriveId(raw) {
+  function getCleanId(raw) {
     const s = String(raw || "").trim();
     const m = s.match(/[-\w]{25,}/);
     return m ? m[0] : s;
   }
 
-  function cleanTitleStr(t) {
+  function getCleanTitle(t) {
     return String(t || "").replace(/\.(mp3|m4a|wav|pdf)$/i, "").trim();
   }
 
-  function getAllNaatItems() {
-    let list = [];
-    if (typeof window.getCleanJamiaLists === "function") {
-      const res = window.getCleanJamiaLists();
-      if (res && Array.isArray(res.naats)) list = list.concat(res.naats);
-    }
-    if (Array.isArray(window.JAMIA_NAATS_LIST)) list = list.concat(window.JAMIA_NAATS_LIST);
-    if (Array.isArray(window.ALL_BOOKS_CACHE)) list = list.concat(window.ALL_BOOKS_CACHE);
-    if (typeof LIBRARY_DATA !== "undefined" && Array.isArray(LIBRARY_DATA)) list = list.concat(LIBRARY_DATA);
-    return list;
-  }
-
+  // =========================================================================
+  // PART 1: 100% WORKING NAAT & BOOK FAVORITE SYNC
+  // =========================================================================
   window.getJamiaFavIds = function() {
     try { return JSON.parse(localStorage.getItem(FAV_KEY) || "[]"); } catch(e) { return []; }
   };
 
-  // Smart matcher: matches by clean Drive ID, exact title, or title without .mp3
   window.isJamiaFav = function(id, title) {
     const favs = window.getJamiaFavIds();
     if (!favs.length) return false;
-    const cid = extractDriveId(id);
-    const cTitle = cleanTitleStr(title);
+    const cid = getCleanId(id);
+    const cTitle = getCleanTitle(title);
 
-    return favs.some(function(f) {
-      const fStr = String(f || "").trim();
-      if (!fStr) return false;
-      if (cid && (fStr === cid || extractDriveId(fStr) === cid)) return true;
-      if (cTitle && (fStr === cTitle || cleanTitleStr(fStr) === cTitle)) return true;
+    return favs.some(function(item) {
+      const f = String(item || "").trim();
+      if (!f) return false;
+      if (cid && (f === cid || getCleanId(f) === cid)) return true;
+      if (cTitle && (f === cTitle || getCleanTitle(f) === cTitle)) return true;
       return false;
     });
   };
 
-  // Toggle favorite and store ALL matching representations (raw id, clean id, raw title, clean title)
-  // so whatever filterLibrary() checks, it 100% finds the naat!
+  function getAllLibraryItems() {
+    let pool = [];
+    if (typeof window.getCleanJamiaLists === "function") {
+      const cl = window.getCleanJamiaLists();
+      if (cl && Array.isArray(cl.books)) pool = pool.concat(cl.books);
+      if (cl && Array.isArray(cl.naats)) pool = pool.concat(cl.naats);
+    }
+    if (Array.isArray(window.JAMIA_NAATS_LIST)) pool = pool.concat(window.JAMIA_NAATS_LIST);
+    if (Array.isArray(window.ALL_BOOKS_CACHE)) pool = pool.concat(window.ALL_BOOKS_CACHE);
+    if (typeof LIBRARY_DATA !== "undefined" && Array.isArray(LIBRARY_DATA)) pool = pool.concat(LIBRARY_DATA);
+    return pool;
+  }
+
+  function refreshAllStarIconsOnScreen() {
+    document.querySelectorAll(".j-fav-star-btn, button[onclick*='toggleJamiaFavItem']").forEach(function(btn) {
+      const oc = btn.getAttribute("onclick") || "";
+      const m = oc.match(/toggleJamiaFavItem\s*\([^,]+,\s*['"]([^'"]*)['"]\s*,\s*['"]([^'"]*)['"]/);
+      if (m) {
+        const isF = window.isJamiaFav(m[1], m[2]);
+        btn.classList.toggle("active", isF);
+        btn.innerHTML = isF ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-regular fa-star"></i>';
+      }
+    });
+  }
+
   window.toggleJamiaFavItem = function(e, id, title, btnEl) {
     if (e) { e.preventDefault(); e.stopPropagation(); }
     let favs = window.getJamiaFavIds();
-    const cid = extractDriveId(id);
-    const cTitle = cleanTitleStr(title);
+    const cid = getCleanId(id);
+    const cTitle = getCleanTitle(title);
 
-    const currentlyFav = window.isJamiaFav(cid, cTitle);
+    // Fallback: if id/title missing, grab from active audio player
+    const audio = document.getElementById("globalHtmlAudio");
+    const tEl = document.getElementById("audioPlayerTitle");
+    const finalId = cid || (audio && audio.dataset.currentId ? getCleanId(audio.dataset.currentId) : "");
+    const finalTitle = cTitle || (tEl && tEl.innerText ? getCleanTitle(tEl.innerText) : "");
+
+    if (!finalId && !finalTitle) return;
+
+    const currentlyFav = window.isJamiaFav(finalId, finalTitle);
 
     if (currentlyFav) {
-      favs = favs.filter(function(f) {
-        const fStr = String(f || "").trim();
-        if (cid && (fStr === cid || extractDriveId(fStr) === cid)) return false;
-        if (cTitle && (fStr === cTitle || cleanTitleStr(fStr) === cTitle)) return false;
+      favs = favs.filter(function(item) {
+        const f = String(item || "").trim();
+        if (finalId && (f === finalId || getCleanId(f) === finalId)) return false;
+        if (finalTitle && (f === finalTitle || getCleanTitle(f) === finalTitle)) return false;
         return true;
       });
     } else {
-      if (cid && !favs.includes(cid)) favs.push(cid);
+      if (finalId && !favs.includes(finalId)) favs.push(finalId);
       if (id && !favs.includes(String(id).trim())) favs.push(String(id).trim());
-      if (cTitle && !favs.includes(cTitle)) favs.push(cTitle);
+      if (finalTitle && !favs.includes(finalTitle)) favs.push(finalTitle);
       if (title && !favs.includes(String(title).trim())) favs.push(String(title).trim());
 
-      // Also find the exact item object in library data and push its exact .id and .title
-      const allItems = getAllNaatItems();
-      allItems.forEach(function(item) {
-        if (!item) return;
-        const itemCid = extractDriveId(item.id || item.audioUrl);
-        const itemCleanT = cleanTitleStr(item.title);
-        if ((cid && itemCid === cid) || (cTitle && itemCleanT === cTitle)) {
-          if (item.id && !favs.includes(item.id)) favs.push(item.id);
-          if (item.audioUrl && !favs.includes(item.audioUrl)) favs.push(item.audioUrl);
-          if (item.title && !favs.includes(item.title)) favs.push(item.title);
-          if (item.title && !favs.includes(item.title.trim())) favs.push(item.title.trim());
+      // Also match the exact object in library data and save its exact .id and .title
+      getAllLibraryItems().forEach(function(it) {
+        if (!it) return;
+        const itId = getCleanId(it.id || it.audioUrl);
+        const itTitle = getCleanTitle(it.title);
+        if ((finalId && itId === finalId) || (finalTitle && itTitle === finalTitle)) {
+          if (it.id && !favs.includes(it.id)) favs.push(it.id);
+          if (it.audioUrl && !favs.includes(it.audioUrl)) favs.push(it.audioUrl);
+          if (it.title && !favs.includes(it.title)) favs.push(it.title);
+          if (it.title && !favs.includes(it.title.trim())) favs.push(it.title.trim());
         }
       });
     }
 
     try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch(err) {}
 
-    // Update card star button if passed
-    if (btnEl && btnEl.id !== "jamiaAudioFavOnlyBtn" && btnEl.id !== "jamiaPdfFavOnlyBtn") {
-      if (!currentlyFav) {
-        btnEl.classList.add("active");
-        btnEl.innerHTML = '<i class="fa-solid fa-star"></i>';
-      } else {
-        btnEl.classList.remove("active");
-        btnEl.innerHTML = '<i class="fa-regular fa-star"></i>';
-      }
+    refreshAllStarIconsOnScreen();
+    syncAudioFavBtnUI();
+    syncPdfFavBtnUI();
+
+    if (typeof window.updateJamiaCategoryCounts === "function") {
+      window.updateJamiaCategoryCounts();
     }
 
-    // Update counts and refresh Meri Pasand view immediately
-    if (typeof window.updateJamiaCategoryCounts === "function") window.updateJamiaCategoryCounts();
-    if (typeof window.filterLibrary === "function") {
-      const isFavTabActive = (typeof currentCategory !== "undefined" && currentCategory === "fav") ||
-        Boolean(document.querySelector(".filter-tag.active[onclick*='fav']"));
-      if (isFavTabActive) {
-        window.filterLibrary();
-      } else {
-        // Still update the sub-tab badge counters (پسندیدہ کتب / پسندیدہ نعتیں)
-        try {
-          if (typeof window.getCleanJamiaLists === "function") {
-            const lists = window.getCleanJamiaLists();
-            const favBooks = (lists.books || []).filter(function(b) { return window.isJamiaFav(b.id, b.title); });
-            const favNaats = (lists.naats || []).filter(function(n) { return window.isJamiaFav(n.id || n.audioUrl, n.title); });
-            const bSpan = document.getElementById("jFavBooksCount");
-            const nSpan = document.getElementById("jFavNaatsCount");
-            if (bSpan) bSpan.innerText = String(favBooks.length);
-            if (nSpan) nSpan.innerText = String(favNaats.length);
-          }
-        } catch(err) {}
-      }
+    // Update sub-tab counters (پسندیدہ کتب / پسندیدہ نعتیں)
+    if (typeof window.getCleanJamiaLists === "function") {
+      const lists = window.getCleanJamiaLists();
+      const favB = (lists.books || []).filter(function(b) { return window.isJamiaFav(b.id, b.title); });
+      const favN = (lists.naats || []).filter(function(n) { return window.isJamiaFav(n.id || n.audioUrl, n.title); });
+      const bSpan = document.getElementById("jFavBooksCount");
+      const nSpan = document.getElementById("jFavNaatsCount");
+      if (bSpan) bSpan.innerText = String(favB.length);
+      if (nSpan) nSpan.innerText = String(favN.length);
+    }
+
+    const isFavCategoryActive = (typeof currentCategory !== "undefined" && currentCategory === "fav") ||
+      Boolean(document.querySelector(".filter-tag.active[onclick*='fav']"));
+    if (isFavCategoryActive && typeof window.filterLibrary === "function") {
+      window.filterLibrary();
     }
   };
 
-  // Sync Audio Bar Favorite Button
-  function syncAudioPlayerFavBtn() {
+  function syncAudioFavBtnUI() {
     const bar = document.getElementById("emeraldAudioBar");
     if (!bar) return;
     let btn = document.getElementById("jamiaAudioFavOnlyBtn");
@@ -7906,72 +7919,90 @@ window.openViewer = function(url, title) {
       btn = document.createElement("button");
       btn.id = "jamiaAudioFavOnlyBtn";
       btn.type = "button";
-      btn.innerHTML = '<i class="fa-regular fa-star"></i> <span>پسند</span>';
       navWrap.appendChild(btn);
     }
-
-    // Always bind our direct click handler
     btn.onclick = function(e) {
       e.preventDefault();
       e.stopPropagation();
       const audio = document.getElementById("globalHtmlAudio");
       const tEl = document.getElementById("audioPlayerTitle");
-      const cid = (audio && audio.dataset.currentId) ? extractDriveId(audio.dataset.currentId) : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.id : "");
-      const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.title : "");
-      if (!cid && !cTitle) return;
+      const cid = (audio && audio.dataset.currentId) ? getCleanId(audio.dataset.currentId) : "";
+      const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : "";
       window.toggleJamiaFavItem(e, cid, cTitle, btn);
-      syncAudioPlayerFavBtn();
     };
 
     const audio = document.getElementById("globalHtmlAudio");
     const tEl = document.getElementById("audioPlayerTitle");
-    const cid = (audio && audio.dataset.currentId) ? extractDriveId(audio.dataset.currentId) : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.id : "");
-    const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.title : "");
-
-    const isFav = window.isJamiaFav(cid, cTitle);
-    btn.classList.toggle("active", isFav);
-    btn.innerHTML = isFav
+    const cid = (audio && audio.dataset.currentId) ? getCleanId(audio.dataset.currentId) : "";
+    const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : "";
+    const isF = window.isJamiaFav(cid, cTitle);
+    btn.classList.toggle("active", isF);
+    btn.innerHTML = isF
       ? '<i class="fa-solid fa-star"></i> <span>پسندیدہ ✓</span>'
       : '<i class="fa-regular fa-star"></i> <span>پسند</span>';
   }
 
-  // =========================================================================
-  // 2. 100% WORKING 3-TAP BACK BUTTON GUARD FOR ANDROID WEBVIEW / APK
-  // =========================================================================
-  let backTapCount = 0;
-  let backTapTimer = null;
-  let guardStep = 1;
-
-  // Android WebView requires a distinct URL/hash change AFTER user interaction to trap Back button
-  function pushDistinctGuardState() {
-    try {
-      guardStep = (guardStep % 9) + 1;
-      const baseUrl = window.location.pathname + window.location.search;
-      window.history.pushState({ jamiaBackLock: guardStep }, document.title, baseUrl + "#lock" + guardStep);
-    } catch (e) {}
+  function syncPdfFavBtnUI() {
+    const viewer = document.getElementById("pdf-viewer-overlay");
+    const btn = document.getElementById("jamiaPdfFavOnlyBtn");
+    if (!viewer || !btn) return;
+    const isOpen = (viewer.style.display === "flex" || viewer.style.display === "block");
+    btn.style.display = isOpen ? "inline-flex" : "none";
+    if (!isOpen) return;
+    const cur = window.jamiaCurrentOpenBook || { id: "", title: "" };
+    const tEl = document.getElementById("viewer-title");
+    const title = cur.title || (tEl ? tEl.innerText.trim() : "");
+    const isF = window.isJamiaFav(cur.id, title);
+    btn.classList.toggle("active", isF);
+    btn.innerHTML = isF
+      ? '<i class="fa-solid fa-star"></i> <span>پسندیدہ ✓</span>'
+      : '<i class="fa-regular fa-star"></i> <span>کتاب پسند</span>';
   }
 
-  function armWebViewBackTrap() {
-    if (!window.location.hash.startsWith("#lock")) {
-      pushDistinctGuardState();
-      pushDistinctGuardState();
+  // =========================================================================
+  // PART 2: STABLE 3-TAP BACK GUARD (NO FALSE TRIGGERS ON SCROLL!)
+  // =========================================================================
+  // Key Fix:
+  // 1. NEVER push history on touchstart/touchend (scrolling) or hidden <a> clicks!
+  // 2. Only push history on genuine user "click" (tap) when stack needs topping up.
+  // 3. Guard with `isPushingState` so pushState NEVER triggers popstate!
+
+  let guardDepth = 0;
+  let exitTapCount = 0;
+  let exitTapTimer = null;
+  let stateSeq = 1;
+
+  function addGuardStateIfNeeded() {
+    const pdf = document.getElementById("pdf-viewer-overlay");
+    const isPdfOpen = pdf && (pdf.style.display === "flex" || pdf.style.display === "block");
+    const needed = isPdfOpen ? 4 : 3;
+
+    if (guardDepth < needed) {
+      try {
+        // Push enough states inside this genuine click gesture so 3 back presses are absorbed
+        while (guardDepth < needed) {
+          stateSeq++;
+          window.history.pushState({ jamiaGuardSeq: stateSeq }, document.title, window.location.pathname + window.location.search);
+          guardDepth++;
+        }
+      } catch (e) {}
     }
   }
 
-  // Arm on every touch/click so the trap never empties after user interactions
-  document.addEventListener("touchstart", armWebViewBackTrap, { passive: true });
-  document.addEventListener("click", armWebViewBackTrap, { passive: true });
-  window.addEventListener("load", function() { setTimeout(armWebViewBackTrap, 300); });
+  // ONLY listen to real "click" events (scrolling does NOT fire click, so scrolling will NEVER trigger anything!)
+  document.addEventListener("click", function() {
+    addGuardStateIfNeeded();
+  }, { capture: true, passive: true });
 
-  function showBackToast(msg) {
+  function showBackToastMsg(remaining) {
     let toast = document.getElementById("jamiaBackGuardToast");
     if (!toast) {
       toast = document.createElement("div");
       toast.id = "jamiaBackGuardToast";
-      toast.style.cssText = "position:fixed; bottom:75px; left:50%; transform:translateX(-50%); background:rgba(2,20,13,0.98); border:1.5px solid #00ffa3; color:#00ffa3; padding:9px 20px; border-radius:25px; font-size:0.82rem; font-weight:bold; z-index:2147483647; box-shadow:0 8px 25px rgba(0,0,0,0.95); direction:rtl; white-space:nowrap;";
+      toast.style.cssText = "position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:rgba(2,20,13,0.98); border:2px solid #00ffa3; color:#00ffa3; padding:10px 22px; border-radius:25px; font-size:0.85rem; font-weight:bold; z-index:2147483647; box-shadow:0 10px 30px rgba(0,0,0,0.95); direction:rtl; white-space:nowrap; pointer-events:none;";
       document.body.appendChild(toast);
     }
-    toast.innerText = msg;
+    toast.innerText = "🔙 ایپ سے باہر نکلنے کے لیے " + remaining + " بار مزید بیک دبائیں";
     toast.style.display = "block";
     clearTimeout(toast.__hideTimer);
     toast.__hideTimer = setTimeout(function() {
@@ -7979,54 +8010,71 @@ window.openViewer = function(url, title) {
     }, 2200);
   }
 
-  window.addEventListener("popstate", function() {
-    // 1. If PDF viewer is open, close it first instead of exiting
+  window.addEventListener("popstate", function(e) {
+    if (guardDepth > 0) guardDepth--;
+
+    // 1. If PDF Book Viewer is open, close it cleanly without counting towards app exit
     const pdf = document.getElementById("pdf-viewer-overlay");
     if (pdf && (pdf.style.display === "flex" || pdf.style.display === "block")) {
       if (typeof window.closeFullscreenPdf === "function") window.closeFullscreenPdf();
       else pdf.style.display = "none";
-      pushDistinctGuardState();
-      backTapCount = 0;
+      syncPdfFavBtnUI();
+      exitTapCount = 0;
+      try {
+        stateSeq++;
+        window.history.pushState({ jamiaGuardSeq: stateSeq }, document.title, window.location.pathname + window.location.search);
+        guardDepth++;
+      } catch(err) {}
       return;
     }
 
-    // 2. If any modal/popup is open, close it first
-    const openModals = ["jamiaSmartModal", "jamiaAdminModal", "jamiaUserHistoryOverlay", "jamiaBatteryAllowModal"];
-    for (let i = 0; i < openModals.length; i++) {
-      const m = document.getElementById(openModals[i]);
+    // 2. If any modal is open, close it cleanly
+    const modals = ["jamiaSmartModal", "jamiaAdminModal", "jamiaUserHistoryOverlay", "jamiaBatteryAllowModal"];
+    for (let i = 0; i < modals.length; i++) {
+      const m = document.getElementById(modals[i]);
       if (m && (m.style.display === "flex" || m.style.display === "block")) {
         m.style.display = "none";
-        pushDistinctGuardState();
-        backTapCount = 0;
+        exitTapCount = 0;
+        try {
+          stateSeq++;
+          window.history.pushState({ jamiaGuardSeq: stateSeq }, document.title, window.location.pathname + window.location.search);
+          guardDepth++;
+        } catch(err) {}
         return;
       }
     }
 
-    // 3. On Main Screen: Require 3 consecutive taps within 3 seconds
-    backTapCount++;
-    clearTimeout(backTapTimer);
-    backTapTimer = setTimeout(function() {
-      backTapCount = 0;
+    // 3. Main screen: require 3 consecutive Back presses within 3 seconds
+    exitTapCount++;
+    clearTimeout(exitTapTimer);
+    exitTapTimer = setTimeout(function() {
+      exitTapCount = 0;
     }, 3000);
 
-    if (backTapCount < 3) {
-      pushDistinctGuardState();
-      const left = 3 - backTapCount;
-      showBackToast("🔙 ایپ سے باہر نکلنے کے لیے " + left + " بار مزید بیک دبائیں");
+    if (exitTapCount < 3) {
+      showBackToastMsg(3 - exitTapCount);
+      try {
+        stateSeq++;
+        window.history.pushState({ jamiaGuardSeq: stateSeq }, document.title, window.location.pathname + window.location.search);
+        guardDepth++;
+      } catch(err) {}
     } else {
-      // 3rd tap reached: allow exit
-      backTapCount = 0;
+      // 3rd consecutive tap: exit app immediately
+      exitTapCount = 0;
       try {
         if (navigator.app && typeof navigator.app.exitApp === "function") {
           navigator.app.exitApp();
         } else {
-          window.history.go(-10);
+          window.history.go(-20);
         }
-      } catch(e) {}
+      } catch(err) {}
     }
   });
 
-  setInterval(syncAudioPlayerFavBtn, 600);
+  setInterval(function() {
+    syncAudioFavBtnUI();
+    syncPdfFavBtnUI();
+  }, 700);
 })();
 </script>
 
