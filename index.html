@@ -8214,76 +8214,124 @@ window.openViewer = function(url, title) {
 </script>
 
 
-<script id="jamia-naat-fav-direct-patch">
+
+
+
+<script id="jamia-ultimate-fav-sync">
 (function() {
   const FAV_KEY = "jamia_fav_ids_v2";
 
-  function getCleanDriveId(raw) {
-    const s = String(raw || "").trim();
+  function extractId(raw) {
+    if (!raw) return "";
+    const s = String(raw).trim();
     const m = s.match(/[-\w]{25,}/);
     return m ? m[0] : s;
   }
 
-  function cleanTitle(t) {
+  function cleanTitleStr(t) {
     return String(t || "").replace(/\.(mp3|m4a|wav|pdf)$/i, "").trim().toLowerCase();
   }
 
-  // Hook into playAudio to ALWAYS record active naat ID and Title
-  const origPlayAudio = window.playAudio;
-  window.playAudio = function(audioUrlOrId, title) {
-    const cleanId = getCleanDriveId(audioUrlOrId);
-    const neatTitle = String(title || "نعت شریف").replace(/\.(mp3|m4a|wav)$/i, "").trim();
-    window.jamiaCurrentPlayingNaat = { id: cleanId, title: neatTitle };
-
-    const audio = document.getElementById("globalHtmlAudio");
-    if (audio) {
-      audio.dataset.currentId = cleanId;
-      audio.dataset.currentTitle = neatTitle;
-    }
-
-    if (typeof origPlayAudio === "function") {
-      origPlayAudio.apply(this, arguments);
-    }
-    setTimeout(updateAudioFavBtnState, 200);
-  };
-
-  // Check if item is in favorites
+  // 1. Bulletproof Global isJamiaFav checker used everywhere
   window.isJamiaFav = function(id, title) {
     let favs = [];
     try { favs = JSON.parse(localStorage.getItem(FAV_KEY) || "[]"); } catch(e) { return false; }
     if (!favs.length) return false;
 
-    const cid = getCleanDriveId(id);
-    const ct = cleanTitle(title);
+    const cid = extractId(id);
+    const ct = cleanTitleStr(title);
 
     return favs.some(function(f) {
       const fStr = String(f || "").trim();
       if (!fStr) return false;
-      if (cid && (fStr === cid || getCleanDriveId(fStr) === cid)) return true;
-      if (ct && (cleanTitle(fStr) === ct)) return true;
+      const fcid = extractId(fStr);
+      const fct = cleanTitleStr(fStr);
+
+      if (cid && fcid && (cid === fcid)) return true;
+      if (ct && fct && (ct === fct || fct.includes(ct) || ct.includes(fct))) return true;
+      if (fStr === String(id).trim()) return true;
       return false;
     });
   };
 
-  function updateAudioFavBtnState() {
-    const btn = document.getElementById("jamiaAudioFavOnlyBtn");
-    if (!btn) return;
+  // 2. Global Robust Toggle Function
+  window.toggleJamiaFavItem = function(e, id, title, btnEl) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    let favs = window.getJamiaFavIds ? window.getJamiaFavIds() : [];
+    
     const audio = document.getElementById("globalHtmlAudio");
     const tEl = document.getElementById("audioPlayerTitle");
-    const cid = (audio && audio.dataset.currentId) ? audio.dataset.currentId : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.id : "");
-    const title = (tEl && tEl.innerText) ? tEl.innerText.trim() : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.title : "");
+    const finalId = extractId(id || (audio ? audio.dataset.currentId : ""));
+    const finalTitle = String(title || (tEl ? tEl.innerText : "")).trim();
 
-    const isFav = window.isJamiaFav(cid, title);
-    btn.classList.toggle("active", isFav);
-    btn.innerHTML = isFav
-      ? '<i class="fa-solid fa-star"></i> <span>پسندیدہ ✓</span>'
-      : '<i class="fa-regular fa-star"></i> <span>پسند</span>';
-    btn.style.background = isFav ? "#f59e0b" : "rgba(245, 158, 11, 0.15)";
-    btn.style.color = isFav ? "#022c22" : "#fbbf24";
-  }
+    if (!finalId && !finalTitle) return;
 
-  // Direct and robust click handler for the Player Fav button
-  function bindPlayerFavButton() {
+    const currentlyFav = window.isJamiaFav(finalId, finalTitle);
+    const targetCleanTitle = cleanTitleStr(finalTitle);
+
+    if (currentlyFav) {
+      favs = favs.filter(function(f) {
+        const fStr = String(f || "").trim();
+        const fcid = extractId(fStr);
+        const fct = cleanTitleStr(fStr);
+        if (finalId && fcid && finalId === fcid) return false;
+        if (targetCleanTitle && fct && (targetCleanTitle === fct || fct.includes(targetCleanTitle))) return false;
+        if (fStr === finalTitle || fStr === finalId) return false;
+        return true;
+      });
+    } else {
+      if (finalId) favs.push(finalId);
+      if (finalTitle) favs.push(finalTitle);
+      
+      // Also grab matching item from library cache
+      let pool = [];
+      if (typeof window.getCleanJamiaLists === "function") {
+        const cl = window.getCleanJamiaLists();
+        if (cl.books) pool = pool.concat(cl.books);
+        if (cl.naats) pool = pool.concat(cl.naats);
+      }
+      if (Array.isArray(window.JAMIA_NAATS_LIST)) pool = pool.concat(window.JAMIA_NAATS_LIST);
+      if (Array.isArray(window.ALL_BOOKS_CACHE)) pool = pool.concat(window.ALL_BOOKS_CACHE);
+      if (typeof LIBRARY_DATA !== "undefined" && Array.isArray(LIBRARY_DATA)) pool = pool.concat(LIBRARY_DATA);
+
+      pool.forEach(function(item) {
+        if (!item) return;
+        const iId = extractId(item.id || item.audioUrl);
+        const iTitle = String(item.title || "").trim();
+        const iCleanT = cleanTitleStr(iTitle);
+
+        if ((finalId && iId === finalId) || (targetCleanTitle && iCleanT === targetCleanTitle)) {
+          if (item.id && !favs.includes(item.id)) favs.push(item.id);
+          if (item.audioUrl && !favs.includes(item.audioUrl)) favs.push(item.audioUrl);
+          if (iTitle && !favs.includes(iTitle)) favs.push(iTitle);
+        }
+      });
+    }
+
+    try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch(err) {}
+
+    // Refresh UI elements
+    updateAudioFavButtonUI();
+    document.querySelectorAll(".j-fav-star-btn, button[onclick*='toggleJamiaFavItem']").forEach(function(btn) {
+      const oc = btn.getAttribute("onclick") || "";
+      const m = oc.match(/toggleJamiaFavItem\s*\([^,]+,\s*['"]([^'"]*)['"]\s*,\s*['"]([^'"]*)['"]/);
+      if (m) {
+        const isF = window.isJamiaFav(m[1], m[2]);
+        btn.classList.toggle("active", isF);
+        btn.innerHTML = isF ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-regular fa-star"></i>';
+      }
+    });
+
+    if (typeof window.updateJamiaCategoryCounts === "function") window.updateJamiaCategoryCounts();
+
+    const isFavTab = (typeof currentCategory !== "undefined" && currentCategory === "fav") ||
+      Boolean(document.querySelector(".filter-tag.active[onclick*='fav']"));
+    if (isFavTab && typeof window.filterLibrary === "function") {
+      window.filterLibrary();
+    }
+  };
+
+  function updateAudioFavButtonUI() {
     const bar = document.getElementById("emeraldAudioBar");
     if (!bar) return;
     let btn = document.getElementById("jamiaAudioFavOnlyBtn");
@@ -8298,68 +8346,47 @@ window.openViewer = function(url, title) {
     }
 
     btn.onclick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-
       const audio = document.getElementById("globalHtmlAudio");
       const tEl = document.getElementById("audioPlayerTitle");
-      const cid = (audio && audio.dataset.currentId) ? audio.dataset.currentId : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.id : "");
-      const title = (tEl && tEl.innerText) ? tEl.innerText.trim() : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.title : "");
-
-      if (!cid && !title) return;
-
-      let favs = [];
-      try { favs = JSON.parse(localStorage.getItem(FAV_KEY) || "[]"); } catch(err) {}
-
-      const currentlyFav = window.isJamiaFav(cid, title);
-      const ct = cleanTitle(title);
-
-      if (currentlyFav) {
-        favs = favs.filter(function(x) {
-          const xCid = getCleanDriveId(x);
-          const xCt = cleanTitle(x);
-          if (cid && (x === cid || xCid === cid)) return false;
-          if (ct && xCt === ct) return false;
-          return true;
-        });
-      } else {
-        if (cid) favs.push(cid);
-        if (title) favs.push(title);
-        // Find exact naat object in pool to store all its references
-        let allItems = (window.ALL_BOOKS_CACHE && window.ALL_BOOKS_CACHE.length) ? window.ALL_BOOKS_CACHE : (typeof LIBRARY_DATA !== "undefined" ? LIBRARY_DATA : []);
-        if (Array.isArray(window.JAMIA_NAATS_LIST)) allItems = allItems.concat(window.JAMIA_NAATS_LIST);
-        allItems.forEach(function(item) {
-          if (!item) return;
-          const iCid = getCleanDriveId(item.id || item.audioUrl);
-          const iCt = cleanTitle(item.title);
-          if ((cid && iCid === cid) || (ct && iCt === ct)) {
-            if (item.id && !favs.includes(item.id)) favs.push(item.id);
-            if (item.audioUrl && !favs.includes(item.audioUrl)) favs.push(item.audioUrl);
-            if (item.title && !favs.includes(item.title)) favs.push(item.title);
-          }
-        });
-      }
-
-      try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch(err) {}
-
-      updateAudioFavBtnState();
-
-      // Refresh Meri Pasand live counts and UI
-      if (typeof window.updateJamiaCategoryCounts === "function") window.updateJamiaCategoryCounts();
-
-      // Immediately refresh the current list if on Fav tab
-      const isFavTab = (typeof currentCategory !== "undefined" && currentCategory === "fav") ||
-        Boolean(document.querySelector(".filter-tag.active[onclick*='fav']"));
-      if (isFavTab && typeof window.filterLibrary === "function") {
-        window.filterLibrary();
-      }
+      const cid = audio ? audio.dataset.currentId : "";
+      const cTitle = tEl ? tEl.innerText : "";
+      window.toggleJamiaFavItem(e, cid, cTitle, btn);
     };
 
-    updateAudioFavBtnState();
+    const audio = document.getElementById("globalHtmlAudio");
+    const tEl = document.getElementById("audioPlayerTitle");
+    const cid = audio ? audio.dataset.currentId : "";
+    const cTitle = tEl ? tEl.innerText : "";
+    const isF = window.isJamiaFav(cid, cTitle);
+
+    btn.classList.toggle("active", isF);
+    btn.innerHTML = isF
+      ? '<i class="fa-solid fa-star"></i> <span>پسندیدہ ✓</span>'
+      : '<i class="fa-regular fa-star"></i> <span>پسند</span>';
+    btn.style.background = isF ? "#f59e0b" : "rgba(245, 158, 11, 0.15)";
+    btn.style.color = isF ? "#022c22" : "#fbbf24";
   }
 
-  document.addEventListener("DOMContentLoaded", bindPlayerFavButton);
-  setInterval(bindPlayerFavButton, 800);
+  // Hook playAudio to tag the audio element with active ID and Title
+  const origPlayAudio = window.playAudio;
+  window.playAudio = function(audioUrlOrId, title) {
+    const cid = extractId(audioUrlOrId);
+    const neatTitle = String(title || "نعت شریف").replace(/\.(mp3|m4a|wav)$/i, "").trim();
+    window.jamiaCurrentPlayingNaat = { id: cid, title: neatTitle };
+
+    const audio = document.getElementById("globalHtmlAudio");
+    if (audio) {
+      audio.dataset.currentId = cid;
+      audio.dataset.currentTitle = neatTitle;
+    }
+    if (typeof origPlayAudio === "function") {
+      origPlayAudio.apply(this, arguments);
+    }
+    setTimeout(updateAudioFavButtonUI, 150);
+  };
+
+  document.addEventListener("DOMContentLoaded", updateAudioFavButtonUI);
+  setInterval(updateAudioFavButtonUI, 600);
 })();
 </script>
 
