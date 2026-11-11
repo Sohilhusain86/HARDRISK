@@ -7765,5 +7765,96 @@ window.openViewer = function(url, title) {
 })();
 </script>
 
+
+<script id="jamia-audio-fav-fix">
+(function() {
+  function getCleanId(raw) {
+    const s = String(raw || "").trim();
+    const m = s.match(/[-\w]{25,}/);
+    return m ? m[0] : s;
+  }
+
+  function forceSyncAudioFavState() {
+    const btn = document.getElementById("jamiaAudioFavOnlyBtn");
+    if (!btn || typeof window.isJamiaFav !== "function") return;
+
+    const audio = document.getElementById("globalHtmlAudio");
+    const tEl = document.getElementById("audioPlayerTitle");
+    const cid = (audio && audio.dataset.currentId) ? getCleanId(audio.dataset.currentId) : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.id : "");
+    const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.title : "نعت شریف");
+
+    const isFav = window.isJamiaFav(cid, cTitle) || window.isJamiaFav(cTitle, cid);
+    btn.classList.toggle("active", isFav);
+    btn.innerHTML = isFav
+      ? '<i class="fa-solid fa-star"></i> <span>پسندیدہ ✓</span>'
+      : '<i class="fa-regular fa-star"></i> <span>پسند</span>';
+  }
+
+  const origPlayAudio = window.playAudio;
+  if (typeof origPlayAudio === "function") {
+    window.playAudio = function(audioUrlOrId, title) {
+      const cleanId = getCleanId(audioUrlOrId);
+      const cleanTitle = String(title || "نعت شریف").replace(/\.(mp3|m4a|wav)$/i, "").trim();
+      window.jamiaCurrentPlayingNaat = { id: cleanId, title: cleanTitle };
+      origPlayAudio.apply(this, arguments);
+      setTimeout(forceSyncAudioFavState, 150);
+    };
+  }
+
+  function ensureAudioFavBtnRobust() {
+    const bar = document.getElementById("emeraldAudioBar");
+    if (!bar) return;
+    let btn = document.getElementById("jamiaAudioFavOnlyBtn");
+    if (!btn) {
+      const navWrap = document.getElementById("jamiaAudioNavWrap") || bar.firstElementChild || bar;
+      btn = document.createElement("button");
+      btn.id = "jamiaAudioFavOnlyBtn";
+      btn.type = "button";
+      btn.title = "میری پسند میں شامل کریں";
+      btn.innerHTML = '<i class="fa-regular fa-star"></i> <span>پسند</span>';
+      btn.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const audio = document.getElementById("globalHtmlAudio");
+        const tEl = document.getElementById("audioPlayerTitle");
+        const cid = (audio && audio.dataset.currentId) ? getCleanId(audio.dataset.currentId) : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.id : "");
+        const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.title : "نعت شریف");
+        
+        if (!cid && !cTitle) return;
+
+        const FAV_KEY = "jamia_fav_ids_v2";
+        let favs = [];
+        try { favs = JSON.parse(localStorage.getItem(FAV_KEY) || "[]"); } catch(err) {}
+
+        const targetKey = cid || cTitle;
+        const index = favs.indexOf(targetKey);
+        const titleIndex = favs.indexOf(cTitle);
+
+        if (index >= 0 || titleIndex >= 0) {
+          favs = favs.filter(function(x) { return x !== targetKey && x !== cTitle && x !== cid; });
+        } else {
+          favs.push(targetKey);
+          if (cTitle && !favs.includes(cTitle)) favs.push(cTitle);
+        }
+        try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch(err) {}
+
+        if (typeof window.updateJamiaCategoryCounts === "function") {
+          window.updateJamiaCategoryCounts();
+        }
+        if (typeof window.filterLibrary === "function" && typeof currentCategory !== "undefined" && currentCategory === "fav") {
+          window.filterLibrary();
+        }
+        forceSyncAudioFavState();
+      };
+      navWrap.appendChild(btn);
+    }
+    forceSyncAudioFavState();
+  }
+
+  document.addEventListener("DOMContentLoaded", ensureAudioFavBtnRobust);
+  setInterval(ensureAudioFavBtnRobust, 600);
+})();
+</script>
+
 </body>
 </html>
