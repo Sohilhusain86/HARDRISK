@@ -8213,5 +8213,155 @@ window.openViewer = function(url, title) {
 })();
 </script>
 
+
+<script id="jamia-naat-fav-direct-patch">
+(function() {
+  const FAV_KEY = "jamia_fav_ids_v2";
+
+  function getCleanDriveId(raw) {
+    const s = String(raw || "").trim();
+    const m = s.match(/[-\w]{25,}/);
+    return m ? m[0] : s;
+  }
+
+  function cleanTitle(t) {
+    return String(t || "").replace(/\.(mp3|m4a|wav|pdf)$/i, "").trim().toLowerCase();
+  }
+
+  // Hook into playAudio to ALWAYS record active naat ID and Title
+  const origPlayAudio = window.playAudio;
+  window.playAudio = function(audioUrlOrId, title) {
+    const cleanId = getCleanDriveId(audioUrlOrId);
+    const neatTitle = String(title || "نعت شریف").replace(/\.(mp3|m4a|wav)$/i, "").trim();
+    window.jamiaCurrentPlayingNaat = { id: cleanId, title: neatTitle };
+
+    const audio = document.getElementById("globalHtmlAudio");
+    if (audio) {
+      audio.dataset.currentId = cleanId;
+      audio.dataset.currentTitle = neatTitle;
+    }
+
+    if (typeof origPlayAudio === "function") {
+      origPlayAudio.apply(this, arguments);
+    }
+    setTimeout(updateAudioFavBtnState, 200);
+  };
+
+  // Check if item is in favorites
+  window.isJamiaFav = function(id, title) {
+    let favs = [];
+    try { favs = JSON.parse(localStorage.getItem(FAV_KEY) || "[]"); } catch(e) { return false; }
+    if (!favs.length) return false;
+
+    const cid = getCleanDriveId(id);
+    const ct = cleanTitle(title);
+
+    return favs.some(function(f) {
+      const fStr = String(f || "").trim();
+      if (!fStr) return false;
+      if (cid && (fStr === cid || getCleanDriveId(fStr) === cid)) return true;
+      if (ct && (cleanTitle(fStr) === ct)) return true;
+      return false;
+    });
+  };
+
+  function updateAudioFavBtnState() {
+    const btn = document.getElementById("jamiaAudioFavOnlyBtn");
+    if (!btn) return;
+    const audio = document.getElementById("globalHtmlAudio");
+    const tEl = document.getElementById("audioPlayerTitle");
+    const cid = (audio && audio.dataset.currentId) ? audio.dataset.currentId : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.id : "");
+    const title = (tEl && tEl.innerText) ? tEl.innerText.trim() : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.title : "");
+
+    const isFav = window.isJamiaFav(cid, title);
+    btn.classList.toggle("active", isFav);
+    btn.innerHTML = isFav
+      ? '<i class="fa-solid fa-star"></i> <span>پسندیدہ ✓</span>'
+      : '<i class="fa-regular fa-star"></i> <span>پسند</span>';
+    btn.style.background = isFav ? "#f59e0b" : "rgba(245, 158, 11, 0.15)";
+    btn.style.color = isFav ? "#022c22" : "#fbbf24";
+  }
+
+  // Direct and robust click handler for the Player Fav button
+  function bindPlayerFavButton() {
+    const bar = document.getElementById("emeraldAudioBar");
+    if (!bar) return;
+    let btn = document.getElementById("jamiaAudioFavOnlyBtn");
+    if (!btn) {
+      const navWrap = document.getElementById("jamiaAudioNavWrap") || bar.firstElementChild || bar;
+      btn = document.createElement("button");
+      btn.id = "jamiaAudioFavOnlyBtn";
+      btn.type = "button";
+      btn.className = "jamia-audio-nav-btn";
+      btn.style.cssText = "background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.5); color:#fbbf24; padding:5px 12px; border-radius:12px; font-size:0.78rem; font-weight:bold; cursor:pointer; margin:0 4px;";
+      navWrap.appendChild(btn);
+    }
+
+    btn.onclick = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const audio = document.getElementById("globalHtmlAudio");
+      const tEl = document.getElementById("audioPlayerTitle");
+      const cid = (audio && audio.dataset.currentId) ? audio.dataset.currentId : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.id : "");
+      const title = (tEl && tEl.innerText) ? tEl.innerText.trim() : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.title : "");
+
+      if (!cid && !title) return;
+
+      let favs = [];
+      try { favs = JSON.parse(localStorage.getItem(FAV_KEY) || "[]"); } catch(err) {}
+
+      const currentlyFav = window.isJamiaFav(cid, title);
+      const ct = cleanTitle(title);
+
+      if (currentlyFav) {
+        favs = favs.filter(function(x) {
+          const xCid = getCleanDriveId(x);
+          const xCt = cleanTitle(x);
+          if (cid && (x === cid || xCid === cid)) return false;
+          if (ct && xCt === ct) return false;
+          return true;
+        });
+      } else {
+        if (cid) favs.push(cid);
+        if (title) favs.push(title);
+        // Find exact naat object in pool to store all its references
+        let allItems = (window.ALL_BOOKS_CACHE && window.ALL_BOOKS_CACHE.length) ? window.ALL_BOOKS_CACHE : (typeof LIBRARY_DATA !== "undefined" ? LIBRARY_DATA : []);
+        if (Array.isArray(window.JAMIA_NAATS_LIST)) allItems = allItems.concat(window.JAMIA_NAATS_LIST);
+        allItems.forEach(function(item) {
+          if (!item) return;
+          const iCid = getCleanDriveId(item.id || item.audioUrl);
+          const iCt = cleanTitle(item.title);
+          if ((cid && iCid === cid) || (ct && iCt === ct)) {
+            if (item.id && !favs.includes(item.id)) favs.push(item.id);
+            if (item.audioUrl && !favs.includes(item.audioUrl)) favs.push(item.audioUrl);
+            if (item.title && !favs.includes(item.title)) favs.push(item.title);
+          }
+        });
+      }
+
+      try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch(err) {}
+
+      updateAudioFavBtnState();
+
+      // Refresh Meri Pasand live counts and UI
+      if (typeof window.updateJamiaCategoryCounts === "function") window.updateJamiaCategoryCounts();
+
+      // Immediately refresh the current list if on Fav tab
+      const isFavTab = (typeof currentCategory !== "undefined" && currentCategory === "fav") ||
+        Boolean(document.querySelector(".filter-tag.active[onclick*='fav']"));
+      if (isFavTab && typeof window.filterLibrary === "function") {
+        window.filterLibrary();
+      }
+    };
+
+    updateAudioFavBtnState();
+  }
+
+  document.addEventListener("DOMContentLoaded", bindPlayerFavButton);
+  setInterval(bindPlayerFavButton, 800);
+})();
+</script>
+
 </body>
 </html>
