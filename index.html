@@ -8078,5 +8078,140 @@ window.openViewer = function(url, title) {
 })();
 </script>
 
+
+<script id="jamia-fatawa-category-engine">
+(function() {
+  // Multilingual Fatawa Matcher: Urdu, Arabic, Hindi, Roman/English
+  window.isJamiaFatawaItem = function(item) {
+    if (!item) return false;
+    // Strictly exclude audio/naat items
+    if (item.type === "audio" || item.category === "naat" || item.audioUrl) return false;
+
+    const fullText = (
+      String(item.title || "") + " " +
+      String(item.subtitle || "") + " " +
+      String(item.author || "") + " " +
+      String(item.category || "")
+    ).toLowerCase();
+
+    // 1. Urdu & Arabic spellings
+    const urduMatch = /(?:فتاویٰ|فتاوی|فتاوا|فتویٰ|فتوی)/.test(fullText);
+
+    // 2. Hindi spellings (फ़तावा, फतावा, फतवा, फ़तवा)
+    const hindiMatch = /(?:फ़तावा|फतावा|फ़तवा|फतवा|फतवे|फ़तवे)/.test(fullText);
+
+    // 3. English & Roman spellings (fatawa, fatwa, fataawa, etc.)
+    const engMatch = /\b(?:fatawa|fatwa|fataawa|fatawah|fatwah)\b/i.test(fullText);
+
+    return urduMatch || hindiMatch || engMatch;
+  };
+
+  // 1. Ensure "فتاویٰ" Tab exists in the Filter Tags Bar
+  function injectFatawaTab() {
+    if (document.getElementById("tab-jamia-fatawa")) return;
+    const filterContainer = document.querySelector(".filter-tags");
+    if (!filterContainer) return;
+
+    const tab = document.createElement("div");
+    tab.id = "tab-jamia-fatawa";
+    tab.className = "filter-tag";
+    tab.setAttribute("onclick", "setFilter('fatawa', this)");
+    tab.innerHTML = '📜 فتاویٰ (<span id="jFatawaCount">0</span>)';
+
+    // Insert after "دینی و فقہی" (islamic) or near the front
+    const islamicTab = Array.from(filterContainer.children).find(function(c) {
+      const oc = c.getAttribute("onclick") || "";
+      return oc.includes("'islamic'") || (c.innerText || "").includes("دینی");
+    });
+
+    if (islamicTab && islamicTab.nextSibling) {
+      filterContainer.insertBefore(tab, islamicTab.nextSibling);
+    } else {
+      filterContainer.appendChild(tab);
+    }
+  }
+
+  // 2. Hook into filterLibrary to show Fatawa books
+  const origFilterLib = window.filterLibrary;
+  window.filterLibrary = function() {
+    injectFatawaTab();
+    const curCat = (typeof currentCategory !== "undefined" && currentCategory) ? currentCategory : "all";
+
+    if (curCat === "fatawa") {
+      let pool = [];
+      if (typeof window.getCleanJamiaLists === "function") {
+        const cl = window.getCleanJamiaLists();
+        if (cl && Array.isArray(cl.books)) pool = cl.books;
+      }
+      if (!pool.length && Array.isArray(window.ALL_BOOKS_CACHE)) {
+        pool = window.ALL_BOOKS_CACHE.filter(function(b) { return b.type !== "audio" && b.category !== "naat"; });
+      }
+      if (!pool.length && typeof LIBRARY_DATA !== "undefined" && Array.isArray(LIBRARY_DATA)) {
+        pool = LIBRARY_DATA.filter(function(b) { return b.type !== "audio" && b.category !== "naat"; });
+      }
+
+      // Filter exclusively by Fatawa in Urdu, Hindi, or English
+      let fatawaBooks = pool.filter(window.isJamiaFatawaItem);
+
+      // Search query filter within Fatawa
+      const searchInp = document.getElementById("lib-search");
+      const q = (searchInp ? searchInp.value : "").trim().toLowerCase();
+      if (q) {
+        fatawaBooks = fatawaBooks.filter(function(b) {
+          return ((b.title || "") + " " + (b.subtitle || "") + " " + (b.author || "")).toLowerCase().includes(q);
+        });
+      }
+
+      if (typeof window.renderBooks === "function") {
+        window.renderBooks(fatawaBooks);
+      }
+
+      // Hide Fav Sub-bar if previously open
+      const favSub = document.getElementById("jamiaFavSubBar");
+      if (favSub) favSub.style.display = "none";
+      return;
+    }
+
+    if (typeof origFilterLib === "function") origFilterLib();
+  };
+
+  // 3. Keep Fatawa count badge updated dynamically
+  const origUpdateCounts = window.updateJamiaCategoryCounts;
+  window.updateJamiaCategoryCounts = function() {
+    if (typeof origUpdateCounts === "function") origUpdateCounts();
+
+    let pool = [];
+    if (typeof window.getCleanJamiaLists === "function") {
+      const cl = window.getCleanJamiaLists();
+      if (cl && Array.isArray(cl.books)) pool = cl.books;
+    }
+    if (!pool.length && Array.isArray(window.ALL_BOOKS_CACHE)) pool = window.ALL_BOOKS_CACHE;
+    if (!pool.length && typeof LIBRARY_DATA !== "undefined" && Array.isArray(LIBRARY_DATA)) pool = LIBRARY_DATA;
+
+    const fatawaCount = pool.filter(window.isJamiaFatawaItem).length;
+    const span = document.getElementById("jFatawaCount");
+    if (span) span.innerText = String(fatawaCount);
+
+    const tab = document.getElementById("tab-jamia-fatawa");
+    if (tab && !span) {
+      tab.innerHTML = '📜 فتاویٰ (' + fatawaCount + ')';
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", function() {
+    injectFatawaTab();
+    if (typeof window.updateJamiaCategoryCounts === "function") window.updateJamiaCategoryCounts();
+  });
+
+  setInterval(function() {
+    injectFatawaTab();
+    const span = document.getElementById("jFatawaCount");
+    if (!span || span.innerText === "0") {
+      if (typeof window.updateJamiaCategoryCounts === "function") window.updateJamiaCategoryCounts();
+    }
+  }, 1200);
+})();
+</script>
+
 </body>
 </html>
