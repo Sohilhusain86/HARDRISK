@@ -7209,5 +7209,221 @@ window.openViewer = function(url, title) {
 })();
 </script>
 
+
+<style id="jamia-unrestricted-Popup-css">
+  #jamiaBatteryAllowModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 16, 11, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 2147483646;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    direction: rtl;
+  }
+  .jb-card {
+    background: radial-gradient(circle at top, #0b3427 0%, #03140e 100%);
+    border: 1.5px solid #00ffa3;
+    border-radius: 20px;
+    padding: 20px 18px;
+    width: 100%;
+    max-width: 350px;
+    color: #ecfdf5;
+    box-shadow: 0 18px 45px rgba(0,0,0,0.9), 0 0 25px rgba(0,255,163,0.2);
+    text-align: center;
+    animation: jbPopIn 0.28s ease-out;
+  }
+  @keyframes jbPopIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .jb-btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .jb-btn-allow {
+    flex: 1.3;
+    background: linear-gradient(135deg, #00ffa3, #10b981);
+    color: #022c22;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 0.88rem;
+    cursor: pointer;
+  }
+  .jb-btn-deny {
+    flex: 0.7;
+    background: rgba(255, 255, 255, 0.08);
+    color: #cbd5e1;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 0.82rem;
+    cursor: pointer;
+  }
+</style>
+
+<div id="jamiaBatteryAllowModal">
+  <div class="jb-card">
+    <div style="width:52px; height:52px; border-radius:50%; background:rgba(0,255,163,0.14); border:1px solid rgba(0,255,163,0.4); display:inline-flex; align-items:center; justify-content:center; font-size:1.5rem; color:#00ffa3; margin-bottom:10px;">
+      🔋
+    </div>
+    <h3 style="margin:0 0 8px 0; color:#00ffa3; font-size:1.05rem;">بیک گراؤنڈ آڈیو کی اجازت (Unrestricted)</h3>
+    <p id="jbModalDesc" style="margin:0; font-size:0.82rem; color:#cbd5e1; line-height:1.6;">
+      اسکرین بند ہونے پر بھی تمام نعتیں بغیر رکے لگاتار چلتی رہیں، اس کے لیے ایپ کو بیک گراؤنڈ میں چلنے کی اجازت (Allow) دیں۔
+    </p>
+    <div class="jb-btn-row" id="jbActionBtns">
+      <button type="button" class="jb-btn-allow" id="jbAllowBtn">✅ Allow (اجازت دیں)</button>
+      <button type="button" class="jb-btn-deny" id="jbDenyBtn">بعد میں</button>
+    </div>
+  </div>
+</div>
+
+<script id="jamia-app-only-unrestricted-engine">
+(function() {
+  const PERM_STORAGE_KEY = "jamia_bg_unrestricted_allowed_v1";
+
+  // 1. Detect ONLY Installed App (APK WebView or Installed PWA Standalone) - NEVER normal web browser!
+  function isRunningInsideInstalledApp() {
+    const ua = navigator.userAgent || "";
+    const isAndroidWebView = /; wv\)|Version\/\d+\.\d+.*Chrome\/\d+.*Mobile/i.test(ua) && /wv/i.test(ua);
+    const isStandalonePWA = window.matchMedia && (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.matchMedia("(display-mode: fullscreen)").matches ||
+      window.matchMedia("(display-mode: minimal-ui)").matches
+    );
+    const isIOSStandalone = Boolean(window.navigator.standalone);
+    const isCustomApk = Boolean(window.Android || window.ReactNativeWebView || ua.includes("Maktaba") || ua.includes("Jamia") || document.referrer.includes("android-app://"));
+
+    return isAndroidWebView || isStandalonePWA || isIOSStandalone || isCustomApk;
+  }
+
+  // 2. WebAudio Silent Oscillator Keep-Alive (Prevents Android OS from suspending WebView between tracks!)
+  let silentAudioCtx = null;
+  let wakeLockSentinel = null;
+
+  function activateBackgroundKeepAliveEngine() {
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass && !silentAudioCtx) {
+        silentAudioCtx = new AudioContextClass();
+        // Create an ultra-quiet (inaudible) oscillator so Android OS sees continuous active audio output
+        const osc = silentAudioCtx.createOscillator();
+        const gain = silentAudioCtx.createGain();
+        gain.gain.value = 0.00001; // Completely silent to human ear
+        osc.connect(gain);
+        gain.connect(silentAudioCtx.destination);
+        osc.start();
+      }
+      if (silentAudioCtx && silentAudioCtx.state === "suspended") {
+        silentAudioCtx.resume().catch(function(){});
+      }
+    } catch (e) {}
+
+    // Request Screen/CPU WakeLock where supported
+    if ("wakeLock" in navigator && !wakeLockSentinel) {
+      navigator.wakeLock.request("screen").then(function(lock) {
+        wakeLockSentinel = lock;
+        lock.addEventListener("release", function() { wakeLockSentinel = null; });
+      }).catch(function(){});
+    }
+  }
+
+  // Whenever main audio plays, ensure silent keep-alive bridge is awake
+  document.addEventListener("DOMContentLoaded", function() {
+    const audio = document.getElementById("globalHtmlAudio");
+    if (audio) {
+      audio.addEventListener("play", function() {
+        if (localStorage.getItem(PERM_STORAGE_KEY) === "1") {
+          activateBackgroundKeepAliveEngine();
+        }
+      });
+    }
+  });
+
+  // 3. Try opening Android Native Battery Optimization / App Info Settings
+  function triggerAndroidBatterySettingsIntent() {
+    try {
+      if (window.Android && typeof window.Android.requestIgnoreBatteryOptimizations === "function") {
+        window.Android.requestIgnoreBatteryOptimizations();
+        return true;
+      }
+      // Attempt standard Android Setting Intent for Ignore Battery Optimization
+      const link = document.createElement("a");
+      link.href = "intent:#Intent;action=android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS;end";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function showAppOnlyUnrestrictedPrompt() {
+    // Strictly exit if user is on regular Web Browser
+    if (!isRunningInsideInstalledApp()) return;
+    // Exit if already allowed
+    if (localStorage.getItem(PERM_STORAGE_KEY) === "1") {
+      activateBackgroundKeepAliveEngine();
+      return;
+    }
+    if (sessionStorage.getItem("jamia_bg_prompt_dismissed") === "1") return;
+
+    const modal = document.getElementById("jamiaBatteryAllowModal");
+    if (!modal) return;
+    modal.style.display = "flex";
+
+    const allowBtn = document.getElementById("jbAllowBtn");
+    const denyBtn = document.getElementById("jbDenyBtn");
+    const descEl = document.getElementById("jbModalDesc");
+    const btnRow = document.getElementById("jbActionBtns");
+
+    if (allowBtn) {
+      allowBtn.onclick = function() {
+        localStorage.setItem(PERM_STORAGE_KEY, "1");
+        activateBackgroundKeepAliveEngine();
+        triggerAndroidBatterySettingsIntent();
+
+        // Show 1-step confirmation in case Android WebView blocks external intent:// links
+        if (descEl && btnRow) {
+          descEl.innerHTML =
+            '<span style="color:#00ffa3; font-weight:bold;">✅ بیک گراؤنڈ آڈیو انجن فعال ہو گیا!</span><br>' +
+            '<span style="font-size:0.76rem; color:#e2e8f0;">اگر آپ کے فون کی سیٹنگز خود نہیں کھلیں، تو بس ایک بار ایپ آئیکن کو دبا کر رکھیں ⬅️ <b>App Info (ℹ️)</b> ⬅️ <b>Battery</b> ⬅️ <b>Unrestricted</b> پر ٹک کر دیں۔</span>';
+          btnRow.innerHTML =
+            '<button type="button" class="jb-btn-allow" onclick="document.getElementById(\'jamiaBatteryAllowModal\').style.display=\'none\'">ٹھیک ہے، سمجھ گیا 👍</button>';
+        } else {
+          modal.style.display = "none";
+        }
+      };
+    }
+
+    if (denyBtn) {
+      denyBtn.onclick = function() {
+        sessionStorage.setItem("jamia_bg_prompt_dismissed", "1");
+        modal.style.display = "none";
+      };
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(showAppOnlyUnrestrictedPrompt, 2500);
+  });
+
+  // Also activate keep-alive automatically on first touch if already allowed
+  document.addEventListener("touchstart", function onceWake() {
+    if (isRunningInsideInstalledApp() && localStorage.getItem(PERM_STORAGE_KEY) === "1") {
+      activateBackgroundKeepAliveEngine();
+    }
+    document.removeEventListener("touchstart", onceWake);
+  }, { passive: true });
+})();
+</script>
+
 </body>
 </html>
