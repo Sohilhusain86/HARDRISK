@@ -6985,5 +6985,34 @@ window.openViewer = function(url, title) {
 })();
 </script>
 
+
+<script id="jamia-autofill-login-fix">
+(function() {
+  const SAVED_LOGIN_NAME_KEY = "jamia_saved_login_name_v1";
+
+  window.enhanceLoginInputWithAutoFill = function() {
+    const cur = localStorage.getItem("jamia_ula_name");
+    if (cur) localStorage.setItem(SAVED_LOGIN_NAME_KEY, cur.trim());
+    const saved = localStorage.getItem(SAVED_LOGIN_NAME_KEY) || cur || "";
+    ["user-name", "jamiaQuickNameInput"].forEach(function(id) {
+      const inp = document.getElementById(id);
+      if (!inp) return;
+      if (!inp.value && saved && !inp.dataset.manuallyCleared) {
+        inp.value = saved;
+      }
+      if (!inp.dataset.autoSaveBound) {
+        inp.dataset.autoSaveBound = "1";
+        inp.addEventListener("input", function() {
+          if (inp.value.trim()) localStorage.setItem(SAVED_LOGIN_NAME_KEY, inp.value.trim());
+        });
+      }
+    });
+  };
+
+  document.addEventListener("DOMContentLoaded", window.enhanceLoginInputWithAutoFill);
+  setInterval(window.enhanceLoginInputWithAutoFill, 1200);
+})();
+</script>
+
 </body>
 </html>
