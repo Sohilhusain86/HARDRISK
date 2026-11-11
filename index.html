@@ -7766,7 +7766,10 @@ window.openViewer = function(url, title) {
 </script>
 
 
-<script id="jamia-audio-fav-fix">
+
+
+
+<script id="jamia-audio-fav-direct">
 (function() {
   function getCleanId(raw) {
     const s = String(raw || "").trim();
@@ -7774,34 +7777,32 @@ window.openViewer = function(url, title) {
     return m ? m[0] : s;
   }
 
-  function forceSyncAudioFavState() {
+  function syncAudioFavBtn() {
     const btn = document.getElementById("jamiaAudioFavOnlyBtn");
-    if (!btn || typeof window.isJamiaFav !== "function") return;
+    if (!btn) return;
 
     const audio = document.getElementById("globalHtmlAudio");
     const tEl = document.getElementById("audioPlayerTitle");
-    const cid = (audio && audio.dataset.currentId) ? getCleanId(audio.dataset.currentId) : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.id : "");
-    const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.title : "نعت شریف");
+    const cid = (audio && audio.dataset.currentId) ? getCleanId(audio.dataset.currentId) : "";
+    const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : "";
 
-    const isFav = window.isJamiaFav(cid, cTitle) || window.isJamiaFav(cTitle, cid);
+    let isFav = false;
+    if (typeof window.isJamiaFav === "function") {
+      isFav = window.isJamiaFav(cid, cTitle) || window.isJamiaFav(cTitle, cid);
+    } else {
+      try {
+        const favs = JSON.parse(localStorage.getItem("jamia_fav_ids_v2") || "[]");
+        isFav = favs.includes(cid) || favs.includes(cTitle);
+      } catch(e) {}
+    }
+
     btn.classList.toggle("active", isFav);
     btn.innerHTML = isFav
       ? '<i class="fa-solid fa-star"></i> <span>پسندیدہ ✓</span>'
       : '<i class="fa-regular fa-star"></i> <span>پسند</span>';
   }
 
-  const origPlayAudio = window.playAudio;
-  if (typeof origPlayAudio === "function") {
-    window.playAudio = function(audioUrlOrId, title) {
-      const cleanId = getCleanId(audioUrlOrId);
-      const cleanTitle = String(title || "نعت شریف").replace(/\.(mp3|m4a|wav)$/i, "").trim();
-      window.jamiaCurrentPlayingNaat = { id: cleanId, title: cleanTitle };
-      origPlayAudio.apply(this, arguments);
-      setTimeout(forceSyncAudioFavState, 150);
-    };
-  }
-
-  function ensureAudioFavBtnRobust() {
+  function ensureAudioFavBtn() {
     const bar = document.getElementById("emeraldAudioBar");
     if (!bar) return;
     let btn = document.getElementById("jamiaAudioFavOnlyBtn");
@@ -7812,47 +7813,50 @@ window.openViewer = function(url, title) {
       btn.type = "button";
       btn.title = "میری پسند میں شامل کریں";
       btn.innerHTML = '<i class="fa-regular fa-star"></i> <span>پسند</span>';
+      
       btn.onclick = function(e) {
         e.preventDefault();
         e.stopPropagation();
+
         const audio = document.getElementById("globalHtmlAudio");
         const tEl = document.getElementById("audioPlayerTitle");
-        const cid = (audio && audio.dataset.currentId) ? getCleanId(audio.dataset.currentId) : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.id : "");
-        const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.title : "نعت شریف");
-        
+        const cid = (audio && audio.dataset.currentId) ? getCleanId(audio.dataset.currentId) : "";
+        const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : "نعت شریف";
+
         if (!cid && !cTitle) return;
 
-        const FAV_KEY = "jamia_fav_ids_v2";
-        let favs = [];
-        try { favs = JSON.parse(localStorage.getItem(FAV_KEY) || "[]"); } catch(err) {}
-
-        const targetKey = cid || cTitle;
-        const index = favs.indexOf(targetKey);
-        const titleIndex = favs.indexOf(cTitle);
-
-        if (index >= 0 || titleIndex >= 0) {
-          favs = favs.filter(function(x) { return x !== targetKey && x !== cTitle && x !== cid; });
+        // Directly call the library's official toggle function if available!
+        if (typeof window.toggleJamiaFavItem === "function") {
+          window.toggleJamiaFavItem(e, cid || cTitle, cTitle, btn);
         } else {
-          favs.push(targetKey);
-          if (cTitle && !favs.includes(cTitle)) favs.push(cTitle);
+          // Fallback direct storage toggle
+          const FAV_KEY = "jamia_fav_ids_v2";
+          let favs = [];
+          try { favs = JSON.parse(localStorage.getItem(FAV_KEY) || "[]"); } catch(err) {}
+          
+          const target = cid || cTitle;
+          if (favs.includes(target)) {
+            favs = favs.filter(x => x !== target && x !== cTitle && x !== cid);
+          } else {
+            favs.push(target);
+            if (cTitle && !favs.includes(cTitle)) favs.push(cTitle);
+          }
+          localStorage.setItem(FAV_KEY, JSON.stringify(favs));
         }
-        try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch(err) {}
 
-        if (typeof window.updateJamiaCategoryCounts === "function") {
-          window.updateJamiaCategoryCounts();
-        }
+        if (typeof window.updateJamiaCategoryCounts === "function") window.updateJamiaCategoryCounts();
         if (typeof window.filterLibrary === "function" && typeof currentCategory !== "undefined" && currentCategory === "fav") {
           window.filterLibrary();
         }
-        forceSyncAudioFavState();
+        syncAudioFavBtn();
       };
       navWrap.appendChild(btn);
     }
-    forceSyncAudioFavState();
+    syncAudioFavBtn();
   }
 
-  document.addEventListener("DOMContentLoaded", ensureAudioFavBtnRobust);
-  setInterval(ensureAudioFavBtnRobust, 600);
+  document.addEventListener("DOMContentLoaded", ensureAudioFavBtn);
+  setInterval(ensureAudioFavBtn, 500);
 })();
 </script>
 
