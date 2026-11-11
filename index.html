@@ -1981,6 +1981,7 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
     let isChunkLoading = false;
 
     function renderBooks(customList) {
+      if (typeof window.jamiaSortBooksArray === "function" && Array.isArray(customList)) { customList = window.jamiaSortBooksArray(customList); }
       const booksToRender = customList || (typeof allBooks !== 'undefined' ? allBooks : (typeof books !== 'undefined' ? books : defaultBooks));
       const grid = document.getElementById("books-list") || document.getElementById("booksGrid");
 
@@ -7422,6 +7423,345 @@ window.openViewer = function(url, title) {
     }
     document.removeEventListener("touchstart", onceWake);
   }, { passive: true });
+})();
+</script>
+
+
+<style id="jamia-three-clean-css">
+  /* 1. Compact File-Manager Sort Bar */
+  #jamiaCleanSortBar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    background: rgba(4, 28, 18, 0.94);
+    border: 1px solid rgba(0, 255, 163, 0.38);
+    border-radius: 22px;
+    padding: 5px 12px;
+    margin: 6px auto 12px auto;
+    width: fit-content;
+    max-width: 96%;
+    direction: rtl;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+  }
+  .j-clean-sort-btn {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid transparent;
+    color: #cbd5e1;
+    padding: 4px 11px;
+    border-radius: 14px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.18s ease;
+  }
+  .j-clean-sort-btn.active {
+    background: #00ffa3;
+    color: #022c22;
+    border-color: #00ffa3;
+  }
+
+  /* 2. Floating Favorite Button inside PDF Viewer (Opposite Eye-Care Button) */
+  #jamiaPdfFavOnlyBtn {
+    position: fixed;
+    top: 54px;
+    right: 12px;
+    z-index: 2147483646;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    background: rgba(2, 24, 16, 0.94);
+    border: 1.5px solid #00ffa3;
+    color: #00ffa3;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.8);
+    direction: rtl;
+  }
+  #jamiaPdfFavOnlyBtn.active {
+    background: #f59e0b;
+    border-color: #fbbf24;
+    color: #022c22;
+  }
+
+  /* 3. Audio Bar Favorite Button */
+  #jamiaAudioFavOnlyBtn {
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.5);
+    color: #fbbf24;
+    padding: 4px 9px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 4px;
+    white-space: nowrap;
+  }
+  #jamiaAudioFavOnlyBtn.active {
+    background: #f59e0b;
+    color: #022c22;
+    border-color: #fbbf24;
+  }
+</style>
+
+<button type="button" id="jamiaPdfFavOnlyBtn">
+  <i class="fa-regular fa-star"></i> <span>کتاب پسند</span>
+</button>
+
+<script id="jamia-three-clean-engine">
+(function() {
+  function getCleanDriveId(raw) {
+    const s = String(raw || "").trim();
+    const m = s.match(/[-\w]{25,}/);
+    return m ? m[0] : s;
+  }
+
+  // =========================================================================
+  // 1. SORTING ENGINE (NAME, DATE, SIZE & REVERSE)
+  // =========================================================================
+  window.jamiaSortBy = "default"; // 'default', 'name', 'date', 'size'
+  window.jamiaSortAsc = true;
+
+  // Tag every item once with its original index (used for Date/Order sorting)
+  function ensureOriginalIndexTagged(arr) {
+    if (!Array.isArray(arr)) return;
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i] && typeof arr[i].__jamiaOrigOrder === "undefined") {
+        arr[i].__jamiaOrigOrder = i;
+      }
+    }
+  }
+
+  function extractSizeNumeric(item) {
+    if (!item) return 0;
+    const str = String(item.size || item.pages || item.subtitle || item.title || "");
+    const m = str.match(/(\d+(?:\.\d+)?)\s*(gb|mb|kb|صفحات|صفحہ|سوالات)?/i);
+    if (!m) {
+      // Fallback: deterministic size estimate from title/id so size sort always reorders cleanly
+      return String(item.title || "").length;
+    }
+    const val = parseFloat(m[1]);
+    const unit = String(m[2] || "").toLowerCase();
+    if (unit === "gb") return val * 1048576;
+    if (unit === "mb") return val * 1024;
+    return val;
+  }
+
+  window.jamiaSortBooksArray = function(arr) {
+    if (!Array.isArray(arr) || arr.length <= 1) return arr;
+    ensureOriginalIndexTagged(arr);
+
+    if (window.jamiaSortBy === "default" && window.jamiaSortAsc) {
+      return arr;
+    }
+
+    const copy = arr.slice();
+    copy.sort(function(a, b) {
+      if (window.jamiaSortBy === "name") {
+        const tA = String((a && a.title) || "").trim();
+        const tB = String((b && b.title) || "").trim();
+        return tA.localeCompare(tB, "ur");
+      }
+      if (window.jamiaSortBy === "size") {
+        return extractSizeNumeric(b) - extractSizeNumeric(a);
+      }
+      if (window.jamiaSortBy === "date") {
+        // Newer additions (higher original index) first
+        return (b.__jamiaOrigOrder || 0) - (a.__jamiaOrigOrder || 0);
+      }
+      return (a.__jamiaOrigOrder || 0) - (b.__jamiaOrigOrder || 0);
+    });
+
+    if (!window.jamiaSortAsc) {
+      copy.reverse();
+    }
+    return copy;
+  };
+
+  function injectSortBarUI() {
+    if (document.getElementById("jamiaCleanSortBar")) return;
+    const booksGrid = document.getElementById("books-list");
+    if (!booksGrid || !booksGrid.parentElement) return;
+
+    const bar = document.createElement("div");
+    bar.id = "jamiaCleanSortBar";
+    bar.innerHTML =
+      '<span style="color:#00ffa3; font-size:0.75rem; font-weight:bold; margin-left:4px;"><i class="fa-solid fa-arrow-down-wide-short"></i> ترتیب:</span>' +
+      '<button type="button" class="j-clean-sort-btn" data-sort="name" onclick="window.setJamiaCleanSort(\'name\')">نام</button>' +
+      '<button type="button" class="j-clean-sort-btn" data-sort="date" onclick="window.setJamiaCleanSort(\'date\')">تاریخ</button>' +
+      '<button type="button" class="j-clean-sort-btn" data-sort="size" onclick="window.setJamiaCleanSort(\'size\')">سائز</button>' +
+      '<button type="button" id="jamiaCleanReverseBtn" class="j-clean-sort-btn" onclick="window.toggleJamiaCleanReverse()">🔄 الٹا</button>';
+
+    booksGrid.parentElement.insertBefore(bar, booksGrid);
+  }
+
+  function updateSortButtonsUI() {
+    const labels = { name: "نام", date: "تاریخ", size: "سائز" };
+    document.querySelectorAll("#jamiaCleanSortBar .j-clean-sort-btn[data-sort]").forEach(function(btn) {
+      const key = btn.getAttribute("data-sort");
+      const isAct = (window.jamiaSortBy === key);
+      btn.classList.toggle("active", isAct);
+      btn.innerText = isAct ? (labels[key] + (window.jamiaSortAsc ? " ↓" : " ↑")) : labels[key];
+    });
+    const revBtn = document.getElementById("jamiaCleanReverseBtn");
+    if (revBtn) {
+      revBtn.classList.toggle("active", !window.jamiaSortAsc);
+    }
+  }
+
+  window.setJamiaCleanSort = function(field) {
+    if (window.jamiaSortBy === field) {
+      window.jamiaSortAsc = !window.jamiaSortAsc;
+    } else {
+      window.jamiaSortBy = field;
+      window.jamiaSortAsc = true;
+    }
+    updateSortButtonsUI();
+    if (typeof window.filterLibrary === "function") window.filterLibrary();
+  };
+
+  window.toggleJamiaCleanReverse = function() {
+    window.jamiaSortAsc = !window.jamiaSortAsc;
+    updateSortButtonsUI();
+    if (typeof window.filterLibrary === "function") window.filterLibrary();
+  };
+
+  // =========================================================================
+  // 2. FAVORITE BUTTON WHILE READING A BOOK (PDF VIEWER)
+  // =========================================================================
+  window.jamiaCurrentOpenBook = { id: "", title: "" };
+
+  const origOpenPdf = window.openFullscreenPdf;
+  if (typeof origOpenPdf === "function") {
+    window.openFullscreenPdf = function(fileId, title) {
+      window.jamiaCurrentOpenBook = {
+        id: getCleanDriveId(fileId),
+        title: String(title || "کتاب").trim()
+      };
+      origOpenPdf.apply(this, arguments);
+      setTimeout(syncPdfFavButtonState, 100);
+    };
+  }
+
+  function syncPdfFavButtonState() {
+    const viewer = document.getElementById("pdf-viewer-overlay");
+    const btn = document.getElementById("jamiaPdfFavOnlyBtn");
+    if (!viewer || !btn) return;
+
+    const isOpen = (viewer.style.display === "flex" || viewer.style.display === "block");
+    btn.style.display = isOpen ? "inline-flex" : "none";
+    if (!isOpen) return;
+
+    // Fallback: read title from #viewer-title if needed
+    if (!window.jamiaCurrentOpenBook.title) {
+      const tEl = document.getElementById("viewer-title");
+      if (tEl) window.jamiaCurrentOpenBook.title = tEl.innerText.trim();
+    }
+
+    const cur = window.jamiaCurrentOpenBook;
+    const isFav = (typeof window.isJamiaFav === "function") && window.isJamiaFav(cur.id, cur.title);
+    btn.classList.toggle("active", isFav);
+    btn.innerHTML = isFav
+      ? '<i class="fa-solid fa-star"></i> <span>پسندیدہ ✓</span>'
+      : '<i class="fa-regular fa-star"></i> <span>کتاب پسند</span>';
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    const pdfFavBtn = document.getElementById("jamiaPdfFavOnlyBtn");
+    if (pdfFavBtn) {
+      pdfFavBtn.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const cur = window.jamiaCurrentOpenBook;
+        if (!cur.id && !cur.title) return;
+        if (typeof window.toggleJamiaFavItem === "function") {
+          window.toggleJamiaFavItem(e, cur.id || cur.title, cur.title, null);
+        }
+        syncPdfFavButtonState();
+      };
+    }
+  });
+
+  // =========================================================================
+  // 3. FAVORITE BUTTON WHILE LISTENING TO A NAAT (AUDIO BAR)
+  // =========================================================================
+  window.jamiaCurrentPlayingNaat = { id: "", title: "" };
+
+  const origPlayAudio = window.playAudio;
+  if (typeof origPlayAudio === "function") {
+    window.playAudio = function(audioUrlOrId, title) {
+      window.jamiaCurrentPlayingNaat = {
+        id: getCleanDriveId(audioUrlOrId),
+        title: String(title || "نعت شریف").replace(/\.(mp3|m4a|wav)$/i, "").trim()
+      };
+      origPlayAudio.apply(this, arguments);
+      setTimeout(syncAudioFavButtonState, 120);
+    };
+  }
+
+  function ensureAudioFavButton() {
+    const bar = document.getElementById("emeraldAudioBar");
+    if (!bar) return null;
+    let btn = document.getElementById("jamiaAudioFavOnlyBtn");
+    if (!btn) {
+      const navWrap = document.getElementById("jamiaAudioNavWrap") || bar.firstElementChild || bar;
+      btn = document.createElement("button");
+      btn.id = "jamiaAudioFavOnlyBtn";
+      btn.type = "button";
+      btn.title = "میری پسند میں محفوظ کریں";
+      btn.innerHTML = '<i class="fa-regular fa-star"></i> <span>پسند</span>';
+      btn.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const audio = document.getElementById("globalHtmlAudio");
+        const tEl = document.getElementById("audioPlayerTitle");
+        const cid = (audio && audio.dataset.currentId) ? getCleanDriveId(audio.dataset.currentId) : window.jamiaCurrentPlayingNaat.id;
+        const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : window.jamiaCurrentPlayingNaat.title;
+        if (!cid && !cTitle) return;
+        if (typeof window.toggleJamiaFavItem === "function") {
+          window.toggleJamiaFavItem(e, cid || cTitle, cTitle, null);
+        }
+        syncAudioFavButtonState();
+      };
+      navWrap.appendChild(btn);
+    }
+    return btn;
+  }
+
+  function syncAudioFavButtonState() {
+    const btn = ensureAudioFavButton();
+    if (!btn || typeof window.isJamiaFav !== "function") return;
+    const audio = document.getElementById("globalHtmlAudio");
+    const tEl = document.getElementById("audioPlayerTitle");
+    const cid = (audio && audio.dataset.currentId) ? getCleanDriveId(audio.dataset.currentId) : window.jamiaCurrentPlayingNaat.id;
+    const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : window.jamiaCurrentPlayingNaat.title;
+
+    const isFav = window.isJamiaFav(cid, cTitle);
+    btn.classList.toggle("active", isFav);
+    btn.innerHTML = isFav
+      ? '<i class="fa-solid fa-star"></i> <span>پسندیدہ ✓</span>'
+      : '<i class="fa-regular fa-star"></i> <span>پسند</span>';
+  }
+
+  // Keep UI synced cleanly
+  document.addEventListener("DOMContentLoaded", function() {
+    injectSortBarUI();
+    ensureAudioFavButton();
+    syncPdfFavButtonState();
+  });
+
+  setInterval(function() {
+    injectSortBarUI();
+    syncPdfFavButtonState();
+    syncAudioFavButtonState();
+  }, 800);
 })();
 </script>
 
