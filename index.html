@@ -7769,162 +7769,135 @@ window.openViewer = function(url, title) {
 
 
 
-<script id="jamia-audio-fav-direct">
+
+
+
+
+
+
+<script id="jamia-final-back-and-naatfav-fix">
 (function() {
-  function getCleanId(raw) {
+  const FAV_KEY = "jamia_fav_ids_v2";
+
+  function extractDriveId(raw) {
     const s = String(raw || "").trim();
     const m = s.match(/[-\w]{25,}/);
     return m ? m[0] : s;
   }
 
-  function syncAudioFavBtn() {
-    const btn = document.getElementById("jamiaAudioFavOnlyBtn");
-    if (!btn) return;
-
-    const audio = document.getElementById("globalHtmlAudio");
-    const tEl = document.getElementById("audioPlayerTitle");
-    const cid = (audio && audio.dataset.currentId) ? getCleanId(audio.dataset.currentId) : "";
-    const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : "";
-
-    let isFav = false;
-    if (typeof window.isJamiaFav === "function") {
-      isFav = window.isJamiaFav(cid, cTitle) || window.isJamiaFav(cTitle, cid);
-    } else {
-      try {
-        const favs = JSON.parse(localStorage.getItem("jamia_fav_ids_v2") || "[]");
-        isFav = favs.includes(cid) || favs.includes(cTitle);
-      } catch(e) {}
-    }
-
-    btn.classList.toggle("active", isFav);
-    btn.innerHTML = isFav
-      ? '<i class="fa-solid fa-star"></i> <span>پسندیدہ ✓</span>'
-      : '<i class="fa-regular fa-star"></i> <span>پسند</span>';
+  function cleanTitleStr(t) {
+    return String(t || "").replace(/\.(mp3|m4a|wav|pdf)$/i, "").trim();
   }
 
-  function ensureAudioFavBtn() {
-    const bar = document.getElementById("emeraldAudioBar");
-    if (!bar) return;
-    let btn = document.getElementById("jamiaAudioFavOnlyBtn");
-    if (!btn) {
-      const navWrap = document.getElementById("jamiaAudioNavWrap") || bar.firstElementChild || bar;
-      btn = document.createElement("button");
-      btn.id = "jamiaAudioFavOnlyBtn";
-      btn.type = "button";
-      btn.title = "میری پسند میں شامل کریں";
-      btn.innerHTML = '<i class="fa-regular fa-star"></i> <span>پسند</span>';
-      
-      btn.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const audio = document.getElementById("globalHtmlAudio");
-        const tEl = document.getElementById("audioPlayerTitle");
-        const cid = (audio && audio.dataset.currentId) ? getCleanId(audio.dataset.currentId) : "";
-        const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : "نعت شریف";
-
-        if (!cid && !cTitle) return;
-
-        // Directly call the library's official toggle function if available!
-        if (typeof window.toggleJamiaFavItem === "function") {
-          window.toggleJamiaFavItem(e, cid || cTitle, cTitle, btn);
-        } else {
-          // Fallback direct storage toggle
-          const FAV_KEY = "jamia_fav_ids_v2";
-          let favs = [];
-          try { favs = JSON.parse(localStorage.getItem(FAV_KEY) || "[]"); } catch(err) {}
-          
-          const target = cid || cTitle;
-          if (favs.includes(target)) {
-            favs = favs.filter(x => x !== target && x !== cTitle && x !== cid);
-          } else {
-            favs.push(target);
-            if (cTitle && !favs.includes(cTitle)) favs.push(cTitle);
-          }
-          localStorage.setItem(FAV_KEY, JSON.stringify(favs));
-        }
-
-        if (typeof window.updateJamiaCategoryCounts === "function") window.updateJamiaCategoryCounts();
-        if (typeof window.filterLibrary === "function" && typeof currentCategory !== "undefined" && currentCategory === "fav") {
-          window.filterLibrary();
-        }
-        syncAudioFavBtn();
-      };
-      navWrap.appendChild(btn);
+  function getAllNaatItems() {
+    let list = [];
+    if (typeof window.getCleanJamiaLists === "function") {
+      const res = window.getCleanJamiaLists();
+      if (res && Array.isArray(res.naats)) list = list.concat(res.naats);
     }
-    syncAudioFavBtn();
+    if (Array.isArray(window.JAMIA_NAATS_LIST)) list = list.concat(window.JAMIA_NAATS_LIST);
+    if (Array.isArray(window.ALL_BOOKS_CACHE)) list = list.concat(window.ALL_BOOKS_CACHE);
+    if (typeof LIBRARY_DATA !== "undefined" && Array.isArray(LIBRARY_DATA)) list = list.concat(LIBRARY_DATA);
+    return list;
   }
-
-  document.addEventListener("DOMContentLoaded", ensureAudioFavBtn);
-  setInterval(ensureAudioFavBtn, 500);
-})();
-</script>
-
-
-<script id="jamia-core-favorite-engine">
-(function() {
-  const FAV_KEY = "jamia_fav_ids_v2";
 
   window.getJamiaFavIds = function() {
-    try {
-      return JSON.parse(localStorage.getItem(FAV_KEY) || "[]");
-    } catch(e) {
-      return [];
-    }
+    try { return JSON.parse(localStorage.getItem(FAV_KEY) || "[]"); } catch(e) { return []; }
   };
 
+  // Smart matcher: matches by clean Drive ID, exact title, or title without .mp3
   window.isJamiaFav = function(id, title) {
     const favs = window.getJamiaFavIds();
-    const cleanId = String(id || "").trim();
-    const cleanTitle = String(title || "").trim();
-    return favs.includes(cleanId) || favs.includes(cleanTitle);
+    if (!favs.length) return false;
+    const cid = extractDriveId(id);
+    const cTitle = cleanTitleStr(title);
+
+    return favs.some(function(f) {
+      const fStr = String(f || "").trim();
+      if (!fStr) return false;
+      if (cid && (fStr === cid || extractDriveId(fStr) === cid)) return true;
+      if (cTitle && (fStr === cTitle || cleanTitleStr(fStr) === cTitle)) return true;
+      return false;
+    });
   };
 
+  // Toggle favorite and store ALL matching representations (raw id, clean id, raw title, clean title)
+  // so whatever filterLibrary() checks, it 100% finds the naat!
   window.toggleJamiaFavItem = function(e, id, title, btnEl) {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+    if (e) { e.preventDefault(); e.stopPropagation(); }
     let favs = window.getJamiaFavIds();
-    const cleanId = String(id || "").trim();
-    const cleanTitle = String(title || "").trim();
-    const targetKey = cleanId || cleanTitle;
+    const cid = extractDriveId(id);
+    const cTitle = cleanTitleStr(title);
 
-    if (!targetKey) return;
+    const currentlyFav = window.isJamiaFav(cid, cTitle);
 
-    if (favs.includes(targetKey) || (cleanTitle && favs.includes(cleanTitle))) {
-      favs = favs.filter(function(x) {
-        return x !== targetKey && x !== cleanTitle && x !== cleanId;
+    if (currentlyFav) {
+      favs = favs.filter(function(f) {
+        const fStr = String(f || "").trim();
+        if (cid && (fStr === cid || extractDriveId(fStr) === cid)) return false;
+        if (cTitle && (fStr === cTitle || cleanTitleStr(fStr) === cTitle)) return false;
+        return true;
       });
-      if (btnEl) {
-        btnEl.classList.remove("active");
-        btnEl.innerHTML = '<i class="fa-regular fa-star"></i> <span>پسند</span>';
-      }
     } else {
-      favs.push(targetKey);
-      if (cleanTitle && !favs.includes(cleanTitle)) {
-        favs.push(cleanTitle);
-      }
-      if (btnEl) {
+      if (cid && !favs.includes(cid)) favs.push(cid);
+      if (id && !favs.includes(String(id).trim())) favs.push(String(id).trim());
+      if (cTitle && !favs.includes(cTitle)) favs.push(cTitle);
+      if (title && !favs.includes(String(title).trim())) favs.push(String(title).trim());
+
+      // Also find the exact item object in library data and push its exact .id and .title
+      const allItems = getAllNaatItems();
+      allItems.forEach(function(item) {
+        if (!item) return;
+        const itemCid = extractDriveId(item.id || item.audioUrl);
+        const itemCleanT = cleanTitleStr(item.title);
+        if ((cid && itemCid === cid) || (cTitle && itemCleanT === cTitle)) {
+          if (item.id && !favs.includes(item.id)) favs.push(item.id);
+          if (item.audioUrl && !favs.includes(item.audioUrl)) favs.push(item.audioUrl);
+          if (item.title && !favs.includes(item.title)) favs.push(item.title);
+          if (item.title && !favs.includes(item.title.trim())) favs.push(item.title.trim());
+        }
+      });
+    }
+
+    try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch(err) {}
+
+    // Update card star button if passed
+    if (btnEl && btnEl.id !== "jamiaAudioFavOnlyBtn" && btnEl.id !== "jamiaPdfFavOnlyBtn") {
+      if (!currentlyFav) {
         btnEl.classList.add("active");
-        btnEl.innerHTML = '<i class="fa-solid fa-star"></i> <span>پسندیدہ ✓</span>';
+        btnEl.innerHTML = '<i class="fa-solid fa-star"></i>';
+      } else {
+        btnEl.classList.remove("active");
+        btnEl.innerHTML = '<i class="fa-regular fa-star"></i>';
       }
     }
 
-    try {
-      localStorage.setItem(FAV_KEY, JSON.stringify(favs));
-    } catch(err) {}
-
-    if (typeof window.updateJamiaCategoryCounts === "function") {
-      window.updateJamiaCategoryCounts();
-    }
-    if (typeof window.filterLibrary === "function" && typeof currentCategory !== "undefined" && currentCategory === "fav") {
-      window.filterLibrary();
+    // Update counts and refresh Meri Pasand view immediately
+    if (typeof window.updateJamiaCategoryCounts === "function") window.updateJamiaCategoryCounts();
+    if (typeof window.filterLibrary === "function") {
+      const isFavTabActive = (typeof currentCategory !== "undefined" && currentCategory === "fav") ||
+        Boolean(document.querySelector(".filter-tag.active[onclick*='fav']"));
+      if (isFavTabActive) {
+        window.filterLibrary();
+      } else {
+        // Still update the sub-tab badge counters (پسندیدہ کتب / پسندیدہ نعتیں)
+        try {
+          if (typeof window.getCleanJamiaLists === "function") {
+            const lists = window.getCleanJamiaLists();
+            const favBooks = (lists.books || []).filter(function(b) { return window.isJamiaFav(b.id, b.title); });
+            const favNaats = (lists.naats || []).filter(function(n) { return window.isJamiaFav(n.id || n.audioUrl, n.title); });
+            const bSpan = document.getElementById("jFavBooksCount");
+            const nSpan = document.getElementById("jFavNaatsCount");
+            if (bSpan) bSpan.innerText = String(favBooks.length);
+            if (nSpan) nSpan.innerText = String(favNaats.length);
+          }
+        } catch(err) {}
+      }
     }
   };
 
-  // Bind Audio Bar Favorite Button Robustly
-  function ensureAudioFavButtonSync() {
+  // Sync Audio Bar Favorite Button
+  function syncAudioPlayerFavBtn() {
     const bar = document.getElementById("emeraldAudioBar");
     if (!bar) return;
     let btn = document.getElementById("jamiaAudioFavOnlyBtn");
@@ -7933,35 +7906,127 @@ window.openViewer = function(url, title) {
       btn = document.createElement("button");
       btn.id = "jamiaAudioFavOnlyBtn";
       btn.type = "button";
-      btn.title = "میری پسند میں شامل کریں";
       btn.innerHTML = '<i class="fa-regular fa-star"></i> <span>پسند</span>';
-      
-      btn.onclick = function(e) {
-        const audio = document.getElementById("globalHtmlAudio");
-        const tEl = document.getElementById("audioPlayerTitle");
-        const cid = (audio && audio.dataset.currentId) ? audio.dataset.currentId : "";
-        const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : "نعت شریف";
-        
-        window.toggleJamiaFavItem(e, cid || cTitle, cTitle, btn);
-      };
       navWrap.appendChild(btn);
     }
 
-    // Sync button active/inactive state
+    // Always bind our direct click handler
+    btn.onclick = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const audio = document.getElementById("globalHtmlAudio");
+      const tEl = document.getElementById("audioPlayerTitle");
+      const cid = (audio && audio.dataset.currentId) ? extractDriveId(audio.dataset.currentId) : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.id : "");
+      const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.title : "");
+      if (!cid && !cTitle) return;
+      window.toggleJamiaFavItem(e, cid, cTitle, btn);
+      syncAudioPlayerFavBtn();
+    };
+
     const audio = document.getElementById("globalHtmlAudio");
     const tEl = document.getElementById("audioPlayerTitle");
-    const cid = (audio && audio.dataset.currentId) ? audio.dataset.currentId : "";
-    const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : "";
-    const isFav = window.isJamiaFav(cid, cTitle);
+    const cid = (audio && audio.dataset.currentId) ? extractDriveId(audio.dataset.currentId) : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.id : "");
+    const cTitle = (tEl && tEl.innerText) ? tEl.innerText.trim() : (window.jamiaCurrentPlayingNaat ? window.jamiaCurrentPlayingNaat.title : "");
 
+    const isFav = window.isJamiaFav(cid, cTitle);
     btn.classList.toggle("active", isFav);
     btn.innerHTML = isFav
       ? '<i class="fa-solid fa-star"></i> <span>پسندیدہ ✓</span>'
       : '<i class="fa-regular fa-star"></i> <span>پسند</span>';
   }
 
-  document.addEventListener("DOMContentLoaded", ensureAudioFavButtonSync);
-  setInterval(ensureAudioFavButtonSync, 600);
+  // =========================================================================
+  // 2. 100% WORKING 3-TAP BACK BUTTON GUARD FOR ANDROID WEBVIEW / APK
+  // =========================================================================
+  let backTapCount = 0;
+  let backTapTimer = null;
+  let guardStep = 1;
+
+  // Android WebView requires a distinct URL/hash change AFTER user interaction to trap Back button
+  function pushDistinctGuardState() {
+    try {
+      guardStep = (guardStep % 9) + 1;
+      const baseUrl = window.location.pathname + window.location.search;
+      window.history.pushState({ jamiaBackLock: guardStep }, document.title, baseUrl + "#lock" + guardStep);
+    } catch (e) {}
+  }
+
+  function armWebViewBackTrap() {
+    if (!window.location.hash.startsWith("#lock")) {
+      pushDistinctGuardState();
+      pushDistinctGuardState();
+    }
+  }
+
+  // Arm on every touch/click so the trap never empties after user interactions
+  document.addEventListener("touchstart", armWebViewBackTrap, { passive: true });
+  document.addEventListener("click", armWebViewBackTrap, { passive: true });
+  window.addEventListener("load", function() { setTimeout(armWebViewBackTrap, 300); });
+
+  function showBackToast(msg) {
+    let toast = document.getElementById("jamiaBackGuardToast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "jamiaBackGuardToast";
+      toast.style.cssText = "position:fixed; bottom:75px; left:50%; transform:translateX(-50%); background:rgba(2,20,13,0.98); border:1.5px solid #00ffa3; color:#00ffa3; padding:9px 20px; border-radius:25px; font-size:0.82rem; font-weight:bold; z-index:2147483647; box-shadow:0 8px 25px rgba(0,0,0,0.95); direction:rtl; white-space:nowrap;";
+      document.body.appendChild(toast);
+    }
+    toast.innerText = msg;
+    toast.style.display = "block";
+    clearTimeout(toast.__hideTimer);
+    toast.__hideTimer = setTimeout(function() {
+      toast.style.display = "none";
+    }, 2200);
+  }
+
+  window.addEventListener("popstate", function() {
+    // 1. If PDF viewer is open, close it first instead of exiting
+    const pdf = document.getElementById("pdf-viewer-overlay");
+    if (pdf && (pdf.style.display === "flex" || pdf.style.display === "block")) {
+      if (typeof window.closeFullscreenPdf === "function") window.closeFullscreenPdf();
+      else pdf.style.display = "none";
+      pushDistinctGuardState();
+      backTapCount = 0;
+      return;
+    }
+
+    // 2. If any modal/popup is open, close it first
+    const openModals = ["jamiaSmartModal", "jamiaAdminModal", "jamiaUserHistoryOverlay", "jamiaBatteryAllowModal"];
+    for (let i = 0; i < openModals.length; i++) {
+      const m = document.getElementById(openModals[i]);
+      if (m && (m.style.display === "flex" || m.style.display === "block")) {
+        m.style.display = "none";
+        pushDistinctGuardState();
+        backTapCount = 0;
+        return;
+      }
+    }
+
+    // 3. On Main Screen: Require 3 consecutive taps within 3 seconds
+    backTapCount++;
+    clearTimeout(backTapTimer);
+    backTapTimer = setTimeout(function() {
+      backTapCount = 0;
+    }, 3000);
+
+    if (backTapCount < 3) {
+      pushDistinctGuardState();
+      const left = 3 - backTapCount;
+      showBackToast("🔙 ایپ سے باہر نکلنے کے لیے " + left + " بار مزید بیک دبائیں");
+    } else {
+      // 3rd tap reached: allow exit
+      backTapCount = 0;
+      try {
+        if (navigator.app && typeof navigator.app.exitApp === "function") {
+          navigator.app.exitApp();
+        } else {
+          window.history.go(-10);
+        }
+      } catch(e) {}
+    }
+  });
+
+  setInterval(syncAudioPlayerFavBtn, 600);
 })();
 </script>
 
