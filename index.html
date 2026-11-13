@@ -8406,39 +8406,42 @@ window.openViewer = function(url, title) {
 
 
 
+
+
+
 <style id="jamia-majlis-sync-css">
   #jamiaMajlisModal {
-    position: fixed; inset: 0; background: #03150e; z-index: 2147483645;
-    display: none; flex-direction: column; direction: rtl; color: #f0fdf4;
+    position: fixed; inset: 0; background: #02120c; z-index: 2147483645;
+    display: none; flex-direction: column; direction: rtl; color: #f8fafc;
     font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
-    --jm-font-size: 1.12rem;
+    --jm-font-size: 1.18rem;
   }
   .jm-header {
-    background: linear-gradient(145deg, #063927, #021a11);
+    background: linear-gradient(145deg, #052e1f, #02160f);
     padding: 10px 12px; border-bottom: 1.5px solid #10b981;
     display: flex; flex-direction: column; gap: 8px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.65);
   }
   .jm-top-row {
-    display: flex; align-items: center; gap: 6px; flex-wrap: nowrap;
+    display: flex; align-items: center; gap: 8px;
   }
   .jm-close-btn {
     background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff;
-    border: none; padding: 6px 12px; border-radius: 12px; font-weight: bold;
-    cursor: pointer; white-space: nowrap; font-size: 0.85rem;
+    border: none; padding: 6px 14px; border-radius: 12px; font-weight: bold;
+    cursor: pointer; white-space: nowrap; font-size: 0.88rem;
   }
   .jm-search-wrap {
     flex: 1; display: flex; align-items: center;
-    background: rgba(0,0,0,0.55); border: 1.5px solid #00ffa3;
-    border-radius: 20px; padding: 3px 10px; gap: 6px;
+    background: rgba(0,0,0,0.55); border: 1.5px solid #10b981;
+    border-radius: 22px; padding: 4px 12px; gap: 6px;
   }
   .jm-search {
     flex: 1; background: transparent; border: none; color: #fff;
-    padding: 5px 4px; font-size: 0.88rem; outline: none; min-width: 90px;
+    padding: 4px; font-size: 0.9rem; outline: none; min-width: 90px;
   }
   .jm-nav-btn {
-    background: rgba(0,255,163,0.16); border: 1px solid rgba(0,255,163,0.4);
-    color: #00ffa3; border-radius: 8px; padding: 2px 7px; font-size: 0.75rem;
+    background: rgba(16,185,129,0.18); border: 1px solid rgba(16,185,129,0.45);
+    color: #34d399; border-radius: 8px; padding: 2px 8px; font-size: 0.75rem;
     cursor: pointer; font-weight: bold;
   }
   .jm-toolbar {
@@ -8448,70 +8451,85 @@ window.openViewer = function(url, title) {
     display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; flex: 1;
   }
   .jm-tab {
-    background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(0, 255, 163, 0.35);
-    color: #a7f3d0; padding: 4px 11px; border-radius: 14px; font-size: 0.78rem;
+    background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #a7f3d0; padding: 4px 12px; border-radius: 14px; font-size: 0.8rem;
     cursor: pointer; white-space: nowrap; transition: all 0.2s;
   }
   .jm-tab.active {
-    background: #00ffa3; color: #022c22; font-weight: bold; border-color: #00ffa3;
+    background: #10b981; color: #022c22; font-weight: bold; border-color: #34d399;
   }
   .jm-font-controls {
     display: flex; gap: 4px; align-items: center;
   }
   .jm-font-btn {
-    background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.5);
+    background: rgba(251,191,36,0.14); border: 1px solid rgba(251,191,36,0.45);
     color: #fde68a; padding: 3px 8px; border-radius: 8px; font-size: 0.76rem;
     cursor: pointer; font-weight: bold;
   }
   .jm-body {
-    flex: 1; overflow-y: auto; padding: 14px 12px 75px 12px; scroll-behavior: smooth;
+    flex: 1; overflow-y: auto; padding: 14px 12px 90px 12px; scroll-behavior: smooth;
   }
+  /* Default Block Style */
   .jm-block {
-    background: linear-gradient(160deg, rgba(16, 42, 29, 0.88), rgba(6, 24, 16, 0.94));
-    border: 1.5px solid rgba(16, 185, 129, 0.35);
-    border-radius: 18px; padding: 16px 18px; margin-bottom: 16px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    background: rgba(8, 32, 22, 0.85);
+    border: 1.5px solid rgba(16, 185, 129, 0.28);
+    border-radius: 18px; padding: 16px 18px; margin-bottom: 14px;
+    transition: all 0.25s ease; cursor: pointer; position: relative;
+    user-select: none;
   }
-  .jm-block.tamheed-card {
-    background: linear-gradient(160deg, rgba(45, 36, 10, 0.92), rgba(24, 19, 5, 0.96));
-    border: 1.5px solid rgba(251, 191, 36, 0.55);
+  /* 1-Tap Golden Highlight Style matching user's screenshot */
+  .jm-block.golden-selected {
+    background: linear-gradient(160deg, rgba(62, 47, 10, 0.94), rgba(40, 30, 6, 0.96)) !important;
+    border: 2px solid #eab308 !important;
+    box-shadow: 0 0 24px rgba(234, 179, 8, 0.35), inset 0 0 15px rgba(234, 179, 8, 0.12) !important;
   }
   .jm-block-header {
     display: flex; justify-content: space-between; align-items: center;
-    gap: 10px; margin-bottom: 12px; padding-bottom: 8px;
-    border-bottom: 1px dashed rgba(251, 191, 36, 0.35);
+    gap: 8px; margin-bottom: 10px; padding-bottom: 6px;
+    border-bottom: 1px dashed rgba(251, 191, 36, 0.28);
   }
   .jm-block-title {
-    color: #fbbf24; font-weight: bold; font-size: 1.05rem;
-  }
-  .jm-card-actions {
-    display: flex; gap: 6px;
-  }
-  .jm-act-btn {
-    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
-    color: #e2e8f0; border-radius: 9px; padding: 3px 9px; font-size: 0.74rem;
-    cursor: pointer; white-space: nowrap;
+    color: #facc15; font-weight: bold; font-size: 1.05rem;
   }
   .jm-para {
-    font-size: var(--jm-font-size); line-height: 2.35; text-align: justify;
-    margin-bottom: 14px; padding-bottom: 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.06); color: #f8fafc;
+    font-size: var(--jm-font-size); line-height: 2.35; text-align: right;
+    color: #f8fafc; margin-bottom: 10px;
   }
-  .jm-para:last-child {
-    margin-bottom: 0; padding-bottom: 0; border-bottom: none;
+  .jm-para:last-child { margin-bottom: 0; }
+  .jm-word {
+    display: inline; padding: 0 1px; border-radius: 4px; transition: background 0.15s;
   }
-  .jm-sail-badge {
-    color: #38bdf8; font-weight: bold;
+  .jm-word:hover, .jm-word.word-active {
+    background: rgba(250, 204, 21, 0.28); color: #fef08a;
   }
-  .jm-mujeeb-badge {
-    color: #fbbf24; font-weight: bold;
-  }
+  .jm-sail-label { color: #38bdf8; font-weight: bold; }
+  .jm-mujeeb-label { color: #facc15; font-weight: bold; }
   mark.jm-hl {
-    background: #fde047; color: #022c22; padding: 1px 6px;
-    border-radius: 6px; font-weight: bold;
+    background: #fde047; color: #022c22; padding: 1px 5px;
+    border-radius: 5px; font-weight: bold;
   }
   mark.jm-hl.current-match {
-    background: #f97316; color: #fff; box-shadow: 0 0 12px #f97316;
+    background: #f97316; color: #fff; box-shadow: 0 0 10px #f97316;
+  }
+  /* Word Lughat Bottom Sheet */
+  #jmLughatSheet {
+    position: fixed; left: 12px; right: 12px; bottom: 14px;
+    background: linear-gradient(145deg, #1e1b08, #0f1712);
+    border: 2px solid #facc15; border-radius: 18px; padding: 14px 16px;
+    z-index: 2147483646; display: none; direction: rtl;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.85);
+  }
+  /* Double-Tap Special Studio Modal */
+  #jmDoubleTapModal {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.82);
+    z-index: 2147483647; display: none; align-items: center; justify-content: center;
+    padding: 16px; direction: rtl;
+  }
+  .jm-dt-box {
+    background: linear-gradient(155deg, #2d2308, #121004);
+    border: 2px solid #facc15; border-radius: 22px; padding: 18px;
+    max-width: 460px; width: 100%; color: #fef9c3;
+    box-shadow: 0 0 35px rgba(250, 204, 21, 0.35);
   }
   #emeraldAudioBar { display: none !important; }
 </style>
@@ -8521,19 +8539,19 @@ window.openViewer = function(url, title) {
     <div class="jm-top-row">
       <button type="button" class="jm-close-btn" onclick="window.closeFiqhiMajlisReader()">✕ بند کریں</button>
       <div class="jm-search-wrap">
-        <input type="text" id="jmSearchInput" class="jm-search" placeholder="🔍 کوئی بھی مسئلہ یا لفظ تلاش کریں (مثلاً: کرسی، نکاح، خون)..." oninput="window.filterMajlisBlocks()">
+        <input type="text" id="jmSearchInput" class="jm-search" placeholder="🔍 کوئی بھی مسئلہ تلاش کریں (مثلاً: کرسی، نکاح، خون، پرفیوم)..." oninput="window.filterMajlisBlocks()">
         <span id="jmSearchMatchInfo" style="font-size:0.74rem; color:#fde047; font-weight:bold; white-space:nowrap;"></span>
-        <button type="button" id="jmPrevBtn" class="jm-nav-btn" style="display:none;" onclick="window.jumpMajlisMatch(-1)" title="پچھلا نتیجہ">▲</button>
-        <button type="button" id="jmNextBtn" class="jm-nav-btn" style="display:none;" onclick="window.jumpMajlisMatch(1)" title="اگلا نتیجہ">▼</button>
+        <button type="button" id="jmPrevBtn" class="jm-nav-btn" style="display:none;" onclick="window.jumpMajlisMatch(-1)">▲</button>
+        <button type="button" id="jmNextBtn" class="jm-nav-btn" style="display:none;" onclick="window.jumpMajlisMatch(1)">▼</button>
         <button type="button" id="jmClearBtn" class="jm-nav-btn" style="display:none; color:#fca5a5; border-color:#f87171;" onclick="window.clearMajlisSearch()">✕</button>
       </div>
     </div>
     <div class="jm-toolbar">
       <div class="jm-tabs">
         <button type="button" class="jm-tab active" data-cat="all" onclick="window.setMajlisCategory('all', this)">📚 مکمل مجلس</button>
-        <button type="button" class="jm-tab" data-cat="roodad" onclick="window.setMajlisCategory('roodad', this)">🕌 آغازِ محفل</button>
         <button type="button" class="jm-tab" data-cat="tamheed" onclick="window.setMajlisCategory('tamheed', this)">🎙️ تمہیدی خطاب</button>
-        <button type="button" class="jm-tab" data-cat="qa" onclick="window.setMajlisCategory('qa', this)">❓ سوال و جواب</button>
+        <button type="button" class="jm-tab" data-cat="qa" onclick="window.setMajlisCategory('qa', this)">❓ سوال و جواب (45)</button>
+        <button type="button" class="jm-tab" data-cat="saved" onclick="window.setMajlisCategory('saved', this)">⭐ محفوظ کردہ</button>
       </div>
       <div class="jm-font-controls">
         <button type="button" class="jm-font-btn" onclick="window.changeMajlisFont(0.08)">A+</button>
@@ -8544,13 +8562,100 @@ window.openViewer = function(url, title) {
   <div class="jm-body" id="jmBlocksContainer">لوڈ ہو رہا ہے...</div>
 </div>
 
+<!-- Smart Lughat Popup -->
+<div id="jmLughatSheet">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+    <span id="jmLughatWord" style="color:#facc15; font-size:1.15rem; font-weight:bold;"></span>
+    <button type="button" onclick="document.getElementById('jmLughatSheet').style.display='none'" style="background:none; border:none; color:#f87171; font-size:1.1rem; cursor:pointer;">✕</button>
+  </div>
+  <div id="jmLughatMeaning" style="font-size:0.95rem; color:#ecfdf5; line-height:1.9; margin-bottom:8px;"></div>
+  <div style="display:flex; gap:8px; justify-content:flex-end;">
+    <a id="jmRekhtaLink" href="#" target="_blank" style="background:rgba(250,204,21,0.18); border:1px solid #facc15; color:#fde047; padding:3px 10px; border-radius:10px; font-size:0.76rem; text-decoration:none;">📖 ریختہ لغت میں مزید دیکھیں</a>
+  </div>
+</div>
+
+<!-- Double Tap Special Studio Modal -->
+<div id="jmDoubleTapModal" onclick="if(event.target===this)this.style.display='none'">
+  <div class="jm-dt-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(250,204,21,0.3); padding-bottom:8px; margin-bottom:10px;">
+      <span id="jmDtTitle" style="color:#facc15; font-weight:bold; font-size:1rem;">✨ خاص علمی اقتباس کارڈ</span>
+      <button type="button" onclick="document.getElementById('jmDoubleTapModal').style.display='none'" style="background:none; border:none; color:#f87171; font-size:1.1rem; cursor:pointer;">✕</button>
+    </div>
+    <div id="jmDtPreview" style="background:rgba(0,0,0,0.45); border:1px solid rgba(250,204,21,0.4); border-radius:14px; padding:14px; font-size:1.02rem; line-height:2.1; max-height:240px; overflow-y:auto; margin-bottom:12px; color:#fff;"></div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
+      <button type="button" onclick="window.dtActionCopy()" style="background:#eab308; color:#1c1917; border:none; padding:7px 14px; border-radius:12px; font-weight:bold; cursor:pointer;">📋 مکمل حوالہ کاپی کریں</button>
+      <button type="button" onclick="window.dtActionBookmark()" style="background:rgba(16,185,129,0.25); border:1px solid #10b981; color:#a7f3d0; padding:7px 14px; border-radius:12px; font-weight:bold; cursor:pointer;">⭐ بُک مارک میں محفوظ کریں</button>
+      <button type="button" onclick="window.dtActionWhatsApp()" style="background:#22c55e; color:#052e16; border:none; padding:7px 14px; border-radius:12px; font-weight:bold; cursor:pointer;">💬 واٹس ایپ پر شیئر</button>
+    </div>
+  </div>
+</div>
+
 <script id="jamia-majlis-sync-engine">
 (function() {
   let majlisData = null;
   let activeCategory = "all";
-  let currentFontRem = 1.12;
+  let currentFontRem = 1.18;
+  let selectedBlockId = "tamheed_01";
   let activeMarks = [];
   let currentMarkIdx = -1;
+  let dtCurrentBlock = null;
+  let savedIds = JSON.parse(localStorage.getItem("jm_saved_blocks") || "[]");
+
+  // Built-in Fiqhi & Ilmi Urdu/Arabic Dictionary
+  const FIQHI_LUGHAT = {
+    "انحطاط": "تنزلی، زوال، معیار کا پہلے سے کم اور نیچے ہو جانا۔",
+    "اسلاف": "سلف کی جمع؛ گزرے ہوئے بزرگ، متقدمین علمائے کرام اور اکابرینِ امت۔",
+    "استنباط": "قرآن و حدیث کے دلائل میں غور و فکر کر کے شرعی مسائل اور احکام نکالنا۔",
+    "محدثین": "حدیثِ پاک کے ماہر علما جو روایات کی سند اور متن پر گہری نظر رکھتے ہیں۔",
+    "فقہا": "فقیہ کی جمع؛ شریعت کے باریک مسائل اور احکام کے ماہر علما۔",
+    "مجتہدین": "وہ اعلیٰ درجے کے فقہا جو اصولِ شرع سے براہِ راست مسائل مستنبط کرنے کی اہلیت رکھتے ہیں۔",
+    "للہیت": "ہر عمل خالص اللہ تعالیٰ کی رضا اور خوشنودی کے لیے کرنا، اخلاص۔",
+    "عند": "نزدیک، پاس (جیسے 'عند اللہ' یعنی اللہ تعالیٰ کے نزدیک)۔",
+    "مقلد": "کسی مجتہد امام کی تحقیق پر بھروسہ کرتے ہوئے اس کی پیروی کرنے والا۔",
+    "تخصص": "فقہ و افتا میں اعلیٰ درجے کی خصوصی مشق اور مہارت حاصل کرنا۔",
+    "علت": "وہ سبب یا حکمت جس کی بنا پر کوئی شرعی حکم نافذ کیا گیا ہو۔",
+    "علل": "علت کی جمع؛ اسباب اور حکمتیں۔",
+    "منطبق": "چسپاں کرنا، کسی قاعدے یا مسئلے کو دوسری صورت پر لاگو کرنا۔",
+    "جزئیہ": "فقہ کی کتابوں میں بیان کردہ کسی خاص مسئلے کی ذیلی صورت یا حکم۔",
+    "جزئیات": "جزئیہ کی جمع؛ فقہی مسائل کی ذیلی شاخیں اور تفصیلی احکام۔",
+    "انتساب": "نسبت کرنا، کسی بزرگ کی طرف منسوب کرنا۔",
+    "تشنگان": "پیاسے؛ علمی پیاس رکھنے والے طلبہ اور علما۔",
+    "سبقت": "آگے بڑھ جانا؛ 'سبقتِ لسانی' یعنی ارادے کے بغیر زبان سے اچانک کوئی دوسرا لفظ نکل جانا۔",
+    "صریح": "بالکل واضح اور کھلا ہوا جس میں کسی تاویل کی گنجائش نہ ہو۔",
+    "تجدید": "نیا کرنا؛ 'تجدیدِ ایمان' یعنی توبہ کر کے دوبارہ کلمۂ شہادت پڑھنا۔",
+    "ساقط": "ختم ہو جانا، ذمے سے اتر جانا (جیسے عذر کی وجہ سے قیام کا ساقط ہونا)۔",
+    "قعود": "نماز میں التحیات کی حالت میں بیٹھنا۔",
+    "واجب": "وہ شرعی حکم جس کا عمل لازم ہو اور بلا عذر چھوڑنے پر گناہ ہو۔",
+    "تحری": "شرعی معاملے میں غالب گمان تک پہنچنے کے لیے خوب غور و فکر کرنا۔",
+    "اکتفا": "کافی سمجھنا، اسی قدر پر بس کرنا۔",
+    "قدیم": "جو ہمیشہ سے ہو اور جس کی کوئی ابتدا نہ ہو (اللہ تعالیٰ کی ذات اور صفات)۔",
+    "حادث": "جو پہلے نہ ہو اور بعد میں پیدا ہوا ہو (مخلوق، کاغذ، روشنائی اور ہماری آواز)۔",
+    "مصحف": "قرآنِ کریم کا لکھا ہوا نسخہ۔",
+    "تلقن": "'تلقن بالخارج' یعنی نماز کے باہر کسی شخص کے بتانے یا لقمہ دینے سے بات لینا۔",
+    "فاسق": "اعلانیہ گناہِ کبیرہ کرنے والا یا واجب ترک کرنے والا (جیسے داڑھی منڈانے یا کتروا کر ایک مشت سے کم کرنے والا)۔",
+    "مکروہ": "'مکروہِ تحریمی' وہ عمل جو حرام کے قریب ہو اور جس کے کرنے سے نماز واجب الاعادہ ہوتی ہے۔",
+    "تکفیر": "کسی شخص پر کفر کا شرعی حکم لگانا۔",
+    "مانع": "روکنے والا، رکاوٹ بننے والی چیز۔",
+    "سواد": "'سوادِ اعظم' یعنی مسلمانوں کی سب سے بڑی اور حق پر قائم جماعت (اہلِ سنت و جماعت)۔",
+    "لحوم": "لحم کی جمع؛ گوشت۔",
+    "فروج": "فرج کی جمع؛ نکاح اور عصمت کے معاملات۔",
+    "اجماعی": "جس مسئلے پر تمام مجتہدین اور علمائے امت کا اتفاق ہو۔",
+    "اصالتا": "اصل قاعدے کے اعتبار سے۔",
+    "اجارہ": "کرائے یا اجرت پر کسی کی خدمات حاصل کرنے کا شرعی عقد۔",
+    "مجہول": "انجان، نامعلوم (جیسے ایسی اجرت جس کی مقدار پہلے سے طے نہ ہو)۔",
+    "منصوص": "وہ شرعی حکم جو قرآن، حدیث یا فقہ کی صریح عبارت سے ثابت ہو۔",
+    "ہبہ": "بلا معاوضہ کسی کو کوئی چیز بطورِ تحفہ یا عطیہ مالک بنا کر دینا۔",
+    "ناظرا": "قرآنِ کریم کو دیکھ کر پڑھنا۔",
+    "اجیر": "مزدور یا وہ شخص جس کے وقت اور خدمت کو اجرت پر لیا گیا ہو۔",
+    "مسبوق": "وہ نمازی جس کی امام کے ساتھ ابتدائی ایک یا چند رکعتیں چھوٹ گئی ہوں۔",
+    "سہوا": "بھولے سے، بلا ارادہ۔",
+    "مستور": "'مستور الحال' وہ شخص جس کی ظاہری حالت مسلمانی کی ہو اگرچہ باطنی عدالت معلوم نہ ہو۔",
+    "تیقن": "مکمل یقین اور پختہ علم۔"
+  };
+
+  function cleanWord(w) {
+    return w.replace(/[،۔؟!:"'()\[\]«»ـ\s]/g, "").replace(/ۂ/g, "ہ").trim();
+  }
 
   function escapeRegExp(str) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -8563,18 +8668,19 @@ window.openViewer = function(url, title) {
     const btn = document.createElement("div");
     btn.id = "openMajlisReaderBtn";
     btn.className = "filter-tag";
-    btn.style.cssText = "border-color:#fbbf24; color:#fde68a; background:rgba(245,158,11,0.18); font-weight:bold;";
-    btn.innerHTML = "📖 فقہی مجلس (مکمل متن و مسائل)";
+    btn.style.cssText = "border-color:#facc15; color:#fef08a; background:rgba(234,179,8,0.2); font-weight:bold;";
+    btn.innerHTML = "📖 فقہی مجلس (تمہیدی خطاب و سوال و جواب)";
     btn.onclick = window.openFiqhiMajlisReader;
     filterBar.insertBefore(btn, filterBar.firstChild);
   }
 
   window.closeFiqhiMajlisReader = function() {
     document.getElementById("jamiaMajlisModal").style.display = "none";
+    document.getElementById("jmLughatSheet").style.display = "none";
   };
 
   window.changeMajlisFont = function(delta) {
-    currentFontRem = Math.min(1.65, Math.max(0.88, +(currentFontRem + delta).toFixed(2)));
+    currentFontRem = Math.min(1.75, Math.max(0.92, +(currentFontRem + delta).toFixed(2)));
     document.getElementById("jamiaMajlisModal").style.setProperty("--jm-font-size", currentFontRem + "rem");
   };
 
@@ -8591,22 +8697,92 @@ window.openViewer = function(url, title) {
     window.filterMajlisBlocks();
   };
 
-  window.copyMajlisCard = function(idx, btnEl) {
-    if (!majlisData || !majlisData.blocks[idx]) return;
-    const b = majlisData.blocks[idx];
-    const fullTxt = b.title + "\n\n" + (b.paragraphs ? b.paragraphs.join("\n\n") : b.text);
-    navigator.clipboard.writeText(fullTxt).then(function() {
-      const old = btnEl.innerText;
-      btnEl.innerText = "✓ کاپی ہو گیا";
-      setTimeout(function() { btnEl.innerText = old; }, 1500);
-    });
+  // Word Tap -> Open Lughat Sheet
+  window.onMajlisWordClick = function(ev, rawWord) {
+    ev.stopPropagation();
+    const cw = cleanWord(rawWord);
+    if (!cw || cw.length < 2) return;
+
+    document.querySelectorAll(".jm-word.word-active").forEach(function(el) { el.classList.remove("word-active"); });
+    ev.target.classList.add("word-active");
+
+    let meaning = FIQHI_LUGHAT[cw];
+    if (!meaning) {
+      // Partial stem match check
+      for (const k in FIQHI_LUGHAT) {
+        if (cw.includes(k) || k.includes(cw)) {
+          meaning = FIQHI_LUGHAT[k];
+          break;
+        }
+      }
+    }
+    if (!meaning) {
+      meaning = "اس لفظ کی مزید ادبی و فقہی تشریح دیکھنے کے لیے نیچے ریختہ لغت کے بٹن پر کلک کریں۔";
+    }
+
+    document.getElementById("jmLughatWord").innerText = "📘 لفظ: «" + cw + "»";
+    document.getElementById("jmLughatMeaning").innerText = meaning;
+    document.getElementById("jmRekhtaLink").href = "https://www.rekhtadictionary.com/search?keyword=" + encodeURIComponent(cw);
+    document.getElementById("jmLughatSheet").style.display = "block";
   };
 
-  window.shareMajlisCardWA = function(idx) {
+  // 1-Tap & 2-Tap Handler on Paragraph/Card
+  let lastTapTime = 0;
+  let lastTapId = "";
+
+  window.onMajlisBlockTap = function(idx) {
     if (!majlisData || !majlisData.blocks[idx]) return;
     const b = majlisData.blocks[idx];
-    const fullTxt = "*" + b.title + "*\n\n" + (b.paragraphs ? b.paragraphs.join("\n\n") : b.text);
-    window.open("https://wa.me/?text=" + encodeURIComponent(fullTxt), "_blank");
+    const now = Date.now();
+
+    // Always highlight Golden on 1st tap
+    selectedBlockId = b.id;
+    document.querySelectorAll(".jm-block").forEach(function(el) {
+      el.classList.remove("golden-selected");
+    });
+    const activeEl = document.getElementById("jmb_" + b.id);
+    if (activeEl) activeEl.classList.add("golden-selected");
+
+    // Check if Double Tap (within 340ms on same card)
+    if (lastTapId === b.id && (now - lastTapTime) < 340) {
+      dtCurrentBlock = b;
+      document.getElementById("jmDtTitle").innerText = "✨ " + b.title;
+      document.getElementById("jmDtPreview").innerText = b.text.replace(/\*\*/g, "");
+      document.getElementById("jmDoubleTapModal").style.display = "flex";
+      lastTapTime = 0;
+      return;
+    }
+
+    lastTapId = b.id;
+    lastTapTime = now;
+  };
+
+  window.dtActionCopy = function() {
+    if (!dtCurrentBlock) return;
+    const txt = "✨ *" + dtCurrentBlock.title + "*\n\n" + dtCurrentBlock.text.replace(/\*\*/g, "") + "\n\n— ماخوذ از: فقہی مجلس (حضرت مفتی بلال احمد رضوی صاحب)";
+    navigator.clipboard.writeText(txt);
+    alert("مکمل علمی اقتباس کاپی ہو گیا!");
+  };
+
+  window.dtActionBookmark = function() {
+    if (!dtCurrentBlock) return;
+    const idx = savedIds.indexOf(dtCurrentBlock.id);
+    if (idx === -1) {
+      savedIds.push(dtCurrentBlock.id);
+      alert("⭐ یہ پیراگراف 'محفوظ کردہ' فہرست میں شامل ہو گیا!");
+    } else {
+      savedIds.splice(idx, 1);
+      alert("محفوظ فہرست سے ہٹا دیا گیا۔");
+    }
+    localStorage.setItem("jm_saved_blocks", JSON.stringify(savedIds));
+    document.getElementById("jmDoubleTapModal").style.display = "none";
+    if (activeCategory === "saved") window.filterMajlisBlocks();
+  };
+
+  window.dtActionWhatsApp = function() {
+    if (!dtCurrentBlock) return;
+    const txt = "✨ *" + dtCurrentBlock.title + "*\n\n" + dtCurrentBlock.text.replace(/\*\*/g, "") + "\n\n— فقہی مجلس (مفتی بلال احمد رضوی صاحب)";
+    window.open("https://wa.me/?text=" + encodeURIComponent(txt), "_blank");
   };
 
   window.jumpMajlisMatch = function(step) {
@@ -8639,6 +8815,15 @@ window.openViewer = function(url, title) {
     window.filterMajlisBlocks();
   };
 
+  function wrapWordsForLughat(paragraphHtml, hasSearchQuery) {
+    if (hasSearchQuery) return paragraphHtml;
+    return paragraphHtml.split(/(\s+|<[^>]+>)/g).map(function(tok) {
+      if (!tok || tok.startsWith("<") || /^\s+$/.test(tok)) return tok;
+      const safeW = tok.replace(/'/g, "");
+      return '<span class="jm-word" onclick="window.onMajlisWordClick(event, \'' + safeW + '\')">' + tok + '</span>';
+    }).join("");
+  }
+
   window.filterMajlisBlocks = function() {
     if (!majlisData) return;
     const rawQ = (document.getElementById("jmSearchInput").value || "").trim();
@@ -8652,13 +8837,11 @@ window.openViewer = function(url, title) {
     const htmlParts = [];
 
     majlisData.blocks.forEach(function(b, idx) {
-      if (activeCategory !== "all" && b.category !== activeCategory) {
-        return;
-      }
-      const combinedBlockText = b.title + " " + (b.paragraphs ? b.paragraphs.join(" ") : b.text);
-      if (q && !combinedBlockText.toLowerCase().includes(q)) {
-        return;
-      }
+      if (activeCategory === "saved" && !savedIds.includes(b.id)) return;
+      if (activeCategory !== "all" && activeCategory !== "saved" && b.category !== activeCategory) return;
+
+      const combined = b.title + " " + b.text;
+      if (q && !combined.toLowerCase().includes(q)) return;
 
       let dispTitle = b.title;
       if (rawQ) {
@@ -8666,37 +8849,38 @@ window.openViewer = function(url, title) {
         dispTitle = dispTitle.replace(reg, '<mark class="jm-hl">$1</mark>');
       }
 
-      const paras = b.paragraphs && b.paragraphs.length ? b.paragraphs : b.text.split(/\n\n+/);
-      const paraHtml = paras.map(function(p) {
+      const subParas = b.text.split(/\n\n+/);
+      const paraHtml = subParas.map(function(p) {
         let dp = p
-          .replace(/\*\*([^*]+)\*\*/g, "<b style='color:#00ffa3;'>$1</b>")
-          .replace(/^سائل:/, "<span class='jm-sail-badge'>سائل:</span>")
-          .replace(/^مجیب:/, "<span class='jm-mujeeb-badge'>مجیب (مفتی بلال احمد رضوی صاحب):</span>");
+          .replace(/\*\*سائل:\*\*/g, "<span class='jm-sail-label'>سائل:</span>")
+          .replace(/\*\*مجیب:\*\*/g, "<span class='jm-mujeeb-label'>مجیب:</span>")
+          .replace(/\*\*([^*]+)\*\*/g, "<b style='color:#facc15;'>$1</b>")
+          .replace(/\n/g, "<br>");
 
         if (rawQ) {
           const reg = new RegExp("(" + escapeRegExp(rawQ) + ")", "gi");
           dp = dp.replace(reg, '<mark class="jm-hl">$1</mark>');
+        } else {
+          dp = wrapWordsForLughat(dp, false);
         }
         return '<div class="jm-para">' + dp + '</div>';
       }).join("");
 
-      const cardClass = (b.category === "tamheed") ? "jm-block tamheed-card" : "jm-block";
+      const isGolden = (b.id === selectedBlockId) ? " golden-selected" : "";
+      const isSaved = savedIds.includes(b.id) ? " ⭐" : "";
 
       htmlParts.push(
-        '<div class="' + cardClass + '" id="jmb_' + b.id + '">' +
+        '<div class="jm-block' + isGolden + '" id="jmb_' + b.id + '" onclick="window.onMajlisBlockTap(' + idx + ')">' +
           '<div class="jm-block-header">' +
-            '<div class="jm-block-title">' + dispTitle + '</div>' +
-            '<div class="jm-card-actions">' +
-              '<button type="button" class="jm-act-btn" onclick="window.copyMajlisCard(' + idx + ', this)">📋 کاپی</button>' +
-              '<button type="button" class="jm-act-btn" style="color:#4ade80; border-color:rgba(74,222,128,0.4);" onclick="window.shareMajlisCardWA(' + idx + ')">💬 واٹس ایپ</button>' +
-            '</div>' +
+            '<div class="jm-block-title">' + dispTitle + isSaved + '</div>' +
+            '<span style="font-size:0.72rem; color:#94a3b8;">1 ٹیپ: گولڈن | 2 ٹیپ: خاص مینو</span>' +
           '</div>' +
           '<div>' + paraHtml + '</div>' +
         '</div>'
       );
     });
 
-    container.innerHTML = htmlParts.length ? htmlParts.join("") : '<div style="text-align:center; padding:35px; color:#94a3b8;">اس لفظ سے کوئی نتیجہ نہیں ملا۔</div>';
+    container.innerHTML = htmlParts.length ? htmlParts.join("") : '<div style="text-align:center; padding:35px; color:#94a3b8;">کوئی نتیجہ نہیں ملا۔</div>';
 
     activeMarks = Array.from(container.querySelectorAll("mark.jm-hl"));
     currentMarkIdx = -1;
