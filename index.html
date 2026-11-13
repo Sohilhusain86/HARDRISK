@@ -8400,49 +8400,70 @@ window.openViewer = function(url, title) {
 
 
 
+
+
+
 <style id="jamia-majlis-sync-css">
   #jamiaMajlisModal {
     position: fixed; inset: 0; background: #02120c; z-index: 2147483645;
     display: none; flex-direction: column; direction: rtl; color: #ecfdf5;
+    font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', sans-serif;
   }
   .jm-header {
     background: linear-gradient(135deg, #063726, #021a12); padding: 10px 14px;
-    border-bottom: 1.5px solid #00ffa3; display: flex; flex-wrap: wrap;
-    align-items: center; justify-content: space-between; gap: 8px;
+    border-bottom: 1.5px solid #00ffa3; display: flex; flex-direction: column; gap: 8px;
+  }
+  .jm-top-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
   }
   .jm-search {
-    flex: 1; min-width: 180px; background: rgba(0,0,0,0.55); border: 1.5px solid #00ffa3;
-    color: #fff; padding: 8px 14px; border-radius: 18px; font-size: 0.86rem; outline: none;
+    flex: 1; background: rgba(0,0,0,0.55); border: 1.5px solid #00ffa3;
+    color: #fff; padding: 8px 14px; border-radius: 18px; font-size: 0.88rem; outline: none;
+  }
+  .jm-tabs {
+    display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px;
+  }
+  .jm-tab {
+    background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(0, 255, 163, 0.4);
+    color: #a7f3d0; padding: 4px 12px; border-radius: 14px; font-size: 0.78rem;
+    cursor: pointer; white-space: nowrap; transition: all 0.2s;
+  }
+  .jm-tab.active {
+    background: #00ffa3; color: #022c22; font-weight: bold; border-color: #00ffa3;
   }
   .jm-body {
-    flex: 1; overflow-y: auto; padding: 12px 12px 125px 12px; scroll-behavior: smooth;
+    flex: 1; overflow-y: auto; padding: 14px 14px 60px 14px; scroll-behavior: smooth;
   }
   .jm-block {
-    background: rgba(255,255,255,0.04); border: 1px solid rgba(16,185,129,0.28);
-    border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; cursor: pointer;
-    transition: all 0.2s ease; line-height: 1.95; font-size: 0.95rem;
-  }
-  .jm-block.golden-active {
-    background: rgba(245, 158, 11, 0.22) !important;
-    border: 2px solid #fbbf24 !important;
-    box-shadow: 0 0 22px rgba(251, 191, 36, 0.38);
+    background: rgba(255,255,255,0.035); border: 1px solid rgba(16,185,129,0.28);
+    border-radius: 14px; padding: 14px 16px; margin-bottom: 12px;
+    line-height: 2.15; font-size: 0.98rem;
   }
   .jm-block-title {
-    color: #00ffa3; font-weight: bold; font-size: 0.86rem; margin-bottom: 6px;
-    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    color: #fbbf24; font-weight: bold; font-size: 0.92rem; margin-bottom: 8px;
+    padding-bottom: 6px; border-bottom: 1px dashed rgba(251, 191, 36, 0.3);
   }
-  .jm-block.golden-active .jm-block-title { color: #fbbf24; }
   mark.jm-hl {
     background: #fde047; color: #022c22; padding: 1px 5px;
-    border-radius: 5px; font-weight: bold; box-shadow: 0 0 8px rgba(253,224,71,0.7);
+    border-radius: 5px; font-weight: bold;
   }
+  /* Audio bar ko chhupana */
+  #emeraldAudioBar { display: none !important; }
 </style>
 
 <div id="jamiaMajlisModal">
   <div class="jm-header">
-    <button type="button" onclick="window.closeFiqhiMajlisReader()" style="background:#ef4444; color:#fff; border:none; padding:6px 14px; border-radius:12px; font-weight:bold; cursor:pointer;">✕ بند کریں</button>
-    <input type="text" id="jmSearchInput" class="jm-search" placeholder="🔍 کوئی بھی لفظ تلاش کریں (مثلاً: کرسی، نکاح، خون، پرفیوم)..." oninput="window.filterMajlisBlocks()">
-    <span id="jmSearchMatchInfo" style="font-size:0.76rem; color:#fde047; font-weight:bold;"></span>
+    <div class="jm-top-row">
+      <button type="button" onclick="window.closeFiqhiMajlisReader()" style="background:#ef4444; color:#fff; border:none; padding:6px 14px; border-radius:12px; font-weight:bold; cursor:pointer; white-space:nowrap;">✕ بند کریں</button>
+      <input type="text" id="jmSearchInput" class="jm-search" placeholder="🔍 کوئی بھی مسئلہ یا لفظ تلاش کریں (مثلاً: کرسی، نکاح، خون، پرفیوم)..." oninput="window.filterMajlisBlocks()">
+      <span id="jmSearchMatchInfo" style="font-size:0.76rem; color:#fde047; font-weight:bold; white-space:nowrap;"></span>
+    </div>
+    <div class="jm-tabs">
+      <button type="button" class="jm-tab active" data-cat="all" onclick="window.setMajlisCategory('all', this)">📚 مکمل مجلس</button>
+      <button type="button" class="jm-tab" data-cat="roodad" onclick="window.setMajlisCategory('roodad', this)">🕌 آغازِ محفل و نظامت</button>
+      <button type="button" class="jm-tab" data-cat="tamheed" onclick="window.setMajlisCategory('tamheed', this)">🎙️ تمہیدی خطاب</button>
+      <button type="button" class="jm-tab" data-cat="qa" onclick="window.setMajlisCategory('qa', this)">❓ سوال و جواب</button>
+    </div>
   </div>
   <div class="jm-body" id="jmBlocksContainer">لوڈ ہو رہا ہے...</div>
 </div>
@@ -8450,15 +8471,7 @@ window.openViewer = function(url, title) {
 <script id="jamia-majlis-sync-engine">
 (function() {
   let majlisData = null;
-  let currentBlockIndex = -1;
-
-  function formatTime(sec) {
-    const h = Math.floor(sec / 3600);
-    const m = Math.floor((sec % 3600) / 60);
-    const s = Math.floor(sec % 60);
-    if (h > 0) return h + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
-    return m + ":" + String(s).padStart(2, "0");
-  }
+  let activeCategory = "all";
 
   function escapeRegExp(str) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -8472,7 +8485,7 @@ window.openViewer = function(url, title) {
     btn.id = "openMajlisReaderBtn";
     btn.className = "filter-tag";
     btn.style.cssText = "border-color:#fbbf24; color:#fde68a; background:rgba(245,158,11,0.16); font-weight:bold;";
-    btn.innerHTML = "🎙️ فقہی مجلس (سوال و جواب)";
+    btn.innerHTML = "📖 فقہی مجلس (روداد و سوال و جواب)";
     btn.onclick = window.openFiqhiMajlisReader;
     filterBar.insertBefore(btn, filterBar.firstChild);
   }
@@ -8481,9 +8494,18 @@ window.openViewer = function(url, title) {
     document.getElementById("jamiaMajlisModal").style.display = "none";
   };
 
+  window.setMajlisCategory = function(cat, el) {
+    activeCategory = cat;
+    document.querySelectorAll(".jm-tab").forEach(function(t) { t.classList.remove("active"); });
+    if (el) el.classList.add("active");
+    window.filterMajlisBlocks();
+  };
+
   window.openFiqhiMajlisReader = async function() {
     const modal = document.getElementById("jamiaMajlisModal");
     modal.style.display = "flex";
+    const audio = document.getElementById("globalHtmlAudio");
+    if (audio) { audio.pause(); }
     if (!majlisData) {
       try {
         const res = await fetch("/fiqhi_majlis_db.json?v=" + Date.now());
@@ -8496,43 +8518,6 @@ window.openViewer = function(url, title) {
     window.filterMajlisBlocks();
   };
 
-  // Play the exact physical MP3 clip for the tapped paragraph/question (starts at 0:00 of that clip!)
-  window.playMajlisClipByIndex = function(idx) {
-    if (!majlisData || !majlisData.blocks[idx]) return;
-    currentBlockIndex = idx;
-    const block = majlisData.blocks[idx];
-
-    document.querySelectorAll(".jm-block.golden-active").forEach(function(el) {
-      el.classList.remove("golden-active");
-    });
-    const activeEl = document.getElementById("jmb_" + block.id);
-    if (activeEl) {
-      activeEl.classList.add("golden-active");
-      activeEl.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-
-    const audio = document.getElementById("globalHtmlAudio");
-    const bar = document.getElementById("emeraldAudioBar");
-    const titleEl = document.getElementById("audioPlayerTitle");
-    if (!audio) return;
-
-    if (bar) bar.style.display = "flex";
-    if (titleEl) titleEl.innerText = block.title;
-
-    audio.dataset.currentId = block.id;
-    audio.src = block.clip_url;
-    audio.currentTime = 0;
-    audio.play().catch(function(){});
-
-    // When this paragraph's clip finishes, automatically play & highlight the next paragraph!
-    audio.onended = function() {
-      const modal = document.getElementById("jamiaMajlisModal");
-      if (modal && modal.style.display === "flex" && currentBlockIndex + 1 < majlisData.blocks.length) {
-        window.playMajlisClipByIndex(currentBlockIndex + 1);
-      }
-    };
-  };
-
   window.filterMajlisBlocks = function() {
     if (!majlisData) return;
     const rawQ = (document.getElementById("jmSearchInput").value || "").trim();
@@ -8543,16 +8528,21 @@ window.openViewer = function(url, title) {
     let matchCount = 0;
     const htmlParts = [];
 
-    majlisData.blocks.forEach(function(b, idx) {
+    majlisData.blocks.forEach(function(b) {
+      if (activeCategory !== "all" && b.category !== activeCategory) {
+        return;
+      }
       if (q && !(b.title + " " + b.text).toLowerCase().includes(q)) {
         return;
       }
       matchCount++;
 
       let dispTitle = b.title;
-      let dispText = b.text.replace(/\*\*([^*]+)\*\*/g, "<b style='color:#fde68a;'>$1</b>");
+      let dispText = b.text
+        .replace(/\*\*([^*]+)\*\*/g, "<b style='color:#00ffa3;'>$1</b>")
+        .replace(/^(سائل:)/gm, "<b style='color:#38bdf8;'>$1</b>")
+        .replace(/^(مجیب:)/gm, "<b style='color:#fbbf24;'>$1</b>");
 
-      // Highlight searched word in bright yellow <mark class="jm-hl">
       if (rawQ) {
         const reg = new RegExp("(" + escapeRegExp(rawQ) + ")", "gi");
         dispTitle = dispTitle.replace(reg, '<mark class="jm-hl">$1</mark>');
@@ -8560,11 +8550,10 @@ window.openViewer = function(url, title) {
       }
 
       dispText = dispText.replace(/\n/g, "<br>");
-      const isAct = (idx === currentBlockIndex) ? " golden-active" : "";
 
       htmlParts.push(
-        '<div class="jm-block' + isAct + '" id="jmb_' + b.id + '" onclick="window.playMajlisClipByIndex(' + idx + ')">' +
-          '<div class="jm-block-title"><span>' + dispTitle + '</span><span style="background:rgba(0,255,163,0.15); border:1px solid rgba(0,255,163,0.4); padding:2px 9px; border-radius:10px; font-size:0.75rem; white-space:nowrap;">▶ ' + formatTime(b.start) + '</span></div>' +
+        '<div class="jm-block" id="jmb_' + b.id + '">' +
+          '<div class="jm-block-title">' + dispTitle + '</div>' +
           '<div>' + dispText + '</div>' +
         '</div>'
       );
@@ -8573,10 +8562,9 @@ window.openViewer = function(url, title) {
     container.innerHTML = htmlParts.length ? htmlParts.join("") : '<div style="text-align:center; padding:30px; color:#94a3b8;">اس لفظ سے کوئی نتیجہ نہیں ملا۔</div>';
 
     if (infoEl) {
-      infoEl.innerText = rawQ ? (matchCount + " نتائج ملے") : "";
+      infoEl.innerText = rawQ ? (matchCount + " نتائج") : "";
     }
 
-    // Automatically scroll to the first highlighted word when searching
     if (rawQ) {
       const firstMark = container.querySelector("mark.jm-hl");
       if (firstMark) {
