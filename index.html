@@ -8391,6 +8391,9 @@ window.openViewer = function(url, title) {
 </script>
 
 
+
+
+
 <style id="jamia-majlis-sync-css">
   #jamiaMajlisModal {
     position: fixed; inset: 0; background: #02120c; z-index: 2147483645;
@@ -8402,20 +8405,15 @@ window.openViewer = function(url, title) {
     align-items: center; justify-content: space-between; gap: 8px;
   }
   .jm-search {
-    flex: 1; min-width: 180px; background: rgba(0,0,0,0.45); border: 1px solid #00ffa3;
-    color: #fff; padding: 7px 12px; border-radius: 18px; font-size: 0.84rem;
+    flex: 1; min-width: 190px; background: rgba(0,0,0,0.45); border: 1px solid #00ffa3;
+    color: #fff; padding: 8px 14px; border-radius: 18px; font-size: 0.85rem;
   }
-  .jm-part-btn {
-    background: rgba(255,255,255,0.08); border: 1px solid #10b981; color: #a7f3d0;
-    padding: 5px 12px; border-radius: 14px; font-size: 0.78rem; font-weight: bold; cursor: pointer;
-  }
-  .jm-part-btn.active { background: #00ffa3; color: #022c22; }
   .jm-body {
-    flex: 1; overflow-y: auto; padding: 14px; scroll-behavior: smooth;
+    flex: 1; overflow-y: auto; padding: 14px 14px 110px 14px; scroll-behavior: smooth;
   }
   .jm-block {
     background: rgba(255,255,255,0.04); border: 1px solid rgba(16,185,129,0.25);
-    border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; cursor: pointer;
+    border-radius: 14px; padding: 13px 15px; margin-bottom: 12px; cursor: pointer;
     transition: all 0.25s ease; line-height: 1.95; font-size: 0.95rem;
   }
   .jm-block:hover { border-color: #00ffa3; }
@@ -8425,20 +8423,16 @@ window.openViewer = function(url, title) {
     box-shadow: 0 0 20px rgba(251, 191, 36, 0.28);
   }
   .jm-block-title {
-    color: #00ffa3; font-weight: bold; font-size: 0.92rem; margin-bottom: 6px;
-    display: flex; justify-content: space-between; align-items: center;
+    color: #00ffa3; font-weight: bold; font-size: 0.92rem; margin-bottom: 8px;
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
   }
   .jm-block.golden-active .jm-block-title { color: #fbbf24; }
 </style>
 
 <div id="jamiaMajlisModal">
   <div class="jm-header">
-    <button type="button" onclick="document.getElementById('jamiaMajlisModal').style.display='none'" style="background:#ef4444; color:#fff; border:none; padding:6px 12px; border-radius:12px; font-weight:bold; cursor:pointer;">✕ بند کریں</button>
-    <input type="text" id="jmSearchInput" class="jm-search" placeholder="🔍 کوئی بھی مسئلہ یا لفظ تلاش کریں (مثلاً: کرسی، نکاح، خون)..." oninput="window.filterMajlisBlocks()">
-    <div style="display:flex; gap:6px;">
-      <button type="button" id="jmPart1Btn" class="jm-part-btn active" onclick="window.switchMajlisAudioPart(1)">🎧 حصہ اول (روداد)</button>
-      <button type="button" id="jmPart2Btn" class="jm-part-btn" onclick="window.switchMajlisAudioPart(2)">🎧 حصہ دوم (سوال و جواب)</button>
-    </div>
+    <button type="button" onclick="window.closeFiqhiMajlisReader()" style="background:#ef4444; color:#fff; border:none; padding:6px 14px; border-radius:12px; font-weight:bold; cursor:pointer;">✕ بند کریں</button>
+    <input type="text" id="jmSearchInput" class="jm-search" placeholder="🔍 کوئی بھی مسئلہ تلاش کریں (مثلاً: کرسی، نکاح، خون، پرفیوم)..." oninput="window.filterMajlisBlocks()">
   </div>
   <div class="jm-body" id="jmBlocksContainer">لوڈ ہو رہا ہے...</div>
 </div>
@@ -8446,8 +8440,16 @@ window.openViewer = function(url, title) {
 <script id="jamia-majlis-sync-engine">
 (function() {
   let majlisData = null;
-  let activePart = 1;
   let lastHighlightedId = "";
+  let isMajlisAudioLocked = false;
+
+  function formatTime(sec) {
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = Math.floor(sec % 60);
+    if (h > 0) return h + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+    return m + ":" + String(s).padStart(2, "0");
+  }
 
   function injectOpenMajlisBtn() {
     if (document.getElementById("openMajlisReaderBtn")) return;
@@ -8457,10 +8459,15 @@ window.openViewer = function(url, title) {
     btn.id = "openMajlisReaderBtn";
     btn.className = "filter-tag";
     btn.style.cssText = "border-color:#fbbf24; color:#fde68a; background:rgba(245,158,11,0.16); font-weight:bold;";
-    btn.innerHTML = "🎙️ فقہی مجلس (آڈیو + متن)";
+    btn.innerHTML = "🎙️ فقہی مجلس (سوال و جواب)";
     btn.onclick = window.openFiqhiMajlisReader;
     filterBar.insertBefore(btn, filterBar.firstChild);
   }
+
+  window.closeFiqhiMajlisReader = function() {
+    document.getElementById("jamiaMajlisModal").style.display = "none";
+    isMajlisAudioLocked = false;
+  };
 
   window.openFiqhiMajlisReader = async function() {
     const modal = document.getElementById("jamiaMajlisModal");
@@ -8475,34 +8482,39 @@ window.openViewer = function(url, title) {
       }
     }
     window.filterMajlisBlocks();
-    if (majlisData.audio_parts && majlisData.audio_parts["1"]) {
-      window.switchMajlisAudioPart(1, false);
-    }
-  };
-
-  window.switchMajlisAudioPart = function(partNum, autoPlay = true) {
-    activePart = partNum;
-    document.getElementById("jmPart1Btn").classList.toggle("active", partNum === 1);
-    document.getElementById("jmPart2Btn").classList.toggle("active", partNum === 2);
-    if (!majlisData || !majlisData.audio_parts) return;
-    const partInfo = majlisData.audio_parts[String(partNum)];
-    if (partInfo && partInfo.drive_id && typeof window.playAudio === "function") {
-      window.playAudio(partInfo.drive_id, partInfo.label);
+    isMajlisAudioLocked = true;
+    if (majlisData.drive_id && typeof window.playAudio === "function") {
+      window.playAudio(majlisData.drive_id, "فقہی مجلس: مفتی بلال احمد رضوی صاحب");
       const audio = document.getElementById("globalHtmlAudio");
-      if (audio && !autoPlay) audio.pause();
+      if (audio) {
+        audio.pause();
+        audio.currentTime = majlisData.min_sec || 1286;
+      }
     }
   };
 
-  window.playMajlisBlockAt = function(partNum, startSec) {
+  window.playMajlisBlockAt = function(startSec) {
+    if (!majlisData) return;
+    isMajlisAudioLocked = true;
     const audio = document.getElementById("globalHtmlAudio");
-    if (activePart !== partNum) {
-      window.switchMajlisAudioPart(partNum, true);
-      setTimeout(function() {
-        if (audio) { audio.currentTime = startSec; audio.play().catch(function(){}); }
-      }, 600);
-    } else if (audio) {
+    if (!audio) return;
+
+    if (!audio.src || !audio.src.includes(majlisData.drive_id)) {
+      if (typeof window.playAudio === "function") {
+        window.playAudio(majlisData.drive_id, "فقہی مجلس: مفتی بلال احمد رضوی صاحب");
+      }
+    }
+
+    const seekAndPlay = function() {
       audio.currentTime = startSec;
-      audio.play().catch(function(){});
+      audio.play().catch(function() {});
+    };
+
+    if (audio.readyState >= 1) {
+      seekAndPlay();
+    } else {
+      audio.addEventListener("loadedmetadata", seekAndPlay, { once: true });
+      audio.play().catch(function() {});
     }
   };
 
@@ -8516,23 +8528,39 @@ window.openViewer = function(url, title) {
     });
 
     container.innerHTML = filtered.map(function(b) {
-      const formattedText = b.text.replace(/\n/g, "<br>");
-      return '<div class="jm-block" id="jmb_' + b.id + '" data-part="' + b.part + '" data-start="' + b.start + '" data-end="' + b.end + '" onclick="window.playMajlisBlockAt(' + b.part + ', ' + b.start + ')">' +
-        '<div class="jm-block-title"><span>' + b.title + '</span><span style="font-size:0.75rem; opacity:0.85;">▶ حصہ ' + (b.part === 1 ? 'اول' : 'دوم') + ' (' + Math.floor(b.start/60) + ':' + String(Math.floor(b.start%60)).padStart(2,'0') + ')</span></div>' +
+      const formattedText = b.text
+        .replace(/\*\*([^*]+)\*\*/g, "<b style='color:#fde68a;'>$1</b>")
+        .replace(/\n/g, "<br>");
+      return '<div class="jm-block" id="jmb_' + b.id + '" onclick="window.playMajlisBlockAt(' + b.start + ')">' +
+        '<div class="jm-block-title"><span>' + b.title + '</span><span style="background:rgba(0,255,163,0.14); padding:2px 8px; border-radius:10px; font-size:0.75rem; white-space:nowrap;">▶ ' + formatTime(b.start) + '</span></div>' +
         '<div>' + formattedText + '</div>' +
       '</div>';
     }).join("");
   };
 
-  // Live Golden Highlight & Auto-Scroll during audio playback
+  // Strict Audio Boundary Lock (Prevents playing noisy intro before 21:26 or outro after 02:19:10) + Live Highlight
   setInterval(function() {
-    const modal = document.getElementById("jamiaMajlisModal");
     const audio = document.getElementById("globalHtmlAudio");
-    if (!modal || modal.style.display !== "flex" || !audio || audio.paused || !majlisData) return;
+    if (!audio || !majlisData) return;
+
+    const isPlayingThisMajlis = isMajlisAudioLocked || (audio.dataset.currentId && audio.dataset.currentId.includes(majlisData.drive_id));
+    if (isPlayingThisMajlis) {
+      const minS = majlisData.min_sec || 1286;
+      const maxS = majlisData.max_sec || 8350;
+      if (audio.currentTime < minS - 1) {
+        audio.currentTime = minS;
+      } else if (audio.currentTime >= maxS) {
+        audio.pause();
+        audio.currentTime = minS;
+      }
+    }
+
+    const modal = document.getElementById("jamiaMajlisModal");
+    if (!modal || modal.style.display !== "flex" || audio.paused) return;
 
     const cur = audio.currentTime;
     const match = majlisData.blocks.find(function(b) {
-      return b.part === activePart && cur >= b.start && cur <= b.end;
+      return cur >= b.start && cur < b.end;
     });
 
     if (match && match.id !== lastHighlightedId) {
@@ -8546,7 +8574,7 @@ window.openViewer = function(url, title) {
         activeEl.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     }
-  }, 500);
+  }, 400);
 
   document.addEventListener("DOMContentLoaded", injectOpenMajlisBtn);
   setInterval(injectOpenMajlisBtn, 1200);
