@@ -8382,11 +8382,11 @@ window.openViewer = function(url, title) {
     if (typeof origPlayAudio === "function") {
       origPlayAudio.apply(this, arguments);
     }
-    setTimeout(updateAudioFavButtonUI, 150);
+    setTimeout(updateAudioFavButtonUI, 100); setTimeout(updateAudioFavButtonUI, 400);
   };
 
   document.addEventListener("DOMContentLoaded", updateAudioFavButtonUI);
-  setInterval(updateAudioFavButtonUI, 600);
+  // setInterval removed for zero lag
 })();
 </script>
 
