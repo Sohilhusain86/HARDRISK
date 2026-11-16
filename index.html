@@ -4581,17 +4581,80 @@ window.openViewer = function(url, title) {
   <button class="u-btn" onclick="openJamiaAdminStats()" title="Admin Analytics">📊</button>
 </div>
 
-<div id="jamiaAdminModal">
-  <div class="ja-box">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-      <h3 style="margin:0; font-size:16px; color:#10b981;">📊 لائیو وزٹرز اور استعمال ریکارڈ</h3>
-      <div>
-        <button onclick="loadJamiaAdminLogs()" style="background:#0284c7; color:#fff; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:12px;">🔄 Refresh</button>
-        <button onclick="document.getElementById('jamiaAdminModal').style.display='none'" style="background:#ef4444; color:#fff; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:12px; margin-left:5px;">✕</button>
+<div id="jamiaAdminModal" dir="rtl">
+  <div class="ja-box" style="max-width:720px; border:1px solid #10b981; box-shadow:0 10px 35px rgba(0,0,0,0.75);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #334155; padding-bottom:10px;">
+      <h3 style="margin:0; font-size:16px; color:#10b981;">👑 ایڈمن کنٹرول پینل (Admin Suite)</h3>
+      <div style="display:flex; gap:6px;">
+        <button type="button" onclick="window.refreshAllJamiaAdmin()" style="background:#0284c7; color:#fff; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:12px;">🔄 ریفریش</button>
+        <button type="button" onclick="document.getElementById('jamiaAdminModal').style.display='none'" style="background:#ef4444; color:#fff; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:12px;">✕ بند کریں</button>
       </div>
     </div>
-    <div id="jaSummary" style="font-size:12px; color:#94a3b8; margin-bottom:10px;">لوڈ ہو رہا ہے...</div>
-    <div id="jaList"></div>
+
+    <!-- 5 Admin Feature Tabs -->
+    <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px;">
+      <button type="button" class="ja-tab-btn active" onclick="window.switchJamiaAdminTab('stats', this)" style="flex:1; min-width:110px; background:#10b981; color:#022c22; border:none; padding:7px 10px; border-radius:8px; font-weight:bold; font-size:12px; cursor:pointer;">📊 اعداد و شمار</button>
+      <button type="button" class="ja-tab-btn" onclick="window.switchJamiaAdminTab('add', this)" style="flex:1; min-width:110px; background:#0f172a; color:#cbd5e1; border:1px solid #334155; padding:7px 10px; border-radius:8px; font-weight:bold; font-size:12px; cursor:pointer;">➕ کتاب/نعت شامل کریں</button>
+      <button type="button" class="ja-tab-btn" onclick="window.switchJamiaAdminTab('ticker', this)" style="flex:1; min-width:110px; background:#0f172a; color:#cbd5e1; border:1px solid #334155; padding:7px 10px; border-radius:8px; font-weight:bold; font-size:12px; cursor:pointer;">📢 اعلان پٹی</button>
+      <button type="button" class="ja-tab-btn" onclick="window.switchJamiaAdminTab('reqs', this)" style="flex:1; min-width:110px; background:#0f172a; color:#cbd5e1; border:1px solid #334155; padding:7px 10px; border-radius:8px; font-weight:bold; font-size:12px; cursor:pointer;">📩 فرمائشیں</button>
+      <button type="button" class="ja-tab-btn" onclick="window.switchJamiaAdminTab('pin', this)" style="flex:1; min-width:110px; background:#0f172a; color:#cbd5e1; border:1px solid #334155; padding:7px 10px; border-radius:8px; font-weight:bold; font-size:12px; cursor:pointer;">📌 پن / چھپائیں</button>
+    </div>
+
+    <!-- TAB 1: PORTAL STATS & LIVE VISITORS -->
+    <div id="jaTab_stats" class="ja-tab-pane">
+      <div id="jaPortalOverview" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:8px; margin-bottom:12px;"></div>
+      <div id="jaSummary" style="font-size:12px; color:#94a3b8; margin-bottom:10px;">لوڈ ہو رہا ہے...</div>
+      <div id="jaList" style="max-height:330px; overflow-y:auto;"></div>
+    </div>
+
+    <!-- TAB 2: DIRECT ADD BOOK / NAAT -->
+    <div id="jaTab_add" class="ja-tab-pane" style="display:none;">
+      <div style="background:#0f172a; border:1px solid #334155; border-radius:10px; padding:12px; margin-bottom:12px;">
+        <h4 style="margin:0 0 10px 0; color:#38bdf8; font-size:14px;">➕ نئی کتاب یا آڈیو نعت شامل کریں</h4>
+        <input id="jaAddTitle" type="text" placeholder="کتاب یا نعت کا مکمل عنوان..." style="width:100%; box-sizing:border-box; padding:8px 10px; margin-bottom:8px; border-radius:8px; border:1px solid #334155; background:#1e293b; color:#fff; font-size:12px;">
+        <input id="jaAddDrive" type="text" placeholder="گوگل ڈرائیو لنک یا File ID..." style="width:100%; box-sizing:border-box; padding:8px 10px; margin-bottom:8px; border-radius:8px; border:1px solid #334155; background:#1e293b; color:#fff; font-size:12px; direction:ltr;">
+        <div style="display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
+          <input id="jaAddAuthor" type="text" placeholder="مؤلف / نعت خواں کا نام..." style="flex:1; min-width:150px; padding:8px 10px; border-radius:8px; border:1px solid #334155; background:#1e293b; color:#fff; font-size:12px;">
+          <select id="jaAddCategory" style="flex:1; min-width:140px; padding:8px 10px; border-radius:8px; border:1px solid #334155; background:#1e293b; color:#fff; font-size:12px;">
+            <option value="islamic">📚 دینی و فقہی کتاب (PDF)</option>
+            <option value="darsi">📖 درسی کتاب (PDF)</option>
+            <option value="fatawa">📜 فتاویٰ (PDF)</option>
+            <option value="papers">📝 امتحانی پرچہ (PDF)</option>
+            <option value="naat">🎙️ آڈیو نعت شریف (MP3)</option>
+          </select>
+        </div>
+        <button type="button" onclick="window.adminAddCustomItem()" style="width:100%; background:#10b981; color:#022c22; border:none; padding:9px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:13px;">✅ پورٹل میں شامل کریں</button>
+      </div>
+      <div id="jaCustomAddedList" style="max-height:240px; overflow-y:auto;"></div>
+    </div>
+
+    <!-- TAB 3: LIVE ANNOUNCEMENT TICKER EDITOR -->
+    <div id="jaTab_ticker" class="ja-tab-pane" style="display:none;">
+      <div style="background:#0f172a; border:1px solid #334155; border-radius:10px; padding:12px;">
+        <h4 style="margin:0 0 8px 0; color:#facc15; font-size:14px;">📢 اوپر چلنے والی اعلان پٹی (Live Ticker)</h4>
+        <p style="margin:0 0 8px 0; font-size:11px; color:#94a3b8;">یہاں جو عبارت لکھیں گے وہ پورٹل کے اوپر والی اعلان پٹی میں فوراً چلنے لگے گی:</p>
+        <textarea id="jaTickerInput" rows="4" placeholder="اعلان کی عبارت یہاں درج کریں..." style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid #334155; background:#1e293b; color:#fff; font-size:12.5px; line-height:1.6; margin-bottom:10px;"></textarea>
+        <div style="display:flex; gap:8px;">
+          <button type="button" onclick="window.adminSaveTicker(false)" style="flex:1; background:#10b981; color:#022c22; border:none; padding:9px; border-radius:8px; font-weight:bold; cursor:pointer;">💾 اعلان محفوظ و نافذ کریں</button>
+          <button type="button" onclick="window.adminSaveTicker(true)" style="background:#475569; color:#fff; border:none; padding:9px 14px; border-radius:8px; cursor:pointer;">🔄 اصلی اعلان بحال کریں</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: STUDENT REQUESTS INBOX -->
+    <div id="jaTab_reqs" class="ja-tab-pane" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <h4 style="margin:0; color:#34d399; font-size:14px;">📩 طلبہ کی فرمائشیں (Requests Inbox)</h4>
+        <button type="button" onclick="window.adminClearDoneRequests()" style="background:#ef4444; color:#fff; border:none; padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer;">🗑️ مکمل شدہ صاف کریں</button>
+      </div>
+      <div id="jaRequestsInboxList" style="max-height:340px; overflow-y:auto;"></div>
+    </div>
+
+    <!-- TAB 5: PIN & HIDE ITEMS CONTROL -->
+    <div id="jaTab_pin" class="ja-tab-pane" style="display:none;">
+      <input id="jaPinSearchInput" type="text" oninput="window.renderAdminPinHideList()" placeholder="کسی بھی کتاب یا نعت کو تلاش کر کے پن (Pin) یا چھپائیں (Hide)..." style="width:100%; box-sizing:border-box; padding:9px 12px; margin-bottom:10px; border-radius:8px; border:1px solid #334155; background:#0f172a; color:#fff; font-size:12px;">
+      <div id="jaPinHideList" style="max-height:340px; overflow-y:auto;"></div>
+    </div>
   </div>
 </div>
 
@@ -6481,7 +6544,10 @@ window.openViewer = function(url, title) {
       const titleNorm = String(item.title || "").trim().toLowerCase();
       const cat = (typeof window.classifyJamiaItem === "function") ? window.classifyJamiaItem(item) : (item.category || "islamic");
 
-      if (cat === "naat" || item.type === "audio" || item.category === "naat") {
+      const isBookCat = ["islamic", "darsi", "papers", "fatawa", "math", "hindi"].includes(String(item.category || "").toLowerCase());
+      const isPdfFile = (item.type === "pdf") || /\.pdf$/i.test(String(item.title || item.url || ""));
+      const isStrictAudio = (item.type === "audio" || item.category === "naat") && !isPdfFile && !isBookCat;
+      if (isStrictAudio) {
         const tLower = String(item.title || "").toLowerCase();
         let khwan = item.naatKhwan || "other";
         if (tLower.includes("asjad") || tLower.includes("عسجد") || tLower.includes("اسجد") || tLower.includes("असजद")) khwan = "asjad";
@@ -8901,6 +8967,345 @@ window.openViewer = function(url, title) {
 
   document.addEventListener("DOMContentLoaded", injectOpenMajlisBtn);
   setInterval(injectOpenMajlisBtn, 1200);
+})();
+</script>
+
+
+<script id="jamia-admin-suite-v1">
+(function() {
+  const CUSTOM_ITEMS_KEY = "jamia_admin_custom_items_v1";
+  const PINNED_IDS_KEY   = "jamia_admin_pinned_ids_v1";
+  const HIDDEN_IDS_KEY   = "jamia_admin_hidden_ids_v1";
+  const CUSTOM_TICKER_KEY = "jamia_admin_custom_ticker_v1";
+
+  function getJsonList(key) {
+    try {
+      const a = JSON.parse(localStorage.getItem(key) || "[]");
+      return Array.isArray(a) ? a : [];
+    } catch (e) { return []; }
+  }
+
+  function cleanDriveId(raw) {
+    const s = String(raw || "").trim();
+    const m = s.match(/[-\w]{25,}/);
+    return m ? m[0] : s;
+  }
+
+  // Apply custom ticker if saved
+  function applySavedTicker() {
+    const customTxt = localStorage.getItem(CUSTOM_TICKER_KEY);
+    const s1 = document.getElementById("tickerSeg1");
+    const s2 = document.getElementById("tickerSeg2");
+    if (!s1 || !s2) return;
+    if (!window._origJamiaTickerHtml) {
+      window._origJamiaTickerHtml = s1.innerHTML;
+    }
+    if (customTxt && customTxt.trim()) {
+      const formatted = " ✨ <b>اعلانِ خاص:</b> " + customTxt.trim() + " ✨ ";
+      s1.innerHTML = formatted;
+      s2.innerHTML = formatted;
+    } else if (window._origJamiaTickerHtml) {
+      s1.innerHTML = window._origJamiaTickerHtml;
+      s2.innerHTML = window._origJamiaTickerHtml;
+    }
+  }
+
+  // Hook getCleanJamiaLists so Admin Custom Items, Pinned IDs, and Hidden IDs work natively everywhere
+  window.addEventListener("DOMContentLoaded", function() {
+    applySavedTicker();
+
+    if (typeof window.getCleanJamiaLists === "function" && !window.getCleanJamiaLists._adminHooked) {
+      const origGetClean = window.getCleanJamiaLists;
+      window.getCleanJamiaLists = function() {
+        const customItems = getJsonList(CUSTOM_ITEMS_KEY);
+        if (customItems.length > 0 && typeof LIBRARY_DATA !== "undefined" && Array.isArray(LIBRARY_DATA)) {
+          const existingIds = new Set(LIBRARY_DATA.map(x => x && x.id));
+          customItems.forEach(ci => {
+            if (ci && ci.id && !existingIds.has(ci.id)) {
+              LIBRARY_DATA.unshift(ci);
+              existingIds.add(ci.id);
+            }
+          });
+        }
+
+        const res = origGetClean.apply(this, arguments);
+        const pinnedIds = new Set(getJsonList(PINNED_IDS_KEY));
+        const hiddenIds = new Set(getJsonList(HIDDEN_IDS_KEY));
+
+        function processArr(arr) {
+          if (!Array.isArray(arr)) return [];
+          const visible = arr.filter(item => item && !hiddenIds.has(item.id));
+          const pinned = visible.filter(item => pinnedIds.has(item.id));
+          const rest   = visible.filter(item => !pinnedIds.has(item.id));
+          return pinned.concat(rest);
+        }
+
+        return {
+          books: processArr(res.books),
+          naats: processArr(res.naats)
+        };
+      };
+      window.getCleanJamiaLists._adminHooked = true;
+    }
+  });
+
+  // Switch between the 5 Admin Tabs
+  window.switchJamiaAdminTab = function(tabKey, btnEl) {
+    document.querySelectorAll("#jamiaAdminModal .ja-tab-pane").forEach(p => p.style.display = "none");
+    const target = document.getElementById("jaTab_" + tabKey);
+    if (target) target.style.display = "block";
+
+    document.querySelectorAll("#jamiaAdminModal .ja-tab-btn").forEach(b => {
+      b.style.background = "#0f172a";
+      b.style.color = "#cbd5e1";
+    });
+    if (btnEl) {
+      btnEl.style.background = "#10b981";
+      btnEl.style.color = "#022c22";
+    }
+    window.refreshAllJamiaAdmin();
+  };
+
+  // Feature 1: Portal Stats Overview
+  function renderAdminPortalStats() {
+    const box = document.getElementById("jaPortalOverview");
+    if (!box || typeof window.getCleanJamiaLists !== "function") return;
+    const { books, naats } = window.getCleanJamiaLists();
+    const fatawaCount = books.filter(b => typeof window.isJamiaFatawaItem === "function" && window.isJamiaFatawaItem(b)).length;
+    const papersCount = books.filter(b => b.category === "papers").length;
+    const customCount = getJsonList(CUSTOM_ITEMS_KEY).length;
+    const reqsCount   = getJsonList("jamia_user_requests").length;
+
+    const cards = [
+      { label: "📚 کل کتب", val: books.length, color: "#38bdf8" },
+      { label: "🎙️ کل نعتیں", val: naats.length, color: "#10b981" },
+      { label: "📜 فتاویٰ", val: fatawaCount, color: "#facc15" },
+      { label: "📝 امتحانی پرچے", val: papersCount, color: "#f472b6" },
+      { label: "➕ ایڈمن اضافہ", val: customCount, color: "#a78bfa" },
+      { label: "📩 فرمائشیں", val: reqsCount, color: "#34d399" }
+    ];
+
+    box.innerHTML = cards.map(c => `
+      <div style="background:#0f172a; border:1px solid #334155; border-radius:10px; padding:8px; text-align:center;">
+        <div style="font-size:11px; color:#94a3b8;">${c.label}</div>
+        <div style="font-size:18px; font-weight:bold; color:${c.color}; margin-top:2px;">${c.val}</div>
+      </div>
+    `).join("");
+  }
+
+  // Feature 2: Direct Add Book / Naat
+  window.adminAddCustomItem = function() {
+    const title = (document.getElementById("jaAddTitle")?.value || "").trim();
+    const rawId = (document.getElementById("jaAddDrive")?.value || "").trim();
+    const author = (document.getElementById("jaAddAuthor")?.value || "").trim();
+    const cat = document.getElementById("jaAddCategory")?.value || "islamic";
+
+    if (!title || !rawId) {
+      alert("براہِ کرم عنوان اور گوگل ڈرائیو لنک/ID دونوں درج کریں!");
+      return;
+    }
+
+    const id = cleanDriveId(rawId);
+    const isAudio = (cat === "naat");
+    const newItem = {
+      id: id,
+      title: title,
+      author: author || (isAudio ? "بزمِ صوتیات • جامعۃ الرضا" : "جامعۃ الرضا اسلامک ریسرچ سینٹر"),
+      subtitle: isAudio ? "آڈیو نعت شریف • MP3" : "مکمل کتاب • مطالعہ و ڈاؤنلوڈ",
+      category: cat,
+      type: isAudio ? "audio" : "pdf",
+      size: isAudio ? "MP3 آڈیو" : "PDF",
+      pages: isAudio ? "MP3" : "مکمل",
+      allowDownload: true,
+      addedByAdmin: true
+    };
+
+    const list = getJsonList(CUSTOM_ITEMS_KEY).filter(x => x && x.id !== id);
+    list.unshift(newItem);
+    localStorage.setItem(CUSTOM_ITEMS_KEY, JSON.stringify(list));
+
+    document.getElementById("jaAddTitle").value = "";
+    document.getElementById("jaAddDrive").value = "";
+    document.getElementById("jaAddAuthor").value = "";
+
+    if (typeof window.filterLibrary === "function") window.filterLibrary();
+    window.refreshAllJamiaAdmin();
+    alert("✅ کامیابی کے ساتھ پورٹل میں شامل کر دیا گیا!");
+  };
+
+  window.adminRemoveCustomItem = function(id) {
+    const list = getJsonList(CUSTOM_ITEMS_KEY).filter(x => x && x.id !== id);
+    localStorage.setItem(CUSTOM_ITEMS_KEY, JSON.stringify(list));
+    if (typeof LIBRARY_DATA !== "undefined" && Array.isArray(LIBRARY_DATA)) {
+      const idx = LIBRARY_DATA.findIndex(x => x && x.id === id);
+      if (idx !== -1) LIBRARY_DATA.splice(idx, 1);
+    }
+    if (typeof window.filterLibrary === "function") window.filterLibrary();
+    window.refreshAllJamiaAdmin();
+  };
+
+  function renderAdminCustomList() {
+    const el = document.getElementById("jaCustomAddedList");
+    if (!el) return;
+    const list = getJsonList(CUSTOM_ITEMS_KEY);
+    if (!list.length) {
+      el.innerHTML = '<div style="text-align:center; color:#64748b; font-size:12px; padding:12px;">ابھی تک ایڈمن پینل سے کوئی اضافی کتاب یا نعت شامل نہیں کی گئی۔</div>';
+      return;
+    }
+    el.innerHTML = list.map(item => `
+      <div class="ja-row">
+        <div>
+          <b style="color:#f8fafc;">${item.title}</b>
+          <div style="font-size:10.5px; color:#94a3b8;">${item.type === 'audio' ? '🎙️ نعت' : '📚 کتاب'} • ID: ${item.id}</div>
+        </div>
+        <button type="button" onclick="window.adminRemoveCustomItem('${item.id}')" style="background:#ef4444; color:#fff; border:none; padding:4px 9px; border-radius:6px; font-size:11px; cursor:pointer;">حذف کریں</button>
+      </div>
+    `).join("");
+  }
+
+  // Feature 3: Live Announcement Ticker Editor
+  window.adminSaveTicker = function(resetToDefault) {
+    const inp = document.getElementById("jaTickerInput");
+    if (resetToDefault) {
+      localStorage.removeItem(CUSTOM_TICKER_KEY);
+      if (inp) inp.value = "";
+      applySavedTicker();
+      alert("✅ اصلی اعلان بحال کر دیا گیا!");
+      return;
+    }
+    const val = (inp ? inp.value : "").trim();
+    if (!val) {
+      alert("براہِ کرم اعلان کی عبارت لکھیں!");
+      return;
+    }
+    localStorage.setItem(CUSTOM_TICKER_KEY, val);
+    applySavedTicker();
+    alert("✅ نیا اعلان اوپر والی پٹی پر نافذ ہو گیا!");
+  };
+
+  // Feature 4: Student Requests Inbox
+  window.adminToggleReqDone = function(idx) {
+    const reqs = getJsonList("jamia_user_requests");
+    if (reqs[idx]) {
+      reqs[idx].done = !reqs[idx].done;
+      localStorage.setItem("jamia_user_requests", JSON.stringify(reqs));
+      window.refreshAllJamiaAdmin();
+    }
+  };
+
+  window.adminDeleteReq = function(idx) {
+    const reqs = getJsonList("jamia_user_requests");
+    reqs.splice(idx, 1);
+    localStorage.setItem("jamia_user_requests", JSON.stringify(reqs));
+    window.refreshAllJamiaAdmin();
+  };
+
+  window.adminClearDoneRequests = function() {
+    const reqs = getJsonList("jamia_user_requests").filter(r => !r.done);
+    localStorage.setItem("jamia_user_requests", JSON.stringify(reqs));
+    window.refreshAllJamiaAdmin();
+  };
+
+  function renderAdminRequestsInbox() {
+    const el = document.getElementById("jaRequestsInboxList");
+    if (!el) return;
+    const reqs = getJsonList("jamia_user_requests");
+    if (!reqs.length) {
+      el.innerHTML = '<div style="text-align:center; color:#64748b; font-size:12px; padding:16px;">کوئی فرمائش موجود نہیں ہے۔</div>';
+      return;
+    }
+    el.innerHTML = reqs.map((r, i) => `
+      <div class="ja-row" style="border-color:${r.done ? '#10b981' : '#334155'}; opacity:${r.done ? '0.75' : '1'};">
+        <div>
+          <b style="color:${r.done ? '#34d399' : '#f8fafc'}; text-decoration:${r.done ? 'line-through' : 'none'};">${i + 1}. ${r.item || ''}</b>
+          <div style="font-size:10.5px; color:#94a3b8;">طالب علم: ${r.user || 'نامعلوم'}</div>
+        </div>
+        <div style="display:flex; gap:5px;">
+          <button type="button" onclick="window.adminToggleReqDone(${i})" style="background:${r.done ? '#475569' : '#10b981'}; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-size:11px; cursor:pointer;">${r.done ? 'واپس کھولیں' : '✓ مکمل'}</button>
+          <button type="button" onclick="window.adminDeleteReq(${i})" style="background:#ef4444; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-size:11px; cursor:pointer;">✕</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  // Feature 5: Pin & Hide Items Control
+  window.adminTogglePinItem = function(id) {
+    const arr = getJsonList(PINNED_IDS_KEY);
+    const idx = arr.indexOf(id);
+    if (idx === -1) arr.unshift(id);
+    else arr.splice(idx, 1);
+    localStorage.setItem(PINNED_IDS_KEY, JSON.stringify(arr));
+    if (typeof window.filterLibrary === "function") window.filterLibrary();
+    window.renderAdminPinHideList();
+  };
+
+  window.adminToggleHideItem = function(id) {
+    const arr = getJsonList(HIDDEN_IDS_KEY);
+    const idx = arr.indexOf(id);
+    if (idx === -1) arr.push(id);
+    else arr.splice(idx, 1);
+    localStorage.setItem(HIDDEN_IDS_KEY, JSON.stringify(arr));
+    if (typeof window.filterLibrary === "function") window.filterLibrary();
+    window.renderAdminPinHideList();
+  };
+
+  window.renderAdminPinHideList = function() {
+    const el = document.getElementById("jaPinHideList");
+    if (!el) return;
+    const q = (document.getElementById("jaPinSearchInput")?.value || "").trim().toLowerCase();
+    const pinnedSet = new Set(getJsonList(PINNED_IDS_KEY));
+    const hiddenSet = new Set(getJsonList(HIDDEN_IDS_KEY));
+
+    const pool = [];
+    const seen = new Set();
+    const sources = [];
+    if (typeof LIBRARY_DATA !== "undefined" && Array.isArray(LIBRARY_DATA)) sources.push(...LIBRARY_DATA);
+    if (Array.isArray(window.ALL_BOOKS_CACHE)) sources.push(...window.ALL_BOOKS_CACHE);
+    if (Array.isArray(window.JAMIA_NAATS_LIST)) sources.push(...window.JAMIA_NAATS_LIST);
+
+    sources.forEach(item => {
+      if (!item || !item.id || item.isPlaceholderPin) return;
+      const cid = cleanDriveId(item.id);
+      if (seen.has(cid)) return;
+      seen.add(cid);
+      pool.push({ id: cid, title: String(item.title || "").trim(), type: item.type || "pdf" });
+    });
+
+    const filtered = pool.filter(it => {
+      if (!q) return pinnedSet.has(it.id) || hiddenSet.has(it.id) || pool.indexOf(it) < 25;
+      return it.title.toLowerCase().includes(q) || it.id.toLowerCase().includes(q);
+    }).slice(0, 40);
+
+    el.innerHTML = filtered.map(it => {
+      const isP = pinnedSet.has(it.id);
+      const isH = hiddenSet.has(it.id);
+      return `
+        <div class="ja-row" style="border-color:${isP ? '#facc15' : (isH ? '#ef4444' : '#334155')};">
+          <div style="max-width:65%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+            <b style="color:${isH ? '#94a3b8' : '#f8fafc'};">${it.title}</b>
+          </div>
+          <div style="display:flex; gap:5px;">
+            <button type="button" onclick="window.adminTogglePinItem('${it.id}')" style="background:${isP ? '#facc15' : '#1e293b'}; color:${isP ? '#022c22' : '#cbd5e1'}; border:1px solid #475569; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;">${isP ? '📌 پن شدہ' : '📌 پن کریں'}</button>
+            <button type="button" onclick="window.adminToggleHideItem('${it.id}')" style="background:${isH ? '#ef4444' : '#1e293b'}; color:#fff; border:1px solid #475569; padding:4px 8px; border-radius:6px; font-size:11px; cursor:pointer;">${isH ? '👁️ واپس دکھائیں' : '🙈 چھپائیں'}</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  };
+
+  window.refreshAllJamiaAdmin = function() {
+    renderAdminPortalStats();
+    renderAdminCustomList();
+    renderAdminRequestsInbox();
+    window.renderAdminPinHideList();
+    const tickerInp = document.getElementById("jaTickerInput");
+    if (tickerInp && !tickerInp.value) {
+      tickerInp.value = localStorage.getItem(CUSTOM_TICKER_KEY) || "";
+    }
+    if (typeof window.loadJamiaAdminLogs === "function") {
+      window.loadJamiaAdminLogs();
+    }
+  };
 })();
 </script>
 
