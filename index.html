@@ -1762,7 +1762,7 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
     
 
     const MASTER_PASSWORD = "78692";
-    const SESSION_EXPIRY_MS = 5 * 60 * 60 * 1000;
+    const SESSION_EXPIRY_MS = 100 * 365 * 24 * 60 * 60 * 1000;
     let currentZoom = 1.0;
     let currentCategory = 'all';
 
@@ -2335,14 +2335,9 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
     function checkActiveSession() {
       try {
         const savedName = localStorage.getItem('jamia_ula_name');
-        const savedExpiry = localStorage.getItem('jamia_ula_expiry');
-        const now = Date.now();
-
-        if (savedName && savedExpiry && now < parseInt(savedExpiry, 10)) {
+        if (savedName) {
+          localStorage.setItem('jamia_ula_expiry', String(Date.now() + 3153600000000));
           showDashboard(savedName);
-        } else {
-          localStorage.removeItem('jamia_ula_name');
-          localStorage.removeItem('jamia_ula_expiry');
         }
       } catch (_) {}
     }
@@ -5068,7 +5063,7 @@ window.openViewer = function(url, title) {
   function checkLoginRedDot() {
     var savedName = localStorage.getItem('jamia_ula_name');
     var savedExpiry = localStorage.getItem('jamia_ula_expiry');
-    var isLoggedIn = savedName && savedExpiry && (Date.now() < parseInt(savedExpiry, 10));
+    var isLoggedIn = Boolean(savedName);
     var dots = document.querySelectorAll('.red-dot, .notification-dot, #redDot, #notifDot, [id*="RedDot"], [class*="red-dot"]');
     dots.forEach(function(d) {
       if (!isLoggedIn) {
@@ -6305,7 +6300,7 @@ window.openViewer = function(url, title) {
 
     const savedName = localStorage.getItem("jamia_ula_name");
     const savedExpiry = parseInt(localStorage.getItem("jamia_ula_expiry") || "0", 10);
-    const isLogged = Boolean(savedName && savedExpiry > Date.now());
+    const isLogged = Boolean(savedName);
 
     if (isLogged) {
       openPendingSharedItem();
