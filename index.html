@@ -1981,8 +1981,31 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
     let isChunkLoading = false;
 
     function renderBooks(customList) {
-      if (typeof window.jamiaSortBooksArray === "function" && Array.isArray(customList)) { customList = window.jamiaSortBooksArray(customList); }
-      const booksToRender = customList || (typeof allBooks !== 'undefined' ? allBooks : (typeof books !== 'undefined' ? books : defaultBooks));
+      let rawList = customList || (typeof allBooks !== 'undefined' ? allBooks : (typeof books !== 'undefined' ? books : defaultBooks));
+      try {
+        const pinnedArr = JSON.parse(localStorage.getItem("jamia_admin_pinned_ids_v1") || "[]");
+        const hiddenArr = JSON.parse(localStorage.getItem("jamia_admin_hidden_ids_v1") || "[]");
+        const pinnedSet = new Set(Array.isArray(pinnedArr) ? pinnedArr : []);
+        const hiddenSet = new Set(Array.isArray(hiddenArr) ? hiddenArr : []);
+        if (Array.isArray(rawList)) {
+          rawList = rawList.filter(function(it) {
+            if (!it) return false;
+            const rawId = String(it.id || "");
+            const m = rawId.match(/[-\w]{25,}/);
+            const cleanId = m ? m[0] : rawId;
+            return !hiddenSet.has(rawId) && !hiddenSet.has(cleanId);
+          });
+          rawList = rawList.slice().sort(function(a, b) {
+            const idA = String((a && a.id) || "");
+            const idB = String((b && b.id) || "");
+            const pA = pinnedSet.has(idA) ? 0 : 1;
+            const pB = pinnedSet.has(idB) ? 0 : 1;
+            return pA - pB;
+          });
+        }
+      } catch (_) {}
+      if (typeof window.jamiaSortBooksArray === "function" && Array.isArray(rawList)) { rawList = window.jamiaSortBooksArray(rawList); }
+      const booksToRender = rawList;
       const grid = document.getElementById("books-list") || document.getElementById("booksGrid");
 
       // Auto-hide any loading indicator
@@ -2335,10 +2358,14 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
     function checkActiveSession() {
       try {
         const savedName = localStorage.getItem('jamia_ula_name');
-        if (savedName) {
-          localStorage.setItem('jamia_ula_expiry', String(Date.now() + 3153600000000));
-          showDashboard(savedName);
+        const nameInp = document.getElementById('user-name');
+        if (savedName && nameInp && !nameInp.value) {
+          nameInp.value = savedName;
         }
+        const authSec = document.getElementById('auth-section');
+        const contSec = document.getElementById('content-section');
+        if (authSec) authSec.style.display = 'block';
+        if (contSec) contSec.style.display = 'none';
       } catch (_) {}
     }
 
@@ -4960,16 +4987,17 @@ window.openViewer = function(url, title) {
   document.addEventListener("visibilitychange", syncWithServer);
 
   window.openJamiaAdminStats = function() {
-    if (sessionStorage.getItem("jamia_admin_ok") !== "1") {
-      const pin = prompt("ایڈمن پن کوڈ درج کریں (Admin PIN):");
-      if (pin !== "7860") {
-        alert("غلط پن کوڈ!");
-        return;
-      }
-      sessionStorage.setItem("jamia_admin_ok", "1");
+    const pin = prompt("ایڈمن پن کوڈ درج کریں (Admin PIN):");
+    if (String(pin || "").trim() !== "7860") {
+      alert("غلط پن کوڈ!");
+      return;
     }
     document.getElementById("jamiaAdminModal").style.display = "block";
-    window.loadJamiaAdminLogs();
+    if (typeof window.refreshAllJamiaAdmin === "function") {
+      window.refreshAllJamiaAdmin();
+    } else if (typeof window.loadJamiaAdminLogs === "function") {
+      window.loadJamiaAdminLogs();
+    }
   };
 
   window.loadJamiaAdminLogs = async function() {
