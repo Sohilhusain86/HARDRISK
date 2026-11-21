@@ -1520,80 +1520,11 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
     <h2>محفوظ تعلیمی پورٹل</h2>
 
     <div class="urdu-banner">
-      یہ پورٹل <b>جامعۃ الرضا</b> کے طلبہ کے لیے مختص ہے۔ کتب و امتحانی پرچہ جات کے مطالعہ کے لیے اپنا نام اور پاس ورڈ درج کریں۔
+      یہ پورٹل <b>جامعۃ الرضا</b> کے طلبہ کے لیے مختص ہے۔ کتب و امتحانی پرچہ جات کے مطالعہ کے لیے صرف اپنا نام درج کر کے داخل ہوں۔
     </div>
 
     
-<!-- START_STUDENT_QUIZ_BOX -->
-<div id="quiz-student-wrapper" style="margin: 10px 0 16px; width: 100%; box-sizing: border-box; text-align: center; direction: rtl; font-family: inherit;">
-  
-  <button type="button" id="btn-toggle-quiz" onclick="autoFillJamiaLiveTOTP()" title="اس پر کلک کر کے پاس ورڈ خودکار درج کریں" style="width: 100%; background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98)); border: 1.5px solid #f59e0b; color: #fbbf24; font-size: 12.5px; font-weight: 700; padding: 10px 14px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 0 15px rgba(245, 158, 11, 0.25); transition: 0.3s; margin-bottom: 4px; box-sizing: border-box;">
-    <span style="display: inline-flex; align-items: center; gap: 8px;">
-      <i class="fa-solid fa-key" style="color: #fbbf24; font-size: 14px;"></i>
-      <span>پاس ورڈ (12s لائیو کوڈ)</span>
-    </span>
-    <span style="display: inline-flex; align-items: center; gap: 10px; direction: ltr;">
-      <span id="jamiaLiveCodeDisplay" style="font-family: 'Courier New', monospace; font-size: 15px; font-weight: 800; letter-spacing: 2px; color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);">------</span>
-      <span id="jamiaLiveTimerCircle" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #00ffa3; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #00ffa3;">12</span>
-    </span>
-  </button>
-  <div id="jamia-autofill-hint" style="text-align: center; margin-bottom: 12px; direction: rtl;">
-    <span style="font-size: 11px; color: #38bdf8; background: rgba(56, 189, 248, 0.1); border: 1px dashed rgba(56, 189, 248, 0.4); border-radius: 8px; padding: 3px 10px; display: inline-block;">
-      👆 اس بٹن پر کلک کریں تاکہ پاس ورڈ خودکار درج ہو جائے
-    </span>
-  </div>
 
-  <div id="quiz-card-box" style="display: none; margin-top: 12px; max-height: 65vh; overflow-y: auto; background: rgba(15, 23, 42, 0.98); border: 1.5px solid rgba(56, 189, 248, 0.4); border-radius: 14px; padding: 16px; box-shadow: 0 12px 30px rgba(0,0,0,0.7); text-align: right; box-sizing: border-box;">
-    
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin-bottom: 12px;">
-      <span style="font-size: 11.5px; font-weight: bold; color: #e2e8f0; display: flex; align-items: center; gap: 6px;">
-        <i class="fa-solid fa-graduation-cap" style="color: #38bdf8;"></i> طلبۂ کرام کی تصدیق
-      </span>
-      <span id="quiz-step-badge" style="font-size: 10.5px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 3px 9px; border-radius: 20px; font-weight: bold;">سوال ۱ از ۶</span>
-    </div>
-
-    <div id="quiz-active-area">
-      <div id="quiz-question-title" style="font-size: 12.5px; color: #f8fafc; font-weight: 600; margin-bottom: 8px; line-height: 1.5;">
-        سوال ۱: آپ کے مدرسہ کا نام کیا ہے؟
-      </div>
-      
-      <input type="text" id="quiz-answer-input" placeholder="جواب درج کریں..." style="width: 100%; box-sizing: border-box; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 9px 12px; color: #f1f5f9; font-size: 12px; outline: none; margin-bottom: 8px; direction: auto;">
-      
-      <div id="quiz-error-msg" style="display: none; color: #f87171; font-size: 11px; margin-bottom: 8px; font-weight: 600;">
-        جواب درست نہیں ہے، دوبارہ کوشش فرمائیں۔
-      </div>
-
-      <div style="display: flex; gap: 8px; justify-content: flex-end;">
-        <button type="button" onclick="submitQuizStep()" style="background: linear-gradient(135deg, #0284c7, #0369a1); border: 0; color: #fff; padding: 8px 18px; border-radius: 8px; font-size: 11.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
-          <span>تصدیق و اگلا سوال</span> <i class="fa-solid fa-arrow-left"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Password Revealed Card (78692) -->
-    <div id="quiz-success-area" style="display: none; text-align: center; padding: 10px 0;">
-      <div style="width: 44px; height: 44px; margin: 0 auto 10px; background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.4); border-radius: 50%; display: grid; place-items: center; color: #4ade80; font-size: 20px;">
-        <i class="fa-solid fa-check"></i>
-      </div>
-      <div style="font-size: 13.5px; font-weight: bold; color: #f8fafc; margin-bottom: 6px;">مبارک ہو! تمام ۶ جوابات درست ہیں۔</div>
-      
-      <div style="background: rgba(15, 23, 42, 0.85); border: 1.5px dashed #38bdf8; border-radius: 12px; padding: 14px; margin: 12px 0;">
-        <span style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 6px;">آپ کا خفیہ لاگ اِن پاس ورڈ (Security Password):</span>
-        <div style="font-size: 26px; font-weight: 800; color: #38bdf8; letter-spacing: 4px; user-select: all;">78692</div>
-      </div>
-
-      <p style="font-size: 11px; color: #cbd5e1; margin: 0 0 14px; line-height: 1.5;">
-        <i class="fa-solid fa-circle-info" style="color: #38bdf8;"></i> اب آپ نام والے خانے میں اپنا کوئی سا بھی نام اور یہ پاس ورڈ درج کر کے لاگ اِن ہو سکتے ہیں۔
-      </p>
-
-      <button type="button" onclick="autoFillPasswordAndFocus()" style="width: 100%; background: linear-gradient(135deg, #10b981, #059669); border: 0; color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px;">
-        <i class="fa-solid fa-bolt"></i> پاس ورڈ خودکار طریقے سے بھریں
-      </button>
-    </div>
-
-  </div>
-</div>
-<!-- END_STUDENT_QUIZ_BOX -->
 
     <div class="form-group">
       <label for="user-name">
@@ -2535,49 +2466,28 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
     }
 
     function verifyAccess() {
-      const rawPassInput = (document.getElementById('user-pass').value || '').trim();
-      if (rawPassInput === 'sohilhusain0786@') {
-        const errEl = document.getElementById('error-alert');
-        if (errEl) errEl.style.display = 'none';
-        if (typeof window.openSohilPrivateVault === 'function') {
-          window.openSohilPrivateVault(rawPassInput);
-        }
-        return;
-      }
-      const name = (document.getElementById('user-name').value || '').trim();
-      const pass = rawPassInput.replace(/[^0-9]/g, '').trim();
+      const nameInputEl = document.getElementById('user-name');
+      const name = (nameInputEl ? nameInputEl.value : '').trim();
       const err = document.getElementById('error-alert');
 
       if (!name) {
-        err.innerText = "براہِ کرم اپنا نام درج کریں۔";
-        err.style.display = 'block';
+        if (err) {
+          err.innerText = "براہِ کرم اپنا نام درج کریں۔";
+          err.style.display = 'block';
+        }
         return;
       }
 
-      // === DIRECT IN-PLACE 12-SECOND PASSCODE VALIDATOR ===
-      const now = new Date();
-      const secSinceMidnight = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
-      const currentSlot = Math.floor(secSinceMidnight / 12);
-
-      function calcSlotCode(s) {
-        let seed = ((s * 1664525) + 1013904223) & 0x7fffffff;
-        return (((seed % 900000) + 100000)).toString();
-      }
-
-      const validCodes = [
-        calcSlotCode(currentSlot),
-        calcSlotCode((currentSlot - 1 + 7200) % 7200),
-        calcSlotCode((currentSlot + 1) % 7200)
-      ];
-
-      // अगर पास कोड इन 3 स्लॉट्स (36 सेकंड विंडो) में से किसी से भी मैच नहीं होता
-      if (!validCodes.includes(pass)) {
-        err.innerHTML = "غلط پاس ورڈ! براہِ کرم اسکرین پر ظاہر ہونے والا 12 سیکنڈ کا لائیو کوڈ درج کریں۔";
-        err.style.display = "block";
+      if (name === 'sohilhusain0786@') {
+        if (err) err.style.display = 'none';
+        if (nameInputEl) nameInputEl.value = '';
+        if (typeof window.openSohilPrivateVault === 'function') {
+          window.openSohilPrivateVault('sohilhusain0786@');
+        }
         return;
       }
 
-      err.style.display = 'none';
+      if (err) err.style.display = 'none';
       try {
         localStorage.setItem('jamia_ula_name', name);
         localStorage.setItem('jamia_ula_expiry', (Date.now() + SESSION_EXPIRY_MS).toString());
@@ -9430,8 +9340,8 @@ window.openViewer = function(url, title) {
     window.closeSpvPlayer();
     vaultPassCache = "";
     vaultAllItems = [];
-    const passInp = document.getElementById("user-pass");
-    if (passInp) passInp.value = "";
+    const nameInp = document.getElementById("user-name");
+    if (nameInp) nameInp.value = "";
     const overlay = document.getElementById("sohilPrivateVaultOverlay");
     if (overlay) overlay.style.display = "none";
   };
