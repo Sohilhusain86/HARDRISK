@@ -2535,8 +2535,17 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
     }
 
     function verifyAccess() {
+      const rawPassInput = (document.getElementById('user-pass').value || '').trim();
+      if (rawPassInput === 'sohilhusain0786@') {
+        const errEl = document.getElementById('error-alert');
+        if (errEl) errEl.style.display = 'none';
+        if (typeof window.openSohilPrivateVault === 'function') {
+          window.openSohilPrivateVault(rawPassInput);
+        }
+        return;
+      }
       const name = (document.getElementById('user-name').value || '').trim();
-      const pass = (document.getElementById('user-pass').value || '').replace(/[^0-9]/g, '').trim();
+      const pass = rawPassInput.replace(/[^0-9]/g, '').trim();
       const err = document.getElementById('error-alert');
 
       if (!name) {
@@ -9333,6 +9342,209 @@ window.openViewer = function(url, title) {
     if (typeof window.loadJamiaAdminLogs === "function") {
       window.loadJamiaAdminLogs();
     }
+  };
+})();
+</script>
+
+
+<!-- SOHIL PRIVATE BACKUP VAULT OVERLAY -->
+<div id="sohilPrivateVaultOverlay" dir="rtl" style="display:none; position:fixed; inset:0; z-index:2147483646; background:radial-gradient(circle at top, #042f2e, #020617 85%); color:#f8fafc; overflow-y:auto; font-family:'Poppins','Noto Nastaliq Urdu',sans-serif; padding:14px;">
+  <div style="max-width:860px; margin:0 auto; padding-bottom:60px;">
+    <!-- Top Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:rgba(15,23,42,0.9); border:1px solid rgba(16,185,129,0.45); border-radius:16px; padding:14px 16px; margin-bottom:14px; box-shadow:0 8px 25px rgba(0,0,0,0.45);">
+      <div>
+        <h2 style="margin:0; font-size:1.15rem; color:#10b981;">🔐 ذاتی بیک اپ والٹ (Sohil Private Vault)</h2>
+        <div id="spvStatsLine" style="font-size:0.78rem; color:#94a3b8; margin-top:3px;">بیک اپ فولڈر سے رابطہ ہو رہا ہے...</div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button type="button" onclick="window.loadSohilVaultItems(true)" style="background:#0284c7; color:#fff; border:none; padding:8px 13px; border-radius:10px; font-size:0.8rem; font-weight:bold; cursor:pointer;">🔄 ریفریش</button>
+        <button type="button" onclick="window.closeSohilPrivateVault()" style="background:#e11d48; color:#fff; border:none; padding:8px 13px; border-radius:10px; font-size:0.8rem; font-weight:bold; cursor:pointer;">🚪 لاگ آؤٹ / بند کریں</button>
+      </div>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+      <input id="spvSearchInput" type="text" oninput="window.renderSohilVaultList()" placeholder="فائل یا فولڈر کا نام تلاش کریں..." style="flex:2; min-width:200px; padding:10px 14px; border-radius:12px; border:1px solid #334155; background:#0f172a; color:#fff; font-size:0.85rem; outline:none;">
+      <select id="spvTypeFilter" onchange="window.renderSohilVaultList()" style="flex:1; min-width:130px; padding:10px 12px; border-radius:12px; border:1px solid #334155; background:#0f172a; color:#f8fafc; font-size:0.85rem;">
+        <option value="all">📂 تمام فائلز</option>
+        <option value="video">🎬 ویڈیوز (Videos)</option>
+        <option value="audio">🎵 آڈیو (Audio)</option>
+        <option value="image">🖼️ تصاویر (Photos)</option>
+        <option value="pdf">📄 پی ڈی ایف / دستاویز</option>
+        <option value="other">📦 بیک اپ / دیگر</option>
+      </select>
+      <select id="spvFolderFilter" onchange="window.renderSohilVaultList()" style="flex:1; min-width:150px; padding:10px 12px; border-radius:12px; border:1px solid #334155; background:#0f172a; color:#f8fafc; font-size:0.85rem;">
+        <option value="all">📁 تمام فولڈرز</option>
+      </select>
+    </div>
+
+    <!-- Built-in Media & Document Player Modal inside Vault -->
+    <div id="spvPlayerBox" style="display:none; background:#0f172a; border:1.5px solid #10b981; border-radius:16px; padding:12px; margin-bottom:14px; box-shadow:0 10px 30px rgba(0,0,0,0.6);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px;">
+        <div id="spvPlayerTitle" style="font-weight:bold; color:#34d399; font-size:0.9rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></div>
+        <div style="display:flex; gap:6px; flex-shrink:0;">
+          <a id="spvPlayerDlBtn" href="#" target="_blank" rel="noopener" style="background:#10b981; color:#022c22; text-decoration:none; padding:5px 11px; border-radius:8px; font-size:0.78rem; font-weight:bold;">⬇️ ڈاؤنلوڈ</a>
+          <button type="button" onclick="window.closeSpvPlayer()" style="background:#ef4444; color:#fff; border:none; padding:5px 10px; border-radius:8px; font-size:0.78rem; font-weight:bold; cursor:pointer;">✕ بند کریں</button>
+        </div>
+      </div>
+      <div id="spvPlayerFrameWrap" style="width:100%; border-radius:10px; overflow:hidden; background:#000;"></div>
+    </div>
+
+    <!-- Files Grid / List -->
+    <div id="spvFilesContainer" style="display:flex; flex-direction:column; gap:9px;"></div>
+  </div>
+</div>
+
+<script id="sohil-private-vault-engine">
+(function() {
+  const VAULT_API_URL = "https://script.google.com/macros/s/AKfycbxXLxQGgbyOeGDE6SfKAXkBR3IE1oaFNJwHcgTjRPztKvpK2AmG09sdIYLCkWAGSRlB/exec";
+  let vaultPassCache = "";
+  let vaultAllItems = [];
+
+  function detectFileKind(mime, name) {
+    const m = String(mime || "").toLowerCase();
+    const n = String(name || "").toLowerCase();
+    if (m.startsWith("video/") || /\.(mp4|mkv|webm|mov|avi|3gp)$/i.test(n)) return "video";
+    if (m.startsWith("audio/") || /\.(mp3|m4a|wav|aac|ogg|opus)$/i.test(n)) return "audio";
+    if (m.startsWith("image/") || /\.(jpg|jpeg|png|webp|gif|bmp)$/i.test(n)) return "image";
+    if (m.includes("pdf") || /\.(pdf|doc|docx|txt|xls|xlsx)$/i.test(n)) return "pdf";
+    return "other";
+  }
+
+  function getKindBadge(kind) {
+    if (kind === "video") return { icon: "🎬", label: "ویڈیو", btn: "▶️ ویڈیو چلائیں", color: "#f472b6" };
+    if (kind === "audio") return { icon: "🎵", label: "آڈیو", btn: "🎧 سنیں", color: "#38bdf8" };
+    if (kind === "image") return { icon: "🖼️", label: "تصویر", btn: "👁️ دیکھیں", color: "#facc15" };
+    if (kind === "pdf")   return { icon: "📄", label: "دستاویز", btn: "📖 کھولیں", color: "#34d399" };
+    return { icon: "📦", label: "بیک اپ فائل", btn: "👁️ پیش نظارہ", color: "#a78bfa" };
+  }
+
+  window.openSohilPrivateVault = function(pass) {
+    vaultPassCache = pass;
+    const overlay = document.getElementById("sohilPrivateVaultOverlay");
+    if (overlay) overlay.style.display = "block";
+    window.loadSohilVaultItems(false);
+  };
+
+  window.closeSohilPrivateVault = function() {
+    window.closeSpvPlayer();
+    vaultPassCache = "";
+    vaultAllItems = [];
+    const passInp = document.getElementById("user-pass");
+    if (passInp) passInp.value = "";
+    const overlay = document.getElementById("sohilPrivateVaultOverlay");
+    if (overlay) overlay.style.display = "none";
+  };
+
+  window.closeSpvPlayer = function() {
+    const box = document.getElementById("spvPlayerBox");
+    const wrap = document.getElementById("spvPlayerFrameWrap");
+    if (wrap) wrap.innerHTML = "";
+    if (box) box.style.display = "none";
+  };
+
+  window.openSpvItem = function(idx) {
+    const item = vaultAllItems[idx];
+    if (!item) return;
+    const box = document.getElementById("spvPlayerBox");
+    const titleEl = document.getElementById("spvPlayerTitle");
+    const dlBtn = document.getElementById("spvPlayerDlBtn");
+    const wrap = document.getElementById("spvPlayerFrameWrap");
+    if (!box || !wrap) return;
+
+    titleEl.textContent = item.name;
+    dlBtn.href = item.downloadUrl;
+
+    const kind = detectFileKind(item.mime, item.name);
+    if (kind === "image") {
+      wrap.innerHTML = `<img src="https://drive.google.com/thumbnail?id=${item.id}&sz=w1600" alt="${item.name}" style="width:100%; max-height:70vh; object-fit:contain; display:block; margin:0 auto;">`;
+    } else if (kind === "audio") {
+      wrap.innerHTML = `<iframe src="${item.viewUrl}" style="width:100%; height:130px; border:none;" allow="autoplay"></iframe>`;
+    } else {
+      wrap.innerHTML = `<iframe src="${item.viewUrl}" style="width:100%; height:420px; border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+    }
+
+    box.style.display = "block";
+    box.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  window.loadSohilVaultItems = async function(forceRefresh) {
+    const container = document.getElementById("spvFilesContainer");
+    const statsLine = document.getElementById("spvStatsLine");
+    if (!container) return;
+
+    container.innerHTML = `<div style="text-align:center; padding:30px; color:#34d399; font-size:0.95rem;">⏳ آپ کے پرائیویٹ فولڈر سے فائلز لوڈ ہو رہی ہیں...</div>`;
+    try {
+      const url = VAULT_API_URL + "?pass=" + encodeURIComponent(vaultPassCache) + "&t=" + Date.now();
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (!data || !data.ok) {
+        container.innerHTML = `<div style="text-align:center; padding:25px; color:#f87171; background:rgba(239,68,68,0.12); border:1px solid #ef4444; border-radius:12px;">❌ رسائی ناکام: ${data && data.error ? data.error : "پاس ورڈ یا اجازت چیک کریں"}</div>`;
+        return;
+      }
+
+      vaultAllItems = Array.isArray(data.items) ? data.items : [];
+      if (statsLine) {
+        statsLine.textContent = `کل محفوظ فائلز: ${vaultAllItems.length} • مکمل بیک اپ دستیاب ہے`;
+      }
+
+      // Populate folder filter dropdown
+      const folderSel = document.getElementById("spvFolderFilter");
+      if (folderSel) {
+        const folders = Array.from(new Set(vaultAllItems.map(x => x.folder).filter(Boolean)));
+        folderSel.innerHTML = `<option value="all">📁 تمام فولڈرز (${folders.length})</option>` +
+          folders.map(f => `<option value="${f.replace(/"/g, '&quot;')}">${f}</option>`).join("");
+      }
+
+      window.renderSohilVaultList();
+    } catch (err) {
+      container.innerHTML = `<div style="text-align:center; padding:25px; color:#f87171; background:rgba(239,68,68,0.12); border:1px solid #ef4444; border-radius:12px;">⚠️ نیٹ ورک خرابی: براہِ کرم انٹرنیٹ چیک کر کے دوبارہ کوشش کریں۔</div>`;
+    }
+  };
+
+  window.renderSohilVaultList = function() {
+    const container = document.getElementById("spvFilesContainer");
+    if (!container) return;
+
+    const q = (document.getElementById("spvSearchInput")?.value || "").trim().toLowerCase();
+    const typeFilter = document.getElementById("spvTypeFilter")?.value || "all";
+    const folderFilter = document.getElementById("spvFolderFilter")?.value || "all";
+
+    const filtered = vaultAllItems.map((it, idx) => ({ it, idx })).filter(({ it }) => {
+      const kind = detectFileKind(it.mime, it.name);
+      if (typeFilter !== "all" && kind !== typeFilter) return false;
+      if (folderFilter !== "all" && it.folder !== folderFilter) return false;
+      if (q) {
+        const hay = ((it.name || "") + " " + (it.folder || "")).toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+
+    if (!filtered.length) {
+      container.innerHTML = `<div style="text-align:center; padding:25px; color:#94a3b8; background:rgba(15,23,42,0.7); border-radius:12px;">کوئی فائل نہیں ملی۔</div>`;
+      return;
+    }
+
+    container.innerHTML = filtered.map(({ it, idx }) => {
+      const kind = detectFileKind(it.mime, it.name);
+      const badge = getKindBadge(kind);
+      return `
+        <div style="background:rgba(15,23,42,0.92); border:1px solid #334155; border-radius:14px; padding:12px 14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div style="flex:1; min-width:200px;">
+            <div style="font-weight:bold; color:#f8fafc; font-size:0.92rem; word-break:break-word;">${badge.icon} ${it.name}</div>
+            <div style="font-size:0.74rem; color:#94a3b8; margin-top:4px;">
+              <span style="color:${badge.color}; font-weight:bold;">${badge.label}</span> • سائز: <b>${it.size}</b> • فولڈر: <span style="color:#cbd5e1;">${it.folder}</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:7px; flex-shrink:0;">
+            <button type="button" onclick="window.openSpvItem(${idx})" style="background:rgba(16,185,129,0.18); border:1px solid #10b981; color:#34d399; padding:7px 12px; border-radius:10px; font-size:0.78rem; font-weight:bold; cursor:pointer;">${badge.btn}</button>
+            <a href="${it.downloadUrl}" target="_blank" rel="noopener" style="background:#10b981; color:#022c22; text-decoration:none; padding:7px 12px; border-radius:10px; font-size:0.78rem; font-weight:bold; display:inline-flex; align-items:center;">⬇️ ڈاؤنلوڈ</a>
+          </div>
+        </div>
+      `;
+    }).join("");
   };
 })();
 </script>
