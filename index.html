@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ur" dir="rtl">
-<head><script>localStorage.removeItem("jamia_offline_naats");if("serviceWorker" in navigator){navigator.serviceWorker.getRegistrations().then(r=>r.forEach(reg=>reg.unregister()));if(window.caches)caches.keys().then(k=>k.forEach(c=>caches.delete(c)));}</script>
+<head>
+<style>html, body { overscroll-behavior-y: contain !important; }</style><script>localStorage.removeItem("jamia_offline_naats");if("serviceWorker" in navigator){navigator.serviceWorker.getRegistrations().then(r=>r.forEach(reg=>reg.unregister()));if(window.caches)caches.keys().then(k=>k.forEach(c=>caches.delete(c)));}</script>
 
 
 
@@ -2283,9 +2284,14 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
     function checkActiveSession() {
       try {
         const savedName = localStorage.getItem('jamia_ula_name');
+        const savedExp = parseInt(localStorage.getItem('jamia_ula_expiry') || '0', 10);
         const nameInp = document.getElementById('user-name');
         if (savedName && nameInp && !nameInp.value && !nameInp.dataset.manuallyCleared) {
           nameInp.value = savedName;
+        }
+        if (savedName && savedExp > Date.now()) {
+          showDashboard(savedName);
+          return;
         }
         const authSec = document.getElementById('auth-section');
         const contSec = document.getElementById('content-section');
@@ -9639,8 +9645,12 @@ window.openViewer = function(url, title) {
       });
     }
 
-    const filterBtn = document.querySelector("button[onclick*='filterCategory']");
-    const filterContainer = (filterBtn && filterBtn.parentElement) || document.querySelector(".filter-tabs, .category-tabs, #categoryFilters");
+    let filterContainer = document.querySelector(".filter-tabs, .category-tabs, #categoryFilters");
+    if (!filterContainer) {
+      const allBtns = Array.from(document.querySelectorAll("#content-section button"));
+      const favBtn = allBtns.find(b => (b.textContent || "").includes("میری پسند") || (b.textContent || "").includes("فتاوی"));
+      if (favBtn) filterContainer = favBtn.parentElement;
+    }
     if (filterContainer && !document.getElementById("jamiaMyAppsTabBtn")) {
       const btn = document.createElement("button");
       btn.id = "jamiaMyAppsTabBtn";
