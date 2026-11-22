@@ -2952,6 +2952,15 @@ window.addEventListener("DOMContentLoaded", updateLive12sUI);
     <i class="fa-solid fa-arrow-down" style="font-size: 10px;"></i>
   </button>
 
+    <button type="button" id="fab-my-offline-apps-btn" onclick="if(typeof toggleFabMenu==='function')toggleFabMenu(); if(typeof window.openJamiaPublicApps==='function')window.openJamiaPublicApps();" class="fab-action-link" style="width: 100%; margin-top: 8px; border: 1.5px solid #38bdf8; background: rgba(12, 74, 110, 0.9); color: #7dd3fc; cursor: pointer; text-align: right; font-family: inherit;">
+    <span style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+      <span style="display: flex; align-items: center; gap: 8px;">
+        <i class="fa-brands fa-android" style="color: #34d399; font-size: 15px;"></i>
+        <span>ہماری آف لائن اینڈرائیڈ ایپس (Apps)</span>
+      </span>
+      <span style="font-size: 10px; background: rgba(56, 189, 248, 0.2); padding: 2px 7px; border-radius: 6px;">ڈاؤنلوڈ</span>
+    </span>
+  </button>
   <!-- WhatsApp 1 -->
   <a href="https://wa.me/919760833104?text=السلام%20علیکم%20ورحمۃ%20اللہ" target="_blank" rel="noopener" onclick="event.stopPropagation(); toggleFabMenu();" class="fab-action-link" style="background: rgba(6, 78, 59, 0.85); border: 1px solid #059669; color: #6ee7b7;">
     <span style="display: flex; align-items: center; gap: 8px;">
@@ -9432,7 +9441,7 @@ window.openViewer = function(url, title) {
     if (kind === "image") {
       wrap.innerHTML = '<img src="https://drive.google.com/thumbnail?id=' + item.id + '&sz=w2000" alt="" style="width:100%; max-height:75vh; object-fit:contain; display:block; margin:0 auto; background:#020617;">';
     } else if (kind === "video") {
-      wrap.innerHTML = '<video controls autoplay playsinline style="width:100%; max-height:65vh; display:block; background:#000;" poster="https://drive.google.com/thumbnail?id=' + item.id + '&sz=w800"><source src="https://drive.google.com/uc?export=download&id=' + item.id + '"></video>' +
+      wrap.innerHTML = '<video controls autoplay playsinline style="width:100%; max-height:65vh; display:block; background:#000;" poster="https://drive.google.com/thumbnail?id=' + item.id + '&sz=w800"><source src="https://drive.usercontent.google.com/download?export=download&confirm=t&id=' + item.id + '"></video>' +
         '<div style="padding:6px 10px; background:#0f172a; font-size:0.75rem; color:#94a3b8; display:flex; justify-content:space-between; align-items:center;"><span>اگر بڑی ویڈیو براہِ راست نہ چلے تو متبادل پلیئر چلائیں:</span><button type="button" onclick="window.switchSpvToDriveIframe()" style="background:#0284c7; color:#fff; border:none; padding:4px 9px; border-radius:6px; font-size:0.72rem; cursor:pointer;">🎬 Drive پلیئر</button></div>';
     } else {
       wrap.innerHTML = '<iframe src="' + item.viewUrl + '" style="width:100%; height:450px; border:none; background:#fff;" allow="autoplay; fullscreen" allowfullscreen></iframe>';
@@ -9671,5 +9680,28 @@ window.openViewer = function(url, title) {
 })();
 </script>
 
+<script id="jamia-exact-12h-time-patch">
+(function() {
+  window.formatJamiaExactTime = function(ts) {
+    if (!ts) return "—";
+    var d = new Date(Number(ts));
+    if (isNaN(d.getTime())) return "—";
+    var months = ["جنوری","فروری","مارچ","اپریل","مئی","جون","جولائی","اگست","ستمبر","اکتوبر","نومبر","دسمبر"];
+    var day = d.getDate();
+    var mon = months[d.getMonth()];
+    var yr = d.getFullYear();
+    var hrs = d.getHours();
+    var mins = String(d.getMinutes()).padStart(2, "0");
+    var period = hrs >= 12 ? "شام/رات" : "صبح/دوپہر";
+    if (hrs === 0) period = "رات";
+    else if (hrs < 12) period = "صبح";
+    else if (hrs < 16) period = "دوپہر";
+    else if (hrs < 19) period = "شام";
+    else period = "رات";
+    var h12 = hrs % 12 || 12;
+    return day + " " + mon + " " + yr + " • " + h12 + ":" + mins + " " + period;
+  };
+})();
+</script>
 </body>
 </html>
